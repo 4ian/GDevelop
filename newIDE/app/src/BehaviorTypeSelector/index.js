@@ -10,6 +10,7 @@ import {
 
 type Props = {|
   project: gdProject,
+  objectType: string,
   value: string,
   onChange: string => void,
   disabled?: boolean,
@@ -30,7 +31,7 @@ export default class BehaviorTypeSelector extends React.Component<
   };
 
   render() {
-    const { disabled, value, onChange } = this.props;
+    const { disabled, objectType, value, onChange } = this.props;
     const { behaviorMetadata } = this.state;
 
     // If the behavior type is not in the list, we'll still
@@ -53,6 +54,9 @@ export default class BehaviorTypeSelector extends React.Component<
             key={metadata.type}
             value={metadata.type}
             primaryText={metadata.fullName}
+            disabled={
+              metadata.objectType !== '' && metadata.objectType !== objectType
+            }
           />
         ))}
         {!valueIsListed && value && (

@@ -3180,13 +3180,13 @@ describe('libGD.js', function() {
       objectsContainer = new gd.ObjectsContainer();
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 0)
-      ).toBe(-1);
+      ).toBe(0);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 1)
       ).toBe(0);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 2)
-      ).toBe(0);
+      ).toBe(2);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 3)
       ).toBe(2);

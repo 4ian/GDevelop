@@ -35,7 +35,7 @@ shell.sed(
 // Run "webidl-tools flow" that will take care of converting
 // the webIDL declarations to Flow classes.
 const webidlToolsFlowResult = shell.exec(
-  `node node_modules/.bin/webidl-tools flow --out types` +
+  `node node_modules/webidl-tools/bin/webidl-tools-flow --out types` +
     ` --module-name libGDevelop` +
     // Prefix all classes by "gd", to easily recognise them
     // in the IDE codebase:
@@ -59,9 +59,9 @@ const webidlToolsFlowResult = shell.exec(
   (code, stdout, stderr) => {
     fs.unlinkSync(idlFile);
     fs.rmdirSync(idlTempFolder);
-    if (stdout.length > 1000) {
+    if (code !== 0 || stdout.length > 1000) {
       shell.echo(
-        '❌ The output of "webidl-tools flow" is suspicously long. Considering as an error'
+        '❌ The output of "webidl-tools flow" is suspicously long or errored. Considering as an error.'
       );
       shell.echo(
         'ℹ️ Is Bindings.idl improperly formatted, or using a syntax not understood by "webidl-tools flow"?'

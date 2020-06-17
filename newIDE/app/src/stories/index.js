@@ -4098,18 +4098,28 @@ storiesOf('ProjectManager', module)
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={''}
       onChange={action('change')}
+      objectType=""
     />
   ))
-  .add('with a non existing behavior selected', () => (
+  .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
+      objectType=""
+    />
+  ))
+  .add('default, for a text object', () => (
+    <BehaviorTypeSelector
+      project={testProject.project}
+      value={''}
+      onChange={action('change')}
+      objectType="TextObject::Text"
     />
   ));
 

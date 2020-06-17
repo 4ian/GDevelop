@@ -59,7 +59,10 @@ gdjs.RuntimeGame = function(data, options) {
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;
 
-  //Optional client to connect to a debugger:
+  /** 
+   * Optional client to connect to a debugger
+   * @type {?gdjs.IDebuggerClient} 
+   */
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
     : null;

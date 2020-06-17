@@ -19,8 +19,8 @@ const styles = {
     minWidth: 300, // Avoid extra small popover for some parameters like relational operator
 
     // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
-    // it could be displayed behind them, because they have a z-index of 1 :/ Use a z-index of 2
-    // then. Only one InlinePopover should be shown at a time anyway.
+    // it could be displayed behind them, because they have a z-index of 1, and 4 for the window titles :/
+    // use a z-index of 5 then. Only one InlinePopover should be shown at a time anyway.
     zIndex: 5,
   },
 };

@@ -62,6 +62,7 @@ const CommandPalette = (props: Props) => {
             getOptionLabel={command => i18n._(command.displayText)}
             onChange={handleCommandChoose}
             openOnFocus
+            autoHighlight
             renderInput={params => (
               <TextField
                 {...params}

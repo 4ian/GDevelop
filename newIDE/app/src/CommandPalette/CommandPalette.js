@@ -11,6 +11,31 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandPalette/CommandsContext';
 import { type NamedCommand } from '../CommandPalette/CommandManager';
+import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
+
+/**
+ * Filters options both simply and fuzzy-ly,
+ * prioritizing simple-matched options
+ */
+const filterOptions = (
+  options: Array<NamedCommand>,
+  state: { getOptionLabel: NamedCommand => string, inputValue: string }
+) => {
+  const searchText = state.inputValue.toLowerCase();
+  if (searchText === '') return options;
+
+  const directMatches = [];
+  const fuzzyMatches = [];
+  options.forEach(option => {
+    const optionText = state.getOptionLabel(option).toLowerCase();
+    if (optionText.includes(searchText)) return directMatches.push(option);
+    if (fuzzyOrEmptyFilter(searchText, optionText))
+      return fuzzyMatches.push(option);
+  });
+
+  directMatches.push(...fuzzyMatches);
+  return directMatches;
+};
 
 const useStyles = makeStyles({
   scrollPaper: {
@@ -63,6 +88,7 @@ const CommandPalette = (props: Props) => {
             onChange={handleCommandChoose}
             openOnFocus
             autoHighlight
+            filterOptions={filterOptions}
             renderInput={params => (
               <TextField
                 {...params}

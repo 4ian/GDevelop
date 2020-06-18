@@ -55,17 +55,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
           runtimeObject.y + this._radius,
           runtimeObject.x + this._radius,
           runtimeObject.y - this._radius,
-          runtimeObject.x + this._radius,
-          runtimeObject.y - this._radius,
           runtimeObject.x - this._radius,
           runtimeObject.y - this._radius,
-          runtimeObject.x - this._radius,
-          runtimeObject.y + this._radius,
         ],
         2
       )
       //TODO: Fix the index buffer.
-      //.addIndex([0, 1, 2, 2, 3, 0]);
+      .addIndex([0, 1, 2, 2, 3, 0]);
     this._light = new PIXI.Mesh(this._geometry, this._shader);
   }
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
@@ -128,64 +124,34 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
-
   this._light.shader.uniforms.center = new Float32Array([
     this._object.x,
     this._object.y,
   ]);
 
-  var raycast = this.raycastTest()
+  var raycast = this.raycastTest();
 
-  var vertexBuffer = [];
+  var vertexBuffer = [this._object.x, this._object.y];
 
-  for(var i = 0; i < 6 * raycast.length; i+= 6) {
-    vertexBuffer[i] = this._object.x;
-    vertexBuffer[i + 1] = this._object.y;
-    vertexBuffer[i + 2] = raycast[i/6][0];
-    vertexBuffer[i + 3] = raycast[i/6][1];
-    if(i/6 + 1 !== raycast.length) {
-      vertexBuffer[i + 4] = raycast[i/6 + 1][0];
-      vertexBuffer[i + 5] = raycast[i/6 + 1][1];
-    } else {
-      vertexBuffer[i + 4] = raycast[0][0];
-      vertexBuffer[i + 5] = raycast[0][1];
-    }
+  for (var i = 2; i < 2 * raycast.length + 2; i += 2) {
+    vertexBuffer[i] = raycast[i/2 - 1][0];
+    vertexBuffer[i + 1] = raycast[i/2 - 1][1];
   }
 
+  var indexBuffer = [];
+
+  for (var i = 0; i < 3 * raycast.length; i += 3) {
+    indexBuffer[i] = 0;
+    indexBuffer[i + 1] = i / 3 + 1;
+    if ((i / 3) + 1  !== raycast.length) indexBuffer[i + 2] = i / 3 + 2;
+    else indexBuffer[i + 2] = 1;
+  }
 
   this._light.geometry
     .getBuffer('aVertexPosition')
     .update(new Float32Array(vertexBuffer));
 
-    // TODO: Fix index buffer.
-    
-    // var indices = [0, 1, 2];
-
-    // for (var i = 3; i < 3 * vertices.length; i += 3) {
-    //   indices[i] = 0;
-    //   indices[i + 1] = indices[i - 1];
-    //   if (i === 3 * (vertices.length - 1)) indices[i + 2] = 1;
-    //   else indices[i + 2] = indices[i + 1] + 1;
-    // }
-
-    // this._light.geometry.getIndex().update(new Uint16Array(indices));
-  // } else {
-  //   this._light.geometry
-  //     .getBuffer('aVertexPosition')
-  //     .update(
-  //       new Float32Array([
-  //         this._object.x - this._radius,
-  //         this._object.y + this._radius,
-  //         this._object.x + this._radius,
-  //         this._object.y + this._radius,
-  //         this._object.x + this._radius,
-  //         this._object.y - this._radius,
-  //         this._object.x - this._radius,
-  //         this._object.y - this._radius,
-  //       ])
-  //     );
-  //   this._light.geometry.getIndex().update(new Uint16Array([0, 1, 2, 2, 3, 0]));
-  // }
+  this._light.geometry.getIndex().update(new Uint16Array(indexBuffer));
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
@@ -263,21 +229,20 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     }
   }
 
-  return (
-    _raycastResult
-      .sort(function (a, b) {
-        if (a.angle < b.angle) return -1;
-        if (a.angle === b.angle) return 0;
-        if (a.angle > b.angle) return 1;
-      })
-      .filter(function (element, index, array) {
-        if(index === 0) return element;
-        if(array[index].angle !== array[index - 1].angle) {
-          return element;
-        }
-      })
-      .map(function (element) {
-        return element.vertex;
-      })
-  );
+  return _raycastResult
+    .sort(function (a, b) {
+      if (a.angle < b.angle) return -1;
+      if (a.angle === b.angle) return 0;
+      if (a.angle > b.angle) return 1;
+    })
+    .filter(function (element, index, array) {
+      if (index === 0) return true;
+      if (array[index].angle !== array[index - 1].angle) {
+        return true;
+      }
+      return false;
+    })
+    .map(function (element) {
+      return element.vertex;
+    });
 };

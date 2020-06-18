@@ -54,6 +54,10 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'debugMode') {
+        objectContent.debugMode = newValue === '1';
+      }
+
       return false;
     };
 
@@ -72,12 +76,20 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.color).setLabel(_('Color'))
       );
 
+      objectProperties.set(
+        'debugMode',
+        new gd.PropertyDescriptor(objectContent.debugMode ? 'true' : 'false')
+          .setType('boolean')
+          .setLabel(_('Debug mode'))
+      );
+
       return objectProperties;
     };
     lightObject.setRawJSONContent(
       JSON.stringify({
         radius: 50,
         color: '180,180,180',
+        debugMode: false,
       })
     );
 

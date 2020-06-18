@@ -6,6 +6,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._color = runtimeObject.getColor().map(function (item) {
     return item / 255;
   });
+  this.DEBUG = runtimeObject.getDebugMode();
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -54,73 +55,137 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
           runtimeObject.y + this._radius,
           runtimeObject.x + this._radius,
           runtimeObject.y - this._radius,
+          runtimeObject.x + this._radius,
+          runtimeObject.y - this._radius,
           runtimeObject.x - this._radius,
           runtimeObject.y - this._radius,
+          runtimeObject.x - this._radius,
+          runtimeObject.y + this._radius,
         ],
         2
       )
-      .addIndex([0, 1, 2, 2, 3, 0]);
+      //TODO: Fix the index buffer.
+      //.addIndex([0, 1, 2, 2, 3, 0]);
     this._light = new PIXI.Mesh(this._geometry, this._shader);
   }
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
+
+  if (this.DEBUG) {
+    if (this._graphics === undefined) {
+      this._graphics = new PIXI.Graphics();
+      this._graphics
+        .lineStyle(1, 0xff0000, 1)
+        .moveTo(this._object.x, this._object.y)
+        .lineTo(this._object.x - this._radius, this._object.y + this._radius)
+        .moveTo(this._object.x, this._object.y)
+        .lineTo(this._object.x + this._radius, this._object.y + this._radius)
+        .moveTo(this._object.x, this._object.y)
+        .lineTo(this._object.x + this._radius, this._object.y - this._radius)
+        .moveTo(this._object.x, this._object.y)
+        .lineTo(this._object.x - this._radius, this._object.y - this._radius);
+    }
+    if (this._debugLight === undefined) {
+      this._debugLight = new PIXI.Container();
+      this._debugLight.addChild(this._light);
+      this._debugLight.addChild(this._graphics);
+    }
+  }
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
   // Mandatory, return the internal PIXI object used for your object:
+  if (this.DEBUG) {
+    return this._debugLight;
+  }
   return this._light;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
+  if (this.DEBUG) this.updateGraphics();
   this.updateVertexBuffer();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
   var vertices = [this._object.x, this._object.y];
+  var raycast = this.raycastTest().flat(1);
+  vertices.push.apply(vertices, raycast);
+
+  this._graphics.clear();
+  for (var i = 0; i < vertices.length; i += 2) {
+    var lineColor = i % 4 === 0 ? 0xff0000 : 0x00ff00;
+    this._graphics
+      .lineStyle(1, lineColor, 1)
+      .moveTo(vertices[0], vertices[1])
+      .lineTo(vertices[i], vertices[i + 1]);
+    if (i !== vertices.length - 2) {
+      this._graphics.lineTo(vertices[i + 2], vertices[i + 3]);
+    } else {
+      this._graphics.lineTo(vertices[2], vertices[3]);
+    }
+  }
+};
+
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
+
   this._light.shader.uniforms.center = new Float32Array([
     this._object.x,
     this._object.y,
   ]);
 
-  var raycast = this.raycastTest().flat(1);
-  if (raycast.length !== 0) {
-    vertices.push.apply(vertices, raycast);
-    this._light.geometry
-      .getBuffer('aVertexPosition')
-      .update(new Float32Array(vertices));
+  var raycast = this.raycastTest()
 
-    var indices = [0, 1, 2];
+  var vertexBuffer = [];
 
-    for (var i = 3; i < 3 * vertices.length; i += 3) {
-      indices[i] = 0;
-      indices[i + 1] = indices[i - 1];
-      if (i + 2 === 3 * vertices.length - 1) {
-        indices[i + 2] = 1;
-      } else {
-        indices[i + 2] = indices[i + 1] + 1;
-      }
+  for(var i = 0; i < 6 * raycast.length; i+= 6) {
+    vertexBuffer[i] = this._object.x;
+    vertexBuffer[i + 1] = this._object.y;
+    vertexBuffer[i + 2] = raycast[i/6][0];
+    vertexBuffer[i + 3] = raycast[i/6][1];
+    if(i/6 + 1 !== raycast.length) {
+      vertexBuffer[i + 4] = raycast[i/6 + 1][0];
+      vertexBuffer[i + 5] = raycast[i/6 + 1][1];
+    } else {
+      vertexBuffer[i + 4] = raycast[0][0];
+      vertexBuffer[i + 5] = raycast[0][1];
     }
-
-    console.log(indices, vertices.length);
-
-    this._light.geometry.getIndex().update(new Uint16Array(indices));
-  } else {
-    this._light.geometry
-      .getBuffer('aVertexPosition')
-      .update(
-        new Float32Array([
-          this._object.x - this._radius,
-          this._object.y + this._radius,
-          this._object.x + this._radius,
-          this._object.y + this._radius,
-          this._object.x + this._radius,
-          this._object.y - this._radius,
-          this._object.x - this._radius,
-          this._object.y - this._radius,
-        ])
-      );
   }
+
+
+  this._light.geometry
+    .getBuffer('aVertexPosition')
+    .update(new Float32Array(vertexBuffer));
+
+    // TODO: Fix index buffer.
+    
+    // var indices = [0, 1, 2];
+
+    // for (var i = 3; i < 3 * vertices.length; i += 3) {
+    //   indices[i] = 0;
+    //   indices[i + 1] = indices[i - 1];
+    //   if (i === 3 * (vertices.length - 1)) indices[i + 2] = 1;
+    //   else indices[i + 2] = indices[i + 1] + 1;
+    // }
+
+    // this._light.geometry.getIndex().update(new Uint16Array(indices));
+  // } else {
+  //   this._light.geometry
+  //     .getBuffer('aVertexPosition')
+  //     .update(
+  //       new Float32Array([
+  //         this._object.x - this._radius,
+  //         this._object.y + this._radius,
+  //         this._object.x + this._radius,
+  //         this._object.y + this._radius,
+  //         this._object.x + this._radius,
+  //         this._object.y - this._radius,
+  //         this._object.x - this._radius,
+  //         this._object.y - this._radius,
+  //       ])
+  //     );
+  //   this._light.geometry.getIndex().update(new Uint16Array([0, 1, 2, 2, 3, 0]));
+  // }
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
@@ -146,7 +211,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     var targetX = centerX + halfOfDiag * Math.cos(angle);
     var targetY = centerY + halfOfDiag * Math.sin(angle);
     var minSqDist = halfOfDiag * halfOfDiag;
-    var minPOI = [targetX, targetY];
+    var minPOI = [];
     for (var poly of polygons) {
       var poi = gdjs.Polygon.raycastTest(
         poly,
@@ -162,7 +227,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
         minPOI[1] = poi.closeY;
       }
     }
-
+    if (!minPOI.length) return null;
     return minPOI;
   }
 
@@ -173,29 +238,46 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     var ydiff = vertex[1] - centerY;
     var angle = Math.atan2(ydiff, xdiff);
 
-    _raycastResult.push({
-      vertex: _calculatePOI(angle),
-      angle: angle,
-    });
+    var result = _calculatePOI(angle);
+    if (result) {
+      _raycastResult.push({
+        vertex: result,
+        angle: angle,
+      });
+    }
 
     // TODO: Check whether we need to raycast these two extra rays or not.
-    _raycastResult.push({
-      vertex: _calculatePOI(angle + 0.0001),
-      angle: angle + 0.0001,
-    });
-    _raycastResult.push({
-      vertex: _calculatePOI(angle - 0.0001),
-      angle: angle - 0.0001,
-    });
+    var result = _calculatePOI(angle + 0.0001);
+    if (result) {
+      _raycastResult.push({
+        vertex: result,
+        angle: angle + 0.0001,
+      });
+    }
+    var result = _calculatePOI(angle - 0.0001);
+    if (result) {
+      _raycastResult.push({
+        vertex: result,
+        angle: angle - 0.0001,
+      });
+    }
   }
 
-  return _raycastResult
-    .sort(function (a, b) {
-      if (a.angle < b.angle) return -1;
-      if (a.angle === b.angle) return 0;
-      if (a.angle > b.angle) return 1;
-    })
-    .map(function (item) {
-      return item.vertex;
-    });
+  return (
+    _raycastResult
+      .sort(function (a, b) {
+        if (a.angle < b.angle) return -1;
+        if (a.angle === b.angle) return 0;
+        if (a.angle > b.angle) return 1;
+      })
+      .filter(function (element, index, array) {
+        if(index === 0) return element;
+        if(array[index].angle !== array[index - 1].angle) {
+          return element;
+        }
+      })
+      .map(function (element) {
+        return element.vertex;
+      })
+  );
 };

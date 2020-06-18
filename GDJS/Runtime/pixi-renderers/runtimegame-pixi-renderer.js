@@ -29,15 +29,12 @@ gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to
 gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
   parentElement
 ) {
-  //This prevents flickering on some mobile devices
-  PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
-
   //Create the renderer and setup the rendering area
   //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
   this._pixiRenderer = PIXI.autoDetectRenderer(
-    this._game.getGameResolutionWidth(),
-    this._game.getGameResolutionHeight(),
     {
+      width: this._game.getGameResolutionWidth(),
+      height: this._game.getGameResolutionHeight(),
       preserveDrawingBuffer: true,
       antialias: false,
     }

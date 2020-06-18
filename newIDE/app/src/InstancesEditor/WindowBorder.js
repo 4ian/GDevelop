@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
@@ -43,7 +43,7 @@ export default class WindowBorder {
       1
     );
     this.pixiRectangle.alpha = 1;
-    this.pixiRectangle.fillAlpha = 0;
+    this.pixiRectangle.fill.alpha = 0;
     this.pixiRectangle.drawRect(
       displayedRectangle.x,
       displayedRectangle.y,

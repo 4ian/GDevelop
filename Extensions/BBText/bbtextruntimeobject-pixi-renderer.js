@@ -70,7 +70,7 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function() 
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateText = function() {
-  this._pixiObject.setText(this._object._text);
+  this._pixiObject.text = this._object._text;
   this.updatePosition();
 };
 

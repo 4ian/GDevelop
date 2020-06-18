@@ -100,10 +100,8 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import {
-  useCommand,
-  useKeyboardShortcutForCommandPalette,
-} from '../CommandPalette/CommandHooks';
+import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
+import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette from '../CommandPalette/CommandPalette';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
@@ -1681,80 +1679,31 @@ const MainFrame = (props: Props) => {
     React.useCallback(() => openCommandPalette(true), [])
   );
 
-  useCommand('QUIT_APP', {
-    displayText: t`Close GDevelop`,
-    enabled: true,
-    handler: closeApp,
-  });
-
-  useCommand('OPEN_PROJECT_MANAGER', {
-    displayText: t`Open project manager`,
-    enabled: !!state.currentProject,
-    handler: toggleProjectManager,
-  });
-
-  useCommand('LAUNCH_PREVIEW', {
-    displayText: t`Launch preview`,
-    enabled:
+  useMainFrameCommands({
+    i18n,
+    project: state.currentProject,
+    previewEnabled:
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
-    handler: React.useCallback(() => launchPreview(/*networkPreview=*/ false), [
-      launchPreview,
-    ]),
-  });
-
-  useCommand('LAUNCH_DEBUG_PREVIEW', {
-    displayText: t`Launch preview with debugger and profiler`,
-    enabled:
-      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
-    handler: React.useCallback(
+    onOpenProjectManager: toggleProjectManager,
+    onLaunchPreview: React.useCallback(
+      () => launchPreview(/*networkPreview=*/ false),
+      [launchPreview]
+    ),
+    onLaunchDebugPreview: React.useCallback(
       () => {
         openDebugger();
         launchPreview(/*networkPreview=*/ false);
       },
       [openDebugger, launchPreview]
     ),
-  });
-
-  useCommand('OPEN_START_PAGE', {
-    displayText: t`Open start page`,
-    enabled: true,
-    handler: openStartPage,
-  });
-
-  useCommand('CREATE_NEW_PROJECT', {
-    displayText: t`Create a new project`,
-    enabled: true,
-    handler: openCreateDialog,
-  });
-
-  useCommand('OPEN_PROJECT', {
-    displayText: t`Open a project`,
-    enabled: true,
-    handler: chooseProject,
-  });
-
-  useCommand('SAVE_PROJECT', {
-    displayText: t`Save project`,
-    enabled: !!state.currentProject,
-    handler: saveProject,
-  });
-
-  useCommand('SAVE_PROJECT_AS', {
-    displayText: t`Save project as...`,
-    enabled: !!state.currentProject,
-    handler: saveProjectAs,
-  });
-
-  useCommand('CLOSE_PROJECT', {
-    displayText: t`Close the current project`,
-    enabled: !!state.currentProject,
-    handler: askToCloseProject,
-  });
-
-  useCommand('EXPORT_GAME', {
-    displayText: t`Export game`,
-    enabled: !!state.currentProject,
-    handler: React.useCallback(() => openExportDialog(true), []),
+    onOpenStartPage: openStartPage,
+    onCreateProject: openCreateDialog,
+    onOpenProject: chooseProject,
+    onSaveProject: saveProject,
+    onSaveProjectAs: saveProjectAs,
+    onCloseApp: closeApp,
+    onCloseProject: askToCloseProject,
+    onExportGame: React.useCallback(() => openExportDialog(true), []),
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;

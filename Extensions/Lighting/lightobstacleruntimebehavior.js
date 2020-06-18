@@ -39,10 +39,10 @@ gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function(
   var searchArea = gdjs.staticObject(
     gdjs.LightObstaclesManager.prototype.getAllObstaclesAround
   );
-  searchArea.minX = x;
-  searchArea.minY = y;
-  searchArea.maxX = x + 2 * radius;
-  searchArea.maxY = y + 2 * radius;
+  searchArea.minX = x - radius;
+  searchArea.minY = y - radius;
+  searchArea.maxX = x + radius;
+  searchArea.maxY = y + radius;
   var nearbyPlatforms = this._obstacleRBush.search(searchArea);
   result.length = 0;
   result.push.apply(result, nearbyPlatforms);
@@ -57,8 +57,6 @@ gdjs.LightObstacleRuntimeBehavior = function (
 
   this._oldX = 0;
   this._oldY = 0;
-  this._oldWidth = 0;
-  this._oldHeight = 0;
 
   this._manager = gdjs.LightObstaclesManager.getManager(runtimeScene);
   this._registeredInManager = false;
@@ -90,19 +88,14 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function(
   //Track changes in size or position
   if (
     this._oldX !== this.owner.getX() ||
-    this._oldY !== this.owner.getY() ||
-    this._oldWidth !== this.owner.getWidth() ||
-    this._oldHeight !== this.owner.getHeight()
+    this._oldY !== this.owner.getY()
   ) {
     if (this._registeredInManager) {
       this._manager.removeObstacle(this);
       this._manager.addObstacle(this);
     }
-
     this._oldX = this.owner.getX();
     this._oldY = this.owner.getY();
-    this._oldWidth = this.owner.getWidth();
-    this._oldHeight = this.owner.getHeight();
   }
 };
 

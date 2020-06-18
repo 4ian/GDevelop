@@ -105,7 +105,9 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
   var vertices = [this._object.x, this._object.y];
-  var raycast = this.raycastTest().flat(1);
+  var raycast = this.raycastTest().reduce(function (acc, val) {
+    return acc.concat(val);
+  });
   vertices.push.apply(vertices, raycast);
 
   this._graphics.clear();
@@ -134,8 +136,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
   var vertexBuffer = [this._object.x, this._object.y];
 
   for (var i = 2; i < 2 * raycast.length + 2; i += 2) {
-    vertexBuffer[i] = raycast[i/2 - 1][0];
-    vertexBuffer[i + 1] = raycast[i/2 - 1][1];
+    vertexBuffer[i] = raycast[i / 2 - 1][0];
+    vertexBuffer[i + 1] = raycast[i / 2 - 1][1];
   }
 
   var indexBuffer = [];
@@ -143,7 +145,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
   for (var i = 0; i < 3 * raycast.length; i += 3) {
     indexBuffer[i] = 0;
     indexBuffer[i + 1] = i / 3 + 1;
-    if ((i / 3) + 1  !== raycast.length) indexBuffer[i + 2] = i / 3 + 2;
+    if (i / 3 + 1 !== raycast.length) indexBuffer[i + 2] = i / 3 + 2;
     else indexBuffer[i + 2] = 1;
   }
 
@@ -166,12 +168,16 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
   });
   hitBoxes.push(this._object.getHitBoxes());
 
-  var polygons = hitBoxes.flat(1);
+  var polygons = hitBoxes.reduce(function (acc, val) {
+    return acc.concat(val);
+  });
   var vertices = polygons
     .map(function (poly) {
       return poly.vertices;
     })
-    .flat(1);
+    .reduce(function (acc, val) {
+      return acc.concat(val);
+    });
 
   function _calculatePOI(angle) {
     var targetX = centerX + halfOfDiag * Math.cos(angle);

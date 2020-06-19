@@ -3,10 +3,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._manager = runtimeObject.getObstaclesManager();
   this._geometry = new PIXI.Geometry();
   this._radius = runtimeObject.getRadius();
-  this._color = runtimeObject.getColor().map(function (item) {
-    return item / 255;
-  });
-  this.DEBUG = runtimeObject.getDebugMode();
+  var objectColor = runtimeObject.getColor();
+  this._color = [
+    objectColor[0] / 255,
+    objectColor[1] / 255,
+    objectColor[2] / 255,
+  ];
+  this._debugMode = runtimeObject.getDebugMode();
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -60,13 +63,12 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
         ],
         2
       )
-      //TODO: Fix the index buffer.
       .addIndex([0, 1, 2, 2, 3, 0]);
     this._light = new PIXI.Mesh(this._geometry, this._shader);
   }
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
 
-  if (this.DEBUG) {
+  if (this._debugMode) {
     if (this._graphics === undefined) {
       this._graphics = new PIXI.Graphics();
       this._graphics
@@ -90,25 +92,60 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
+gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint = function (
+  lightObject,
+  angle,
+  polygons
+) {
+  var centerX = lightObject.getX();
+  var centerY = lightObject.getY();
+  var halfOfDiag = Math.sqrt(2) * lightObject.getRadius();
+  var targetX = centerX + halfOfDiag * Math.cos(angle);
+  var targetY = centerY + halfOfDiag * Math.sin(angle);
+  var minSqDist = halfOfDiag * halfOfDiag;
+  var minPOI = [null, null];
+  for (var poly of polygons) {
+    var poi = gdjs.Polygon.raycastTest(
+      poly,
+      centerX,
+      centerY,
+      targetX,
+      targetY
+    );
+
+    if (poi.collision && poi.closeSqDist <= minSqDist) {
+      minSqDist = poi.closeSqDist;
+      minPOI[0] = poi.closeX;
+      minPOI[1] = poi.closeY;
+    }
+  }
+  if (minPOI[0] && minPOI[1]) return minPOI;
+  return null;
+};
+
 gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
   // Mandatory, return the internal PIXI object used for your object:
-  if (this.DEBUG) {
+  if (this._debugMode) {
     return this._debugLight;
   }
   return this._light;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
-  if (this.DEBUG) this.updateGraphics();
+  if (this._debugMode) this.updateGraphics();
   this.updateVertexBuffer();
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
-  var vertices = [this._object.x, this._object.y];
-  var raycast = this.raycastTest().reduce(function (acc, val) {
-    return acc.concat(val);
-  });
-  vertices.push.apply(vertices, raycast);
+  var raycastResult = this.raycastTest();
+  var vertices = new Array(2 * raycastResult.length + 2);
+  vertices[0] = this._object.x;
+  vertices[1] = this._object.y;
+
+  for (var i = 2; i < 2 * raycastResult.length + 2; i += 2) {
+    vertices[i] = raycastResult[i / 2 - 1][0];
+    vertices[i + 1] = raycastResult[i / 2 - 1][1];
+  }
 
   this._graphics.clear();
   for (var i = 0; i < vertices.length; i += 2) {
@@ -158,59 +195,41 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
   var result = [];
-  var centerX = this._object.x;
-  var centerY = this._object.y;
-  var halfOfDiag = Math.sqrt(2) * this._radius;
-
   this._manager.getAllObstaclesAround(this._object, this._radius, result);
-  var hitBoxes = result.map(function (item) {
-    return item.owner.getHitBoxes();
-  });
-  hitBoxes.push(this._object.getHitBoxes());
 
-  var polygons = hitBoxes.reduce(function (acc, val) {
-    return acc.concat(val);
-  });
-  var vertices = polygons
-    .map(function (poly) {
-      return poly.vertices;
-    })
-    .reduce(function (acc, val) {
-      return acc.concat(val);
-    });
+  var noOfObstacles = result.length + 1;
+  var obstacleHitBoxes = new Array(noOfObstacles);
+  obstacleHitBoxes[0] = this._object.getHitBoxes();
+  for (var i = 0; i < noOfObstacles - 1; i++) {
+    obstacleHitBoxes[i + 1] = result[i].owner.getHitBoxes();
+  }
 
-  function _calculatePOI(angle) {
-    var targetX = centerX + halfOfDiag * Math.cos(angle);
-    var targetY = centerY + halfOfDiag * Math.sin(angle);
-    var minSqDist = halfOfDiag * halfOfDiag;
-    var minPOI = [];
-    for (var poly of polygons) {
-      var poi = gdjs.Polygon.raycastTest(
-        poly,
-        centerX,
-        centerY,
-        targetX,
-        targetY
-      );
+  var obstaclePolygons = [];
+  for (var i = 0; i < noOfObstacles; i++) {
+    var noOfHitBoxes = obstacleHitBoxes[i].length;
+    for (var j = 0; j < noOfHitBoxes; j++)
+      obstaclePolygons.push(obstacleHitBoxes[i][j]);
+  }
 
-      if (poi.collision && poi.closeSqDist <= minSqDist) {
-        minSqDist = poi.closeSqDist;
-        minPOI[0] = poi.closeX;
-        minPOI[1] = poi.closeY;
-      }
-    }
-    if (!minPOI.length) return null;
-    return minPOI;
+  var flattenVertices = [];
+  for (var i = 0; i < obstaclePolygons.length; i++) {
+    var vertices = obstaclePolygons[i].vertices;
+    var noOfVertices = vertices.length;
+    for (var j = 0; j < noOfVertices; j++) flattenVertices.push(vertices[j]);
   }
 
   var _raycastResult = [];
 
-  for (var vertex of vertices) {
-    var xdiff = vertex[0] - centerX;
-    var ydiff = vertex[1] - centerY;
+  for (var vertex of flattenVertices) {
+    var xdiff = vertex[0] - this._object.x;
+    var ydiff = vertex[1] - this._object.y;
     var angle = Math.atan2(ydiff, xdiff);
 
-    var result = _calculatePOI(angle);
+    var result = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+      this._object,
+      angle,
+      obstaclePolygons
+    );
     if (result) {
       _raycastResult.push({
         vertex: result,
@@ -219,36 +238,41 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     }
 
     // TODO: Check whether we need to raycast these two extra rays or not.
-    var result = _calculatePOI(angle + 0.0001);
-    if (result) {
+    var resultOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+      this._object,
+      angle + 0.0001,
+      obstaclePolygons
+    );
+    if (resultOffsetLeft) {
       _raycastResult.push({
-        vertex: result,
+        vertex: resultOffsetLeft,
         angle: angle + 0.0001,
       });
     }
-    var result = _calculatePOI(angle - 0.0001);
-    if (result) {
+    var resultOffsetRight = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+      this._object,
+      angle - 0.0001,
+      obstaclePolygons
+    );
+    if (resultOffsetRight) {
       _raycastResult.push({
-        vertex: result,
+        vertex: resultOffsetRight,
         angle: angle - 0.0001,
       });
     }
   }
 
-  return _raycastResult
-    .sort(function (a, b) {
-      if (a.angle < b.angle) return -1;
-      if (a.angle === b.angle) return 0;
-      if (a.angle > b.angle) return 1;
-    })
-    .filter(function (element, index, array) {
-      if (index === 0) return true;
-      if (array[index].angle !== array[index - 1].angle) {
-        return true;
-      }
-      return false;
-    })
-    .map(function (element) {
-      return element.vertex;
-    });
+  _raycastResult.sort(function (a, b) {
+    if (a.angle < b.angle) return -1;
+    if (a.angle === b.angle) return 0;
+    if (a.angle > b.angle) return 1;
+  });
+
+  var filteredRaycastResult = [_raycastResult[0].vertex];
+  for (var i = 1; i < _raycastResult.length; i++) {
+    if (_raycastResult[i].angle !== _raycastResult[i - 1].angle)
+      filteredRaycastResult.push(_raycastResult[i].vertex);
+  }
+
+  return filteredRaycastResult;
 };

@@ -18,15 +18,15 @@ gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
   return runtimeScene.lightObstaclesManager;
 };
 
-gdjs.LightObstaclesManager.prototype.addObstacle = function(obstacle) {
+gdjs.LightObstaclesManager.prototype.addObstacle = function (obstacle) {
   this._obstacleRBush.insert(obstacle);
 };
 
-gdjs.LightObstaclesManager.prototype.removeObstacle = function(obstacle) {
+gdjs.LightObstaclesManager.prototype.removeObstacle = function (obstacle) {
   this._obstacleRBush.remove(obstacle);
 };
 
-gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function(
+gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
   object,
   radius,
   result
@@ -57,6 +57,8 @@ gdjs.LightObstacleRuntimeBehavior = function (
 
   this._oldX = 0;
   this._oldY = 0;
+  this._oldWidth = 0;
+  this._oldHeight = 0;
 
   this._manager = gdjs.LightObstaclesManager.getManager(runtimeScene);
   this._registeredInManager = false;
@@ -70,9 +72,9 @@ gdjs.registerBehavior(
   gdjs.LightObstacleRuntimeBehavior
 );
 
-gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function() {};
+gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function () {};
 
-gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function(
+gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
   runtimeScene
 ) {
   // This is run at every frame, before events are launched.
@@ -88,7 +90,9 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function(
   //Track changes in size or position
   if (
     this._oldX !== this.owner.getX() ||
-    this._oldY !== this.owner.getY()
+    this._oldY !== this.owner.getY() ||
+    this._oldWidth !== this.owner.getWidth() ||
+    this._oldHeight !== this.owner.getHeight()
   ) {
     if (this._registeredInManager) {
       this._manager.removeObstacle(this);
@@ -96,10 +100,12 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function(
     }
     this._oldX = this.owner.getX();
     this._oldY = this.owner.getY();
+    this._oldWidth = this.owner.getWidth();
+    this._oldHeight = this.owner.getHeight();
   }
 };
 
-gdjs.LightObstacleRuntimeBehavior.prototype.doStepPostEvents = function(
+gdjs.LightObstacleRuntimeBehavior.prototype.doStepPostEvents = function (
   runtimeScene
 ) {
   // This is run at every frame, after events are launched.

@@ -10,6 +10,19 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
   this._debugMode = runtimeObject.getDebugMode();
+  this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
+  this._vertexBuffer = new Float32Array([
+    runtimeObject.x - this._radius,
+    runtimeObject.y + this._radius,
+    runtimeObject.x + this._radius,
+    runtimeObject.y + this._radius,
+    runtimeObject.x + this._radius,
+    runtimeObject.y - this._radius,
+    runtimeObject.x - this._radius,
+    runtimeObject.y - this._radius,
+  ]);
+  this._indexBuffer = new Uint16Array([0, 1, 2, 2, 3, 0]);
+
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -42,28 +55,15 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     }
     `,
     {
-      center: [runtimeObject.x, runtimeObject.y],
+      center: this._center,
       radius: this._radius,
       color: this._color,
     }
   );
   if (this._light === undefined) {
     this._geometry
-      .addAttribute(
-        'aVertexPosition',
-        [
-          runtimeObject.x - this._radius,
-          runtimeObject.y + this._radius,
-          runtimeObject.x + this._radius,
-          runtimeObject.y + this._radius,
-          runtimeObject.x + this._radius,
-          runtimeObject.y - this._radius,
-          runtimeObject.x - this._radius,
-          runtimeObject.y - this._radius,
-        ],
-        2
-      )
-      .addIndex([0, 1, 2, 2, 3, 0]);
+      .addAttribute('aVertexPosition', this._vertexBuffer, 2)
+      .addIndex(this._indexBuffer);
     this._light = new PIXI.Mesh(this._geometry, this._shader);
   }
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
@@ -133,7 +133,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
   if (this._debugMode) this.updateGraphics();
-  this.updateVertexBuffer();
+  this.updateVertexBufferObject();
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
@@ -162,35 +162,66 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
   }
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBuffer = function () {
-  this._light.shader.uniforms.center = new Float32Array([
-    this._object.x,
-    this._object.y,
-  ]);
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBufferObject = function () {
+  this._center[0] = this._object.x;
+  this._center[1] = this._object.y;
+  this._light.shader.uniforms.center = this._center;
 
-  var raycast = this.raycastTest();
+  var raycastResult = this.raycastTest();
+  var raycastResultLength = raycastResult.length;
 
-  var vertexBuffer = [this._object.x, this._object.y];
+  var isSubArrayUsed = false;
+  var vertexBufferSubArray = null;
+  var indexBufferSubArray = null;
 
-  for (var i = 2; i < 2 * raycast.length + 2; i += 2) {
-    vertexBuffer[i] = raycast[i / 2 - 1][0];
-    vertexBuffer[i + 1] = raycast[i / 2 - 1][1];
+  if (this._vertexBuffer.length > 2 * raycastResultLength + 2) {
+    if (this._vertexBuffer.length < 4 * raycastResultLength + 4) {
+      isSubArrayUsed = true;
+      vertexBufferSubArray = this._vertexBuffer.subarray(
+        0,
+        2 * raycastResultLength + 2
+      );
+      indexBufferSubArray = this._indexBuffer.subarray(
+        0,
+        3 * raycastResultLength
+      );
+    } else {
+      this._vertexBuffer = new Float32Array(2 * raycastResultLength + 2);
+      this._indexBuffer = new Uint16Array(3 * raycastResultLength);
+    }
   }
 
-  var indexBuffer = [];
-
-  for (var i = 0; i < 3 * raycast.length; i += 3) {
-    indexBuffer[i] = 0;
-    indexBuffer[i + 1] = i / 3 + 1;
-    if (i / 3 + 1 !== raycast.length) indexBuffer[i + 2] = i / 3 + 2;
-    else indexBuffer[i + 2] = 1;
+  if (this._vertexBuffer.length < 2 * raycastResultLength + 2) {
+    this._vertexBuffer = new Float32Array(2 * raycastResultLength + 2);
+    this._indexBuffer = new Uint16Array(3 * raycastResultLength);
   }
 
-  this._light.geometry
-    .getBuffer('aVertexPosition')
-    .update(new Float32Array(vertexBuffer));
+  this._vertexBuffer[0] = this._object.x;
+  this._vertexBuffer[1] = this._object.y;
 
-  this._light.geometry.getIndex().update(new Uint16Array(indexBuffer));
+  for (var i = 2; i < 2 * raycastResultLength + 2; i += 2) {
+    this._vertexBuffer[i] = raycastResult[i / 2 - 1][0];
+    this._vertexBuffer[i + 1] = raycastResult[i / 2 - 1][1];
+  }
+
+  for (var i = 0; i < 3 * raycastResultLength; i += 3) {
+    this._indexBuffer[i] = 0;
+    this._indexBuffer[i + 1] = i / 3 + 1;
+    if (i / 3 + 1 !== raycastResultLength) this._indexBuffer[i + 2] = i / 3 + 2;
+    else this._indexBuffer[i + 2] = 1;
+  }
+
+  if (!isSubArrayUsed) {
+    this._light.geometry
+      .getBuffer('aVertexPosition')
+      .update(this._vertexBuffer);
+    this._light.geometry.getIndex().update(this._indexBuffer);
+  } else {
+    this._light.geometry
+      .getBuffer('aVertexPosition')
+      .update(vertexBufferSubArray);
+    this._light.geometry.getIndex().update(indexBufferSubArray);
+  }
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {

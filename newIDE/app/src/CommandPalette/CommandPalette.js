@@ -33,8 +33,7 @@ const filterOptions = (
       return fuzzyMatches.push(option);
   });
 
-  directMatches.push(...fuzzyMatches);
-  return directMatches;
+  return [...directMatches, ...fuzzyMatches];
 };
 
 const useStyles = makeStyles({

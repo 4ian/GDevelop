@@ -22,15 +22,15 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
   React.useEffect(
     () => {
       const handler = (e: KeyboardEvent) => {
-        if (!values.useCommandPalette) return;
-        const body = document.body;
-        const activeEl = document.activeElement;
-        const mainFrame = document.querySelector('div.main-frame');
-        const isBody = activeEl === body;
-        const isInMainframe = mainFrame && mainFrame.contains(activeEl);
-        if (!isBody && !isInMainframe) return;
         if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyP') {
+          if (!values.useCommandPalette) return;
           e.preventDefault();
+          const body = document.body;
+          const activeEl = document.activeElement;
+          const mainFrame = document.querySelector('div.main-frame');
+          const isBody = activeEl === body;
+          const isInMainframe = mainFrame && mainFrame.contains(activeEl);
+          if (!isBody && !isInMainframe) return;
           onOpen();
         }
       };

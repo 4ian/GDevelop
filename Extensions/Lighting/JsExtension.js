@@ -75,7 +75,9 @@ module.exports = {
 
       objectProperties.set(
         'color',
-        new gd.PropertyDescriptor(objectContent.color).setLabel(_('Color'))
+        new gd.PropertyDescriptor(objectContent.color)
+        .setType('color')
+        .setLabel(_('Color'))
       );
 
       objectProperties.set(
@@ -90,7 +92,7 @@ module.exports = {
     lightObject.setRawJSONContent(
       JSON.stringify({
         radius: 50,
-        color: '180,180,180',
+        color: '#b4b4b4',
         debugMode: false,
       })
     );
@@ -183,12 +185,17 @@ module.exports = {
           .get('radius')
           .getValue()
       );
-      this._color = this._associatedObject
+      this._colorHex = parseInt(
+        this._associatedObject
         .getProperties(this.project)
         .get('color')
         .getValue()
-        .split(',')
-        .map((item) => parseFloat(item) / 255);
+        .replace('#', ''), 16);
+      this._color = [
+        ((this._colorHex >> 16) & 0xff)/255, 
+        ((this._colorHex >> 8) & 0xff)/255, 
+        (this._colorHex & 0xff)/255,
+      ];
       this._geometry = new PIXI.Geometry();
       this._shader = PIXI.Shader.from(
         `

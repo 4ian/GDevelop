@@ -103,9 +103,9 @@ gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint = function (
   var targetX = centerX + halfOfDiag * Math.cos(angle);
   var targetY = centerY + halfOfDiag * Math.sin(angle);
   var minSqDist = halfOfDiag * halfOfDiag;
-  var minPOI = [null, null];
+  var closestPoint = [null, null];
   for (var poly of polygons) {
-    var poi = gdjs.Polygon.raycastTest(
+    var raycastResult = gdjs.Polygon.raycastTest(
       poly,
       centerX,
       centerY,
@@ -113,13 +113,13 @@ gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint = function (
       targetY
     );
 
-    if (poi.collision && poi.closeSqDist <= minSqDist) {
-      minSqDist = poi.closeSqDist;
-      minPOI[0] = poi.closeX;
-      minPOI[1] = poi.closeY;
+    if (raycastResult.collision && raycastResult.closeSqDist <= minSqDist) {
+      minSqDist = raycastResult.closeSqDist;
+      closestPoint[0] = raycastResult.closeX;
+      closestPoint[1] = raycastResult.closeY;
     }
   }
-  if (minPOI[0] && minPOI[1]) return minPOI;
+  if (closestPoint[0] && closestPoint[1]) return closestPoint;
   return null;
 };
 

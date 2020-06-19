@@ -3,8 +3,10 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'Lighting',
-      _('PIXI Lights'),
-      _('Lights using PIXI'),
+      _('Lights'),
+      _(
+        'Allow to display lights on the screen and mark objects as obstacles for the lights.'
+      ),
       'Harsimran Virk',
       'MIT'
     );
@@ -117,9 +119,9 @@ module.exports = {
     const object = extension
       .addObject(
         'LightObject',
-        _('Light Object for testing'),
-        _('This is an experimental light object'),
-        'CppPlatform/Extensions/topdownmovementicon.png',
+        _('Light'),
+        _('An object displaying a light on screen.'),
+        'CppPlatform/Extensions/lightIcon32.png',
         lightObject
       )
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
@@ -259,7 +261,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'CppPlatform/Extensions/topdownmovementicon.png';
+      return 'CppPlatform/Extensions/lightIcon32.png';
     };
 
     /**

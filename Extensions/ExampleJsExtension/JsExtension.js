@@ -1,3 +1,4 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -10,8 +11,16 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'MyDummyExtension',
@@ -116,6 +125,7 @@ module.exports = {
     // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
     // saved/loaded to JSON.
     var dummyBehavior = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -132,6 +142,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -150,6 +161,7 @@ module.exports = {
 
       return behaviorProperties;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
       behaviorContent.setBoolAttribute('property2', true);
@@ -177,6 +189,7 @@ module.exports = {
     // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
     // that are called to get and set the properties of the shared data.
     var dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -189,6 +202,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -201,11 +215,13 @@ module.exports = {
 
       return behaviorProperties;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.updateProperty = function(
       sharedContent,
       propertyName,
@@ -218,6 +234,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.getProperties = function(sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
@@ -230,6 +247,7 @@ module.exports = {
 
       return sharedProperties;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute(
         'sharedProperty1',
@@ -264,6 +282,7 @@ module.exports = {
     // Everything that is stored inside the object is in "content" and is automatically
     // saved/loaded to JSON.
     var dummyObject = new gd.ObjectJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.updateProperty = function(
       objectContent,
       propertyName,
@@ -288,6 +307,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.getProperties = function(objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -328,6 +348,7 @@ module.exports = {
       })
     );
 
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.updateInitialInstanceProperty = function(
       objectContent,
       instance,
@@ -347,6 +368,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.getInitialInstanceProperties = function(
       content,
       instance,
@@ -409,13 +431,12 @@ module.exports = {
    * of your extension behaviors/objects by instanciating behaviors/objects
    * and setting the property to a given value.
    *
-   * If you don't have any tests, you can simply return an empty array like this:
-   * `runExtensionSanityTests: function(gd, extension) { return []; }`
+   * If you don't have any tests, you can simply return an empty array.
    *
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
     const dummyBehavior = extension
       .getBehaviorMetadata('MyDummyExtension::DummyBehavior')
       .get();
@@ -440,7 +461,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(objectsEditorService) {
+  registerEditorConfigurations: function(objectsEditorService /*: ObjectsEditorService */) {
     objectsEditorService.registerEditorConfiguration(
       'MyDummyExtension::DummyObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -453,7 +474,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService) {
+  registerInstanceRenderers: function(objectsRenderingService /*: ObjectsRenderingService */) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 

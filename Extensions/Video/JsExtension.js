@@ -20,38 +20,41 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        "Video",
-        "Video",
-        _("Display a video on the scene."),
-        "Aurélien Vivet",
-        "Open source (MIT License)"
+        'Video',
+        'Video',
+        _('Display a video on the scene.'),
+        'Aurélien Vivet',
+        'Open source (MIT License)'
       )
-      .setExtensionHelpPath("/objects/video");
+      .setExtensionHelpPath('/objects/video');
 
     var videoObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    videoObject.updateProperty = function(
+    videoObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
     ) {
-      if (propertyName === "Opacity") {
+      if (propertyName === 'Opacity') {
         objectContent.opacity = parseFloat(newValue);
         return true;
       }
-      if (propertyName === "Looped") {
-        objectContent.loop = newValue === "1";
+      if (propertyName === 'Looped') {
+        objectContent.loop = newValue === '1';
         return true;
       }
-      if (propertyName === "Volume") {
+      if (propertyName === 'Volume') {
         objectContent.volume = parseFloat(newValue);
         return true;
       }
-      if (propertyName === "videoResource") {
+      if (propertyName === 'videoResource') {
         objectContent.videoResource = newValue;
         return true;
       }
@@ -59,34 +62,30 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    videoObject.getProperties = function(objectContent) {
+    videoObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
-      objectProperties.set(
-        "Opacity",
-        new gd.PropertyDescriptor(objectContent.opacity.toString())
-          .setType("number")
-          .setLabel(_("Video opacity (0-255)"))
-      );
-      objectProperties.set(
-        "Looped",
-        new gd.PropertyDescriptor(objectContent.loop ? "true" : "false")
-          .setType("boolean")
-          .setLabel(_("Loop the video"))
-      );
-      objectProperties.set(
-        "Volume",
-        new gd.PropertyDescriptor(objectContent.volume.toString())
-          .setType("number")
-          .setLabel(_("Video volume (0-100)"))
-      );
-      objectProperties.set(
-        "videoResource",
-        new gd.PropertyDescriptor(objectContent.videoResource)
-          .setType("resource")
-          .addExtraInfo("video")
-          .setLabel(_("Video resource"))
-      );
+      objectProperties
+        .getOrCreate('Opacity')
+        .setValue(objectContent.opacity.toString())
+        .setType('number')
+        .setLabel(_('Video opacity (0-255)'));
+      objectProperties
+        .getOrCreate('Looped')
+        .setValue(objectContent.loop ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Loop the video'));
+      objectProperties
+        .getOrCreate('Volume')
+        .setValue(objectContent.volume.toString())
+        .setType('number')
+        .setLabel(_('Video volume (0-100)'));
+      objectProperties
+        .getOrCreate('videoResource')
+        .setValue(objectContent.videoResource)
+        .setType('resource')
+        .addExtraInfo('video')
+        .setLabel(_('Video resource'));
 
       return objectProperties;
     };
@@ -95,12 +94,12 @@ module.exports = {
         opacity: 255,
         loop: false,
         volume: 100,
-        videoResource: ""
+        videoResource: '',
       })
     );
 
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    videoObject.updateInitialInstanceProperty = function(
+    videoObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -111,7 +110,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    videoObject.getInitialInstanceProperties = function(
+    videoObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -123,352 +122,352 @@ module.exports = {
 
     const object = extension
       .addObject(
-        "VideoObject",
-        _("Video"),
-        _("Displays a video."),
-        "JsPlatform/Extensions/videoicon32.png",
+        'VideoObject',
+        _('Video'),
+        _('Displays a video.'),
+        'JsPlatform/Extensions/videoicon32.png',
         videoObject
       )
-      .setIncludeFile("Extensions/Video/videoruntimeobject.js")
-      .addIncludeFile("Extensions/Video/videoruntimeobject-pixi-renderer.js")
-      .addIncludeFile("Extensions/Video/videoruntimeobject-cocos-renderer.js");
+      .setIncludeFile('Extensions/Video/videoruntimeobject.js')
+      .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
+      .addIncludeFile('Extensions/Video/videoruntimeobject-cocos-renderer.js');
 
     object
       .addAction(
-        "Play",
-        _("Play a video"),
+        'Play',
+        _('Play a video'),
         _(
-          "Play a video (recommended file format is MPEG4, with H264 video codec and AAC audio codec)."
+          'Play a video (recommended file format is MPEG4, with H264 video codec and AAC audio codec).'
         ),
-        _("Play the video of _PARAM0_"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        _('Play the video of _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("play");
+      .setFunctionName('play');
 
     object
       .addAction(
-        "Pause",
-        _("Pause a video"),
-        _("Pause the specified video."),
-        _("Pause video _PARAM0_"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Pause',
+        _('Pause a video'),
+        _('Pause the specified video.'),
+        _('Pause video _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("pause");
+      .setFunctionName('pause');
 
     object
       .addAction(
-        "Loop",
-        _("Loop a video"),
-        _("Loop the specified video."),
-        _("Loop video of _PARAM0_: _PARAM1_"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Loop',
+        _('Loop a video'),
+        _('Loop the specified video.'),
+        _('Loop video of _PARAM0_: _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("yesorno", _("Activate loop"), "", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .addParameter('yesorno', _('Activate loop'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName("setLoop");
+      .setFunctionName('setLoop');
 
     object
       .addAction(
-        "Mute",
-        _("Mute a video"),
-        _("Mute, or unmute, the specified video."),
-        _("Mute video of _PARAM0_: _PARAM1_"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Mute',
+        _('Mute a video'),
+        _('Mute, or unmute, the specified video.'),
+        _('Mute video of _PARAM0_: _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .addParameter("yesorno", _("Activate mute"), "", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .addParameter('yesorno', _('Activate mute'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName("mute");
-
-     object
-      .addAction(
-        "SetTime",
-        _("Set time"),
-        _("Set the time of the video object in seconds"),
-        _("the time"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
-      )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardOperatorParameters("number")
-      .getCodeExtraInformation()
-      .setFunctionName("setCurrentTime")
-      .setGetter("getCurrentTime");
+      .setFunctionName('mute');
 
     object
       .addAction(
-        "SetVolume",
-        _("Set volume"),
+        'SetTime',
+        _('Set time'),
+        _('Set the time of the video object in seconds'),
+        _('the time'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
+      )
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('setCurrentTime')
+      .setGetter('getCurrentTime');
+
+    object
+      .addAction(
+        'SetVolume',
+        _('Set volume'),
         _(
-          "Set the volume of the video object, between 0 (muted) and 100 (maximum)."
+          'Set the volume of the video object, between 0 (muted) and 100 (maximum).'
         ),
-        _("the volume"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        _('the volume'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("setVolume")
-      .setGetter("getVolume");
+      .setFunctionName('setVolume')
+      .setGetter('getVolume');
 
     object
       .addExpression(
-        "Volume",
-        _("Get the volume"),
+        'Volume',
+        _('Get the volume'),
         _(
-          "Get the volume of a video object, between 0 (muted) and 100 (maximum)."
+          'Get the volume of a video object, between 0 (muted) and 100 (maximum).'
         ),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
+        '',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Object"), "VideoObject", false)
+      .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("getVolume");
+      .setFunctionName('getVolume');
 
     object
       .addCondition(
-        "Play",
-        _("Is played"),
-        _("Check if a video is played."),
-        _("_PARAM0_ is played"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Play',
+        _('Is played'),
+        _('Check if a video is played.'),
+        _('_PARAM0_ is played'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("isPlayed");
+      .setFunctionName('isPlayed');
 
     object
       .addCondition(
-        "Pause",
-        _("Is paused"),
-        _("Check if the video is paused."),
-        _("_PARAM0_ is paused"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Pause',
+        _('Is paused'),
+        _('Check if the video is paused.'),
+        _('_PARAM0_ is paused'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("isPaused");
+      .setFunctionName('isPaused');
 
     object
       .addCondition(
-        "Loop",
-        _("Is looped"),
-        _("Check if the video is looped."),
-        _("_PARAM0_ is looped"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Loop',
+        _('Is looped'),
+        _('Check if the video is looped.'),
+        _('_PARAM0_ is looped'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("isLooped");
+      .setFunctionName('isLooped');
 
     object
       .addCondition(
-        "Volume",
-        _("Volume"),
-        _("Compare the current volume of a video object."),
-        _("the volume"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Volume',
+        _('Volume'),
+        _('Compare the current volume of a video object.'),
+        _('the volume'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardRelationalOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("getVolume");
+      .setFunctionName('getVolume');
 
     object
       .addCondition(
-        "Mute",
-        _("Is muted"),
-        _("Check if a video is muted."),
-        _("_PARAM0_ is muted"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Mute',
+        _('Is muted'),
+        _('Check if a video is muted.'),
+        _('_PARAM0_ is muted'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("isMuted");
+      .setFunctionName('isMuted');
 
     object
       .addExpression(
-        "CurrentTime",
-        _("Get current time"),
-        _("Return the current time of a video object (in seconds)."),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
+        'CurrentTime',
+        _('Get current time'),
+        _('Return the current time of a video object (in seconds).'),
+        '',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Object"), "VideoObject", false)
+      .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("getCurrentTime");
+      .setFunctionName('getCurrentTime');
 
     object
       .addExpression(
-        "Duration",
-        _("Get the duration"),
-        _("Return the duration of a video object (in seconds)."),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Duration',
+        _('Get the duration'),
+        _('Return the duration of a video object (in seconds).'),
+        '',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Object"), "VideoObject", false)
+      .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("getDuration");
+      .setFunctionName('getDuration');
 
     object
       .addCondition(
-        "Duration",
-        _("Duration"),
-        _("Compare the duration of a video object"),
-        _("the duration (in seconds)"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Duration',
+        _('Duration'),
+        _('Compare the duration of a video object'),
+        _('the duration (in seconds)'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardRelationalOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("getDuration");
+      .setFunctionName('getDuration');
 
     object
       .addCondition(
-        "CurrentTime",
-        _("Current time"),
-        _("Compare the current time of a video object"),
-        _("the current time (in seconds)"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'CurrentTime',
+        _('Current time'),
+        _('Compare the current time of a video object'),
+        _('the current time (in seconds)'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardRelationalOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("getCurrentTime");
+      .setFunctionName('getCurrentTime');
 
     object
       .addCondition(
-        "Ended",
-        _("Is ended"),
-        _("Check if a video is ended"),
-        _("_PARAM0_ is ended"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Ended',
+        _('Is ended'),
+        _('Check if a video is ended'),
+        _('_PARAM0_ is ended'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter('object', _('Video object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("isEnded");
+      .setFunctionName('isEnded');
 
     object
       .addAction(
-        "SetOpacity",
-        _("Set opacity"),
+        'SetOpacity',
+        _('Set opacity'),
         _(
-          "Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."
+          'Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque).'
         ),
-        _("the opacity"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        _('the opacity'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("setOpacity")
-      .setGetter("getOpacity");
+      .setFunctionName('setOpacity')
+      .setGetter('getOpacity');
 
     object
       .addCondition(
-        "GetOpacity",
-        _("Opacity"),
-        _("Compare the opacity of a video object"),
-        _("the opacity"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'GetOpacity',
+        _('Opacity'),
+        _('Compare the opacity of a video object'),
+        _('the opacity'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardRelationalOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("getOpacity");
+      .setFunctionName('getOpacity');
 
     object
       .addExpression(
-        "Opacity",
-        _("Get current opacity"),
-        _("Return the opacity of a video object"),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
+        'Opacity',
+        _('Get current opacity'),
+        _('Return the opacity of a video object'),
+        '',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Object"), "VideoObject", false)
+      .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("getOpacity");
+      .setFunctionName('getOpacity');
 
     object
       .addAction(
-        "SetPlaybackSpeed",
-        _("Set playback speed"),
+        'SetPlaybackSpeed',
+        _('Set playback speed'),
         _(
-          "Set playback speed of the specified video object, (1 = the default speed, >1 = faster and <1 = slower)."
+          'Set playback speed of the specified video object, (1 = the default speed, >1 = faster and <1 = slower).'
         ),
-        _("the playback speed"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        _('the playback speed'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("setPlaybackSpeed")
-      .setGetter("getPlaybackSpeed");
+      .setFunctionName('setPlaybackSpeed')
+      .setGetter('getPlaybackSpeed');
 
     object
       .addCondition(
-        "GetPlaybackSpeed",
-        _("Playback speed "),
-        _("Compare the playback speed of a video object"),
-        _("the playback speed"),
-        "",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
+        'GetPlaybackSpeed',
+        _('Playback speed '),
+        _('Compare the playback speed of a video object'),
+        _('the playback speed'),
+        '',
+        'JsPlatform/Extensions/videoicon24.png',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Video object"), "VideoObject", false)
-      .useStandardRelationalOperatorParameters("number")
+      .addParameter('object', _('Video object'), 'VideoObject', false)
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName("getPlaybackSpeed");
+      .setFunctionName('getPlaybackSpeed');
 
     object
       .addExpression(
-        "PlaybackSpeed",
-        _("Get current playback speed"),
-        _("Return the playback speed of a video object"),
-        "",
-        "JsPlatform/Extensions/videoicon16.png"
+        'PlaybackSpeed',
+        _('Get current playback speed'),
+        _('Return the playback speed of a video object'),
+        '',
+        'JsPlatform/Extensions/videoicon16.png'
       )
-      .addParameter("object", _("Object"), "VideoObject", false)
+      .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName("getPlaybackSpeed");
+      .setFunctionName('getPlaybackSpeed');
 
     return extension;
   },
@@ -482,7 +481,10 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
   /**
@@ -491,11 +493,13 @@ module.exports = {
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
 
-  registerEditorConfigurations: function(objectsEditorService /*: ObjectsEditorService */) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
-      "Video::VideoObject",
+      'Video::VideoObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: "/objects/video"
+        helpPagePath: '/objects/video',
       })
     );
   },
@@ -504,7 +508,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService /*: ObjectsRenderingService */) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -549,19 +555,19 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedVideoObjectInstance.getThumbnail = function(
+    RenderedVideoObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
     ) {
-      return "JsPlatform/Extensions/videoicon24.png";
+      return 'JsPlatform/Extensions/videoicon24.png';
     };
 
-    RenderedVideoObjectInstance.prototype._getVideoTexture = function() {
+    RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
       const videoResource = this._associatedObject
         .getProperties(this.project)
-        .get("videoResource")
+        .get('videoResource')
         .getValue();
 
       // This returns a VideoTexture with autoPlay set to false
@@ -574,11 +580,11 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedVideoObjectInstance.prototype.update = function() {
+    RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
       const videoResource = this._associatedObject
         .getProperties(this.project)
-        .get("videoResource")
+        .get('videoResource')
         .getValue();
       if (videoResource !== this._videoResource) {
         this._videoResource = videoResource;
@@ -589,8 +595,8 @@ module.exports = {
 
           // Try to display an error texture in case of error, though
           // for some reason "error" is never called.
-          that._pixiObject.texture.on("error", function() {
-            that._pixiObject.texture.off("error", this);
+          that._pixiObject.texture.on('error', function () {
+            that._pixiObject.texture.off('error', this);
             that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
           });
         }
@@ -599,7 +605,7 @@ module.exports = {
       // Update opacity
       const opacity = this._associatedObject
         .getProperties(this.project)
-        .get("Opacity")
+        .get('Opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;
 
@@ -621,14 +627,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedVideoObjectInstance.prototype.getDefaultWidth = function() {
+    RenderedVideoObjectInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedVideoObjectInstance.prototype.getDefaultHeight = function() {
+    RenderedVideoObjectInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 
@@ -636,8 +642,8 @@ module.exports = {
     // because the video is never really played.
 
     objectsRenderingService.registerInstanceRenderer(
-      "Video::VideoObject",
+      'Video::VideoObject',
       RenderedVideoObjectInstance
     );
-  }
+  },
 };

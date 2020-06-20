@@ -20,7 +20,10 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -36,7 +39,7 @@ module.exports = {
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    objectBBText.updateProperty = function(
+    objectBBText.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -53,68 +56,60 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    objectBBText.getProperties = function(objectContent) {
-      var objectProperties = new gd.MapStringPropertyDescriptor();
+    objectBBText.getProperties = function (objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
 
-      objectProperties.set(
-        'text',
-        new gd.PropertyDescriptor(objectContent.text)
-          .setType('textarea')
-          .setLabel(_('BBCode text'))
-      );
+      objectProperties
+        .getOrCreate('text')
+        .setValue(objectContent.text)
+        .setType('textarea')
+        .setLabel(_('BBCode text'));
 
-      objectProperties.set(
-        'color',
-        new gd.PropertyDescriptor(objectContent.color)
-          .setType('color')
-          .setLabel(_('Base color'))
-      );
+      objectProperties
+        .getOrCreate('color')
+        .setValue(objectContent.color)
+        .setType('color')
+        .setLabel(_('Base color'));
 
-      objectProperties.set(
-        'opacity',
-        new gd.PropertyDescriptor(objectContent.opacity.toString())
-          .setType('number')
-          .setLabel(_('Opacity (0-255)'))
-      );
+      objectProperties
+        .getOrCreate('opacity')
+        .setValue(objectContent.opacity.toString())
+        .setType('number')
+        .setLabel(_('Opacity (0-255)'));
 
-      objectProperties.set(
-        'fontSize',
-        new gd.PropertyDescriptor(objectContent.fontSize.toString())
-          .setType('number')
-          .setLabel(_('Base size'))
-      );
+      objectProperties
+        .getOrCreate('fontSize')
+        .setValue(objectContent.fontSize.toString())
+        .setType('number')
+        .setLabel(_('Base size'));
 
-      objectProperties.set(
-        'align',
-        new gd.PropertyDescriptor(objectContent.align)
-          .setType('choice')
-          .addExtraInfo('left')
-          .addExtraInfo('center')
-          .addExtraInfo('right')
-          .setLabel(_('Base alignment'))
-      );
+      objectProperties
+        .getOrCreate('align')
+        .setValue(objectContent.align)
+        .setType('choice')
+        .addExtraInfo('left')
+        .addExtraInfo('center')
+        .addExtraInfo('right')
+        .setLabel(_('Base alignment'));
 
-      objectProperties.set(
-        'fontFamily',
-        new gd.PropertyDescriptor(objectContent.fontFamily)
-          .setType('resource')
-          .addExtraInfo('font')
-          .setLabel(_('Base font family'))
-      );
+      objectProperties
+        .getOrCreate('fontFamily')
+        .setValue(objectContent.fontFamily)
+        .setType('resource')
+        .addExtraInfo('font')
+        .setLabel(_('Base font family'));
 
-      objectProperties.set(
-        'wordWrap',
-        new gd.PropertyDescriptor(objectContent.wordWrap ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Word wrapping'))
-      );
+      objectProperties
+        .getOrCreate('wordWrap')
+        .setValue(objectContent.wordWrap ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Word wrapping'));
 
-      objectProperties.set(
-        'visible',
-        new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Visible on start'))
-      );
+      objectProperties
+        .getOrCreate('visible')
+        .setValue(objectContent.visible ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Visible on start'));
 
       return objectProperties;
     };
@@ -133,7 +128,7 @@ module.exports = {
     );
 
     // $FlowExpectedError
-    objectBBText.updateInitialInstanceProperty = function(
+    objectBBText.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -144,7 +139,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    objectBBText.getInitialInstanceProperties = function(
+    objectBBText.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -175,7 +170,7 @@ module.exports = {
      * Useful for setting multiple generic properties.
      */
     const addSettersAndGettersToObject = (gdObject, properties, objectName) => {
-      properties.forEach(property => {
+      properties.forEach((property) => {
         const parameterType =
           property.type === 'boolean' ? 'yesorno' : property.type;
 
@@ -407,7 +402,10 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
   /**
@@ -415,7 +413,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(objectsEditorService /*: ObjectsEditorService */) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -428,7 +428,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService /*: ObjectsRenderingService */) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
     const MultiStyleText = objectsRenderingService.requireModule(
@@ -487,7 +489,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedBBTextInstance.getThumbnail = function(
+    RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -498,7 +500,7 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedBBTextInstance.prototype.update = function() {
+    RenderedBBTextInstance.prototype.update = function () {
       const rawText = this._associatedObject
         .getProperties(this.project)
         .get('text')
@@ -535,11 +537,11 @@ module.exports = {
 
         this._pixiResourcesLoader
           .loadFontFamily(this._project, fontResourceName)
-          .then(fontFamily => {
+          .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
             this._pixiObject.textStyles.default.fontFamily = fontFamily;
           })
-          .catch(err => {
+          .catch((err) => {
             // Ignore errors
             console.warn('Unable to load font family', err);
           });
@@ -586,14 +588,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedBBTextInstance.prototype.getDefaultWidth = function() {
+    RenderedBBTextInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedBBTextInstance.prototype.getDefaultHeight = function() {
+    RenderedBBTextInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 

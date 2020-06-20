@@ -1,8 +1,8 @@
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -240,7 +240,7 @@ module.exports = {
       .addParameter('expression', _('Variable number value'), '', true)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
-      
+
     extension
       .addAction(
         'SetBooleanVariable',
@@ -257,7 +257,7 @@ module.exports = {
       .addParameter('trueorfalse', _('Variable boolean value'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.setVariable');
-            
+
     extension
       .addAction(
         'SaveState',

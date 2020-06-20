@@ -1,3 +1,4 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -10,8 +11,16 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'Physics2',
@@ -22,6 +31,7 @@ module.exports = {
     );
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -77,6 +87,7 @@ module.exports = {
       }
       if (propertyName === 'vertices') {
         behaviorContent.addChild('vertices');
+        // $FlowFixMe
         behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
@@ -123,6 +134,7 @@ module.exports = {
         return true;
       }
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -290,6 +302,7 @@ module.exports = {
       return behaviorProperties;
     };
 
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.initializeContent = function(behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
       behaviorContent.addChild('bullet').setBoolValue(false);
@@ -313,6 +326,7 @@ module.exports = {
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.updateProperty = function(
       sharedContent,
       propertyName,
@@ -345,6 +359,7 @@ module.exports = {
 
       return false;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.getProperties = function(sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
@@ -375,6 +390,7 @@ module.exports = {
 
       return sharedProperties;
     };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.initializeContent = function(behaviorContent) {
       behaviorContent.addChild("gravityX").setDoubleValue(0);
       behaviorContent.addChild("gravityY").setDoubleValue(9.8);
@@ -3714,7 +3730,7 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
     return [];
   },
 };

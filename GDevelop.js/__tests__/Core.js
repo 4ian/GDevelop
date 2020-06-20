@@ -1143,18 +1143,11 @@ describe('libGD.js', function() {
       mySharedData.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(
-            behaviorContent.getStringAttribute('property1')
-          )
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(
-            behaviorContent.getBoolAttribute('property2') ? '1' : '0'
-          ).setType('Boolean')
-        );
+        properties.getOrCreate('My first property')
+          .setValue(behaviorContent.getStringAttribute('property1'));
+        properties.getOrCreate('My other property')
+          .setValue(behaviorContent.getBoolAttribute('property2') ? '1' : '0')
+          .setType('Boolean');
 
         return properties;
       };
@@ -1248,6 +1241,7 @@ describe('libGD.js', function() {
       property1.setValue('123');
       expect(list.getAt(0).getLabel()).toBe('Property 1');
       expect(list.getAt(0).getValue()).toBe('123');
+      list.delete();
     });
   });
 
@@ -1256,7 +1250,11 @@ describe('libGD.js', function() {
       var properties = new gd.MapStringPropertyDescriptor();
       expect(properties.has('Property0')).toBe(false);
 
-      properties.set('Property1', new gd.PropertyDescriptor('Hello Property1'));
+      // Ensure the "set" method works (though in practice, prefer "getOrCreate")
+      const property1 = new gd.PropertyDescriptor('Hello Property1');
+      properties.set('Property1', property1);
+      property1.delete();
+
       expect(properties.get('Property1').getValue()).toBe('Hello Property1');
       expect(properties.get('Property1').getType()).toBe('string');
       properties.get('Property1').setValue('Hello modified Property1');
@@ -1266,13 +1264,14 @@ describe('libGD.js', function() {
       expect(properties.keys().toJSArray()).not.toContain('Property0');
       expect(properties.keys().toJSArray()).toContain('Property1');
 
-      properties.set(
-        'Property0',
-        new gd.PropertyDescriptor('Hello Property0')
-          .setType('another type')
-          .addExtraInfo('Info1')
-          .addExtraInfo('Info3')
-      );
+      // Ensure the "getOrCreate" method works
+      expect(properties.has('Property0')).toBe(false);
+      properties.getOrCreate('Property0')
+        .setValue('Hello Property0')
+        .setType('another type')
+        .addExtraInfo('Info1')
+        .addExtraInfo('Info3');
+      expect(properties.has('Property0')).toBe(true);
       expect(properties.get('Property0').getValue()).toBe('Hello Property0');
       expect(properties.get('Property0').getType()).toBe('another type');
       expect(
@@ -1297,6 +1296,7 @@ describe('libGD.js', function() {
       expect(properties.has('Property1')).toBe(true);
       expect(properties.keys().toJSArray()).toContain('Property0');
       expect(properties.keys().toJSArray()).toContain('Property1');
+      properties.delete();
     });
   });
 
@@ -1322,18 +1322,16 @@ describe('libGD.js', function() {
       myBehavior.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(
+        properties
+          .getOrCreate('My first property')
+          .setValue(
             behaviorContent.getStringAttribute('property1')
-          )
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(
+          );
+        properties
+          .getOrCreate('My other property')
+          .setValue(
             behaviorContent.getBoolAttribute('property2') ? '1' : '0'
-          ).setType('Boolean')
-        );
+          ).setType('Boolean');
 
         return properties;
       };
@@ -1481,16 +1479,13 @@ describe('libGD.js', function() {
       myObject.getProperties = function(content) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(content.property1)
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(content.property2 ? '1' : '0').setType(
-            'Boolean'
-          )
-        );
+        properties
+          .getOrCreate('My first property')
+          .setValue(content.property1);
+        properties
+          .getOrCreate('My other property')
+          .setValue(content.property2 ? '1' : '0')
+          .setType('Boolean');
 
         return properties;
       };
@@ -1528,18 +1523,16 @@ describe('libGD.js', function() {
       ) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My instance property',
-          new gd.PropertyDescriptor(
+        properties
+          .getOrCreate('My instance property')
+          .setValue(
             instance.getRawStringProperty('instanceprop1')
-          )
-        );
-        properties.set(
-          'My other instance property',
-          new gd.PropertyDescriptor(
-            instance.getRawFloatProperty('instanceprop2').toString() //TODO: How to avoid people forgetting toString?
-          ).setType('number')
-        );
+          );
+        properties
+          .getOrCreate('My other instance property')
+          .setValue(
+            instance.getRawFloatProperty('instanceprop2').toString()
+          ).setType('number');
 
         return properties;
       };

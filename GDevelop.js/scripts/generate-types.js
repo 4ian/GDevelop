@@ -214,9 +214,21 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
+      'declare class gdObjectJsImplementation {',
+      'declare class gdObjectJsImplementation extends gdObject {',
+      'types/gdobjectjsimplementation.js'
+    );
+    shell.sed(
+      '-i',
       'declare class gdBehaviorJsImplementation {',
       'declare class gdBehaviorJsImplementation extends gdBehavior {',
       'types/gdbehaviorjsimplementation.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdBehaviorSharedDataJsImplementation {',
+      'declare class gdBehaviorSharedDataJsImplementation extends gdBehaviorsSharedData {',
+      'types/gdbehaviorshareddatajsimplementation.js'
     );
     shell.sed(
       '-i',
@@ -279,6 +291,22 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'y: number;\n  set_y(number): void;\n  get_y(): number;',
       'types/gdvector2f.js'
     );
+
+    // Set a few parameters as optionals. No parameter is ever optional when compiled in Emscripten,
+    // but passing undefined is tolerated for these and it's convenient:
+    shell.sed(
+      '-i',
+      'type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean',
+      'type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean',
+      'types/gdinstructionmetadata.js'
+    );
+    shell.sed(
+      '-i',
+      'type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean',
+      'type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean',
+      'types/gdexpressionmetadata.js'
+    );
+
 
     // Add a notice that the file is auto-generated.
     shell.sed(

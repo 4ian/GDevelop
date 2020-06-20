@@ -132,7 +132,7 @@ Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documen
 To add an editor to your object, implement the function `registerEditorConfigurations` in your extension module. For now, only a default editor, displaying the object properties, is supported:
 
 ```js
-registerEditorConfigurations: function(objectsEditorService) {
+registerEditorConfigurations: function(objectsEditorService /*: ObjectsEditorService */) {
   objectsEditorService.registerEditorConfiguration(
     "MyDummyExtension::DummyObject", // Replace by your extension and object type names.
     objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({

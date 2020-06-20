@@ -61,7 +61,7 @@ export default class PixiResourcesLoader {
       onProgress(loadingCount, totalCount);
     });
 
-    loader.load((loader, loadedResources) =>  {
+    loader.load((loader, loadedResources) => {
       loader.onProgress.detach(progressCallbackId);
 
       //Store the loaded textures so that they are ready to use.

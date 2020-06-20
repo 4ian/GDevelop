@@ -37,7 +37,6 @@ export default class PixiResourcesLoader {
     const resourcesManager = project.getResourcesManager();
     const loader = PIXI.Loader.shared;
     loader.reset();
-    loader.removeAllListeners();
 
     const allResources = {};
     resourceNames.forEach(resourceName => {
@@ -57,7 +56,14 @@ export default class PixiResourcesLoader {
     }
 
     let loadingCount = 0;
-    loader.once('complete', function(loader, loadedResources) {
+    const progressCallbackId = loader.onProgress.add(function() {
+      loadingCount++;
+      onProgress(loadingCount, totalCount);
+    });
+
+    loader.load((loader, loadedResources) =>  {
+      loader.onProgress.detach(progressCallbackId);
+
       //Store the loaded textures so that they are ready to use.
       for (const resourceName in loadedResources) {
         if (loadedResources.hasOwnProperty(resourceName)) {
@@ -74,12 +80,6 @@ export default class PixiResourcesLoader {
 
       onComplete();
     });
-    loader.on('progress', function() {
-      loadingCount++;
-      onProgress(loadingCount, totalCount);
-    });
-
-    loader.load();
   }
 
   /**

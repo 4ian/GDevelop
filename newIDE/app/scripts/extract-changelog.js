@@ -48,6 +48,7 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('fix formatting') ||
           lowerCaseMessage.includes('fix warning') ||
           lowerCaseMessage.includes('fix typo') ||
+          lowerCaseMessage === 'update translations' ||
           lowerCaseMessage.includes('package-lock.json');
         const forceHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
@@ -140,7 +141,15 @@ const formatCommitMessage = commit => {
           : 'TODO:' + commit.authorEmail
       }!)`
     : '';
-  const prNumberCleanedMessage = commit.message.replace(
+
+  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in changelog/i;
+  const foundIgnoreRest = commit.message.match(ignoreRestRegex);
+  const cleanedMessage =
+    foundIgnoreRest && foundIgnoreRest.index > 0
+      ? commit.message.substr(0, foundIgnoreRest.index)
+      : commit.message;
+
+  const prNumberCleanedMessage = cleanedMessage.replace(
     /(\(#[1-9][0-9]*\))/,
     ''
   );

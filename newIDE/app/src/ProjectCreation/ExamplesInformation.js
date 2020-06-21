@@ -418,6 +418,43 @@ module.exports = {
       }
     ]
   },
+  "board-walk-with-raycast": {
+    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      }
+    ]
+  },
   "bomb-the-crate": {
     "description": "A basic bomberman like game, where the player can move on the map, drop bombs and destroy crates on the map.",
     "usedExtensions": [

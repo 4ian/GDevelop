@@ -523,7 +523,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("yesorno", _("Can grab platforms"))
+        .AddParameter("yesorno", _("Can grab platfroms"))
         .MarkAsAdvanced();
 
     aut.AddCondition("CanGrabPlatforms",

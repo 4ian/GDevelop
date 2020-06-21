@@ -47,8 +47,12 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
-// Set to true, will be default value in future Electron versions
-app.allowRendererProcessReuse = true;
+// Should be set to true, which will be the default value in future Electron
+// versions, but then causes an issue on Windows where the `fs` module stops
+// working in the renderer process.
+// See https://github.com/electron/electron/issues/22119
+// For now, disable this as we rely heavily on `fs` in the renderer process.
+app.allowRendererProcessReuse = false;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {

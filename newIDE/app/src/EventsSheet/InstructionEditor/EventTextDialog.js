@@ -10,7 +10,7 @@ import ColorPicker, { type RGBColor } from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   sizeTextField: {
@@ -212,7 +212,7 @@ export default class EventTextDialog extends React.Component<Props, State> {
                   commitOnBlur
                   hintText={t`Enter the text to be displayed`}
                   fullWidth
-                  multiLine
+                  multiline
                   rows={8}
                   rowsMax={30}
                   value={textValue}

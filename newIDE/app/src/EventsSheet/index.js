@@ -12,7 +12,6 @@ import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
-import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
@@ -43,7 +42,6 @@ import {
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
 } from './SelectionHandler';
-import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
   type EventsContextResult,
@@ -81,8 +79,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type PreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -91,11 +88,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  showPreviewButton: boolean,
-  showNetworkPreviewButton: boolean,
-  previewButtonSettings: PreviewButtonSettings,
-  onPreview: (options: PreviewOptions) => void,
-  onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
@@ -110,8 +102,9 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
+
 type State = {|
   history: HistoryState,
 
@@ -150,6 +143,11 @@ type State = {|
   allEventsMetadata: Array<EventMetadata>,
 |};
 
+type EventInsertionContext = {|
+  eventsList: gdEventsList,
+  indexInList: number,
+|};
+
 const styles = {
   container: {
     display: 'flex',
@@ -177,6 +175,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
       onSearch: () => this._toggleSearchPanel(),
+      onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
     },
@@ -250,15 +249,6 @@ export default class EventsSheet extends React.Component<Props, State> {
         }}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
-        showPreviewButton={this.props.showPreviewButton}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        onPreview={() => this.props.onPreview({})}
-        previewButtonSettings={this.props.previewButtonSettings}
-        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
-        onOpenDebugger={() => {
-          this.props.onOpenDebugger();
-          this.props.onPreview({});
-        }}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -287,6 +277,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         }
       }
     );
+  };
+
+  _closeSearchPanel = () => {
+    this.setState({ showSearchPanel: false });
   };
 
   addSubEvents = () => {
@@ -321,15 +315,15 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
+  addNewEvent = (
+    type: string,
+    context: ?EventInsertionContext
+  ): Array<gdBaseEvent> => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
     let insertTopOfSelection = false;
 
-    let insertions: Array<{
-      eventsList: gdEventsList,
-      indexInList: number,
-    }> = [];
+    let insertions: Array<EventInsertionContext> = [];
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
@@ -474,7 +468,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   ) => {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
     const destinationIndex =
-      indexInList === undefined
+      indexInList === undefined || indexInList === null
         ? destinationContext.instrsList.size()
         : indexInList;
 
@@ -718,6 +712,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         if (cb) cb();
       }
     );
+    if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
   };
 
   undo = () => {
@@ -731,7 +726,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   redo = () => {
@@ -745,7 +744,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   _openEventsContextAnalyzer = () => {
@@ -810,10 +813,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Standard',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Standard', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -834,10 +837,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Group',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Group', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -924,9 +927,9 @@ export default class EventsSheet extends React.Component<Props, State> {
             instruction,
             indexInList,
           } = this.state.editedInstruction;
-          if (!instrsList) return;
+          if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined) {
+          if (indexInList !== undefined && indexInList !== null) {
             // Replace an existing instruction
             instrsList.set(indexInList, instruction);
           } else {
@@ -1052,11 +1055,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                           onParameterClick={this.openParameterEditor}
                           onEventClick={this.selectEvent}
                           onEventContextMenu={this.openEventContextMenu}
-                          onAddNewEvent={context => {
-                            this.addNewEvent(
-                              'BuiltinCommonInstructions::Standard',
-                              context
-                            );
+                          onAddNewEvent={(
+                            eventType: string,
+                            eventsList: gdEventsList
+                          ) => {
+                            this.addNewEvent(eventType, {
+                              eventsList,
+                              indexInList: eventsList.getEventsCount(),
+                            });
                           }}
                           onOpenExternalEvents={onOpenExternalEvents}
                           onOpenLayout={onOpenLayout}
@@ -1098,9 +1104,6 @@ export default class EventsSheet extends React.Component<Props, State> {
                             }
                           />
                         )}
-                        {events && events.getEventsCount() === 0 && (
-                          <EmptyEventsPlaceholder />
-                        )}
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
@@ -1124,6 +1127,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                             this.setState({
                               inlineEditingChangesMade: true,
                             });
+                            if (this._searchPanel)
+                              this._searchPanel.markSearchResultsDirty();
                           }}
                           resourceSources={this.props.resourceSources}
                           onChooseResource={this.props.onChooseResource}

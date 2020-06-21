@@ -21,7 +21,7 @@ import AlertMessage from '../UI/AlertMessage';
 const styles = {
   icon: { width: 40, height: 40 },
   disabledItem: { opacity: 0.6 },
-  content: { padding: 24 },
+  content: { padding: 8 },
 };
 
 export type Exporter = {|

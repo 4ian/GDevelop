@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
@@ -68,6 +69,7 @@ export default class ObjectVariableField extends React.Component<
         />
         {this.state.editorOpen && variablesContainer && (
           <VariablesEditorDialog
+            title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
             onCancel={() => this.setState({ editorOpen: false })}

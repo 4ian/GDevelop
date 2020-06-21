@@ -23,7 +23,7 @@ import {
 } from '../GenericExporters/OnlineElectronExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,

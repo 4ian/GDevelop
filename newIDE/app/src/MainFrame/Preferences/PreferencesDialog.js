@@ -7,7 +7,7 @@ import FlatButton from '../../UI/FlatButton';
 import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
@@ -15,6 +15,7 @@ import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
+import RaisedButton from '../../UI/RaisedButton';
 
 type Props = {|
   onClose: Function,
@@ -34,6 +35,9 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setUseNewInstructionEditorDialog,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
+    getDefaultEditorMosaicNode,
+    setDefaultEditorMosaicNode,
+    setAutoOpenMostRecentProject,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -106,6 +110,55 @@ const PreferencesDialog = ({ onClose }: Props) => {
             />
           </Line>
           <Text size="title">
+            <Trans>Layouts</Trans>
+          </Text>
+          <Line>
+            <Column>
+              <RaisedButton
+                label={<Trans>Reset Scene Editor layout</Trans>}
+                onClick={() => setDefaultEditorMosaicNode('scene-editor', null)}
+                disabled={!getDefaultEditorMosaicNode('scene-editor')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Scene Editor (small window) layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode('scene-editor-small', null)
+                }
+                disabled={!getDefaultEditorMosaicNode('scene-editor-small')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Debugger layout</Trans>}
+                onClick={() => setDefaultEditorMosaicNode('debugger', null)}
+                disabled={!getDefaultEditorMosaicNode('debugger')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Resource Editor layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode('resources-editor', null)
+                }
+                disabled={!getDefaultEditorMosaicNode('resources-editor')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Extension Editor layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode(
+                    'events-functions-extension-editor',
+                    null
+                  )
+                }
+                disabled={
+                  !getDefaultEditorMosaicNode(
+                    'events-functions-extension-editor'
+                  )
+                }
+              />
+            </Column>
+          </Line>
+          <Text size="title">
             <Trans>Updates</Trans>
           </Text>
           <Line>
@@ -173,6 +226,18 @@ const PreferencesDialog = ({ onClose }: Props) => {
               label={<Trans>Auto-save project on Preview</Trans>}
             />
           </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
+              toggled={values.autoOpenMostRecentProject}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Automatically re-open the project edited during last session
+                </Trans>
+              }
+            />
+          </Line>
           {Window.isDev() && (
             <Line>
               <Toggle
@@ -198,7 +263,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
                 <Trans>Warn/show explanation about:</Trans>
               </Text>
               {allAlertMessages.map(({ key, label }) => (
-                <Line>
+                <Line key={key}>
                   <Toggle
                     onToggle={(e, check) => showAlertMessage(key, check)}
                     toggled={!values.hiddenAlertMessages[key]}

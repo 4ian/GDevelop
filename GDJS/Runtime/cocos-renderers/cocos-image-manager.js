@@ -9,7 +9,7 @@
  *
  * @class CocosImageManager
  * @memberof gdjs
- * @param {Object} resources The resources data of the game.
+ * @param {ResourceData[]} resources The resources data of the game.
  */
 gdjs.CocosImageManager = function(resources)
 {

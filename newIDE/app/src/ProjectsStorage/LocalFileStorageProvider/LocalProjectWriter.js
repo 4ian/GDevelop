@@ -10,7 +10,7 @@ import {
 import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -22,6 +22,12 @@ const writeJSONFile = (object: Object, filePath: string): Promise<void> => {
 
   try {
     const content = JSON.stringify(object, null, 2);
+    if (content === '') {
+      return Promise.reject(
+        new Error('The content to save on disk is empty. Aborting.')
+      );
+    }
+
     return fs.ensureDir(path.dirname(filePath)).then(
       () =>
         new Promise((resolve, reject) => {
@@ -157,10 +163,12 @@ export const onSaveProjectAs = (
 export const onAutoSaveProject = (
   project: gdProject,
   fileMetadata: FileMetadata
-) => {
+): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
-  writeJSONFile(serializeToJSObject(project), autoSavePath).catch(err => {
-    console.error(`Unable to write ${autoSavePath}:`, err);
-    throw err;
-  });
+  return writeJSONFile(serializeToJSObject(project), autoSavePath).catch(
+    err => {
+      console.error(`Unable to write ${autoSavePath}:`, err);
+      throw err;
+    }
+  );
 };

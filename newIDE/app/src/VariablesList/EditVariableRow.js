@@ -29,13 +29,17 @@ const EditVariableRow = ({
   <Line justifyContent="space-between" alignItems="center">
     <Column>
       <Line noMargin>
-        <IconButton onClick={onCopy} disabled={!hasSelection}>
+        <IconButton size="small" onClick={onCopy} disabled={!hasSelection}>
           <Copy />
         </IconButton>
-        <IconButton onClick={onPaste} disabled={!hasClipboard}>
+        <IconButton size="small" onClick={onPaste} disabled={!hasClipboard}>
           <Paste />
         </IconButton>
-        <IconButton onClick={onDeleteSelection} disabled={!hasSelection}>
+        <IconButton
+          size="small"
+          onClick={onDeleteSelection}
+          disabled={!hasSelection}
+        >
           <Delete />
         </IconButton>
       </Line>

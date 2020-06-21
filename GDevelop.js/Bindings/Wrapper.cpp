@@ -445,7 +445,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define WRAPPED_at(a) at(a).get()
 
-#define MAP_get(a) find(a)->second
+#define MAP_getOrCreate(key) operator[](key)
+#define MAP_get(key) find(key)->second
 #define MAP_set(key, value) [key] = value
 #define MAP_has(key) find(key) != self->end()
 

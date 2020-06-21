@@ -16,9 +16,8 @@ import {
 } from '../../ResourcesList/ResourceSource.flow';
 
 const styles = {
-  imagePreview: { flex: 1 },
   propertiesContainer: {
-    padding: 10,
+    padding: 8,
     overflowY: 'scroll',
     overflowX: 'hidden',
     flex: 2,
@@ -123,7 +122,6 @@ export default class ResourcePropertiesEditor extends React.Component<
 
     return (
       <ResourcePreview
-        style={styles.imagePreview}
         resourceName={resources[0].getName()}
         resourcePath={resources[0].getFile()}
         resourcesLoader={resourcesLoader}

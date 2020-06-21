@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type StoryDecorator } from '@storybook/react';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { makeTestProject } from '../fixtures/TestProject';
+import { makeTestProject, type TestProject } from '../fixtures/TestProject';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 const initializeGDevelopJs = global.initializeGDevelopJs;
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -16,9 +16,11 @@ global.gd = {
 };
 
 // Will contain the result of makeTestProject
-export let testProject: any = {
-  I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY: true,
-};
+export let testProject: TestProject =
+  // $FlowExpectedError - make a "bad" object on purpose to ease debugging
+  {
+    I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY: true,
+  };
 
 type GDevelopJsInitializerProps = {|
   children: () => React.Node,
@@ -57,6 +59,7 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
       for (let key in newTestProject) {
         testProject[key] = newTestProject[key];
       }
+      // $FlowExpectedError - clean the "bad" object made on purpose to ease debugging
       delete testProject.I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY;
 
       console.info(

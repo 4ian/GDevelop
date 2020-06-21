@@ -2,7 +2,7 @@
 const isDev = process.env.NODE_ENV === 'development';
 
 export const GDevelopGamePreviews = {
-  baseUrl: `http://game-previews.gdevelop-app.com/`,
+  baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
 export const GDevelopBuildApi = {

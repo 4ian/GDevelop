@@ -15,7 +15,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export const CLIPBOARD_KIND = 'EventsAndInstructions';
 

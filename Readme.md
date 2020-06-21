@@ -4,7 +4,7 @@ GDevelop is a full-featured, open-source game development software, allowing to 
 
 ![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
-Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop)
+Getting started [![Test status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master)
 ---------------
 
 | ❔ I want to... | 🚀 What to do |
@@ -22,11 +22,11 @@ Overview of the architecture
 | Directory | ℹ️ Description |
 | --- | --- |
 | `Core` | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games. |
-| `GDCpp` | GDevelop C++ game engine, used to **build native games**. |
-| `GDJS` | GDevelop JS game engine, used to build **HTML5 games**. |
-| `GDevelop.js` | Bindings of Core/GDCpp/GDJS and Extensions to JavaScript (used by the IDE). |
+| `GDCpp` | The C++ game engine, used to build native games (*not used in GDevelop 5*). |
+| `GDJS` | The JavaScript game engine, using Pixi.js (WebGL), powering all GDevelop games. |
+| `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
 | `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |
-| `Extensions` | Extensions for C++ or JS game engines, providing objects, events and new features. |
+| `Extensions` | Extensions for the C++ or JavaScript game engines, providing objects, behaviors, events and new features. |
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 

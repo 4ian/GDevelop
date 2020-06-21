@@ -59,6 +59,25 @@ gdjs.PixiFiltersTools.registerFilterCreator = function(filterName, filterCreator
     gdjs.PixiFiltersTools._filterCreators[filterName] = filterCreator;
 }
 
+/**
+ * Convert an string rgb color value or an hex value to an to a hex number value.
+ * @param {string} value rgb or hex value
+ * @returns {number}
+ */
+gdjs.PixiFiltersTools.rgbOrHexToHexNumber = function(value) {
+  const splitValue = value.split(';');
+  if (splitValue.length === 3) {
+    value = gdjs.rgbToHexNumber(
+      parseInt(splitValue[0], 0),
+      parseInt(splitValue[1], 0),
+      parseInt(splitValue[2], 0)
+    );
+  } else {
+    value = parseInt(value.replace('#', '0x'), 16);
+  }
+  return value;
+};
+
 // Type definitions:
 
 /**

@@ -14,18 +14,9 @@ gdjs.PixiFiltersTools.registerFilterCreator('Glow', {
       filter.distance = value;
     }
   },
-  updateStringParameter: function(filter, parameterName, value) {
-      const splitValue = value.split(';');
-      if (splitValue.length !== 3) return;
-      const hexColor = '#' + gdjs.rgbToHex(
-        parseInt(splitValue[0], 0),
-        parseInt(splitValue[1], 0),
-        parseInt(splitValue[2], 0)
-      );
-      value = hexColor;
-      
+  updateStringParameter: function(filter, parameterName, value) {      
     if (parameterName === 'color') {
-      filter.color = value.replace('#', '0x');
+      filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
   },
   updateBooleanParameter: function(filter, parameterName, value) {},

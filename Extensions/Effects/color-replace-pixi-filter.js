@@ -11,20 +11,11 @@ gdjs.PixiFiltersTools.registerFilterCreator('ColorReplace', {
     }
   },
   updateStringParameter: function(filter, parameterName, value) {
-      const splitValue = value.split(';');
-      if (splitValue.length !== 3) return;
-      const hexColor = '#' + gdjs.rgbToHex(
-        parseInt(splitValue[0], 0),
-        parseInt(splitValue[1], 0),
-        parseInt(splitValue[2], 0)
-      );
-      value = hexColor;
-
-    if (parameterName === 'originalColor') {
-      filter.originalColor = parseInt(value.replace('#', '0x'), 16);
+      if (parameterName === 'originalColor') {
+      filter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
     else if (parameterName === 'newColor') {
-      filter.newColor = parseInt(value.replace('#', '0x'), 16);
+      filter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
   },
   updateBooleanParameter: function(filter, parameterName, value) {},

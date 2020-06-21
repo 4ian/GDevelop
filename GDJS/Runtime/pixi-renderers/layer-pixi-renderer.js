@@ -198,19 +198,6 @@ gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function(
   var filter = this._filters[name];
   if (!filter) return;
 
-  // detect "255;255;255"
-  const regex = /"((?<!\d|\.)([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?!\d|\.) *[;] *){2}(?<!\d|\.)([0-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?!\d|\.)"/gi;
-
-  if(regex.exec(value)){
-    const splitValue = value.split(';');
-    const hexColor = '#' + gdjs.rgbToHex(
-      parseInt(splitValue[0], 0),
-      parseInt(splitValue[1], 0),
-      parseInt(splitValue[2], 0)
-    );
-    value = hexColor;
-  }
-
   filter.updateStringParameter(filter.pixiFilter, parameterName, value);
 };
 

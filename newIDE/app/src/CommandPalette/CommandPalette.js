@@ -36,6 +36,7 @@ const filterOptions = (
   return [...directMatches, ...fuzzyMatches];
 };
 
+// Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
   scrollPaper: {
     alignItems: 'flex-start',

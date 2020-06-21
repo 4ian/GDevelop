@@ -1674,7 +1674,6 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  // Temporary keyboard shortcut for command palette
   useKeyboardShortcutForCommandPalette(
     React.useCallback(() => openCommandPalette(true), [])
   );

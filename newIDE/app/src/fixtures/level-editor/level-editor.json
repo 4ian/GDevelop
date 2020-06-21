@@ -1127,7 +1127,8 @@
             "g": 0,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "bold": false,

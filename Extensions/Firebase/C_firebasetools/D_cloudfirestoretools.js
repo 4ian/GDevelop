@@ -53,14 +53,14 @@ gdjs.evtTools.firebase.firestore.writeField = function (
   callbackStateVariable,
   merge
 ) {
-  merge = merge || true;
+  merge = merge == undefined ? true : merge;
   const updateObject = {};
   updateObject[field] = value;
   firebase
     .firestore()
     .collection(collectionName)
     .doc(documentName)
-    .set(updateObject, { merge: true })
+    .set(updateObject, { merge: merge })
     .then(function () {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
     })
@@ -182,7 +182,7 @@ gdjs.evtTools.firebase.firestore.deleteField = function (
  * @param {string} collectionName - The collection where the document is stored.
  * @param {string} documentName - The name of the document to get.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.firestore.getDocument = function (
   collectionName,
@@ -213,7 +213,7 @@ gdjs.evtTools.firebase.firestore.getDocument = function (
  * @param {string} documentName - The name of the document.
  * @param {string} field - The field to get.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.firestore.getField = function (
   collectionName,
@@ -244,7 +244,7 @@ gdjs.evtTools.firebase.firestore.getField = function (
  * @param {string} collectionName - The collection where the document is stored.
  * @param {string} documentName - The name of the document to check.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.firestore.hasDocument = function (
   collectionName,
@@ -272,7 +272,7 @@ gdjs.evtTools.firebase.firestore.hasDocument = function (
  * @param {string} documentName - The name of the document.
  * @param {string} field - The field to check.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.firestore.hasField = function (
   collectionName,

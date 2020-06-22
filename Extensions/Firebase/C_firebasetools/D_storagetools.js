@@ -18,7 +18,7 @@ gdjs.evtTools.firebase.storage = {
  * @param {string} onlinePath - The path under wich the file will be accessible on the bucket.
  * @param {"none"|"base64"|"base64url"|"data_url"} [type] - The type/format of the string to upload.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result (url to the file).
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  * @param {gdjs.Variable} [callbackUIDVariable] - The variable where to store the upload ID.
  * @param {gdjs.Variable} [callbackProgressVariable] - The variable where to store the progress.
  */
@@ -60,7 +60,7 @@ gdjs.evtTools.firebase.storage.upload = function (
         gdjs.evtTools.network._objectToVariable(
           uploadProgress,
           callbackProgressVariable,
-          ['tasks']
+          ['tasks'] // Remove circular reference
         );
     },
     (error) => {
@@ -71,7 +71,6 @@ gdjs.evtTools.firebase.storage.upload = function (
       if (typeof callbackStateVariable !== 'undefined')
         callbackStateVariable.setString('ok');
       if (typeof callbackUIDVariable !== 'undefined') {
-        console.log(uploadID);
         gdjs.evtTools.firebase.storage.uploads.remove(uploadID); // Free memory
       }
       uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
@@ -86,7 +85,7 @@ gdjs.evtTools.firebase.storage.upload = function (
  * Generate a download URL for a file.
  * @param {string} filePath - The path in the remote storage bucket to the file to download.
  * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.storage.getDownloadURL = function (
   filePath,
@@ -113,7 +112,7 @@ gdjs.evtTools.firebase.storage.getDownloadURL = function (
 /**
  * Deletes a file on the remote storage bucket.
  * @param {string} filePath - The path in the remote storage bucket to the file to download.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.storage.delete = function (
   filePath,

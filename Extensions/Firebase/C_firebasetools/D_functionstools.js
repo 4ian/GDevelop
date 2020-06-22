@@ -14,7 +14,7 @@ gdjs.evtTools.firebase.functions = {
    * @param {string} httpFunctionName - The name of the function to call
    * @param {string} [parameters] - Parameters for the function either as a JSON object or a string.
    * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
-   * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+   * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
    */
   call(
     httpFunctionName,
@@ -37,9 +37,8 @@ gdjs.evtTools.firebase.functions = {
       .then((data) => {
         if (callbackValueVariable)
           gdjs.evtTools.network._objectToVariable(data, callbackValueVariable);
-      })
-      .then(() => {
-        if (callbackStateVariable) callbackStateVariable.setString('ok');
+        if (callbackStateVariable) 
+          callbackStateVariable.setString('ok');
       })
       .catch((error) => {
         if (callbackValueVariable)

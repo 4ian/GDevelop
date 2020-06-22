@@ -161,7 +161,7 @@ gdjs.evtTools.firebase.database.deleteField = function (
  * Gets a database variable and store it in a variable.
  * @param {string} path - The name under wich the variable will be saved (document name).
  * @param {gdjs.Variable} callbackValueVariable - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.database.getVariable = function (
   path,
@@ -189,7 +189,7 @@ gdjs.evtTools.firebase.database.getVariable = function (
  * @param {string} path - The name under wich the variable will be saved (document name).
  * @param {string} field - The field to get.
  * @param {gdjs.Variable} callbackValueVariable - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.database.getField = function (
   path,
@@ -217,7 +217,7 @@ gdjs.evtTools.firebase.database.getField = function (
  * Checks for existence of a database variable.
  * @param {string} path - The name under wich the variable will be saved (document name).
  * @param {gdjs.Variable} callbackValueVariable - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.database.hasVariable = function (
   path,
@@ -244,7 +244,7 @@ gdjs.evtTools.firebase.database.hasVariable = function (
  * @param {string} path - The name under wich the variable will be saved (document name).
  * @param {string} field - The field to check.
  * @param {gdjs.Variable} callbackValueVariable - The variable where to store the result.
- * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operration was successful.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
  */
 gdjs.evtTools.firebase.database.hasField = function (
   path,

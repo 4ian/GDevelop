@@ -8,31 +8,26 @@
  * Remote Config Tools
  * @namespace
  */
-gdjs.evtTools.firebase.RC = {};
+gdjs.evtTools.firebase.remoteConfig = {};
 
 /**
  * Set the interval between auto-config updates
  */
-gdjs.evtTools.firebase.RC.setAutoUpdateInterval = function (interval) {
-  firebase.remoteConfig().settings = {
-    minimumFetchIntervalMillis: interval,
-  };
+gdjs.evtTools.firebase.remoteConfig.setAutoUpdateInterval = function (interval) {
+  firebase.remoteConfig().settings.minimumFetchIntervalMillis = interval;
 };
 
 /**
- * Set the default offline configuration.
- * @param {gdjs.Variable} variable The Structure is
+ * Set the default configuration, for when starting the game offline.
+ * @param {gdjs.Variable} variable A structure defining the default variables.
  */
-gdjs.evtTools.firebase.RC.setDefaultConfig = function (variable) {
+gdjs.evtTools.firebase.remoteConfig.setDefaultConfig = function (variable) {
   firebase.remoteConfig().defaultConfig = JSON.parse(
     gdjs.evtTools.network.variableStructureToJSON(variable)
   );
 };
 
-/** Register callback for after firebase initialization. */
 gdjs.evtTools.firebase.onAppCreated.push(function () {
   // Synchronisation seems to be impossible when that value isn't preset
-  firebase.remoteConfig().settings = {
-    minimumFetchIntervalMillis: -1,
-  };
+  firebase.remoteConfig().settings.minimumFetchIntervalMillis = -1;
 });

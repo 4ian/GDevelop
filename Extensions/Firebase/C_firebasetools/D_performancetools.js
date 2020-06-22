@@ -9,8 +9,8 @@
  * @namespace
  */
 gdjs.evtTools.firebase.performance = {
-  /** @type {Hashtable} */
-  tracers: new Hashtable(),
+  /** @type {Object.<string, firebase.performance.Trace>} */
+  tracers: {},
 };
 
 /**
@@ -19,13 +19,10 @@ gdjs.evtTools.firebase.performance = {
  * @returns {firebase.performance.Trace} The tracer instance.
  */
 gdjs.evtTools.firebase.performance.getTracer = function (tracerName) {
-  if (!gdjs.evtTools.firebase.performance.tracers.containsKey(tracerName)) {
-    gdjs.evtTools.firebase.performance.tracers.put(
-      tracerName,
-      firebase.performance().trace(tracerName)
-    );
+  if (!gdjs.evtTools.firebase.performance.tracers.hasOwnProperty(tracerName)) {
+    gdjs.evtTools.firebase.performance.tracers[tracerName] = firebase.performance().trace(tracerName);
   }
-  return gdjs.evtTools.firebase.performance.tracers.get(tracerName);
+  return gdjs.evtTools.firebase.performance.tracers[tracerName];
 };
 
 /**

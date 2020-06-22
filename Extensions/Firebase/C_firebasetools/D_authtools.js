@@ -226,7 +226,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
    * @returns {string} - The users Email address.
    */
   getEmail() {
-    return gdjs.evtTools.firebase.auth.currentUser.email || 'none';
+    return gdjs.evtTools.firebase.auth.currentUser.email || '';
   },
 
   /**
@@ -250,7 +250,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
    * @returns {string} - The current user's username.
    */
   getDisplayName() {
-    return gdjs.evtTools.firebase.auth.currentUser.displayName || 'none';
+    return gdjs.evtTools.firebase.auth.currentUser.displayName || '';
   },
 
   /**
@@ -258,7 +258,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
    * @returns {string}
    */
   getPhoneNumber() {
-    return gdjs.evtTools.firebase.auth.currentUser.phoneNumber || 'none';
+    return gdjs.evtTools.firebase.auth.currentUser.phoneNumber || '';
   },
 
   /**
@@ -292,7 +292,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
    * @returns {string}
    */
   getPhotoURL() {
-    return gdjs.evtTools.firebase.auth.currentUser.photoURL || 'none';
+    return gdjs.evtTools.firebase.auth.currentUser.photoURL || '';
   },
 
   /**
@@ -326,7 +326,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
 
 /**
  * Get the logged-in user's authentification token.
- * Tries to refresh it everytime you get it.
+ * Tries to refresh it everytime the function is called.
  * @returns {string}
  */
 gdjs.evtTools.firebase.auth.token = function () {
@@ -337,7 +337,7 @@ gdjs.evtTools.firebase.auth.token = function () {
 };
 
 /**
- * A getter for {@link gdjs.evtTools.firebase.auth.authentified}.
+ * Returns true if the user is currently authetified.
  * @returns {boolean} Is the user authentified?
  * @see gdjs.evtTools.firebase.auth.authentified
  */
@@ -346,7 +346,7 @@ gdjs.evtTools.firebase.auth.isAuthentified = function () {
 };
 
 /**
- * Signs you in with basic email-password authentification.
+ * Signs the user in with basic email-password authentification.
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
  * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
@@ -406,7 +406,7 @@ gdjs.evtTools.firebase.auth.anonymSignIn = function (callbackStateVariable) {
 };
 
 /**
- * Signs you in with an external provider.
+ * Signs the user in with an external provider.
  * Only works on the web, NOT on elctron and probably not on Cordova.
  * @param {"google" | "facebook" | "github" | "twitter"} providerName - The external provider to use.
  * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
@@ -429,9 +429,8 @@ gdjs.evtTools.firebase.auth.signInWithProvider = function (
     });
 };
 
-/** Register callback for after firebase initialization. */
+// Listen to authentication state changes to regenerate tokens and keep the user and the authenticated state up to date
 gdjs.evtTools.firebase.onAppCreated.push(function () {
-  /** Registers callback for Auth Status. */
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       gdjs.evtTools.firebase.auth.authentified = true;

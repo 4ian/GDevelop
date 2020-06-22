@@ -16,30 +16,27 @@ That's why object and behaviors can have "properties". A property is defined by 
 * You can use them when declaring **an object or behavior** in JavaScript (in `JsExtension.js`). For example, in the case of a Video Object:
 
     ```js
-        videoObject.getProperties = function(objectContent) {
+    videoObject.getProperties = function(objectContent) {
         var objectProperties = new gd.MapStringPropertyDescriptor();
-        objectProperties.set(
-            "Opacity",
-            new gd.PropertyDescriptor(objectContent.opacity.toString())
+        objectProperties
+            .getOrCreate('opacity')
+            .setValue(objectContent.opacity.toString())
             .setType("number")
-            .setLabel(_("Video opacity (0-255)"))
-        );
-        objectProperties.set(
-            "Looped",
-            new gd.PropertyDescriptor(objectContent.loop ? "true" : "false")
+            .setLabel(_("Video opacity (0-255)"));
+        objectProperties
+            .getOrCreate('looped')
+            .setValue(objectContent.loop ? "true" : "false")
             .setType("boolean")
-            .setLabel(_("Loop the video"))
-        );
-        objectProperties.set(
-            "videoResource",
-            new gd.PropertyDescriptor(objectContent.videoResource)
+            .setLabel(_("Loop the video"));
+        objectProperties
+            .getOrCreate('videoResource')
+            .setValue(objectContent.videoResource)
             .setType("resource")
             .addExtraInfo("video")
-            .setLabel(_("Video resource"))
-        );
+            .setLabel(_("Video resource"));
 
         return objectProperties;
-        };
+    };
     ```
 
 * Their usage is mostly the same in C++. For example, in the case of a Skeleton Object:
@@ -48,13 +45,18 @@ That's why object and behaviors can have "properties". A property is defined by 
     std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(
         gd::Project& project) const {
     std::map<gd::String, gd::PropertyDescriptor> properties;
-    properties[_("Skeletal data filename")].SetValue(skeletalDataFilename)
-        .SetType("resource").AddExtraInfo("json");
+    properties[_("Skeletal data filename")]
+        .SetValue(skeletalDataFilename)
+        .SetType("resource")
+        .AddExtraInfo("json");
     properties[_("Main armature name")].SetValue(rootArmatureName);
-    properties[_("Texture data filename")].SetValue(textureDataFilename)
-        .SetType("resource").AddExtraInfo("json");
+    properties[_("Texture data filename")]
+        .SetValue(textureDataFilename)
+        .SetType("resource")
+        .AddExtraInfo("json");
     properties[_("Texture")].SetValue(textureName)
-        .SetType("resource").AddExtraInfo("image");
+        .SetType("resource")
+        .AddExtraInfo("image");
 
     return properties;
     }

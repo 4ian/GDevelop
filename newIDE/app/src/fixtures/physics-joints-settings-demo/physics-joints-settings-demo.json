@@ -345,7 +345,8 @@
         "g": 188,
         "r": 138
       },
-      "absoluteCoordinates": true
+      "absoluteCoordinates": true,
+      "clearBetweenFrames": true
     },
     {
       "name": "Button",

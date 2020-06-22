@@ -1245,7 +1245,8 @@
             "g": 249,
             "r": 249
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Follow",

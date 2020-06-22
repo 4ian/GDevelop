@@ -21,6 +21,7 @@ import {
 } from '../EventsFunctionsExtensionsLoader/Storage';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
+import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 
 type Props = {|
   authentification: Authentification,
@@ -76,14 +77,16 @@ export default class Providers extends React.Component<Props, {||}> {
                                   eventsFunctionsExtensionOpener
                                 }
                               >
-                                <EventsFunctionsExtensionsContext.Consumer>
-                                  {eventsFunctionsExtensionsState =>
-                                    children({
-                                      i18n,
-                                      eventsFunctionsExtensionsState,
-                                    })
-                                  }
-                                </EventsFunctionsExtensionsContext.Consumer>
+                                <CommandsContextProvider>
+                                  <EventsFunctionsExtensionsContext.Consumer>
+                                    {eventsFunctionsExtensionsState =>
+                                      children({
+                                        i18n,
+                                        eventsFunctionsExtensionsState,
+                                      })
+                                    }
+                                  </EventsFunctionsExtensionsContext.Consumer>
+                                </CommandsContextProvider>
                               </EventsFunctionsExtensionsProvider>
                             )}
                           </I18n>

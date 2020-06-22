@@ -658,6 +658,7 @@ NamedPropertyDescriptor implements PropertyDescriptor;
 interface MapStringPropertyDescriptor {
     void MapStringPropertyDescriptor();
 
+    [Ref] PropertyDescriptor MAP_getOrCreate([Const] DOMString name);
     [Ref] PropertyDescriptor MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] PropertyDescriptor prop);
     boolean MAP_has([Const] DOMString name);

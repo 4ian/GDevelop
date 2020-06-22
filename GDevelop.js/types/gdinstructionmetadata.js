@@ -19,7 +19,7 @@ declare class gdInstructionMetadata {
   setHelpPath(helpPath: string): gdInstructionMetadata;
   setHidden(): gdInstructionMetadata;
   setPrivate(): gdInstructionMetadata;
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): gdInstructionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): gdInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdInstructionMetadata;
   setDefaultValue(defaultValue: string): gdInstructionMetadata;
   setParameterLongDescription(longDescription: string): gdInstructionMetadata;

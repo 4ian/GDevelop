@@ -1,4 +1,7 @@
 // @flow
+/*::
+import { type Trans } from '../../newIDE/app/node_modules/@lingui/macro'
+*/
 
 /**
  * This is a declaration of an extension for GDevelop 5.
@@ -13,14 +16,17 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function (_, gd/*: libGDevelop */) {
-    const extension = new gd.PlatformExtension();
+  createExtension: function (
+      _ /*: Trans */, 
+      gd /*: libGDevelop */
+    ) {
+    const extension /*: gdPlatformExtension */ = new gd.PlatformExtension();
 
     extension
       .setExtensionInformation(
         'Firebase',
         _('Firebase'),
-        _('Use google Firebase features in GDevelop'),
+        _('Use Google Firebase services (database, functions, storage...) in your game.'),
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
@@ -124,13 +130,11 @@ module.exports = {
     /* ====== REMOTE CONFIGURATION ====== */
     extension
       .addStrExpression(
-        'GetRCString',
+        'GetRemoteConfigString',
         _('Get Remote setting as String'),
-        _('Get a setting from Firebase Remote Config as String.'),
+        _('Get a setting from Firebase Remote Config as a string.'),
         _('Firebase/Remote Config'),
-        'JsPlatform/Extensions/firebase.png',
-        'JsPlatform/Extensions/firebase.png'
-      )
+        'JsPlatform/Extensions/firebase.png')
       .addParameter('string', _('Setting Name'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -145,11 +149,10 @@ module.exports = {
 
     extension
       .addExpression(
-        'GetRCString',
+        'GetRemoteConfigString',
         _('Get Remote setting as Number'),
         _('Get a setting from Firebase Remote Config as Number.'),
         _('Firebase/Remote Config'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Setting Name'), '', false)
@@ -166,7 +169,7 @@ module.exports = {
 
     extension
       .addAction(
-        'SetRCAutoUpdateInterval',
+        'SetRemoteConfigAutoUpdateInterval',
         _('Set Remote Config Auto Update Inteval'),
         _('Sets Remote Config Auto Update Inteval.'),
         _('Set Remote Config Auto Update Inteval to _PARAM0_'),
@@ -188,7 +191,7 @@ module.exports = {
 
     extension
       .addAction(
-        'SetRCDefaultConfig',
+        'SetRemoteConfigDefaultConfig',
         _('Set the default configuration'),
         _(
           'As the Remote Config is online, you need to set a default ' +
@@ -213,7 +216,7 @@ module.exports = {
 
     extension
       .addAction(
-        'ForceReloadRC',
+        'ForceReloadRemoteConfig',
         _('Force sync the configuration'),
         _('Use this to sync the Remote Config with the client at any time.'),
         _('Synchronize Remote Config'),
@@ -344,7 +347,6 @@ module.exports = {
           'Get the users authentififcation token. The token is the proof of authentification.'
         ),
         _('Firebase/Authentification'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Setting Name'), '', false)
@@ -381,7 +383,6 @@ module.exports = {
         _('Get the users email address'),
         _('Gets the users email address.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -397,7 +398,6 @@ module.exports = {
         _('Get the accounts creation time'),
         _('Gets the accounts creation time.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -415,7 +415,6 @@ module.exports = {
         _('Get the users last login time'),
         _('Gets the users last login time.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -433,7 +432,6 @@ module.exports = {
         _('Get the users display name'),
         _('Gets the users display name.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -451,7 +449,6 @@ module.exports = {
         _('Get the users phone number'),
         _('Gets the users phone number.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -472,7 +469,6 @@ module.exports = {
             'user instead of the name or email.'
         ),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -490,7 +486,6 @@ module.exports = {
           'Gets the users Tenant ID. Only use that if you know what you are doing.'
         ),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -510,7 +505,6 @@ module.exports = {
           'Gets the users Refresh Token. Only use that if you know what you are doing.'
         ),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -528,7 +522,6 @@ module.exports = {
         _('Get the users Profile Picture URL'),
         _('Gets an URL to the users profile picture.'),
         _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -1731,7 +1724,10 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (gd, extension) {
+  runExtensionSanityTests: function (
+      gd /*: libGDevelop */, 
+      extension /*: gdPlatformExtension */
+    ) {
     return [];
   },
 };

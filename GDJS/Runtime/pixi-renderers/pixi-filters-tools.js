@@ -70,7 +70,7 @@ gdjs.PixiFiltersTools.registerFilterCreator = function (
 
 /**
  * Convert a string RGB color ("rrr;ggg;bbb") or a hex string (#rrggbb) to a hex number.
- * @param {string} The color as a RGB string or hex string
+ * @param {string} value The color as a RGB string or hex string
  * @returns {number}
  */
 gdjs.PixiFiltersTools.rgbOrHexToHexNumber = function (value) {
@@ -81,7 +81,7 @@ gdjs.PixiFiltersTools.rgbOrHexToHexNumber = function (value) {
       parseInt(splitValue[1], 0),
       parseInt(splitValue[2], 0)
     );
-  } 
+  }
 
   return parseInt(value.replace('#', '0x'), 16);
 };

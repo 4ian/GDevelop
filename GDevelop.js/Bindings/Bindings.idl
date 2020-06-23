@@ -390,8 +390,8 @@ interface Behavior {
     Behavior Clone();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
@@ -399,8 +399,8 @@ interface Behavior {
 interface BehaviorJsImplementation {
     void BehaviorJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
@@ -420,8 +420,8 @@ interface BehaviorContent {
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
@@ -429,8 +429,8 @@ interface BehaviorsSharedData {
 interface BehaviorSharedDataJsImplementation {
     void BehaviorSharedDataJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
@@ -438,7 +438,7 @@ interface gdObject {
     // /!\ We need to call it gdObject to avoid messing up with javascript Object
     //     global in glue.js!
     void gdObject([Const] DOMString name);
-    // [Value] UniquePtrObject Clone(); Not exposed
+    [Value] UniquePtrObject Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
@@ -447,8 +447,8 @@ interface gdObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -477,8 +477,8 @@ interface ObjectJsImplementation {
     void ObjectJsImplementation();
     [Value] UniquePtrObject Clone();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -679,8 +679,8 @@ interface Resource {
     void SetMetadata([Const] DOMString metadata);
     [Const, Ref] DOMString GetMetadata();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -2220,8 +2220,8 @@ interface SkeletonObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);

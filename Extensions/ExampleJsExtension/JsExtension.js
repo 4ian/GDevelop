@@ -519,7 +519,7 @@ module.exports = {
     RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
       const property1Value = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('My first property')
         .getValue();
       this._pixiObject.text = property1Value;

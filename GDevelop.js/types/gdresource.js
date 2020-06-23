@@ -13,8 +13,8 @@ declare class gdResource {
   getFile(): string;
   setMetadata(metadata: string): void;
   getMetadata(): string;
-  getProperties(project: gdProject): gdMapStringPropertyDescriptor;
-  updateProperty(name: string, value: string, project: gdProject): boolean;
+  getProperties(): gdMapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

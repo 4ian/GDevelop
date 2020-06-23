@@ -2,8 +2,8 @@
 declare class gdObjectJsImplementation extends gdObject {
   constructor(): void;
   clone(): gdUniquePtrObject;
-  getProperties(project: gdProject): gdMapStringPropertyDescriptor;
-  updateProperty(name: string, value: string, project: gdProject): boolean;
+  getProperties(): gdMapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance, project: gdProject, scene: gdLayout): gdMapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string, project: gdProject, scene: gdLayout): boolean;
   getRawJSONContent(): string;

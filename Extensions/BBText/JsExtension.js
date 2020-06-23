@@ -502,7 +502,7 @@ module.exports = {
      */
     RenderedBBTextInstance.prototype.update = function () {
       const rawText = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('text')
         .getValue();
       if (rawText !== this._pixiObject.text) {
@@ -510,25 +510,25 @@ module.exports = {
       }
 
       const opacity = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;
 
       const color = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('color')
         .getValue();
       this._pixiObject.textStyles.default.fill = color;
 
       const fontSize = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('fontSize')
         .getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
 
       const fontResourceName = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('fontFamily')
         .getValue();
 
@@ -548,7 +548,7 @@ module.exports = {
       }
 
       const wordWrap = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('wordWrap')
         .getValue();
       if (wordWrap !== this._pixiObject._style.wordWrap) {
@@ -557,7 +557,7 @@ module.exports = {
       }
 
       const align = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('align')
         .getValue();
       if (align !== this._pixiObject._style.align) {

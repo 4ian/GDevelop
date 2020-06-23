@@ -79,7 +79,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
   };
 
   render() {
-    const { layout, project } = this.props;
+    const { layout } = this.props;
     const actions = [
       // TODO: Add support for cancelling modifications made to BehaviorSharedData
       // (either by enhancing a function like propertiesMapToSchema or using copies)
@@ -113,22 +113,17 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         if (isNullPtr(gd, behaviorSharedData)) return null;
 
         const properties = behaviorSharedData.getProperties(
-          sharedDataContent.getContent(),
-          project
+          sharedDataContent.getContent()
         );
         const propertiesSchema = propertiesMapToSchema(
           properties,
           sharedDataContent =>
-            behaviorSharedData.getProperties(
-              sharedDataContent.getContent(),
-              project
-            ),
+            behaviorSharedData.getProperties(sharedDataContent.getContent()),
           (sharedDataContent, name, value) => {
             behaviorSharedData.updateProperty(
               sharedDataContent.getContent(),
               name,
-              value,
-              project
+              value
             );
           }
         );

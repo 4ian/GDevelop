@@ -77,8 +77,7 @@ gd::BehaviorContent& Object::AddBehavior(
 }
 
 #if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }

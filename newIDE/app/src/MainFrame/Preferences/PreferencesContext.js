@@ -135,6 +135,7 @@ export type PreferencesValues = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
+  useCommandPalette: boolean,
 |};
 
 /**
@@ -179,6 +180,7 @@ export type Preferences = {|
   setAutoOpenMostRecentProject: (enabled: boolean) => void,
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
+  setUseCommandPalette: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -202,6 +204,7 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
+    useCommandPalette: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -236,6 +239,7 @@ export const initialPreferences = {
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
+  setUseCommandPalette: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

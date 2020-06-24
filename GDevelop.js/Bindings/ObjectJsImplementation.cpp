@@ -1,10 +1,13 @@
 #include "ObjectJsImplementation.h"
-#include <GDCore/Project/PropertyDescriptor.h>
+
+#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/Project.h>
+#include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <emscripten.h>
+
 #include <map>
 
 using namespace gd;
@@ -32,7 +35,7 @@ std::unique_ptr<gd::Object> ObjectJsImplementation::Clone() const {
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-ObjectJsImplementation::GetProperties(gd::Project&) const {
+ObjectJsImplementation::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -57,8 +60,7 @@ ObjectJsImplementation::GetProperties(gd::Project&) const {
   return copiedProperties;
 }
 bool ObjectJsImplementation::UpdateProperty(const gd::String& arg0,
-                                            const gd::String& arg1,
-                                            Project&) {
+                                            const gd::String& arg1) {
   jsonContent = (const char*)EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
@@ -159,4 +161,36 @@ void ObjectJsImplementation::__destroy__() {  // Useless?
         self['__destroy__']();
       },
       (int)this);
+}
+
+void ObjectJsImplementation::ExposeResources(
+    gd::ArbitraryResourceWorker& worker) {
+  std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
+
+  for (auto& property : properties) {
+    const String& propertyName = property.first;
+    const gd::PropertyDescriptor& propertyDescriptor = property.second;
+    if (propertyDescriptor.GetType() == "resource") {
+      auto& extraInfo = propertyDescriptor.GetExtraInfo();
+      const gd::String& resourceType = extraInfo.empty() ? "" : extraInfo[0];
+      const gd::String& oldPropertyValue = propertyDescriptor.GetValue();
+
+      gd::String newPropertyValue = oldPropertyValue;
+      if (resourceType == "image") {
+        worker.ExposeImage(newPropertyValue);
+      } else if (resourceType == "audio") {
+        worker.ExposeAudio(newPropertyValue);
+      } else if (resourceType == "font") {
+        worker.ExposeFont(newPropertyValue);
+      } else if (resourceType == "video") {
+        // Not supported in gd::ArbitraryResourceWorker
+      } else if (resourceType == "json") {
+        // Not supported in gd::ArbitraryResourceWorker
+      }
+
+      if (newPropertyValue != oldPropertyValue) {
+        UpdateProperty(propertyName, newPropertyValue);
+      }
+    }
+  }
 }

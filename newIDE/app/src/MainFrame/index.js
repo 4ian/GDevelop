@@ -100,6 +100,10 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
+import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
+import useMainFrameCommands from './MainFrameCommands';
+import CommandPalette from '../CommandPalette/CommandPalette';
+import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
 import { ResourcesWatcher } from '../ResourcesLoader/ResourcesWatcher.js';
 
@@ -222,6 +226,9 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
+  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
+    false
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -912,9 +919,11 @@ const MainFrame = (props: Props) => {
       return;
     }
 
-    if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
+    if (isExtensionNameTaken(newName, currentProject)) {
       showWarningBox(
-        i18n._(t`Another extension with this name already exists.`)
+        i18n._(
+          t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
+        )
       );
       return;
     }
@@ -1666,6 +1675,37 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
+  useKeyboardShortcutForCommandPalette(
+    React.useCallback(() => openCommandPalette(true), [])
+  );
+
+  useMainFrameCommands({
+    i18n,
+    project: state.currentProject,
+    previewEnabled:
+      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
+    onOpenProjectManager: toggleProjectManager,
+    onLaunchPreview: React.useCallback(
+      () => launchPreview(/*networkPreview=*/ false),
+      [launchPreview]
+    ),
+    onLaunchDebugPreview: React.useCallback(
+      () => {
+        openDebugger();
+        launchPreview(/*networkPreview=*/ false);
+      },
+      [openDebugger, launchPreview]
+    ),
+    onOpenStartPage: openStartPage,
+    onCreateProject: openCreateDialog,
+    onOpenProject: chooseProject,
+    onSaveProject: saveProject,
+    onSaveProjectAs: saveProjectAs,
+    onCloseApp: closeApp,
+    onCloseProject: askToCloseProject,
+    onExportGame: React.useCallback(() => openExportDialog(true), []),
+  });
+
   const showLoader = isLoadingProject || previewLoading || props.loading;
 
   return (
@@ -1987,6 +2027,9 @@ const MainFrame = (props: Props) => {
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
+      )}
+      {commandPaletteOpen && (
+        <CommandPalette open onClose={() => openCommandPalette(false)} />
       )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog

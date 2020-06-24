@@ -5371,7 +5371,8 @@
             "g": 0,
             "r": 0
           },
-          "absoluteCoordinates": false
+          "absoluteCoordinates": false,
+          "clearBetweenFrames": true
         }
       ],
       "events": [

@@ -472,7 +472,8 @@
             "g": 232,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Shapes",

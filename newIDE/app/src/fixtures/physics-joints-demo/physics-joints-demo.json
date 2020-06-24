@@ -1265,7 +1265,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RevoluteBox",
@@ -1484,7 +1485,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PrismaticBox",
@@ -1637,7 +1639,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PulleyBox",
@@ -1790,7 +1793,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "GearBox1",
@@ -2075,7 +2079,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MouseBox",
@@ -2162,7 +2167,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WheelBox",
@@ -2386,7 +2392,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WeldBox",
@@ -2610,7 +2617,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RopeBox",
@@ -2763,7 +2771,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "FrictionBox",
@@ -2921,7 +2930,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MotorBox1",
@@ -3150,7 +3160,8 @@
             "g": 255,
             "r": 255
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "BreakableBox1",
@@ -3511,7 +3522,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         }
       ],
       "events": [

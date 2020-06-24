@@ -64,6 +64,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
+    setUseCommandPalette: this._setUseCommandPalette.bind(this),
   };
 
   componentDidMount() {
@@ -432,6 +433,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           hasProjectOpened: enabled,
         },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseCommandPalette(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, useCommandPalette: enabled },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

@@ -29,19 +29,24 @@
 
 namespace gdjs {
 
-// Nice tools functions
 static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
   if (std::find(container.begin(), container.end(), str) == container.end())
     container.push_back(str);
 }
 
-static void GenerateFontsDeclaration(
+static void GenerateDeprecatedFontsDeclaration(
     const gd::ResourcesManager &resourcesManager,
     gd::AbstractFileSystem &fs,
     const gd::String &outputDir,
     gd::String &css,
     gd::String &html,
     gd::String urlPrefix = "") {
+  // Compatibility with GD <= 5.0-beta56
+  // Before, fonts were detected by scanning the export folder for .TTF files.
+  // Text Object (or anything using a font) was just declaring the font filename
+  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
+  // We still support this, the time everything is migrated to using font
+  // resources.
   std::set<gd::String> files;
   auto makeCSSDeclarationFor = [&urlPrefix](gd::String relativeFile) {
     gd::String css;
@@ -54,21 +59,6 @@ static void GenerateFontsDeclaration(
     return css;
   };
 
-  for (auto &resourceName : resourcesManager.GetAllResourceNames()) {
-    const gd::Resource &resource = resourcesManager.GetResource(resourceName);
-    if (resource.GetKind() != "font") continue;
-
-    gd::String relativeFile = resource.GetFile();
-    css += makeCSSDeclarationFor(relativeFile);
-    files.insert(relativeFile);
-  }
-
-  // Compatibility with GD <= 5.0-beta56
-  // Before, fonts were detected by scanning the export folder for .TTF files.
-  // Text Object (or anything using a font) was just declaring the font filename
-  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
-  // We still support this, the time everything is migrated to using font
-  // resources.
   std::vector<gd::String> ttfFiles = fs.ReadDir(outputDir, ".TTF");
   for (std::size_t i = 0; i < ttfFiles.size(); ++i) {
     gd::String relativeFile = ttfFiles[i];
@@ -184,7 +174,7 @@ bool ExporterHelper::ExportPixiIndexFile(
   gd::String customCss;
   gd::String customHtml;  // Custom HTML is only needed for the deprecated way
                           // of loading fonts
-  GenerateFontsDeclaration(project.GetResourcesManager(),
+  GenerateDeprecatedFontsDeclaration(project.GetResourcesManager(),
                            fs,  // File system is only needed for the deprecated
                                 // way of loading fonts
                            exportDir,
@@ -344,7 +334,7 @@ bool ExporterHelper::ExportCocos2dFiles(
     // Generate custom declarations for font resources
     gd::String customCss;
     gd::String customHtml;
-    GenerateFontsDeclaration(project.GetResourcesManager(),
+    GenerateDeprecatedFontsDeclaration(project.GetResourcesManager(),
                              fs,
                              exportDir + "/res",
                              customCss,

@@ -14,9 +14,9 @@ gdjs.PixiFiltersTools.registerFilterCreator('Glow', {
       filter.distance = value;
     }
   },
-  updateStringParameter: function(filter, parameterName, value) {
+  updateStringParameter: function(filter, parameterName, value) {      
     if (parameterName === 'color') {
-      filter.color = value.replace('#', '0x');
+      filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
   },
   updateBooleanParameter: function(filter, parameterName, value) {},

@@ -24,12 +24,12 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
     } = this.props;
     console.log(object);
     // TODO: cast to gdObject?
-    const properties = object.getProperties(project);
+    const properties = object.getProperties();
 
     const propertiesSchema = propertiesMapToSchema(
       properties,
-      object => object.getProperties(project),
-      (object, name, value) => object.updateProperty(name, value, project)
+      object => object.getProperties(),
+      (object, name, value) => object.updateProperty(name, value)
     );
 
     const extraInformation = getExtraObjectsInformation()[object.getType()];

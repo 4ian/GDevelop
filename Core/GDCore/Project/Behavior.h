@@ -61,7 +61,7 @@ class GD_CORE_API Behavior {
    * \see gd::PropertyDescriptor
    */
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializerElement& behaviorContent, gd::Project& project) const;
+      const gd::SerializerElement& behaviorContent) const;
 
   /**
    * \brief Called when the IDE wants to update a custom property of the
@@ -72,8 +72,7 @@ class GD_CORE_API Behavior {
    */
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) {
+                              const gd::String& value) {
     return false;
   };
 #endif

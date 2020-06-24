@@ -312,6 +312,16 @@ describe('libGD.js - GDJS related tests', function() {
       expect(object.areCoordinatesAbsolute()).toBe(false);
     });
   });
+  describe('ShapePainterObject', function() {
+    it('should expose ShapePainterObject specific methods', function() {
+      var object = new gd.ShapePainterObject('MyShapePainterObject');
+      testObjectFeatures(object);
+      object.setClearBetweenFrames(true);
+      expect(object.isClearedBetweenFrames()).toBe(true);
+      object.setClearBetweenFrames(false);
+      expect(object.isClearedBetweenFrames()).toBe(false);
+    });
+  });
   describe('TextEntryObject', function() {
     it('should expose TextEntryObject', function() {
       var object = new gd.TextEntryObject('MyTextEntryObject');

@@ -6,14 +6,18 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 export const useCommand = (commandName: string, command: Command) => {
   const commandManager = React.useContext(CommandsContext);
+  const { displayText, enabled, handler } = command;
   React.useEffect(
     () => {
-      if (!command.enabled) return;
-      commandManager.registerCommand(commandName, command);
+      if (!enabled) return;
+      commandManager.registerCommand(commandName, {
+        displayText,
+        enabled,
+        handler,
+      });
       return () => commandManager.deregisterCommand(commandName);
     },
-    // eslint-disable-next-line
-    [commandManager, commandName, command.enabled, command.handler]
+    [commandManager, commandName, displayText, enabled, handler]
   );
 };
 

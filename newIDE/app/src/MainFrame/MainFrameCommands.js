@@ -20,69 +20,81 @@ type CommandHandlers = {
   onExportGame: () => void,
 };
 
+const quitAppText = t`Close GDevelop`;
+const openProjectManagerText = t`Open project manager`;
+const launchPreviewText = t`Launch preview`;
+const launchDebugPreviewText = t`Launch preview with debugger and profiler`;
+const openStartPageText = t`Open start page`;
+const createNewProjectText = t`Create a new project`;
+const openProjectText = t`Open project`;
+const saveProjectText = t`Save project`;
+const saveProjectAsText = t`Save project as...`;
+const closeProjectText = t`Close project`;
+const exportGameText = t`Export game`;
+
 const useMainFrameCommands = (handlers: CommandHandlers) => {
   useCommand('QUIT_APP', {
-    displayText: t`Close GDevelop`,
+    displayText: quitAppText,
     enabled: true,
     handler: handlers.onCloseApp,
   });
 
   useCommand('OPEN_PROJECT_MANAGER', {
-    displayText: t`Open project manager`,
+    displayText: openProjectManagerText,
     enabled: !!handlers.project,
     handler: handlers.onOpenProjectManager,
   });
 
   useCommand('LAUNCH_PREVIEW', {
-    displayText: t`Launch preview`,
+    displayText: launchPreviewText,
     enabled: handlers.previewEnabled,
     handler: handlers.onLaunchPreview,
   });
 
   useCommand('LAUNCH_DEBUG_PREVIEW', {
-    displayText: t`Launch preview with debugger and profiler`,
+    displayText: launchDebugPreviewText,
     enabled: handlers.previewEnabled,
     handler: handlers.onLaunchDebugPreview,
   });
 
   useCommand('OPEN_START_PAGE', {
-    displayText: t`Open start page`,
+    displayText: openStartPageText,
     enabled: true,
     handler: handlers.onOpenStartPage,
   });
 
   useCommand('CREATE_NEW_PROJECT', {
-    displayText: t`Create a new project`,
+    displayText: createNewProjectText,
     enabled: true,
     handler: handlers.onCreateProject,
   });
 
   useCommand('OPEN_PROJECT', {
-    displayText: t`Open a project`,
+    displayText: openProjectText,
     enabled: true,
     handler: handlers.onOpenProject,
   });
 
   useCommand('SAVE_PROJECT', {
-    displayText: t`Save project`,
+    displayText: saveProjectText,
     enabled: !!handlers.project,
     handler: handlers.onSaveProject,
   });
 
   useCommand('SAVE_PROJECT_AS', {
-    displayText: t`Save project as...`,
+    displayText: saveProjectAsText,
     enabled: !!handlers.project,
     handler: handlers.onSaveProjectAs,
   });
 
   useCommand('CLOSE_PROJECT', {
-    displayText: t`Close the current project`,
+    displayText: closeProjectText,
     enabled: !!handlers.project,
     handler: handlers.onCloseProject,
   });
 
   useCommand('EXPORT_GAME', {
-    displayText: t`Export game`,
+    displayText: exportGameText,
     enabled: !!handlers.project,
     handler: handlers.onExportGame,
   });

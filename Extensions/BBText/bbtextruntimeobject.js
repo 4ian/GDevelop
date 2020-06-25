@@ -48,7 +48,6 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
-    /** @type {gdjs.BBTextRuntimeObjectRenderer} */
     this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

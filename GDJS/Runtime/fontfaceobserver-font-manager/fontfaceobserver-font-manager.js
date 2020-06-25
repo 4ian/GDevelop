@@ -22,6 +22,9 @@ gdjs.FontFaceObserverFontManager = function (resources) {
 
   /** @type {Object.<string, ResourceData>} */
   this._loadedFonts = {}; // Associate font resource names to the resources, for faster access
+
+  /** @type {Object.<string, string>} */
+  this._filenameToFontFamily = {}; // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
 };
 
 gdjs.FontManager = gdjs.FontFaceObserverFontManager; //Register the class to let the engine use it.
@@ -29,12 +32,11 @@ gdjs.FontManager = gdjs.FontFaceObserverFontManager; //Register the class to let
 /**
  * Return the font family associated to the specified font resource name.
  * The font resource must have been loaded before. If that's not the case,
- * a font family will be returned but without guarantee of it being loaded (to
- * keep compatibility with GDevelop 5.0-beta56 and previous).
+ * a default font family will be returned ("Arial").
  *
  * @param {string} resourceName The name of the resource to get.
  * @returns {string} The font family to be used for this font resource,
- * or "Arial" if `resourceName` is empty.
+ * or "Arial" if not loaded.
  */
 gdjs.FontFaceObserverFontManager.prototype.getFontFamily = function (
   resourceName
@@ -43,9 +45,7 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFamily = function (
     return this._loadedFontFamily[resourceName];
   }
 
-  return resourceName
-    ? gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename(resourceName)
-    : 'Arial';
+  return 'Arial';
 };
 
 /**
@@ -70,15 +70,36 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFile = function (
 };
 
 /**
- * Return the font family for a given filename.
+ * Return the font family to use for a given filename.
+ * Each filename is guaranteed to have a unique font family. You should not rely
+ * on the font family formatting (consider it as an "opaque string") - it's slugified
+ * (no spaces, no dots, no non-alphanumeric characters) to avoid issues when using the
+ * font family in various contexts.
  *
- * @param {string} filename The filename of the font
+ * @param {string} filename The filename of the font.
  * @returns {string} The font family to be used for this font resource.
  */
-gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename = function (
+gdjs.FontFaceObserverFontManager.prototype._getFontFamilyFromFilename = function (
   filename
 ) {
-  return 'gdjs_font_' + filename;
+  if (this._filenameToFontFamily[filename]) {
+    return this._filenameToFontFamily[filename];
+  }
+
+  // Replaces all non-alphanumeric characters with dashes to ensure no issues when
+  // refering to this font family (see https://github.com/4ian/GDevelop/issues/1521).
+  var baseSlugifiedName = 'gdjs_font_' + filename.toLowerCase().replace(/[^\w]/gi, '-');
+
+  // Ensure the generated font family is unique.
+  var slugifiedName = baseSlugifiedName;
+  var uniqueSuffix = 2;
+  while (!!this._filenameToFontFamily[baseSlugifiedName]) {
+    baseSlugifiedName = baseSlugifiedName + '-' + uniqueSuffix;
+    uniqueSuffix++;
+  }
+
+  // Cache the result to avoid collision with a similar slugified name for another filename.
+  return (this._filenameToFontFamily[filename] = slugifiedName);
 };
 
 /**
@@ -170,9 +191,7 @@ gdjs.FontFaceObserverFontManager.prototype.loadFonts = function (
     };
 
   Object.keys(filesResources).forEach(function (file) {
-    var fontFamily = gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename(
-      file
-    );
+    var fontFamily = that._getFontFamilyFromFilename(file);
     var fontResources = filesResources[file];
     gdjs.FontFaceObserverFontManager._loadFont(fontFamily, file).then(
       function () {

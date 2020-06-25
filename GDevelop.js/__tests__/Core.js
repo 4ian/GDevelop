@@ -2600,6 +2600,9 @@ describe('libGD.js', function() {
       fs.dirNameFrom = function(fullpath) {
         return path.dirname(fullpath);
       };
+      fs.readDir = function() {
+        return new gd.VectorString();
+      };
       fs.writeToFile = function(path, content) {
         //Validate that some code have been generated:
         expect(content).toMatch('runtimeScene.getOnceTriggers().startNewFrame');

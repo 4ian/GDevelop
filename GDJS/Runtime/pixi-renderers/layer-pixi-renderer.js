@@ -19,6 +19,11 @@ gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
   this._layer = layer;
+  this._renderTexture = null;
+  this._runtimeSceneRenderer = runtimeSceneRenderer;
+  this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
+  this._oldWidth = this._pixiRenderer.width;
+  this._oldHeight = this._pixiRenderer.height;
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
 
   this._setupFilters();
@@ -250,3 +255,33 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function(name) {
 
   return gdjs.PixiFiltersTools.isEffectEnabled(filter);
 };
+
+gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function() {
+  if(!this._renderTexture) {
+    var width = this._pixiRenderer.width;
+    var height = this._pixiRenderer.height;
+    var resolution = this._pixiRenderer.resolution;
+    this._renderTexture = PIXI.RenderTexture.create({
+      width,
+      height,
+      resolution
+    });
+  }
+
+  if(this._oldWidth !== this._pixiRenderer.width || 
+    this._oldHeight !== this._pixiRenderer.height) {
+      this._renderTexture.resize(
+        this._pixiRenderer.width,
+        this._pixiRenderer.height
+      )
+      this._oldWidth = this._pixiRenderer.width;
+      this._oldHeight = this._pixiRenderer.height;
+  }
+
+  this._pixiRenderer.render(this._pixiContainer, this._renderTexture, false);
+}
+
+gdjs.LayerPixiRenderer.prototype.getRenderTexture = function() {
+  if(!this._renderTexture) this.updateRenderTexture();
+  return this._renderTexture;
+}

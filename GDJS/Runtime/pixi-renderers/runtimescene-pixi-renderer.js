@@ -85,3 +85,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.showCursor = function() {
 gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function() {
   return this._pixiContainer;
 };
+
+gdjs.RuntimeScenePixiRenderer.prototype.getPIXIRenderer = function() {
+  return this._pixiRenderer;
+}

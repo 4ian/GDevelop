@@ -684,6 +684,18 @@ gdjs.RuntimeObject.prototype.isHidden = function() {
 };
 
 /**
+ * Set the width of the object, if applicable.
+ * @param {number} width The new width in pixels.
+ */
+gdjs.RuntimeObject.prototype.setWidth = function(width) {};
+
+/**
+ * Set the height of the object, if applicable.
+ * @param {number} height The new height in pixels.
+ */
+gdjs.RuntimeObject.prototype.setHeight = function(height) {};
+
+/**
  * Return the width of the object.
  * @return {number} The width of the object
  */

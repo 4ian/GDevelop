@@ -25,8 +25,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
         align: runtimeObject._align,
       },
     });
-
-    this._object.hidden = !runtimeObject._visible;
   } else {
     this.updateColor();
     this.updateAlignment();
@@ -48,7 +46,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
-  this.updateVisible();
 };
 
 gdjs.BBTextRuntimeObjectRenderer = gdjs.BBTextRuntimeObjectPixiRenderer;
@@ -98,10 +95,6 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function () {
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updatePosition = function () {
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
-};
-
-gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateVisible = function () {
-  this._pixiObject.hidden = !this._object._visible;
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateAngle = function () {

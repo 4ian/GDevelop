@@ -797,13 +797,13 @@ const MainFrame = (props: Props) => {
     })).then(state => {
       currentProject.removeEventsFunctionsExtension(externalLayout.getName());
       _onProjectItemModified();
-    });
 
-    // Reload extensions to make sure the deleted extension is removed
-    // from the platform
-    eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-      currentProject
-    );
+      // Reload extensions to make sure the deleted extension is removed
+      // from the platform
+      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+    });
   };
 
   const renameLayout = (oldName: string, newName: string) => {

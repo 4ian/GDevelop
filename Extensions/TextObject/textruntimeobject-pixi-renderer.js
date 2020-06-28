@@ -105,13 +105,9 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.getHeight = function() {
     return this._text.height;
 };
 
-gdjs.TextRuntimeObjectPixiRenderer.prototype.setWidth = function(newWidth) {
-    this._text.width = newWidth;
-};
+gdjs.TextRuntimeObjectPixiRenderer.prototype.setWidth = function(newWidth) {};
 
-gdjs.TextRuntimeObjectPixiRenderer.prototype.setHeight = function(newHeight) {
-    this._text.height = newHeight;
-};
+gdjs.TextRuntimeObjectPixiRenderer.prototype.setHeight = function(newHeight) {};
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype._getColorHex = function() {
     return gdjs.rgbToHexNumber(

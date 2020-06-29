@@ -271,7 +271,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
 
   /**
    * Gets the tenant ID.
-   * Only use it if you know what you are doing.
+   * For advanced usage only.
    * @returns {string}
    */
   getTenantID() {
@@ -280,7 +280,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
 
   /**
    * Gets the refresh Token.
-   * Only use it if you know what you are doing.
+   * For advanced usage only.
    * @returns {string}
    */
   getRefreshToken() {

@@ -82,9 +82,9 @@ module.exports = {
         _('Change user UID'),
         _(
           "Changes the current user's analytics identifier. " +
-            'This is what let Analytics differienciate users, ' +
+            'This is what let Analytics differienciate user, ' +
             'so it should always be unique for each user. ' +
-            'Only mess with that if you know what you are doing!'
+            'For advanced usage only.'
         ),
         _("Set current user's ID to _PARAM1_"),
         _('Firebase/Analytics'),
@@ -108,7 +108,7 @@ module.exports = {
         _("Set a user's property"),
         _(
           "Sets an user's properties." +
-            'Can be used to classify users in Analytics.'
+            'Can be used to classify user in Analytics.'
         ),
         _('Set property _PARAM1_ of the current user to _PARAM2_'),
         _('Firebase/Analytics'),
@@ -194,8 +194,9 @@ module.exports = {
         'SetRemoteConfigDefaultConfig',
         _('Set the default configuration'),
         _(
-          'As the Remote Config is online, you need to set a default ' +
-            'for when there is no internet or the config still loading.'
+          'As the Remote Config is stored online, you need to set default values ' +
+          'or the Remote Config expressions to return while there is no internet or ' +
+          'the config is still loading.'
         ),
         _('Set default config to _PARAM0_'),
         _('Firebase/Remote Config'),
@@ -236,16 +237,16 @@ module.exports = {
     extension
       .addAction(
         'CreateBasicAccount',
-        _('Create account with basic auth'),
-        _('Create an account with e-mail and password as credentials.'),
-        _('Create account with E-Mail _PARAM0_ and password _PARAM1_'),
+        _('Create account with with email'),
+        _('Create an account with email and password as credentials.'),
+        _('Create account with email _PARAM0_ and password _PARAM1_'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _('E-Mail'), '', false)
+      .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -256,20 +257,18 @@ module.exports = {
     extension
       .addAction(
         'BasicAccountSignIn',
-        _('Sign into an account with basic auth'),
+        _('Sign into an account with email'),
         _(
-          'Sign into an account with e-mail and password as credentials. ' +
-            'The Authetification state variable will be set to "ok" if the authentification ' +
-            'is succcessful, else it will contain the error message.'
+          'Sign into an account with email and password as credentials. '
         ),
-        _('Connect to account with E-Mail _PARAM0_ and password _PARAM1_'),
+        _('Connect to account with email _PARAM0_ and password _PARAM1_'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _('E-Mail'), '', false)
+      .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -283,17 +282,15 @@ module.exports = {
         _('Sign into an account with auth from provider'),
         _(
           'Sign into an account via an external provider. ' +
-            'The Authetification state variable will be set to "ok" if the authentification ' +
-            'is succcessful, else it will contain the error message. \n' +
-            'The availablke providers are: "google", "facebook", "github" and "twitter".\n' +
-            'Provider Authentification only works in the browser.'
+            'The available providers are: "google", "facebook", "github" and "twitter".\n' +
+            'Provider authentification only works in the browser! Not on previews or pc/mobile exports.'
         ),
         _('Connect to account with Provider _PARAM0_'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -303,15 +300,15 @@ module.exports = {
 
     extension
       .addAction(
-        'AnonymSignIn',
-        _('Sign In as an anonym guest'),
+        'AnonymousSignIn',
+        _('Sign In as an anonymous guest'),
         _('Sign into a temporary anonymous account.'),
         _('Authenticate anonymously'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -342,9 +339,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetAuthToken',
-        _('Get the users authentififcation token'),
+        _('Get the user authentififcation token'),
         _(
-          'Get the users authentififcation token. The token is the proof of authentification.'
+          'Get the user authentififcation token. The token is the proof of authentification.'
         ),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png'
@@ -357,13 +354,13 @@ module.exports = {
       .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
       .setFunctionName('gdjs.evtTools.firebase.auth.token');
 
-    //User management Instructions
+    // User management instructions
     extension
       .addCondition(
         'IsEmailVerified',
-        _('Is the users Email address verified'),
+        _('Is the user email address verified'),
         _('Checks if the email address of the user got verified.'),
-        _('The Email of the user is verified'),
+        _('The email of the user is verified'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -380,8 +377,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserEmail',
-        _('Get the users email address'),
-        _('Gets the users email address.'),
+        _('Get the user email address'),
+        _('Gets the user email address.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -412,8 +409,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetLastLoginTime',
-        _('Get the users last login time'),
-        _('Gets the users last login time.'),
+        _('Get the user last login time'),
+        _('Gets the user last login time.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -429,8 +426,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserDisplayName',
-        _('Get the users display name'),
-        _('Gets the users display name.'),
+        _('Get the user display name'),
+        _('Gets the user display name.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -446,8 +443,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetPhoneNumber',
-        _('Get the users phone number'),
-        _('Gets the users phone number.'),
+        _('Get the user phone number'),
+        _('Gets the user phone number.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -463,9 +460,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserUID',
-        _('Get the users ID'),
+        _('Get the user UID'),
         _(
-          'Gets the users Unique Identifier. Use that to link data to an ' +
+          'Gets the user Unique IDentifier. Use that to link data to an ' +
             'user instead of the name or email.'
         ),
         _('Firebase/Authentification/User Management'),
@@ -481,9 +478,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetTenantID',
-        _('Get the users Tenant ID'),
+        _('Get the user tenant ID'),
         _(
-          'Gets the users Tenant ID. Only use that if you know what you are doing.'
+          'Gets the user tenant ID. For advanced usage only.'
         ),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
@@ -500,9 +497,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetRefreshToken',
-        _('Get the users refresh token'),
+        _('Get the user refresh token'),
         _(
-          'Gets the users Refresh Token. Only use that if you know what you are doing.'
+          'Gets the user refresh token. For advanced usage only.'
         ),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
@@ -519,8 +516,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetPhotoURL',
-        _('Get the users Profile Picture URL'),
-        _('Gets an URL to the users profile picture.'),
+        _('Get the user profile picture URL'),
+        _('Gets an URL to the user profile picture.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -536,9 +533,9 @@ module.exports = {
     extension
       .addAction(
         'SendEmailVerification',
-        _('Send a verification Email'),
-        _('Send a link per email to verify the users email.'),
-        _('Send Verification Email'),
+        _('Send a verification email'),
+        _('Send a link per email to verify the user email.'),
+        _('Send verification email'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -555,8 +552,8 @@ module.exports = {
     extension
       .addAction(
         'SetDisplayName',
-        _('Set Display Name'),
-        _('Sets the users display name.'),
+        _('Set display name'),
+        _('Sets the user display name.'),
         _("Set the user's display name to _PARAM0_"),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png',
@@ -575,14 +572,14 @@ module.exports = {
     extension
       .addAction(
         'SetPhotoURL',
-        _('Set the users profile picture'),
-        _('Sets the users profile picture URL to a new one.'),
-        _("Set the user's display name to _PARAM0_"),
+        _('Set the user profile picture'),
+        _('Sets the user profile picture URL to a new one.'),
+        _("Set the user's profile picture URL to _PARAM0_"),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _("New photo's URL"), '', false)
+      .addParameter('string', _("New profile picture URL"), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -592,53 +589,33 @@ module.exports = {
         'gdjs.evtTools.firebase.auth.userManagement.setPhotoURL'
       );
 
-    extension
-      .addAction(
-        'SetPhotoURL',
-        _('Set the users profile picture'),
-        _('Sets the users profile picture URL to a new one.'),
-        _("Set the user's display name to _PARAM0_"),
-        _('Firebase/Authentification/User Management'),
-        'JsPlatform/Extensions/firebase.png',
-        'JsPlatform/Extensions/firebase.png'
-      )
-      .addParameter('string', _("New photo's URL"), '', false)
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
-      .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
-      .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
-      .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
-      .setFunctionName(
-        'gdjs.evtTools.firebase.auth.userManagement.setPhotoURL'
-      );
-
-    // Dangerous Authentification Instructions
+    // Advanced Authentification Instructions
     extension
       .addAction(
         'ChangeEmail',
-        _('Change the users email'),
+        _('Change the user email'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
+          'This action is dangerous so it requires reauthentification.\n' +
             "Changes the user's email address."
         ),
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM4_ (Send verification email: _PARAM3_)"
         ),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _('Old Email'), '', false)
+      .addParameter('string', _('Old email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('string', _('New Email'), '', false)
+      .addParameter('string', _('New email'), '', false)
       .addParameter(
         'yesorno',
-        _('Send verification Email before change?'),
+        _('Send a verification email before doing the change?'),
         '',
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -651,28 +628,28 @@ module.exports = {
     extension
       .addAction(
         'ChangeEmailProvider',
-        _('Change the users email (Provider)'),
+        _('Change the user email (Provider)'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
+          'This action is dangerous so it requires reauthentification.\n' +
             "Changes the user's email address.\n" +
-            'This is the same as Change the users email but reauthenticates via an external provider.'
+            'This is the same as Change the user email but reauthenticates via an external provider.'
         ),
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM2_ (Send verification email: _PARAM1_)"
         ),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _('New Email'), '', false)
+      .addParameter('string', _('New email'), '', false)
       .addParameter(
         'yesorno',
-        _('Send verification Email before change?'),
+        _('Send a verification email before doing the change?'),
         '',
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -685,30 +662,30 @@ module.exports = {
     extension
       .addAction(
         'ChangePassword',
-        _('Change the users password'),
+        _('Change the user password'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
-            "Changes the user's password."
+          'This action is dangerous so it requires reauthentification.\n' +
+            'Changes the user password.'
         ),
         _(
-          "Change the user's password to _PARAM2_ and store result in " +
+          'Change the user password to _PARAM2_ and store result in ' +
             '_PARAM4_ (Send verification email: _PARAM3_)'
         ),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Email'), '', false)
-      .addParameter('string', _('Old Password'), '', false)
-      .addParameter('string', _('New Password'), '', false)
+      .addParameter('string', _('Old password'), '', false)
+      .addParameter('string', _('New password'), '', false)
       .addParameter(
         'yesorno',
-        _('Send verification Email before change?'),
+        _('Send a verification email before doing the change?'),
         '',
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -721,29 +698,29 @@ module.exports = {
     extension
       .addAction(
         'ChangePasswordProvider',
-        _('Change the users password (Provider)'),
+        _('Change the user password (Provider)'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
-            "Changes the user's password.\n" +
-            'This is the same as Change the users password but reauthenticates via an external provider.'
+          'This action is dangerous so it requires reauthentification.\n' +
+            'Changes the user password.\n' +
+            'This is the same as "Change the user password" but reauthenticates via an external provider.'
         ),
         _(
-          "Change the user's password to _PARAM0_ and store result in " +
+          'Change the user password to _PARAM0_ and store result in ' +
             '_PARAM2_ (Send verification email: _PARAM1_)'
         ),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('New Password'), '', false)
       .addParameter(
         'yesorno',
-        _('Send verification Email before change?'),
+        _('Send a verification email before doing the change?'),
         '',
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -756,19 +733,19 @@ module.exports = {
     extension
       .addAction(
         'DeleteUser',
-        _('Delete the users account'),
+        _('Delete the user account'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
-            'Deletes the users account.'
+          'This action is dangerous so it requires reauthentification.\n' +
+            'Deletes the user account.'
         ),
-        _('Delete the users account and store result in _PARAM2_'),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Delete the user account and store result in _PARAM2_'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -781,18 +758,18 @@ module.exports = {
     extension
       .addAction(
         'DeleteUserProvider',
-        _('Delete the users account (Provider)'),
+        _('Delete the user account (Provider)'),
         _(
-          'This Action is dangerous so it requires reauthentification.\n' +
-            'Deletes the users account.\n' +
-            'This is the same as Delete the users account but reauthenticates via an external provider.'
+          'This action is dangerous so it requires reauthentification.\n' +
+            'Deletes the user account.\n' +
+            'This is the same as "Delete the user account" but reauthenticates via an external provider.'
         ),
-        _('Delete the users account and store result in _PARAM0_'),
-        _('Firebase/Authentification/User Management/Dangerous'),
+        _('Delete the user account and store result in _PARAM0_'),
+        _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Authentification State Variable'), '', false)
+      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -807,9 +784,9 @@ module.exports = {
     extension
       .addAction(
         'EnablePerformance',
-        _('Enable Performance Measuring'),
-        _('Enables Performance Measuring.'),
-        _('Enable Performance Measuring'),
+        _('Enable performance measuring'),
+        _('Enables performance measuring.'),
+        _('Enable performance measuring'),
         _('Firebase/Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -852,7 +829,7 @@ module.exports = {
         'StartTracer',
         _('Start a tracer'),
         _('Start measuring performance for that tracer'),
-        _('Start Performance Measuring on tracer _PARAM0_'),
+        _('Start performance measuring on tracer _PARAM0_'),
         _('Firebase/Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -897,7 +874,7 @@ module.exports = {
         _('Record performance'),
         _(
           'Record performance from a fixed start to end time. ' +
-            'Use this if you know how much fixed time you want the performance measuring to happen.'
+            'Use this if you want to measure the performance for a specified duration.'
         ),
         _(
           'Record performance for _PARAM1_ms with a delay of _PARAM2_ms (Store in tracker _PARAM0_)'
@@ -944,13 +921,13 @@ module.exports = {
       .addParameter('string', _('Parameter(s) as JSON or string.'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with returned value'),
+        _('Callback variable with returned value'),
         '',
         false
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1005,7 +982,7 @@ module.exports = {
       .addParameter('scenevar', _('Variable to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1038,7 +1015,7 @@ module.exports = {
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1071,7 +1048,7 @@ module.exports = {
       .addParameter('scenevar', _('Variable to update with'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1104,7 +1081,7 @@ module.exports = {
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1135,7 +1112,7 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1167,7 +1144,7 @@ module.exports = {
       .addParameter('string', _('Field to delete'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1204,7 +1181,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1242,7 +1219,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1281,7 +1258,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1321,7 +1298,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1362,7 +1339,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1374,7 +1351,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1407,7 +1384,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1437,7 +1414,7 @@ module.exports = {
       .addParameter('scenevar', _('Variable to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1465,7 +1442,7 @@ module.exports = {
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1492,7 +1469,7 @@ module.exports = {
       .addParameter('scenevar', _('Variable to update with'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1520,7 +1497,7 @@ module.exports = {
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1546,7 +1523,7 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1573,7 +1550,7 @@ module.exports = {
       .addParameter('string', _('Field to delete'), '', false)
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1607,7 +1584,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1642,7 +1619,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1676,7 +1653,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )
@@ -1711,7 +1688,7 @@ module.exports = {
       )
       .addParameter(
         'scenevar',
-        _('Callback Variable with state (ok or error)'),
+        _('Callback variable with state (ok or error)'),
         '',
         false
       )

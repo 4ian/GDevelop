@@ -74,6 +74,7 @@ export default class Debugger extends React.Component<Props, State> {
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger()}
         canPause={this._hasSelectedDebugger()}
+        canOpenProfiler={this._hasSelectedDebugger()}
         onOpenProfiler={() => {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].openProfiler();
@@ -289,9 +290,12 @@ export default class Debugger extends React.Component<Props, State> {
               selectedId={selectedId}
               debuggerIds={debuggerIds}
               onChooseDebugger={id =>
-                this.setState({
-                  selectedId: id,
-                })
+                this.setState(
+                  {
+                    selectedId: id,
+                  },
+                  () => this.updateToolbar()
+                )
               }
             />
             {this._hasSelectedDebugger() && (

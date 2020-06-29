@@ -48,10 +48,7 @@ export default function HotReloadLogsDialog({
         />,
       ]}
       secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath={'/interface/preview'}
-        />,
+        <HelpButton key="help" helpPagePath={'/interface/preview'} />,
       ]}
       open
       cannotBeDismissed

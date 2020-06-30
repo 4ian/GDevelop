@@ -172,6 +172,10 @@ gdjs.FontFaceObserverFontManager.prototype.loadFonts = function (
   for (var i = 0, len = resources.length; i < len; ++i) {
     var res = resources[i];
     if (res.file && res.kind === 'font') {
+      if (!!this._loadedFonts[res.name]) {
+        continue;
+      }
+
       filesResources[res.file] = filesResources[res.file]
         ? filesResources[res.file].concat(res)
         : [res];

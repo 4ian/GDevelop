@@ -36,6 +36,7 @@ import {
   getTagsFromString,
 } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { UseCompoundCommandHook } from '../CommandPalette/CommandHooks';
 
 const styles = {
   listContainer: {
@@ -526,6 +527,18 @@ export default class ObjectsList extends React.Component<Props, State> {
         <TagChips
           tags={this.props.selectedObjectTags}
           onChange={this.props.onChangeSelectedObjectTags}
+        />
+        <UseCompoundCommandHook
+          commandName={'PRINT_OBJ_PTR'}
+          command={{
+            displayText: `(...) Print object ptr`,
+            enabled: true,
+            options: lists.containerObjectsList.map(item => ({
+              text: item.object.getName(),
+              value: item.object,
+              handler: () => console.log(item.object.ptr),
+            })),
+          }}
         />
         <div style={styles.listContainer}>
           <AutoSizer>

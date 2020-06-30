@@ -10,7 +10,10 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandPalette/CommandsContext';
-import { type NamedCommand } from '../CommandPalette/CommandManager';
+import {
+  type NamedCommand,
+  type NamedCompoundCommand,
+} from '../CommandPalette/CommandManager';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 /**
@@ -58,9 +61,19 @@ const CommandPalette = (props: Props) => {
     onClose();
   };
 
-  const handleCommandChoose = (e, command: NamedCommand) => {
-    command && command.handler();
-    props.onClose();
+  const handleCommandChoose = (
+    e,
+    command: NamedCommand | NamedCompoundCommand<*>
+  ) => {
+    if (!command) return;
+    if (!command.options) {
+      // Simple command
+      command.handler();
+      props.onClose();
+    } else {
+      // Compound command
+      console.log(command.options);
+    }
   };
 
   return (
@@ -78,12 +91,12 @@ const CommandPalette = (props: Props) => {
         >
           <Autocomplete
             open={autocompleteOpen}
-            onClose={() => {
+            onClose={(a, b) => {
               openAutocomplete(false);
-              handleClose();
+              if (b !== 'select-option') handleClose();
             }}
             onOpen={() => openAutocomplete(true)}
-            options={commandManager.getAllNamedCommands()}
+            options={commandManager.getAllCommands()}
             getOptionLabel={command => i18n._(command.displayText)}
             onChange={handleCommandChoose}
             openOnFocus

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type Command } from './CommandManager';
+import { type Command, type CompoundCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
@@ -18,6 +18,26 @@ export const useCommand = (commandName: string, command: Command) => {
       return () => commandManager.deregisterCommand(commandName);
     },
     [commandManager, commandName, displayText, enabled, handler]
+  );
+};
+
+export const useCompoundCommand = <T>(
+  commandName: string,
+  command: CompoundCommand<T>
+) => {
+  const commandManager = React.useContext(CommandsContext);
+  const { displayText, enabled, options } = command;
+  React.useEffect(
+    () => {
+      if (!enabled) return;
+      commandManager.registerCompoundCommand(commandName, {
+        displayText,
+        enabled,
+        options,
+      });
+      return () => commandManager.deregisterCompoundCommand(commandName);
+    },
+    [commandManager, commandName, displayText, enabled, options]
   );
 };
 
@@ -53,4 +73,20 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
     },
     [onOpen, values.useCommandPalette]
   );
+};
+
+export const UseCommandHook = (props: {
+  commandName: string,
+  command: Command,
+}) => {
+  useCommand(props.commandName, props.command);
+  return null;
+};
+
+export const UseCompoundCommandHook = <T>(props: {
+  commandName: string,
+  command: CompoundCommand<T>,
+}) => {
+  useCompoundCommand(props.commandName, props.command);
+  return null;
 };

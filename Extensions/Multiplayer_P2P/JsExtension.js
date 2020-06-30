@@ -24,7 +24,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'P2P',
-      _('Peer-to-Peer Multiplayer'),
+      _('Peer-to-Peer communication'),
       _(
         'Adds possibility to connect multiple game instances together via WebRTC (P2P)'
       ),
@@ -35,8 +35,8 @@ module.exports = {
     extension
       .addCondition(
         'OnEvent',
-        _('Banner loading'),
-        _('Triggers once when a connected client sends the event.'),
+        _('Event triggered by peer'),
+        _('Triggers once when a connected client sends the event'),
         _('Event _PARAM0_ received from other client'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
@@ -46,13 +46,13 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer_P2P/A_peer.js')
       .addIncludeFile('Extensions/Multiplayer_P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.on');
+      .setFunctionName('gdjs.evtTools.p2p.onEvent');
 
     extension
       .addAction(
         'Connect',
-        _('Connect to other client'),
-        _('Connects the current client to another client using it\'s id.'),
+        _('Connect to another client'),
+        _('Connects the current client to another client using its id'),
         _('Connect to P2P client _PARAM0_'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
@@ -67,9 +67,9 @@ module.exports = {
     extension
       .addAction(
         'SendToAll',
-        _('Send to all connected clients'),
-        _('Triggers an event on all connected clients.'),
-        _('Trigger event _PARAM0_ on all connected clients. (Extra data: _PARAM1_)'),
+        _('Trigger event on all connected clients'),
+        _('Triggers an event on all connected clients'),
+        _('Trigger event _PARAM0_ on all connected clients (extra data: _PARAM1_)'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
@@ -84,9 +84,9 @@ module.exports = {
     extension
       .addAction(
         'SendToOne',
-        _('Send to one connected client'),
-        _('Triggers an event on one specific connected client.'),
-        _('Trigger event _PARAM1_ on _PARAM0_. (Extra data: _PARAM2_)'),
+        _('Trigger event on a specific client'),
+        _('Triggers an event on a specific connected client'),
+        _('Trigger event _PARAM1_ on client _PARAM0_ (extra data: _PARAM2_)'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
@@ -102,15 +102,15 @@ module.exports = {
       extension
       .addAction(
         'SendToAllVariable',
-        _('Send to all connected clients (variable)'),
-        _('Triggers an event on all connected clients.'),
-        _('Trigger event _PARAM0_ on all connected clients. (Extra data: _PARAM1_)'),
+        _('Trigger event on all connected clients (variable)'),
+        _('Triggers an event on all connected clients'),
+        _('Trigger event _PARAM0_ on all connected clients (extra data: _PARAM1_)'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('Event name'), '', false)
-      .addParameter('scenevar', _('Extra data as variable (optional)'), '', false)
+      .addParameter('scenevar', _('Variable containing the extra data'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer_P2P/A_peer.js')
       .addIncludeFile('Extensions/Multiplayer_P2P/B_p2ptools.js')
@@ -119,16 +119,16 @@ module.exports = {
     extension
       .addAction(
         'SendToOneVariable',
-        _('Send to one connected client (variable)'),
-        _('Triggers an event on one specific connected client.'),
-        _('Trigger event _PARAM1_ on _PARAM0_. (Extra data: _PARAM2_)'),
+        _('Trigger event on a specific client (variable)'),
+        _('Triggers an event on a specific connected client'),
+        _('Trigger event _PARAM1_ on client _PARAM0_ (extra data: _PARAM2_)'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('ID of the other client'), '', false)
       .addParameter('string', _('Event name'), '', false)
-      .addParameter('scenevar', _('Extra data as variable (optional)'), '', false)
+      .addParameter('scenevar', _('Variable containing the extra data'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer_P2P/A_peer.js')
       .addIncludeFile('Extensions/Multiplayer_P2P/B_p2ptools.js')
@@ -138,14 +138,17 @@ module.exports = {
       .addAction(
         'GetEventVariable',
         _('Get event data (variable)'),
-        _('Gets the variable sent with the last trigger of the passed event.'),
+        _(
+          'Store the data of the specified event in a variable. ' + 
+          'Check in the conditions that the event was received using the "Event received" condition.'
+        ),
         _('Overwrite _PARAM1_ with variable sent with last trigger of _PARAM0_'),
         _('P2P Multiplayer'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('Event name'), '', false)
-      .addParameter('scenevar', _('Extra data as variable (optional)'), '', false)
+      .addParameter('scenevar', _('Variable where to store the received data'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer_P2P/A_peer.js')
       .addIncludeFile('Extensions/Multiplayer_P2P/B_p2ptools.js')
@@ -155,7 +158,7 @@ module.exports = {
       .addStrExpression(
         'GetEventData',
         _('Get event data'),
-        _('Gets the data sent with the latest trigger of the passed event.'),
+        _('Returns the data received when the specified event was last triggered'),
         _('P2P Multiplayer'),
         'res/actions/camera.png'
       )
@@ -169,7 +172,7 @@ module.exports = {
       .addStrExpression(
         'GetID',
         _('Get client ID'),
-        _('Gets the current client ID of the current game instance.'),
+        _('Gets the current client ID of the current game instance'),
         _('P2P Multiplayer'),
         'res/actions/camera.png'
       )

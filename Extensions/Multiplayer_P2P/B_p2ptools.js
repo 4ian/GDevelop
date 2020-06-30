@@ -14,7 +14,7 @@ gdjs.evtTools.p2p = {
   connections: {},
 
   /**
-   * Contains a list of events triggeres by other p2p clients.
+   * Contains a list of events triggered by other p2p clients.
    */
   triggeredEvents: {},
 
@@ -24,12 +24,12 @@ gdjs.evtTools.p2p = {
   lastEventData: {},
 }
 
-function onConnection(connection) {
+gdjs.evtTools.p2p._onConnection = function(connection) {
   gdjs.evtTools.p2p.connections[connection.peer] = connection;
   connection.on("data", function(data) {
-    if(data.event === undefined) return;
-    gdjs.evtTools.p2p.triggeredEvents[data.event] = true;
-    gdjs.evtTools.p2p.lastEventData[data.event] = data.data;
+    if(data.eventName === undefined) return;
+    gdjs.evtTools.p2p.triggeredEvents[data.eventName] = true;
+    gdjs.evtTools.p2p.lastEventData[data.eventName] = data.data;
   });
 }
 
@@ -39,16 +39,16 @@ function onConnection(connection) {
  */
 gdjs.evtTools.p2p.connect = function(id) {
   var connection = gdjs.evtTools.p2p.peer.connect(id);
-  onConnection(connection);
+  gdjs.evtTools.p2p._onConnection(connection);
 }
 
 /**
  * Returns true when the event got triggered by another p2p client.
  * @returns {boolean}
  */
-gdjs.evtTools.p2p.on = function(event) {
-  var returnValue = gdjs.evtTools.p2p.triggeredEvents[event];
-  gdjs.evtTools.p2p.triggeredEvents[event] = false;
+gdjs.evtTools.p2p.onEvent = function(eventName) {
+  var returnValue = gdjs.evtTools.p2p.triggeredEvents[eventName];
+  gdjs.evtTools.p2p.triggeredEvents[eventName] = false;
   return returnValue;
 }
 
@@ -60,7 +60,7 @@ gdjs.evtTools.p2p.on = function(event) {
  */
 gdjs.evtTools.p2p.sendDataTo = function(id, eventName, eventData) {
   if(gdjs.evtTools.p2p.connections[id])
-    gdjs.evtTools.p2p.connections[id].send({event: eventName, data: eventData});
+    gdjs.evtTools.p2p.connections[id].send({eventName: eventName, data: eventData});
 }
 
 /**
@@ -70,7 +70,7 @@ gdjs.evtTools.p2p.sendDataTo = function(id, eventName, eventData) {
  */
 gdjs.evtTools.p2p.sendDataToAll = function(eventName, eventData) {
   for(var id in gdjs.evtTools.p2p.connections) {
-    gdjs.evtTools.p2p.connections[id].send({event: eventName, data: eventData});
+    gdjs.evtTools.p2p.connections[id].send({eventName: eventName, data: eventData});
   }
 }
 
@@ -83,7 +83,7 @@ gdjs.evtTools.p2p.sendDataToAll = function(eventName, eventData) {
 gdjs.evtTools.p2p.sendVariableTo = function(id, eventName, variable) {
   if(gdjs.evtTools.p2p.connections[id])
     gdjs.evtTools.p2p.connections[id].send({
-      event: eventName, 
+      eventName: eventName, 
       data: gdjs.evtTools.network.variableStructureToJSON(variable)
     });
 }
@@ -96,7 +96,7 @@ gdjs.evtTools.p2p.sendVariableTo = function(id, eventName, variable) {
 gdjs.evtTools.p2p.sendVariableToAll = function(eventName, variable) {
   for(var id in gdjs.evtTools.p2p.connections) {
     gdjs.evtTools.p2p.connections[id].send({
-      event: eventName, 
+      eventName: eventName, 
       data: gdjs.evtTools.network.variableStructureToJSON(variable)
     });
   }
@@ -123,4 +123,4 @@ gdjs.evtTools.p2p.getEventVariable = function(eventName, variable) {
 gdjs.evtTools.p2p.getCurrentId = function() {return gdjs.evtTools.p2p.peer.id;}
 
 
-gdjs.evtTools.p2p.peer.on("connection", onConnection);
+gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);

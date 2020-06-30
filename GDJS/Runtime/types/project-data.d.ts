@@ -158,6 +158,7 @@ export interface ResourceData {
   name: string;
   smoothed?: boolean;
   userAdded: boolean;
+  disablePreload?: boolean;
 }
 
 export enum ResourceKind {
@@ -165,4 +166,5 @@ export enum ResourceKind {
   Image = 'image',
   Font = 'font',
   Video = 'video',
+  Json = 'json',
 }

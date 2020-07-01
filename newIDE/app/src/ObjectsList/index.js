@@ -529,14 +529,15 @@ export default class ObjectsList extends React.Component<Props, State> {
           onChange={this.props.onChangeSelectedObjectTags}
         />
         <UseCompoundCommandHook
-          commandName={'PRINT_OBJ_PTR'}
+          commandName={'EDIT_OBJECT'}
           command={{
-            displayText: `(...) Print object ptr`,
+            displayText: `Edit object...`,
             enabled: true,
             options: lists.containerObjectsList.map(item => ({
               text: item.object.getName(),
               value: item.object,
-              handler: () => console.log(item.object.ptr),
+              iconSrc: this.props.getThumbnail(this.props.project, item.object),
+              handler: () => this.props.onEditObject(item.object),
             })),
           }}
         />

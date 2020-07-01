@@ -14,10 +14,11 @@ export type NamedCommand = {|
   ...Command,
 |};
 
-type CompoundCommandOption<T> = {|
+export type CompoundCommandOption<T> = {|
   value: T,
   handler: CommandHandler,
   text: string,
+  iconSrc?: string,
 |};
 
 export type CompoundCommand<T> = {|
@@ -40,15 +41,12 @@ export default class CommandManager {
     this.commands = {};
     this.compoundCommands = {};
     this._isScoped = scoped || false;
-    console.warn(`SCOPED: ${this._isScoped} | Initialized command manager`);
   }
 
   registerCommand = (commandName: string, command: Command) => {
     if (this.commands[commandName])
       return console.warn(
-        `SCOPED: ${
-          this._isScoped
-        } | Tried to register command ${commandName}, but it is already registered.`
+        `Tried to register command ${commandName}, but it is already registered.`
       );
     this.commands[commandName] = command;
   };
@@ -56,9 +54,7 @@ export default class CommandManager {
   deregisterCommand = (commandName: string) => {
     if (!this.commands[commandName])
       return console.warn(
-        `SCOPED: ${
-          this._isScoped
-        } | Tried to deregister command ${commandName}, but it is not registered.`
+        `Tried to deregister command ${commandName}, but it is not registered.`
       );
     delete this.commands[commandName];
   };
@@ -69,23 +65,17 @@ export default class CommandManager {
   ) => {
     if (this.compoundCommands[commandName])
       return console.warn(
-        `SCOPED: ${
-          this._isScoped
-        } | Tried to register command ${commandName}, but it is already registered.`
+        `Tried to register command ${commandName}, but it is already registered.`
       );
     this.compoundCommands[commandName] = command;
-    console.warn(`SCOPED: ${this._isScoped} | Registered ${commandName}!`);
   };
 
   deregisterCompoundCommand = (commandName: string) => {
     if (!this.compoundCommands[commandName])
       return console.warn(
-        `SCOPED: ${
-          this._isScoped
-        } | Tried to deregister command ${commandName}, but it is not registered.`
+        `Tried to deregister command ${commandName}, but it is not registered.`
       );
     delete this.compoundCommands[commandName];
-    console.warn(`SCOPED: ${this._isScoped} | Deregistered ${commandName}!`);
   };
 
   getAllNamedCommands = () => {

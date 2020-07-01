@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import CommandManager from './CommandManager';
+import useRefInit from './UseRefInitHook';
 
 const CommandsContext = React.createContext<CommandManager>(
   new CommandManager()
@@ -11,10 +12,10 @@ type Props = {
 };
 
 export const CommandsContextProvider = (props: Props) => {
-  const managerRef = React.useRef<CommandManager>(new CommandManager());
+  const commandManager = useRefInit<CommandManager>(() => new CommandManager());
 
   return (
-    <CommandsContext.Provider value={managerRef.current}>
+    <CommandsContext.Provider value={commandManager}>
       {props.children}
     </CommandsContext.Provider>
   );

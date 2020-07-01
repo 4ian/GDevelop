@@ -73,6 +73,11 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'P2P Multiplayer',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Multiplayer_P2P/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

@@ -12,7 +12,7 @@ gdjs.evtTools.p2p = {
   peer: new Peer(),
 
   /**
-   * All connected p2p clients accessible by id.
+   * All connected p2p clients, keyed by their id.
    */
   connections: {},
 

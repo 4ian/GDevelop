@@ -149,12 +149,17 @@ export default class JsCodeEvent extends React.Component<
     );
 
     const eventsFunctionContext = this.props.scope.eventsFunction ? (
-      <span style={this.props.disabled ? styles.comment : {}}>, eventsFunctionContext</span>
+      <span style={this.props.disabled ? styles.comment : {}}>
+        , eventsFunctionContext
+      </span>
     ) : null;
 
     const functionStart = (
       <p style={styles.wrappingText}>
-        <span style={this.props.disabled ? styles.comment : {}}>{this.props.disabled ? "/*" : ""}{'(function(runtimeScene'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>
+          {this.props.disabled ? '/*' : ''}
+          {'(function(runtimeScene'}
+        </span>
         {objects}
         {eventsFunctionContext}
         <span style={this.props.disabled ? styles.comment : {}}>{') {'}</span>
@@ -162,10 +167,15 @@ export default class JsCodeEvent extends React.Component<
     );
     const functionEnd = (
       <p style={styles.wrappingText}>
-        <span style={this.props.disabled ? styles.comment : {}}>{'})(runtimeScene'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>
+          {'})(runtimeScene'}
+        </span>
         {objects}
         {eventsFunctionContext}
-        <span style={this.props.disabled ? styles.comment : {}}>{');'}{this.props.disabled ? "*/" : ""}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>
+          {');'}
+          {this.props.disabled ? '*/' : ''}
+        </span>
         <span style={styles.comment}>
           {' // '}
           <a

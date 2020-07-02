@@ -74,8 +74,8 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
-    name: 'P2P Multiplayer',
-    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Multiplayer_P2P/JsExtension.js'),
+    name: 'P2P',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
 ];

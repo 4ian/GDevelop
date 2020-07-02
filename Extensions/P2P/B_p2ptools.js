@@ -1,3 +1,6 @@
+// @ts-check
+/// <reference path="peerjs" />
+
 /**
  * Tools for p2p multiplayer.
  * @namespace
@@ -78,7 +81,7 @@ gdjs.evtTools.p2p.sendDataToAll = function(eventName, eventData) {
  * Send an event to one specific connected client.
  * @param {string} id - The id of the client to send the event to.
  * @param {string} eventName - The event to trigger.
- * @param {string} [variable] - Additional variable to send with the event.
+ * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableTo = function(id, eventName, variable) {
   if(gdjs.evtTools.p2p.connections[id])
@@ -91,7 +94,7 @@ gdjs.evtTools.p2p.sendVariableTo = function(id, eventName, variable) {
 /**
  * Send an event to all connected clients.
  * @param {string} eventName - The event to trigger.
- * @param {string} [variable] - Additional variable to send with the event.
+ * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableToAll = function(eventName, variable) {
   for(var id in gdjs.evtTools.p2p.connections) {

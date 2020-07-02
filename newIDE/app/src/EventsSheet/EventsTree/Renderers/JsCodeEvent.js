@@ -140,6 +140,7 @@ export default class JsCodeEvent extends React.Component<
           [selectableArea]: true,
         })}
         onClick={this.editObject}
+        style={this.props.disabled ? styles.comment : {}}
       >
         {parameterObjects
           ? `, objects /*${parameterObjects}*/`
@@ -148,23 +149,23 @@ export default class JsCodeEvent extends React.Component<
     );
 
     const eventsFunctionContext = this.props.scope.eventsFunction ? (
-      <span>, eventsFunctionContext</span>
+      <span style={this.props.disabled ? styles.comment : {}}>, eventsFunctionContext</span>
     ) : null;
 
     const functionStart = (
       <p style={styles.wrappingText}>
-        <span>{'(function(runtimeScene'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>{this.props.disabled ? "/*" : ""}{'(function(runtimeScene'}</span>
         {objects}
         {eventsFunctionContext}
-        <span>{') {'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>{') {'}</span>
       </p>
     );
     const functionEnd = (
       <p style={styles.wrappingText}>
-        <span>{'})(runtimeScene'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>{'})(runtimeScene'}</span>
         {objects}
         {eventsFunctionContext}
-        <span>{');'}</span>
+        <span style={this.props.disabled ? styles.comment : {}}>{');'}{this.props.disabled ? "*/" : ""}</span>
         <span style={styles.comment}>
           {' // '}
           <a

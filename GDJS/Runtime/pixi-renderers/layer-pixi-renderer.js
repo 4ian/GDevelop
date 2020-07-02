@@ -22,10 +22,9 @@ gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
   this._renderTexture = null;
   this._runtimeSceneRenderer = runtimeSceneRenderer;
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
-  this._oldWidth = this._pixiRenderer.width;
-  this._oldHeight = this._pixiRenderer.height;
+  this._oldWidth = this._pixiRenderer.screen.width;
+  this._oldHeight = this._pixiRenderer.screen.height;
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
-
   this._setupFilters();
 };
 
@@ -64,6 +63,10 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function(visible) {
 };
 
 gdjs.LayerPixiRenderer.prototype.updateTime = function() {
+  if (this._renderTexture) {
+    this.updateRenderTexture();
+  }
+
   for(var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
@@ -258,18 +261,19 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function(name) {
 
 gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function() {
   if(!this._renderTexture) {
-    var width = this._pixiRenderer.width;
-    var height = this._pixiRenderer.height;
+    var width = this._pixiRenderer.screen.width;
+    var height = this._pixiRenderer.screen.height;
     var resolution = this._pixiRenderer.resolution;
     this._renderTexture = PIXI.RenderTexture.create({
       width,
       height,
       resolution
     });
+    this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
   }
 
-  if(this._oldWidth !== this._pixiRenderer.width || 
-    this._oldHeight !== this._pixiRenderer.height) {
+  if(this._oldWidth !== this._pixiRenderer.screen.width || 
+    this._oldHeight !== this._pixiRenderer.screen.height) {
       this._renderTexture.resize(
         this._pixiRenderer.width,
         this._pixiRenderer.height
@@ -278,10 +282,29 @@ gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function() {
       this._oldHeight = this._pixiRenderer.height;
   }
 
+  var oldRenderTexture = this._pixiRenderer.renderTexture.current;
+  var oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
+
+  this._pixiRenderer.renderTexture.bind(this._renderTexture);
+  this._pixiRenderer.renderTexture.clear([0.25, 0.25, 0.25, 1.0]);
+
   this._pixiRenderer.render(this._pixiContainer, this._renderTexture, false);
+  this._pixiRenderer.renderTexture.bind(oldRenderTexture, oldSourceFrame, undefined);
 }
 
 gdjs.LayerPixiRenderer.prototype.getRenderTexture = function() {
   if(!this._renderTexture) this.updateRenderTexture();
   return this._renderTexture;
+}
+
+gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function() {
+  if(!this._lightingSprite) {
+    this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
+    this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+    this._runtimeSceneRenderer.getPIXIContainer().addChild(this._lightingSprite);
+  }
+}
+
+gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function() {
+  return this._pixiContainer;
 }

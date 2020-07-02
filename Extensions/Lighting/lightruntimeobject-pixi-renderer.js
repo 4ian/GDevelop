@@ -23,6 +23,10 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   ]);
   this._indexBuffer = new Uint16Array([0, 1, 2, 2, 3, 0]);
 
+  this._layer = runtimeScene.getLayer("Light").getRenderer();
+  this._layer.addLayerToLighting();
+  
+
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -43,7 +47,6 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     uniform vec3 color;
     uniform mat3 translationMatrix;
     uniform mat3 projectionMatrix;
-
     varying vec2 vPos;
 
     void main() {
@@ -88,6 +91,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       this._debugLight.addChild(this._graphics);
     }
   }
+  console.log(this._layer.getPIXIContainer());
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

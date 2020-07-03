@@ -183,6 +183,7 @@
       "objects": [
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

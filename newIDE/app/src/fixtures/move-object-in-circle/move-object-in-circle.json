@@ -215,6 +215,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Char1",
           "tags": "",
           "type": "Sprite",
@@ -273,6 +274,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Char2",
           "tags": "",
           "type": "Sprite",
@@ -332,6 +334,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "InfoText1",
           "smoothed": true,
@@ -351,6 +354,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "InfoText2",
           "smoothed": true,

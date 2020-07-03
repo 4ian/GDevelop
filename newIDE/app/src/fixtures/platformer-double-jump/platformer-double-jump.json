@@ -1903,6 +1903,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -2201,6 +2202,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -2315,6 +2317,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -2381,6 +2384,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -2399,6 +2403,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledCastlePlatform",
           "tags": "",
@@ -2417,6 +2422,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MovingPlatform",
           "tags": "",
           "type": "Sprite",
@@ -2483,6 +2489,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoLeft",
           "tags": "",
           "type": "Sprite",
@@ -2541,6 +2548,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoRight",
           "tags": "",
           "type": "Sprite",
@@ -2599,6 +2607,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "Ladder",
           "tags": "",
@@ -2617,6 +2626,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -2691,6 +2701,7 @@
           ]
         },
         {
+          "group": "",
           "name": "SlimeWalk",
           "tags": "",
           "type": "Sprite",
@@ -2854,6 +2865,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fly",
           "tags": "",
           "type": "Sprite",
@@ -3012,6 +3024,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Cloud",
           "tags": "",
           "type": "Sprite",
@@ -3166,6 +3179,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",
@@ -3321,6 +3335,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -3339,6 +3354,7 @@
           }
         },
         {
+          "group": "",
           "name": "Coin",
           "tags": "",
           "type": "Sprite",
@@ -3397,6 +3413,7 @@
           ]
         },
         {
+          "group": "",
           "name": "CoinIcon",
           "tags": "",
           "type": "Sprite",
@@ -3455,6 +3472,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -3513,6 +3531,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -3571,6 +3590,7 @@
           ]
         },
         {
+          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",
@@ -3639,6 +3659,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ArrowButtonsBg",
           "tags": "",
           "type": "Sprite",

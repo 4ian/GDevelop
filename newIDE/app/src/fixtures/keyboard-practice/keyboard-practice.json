@@ -1283,6 +1283,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "a",
           "tags": "",
           "type": "Sprite",
@@ -1351,6 +1352,7 @@
           ]
         },
         {
+          "group": "",
           "name": "b",
           "tags": "",
           "type": "Sprite",
@@ -1419,6 +1421,7 @@
           ]
         },
         {
+          "group": "",
           "name": "c",
           "tags": "",
           "type": "Sprite",
@@ -1487,6 +1490,7 @@
           ]
         },
         {
+          "group": "",
           "name": "d",
           "tags": "",
           "type": "Sprite",
@@ -1555,6 +1559,7 @@
           ]
         },
         {
+          "group": "",
           "name": "e",
           "tags": "",
           "type": "Sprite",
@@ -1623,6 +1628,7 @@
           ]
         },
         {
+          "group": "",
           "name": "f",
           "tags": "",
           "type": "Sprite",
@@ -1691,6 +1697,7 @@
           ]
         },
         {
+          "group": "",
           "name": "g",
           "tags": "",
           "type": "Sprite",
@@ -1759,6 +1766,7 @@
           ]
         },
         {
+          "group": "",
           "name": "h",
           "tags": "",
           "type": "Sprite",
@@ -1827,6 +1835,7 @@
           ]
         },
         {
+          "group": "",
           "name": "i",
           "tags": "",
           "type": "Sprite",
@@ -1895,6 +1904,7 @@
           ]
         },
         {
+          "group": "",
           "name": "j",
           "tags": "",
           "type": "Sprite",
@@ -1963,6 +1973,7 @@
           ]
         },
         {
+          "group": "",
           "name": "k",
           "tags": "",
           "type": "Sprite",
@@ -2031,6 +2042,7 @@
           ]
         },
         {
+          "group": "",
           "name": "l",
           "tags": "",
           "type": "Sprite",
@@ -2099,6 +2111,7 @@
           ]
         },
         {
+          "group": "",
           "name": "m",
           "tags": "",
           "type": "Sprite",
@@ -2167,6 +2180,7 @@
           ]
         },
         {
+          "group": "",
           "name": "n",
           "tags": "",
           "type": "Sprite",
@@ -2235,6 +2249,7 @@
           ]
         },
         {
+          "group": "",
           "name": "o",
           "tags": "",
           "type": "Sprite",
@@ -2303,6 +2318,7 @@
           ]
         },
         {
+          "group": "",
           "name": "p",
           "tags": "",
           "type": "Sprite",
@@ -2371,6 +2387,7 @@
           ]
         },
         {
+          "group": "",
           "name": "q",
           "tags": "",
           "type": "Sprite",
@@ -2439,6 +2456,7 @@
           ]
         },
         {
+          "group": "",
           "name": "r",
           "tags": "",
           "type": "Sprite",
@@ -2507,6 +2525,7 @@
           ]
         },
         {
+          "group": "",
           "name": "s",
           "tags": "",
           "type": "Sprite",
@@ -2575,6 +2594,7 @@
           ]
         },
         {
+          "group": "",
           "name": "t",
           "tags": "",
           "type": "Sprite",
@@ -2643,6 +2663,7 @@
           ]
         },
         {
+          "group": "",
           "name": "u",
           "tags": "",
           "type": "Sprite",
@@ -2711,6 +2732,7 @@
           ]
         },
         {
+          "group": "",
           "name": "v",
           "tags": "",
           "type": "Sprite",
@@ -2779,6 +2801,7 @@
           ]
         },
         {
+          "group": "",
           "name": "w",
           "tags": "",
           "type": "Sprite",
@@ -2847,6 +2870,7 @@
           ]
         },
         {
+          "group": "",
           "name": "x",
           "tags": "",
           "type": "Sprite",
@@ -2915,6 +2939,7 @@
           ]
         },
         {
+          "group": "",
           "name": "y",
           "tags": "",
           "type": "Sprite",
@@ -2983,6 +3008,7 @@
           ]
         },
         {
+          "group": "",
           "name": "z",
           "tags": "",
           "type": "Sprite",
@@ -3051,6 +3077,7 @@
           ]
         },
         {
+          "group": "",
           "name": "space",
           "tags": "",
           "type": "Sprite",
@@ -3120,6 +3147,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "txt_keys_pressed",
           "smoothed": true,
@@ -3139,6 +3167,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "time",
           "smoothed": true,
@@ -4142,6 +4171,7 @@
       "objects": [
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "gameover",
           "smoothed": true,
@@ -4161,6 +4191,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -4180,6 +4211,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "playagain",
           "smoothed": true,

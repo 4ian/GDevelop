@@ -788,6 +788,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -827,6 +828,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Block",
           "tags": "",
           "type": "Sprite",
@@ -872,6 +874,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ObjVariableBlockUp",
           "smoothed": true,
@@ -891,6 +894,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ObjVariableBlockDown",
           "smoothed": true,
@@ -910,6 +914,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ObjVariableBlockLeft",
           "smoothed": true,
@@ -929,6 +934,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ObjVariableBlockRight",
           "smoothed": true,
@@ -948,6 +954,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Info",
           "smoothed": true,

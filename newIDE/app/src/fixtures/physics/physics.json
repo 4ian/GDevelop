@@ -571,6 +571,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "BigBox",
           "tags": "",
           "type": "Sprite",
@@ -947,6 +948,7 @@
           ]
         },
         {
+          "group": "",
           "name": "SmallBox",
           "tags": "",
           "type": "Sprite",
@@ -1323,6 +1325,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BlackSphere",
           "tags": "",
           "type": "Sprite",
@@ -1699,6 +1702,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Floor",
           "tags": "",
           "type": "Sprite",
@@ -2075,6 +2079,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -2168,6 +2173,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Lever",
           "tags": "",
           "type": "Sprite",
@@ -2544,6 +2550,7 @@
           ]
         },
         {
+          "group": "",
           "name": "HeavyBlackSphere",
           "tags": "",
           "type": "Sprite",
@@ -2921,6 +2928,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text",
           "smoothed": true,

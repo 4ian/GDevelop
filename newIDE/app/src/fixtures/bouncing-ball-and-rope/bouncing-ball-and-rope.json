@@ -297,6 +297,7 @@
       "objects": [
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Instructions",
           "smoothed": true,
@@ -315,6 +316,7 @@
           }
         },
         {
+          "group": "",
           "name": "Logo",
           "tags": "",
           "type": "Sprite",
@@ -355,6 +357,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -373,6 +376,7 @@
           }
         },
         {
+          "group": "",
           "height": 64,
           "name": "Back",
           "tags": "",
@@ -1065,6 +1069,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "SwingBox",
           "tags": "",
           "type": "Sprite",
@@ -1166,6 +1171,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MainChar",
           "tags": "",
           "type": "Sprite",
@@ -1227,6 +1233,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Rope",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -1249,6 +1256,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -1259,6 +1267,7 @@
         },
         {
           "bottomMargin": 16,
+          "group": "",
           "height": 64,
           "leftMargin": 10,
           "name": "Platform",
@@ -1295,6 +1304,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Finish",
           "tags": "",
@@ -1305,6 +1315,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "Background",
           "tags": "",
@@ -1315,6 +1326,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "MainShaow",
           "tags": "",
           "type": "Sprite",
@@ -1354,6 +1366,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BoundsLine",
           "tags": "",
           "type": "Sprite",

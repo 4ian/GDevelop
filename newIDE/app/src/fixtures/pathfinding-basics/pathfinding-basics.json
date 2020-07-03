@@ -383,6 +383,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "player",
           "tags": "",
           "type": "Sprite",
@@ -436,6 +437,7 @@
           ]
         },
         {
+          "group": "",
           "name": "obstacle",
           "tags": "",
           "type": "Sprite",
@@ -487,6 +489,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -506,6 +509,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message2",
           "smoothed": true,

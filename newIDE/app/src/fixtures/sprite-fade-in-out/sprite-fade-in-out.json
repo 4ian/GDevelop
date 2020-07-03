@@ -183,6 +183,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -201,6 +202,7 @@
           }
         },
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -419,6 +421,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -437,6 +440,7 @@
           }
         },
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -689,6 +693,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -707,6 +712,7 @@
           }
         },
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",

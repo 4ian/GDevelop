@@ -595,6 +595,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Save_BTN",
           "tags": "",
           "type": "Sprite",
@@ -634,6 +635,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Lives_add_BTN",
           "tags": "",
           "type": "Sprite",
@@ -673,6 +675,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Lives_sub_BTN",
           "tags": "",
           "type": "Sprite",
@@ -712,6 +715,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Score_sub_BTN",
           "tags": "",
           "type": "Sprite",
@@ -751,6 +755,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Score_add_BTN",
           "tags": "",
           "type": "Sprite",
@@ -791,6 +796,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Score",
           "smoothed": true,
@@ -810,6 +816,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -829,6 +836,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Name_Player",
           "smoothed": true,
@@ -848,6 +856,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "player_name",
           "smoothed": true,
@@ -867,6 +876,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Rank_Player",
           "smoothed": true,
@@ -886,6 +896,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "rank_player",
           "smoothed": true,
@@ -905,6 +916,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Player_ID",
           "smoothed": true,
@@ -924,6 +936,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "player_id",
           "smoothed": true,
@@ -943,6 +956,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Lives",
           "smoothed": true,
@@ -962,6 +976,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "lives",
           "smoothed": true,
@@ -981,6 +996,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Text_Error",
           "smoothed": true,
@@ -1000,6 +1016,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "error",
           "smoothed": true,
@@ -1018,6 +1035,7 @@
           }
         },
         {
+          "group": "",
           "name": "Ad_show_video",
           "tags": "",
           "type": "Sprite",
@@ -1057,6 +1075,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ad_show_interstitial",
           "tags": "",
           "type": "Sprite",
@@ -1096,6 +1115,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ad_load_video",
           "tags": "",
           "type": "Sprite",
@@ -1135,6 +1155,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ad_load_interstitial",
           "tags": "",
           "type": "Sprite",
@@ -1175,6 +1196,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text_Ad_load_interstitial",
           "smoothed": true,
@@ -1194,6 +1216,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text_Ad_show_interstitial",
           "smoothed": true,
@@ -1213,6 +1236,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text_Ad_load_video",
           "smoothed": true,
@@ -1232,6 +1256,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text_Ad_show_video",
           "smoothed": true,

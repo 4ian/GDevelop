@@ -371,6 +371,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -411,6 +412,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -430,6 +432,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Start",
           "smoothed": true,
@@ -448,6 +451,7 @@
           }
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -1552,6 +1556,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1608,6 +1613,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Skin",
           "tags": "",
           "type": "Sprite",
@@ -1647,6 +1653,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -1686,6 +1693,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Platforms",
           "tags": "",
@@ -1704,6 +1712,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Spikes",
           "tags": "",
@@ -1715,6 +1724,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 32,
           "leftMargin": 0,
           "name": "Goal",
@@ -1729,6 +1739,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -1768,6 +1779,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "HalfPlatforms",
           "tags": "",
@@ -1803,6 +1815,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 500,
           "name": "Skidder",
           "particleAlpha1": 255,
@@ -1843,6 +1856,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -1883,6 +1897,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
@@ -2860,6 +2875,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -2916,6 +2932,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Skin",
           "tags": "",
           "type": "Sprite",
@@ -2955,6 +2972,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -2994,6 +3012,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Platforms",
           "tags": "",
@@ -3012,6 +3031,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Spikes",
           "tags": "",
@@ -3023,6 +3043,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 32,
           "leftMargin": 0,
           "name": "Goal",
@@ -3037,6 +3058,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -3076,6 +3098,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "HalfPlatforms",
           "tags": "",
@@ -3111,6 +3134,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 500,
           "name": "Skidder",
           "particleAlpha1": 255,
@@ -3151,6 +3175,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -3191,6 +3216,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
@@ -4156,6 +4182,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -4212,6 +4239,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Skin",
           "tags": "",
           "type": "Sprite",
@@ -4251,6 +4279,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -4290,6 +4319,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Platforms",
           "tags": "",
@@ -4308,6 +4338,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Spikes",
           "tags": "",
@@ -4319,6 +4350,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 32,
           "leftMargin": 0,
           "name": "Goal",
@@ -4333,6 +4365,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -4372,6 +4405,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "HalfPlatforms",
           "tags": "",
@@ -4407,6 +4441,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 500,
           "name": "Skidder",
           "particleAlpha1": 255,
@@ -4447,6 +4482,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -4487,6 +4523,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
@@ -5299,6 +5336,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -5355,6 +5393,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Skin",
           "tags": "",
           "type": "Sprite",
@@ -5394,6 +5433,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -5433,6 +5473,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Platforms",
           "tags": "",
@@ -5451,6 +5492,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Spikes",
           "tags": "",
@@ -5462,6 +5504,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 32,
           "leftMargin": 0,
           "name": "Goal",
@@ -5476,6 +5519,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -5515,6 +5559,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "HalfPlatforms",
           "tags": "",
@@ -5550,6 +5595,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 500,
           "name": "Skidder",
           "particleAlpha1": 255,
@@ -5590,6 +5636,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -5630,6 +5677,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LevelText",
           "smoothed": true,
@@ -6442,6 +6490,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -6498,6 +6547,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Skin",
           "tags": "",
           "type": "Sprite",
@@ -6537,6 +6587,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -6576,6 +6627,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Platforms",
           "tags": "",
@@ -6594,6 +6646,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Spikes",
           "tags": "",
@@ -6605,6 +6658,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 32,
           "leftMargin": 0,
           "name": "Goal",
@@ -6619,6 +6673,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -6658,6 +6713,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "HalfPlatforms",
           "tags": "",
@@ -6693,6 +6749,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 500,
           "name": "Skidder",
           "particleAlpha1": 255,
@@ -6733,6 +6790,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Pattern",
           "tags": "",
           "type": "Sprite",
@@ -6773,6 +6831,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LevelText",
           "smoothed": true,

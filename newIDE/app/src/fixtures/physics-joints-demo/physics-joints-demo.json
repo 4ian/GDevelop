@@ -1055,6 +1055,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Walls",
           "tags": "",
           "type": "Sprite",
@@ -1115,6 +1116,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DistanceBox",
           "tags": "",
           "type": "Sprite",
@@ -1181,6 +1183,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DistanceCircle",
           "tags": "",
           "type": "Sprite",
@@ -1247,6 +1250,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DistanceDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -1269,6 +1273,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "RevoluteBox",
           "tags": "",
           "type": "Sprite",
@@ -1335,6 +1340,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RevoluteCircle",
           "tags": "",
           "type": "Sprite",
@@ -1401,6 +1407,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RevoluteBox2",
           "tags": "",
           "type": "Sprite",
@@ -1467,6 +1474,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RevoluteDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -1489,6 +1497,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "PrismaticBox",
           "tags": "",
           "type": "Sprite",
@@ -1555,6 +1564,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PrismaticCircle",
           "tags": "",
           "type": "Sprite",
@@ -1621,6 +1631,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PrismaticDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -1643,6 +1654,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "PulleyBox",
           "tags": "",
           "type": "Sprite",
@@ -1709,6 +1721,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PulleyCircle",
           "tags": "",
           "type": "Sprite",
@@ -1775,6 +1788,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PulleyDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -1797,6 +1811,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "GearBox1",
           "tags": "",
           "type": "Sprite",
@@ -1863,6 +1878,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GearBox2",
           "tags": "",
           "type": "Sprite",
@@ -1929,6 +1945,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GearCircle1",
           "tags": "",
           "type": "Sprite",
@@ -1995,6 +2012,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GearCircle2",
           "tags": "",
           "type": "Sprite",
@@ -2061,6 +2079,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GearDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2083,6 +2102,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "MouseBox",
           "tags": "",
           "type": "Sprite",
@@ -2149,6 +2169,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MouseDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2171,6 +2192,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "WheelBox",
           "tags": "",
           "type": "Sprite",
@@ -2242,6 +2264,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WheelCircle1",
           "tags": "",
           "type": "Sprite",
@@ -2308,6 +2331,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WheelCircle2",
           "tags": "",
           "type": "Sprite",
@@ -2374,6 +2398,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WheelDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2396,6 +2421,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "WeldBox",
           "tags": "",
           "type": "Sprite",
@@ -2467,6 +2493,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WeldCircle1",
           "tags": "",
           "type": "Sprite",
@@ -2533,6 +2560,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WeldCircle2",
           "tags": "",
           "type": "Sprite",
@@ -2599,6 +2627,7 @@
           ]
         },
         {
+          "group": "",
           "name": "WeldDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2621,6 +2650,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "RopeBox",
           "tags": "",
           "type": "Sprite",
@@ -2687,6 +2717,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RopeCircle",
           "tags": "",
           "type": "Sprite",
@@ -2753,6 +2784,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RopeDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2775,6 +2807,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "FrictionBox",
           "tags": "",
           "type": "Sprite",
@@ -2846,6 +2879,7 @@
           ]
         },
         {
+          "group": "",
           "name": "FrictionCircle",
           "tags": "",
           "type": "Sprite",
@@ -2912,6 +2946,7 @@
           ]
         },
         {
+          "group": "",
           "name": "FrictionDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2934,6 +2969,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "MotorBox1",
           "tags": "",
           "type": "Sprite",
@@ -3005,6 +3041,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MotorBox2",
           "tags": "",
           "type": "Sprite",
@@ -3076,6 +3113,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MotorCircle",
           "tags": "",
           "type": "Sprite",
@@ -3142,6 +3180,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MotorDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -3164,6 +3203,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "BreakableBox1",
           "tags": "",
           "type": "Sprite",
@@ -3235,6 +3275,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BreakableBox2",
           "tags": "",
           "type": "Sprite",
@@ -3306,6 +3347,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BreakableCircle1",
           "tags": "",
           "type": "Sprite",
@@ -3372,6 +3414,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BreakableCircle2",
           "tags": "",
           "type": "Sprite",
@@ -3438,6 +3481,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BreakableCircle3",
           "tags": "",
           "type": "Sprite",
@@ -3504,6 +3548,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BreakableDraw",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",

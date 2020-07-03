@@ -356,6 +356,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "play",
           "tags": "",
           "type": "Sprite",
@@ -395,6 +396,7 @@
           ]
         },
         {
+          "group": "",
           "name": "pause",
           "tags": "",
           "type": "Sprite",
@@ -434,6 +436,7 @@
           ]
         },
         {
+          "group": "",
           "name": "mute",
           "tags": "",
           "type": "Sprite",
@@ -502,6 +505,7 @@
           ]
         },
         {
+          "group": "",
           "name": "music",
           "tags": "",
           "type": "Sprite",
@@ -571,6 +575,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "track_info",
           "smoothed": true,
@@ -589,6 +594,7 @@
           }
         },
         {
+          "group": "",
           "name": "volume_background",
           "tags": "",
           "type": "Sprite",
@@ -628,6 +634,7 @@
           ]
         },
         {
+          "group": "",
           "name": "volume_slider",
           "tags": "",
           "type": "Sprite",
@@ -673,6 +680,7 @@
           ]
         },
         {
+          "group": "",
           "name": "slider_button",
           "tags": "",
           "type": "Sprite",

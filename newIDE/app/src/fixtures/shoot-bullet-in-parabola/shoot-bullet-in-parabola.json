@@ -212,6 +212,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Source",
           "tags": "",
           "type": "Sprite",
@@ -270,6 +271,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",
@@ -333,6 +335,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -392,6 +395,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

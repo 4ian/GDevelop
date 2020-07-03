@@ -3750,6 +3750,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Invader1",
           "tags": "",
           "type": "Sprite",
@@ -3789,6 +3790,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Invader2",
           "tags": "",
           "type": "Sprite",
@@ -3828,6 +3830,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Invader3",
           "tags": "",
           "type": "Sprite",
@@ -3867,6 +3870,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ship",
           "tags": "",
           "type": "Sprite",
@@ -3925,6 +3929,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -3964,6 +3969,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -4009,6 +4015,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Left",
           "tags": "",
           "type": "Sprite",
@@ -4048,6 +4055,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Right",
           "tags": "",
           "type": "Sprite",
@@ -4087,6 +4095,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fire",
           "tags": "",
           "type": "Sprite",
@@ -4127,6 +4136,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ScoreTEXT",
           "smoothed": true,
@@ -4146,6 +4156,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ScoreNUM",
           "smoothed": true,
@@ -4164,6 +4175,7 @@
           }
         },
         {
+          "group": "",
           "name": "UFO",
           "tags": "",
           "type": "Sprite",
@@ -4209,6 +4221,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Bomb",
           "tags": "",
           "type": "Sprite",
@@ -4249,6 +4262,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Count",
           "smoothed": true,
@@ -4268,6 +4282,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "BombTextNUM",
           "smoothed": true,
@@ -4286,6 +4301,7 @@
           }
         },
         {
+          "group": "",
           "name": "Base",
           "tags": "",
           "type": "Sprite",
@@ -6895,6 +6911,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -6935,6 +6952,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -6954,6 +6972,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Instruction1",
           "smoothed": true,
@@ -6973,6 +6992,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Instruction2",
           "smoothed": true,
@@ -6991,6 +7011,7 @@
           }
         },
         {
+          "group": "",
           "name": "NewObject3",
           "tags": "",
           "type": "Sprite",

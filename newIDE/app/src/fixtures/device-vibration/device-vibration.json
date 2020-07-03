@@ -255,6 +255,7 @@
       "objects": [
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "title",
           "smoothed": true,
@@ -274,6 +275,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "VibrateOnce",
           "smoothed": true,
@@ -293,6 +295,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "VibrateMulti",
           "smoothed": true,
@@ -312,6 +315,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "StopVibration",
           "smoothed": true,
@@ -330,6 +334,7 @@
           }
         },
         {
+          "group": "",
           "name": "background",
           "tags": "",
           "type": "Sprite",

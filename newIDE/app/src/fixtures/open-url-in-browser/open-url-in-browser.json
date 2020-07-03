@@ -158,6 +158,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Explanation",
           "smoothed": true,

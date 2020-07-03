@@ -1188,6 +1188,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1255,6 +1256,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerFeet",
           "tags": "",
           "type": "Sprite",
@@ -1294,6 +1296,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerSprite",
           "tags": "",
           "type": "Sprite",
@@ -1539,6 +1542,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -1586,6 +1590,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Rock",
           "tags": "",
           "type": "Sprite",
@@ -1626,6 +1631,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ScoreText",
           "smoothed": true,
@@ -1644,6 +1650,7 @@
           }
         },
         {
+          "group": "",
           "name": "BlackMask",
           "tags": "",
           "type": "Sprite",
@@ -1683,6 +1690,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PauseButton",
           "tags": "",
           "type": "Sprite",
@@ -1722,6 +1730,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Spring",
           "tags": "",
           "type": "Sprite",
@@ -1790,6 +1799,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayButton",
           "tags": "",
           "type": "Sprite",
@@ -1829,6 +1839,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RestartButton",
           "tags": "",
           "type": "Sprite",
@@ -1868,6 +1879,7 @@
           ]
         },
         {
+          "group": "",
           "name": "TutorialTips",
           "tags": "",
           "type": "Sprite",
@@ -2227,6 +2239,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "FinalScoreTitle",
           "smoothed": true,
@@ -2246,6 +2259,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "FinalScore",
           "smoothed": true,
@@ -2265,6 +2279,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "NewRecord",
           "smoothed": true,
@@ -2284,6 +2299,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "BestScore",
           "smoothed": true,
@@ -2302,6 +2318,7 @@
           }
         },
         {
+          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -2341,6 +2358,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -2380,6 +2398,7 @@
           ]
         },
         {
+          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",

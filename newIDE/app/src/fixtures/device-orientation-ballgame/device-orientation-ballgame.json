@@ -326,6 +326,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "board",
           "tags": "",
           "type": "Sprite",
@@ -365,6 +366,7 @@
           ]
         },
         {
+          "group": "",
           "name": "boundary",
           "tags": "",
           "type": "Sprite",
@@ -404,6 +406,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ball",
           "tags": "",
           "type": "Sprite",
@@ -443,6 +446,7 @@
           ]
         },
         {
+          "group": "",
           "name": "pit",
           "tags": "",
           "type": "Sprite",
@@ -483,6 +487,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "you_win",
           "smoothed": true,

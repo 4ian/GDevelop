@@ -557,6 +557,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Box",
           "tags": "",
           "type": "Sprite",
@@ -615,6 +616,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Mask",
           "tags": "",
           "type": "Sprite",
@@ -800,6 +802,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,
@@ -1389,6 +1392,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Box",
           "tags": "",
           "type": "Sprite",
@@ -1447,6 +1451,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Mask",
           "tags": "",
           "type": "Sprite",
@@ -1506,6 +1511,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,
@@ -2254,6 +2260,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Box",
           "tags": "",
           "type": "Sprite",
@@ -2313,6 +2320,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

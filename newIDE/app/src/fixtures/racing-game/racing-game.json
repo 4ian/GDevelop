@@ -2340,6 +2340,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "PlayerCar",
           "tags": "",
           "type": "Sprite",
@@ -2716,6 +2717,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Road",
           "tags": "",
           "type": "Sprite",
@@ -3068,6 +3070,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BentRoad",
           "tags": "",
           "type": "Sprite",
@@ -3420,6 +3423,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Plant",
           "tags": "",
           "type": "Sprite",
@@ -4480,6 +4484,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tire",
           "tags": "",
           "type": "Sprite",
@@ -5198,6 +5203,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Camera",
           "tags": "",
           "type": "Sprite",
@@ -5550,6 +5556,7 @@
           ]
         },
         {
+          "group": "",
           "name": "AIDirectionIndicator",
           "tags": "",
           "type": "Sprite",
@@ -5902,6 +5909,7 @@
           ]
         },
         {
+          "group": "",
           "name": "AICar",
           "tags": "",
           "type": "Sprite",
@@ -6962,6 +6970,7 @@
           ]
         },
         {
+          "group": "",
           "name": "FinishLine",
           "tags": "",
           "type": "Sprite",
@@ -7314,6 +7323,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Grass",
           "tags": "",

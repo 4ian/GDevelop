@@ -219,6 +219,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "logo",
           "tags": "",
           "type": "Sprite",
@@ -259,6 +260,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "person",
           "smoothed": true,
@@ -278,6 +280,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

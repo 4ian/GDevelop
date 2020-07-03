@@ -1077,6 +1077,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "tab_name",
           "smoothed": true,
@@ -1096,6 +1097,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "logo",
           "smoothed": true,
@@ -1114,6 +1116,7 @@
           }
         },
         {
+          "group": "",
           "height": 32,
           "name": "underline",
           "tags": "",
@@ -1129,6 +1132,7 @@
           ]
         },
         {
+          "group": "",
           "name": "tab_btn",
           "tags": "",
           "type": "Sprite",
@@ -1642,6 +1646,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "nav_line",
           "tags": "",
@@ -1652,6 +1657,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "indicator",
           "tags": "",
           "type": "Sprite",
@@ -1696,6 +1702,7 @@
           ]
         },
         {
+          "group": "",
           "name": "body",
           "tags": "",
           "type": "Sprite",
@@ -1736,6 +1743,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "update",
           "smoothed": true,
@@ -1755,6 +1763,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Big_name",
           "smoothed": true,
@@ -1773,6 +1782,7 @@
           }
         },
         {
+          "group": "",
           "height": 32,
           "name": "color",
           "tags": "",
@@ -1784,6 +1794,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "play_text",
           "smoothed": true,
@@ -1803,6 +1814,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "options_text",
           "smoothed": true,
@@ -1822,6 +1834,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "about_text",
           "smoothed": true,
@@ -1840,6 +1853,7 @@
           }
         },
         {
+          "group": "",
           "name": "lvl_btn",
           "tags": "",
           "type": "Sprite",
@@ -1914,6 +1928,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "lvl_name",
           "smoothed": true,

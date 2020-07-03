@@ -200,6 +200,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Button",
           "tags": "",
           "type": "Sprite",
@@ -355,6 +356,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -697,6 +699,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Button1",
           "tags": "",
           "type": "Sprite",
@@ -852,6 +855,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -870,6 +874,7 @@
           }
         },
         {
+          "group": "",
           "name": "Button2",
           "tags": "",
           "type": "Sprite",
@@ -1024,6 +1029,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Button3",
           "tags": "",
           "type": "Sprite",

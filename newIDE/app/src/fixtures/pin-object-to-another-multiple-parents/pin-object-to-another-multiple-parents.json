@@ -340,6 +340,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -358,6 +359,7 @@
           }
         },
         {
+          "group": "",
           "name": "parent",
           "tags": "",
           "type": "Sprite",
@@ -421,6 +423,7 @@
           ]
         },
         {
+          "group": "",
           "name": "child",
           "tags": "",
           "type": "Sprite",

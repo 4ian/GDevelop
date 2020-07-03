@@ -239,6 +239,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "My_picture",
           "tags": "",
           "type": "Sprite",
@@ -279,6 +280,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "sentence_explain_1",
           "smoothed": true,
@@ -298,6 +300,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "sentence_explain_2",
           "smoothed": true,
@@ -317,6 +320,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "bybouhandlizard",
           "smoothed": true,

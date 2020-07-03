@@ -3381,6 +3381,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -3420,6 +3421,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ground",
           "tags": "",
           "type": "Sprite",
@@ -3749,6 +3751,7 @@
           ]
         },
         {
+          "group": "",
           "name": "tree_top",
           "tags": "",
           "type": "Sprite",
@@ -3933,6 +3936,7 @@
           ]
         },
         {
+          "group": "",
           "name": "tree_bottom",
           "tags": "",
           "type": "Sprite",
@@ -4118,6 +4122,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

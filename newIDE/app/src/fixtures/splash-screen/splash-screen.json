@@ -169,6 +169,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "logo",
           "tags": "",
           "type": "Sprite",

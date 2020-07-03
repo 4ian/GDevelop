@@ -295,6 +295,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Planet",
           "tags": "",
           "type": "Sprite",
@@ -377,6 +378,7 @@
           ]
         },
         {
+          "group": "",
           "name": "SpaceGuy",
           "tags": "",
           "type": "Sprite",
@@ -460,6 +462,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,
@@ -478,6 +481,7 @@
           }
         },
         {
+          "group": "",
           "name": "BtnLeft",
           "tags": "",
           "type": "Sprite",
@@ -517,6 +521,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BtnRight",
           "tags": "",
           "type": "Sprite",
@@ -556,6 +561,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BtnJump",
           "tags": "",
           "type": "Sprite",

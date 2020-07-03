@@ -3220,6 +3220,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "MainFrame",
           "tags": "",
           "type": "Sprite",
@@ -3327,6 +3328,7 @@
           ]
         },
         {
+          "group": "",
           "name": "FrontWheel",
           "tags": "",
           "type": "Sprite",
@@ -3388,6 +3390,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BackWheel",
           "tags": "",
           "type": "Sprite",
@@ -3449,6 +3452,7 @@
           ]
         },
         {
+          "group": "",
           "name": "floor",
           "tags": "",
           "type": "Sprite",
@@ -3511,6 +3515,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Timing",
           "smoothed": true,
@@ -3530,6 +3535,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Elapsed",
           "smoothed": true,
@@ -3548,6 +3554,7 @@
           }
         },
         {
+          "group": "",
           "name": "RearSuspension",
           "tags": "",
           "type": "Sprite",
@@ -3620,6 +3627,7 @@
           ]
         },
         {
+          "group": "",
           "name": "FrontSuspensionBottom",
           "tags": "",
           "type": "Sprite",
@@ -3670,6 +3678,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Seat",
           "tags": "",
           "type": "Sprite",
@@ -3742,6 +3751,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Crank",
           "tags": "",
           "type": "Sprite",
@@ -3814,6 +3824,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RPedal",
           "tags": "",
           "type": "Sprite",
@@ -3875,6 +3886,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LPedal",
           "tags": "",
           "type": "Sprite",
@@ -3936,6 +3948,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Torso",
           "tags": "",
           "type": "Sprite",
@@ -4018,6 +4031,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightThigh",
           "tags": "",
           "type": "Sprite",
@@ -4090,6 +4104,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LeftThigh",
           "tags": "",
           "type": "Sprite",
@@ -4162,6 +4177,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightLeg",
           "tags": "",
           "type": "Sprite",
@@ -4234,6 +4250,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LeftLeg",
           "tags": "",
           "type": "Sprite",
@@ -4306,6 +4323,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RUpperArm",
           "tags": "",
           "type": "Sprite",
@@ -4378,6 +4396,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LUpperArm",
           "tags": "",
           "type": "Sprite",
@@ -4450,6 +4469,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RArm",
           "tags": "",
           "type": "Sprite",
@@ -4522,6 +4542,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LArm",
           "tags": "",
           "type": "Sprite",
@@ -4594,6 +4615,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Head",
           "tags": "",
           "type": "Sprite",
@@ -4661,6 +4683,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Follow",
           "tags": "",
           "type": "Sprite",
@@ -4682,6 +4705,7 @@
           ]
         },
         {
+          "group": "",
           "height": 1185,
           "name": "Win",
           "tags": "",
@@ -4692,6 +4716,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Start",
           "tags": "",
           "type": "Sprite",
@@ -4732,6 +4757,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Force",
           "smoothed": true,
@@ -4751,6 +4777,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ForceStrength",
           "smoothed": true,
@@ -4770,6 +4797,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DesktopControls",
           "smoothed": true,
@@ -4789,6 +4817,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "GameInstructions",
           "smoothed": true,
@@ -4807,6 +4836,7 @@
           }
         },
         {
+          "group": "",
           "name": "Jump",
           "tags": "",
           "type": "Sprite",
@@ -4870,6 +4900,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Forward",
           "tags": "",
           "type": "Sprite",
@@ -4909,6 +4940,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Backward",
           "tags": "",
           "type": "Sprite",
@@ -4948,6 +4980,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Brake",
           "tags": "",
           "type": "Sprite",
@@ -4987,6 +5020,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Retry",
           "tags": "",
           "type": "Sprite",
@@ -5026,6 +5060,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Left",
           "tags": "",
           "type": "Sprite",
@@ -5065,6 +5100,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Right",
           "tags": "",
           "type": "Sprite",
@@ -5105,6 +5141,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 205,
           "leftMargin": 0,
           "name": "Track",
@@ -5119,6 +5156,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Cliff",
           "tags": "",
           "type": "Sprite",
@@ -5158,6 +5196,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -5197,6 +5236,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tree",
           "tags": "",
           "type": "Sprite",
@@ -5236,6 +5276,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Bush",
           "tags": "",
           "type": "Sprite",
@@ -5275,6 +5316,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Grass",
           "tags": "",
           "type": "Sprite",
@@ -5314,6 +5356,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Sign",
           "tags": "",
           "type": "Sprite",
@@ -5353,6 +5396,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ForceIndicator",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",

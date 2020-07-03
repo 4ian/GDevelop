@@ -301,6 +301,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -455,6 +456,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ObjectToFollow",
           "tags": "",
           "type": "Sprite",

@@ -173,6 +173,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Coin",
           "tags": "",
           "type": "Sprite",
@@ -212,6 +213,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Brick",
           "tags": "",
           "type": "Sprite",
@@ -252,6 +254,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text",
           "smoothed": true,

@@ -265,6 +265,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "line",
           "smoothed": true,
@@ -284,6 +285,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "another_line",
           "smoothed": true,
@@ -302,6 +304,7 @@
           }
         },
         {
+          "group": "",
           "name": "change_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -313,12 +316,13 @@
             "fontSize": "20",
             "visible": true,
             "color": "#027c61",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "right",
             "wordWrap": true
           }
         },
         {
+          "group": "",
           "name": "hide_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -330,12 +334,13 @@
             "fontSize": "20",
             "visible": true,
             "color": "#696969",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "center",
             "wordWrap": true
           }
         },
         {
+          "group": "",
           "name": "drag_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -352,12 +357,13 @@
             "fontSize": "40",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
         },
         {
+          "group": "",
           "name": "wrapping_demo",
           "tags": "",
           "type": "BBText::BBText",
@@ -374,12 +380,13 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
         },
         {
+          "group": "",
           "name": "about",
           "tags": "",
           "type": "BBText::BBText",
@@ -391,7 +398,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }

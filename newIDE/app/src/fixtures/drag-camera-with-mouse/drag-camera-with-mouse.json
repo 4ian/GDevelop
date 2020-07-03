@@ -1656,6 +1656,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "object1",
           "tags": "",
           "type": "Sprite",
@@ -1714,6 +1715,7 @@
           ]
         },
         {
+          "group": "",
           "name": "object2",
           "tags": "",
           "type": "Sprite",
@@ -1773,6 +1775,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

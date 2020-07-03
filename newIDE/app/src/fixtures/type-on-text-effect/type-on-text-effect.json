@@ -161,6 +161,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "text_display",
           "smoothed": false,

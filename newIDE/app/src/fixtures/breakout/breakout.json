@@ -259,6 +259,7 @@
   },
   "objects": [
     {
+      "group": "",
       "height": 32,
       "name": "Barrier",
       "tags": "",
@@ -383,6 +384,7 @@
       "objects": [
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Welcom",
           "smoothed": true,
@@ -402,6 +404,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
@@ -421,6 +424,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Phys",
           "smoothed": true,
@@ -744,6 +748,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Paddle",
           "tags": "",
           "type": "Sprite",
@@ -789,6 +794,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ball",
           "tags": "",
           "type": "Sprite",
@@ -882,6 +888,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Brick",
           "tags": "",
           "type": "Sprite",
@@ -980,6 +987,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Congratulations",
           "smoothed": true,
@@ -999,6 +1007,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
@@ -1018,6 +1027,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Start",
           "smoothed": true,
@@ -1053,6 +1063,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 300,
           "name": "OnFire",
           "particleAlpha1": 204,
@@ -2724,6 +2735,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Paddle",
           "tags": "",
           "type": "Sprite",
@@ -2793,6 +2805,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ball",
           "tags": "",
           "type": "Sprite",
@@ -2861,6 +2874,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Brick",
           "tags": "",
           "type": "Sprite",
@@ -2983,6 +2997,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Congratulations",
           "smoothed": true,
@@ -3002,6 +3017,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
@@ -3037,6 +3053,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 300,
           "name": "OnFire",
           "particleAlpha1": 204,
@@ -3078,6 +3095,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Start",
           "smoothed": true,

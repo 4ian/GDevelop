@@ -169,6 +169,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "TextEntry",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -177,6 +178,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "EntryText",
           "smoothed": true,

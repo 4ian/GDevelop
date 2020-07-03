@@ -182,6 +182,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",

@@ -337,6 +337,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Hero",
           "tags": "",
           "type": "Sprite",
@@ -783,6 +784,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Wall",
           "tags": "",
           "type": "Sprite",
@@ -1826,6 +1828,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Zombie",
           "tags": "",
           "type": "Sprite",
@@ -2192,6 +2195,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LaserDrawer",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -2214,6 +2218,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "Background",
           "tags": "",
           "type": "Sprite",
@@ -2474,6 +2479,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
@@ -2493,6 +2499,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewObject",
           "smoothed": true,

@@ -889,6 +889,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Voiture",
           "tags": "",
           "type": "Sprite",
@@ -958,6 +959,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Batiment",
           "tags": "",
           "type": "Sprite",
@@ -1084,6 +1086,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fond",
           "tags": "",
           "type": "Sprite",
@@ -1142,6 +1145,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Route",
           "tags": "",
           "type": "Sprite",
@@ -1284,6 +1288,7 @@
           ]
         },
         {
+          "group": "",
           "name": "etincelle",
           "tags": "",
           "type": "Sprite",
@@ -1342,6 +1347,7 @@
           ]
         },
         {
+          "group": "",
           "name": "smoke",
           "tags": "",
           "type": "Sprite",
@@ -1496,6 +1502,7 @@
           ]
         },
         {
+          "group": "",
           "name": "frein",
           "tags": "",
           "type": "Sprite",
@@ -1555,6 +1562,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Speed",
           "smoothed": true,
@@ -1574,6 +1582,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
@@ -1592,6 +1601,7 @@
           }
         },
         {
+          "group": "",
           "name": "btnTurnLeft",
           "tags": "",
           "type": "Sprite",
@@ -1631,6 +1641,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btnTurnRight",
           "tags": "",
           "type": "Sprite",
@@ -1670,6 +1681,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btnAccelerate",
           "tags": "",
           "type": "Sprite",
@@ -1709,6 +1721,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btnBreak",
           "tags": "",
           "type": "Sprite",

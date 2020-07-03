@@ -704,6 +704,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -744,6 +745,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -762,6 +764,7 @@
           }
         },
         {
+          "group": "",
           "name": "LoadAtTop",
           "tags": "",
           "type": "Sprite",
@@ -801,6 +804,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LoadAtBottom",
           "tags": "",
           "type": "Sprite",
@@ -840,6 +844,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Show",
           "tags": "",
           "type": "Sprite",
@@ -879,6 +884,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Hide",
           "tags": "",
           "type": "Sprite",
@@ -918,6 +924,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LoadAtTopAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -957,6 +964,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LoadAtBottomAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -996,6 +1004,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Remove",
           "tags": "",
           "type": "Sprite",
@@ -1036,6 +1045,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -1055,6 +1065,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -1073,6 +1084,7 @@
           }
         },
         {
+          "group": "",
           "name": "GoToInterstitials",
           "tags": "",
           "type": "Sprite",
@@ -1112,6 +1124,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoToRewardVideos",
           "tags": "",
           "type": "Sprite",
@@ -2484,6 +2497,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -2524,6 +2538,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -2542,6 +2557,7 @@
           }
         },
         {
+          "group": "",
           "name": "Load",
           "tags": "",
           "type": "Sprite",
@@ -2581,6 +2597,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Display",
           "tags": "",
           "type": "Sprite",
@@ -2620,6 +2637,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LoadAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -2660,6 +2678,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -2679,6 +2698,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -2697,6 +2717,7 @@
           }
         },
         {
+          "group": "",
           "name": "GoToBanners",
           "tags": "",
           "type": "Sprite",
@@ -2736,6 +2757,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoToRewardVideos",
           "tags": "",
           "type": "Sprite",
@@ -3758,6 +3780,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -3798,6 +3821,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -3816,6 +3840,7 @@
           }
         },
         {
+          "group": "",
           "name": "Load",
           "tags": "",
           "type": "Sprite",
@@ -3855,6 +3880,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Display",
           "tags": "",
           "type": "Sprite",
@@ -3894,6 +3920,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LoadAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -3933,6 +3960,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ClaimReward",
           "tags": "",
           "type": "Sprite",
@@ -3973,6 +4001,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -3992,6 +4021,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -4010,6 +4040,7 @@
           }
         },
         {
+          "group": "",
           "name": "GoToBanners",
           "tags": "",
           "type": "Sprite",
@@ -4049,6 +4080,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoToInterstitials",
           "tags": "",
           "type": "Sprite",

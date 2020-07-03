@@ -433,6 +433,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Drawer",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -476,6 +477,7 @@
           "clearBetweenFrames": true
         },
         {
+          "group": "",
           "name": "Shapes",
           "tags": "",
           "type": "Sprite",
@@ -678,6 +680,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BarSelect",
           "tags": "",
           "type": "Sprite",
@@ -746,6 +749,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

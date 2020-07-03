@@ -1149,6 +1149,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "inventory_background",
           "tags": "",
           "type": "Sprite",
@@ -1188,6 +1189,7 @@
           ]
         },
         {
+          "group": "",
           "name": "inventory_slot",
           "tags": "",
           "type": "Sprite",
@@ -1684,6 +1686,7 @@
           ]
         },
         {
+          "group": "",
           "name": "inventory_bin",
           "tags": "",
           "type": "Sprite",
@@ -1790,6 +1793,7 @@
           ]
         },
         {
+          "group": "",
           "name": "button_background",
           "tags": "",
           "type": "Sprite",
@@ -1829,6 +1833,7 @@
           ]
         },
         {
+          "group": "",
           "name": "pointer_dragobject",
           "tags": "",
           "type": "Sprite",
@@ -2301,6 +2306,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "slot_text",
           "smoothed": true,
@@ -2320,6 +2326,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": true,
           "name": "Inventory_title",
           "smoothed": true,
@@ -2339,6 +2346,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "debug",
           "smoothed": true,
@@ -2358,6 +2366,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -2377,6 +2386,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "save_text",
           "smoothed": true,
@@ -2396,6 +2406,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "load_text",
           "smoothed": true,
@@ -2414,6 +2425,7 @@
           }
         },
         {
+          "group": "",
           "name": "item_apple",
           "tags": "",
           "type": "Sprite",
@@ -2472,6 +2484,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_banana",
           "tags": "",
           "type": "Sprite",
@@ -2530,6 +2543,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_cherry",
           "tags": "",
           "type": "Sprite",
@@ -2588,6 +2602,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_grape",
           "tags": "",
           "type": "Sprite",
@@ -2646,6 +2661,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_orange",
           "tags": "",
           "type": "Sprite",
@@ -2704,6 +2720,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_pearl",
           "tags": "",
           "type": "Sprite",
@@ -2762,6 +2779,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_raspberry",
           "tags": "",
           "type": "Sprite",
@@ -2820,6 +2838,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_strawberry",
           "tags": "",
           "type": "Sprite",
@@ -2878,6 +2897,7 @@
           ]
         },
         {
+          "group": "",
           "name": "item_watermelon",
           "tags": "",
           "type": "Sprite",

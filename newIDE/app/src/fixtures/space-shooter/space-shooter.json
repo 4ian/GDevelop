@@ -1971,6 +1971,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -3102,6 +3103,7 @@
           ]
         },
         {
+          "group": "",
           "height": 90,
           "name": "SpaceBackground",
           "tags": "Background",
@@ -3112,6 +3114,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "CorridorBackground",
           "tags": "Background",
           "type": "Sprite",
@@ -3151,6 +3154,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Asteroid",
           "tags": "",
           "type": "Sprite",
@@ -3259,6 +3263,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Enemy2",
           "tags": "",
           "type": "Sprite",
@@ -3498,6 +3503,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerBullet",
           "tags": "",
           "type": "Sprite",
@@ -3542,6 +3548,7 @@
           ]
         },
         {
+          "group": "",
           "name": "HealthPack",
           "tags": "",
           "type": "Sprite",
@@ -3657,6 +3664,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Explosion",
           "tags": "",
           "type": "Sprite",
@@ -3781,6 +3789,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Enemy3",
           "tags": "",
           "type": "Sprite",
@@ -3845,6 +3854,7 @@
           ]
         },
         {
+          "group": "",
           "name": "EnemyBullet",
           "tags": "",
           "type": "Sprite",
@@ -3918,6 +3928,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Enemy1",
           "tags": "",
           "type": "Sprite",
@@ -4068,6 +4079,7 @@
           ]
         },
         {
+          "group": "",
           "name": "AttackFlame",
           "tags": "",
           "type": "Sprite",
@@ -4124,6 +4136,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LifebarContainer",
           "tags": "",
           "type": "Sprite",
@@ -4163,6 +4176,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Lifebar",
           "tags": "",
           "type": "Sprite",
@@ -4202,6 +4216,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerAttackArea",
           "tags": "",
           "type": "Sprite",
@@ -4261,6 +4276,7 @@
         },
         {
           "bottomMargin": 2,
+          "group": "",
           "height": 32,
           "leftMargin": 8,
           "name": "TilesMechanical2",
@@ -4276,6 +4292,7 @@
         },
         {
           "bottomMargin": 1,
+          "group": "",
           "height": 32,
           "leftMargin": 9,
           "name": "TilesMechanical1",
@@ -4290,6 +4307,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "ChangeButton",
           "tags": "",
           "type": "Sprite",
@@ -4329,6 +4347,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BossBody",
           "tags": "",
           "type": "Sprite",
@@ -4520,6 +4539,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BossTopArm",
           "tags": "",
           "type": "Sprite",
@@ -5304,6 +5324,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BossBottomArm",
           "tags": "",
           "type": "Sprite",
@@ -6088,6 +6109,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BossSuperLaser",
           "tags": "",
           "type": "Sprite",
@@ -6144,6 +6166,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BossBackground",
           "tags": "",
           "type": "Sprite",
@@ -6183,6 +6206,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fade",
           "tags": "",
           "type": "Sprite",
@@ -6222,6 +6246,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GameOver",
           "tags": "",
           "type": "Sprite",

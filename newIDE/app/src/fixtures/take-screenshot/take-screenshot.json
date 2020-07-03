@@ -234,6 +234,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "GDLogo",
           "tags": "",
           "type": "Sprite",
@@ -274,6 +275,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Description",
           "smoothed": true,
@@ -292,6 +294,7 @@
           }
         },
         {
+          "group": "",
           "name": "Button",
           "tags": "",
           "type": "Sprite",
@@ -332,6 +335,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ScreenshotPath",
           "smoothed": true,

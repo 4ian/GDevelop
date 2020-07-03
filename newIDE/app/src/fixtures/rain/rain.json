@@ -277,6 +277,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "nuages_1",
           "tags": "",
           "type": "Sprite",
@@ -335,6 +336,7 @@
           ]
         },
         {
+          "group": "",
           "name": "nuages_2",
           "tags": "",
           "type": "Sprite",
@@ -393,6 +395,7 @@
           ]
         },
         {
+          "group": "",
           "name": "nuages_3",
           "tags": "",
           "type": "Sprite",
@@ -451,6 +454,7 @@
           ]
         },
         {
+          "group": "",
           "name": "goutte",
           "tags": "",
           "type": "Sprite",
@@ -515,6 +519,7 @@
           ]
         },
         {
+          "group": "",
           "name": "logo_inrain",
           "tags": "",
           "type": "Sprite",

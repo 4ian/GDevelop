@@ -188,6 +188,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "coin",
           "tags": "",
           "type": "Sprite",
@@ -227,6 +228,7 @@
           ]
         },
         {
+          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -267,6 +269,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

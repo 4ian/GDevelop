@@ -2047,6 +2047,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -2909,6 +2910,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -2975,6 +2977,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -3041,6 +3044,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -3059,6 +3063,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MovingPlatform",
           "tags": "",
           "type": "Sprite",
@@ -3125,6 +3130,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoLeft",
           "tags": "",
           "type": "Sprite",
@@ -3183,6 +3189,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoRight",
           "tags": "",
           "type": "Sprite",
@@ -3241,6 +3248,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -3316,6 +3324,7 @@
           ]
         },
         {
+          "group": "",
           "name": "enemy2",
           "tags": "",
           "type": "Sprite",
@@ -3529,6 +3538,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ant",
           "tags": "",
           "type": "Sprite",
@@ -3995,6 +4005,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fly",
           "tags": "",
           "type": "Sprite",
@@ -4334,6 +4345,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",
@@ -4576,6 +4588,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -4594,6 +4607,7 @@
           }
         },
         {
+          "group": "",
           "name": "Coin",
           "tags": "",
           "type": "Sprite",
@@ -4724,6 +4738,7 @@
           ]
         },
         {
+          "group": "",
           "name": "CoinIcon",
           "tags": "",
           "type": "Sprite",
@@ -4854,6 +4869,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -4912,6 +4928,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -4970,6 +4987,7 @@
           ]
         },
         {
+          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",
@@ -5038,6 +5056,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ArrowButtonsBg",
           "tags": "",
           "type": "Sprite",
@@ -5096,6 +5115,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "mountains",
           "tags": "",
@@ -5106,6 +5126,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "trees",
           "tags": "",
@@ -5116,6 +5137,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "clouds",
           "tags": "",
@@ -5126,6 +5148,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "NewObject",
           "tags": "",
@@ -5144,6 +5167,7 @@
           ]
         },
         {
+          "group": "",
           "name": "sign",
           "tags": "",
           "type": "Sprite",
@@ -5194,6 +5218,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": true,
           "name": "questionChoicesText",
           "smoothed": true,
@@ -5213,6 +5238,7 @@
         },
         {
           "bottomMargin": 2,
+          "group": "",
           "height": 24,
           "leftMargin": 2,
           "name": "textBg",
@@ -5227,6 +5253,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "avatars",
           "tags": "",
           "type": "Sprite",
@@ -5415,6 +5442,7 @@
           ]
         },
         {
+          "group": "",
           "name": "crumb",
           "tags": "",
           "type": "Sprite",
@@ -5459,6 +5487,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DialogueTreeBBtextObject",
           "tags": "",
           "type": "BBText::BBText",
@@ -5470,13 +5499,14 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
             "align": "left",
             "wordWrap": true
           }
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "commandsDebug",
           "smoothed": true,
@@ -5495,6 +5525,7 @@
           }
         },
         {
+          "group": "",
           "name": "fullTextDebug",
           "tags": "",
           "type": "BBText::BBText",
@@ -5506,7 +5537,7 @@
             "fontSize": "20",
             "visible": false,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
             "align": "left",
             "wordWrap": true
           }

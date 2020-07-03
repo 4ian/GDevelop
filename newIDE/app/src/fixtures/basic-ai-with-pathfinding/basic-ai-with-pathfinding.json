@@ -836,6 +836,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Perso",
           "tags": "",
           "type": "Sprite",
@@ -894,6 +895,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Mur",
           "tags": "",
           "type": "Sprite",
@@ -969,6 +971,7 @@
           ]
         },
         {
+          "group": "",
           "name": "IA",
           "tags": "",
           "type": "Sprite",
@@ -1306,6 +1309,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Note",
           "smoothed": true,
@@ -1324,6 +1328,7 @@
           }
         },
         {
+          "group": "",
           "name": "Alert",
           "tags": "",
           "type": "Sprite",

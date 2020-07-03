@@ -923,6 +923,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "bg",
           "tags": "",
           "type": "Sprite",
@@ -962,6 +963,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "floor",
           "tags": "",
@@ -996,6 +998,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ball",
           "tags": "",
           "type": "Sprite",
@@ -1059,6 +1062,7 @@
           ]
         },
         {
+          "group": "",
           "name": "cannon",
           "tags": "",
           "type": "Sprite",
@@ -1104,6 +1108,7 @@
           ]
         },
         {
+          "group": "",
           "name": "cannon_base",
           "tags": "",
           "type": "Sprite",
@@ -1143,6 +1148,7 @@
           ]
         },
         {
+          "group": "",
           "name": "crate",
           "tags": "",
           "type": "Sprite",
@@ -1206,6 +1212,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Yt",
           "tags": "",
           "type": "Sprite",
@@ -1246,6 +1253,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "channel",
           "smoothed": true,
@@ -1265,6 +1273,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "tutorial",
           "smoothed": true,

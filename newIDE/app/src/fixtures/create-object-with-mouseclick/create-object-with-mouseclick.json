@@ -173,6 +173,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "coin",
           "tags": "",
           "type": "Sprite",
@@ -213,6 +214,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

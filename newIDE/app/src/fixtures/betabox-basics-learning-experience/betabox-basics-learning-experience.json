@@ -1907,6 +1907,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "PlayerPink",
           "tags": "",
           "type": "Sprite",
@@ -2234,6 +2235,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerGreen",
           "tags": "",
           "type": "Sprite",
@@ -2567,6 +2569,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerBlue",
           "tags": "",
           "type": "Sprite",
@@ -2901,6 +2904,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 128,
           "leftMargin": 0,
           "name": "Box",
@@ -2923,6 +2927,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -3037,6 +3042,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -3103,6 +3109,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "Snow",
           "tags": "",
@@ -3121,6 +3128,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "Stone",
           "tags": "",
@@ -3139,6 +3147,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -3157,6 +3166,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledCastlePlatform",
           "tags": "",
@@ -3175,6 +3185,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -3250,6 +3261,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "Ladder",
           "tags": "",
@@ -3268,6 +3280,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoLeft",
           "tags": "",
           "type": "Sprite",
@@ -3326,6 +3339,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GoRight",
           "tags": "",
           "type": "Sprite",
@@ -3384,6 +3398,7 @@
           ]
         },
         {
+          "group": "",
           "name": "MovingPlatform",
           "tags": "",
           "type": "Sprite",
@@ -3450,6 +3465,7 @@
           ]
         },
         {
+          "group": "",
           "name": "SlimeWalk",
           "tags": "",
           "type": "Sprite",
@@ -3614,6 +3630,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fly",
           "tags": "",
           "type": "Sprite",
@@ -3773,6 +3790,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Cloud",
           "tags": "",
           "type": "Sprite",
@@ -3927,6 +3945,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",
@@ -4081,6 +4100,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Coin",
           "tags": "",
           "type": "Sprite",
@@ -4139,6 +4159,7 @@
           ]
         },
         {
+          "group": "",
           "name": "CoinIcon",
           "tags": "",
           "type": "Sprite",
@@ -4197,6 +4218,7 @@
           ]
         },
         {
+          "group": "",
           "name": "KeyIcon",
           "tags": "",
           "type": "Sprite",
@@ -4265,6 +4287,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Win",
           "tags": "",
           "type": "Sprite",
@@ -4334,6 +4357,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 128,
           "leftMargin": 0,
           "name": "Sign",
@@ -4348,6 +4372,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Spikes",
           "tags": "",
           "type": "Sprite",
@@ -4406,6 +4431,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Lava",
           "tags": "",
@@ -4416,6 +4442,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Key",
           "tags": "",
           "type": "Sprite",
@@ -4456,6 +4483,7 @@
         },
         {
           "bottomMargin": 0,
+          "group": "",
           "height": 64,
           "leftMargin": 0,
           "name": "KeyBlock",
@@ -4478,6 +4506,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Spring",
           "tags": "",
           "type": "Sprite",
@@ -4571,6 +4600,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Betabox",
           "tags": "",
           "type": "Sprite",
@@ -4610,6 +4640,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BetaboxFront",
           "tags": "",
           "type": "Sprite",
@@ -4649,6 +4680,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ArrowButtonsBg",
           "tags": "",
           "type": "Sprite",
@@ -4707,6 +4739,7 @@
           ]
         },
         {
+          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",
@@ -4775,6 +4808,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -4833,6 +4867,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -4891,6 +4926,7 @@
           ]
         },
         {
+          "group": "",
           "name": "HealthBar",
           "tags": "",
           "type": "Sprite",
@@ -4930,6 +4966,7 @@
           ]
         },
         {
+          "group": "",
           "name": "HealthBarFrame",
           "tags": "",
           "type": "Sprite",
@@ -4986,6 +5023,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 300,
           "name": "WinConfetti",
           "particleAlpha1": 255,
@@ -5027,6 +5065,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -5046,6 +5085,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Loops",
           "smoothed": true,
@@ -5065,6 +5105,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Variables",
           "smoothed": true,
@@ -5084,6 +5125,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "IF",
           "smoothed": true,
@@ -5103,6 +5145,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "MakeAGame",
           "smoothed": true,
@@ -5122,6 +5165,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ChangeCharacter",
           "smoothed": true,
@@ -5141,6 +5185,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Experiment",
           "smoothed": true,

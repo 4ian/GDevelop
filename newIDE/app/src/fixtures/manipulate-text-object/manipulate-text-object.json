@@ -185,6 +185,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "change_text",
           "smoothed": true,
@@ -204,6 +205,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "hide_text",
           "smoothed": true,
@@ -223,6 +225,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "drag_text",
           "smoothed": true,

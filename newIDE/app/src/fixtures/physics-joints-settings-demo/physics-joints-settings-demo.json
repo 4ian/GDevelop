@@ -133,6 +133,7 @@
   },
   "objects": [
     {
+      "group": "",
       "name": "Box",
       "tags": "",
       "type": "Sprite",
@@ -200,6 +201,7 @@
       ]
     },
     {
+      "group": "",
       "name": "Circle",
       "tags": "",
       "type": "Sprite",
@@ -267,6 +269,7 @@
       ]
     },
     {
+      "group": "",
       "name": "Wall",
       "tags": "",
       "type": "Sprite",
@@ -327,6 +330,7 @@
       ]
     },
     {
+      "group": "",
       "name": "Drawer",
       "tags": "",
       "type": "PrimitiveDrawing::Drawer",
@@ -349,6 +353,7 @@
       "clearBetweenFrames": true
     },
     {
+      "group": "",
       "name": "Button",
       "tags": "",
       "type": "Sprite",
@@ -394,6 +399,7 @@
     },
     {
       "bold": false,
+      "group": "",
       "italic": false,
       "name": "ValueText",
       "smoothed": true,
@@ -418,6 +424,7 @@
     },
     {
       "bold": false,
+      "group": "",
       "italic": false,
       "name": "TitleText",
       "smoothed": true,
@@ -442,6 +449,7 @@
     },
     {
       "bold": false,
+      "group": "",
       "italic": false,
       "name": "ButtonText",
       "smoothed": true,
@@ -460,6 +468,7 @@
       }
     },
     {
+      "group": "",
       "name": "SceneButton",
       "tags": "",
       "type": "Sprite",
@@ -500,6 +509,7 @@
     },
     {
       "bold": false,
+      "group": "",
       "italic": false,
       "name": "SceneButtonText",
       "smoothed": true,

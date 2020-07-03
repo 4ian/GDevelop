@@ -270,6 +270,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Plane",
           "tags": "",
           "type": "Sprite",
@@ -325,6 +326,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Cloud",
           "tags": "",
           "type": "Sprite",
@@ -439,6 +441,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 300,
           "name": "Smoke",
           "particleAlpha1": 204,
@@ -496,6 +499,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 300,
           "name": "Bullet",
           "particleAlpha1": 204,

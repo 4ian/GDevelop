@@ -845,6 +845,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1159,6 +1160,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -1273,6 +1275,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -1339,6 +1342,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -1358,6 +1362,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "AnimationScaleText",
           "smoothed": true,
@@ -1376,6 +1381,7 @@
           }
         },
         {
+          "group": "",
           "name": "btn_left",
           "tags": "",
           "type": "Sprite",
@@ -1415,6 +1421,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btn_right",
           "tags": "",
           "type": "Sprite",
@@ -1454,6 +1461,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btn_jump",
           "tags": "",
           "type": "Sprite",

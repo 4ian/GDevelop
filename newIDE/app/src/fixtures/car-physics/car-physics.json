@@ -656,6 +656,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Car",
           "tags": "",
           "type": "Sprite",
@@ -738,6 +739,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tire",
           "tags": "",
           "type": "Sprite",
@@ -820,6 +822,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ground",
           "tags": "",
           "type": "Sprite",
@@ -903,6 +906,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Debug",
           "smoothed": true,
@@ -921,6 +925,7 @@
           }
         },
         {
+          "group": "",
           "name": "BtnLeft",
           "tags": "",
           "type": "Sprite",
@@ -960,6 +965,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BtnRight",
           "tags": "",
           "type": "Sprite",
@@ -1000,6 +1006,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

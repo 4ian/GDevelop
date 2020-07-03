@@ -783,6 +783,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Cursor",
           "tags": "",
           "type": "Sprite",
@@ -876,6 +877,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Block",
           "tags": "",
           "type": "Sprite",
@@ -976,6 +978,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Flag",
           "tags": "",
           "type": "Sprite",
@@ -1069,6 +1072,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DestroyedTank",
           "tags": "",
           "type": "Sprite",
@@ -1428,6 +1432,7 @@
           ]
         },
         {
+          "group": "",
           "name": "NodeMarker",
           "tags": "",
           "type": "Sprite",
@@ -1486,6 +1491,7 @@
           ]
         },
         {
+          "group": "",
           "height": 256,
           "name": "Background",
           "tags": "",
@@ -1496,6 +1502,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Tank",
           "tags": "",
           "type": "Sprite",
@@ -2233,6 +2240,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Symbol",
           "tags": "",
           "type": "Sprite",

@@ -214,6 +214,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Pea",
           "tags": "",
           "type": "Sprite",
@@ -277,6 +278,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Drawer",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -300,6 +302,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

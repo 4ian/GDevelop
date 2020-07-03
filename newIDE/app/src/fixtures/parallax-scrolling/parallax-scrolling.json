@@ -1578,6 +1578,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "player",
           "tags": "",
           "type": "Sprite",
@@ -2108,6 +2109,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ground1",
           "tags": "",
           "type": "Sprite",
@@ -2174,6 +2176,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ground2",
           "tags": "",
           "type": "Sprite",
@@ -2240,6 +2243,7 @@
           ]
         },
         {
+          "group": "",
           "name": "background1",
           "tags": "",
           "type": "Sprite",
@@ -2298,6 +2302,7 @@
           ]
         },
         {
+          "group": "",
           "name": "background2",
           "tags": "",
           "type": "Sprite",
@@ -2356,6 +2361,7 @@
           ]
         },
         {
+          "group": "",
           "name": "clouds",
           "tags": "",
           "type": "Sprite",
@@ -2415,6 +2421,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

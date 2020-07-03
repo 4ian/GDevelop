@@ -400,6 +400,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Video",
           "tags": "",
           "type": "Video::VideoObject",
@@ -427,6 +428,7 @@
           }
         },
         {
+          "group": "",
           "name": "State_video",
           "tags": "",
           "type": "Sprite",
@@ -679,6 +681,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Play_Pause",
           "tags": "",
           "type": "Sprite",
@@ -863,6 +866,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Volume_Background_Transparent",
           "tags": "",
           "type": "Sprite",
@@ -902,6 +906,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Volume_Background_ProgressBar",
           "tags": "",
           "type": "Sprite",
@@ -941,6 +946,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Volume_ProgressBar",
           "tags": "",
           "type": "Sprite",
@@ -980,6 +986,7 @@
           ]
         },
         {
+          "group": "",
           "name": "VOLUME_CIRCLE",
           "tags": "",
           "type": "Sprite",
@@ -1019,6 +1026,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fullscreen",
           "tags": "",
           "type": "Sprite",
@@ -1058,6 +1066,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Prevent_click",
           "tags": "",
           "type": "Sprite",
@@ -1097,6 +1106,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Cursor",
           "tags": "",
           "type": "Sprite",
@@ -1136,6 +1146,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Sound",
           "tags": "",
           "type": "Sprite",
@@ -1233,6 +1244,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Time_Background_ProgressBar",
           "tags": "",
           "type": "Sprite",
@@ -1272,6 +1284,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Time_ProgressBar",
           "tags": "",
           "type": "Sprite",
@@ -1311,6 +1324,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Time_Circle",
           "tags": "",
           "type": "Sprite",
@@ -1351,6 +1365,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "DEBUG_VIDEO",
           "smoothed": true,
@@ -1370,6 +1385,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "TimeCode",
           "smoothed": true,
@@ -1388,6 +1404,7 @@
           }
         },
         {
+          "group": "",
           "name": "DEBUG_CIRCLE",
           "tags": "",
           "type": "Sprite",
@@ -1428,6 +1445,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Explain",
           "smoothed": true,
@@ -1446,6 +1464,7 @@
           }
         },
         {
+          "group": "",
           "name": "Looped",
           "tags": "",
           "type": "Sprite",
@@ -1515,6 +1534,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Credit",
           "smoothed": true,
@@ -1534,6 +1554,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,

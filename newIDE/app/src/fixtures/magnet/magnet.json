@@ -858,6 +858,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Ball",
           "tags": "",
           "type": "Sprite",
@@ -916,6 +917,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Hole",
           "tags": "",
           "type": "Sprite",
@@ -974,6 +976,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Magnet",
           "tags": "",
           "type": "Sprite",
@@ -1032,6 +1035,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Table",
           "tags": "",
           "type": "Sprite",
@@ -1090,6 +1094,7 @@
           ]
         },
         {
+          "group": "",
           "name": "small_magnet",
           "tags": "",
           "type": "Sprite",

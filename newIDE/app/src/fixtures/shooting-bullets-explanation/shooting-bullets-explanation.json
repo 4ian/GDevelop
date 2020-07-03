@@ -208,6 +208,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -272,6 +273,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tank",
           "tags": "",
           "type": "Sprite",
@@ -336,6 +338,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",
@@ -646,6 +649,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -710,6 +714,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tank",
           "tags": "",
           "type": "Sprite",
@@ -774,6 +779,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",

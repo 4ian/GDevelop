@@ -3987,6 +3987,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Minda",
           "tags": "",
           "type": "Sprite",
@@ -12794,6 +12795,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Tilebg",
           "tags": "",
           "type": "Sprite",
@@ -14052,6 +14054,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Avatar",
           "tags": "",
           "type": "Sprite",
@@ -14091,6 +14094,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Obstacle",
           "tags": "",

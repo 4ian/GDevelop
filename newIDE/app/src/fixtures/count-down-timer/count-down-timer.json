@@ -155,6 +155,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "TimerText",
           "smoothed": true,
@@ -490,6 +491,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "GOText",
           "smoothed": true,

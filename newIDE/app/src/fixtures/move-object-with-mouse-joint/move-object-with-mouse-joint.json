@@ -436,6 +436,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -518,6 +519,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ground",
           "tags": "",
           "type": "Sprite",
@@ -600,6 +602,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Border",
           "tags": "",

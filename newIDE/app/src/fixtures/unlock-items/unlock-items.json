@@ -727,6 +727,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Item",
           "tags": "",
           "type": "Sprite",
@@ -795,6 +796,7 @@
           ]
         },
         {
+          "group": "",
           "name": "SaveButton",
           "tags": "",
           "type": "Sprite",
@@ -835,6 +837,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "SaveButtonText",
           "smoothed": true,
@@ -853,6 +856,7 @@
           }
         },
         {
+          "group": "",
           "name": "LoadButton",
           "tags": "",
           "type": "Sprite",
@@ -893,6 +897,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LoadButtonText",
           "smoothed": true,
@@ -912,6 +917,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

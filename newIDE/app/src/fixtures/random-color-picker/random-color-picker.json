@@ -1952,6 +1952,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "whiteBox",
           "tags": "",
           "type": "Sprite",
@@ -2010,6 +2011,7 @@
           ]
         },
         {
+          "group": "",
           "name": "pickColor",
           "tags": "",
           "type": "Sprite",
@@ -2069,6 +2071,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "pickedColor",
           "smoothed": true,
@@ -2088,6 +2091,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

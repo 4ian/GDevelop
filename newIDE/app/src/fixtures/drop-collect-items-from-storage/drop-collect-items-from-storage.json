@@ -646,6 +646,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Box",
           "tags": "",
           "type": "Sprite",
@@ -760,6 +761,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jug",
           "tags": "",
           "type": "Sprite",
@@ -874,6 +876,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Barrel",
           "tags": "",
           "type": "Sprite",
@@ -988,6 +991,7 @@
           ]
         },
         {
+          "group": "",
           "name": "DropItem",
           "tags": "",
           "type": "Sprite",
@@ -1144,6 +1148,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -1163,6 +1168,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ExampleDescription",
           "smoothed": true,

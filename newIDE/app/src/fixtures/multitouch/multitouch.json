@@ -167,6 +167,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Marker",
           "tags": "",
           "type": "Sprite",
@@ -231,6 +232,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Explanation",
           "smoothed": true,

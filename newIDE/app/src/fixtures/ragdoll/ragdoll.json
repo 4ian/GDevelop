@@ -1131,6 +1131,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Head",
           "tags": "",
           "type": "Sprite",
@@ -1203,6 +1204,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Torso",
           "tags": "",
           "type": "Sprite",
@@ -1280,6 +1282,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RThigh",
           "tags": "",
           "type": "Sprite",
@@ -1352,6 +1355,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LThigh",
           "tags": "",
           "type": "Sprite",
@@ -1424,6 +1428,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LLeg",
           "tags": "",
           "type": "Sprite",
@@ -1491,6 +1496,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RLeg",
           "tags": "",
           "type": "Sprite",
@@ -1558,6 +1564,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RUpperArm",
           "tags": "",
           "type": "Sprite",
@@ -1630,6 +1637,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LUpperArm",
           "tags": "",
           "type": "Sprite",
@@ -1702,6 +1710,7 @@
           ]
         },
         {
+          "group": "",
           "name": "LArm",
           "tags": "",
           "type": "Sprite",
@@ -1769,6 +1778,7 @@
           ]
         },
         {
+          "group": "",
           "name": "RArm",
           "tags": "",
           "type": "Sprite",
@@ -1836,6 +1846,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Ground",
           "tags": "",
           "type": "Sprite",
@@ -1898,6 +1909,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Instructions",
           "smoothed": true,
@@ -1933,6 +1945,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 1000,
           "name": "Splatter",
           "particleAlpha1": 255,
@@ -1974,6 +1987,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Special",
           "smoothed": true,
@@ -1993,6 +2007,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Reset",
           "smoothed": true,

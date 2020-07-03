@@ -757,6 +757,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Bomb",
           "tags": "",
           "type": "Sprite",
@@ -910,6 +911,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Crate",
           "tags": "",
           "type": "Sprite",
@@ -949,6 +951,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Fire",
           "tags": "",
           "type": "Sprite",
@@ -1044,6 +1047,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Wall",
           "tags": "",
           "type": "Sprite",
@@ -1083,6 +1087,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1710,6 +1715,7 @@
           ]
         },
         {
+          "group": "",
           "height": 64,
           "name": "Tile_Grass",
           "tags": "",
@@ -1720,6 +1726,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 64,
           "name": "Tile_Wall1",
           "tags": "",
@@ -1730,6 +1737,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 64,
           "name": "Tile_Wall2",
           "tags": "",
@@ -1740,6 +1748,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "name": "Right_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1798,6 +1807,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Left_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1856,6 +1866,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Up_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1914,6 +1925,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Down_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1973,6 +1985,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewObject",
           "smoothed": true,

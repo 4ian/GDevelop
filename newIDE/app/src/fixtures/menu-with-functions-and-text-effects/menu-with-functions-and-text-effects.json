@@ -305,6 +305,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "menuitem",
           "smoothed": true,
@@ -323,6 +324,7 @@
           }
         },
         {
+          "group": "",
           "name": "image",
           "tags": "image",
           "type": "Sprite",
@@ -573,6 +575,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "menuitem",
           "smoothed": true,
@@ -591,6 +594,7 @@
           }
         },
         {
+          "group": "",
           "name": "image",
           "tags": "image",
           "type": "Sprite",
@@ -826,6 +830,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "menuitem",
           "smoothed": true,
@@ -844,6 +849,7 @@
           }
         },
         {
+          "group": "",
           "name": "image",
           "tags": "image",
           "type": "Sprite",
@@ -1079,6 +1085,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "menuitem",
           "smoothed": true,
@@ -1097,6 +1104,7 @@
           }
         },
         {
+          "group": "",
           "name": "image",
           "tags": "image",
           "type": "Sprite",
@@ -1332,6 +1340,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "menuitem",
           "smoothed": true,
@@ -1350,6 +1359,7 @@
           }
         },
         {
+          "group": "",
           "name": "image",
           "tags": "image",
           "type": "Sprite",

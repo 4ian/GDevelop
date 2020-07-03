@@ -822,6 +822,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Label_flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -872,6 +873,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -956,6 +958,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Start",
           "tags": "",
           "type": "Sprite",
@@ -995,6 +998,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Rate",
           "tags": "",
           "type": "Sprite",
@@ -1034,6 +1038,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Rect_black",
           "tags": "",
           "type": "Sprite",
@@ -1073,6 +1078,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Ground",
           "tags": "",
@@ -1083,6 +1089,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "Background_day",
           "tags": "",
@@ -1094,6 +1101,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ytchannel",
           "smoothed": true,
@@ -1666,6 +1674,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -1766,6 +1775,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Top_pipe",
           "tags": "",
           "type": "Sprite",
@@ -1811,6 +1821,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Bottom_pipe",
           "tags": "",
           "type": "Sprite",
@@ -1857,6 +1868,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Flappy_bird_score_two",
           "smoothed": true,
@@ -1876,6 +1888,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Flappy_bird_score",
           "smoothed": true,
@@ -1895,6 +1908,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Flappy_bird_hscore",
           "smoothed": true,
@@ -1913,6 +1927,7 @@
           }
         },
         {
+          "group": "",
           "name": "Menu_button",
           "tags": "",
           "type": "Sprite",
@@ -1952,6 +1967,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Share_button",
           "tags": "",
           "type": "Sprite",
@@ -1991,6 +2007,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Restart_button",
           "tags": "",
           "type": "Sprite",
@@ -2030,6 +2047,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Panel_score",
           "tags": "",
           "type": "Sprite",
@@ -2080,6 +2098,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Border",
           "tags": "",
           "type": "Sprite",
@@ -2119,6 +2138,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Flash",
           "tags": "",
           "type": "Sprite",
@@ -2166,6 +2186,7 @@
           ]
         },
         {
+          "group": "",
           "name": "label_game_over",
           "tags": "",
           "type": "Sprite",
@@ -2216,6 +2237,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Instructions",
           "tags": "",
           "type": "Sprite",
@@ -2255,6 +2277,7 @@
           ]
         },
         {
+          "group": "",
           "height": 32,
           "name": "Background_day",
           "tags": "",
@@ -2265,6 +2288,7 @@
           "behaviors": []
         },
         {
+          "group": "",
           "height": 32,
           "name": "Ground",
           "tags": "",
@@ -2283,6 +2307,7 @@
           ]
         },
         {
+          "group": "",
           "name": "New_hscore",
           "tags": "",
           "type": "Sprite",

@@ -243,6 +243,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewGameText",
           "smoothed": true,
@@ -262,6 +263,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "LoadGameText",
           "smoothed": true,
@@ -281,6 +283,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ExitText",
           "smoothed": true,
@@ -300,6 +303,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "SettingsText",
           "smoothed": true,
@@ -319,6 +323,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "MenuTitleText",
           "smoothed": true,
@@ -1022,6 +1027,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "MenuTitle",
           "smoothed": true,
@@ -1041,6 +1047,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "SelectLangText",
           "smoothed": true,
@@ -1060,6 +1067,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "OptionEnglishText",
           "smoothed": true,
@@ -1079,6 +1087,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "OptionHungarianText",
           "smoothed": true,
@@ -1098,6 +1107,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "OptionFrenchText",
           "smoothed": true,
@@ -1117,6 +1127,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "OptionSpanishText",
           "smoothed": true,
@@ -1136,6 +1147,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "BackToMenuText",
           "smoothed": true,

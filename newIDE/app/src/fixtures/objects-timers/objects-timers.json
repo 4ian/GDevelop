@@ -401,6 +401,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Sprite",
           "tags": "",
           "type": "Sprite",
@@ -459,6 +460,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Sprite2",
           "tags": "",
           "type": "Sprite",
@@ -518,6 +520,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Counter",
           "smoothed": true,
@@ -537,6 +540,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Counter2",
           "smoothed": true,

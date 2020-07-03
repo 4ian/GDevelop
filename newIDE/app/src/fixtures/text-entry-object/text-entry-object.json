@@ -190,6 +190,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Entry",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -198,6 +199,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Text",
           "smoothed": true,
@@ -217,6 +219,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

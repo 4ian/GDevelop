@@ -179,6 +179,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "background",
           "tags": "",
           "type": "Sprite",

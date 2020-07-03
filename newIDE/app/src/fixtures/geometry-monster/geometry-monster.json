@@ -490,6 +490,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "GameTitle",
           "tags": "",
           "type": "Sprite",
@@ -540,6 +541,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ButtonStart",
           "tags": "",
           "type": "Sprite",
@@ -944,6 +946,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Monster",
           "tags": "",
           "type": "Sprite",
@@ -1224,6 +1227,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Shape1",
           "tags": "",
           "type": "Sprite",
@@ -1263,6 +1267,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Shape2",
           "tags": "",
           "type": "Sprite",
@@ -1302,6 +1307,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Shape3",
           "tags": "",
           "type": "Sprite",
@@ -1341,6 +1347,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Shape4",
           "tags": "",
           "type": "Sprite",
@@ -1381,6 +1388,7 @@
         },
         {
           "bold": true,
+          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -1399,6 +1407,7 @@
           }
         },
         {
+          "group": "",
           "name": "Obstacle",
           "tags": "",
           "type": "Sprite",
@@ -1455,6 +1464,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Life",
           "tags": "",
           "type": "Sprite",
@@ -1581,6 +1591,7 @@
           ]
         },
         {
+          "group": "",
           "name": "GameOver",
           "tags": "",
           "type": "Sprite",
@@ -1620,6 +1631,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ButtonTryAgain",
           "tags": "",
           "type": "Sprite",
@@ -1717,6 +1729,7 @@
           ]
         },
         {
+          "group": "",
           "name": "ButtonMainMenu",
           "tags": "",
           "type": "Sprite",
@@ -1831,6 +1844,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 10,
           "name": "Shape4Explosion",
           "particleAlpha1": 255,
@@ -1888,6 +1902,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 10,
           "name": "Shape3Explosion",
           "particleAlpha1": 255,
@@ -1945,6 +1960,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 10,
           "name": "Shape2Explosion",
           "particleAlpha1": 255,
@@ -2002,6 +2018,7 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
+          "group": "",
           "maxParticleNb": 10,
           "name": "Shape1Explosion",
           "particleAlpha1": 255,

@@ -257,6 +257,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "load_button",
           "tags": "",
           "type": "Sprite",
@@ -315,6 +316,7 @@
           ]
         },
         {
+          "group": "",
           "name": "new_button",
           "tags": "",
           "type": "Sprite",
@@ -374,6 +376,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "load",
           "smoothed": true,
@@ -393,6 +396,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "new",
           "smoothed": true,
@@ -412,6 +416,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -807,6 +812,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "character1",
           "tags": "",
           "type": "Sprite",
@@ -870,6 +876,7 @@
           ]
         },
         {
+          "group": "",
           "name": "character2",
           "tags": "",
           "type": "Sprite",
@@ -933,6 +940,7 @@
           ]
         },
         {
+          "group": "",
           "name": "character3",
           "tags": "",
           "type": "Sprite",
@@ -996,6 +1004,7 @@
           ]
         },
         {
+          "group": "",
           "name": "save_button",
           "tags": "",
           "type": "Sprite",
@@ -1055,6 +1064,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "save",
           "smoothed": true,
@@ -1074,6 +1084,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -1092,6 +1103,7 @@
           }
         },
         {
+          "group": "",
           "name": "back_button",
           "tags": "",
           "type": "Sprite",
@@ -1132,6 +1144,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "highscore",
           "smoothed": true,
@@ -1151,6 +1164,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Back",
           "smoothed": true,

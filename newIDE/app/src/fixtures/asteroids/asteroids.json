@@ -401,6 +401,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "button",
           "smoothed": true,
@@ -420,6 +421,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "title",
           "smoothed": true,
@@ -798,6 +800,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "player",
           "tags": "",
           "type": "Sprite",
@@ -867,6 +870,7 @@
           ]
         },
         {
+          "group": "",
           "name": "larg_asteroid",
           "tags": "",
           "type": "Sprite",
@@ -1021,6 +1025,7 @@
           ]
         },
         {
+          "group": "",
           "name": "medium_asteroid",
           "tags": "",
           "type": "Sprite",
@@ -1175,6 +1180,7 @@
           ]
         },
         {
+          "group": "",
           "name": "small_asteroid",
           "tags": "",
           "type": "Sprite",
@@ -1329,6 +1335,7 @@
           ]
         },
         {
+          "group": "",
           "name": "debrish",
           "tags": "",
           "type": "Sprite",
@@ -1387,6 +1394,7 @@
           ]
         },
         {
+          "group": "",
           "name": "player_bullet",
           "tags": "",
           "type": "Sprite",
@@ -1451,6 +1459,7 @@
           ]
         },
         {
+          "group": "",
           "name": "player_debrish_1",
           "tags": "",
           "type": "Sprite",
@@ -1515,6 +1524,7 @@
           ]
         },
         {
+          "group": "",
           "name": "player_debrish_2",
           "tags": "",
           "type": "Sprite",
@@ -1579,6 +1589,7 @@
           ]
         },
         {
+          "group": "",
           "name": "player_debrish_3",
           "tags": "",
           "type": "Sprite",
@@ -1643,6 +1654,7 @@
           ]
         },
         {
+          "group": "",
           "name": "engine_particle",
           "tags": "",
           "type": "Sprite",
@@ -1702,6 +1714,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "player_life_text",
           "smoothed": true,
@@ -1720,6 +1733,7 @@
           }
         },
         {
+          "group": "",
           "name": "btn_rotate_left",
           "tags": "",
           "type": "Sprite",
@@ -1759,6 +1773,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btn_rotate_right",
           "tags": "",
           "type": "Sprite",
@@ -1798,6 +1813,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btn_fire",
           "tags": "",
           "type": "Sprite",
@@ -1837,6 +1853,7 @@
           ]
         },
         {
+          "group": "",
           "name": "btn_thruster",
           "tags": "",
           "type": "Sprite",
@@ -7765,6 +7782,7 @@
       "objects": [
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "gameover",
           "smoothed": true,
@@ -7784,6 +7802,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "restart",
           "smoothed": true,

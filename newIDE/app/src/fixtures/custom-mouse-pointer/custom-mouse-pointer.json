@@ -179,6 +179,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "MousePointer",
           "tags": "",
           "type": "Sprite",
@@ -219,6 +220,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

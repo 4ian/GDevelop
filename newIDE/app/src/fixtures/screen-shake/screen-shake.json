@@ -444,6 +444,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -742,6 +743,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -808,6 +810,7 @@
           ]
         },
         {
+          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -826,6 +829,7 @@
           ]
         },
         {
+          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -901,6 +905,7 @@
           ]
         },
         {
+          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",

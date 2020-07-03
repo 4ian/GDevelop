@@ -356,6 +356,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -396,6 +397,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Desktop",
           "smoothed": true,
@@ -415,6 +417,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Documents",
           "smoothed": true,
@@ -433,6 +436,7 @@
           }
         },
         {
+          "group": "",
           "name": "HowerDesktop",
           "tags": "",
           "type": "Sprite",
@@ -472,6 +476,7 @@
           ]
         },
         {
+          "group": "",
           "name": "HowerDocuments",
           "tags": "",
           "type": "Sprite",
@@ -512,6 +517,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "CreateMessage",
           "smoothed": true,
@@ -850,6 +856,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -890,6 +897,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewFileDesktop",
           "smoothed": true,
@@ -908,6 +916,7 @@
           }
         },
         {
+          "group": "",
           "name": "DirInput",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -916,6 +925,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DirName",
           "smoothed": true,
@@ -935,6 +945,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ErrorMessage",
           "smoothed": true,
@@ -953,6 +964,7 @@
           }
         },
         {
+          "group": "",
           "name": "CreateButton",
           "tags": "",
           "type": "Sprite",
@@ -1442,6 +1454,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -1482,6 +1495,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "NewFileDocuments",
           "smoothed": true,
@@ -1500,6 +1514,7 @@
           }
         },
         {
+          "group": "",
           "name": "DirInput",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -1508,6 +1523,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "DirName",
           "smoothed": true,
@@ -1527,6 +1543,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "ErrorMessage",
           "smoothed": true,
@@ -1545,6 +1562,7 @@
           }
         },
         {
+          "group": "",
           "name": "CreateButton",
           "tags": "",
           "type": "Sprite",

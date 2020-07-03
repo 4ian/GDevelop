@@ -188,6 +188,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "compass",
           "tags": "",
           "type": "Sprite",
@@ -227,6 +228,7 @@
           ]
         },
         {
+          "group": "",
           "name": "needle",
           "tags": "",
           "type": "Sprite",

@@ -447,6 +447,7 @@
       ],
       "objects": [
         {
+          "group": "",
           "name": "P1_Hitbox",
           "tags": "",
           "type": "Sprite",
@@ -503,6 +504,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Block_Sprite",
           "tags": "",
           "type": "Sprite",
@@ -550,6 +552,7 @@
           ]
         },
         {
+          "group": "",
           "height": 16,
           "name": "Block_Tile",
           "tags": "",
@@ -568,6 +571,7 @@
           ]
         },
         {
+          "group": "",
           "name": "Block_Extra",
           "tags": "",
           "type": "Sprite",
@@ -616,6 +620,7 @@
         },
         {
           "bold": false,
+          "group": "",
           "italic": false,
           "name": "Description",
           "smoothed": true,

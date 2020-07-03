@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import Dialog from '@material-ui/core/Dialog';
 import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandsContext';
@@ -9,8 +10,7 @@ import {
   type NamedCompoundCommand,
   type CompoundCommandOption,
 } from '../CommandManager';
-import CommandPicker from './CommandPicker';
-import OptionPicker from './OptionPicker';
+import AutocompletePicker from './AutocompletePicker';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -58,7 +58,7 @@ const CommandPalette = (props: Props) => {
     <I18n>
       {({ i18n }) => (
         <Dialog
-          onClose={() => props.onClose()}
+          onClose={props.onClose}
           aria-label="command-palette"
           open={props.open}
           fullWidth
@@ -68,18 +68,22 @@ const CommandPalette = (props: Props) => {
           transitionDuration={0}
         >
           {commandPickerOpen && (
-            <CommandPicker
+            // Command picker
+            <AutocompletePicker
               i18n={i18n}
-              commands={commandManager.getAllCommands()}
-              onClose={() => props.onClose()}
+              items={commandManager.getAllCommands()}
+              placeholder={t`Start typing a command...`}
+              onClose={props.onClose}
               onSelect={handleCommandChoose}
             />
           )}
           {optionPickerOpen && selectedCompoundCommand && (
-            <OptionPicker
+            // Compound command option picker
+            <AutocompletePicker
               i18n={i18n}
-              options={selectedCompoundCommand.options}
-              onClose={() => props.onClose()}
+              items={selectedCompoundCommand.options}
+              placeholder={t`Pick an option...`}
+              onClose={props.onClose}
               onSelect={handleOptionChoose}
             />
           )}

@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import { type I18n } from '@lingui/core';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import ListIcon from '../../UI/ListIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import TextField from '@material-ui/core/TextField';
@@ -11,18 +12,23 @@ import filterOptions from './FilterOptions';
 import {
   type NamedCommand,
   type NamedCompoundCommand,
+  type CompoundCommandOption,
 } from '../CommandManager';
 
 type Command = NamedCommand | NamedCompoundCommand<*>;
+type Item = Command | CompoundCommandOption<*>;
 
-type Props = {
+type Props<T> = {
   onClose: () => void,
-  onSelect: (command: Command) => void,
-  commands: Array<Command>,
+  onSelect: (item: T) => void,
+  items: Array<T>,
+  placeholder: MessageDescriptor,
   i18n: I18n,
 };
 
-const CommandPicker = (props: Props) => {
+const AutocompletePicker = (
+  props: Props<Command> | Props<CompoundCommandOption<*>>
+) => {
   const [open, setOpen] = React.useState(true);
 
   const handleClose = (_, reason) => {
@@ -30,8 +36,21 @@ const CommandPicker = (props: Props) => {
     props.onClose();
   };
 
-  const handleSelect = (_, command) => {
-    props.onSelect(command);
+  const handleSelect = (_, item) => {
+    props.onSelect(item);
+  };
+
+  const getItemText = (item: Item) => {
+    if (item.text) return item.text;
+    else if (item.displayText) return props.i18n._(item.displayText);
+  };
+
+  const getItemIcon = (item: Item) => {
+    if (item.text && item.iconSrc) {
+      return <ListIcon iconSize={24} src={item.iconSrc} />;
+    } else if (item.displayText) {
+      return <ChevronRightIcon />;
+    }
   };
 
   return (
@@ -39,8 +58,8 @@ const CommandPicker = (props: Props) => {
       open={open}
       onClose={handleClose}
       onOpen={() => setOpen(true)}
-      options={props.commands}
-      getOptionLabel={command => props.i18n._(command.displayText)}
+      options={props.items}
+      getOptionLabel={getItemText}
       onChange={handleSelect}
       openOnFocus
       autoHighlight
@@ -48,21 +67,19 @@ const CommandPicker = (props: Props) => {
       renderInput={params => (
         <TextField
           {...params}
-          placeholder={props.i18n._(t`Start typing a command...`)}
+          placeholder={props.i18n._(props.placeholder)}
           variant="outlined"
           autoFocus
         />
       )}
-      renderOption={command => (
+      renderOption={item => (
         <>
-          <ListItemIcon>
-            <ChevronRightIcon />
-          </ListItemIcon>
-          <ListItemText primary={props.i18n._(command.displayText)} />
+          <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
+          <ListItemText primary={getItemText(item)} />
         </>
       )}
     />
   );
 };
 
-export default CommandPicker;
+export default AutocompletePicker;

@@ -30,7 +30,8 @@ module.exports = {
       ),
       'Arthur Pacaud (arthuro555)',
       'MIT'
-    );
+    )
+    .setExtensionHelpPath('/all-features/p2p');
 
     extension
       .addCondition(

@@ -123,7 +123,7 @@ gdjs.evtTools.p2p.getEventVariable = function(eventName, variable) {
   gdjs.evtTools.network.jsonToVariableStructure(gdjs.evtTools.p2p.lastEventData[eventName], variable);
 }
 
-gdjs.evtTools.p2p.getCurrentId = function() {return gdjs.evtTools.p2p.peer.id;}
+gdjs.evtTools.p2p.getCurrentId = function() {return gdjs.evtTools.p2p.peer.id || "";}
 
 
 gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);

@@ -12,7 +12,7 @@ declare class gdExpressionMetadata {
   getParameters(): gdVectorParameterMetadata;
   setHidden(): gdExpressionMetadata;
   setPrivate(): gdExpressionMetadata;
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): gdExpressionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): gdExpressionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdExpressionMetadata;
   setDefaultValue(defaultValue: string): gdExpressionMetadata;
   setParameterLongDescription(longDescription: string): gdExpressionMetadata;

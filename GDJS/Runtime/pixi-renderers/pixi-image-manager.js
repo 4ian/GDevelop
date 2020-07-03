@@ -136,10 +136,24 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete) 
     if (totalCount === 0)
     	return onComplete(totalCount); //Nothing to load.
 
-    var loadingCount = 0;
     var loader = PIXI.Loader.shared;
 	var that = this;
-    loader.once('complete', function(loader, loadedFiles) {
+
+    var loadingCount = 0;
+    var progressCallbackId = loader.onProgress.add(function() {
+		loadingCount++;
+		onProgress(loadingCount, totalCount);
+    });
+
+	for (var file in files) {
+		if (files.hasOwnProperty(file)) {
+            loader.add(file, file);
+        }
+    }
+
+    loader.load(function(loader, loadedFiles) {
+		loader.onProgress.detach(progressCallbackId);
+
     	//Store the loaded textures so that they are ready to use.
     	for (var file in loadedFiles) {
     		if (loadedFiles.hasOwnProperty(file)) {
@@ -156,17 +170,5 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete) 
     	}
 
     	onComplete(totalCount);
-    });
-    loader.on('progress', function() {
-    	loadingCount++;
-    	onProgress(loadingCount, totalCount);
-    });
-
-	for (var file in files) {
-		if (files.hasOwnProperty(file)) {
-            loader.add(file, file);
-        }
-    }
-
-    loader.load();
+	});
 }

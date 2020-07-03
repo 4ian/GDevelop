@@ -16,24 +16,24 @@ const CommandsContextScopedProvider = (props: Props) => {
   React.useEffect(
     () => {
       if (!props.active) return;
-      const scopedCompoundCommands = scopedManager.compoundCommands;
-      // Forward all registered compound commands to central manager
-      Object.keys(scopedCompoundCommands).forEach(commandName => {
+      const scopedCommands = scopedManager.commands;
+      // Forward all registered commands to central manager
+      Object.keys(scopedCommands).forEach(commandName => {
         console.warn(`SCOPED PROVIDER: Registering command ${commandName}`);
-        centralManager.registerCompoundCommand(
+        centralManager.registerCommand(
           commandName,
-          scopedCompoundCommands[commandName]
+          scopedCommands[commandName]
         );
       });
       return () => {
-        // Withdraw all registered compound commands from central manager
-        Object.keys(scopedCompoundCommands).forEach(commandName => {
+        // Withdraw all registered commands from central manager
+        Object.keys(scopedCommands).forEach(commandName => {
           console.warn(`SCOPED PROVIDER: Deregistering command ${commandName}`);
-          centralManager.deregisterCompoundCommand(commandName);
+          centralManager.deregisterCommand(commandName);
         });
       };
     },
-    [props.active, centralManager, scopedManager.compoundCommands]
+    [props.active, centralManager, scopedManager.commands]
   );
 
   return (

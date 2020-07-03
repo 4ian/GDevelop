@@ -9,14 +9,9 @@ import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
-import {
-  type NamedCommand,
-  type NamedCompoundCommand,
-  type CompoundCommandOption,
-} from '../CommandManager';
+import { type NamedCommand, type CommandOption } from '../CommandManager';
 
-type Command = NamedCommand | NamedCompoundCommand<*>;
-type Item = Command | CompoundCommandOption<*>;
+type Item = NamedCommand | CommandOption<*>;
 
 type Props<T> = {
   onClose: () => void,
@@ -27,7 +22,7 @@ type Props<T> = {
 };
 
 const AutocompletePicker = (
-  props: Props<Command> | Props<CompoundCommandOption<*>>
+  props: Props<NamedCommand> | Props<CommandOption<*>>
 ) => {
   const [open, setOpen] = React.useState(true);
 

@@ -34,7 +34,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
-import { UseCompoundCommandHook } from '../CommandPalette/CommandHooks';
+import { UseCommandHook } from '../CommandPalette/CommandHooks';
 
 import {
   type ResourceSource,
@@ -1029,7 +1029,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     };
     return (
       <div style={styles.container}>
-        <UseCompoundCommandHook
+        <UseCommandHook
           commandName={'EDIT_OBJECT'}
           command={{
             displayText: t`Edit object...`,
@@ -1048,7 +1048,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               ),
           }}
         />
-        <UseCompoundCommandHook
+        <UseCommandHook
           commandName={'EDIT_OBJECT_VARIABLES'}
           command={{
             displayText: t`Edit object variables...`,

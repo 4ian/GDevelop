@@ -7,8 +7,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandsContext';
 import {
   type NamedCommand,
-  type NamedCompoundCommand,
-  type CompoundCommandOption,
+  type NamedCommandWithOptions,
+  type CommandOption,
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
 
@@ -18,8 +18,6 @@ const useStyles = makeStyles({
     alignItems: 'flex-start',
   },
 });
-
-type Command = NamedCommand | NamedCompoundCommand<*>;
 
 type Props = {|
   open: boolean,
@@ -32,24 +30,24 @@ const CommandPalette = (props: Props) => {
   const [commandPickerOpen, openCommandPicker] = React.useState(true);
   const [optionPickerOpen, openOptionPicker] = React.useState(false);
   const [
-    selectedCompoundCommand,
-    selectCompoundCommand,
-  ] = React.useState<null | NamedCompoundCommand<*>>(null);
+    selectedCommand,
+    selectCommand,
+  ] = React.useState<null | NamedCommandWithOptions<*>>(null);
 
-  const handleCommandChoose = (command: Command) => {
+  const handleCommandChoose = (command: NamedCommand) => {
     if (command.handler) {
       // Simple command
       command.handler();
       props.onClose();
     } else {
-      // Compound command
-      selectCompoundCommand(command);
+      // Command with options
+      selectCommand(command);
       openCommandPicker(false);
       openOptionPicker(true);
     }
   };
 
-  const handleOptionChoose = <T>(option: CompoundCommandOption<T>) => {
+  const handleOptionChoose = <T>(option: CommandOption<T>) => {
     option.handler();
     props.onClose();
   };
@@ -71,17 +69,17 @@ const CommandPalette = (props: Props) => {
             // Command picker
             <AutocompletePicker
               i18n={i18n}
-              items={commandManager.getAllCommands()}
+              items={commandManager.getAllNamedCommands()}
               placeholder={t`Start typing a command...`}
               onClose={props.onClose}
               onSelect={handleCommandChoose}
             />
           )}
-          {optionPickerOpen && selectedCompoundCommand && (
-            // Compound command option picker
+          {optionPickerOpen && selectedCommand && (
+            // Command options picker
             <AutocompletePicker
               i18n={i18n}
-              items={selectedCompoundCommand.generateOptions()}
+              items={selectedCommand.generateOptions()}
               placeholder={t`Pick an option...`}
               onClose={props.onClose}
               onSelect={handleOptionChoose}

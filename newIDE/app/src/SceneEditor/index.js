@@ -1032,7 +1032,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         <UseCompoundCommandHook
           commandName={'EDIT_OBJECT'}
           command={{
-            displayText: `Edit object...`,
+            displayText: t`Edit object...`,
             enabled: true,
             generateOptions: () =>
               enumerateObjects(project, layout).containerObjectsList.map(
@@ -1044,6 +1044,24 @@ export default class SceneEditor extends React.Component<Props, State> {
                   )(this.props.project, item.object),
                   handler: () =>
                     (this.props.onEditObject || this.editObject)(item.object),
+                })
+              ),
+          }}
+        />
+        <UseCompoundCommandHook
+          commandName={'EDIT_OBJECT_VARIABLES'}
+          command={{
+            displayText: t`Edit object variables...`,
+            enabled: true,
+            generateOptions: () =>
+              enumerateObjects(project, layout).containerObjectsList.map(
+                item => ({
+                  text: item.object.getName(),
+                  value: item.object,
+                  iconSrc: ObjectsRenderingService.getThumbnail.bind(
+                    ObjectsRenderingService
+                  )(this.props.project, item.object),
+                  handler: () => this.editObjectVariables(item.object),
                 })
               ),
           }}

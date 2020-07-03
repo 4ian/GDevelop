@@ -1034,17 +1034,18 @@ export default class SceneEditor extends React.Component<Props, State> {
           command={{
             displayText: `Edit object...`,
             enabled: true,
-            options: enumerateObjects(project, layout).containerObjectsList.map(
-              item => ({
-                text: item.object.getName(),
-                value: item.object,
-                iconSrc: ObjectsRenderingService.getThumbnail.bind(
-                  ObjectsRenderingService
-                )(this.props.project, item.object),
-                handler: () =>
-                  (this.props.onEditObject || this.editObject)(item.object),
-              })
-            ),
+            generateOptions: () =>
+              enumerateObjects(project, layout).containerObjectsList.map(
+                item => ({
+                  text: item.object.getName(),
+                  value: item.object,
+                  iconSrc: ObjectsRenderingService.getThumbnail.bind(
+                    ObjectsRenderingService
+                  )(this.props.project, item.object),
+                  handler: () =>
+                    (this.props.onEditObject || this.editObject)(item.object),
+                })
+              ),
           }}
         />
         <ResponsiveWindowMeasurer>

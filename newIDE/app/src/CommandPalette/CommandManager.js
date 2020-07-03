@@ -24,7 +24,7 @@ export type CompoundCommandOption<T> = {|
 export type CompoundCommand<T> = {|
   displayText: MessageDescriptor,
   enabled: boolean,
-  options: Array<CompoundCommandOption<T>>,
+  generateOptions: () => Array<CompoundCommandOption<T>>,
 |};
 
 export type NamedCompoundCommand<T> = {|

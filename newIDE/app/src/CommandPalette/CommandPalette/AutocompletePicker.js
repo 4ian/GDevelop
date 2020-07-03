@@ -48,9 +48,7 @@ const AutocompletePicker = (
   const getItemIcon = (item: Item) => {
     if (item.text && item.iconSrc) {
       return <ListIcon iconSize={24} src={item.iconSrc} />;
-    } else if (item.displayText) {
-      return <ChevronRightIcon />;
-    }
+    } else return <ChevronRightIcon />;
   };
 
   return (

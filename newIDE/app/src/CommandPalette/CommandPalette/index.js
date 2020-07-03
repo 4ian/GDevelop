@@ -37,7 +37,7 @@ const CommandPalette = (props: Props) => {
   ] = React.useState<null | NamedCompoundCommand<*>>(null);
 
   const handleCommandChoose = (command: Command) => {
-    if (!command.options) {
+    if (command.handler) {
       // Simple command
       command.handler();
       props.onClose();
@@ -81,7 +81,7 @@ const CommandPalette = (props: Props) => {
             // Compound command option picker
             <AutocompletePicker
               i18n={i18n}
-              items={selectedCompoundCommand.options}
+              items={selectedCompoundCommand.generateOptions()}
               placeholder={t`Pick an option...`}
               onClose={props.onClose}
               onSelect={handleOptionChoose}

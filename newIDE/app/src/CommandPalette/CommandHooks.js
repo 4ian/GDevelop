@@ -26,18 +26,18 @@ export const useCompoundCommand = <T>(
   command: CompoundCommand<T>
 ) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, enabled, options } = command;
+  const { displayText, enabled, generateOptions } = command;
   React.useEffect(
     () => {
       if (!enabled) return;
       commandManager.registerCompoundCommand(commandName, {
         displayText,
         enabled,
-        options,
+        generateOptions,
       });
       return () => commandManager.deregisterCompoundCommand(commandName);
     },
-    [commandManager, commandName, displayText, enabled, options]
+    [commandManager, commandName, displayText, enabled, generateOptions]
   );
 };
 

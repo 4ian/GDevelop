@@ -13,7 +13,7 @@
  * @param {gdjs.Layer} layer The layer
  * @param {gdjs.RuntimeScenePixiRenderer} runtimeSceneRenderer The scene renderer
  */
-gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
+gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   // @ts-ignore
   this._pixiContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
@@ -35,7 +35,7 @@ gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the eng
  * made to position, zoom or rotation of the camera.
  * @private
  */
-gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
+gdjs.LayerPixiRenderer.prototype.updatePosition = function () {
   var angle = -gdjs.toRad(this._layer.getCameraRotation());
   var zoomFactor = this._layer.getCameraZoom();
 
@@ -58,22 +58,23 @@ gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
   this._pixiContainer.position.y += this._layer.getHeight() / 2;
 };
 
-gdjs.LayerPixiRenderer.prototype.updateVisibility = function(visible) {
+gdjs.LayerPixiRenderer.prototype.updateVisibility = function (visible) {
   this._pixiContainer.visible = !!visible;
 };
 
-gdjs.LayerPixiRenderer.prototype.updateTime = function() {
+gdjs.LayerPixiRenderer.prototype.updateTime = function () {
   if (this._renderTexture) {
     this.updateRenderTexture();
+    this.syncWithBaseLayer();
   }
 
-  for(var filterName in this._filters) {
+  for (var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
   }
 };
 
-gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
+gdjs.LayerPixiRenderer.prototype._setupFilters = function () {
   var effectsData = this._layer.getEffectsData();
   if (effectsData.length === 0) {
     return;
@@ -81,7 +82,7 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
 
   this._pixiContainer.filters = [];
   for (var i = 0; i < effectsData.length; ++i) {
-    this.addEffect(effectsData[i])
+    this.addEffect(effectsData[i]);
   }
 };
 
@@ -89,7 +90,7 @@ gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
  * Add a new effect, or replace the one with the same name.
  * @param {EffectData} effectData The data of the effect to add.
  */
-gdjs.LayerPixiRenderer.prototype.addEffect = function(effectData) {
+gdjs.LayerPixiRenderer.prototype.addEffect = function (effectData) {
   var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
     effectData.effectType
   );
@@ -113,23 +114,27 @@ gdjs.LayerPixiRenderer.prototype.addEffect = function(effectData) {
     update: filterCreator.update,
   };
 
-  this._pixiContainer.filters = (this._pixiContainer.filters || [])
-    .concat(filter.pixiFilter);
+  this._pixiContainer.filters = (this._pixiContainer.filters || []).concat(
+    filter.pixiFilter
+  );
   this._filters[effectData.name] = filter;
-}
+};
 
 /**
  * Remove the effect with the specified name
  * @param {string} effectName The name of the effect.
  */
-gdjs.LayerPixiRenderer.prototype.removeEffect = function(effectName) {
+gdjs.LayerPixiRenderer.prototype.removeEffect = function (effectName) {
   var filter = this._filters[effectName];
   if (!filter) return;
 
-  this._pixiContainer.filters = (this._pixiContainer.filters || [])
-    .filter(function(pixiFilter) { return pixiFilter !== filter.pixiFilter; });
+  this._pixiContainer.filters = (this._pixiContainer.filters || []).filter(
+    function (pixiFilter) {
+      return pixiFilter !== filter.pixiFilter;
+    }
+  );
   delete this._filters[effectName];
-}
+};
 
 /**
  * Add a child to the pixi container associated to the layer.
@@ -138,7 +143,7 @@ gdjs.LayerPixiRenderer.prototype.removeEffect = function(effectName) {
  * @param child The child (PIXI object) to be added.
  * @param zOrder The z order of the associated object.
  */
-gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
+gdjs.LayerPixiRenderer.prototype.addRendererObject = function (child, zOrder) {
   child.zOrder = zOrder; //Extend the pixi object with a z order.
 
   for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
@@ -157,7 +162,7 @@ gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
  * @param child The child (PIXI object) to be modified.
  * @param newZOrder The z order of the associated object.
  */
-gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function(
+gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function (
   child,
   newZOrder
 ) {
@@ -171,7 +176,7 @@ gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function(
  *
  * @param child The child (PIXI object) to be removed.
  */
-gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
+gdjs.LayerPixiRenderer.prototype.removeRendererObject = function (child) {
   this._pixiContainer.removeChild(child);
 };
 
@@ -181,7 +186,7 @@ gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
  * @param {string} parameterName The parameter name
  * @param {number} value The new value for the parameter
  */
-gdjs.LayerPixiRenderer.prototype.setEffectDoubleParameter = function(
+gdjs.LayerPixiRenderer.prototype.setEffectDoubleParameter = function (
   name,
   parameterName,
   value
@@ -198,7 +203,7 @@ gdjs.LayerPixiRenderer.prototype.setEffectDoubleParameter = function(
  * @param {string} parameterName The parameter name
  * @param {string} value The new value for the parameter
  */
-gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function(
+gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function (
   name,
   parameterName,
   value
@@ -215,7 +220,7 @@ gdjs.LayerPixiRenderer.prototype.setEffectStringParameter = function(
  * @param {string} parameterName The parameter name
  * @param {boolean} value The new value for the parameter
  */
-gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function(
+gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function (
   name,
   parameterName,
   value
@@ -231,7 +236,7 @@ gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function(
  * @param {string} name The effect name
  * @returns {boolean} True if the effect exists, false otherwise
  */
-gdjs.LayerPixiRenderer.prototype.hasEffect = function(name) {
+gdjs.LayerPixiRenderer.prototype.hasEffect = function (name) {
   return !!this._filters[name];
 };
 
@@ -240,7 +245,7 @@ gdjs.LayerPixiRenderer.prototype.hasEffect = function(name) {
  * @param {string} name The effect name
  * @param {boolean} value Set to true to enable, false to disable
  */
-gdjs.LayerPixiRenderer.prototype.enableEffect = function(name, value) {
+gdjs.LayerPixiRenderer.prototype.enableEffect = function (name, value) {
   var filter = this._filters[name];
   if (!filter) return;
 
@@ -252,59 +257,101 @@ gdjs.LayerPixiRenderer.prototype.enableEffect = function(name, value) {
  * @param {string} name The effect name
  * @return {boolean} true if the filter is enabled
  */
-gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function(name) {
+gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
   var filter = this._filters[name];
   if (!filter) return false;
 
   return gdjs.PixiFiltersTools.isEffectEnabled(filter);
 };
 
-gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function() {
-  if(!this._renderTexture) {
+gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
+  if (!this._renderTexture) {
     var width = this._pixiRenderer.screen.width;
     var height = this._pixiRenderer.screen.height;
     var resolution = this._pixiRenderer.resolution;
     this._renderTexture = PIXI.RenderTexture.create({
       width,
       height,
-      resolution
+      resolution,
     });
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
   }
 
-  if(this._oldWidth !== this._pixiRenderer.screen.width || 
-    this._oldHeight !== this._pixiRenderer.screen.height) {
-      this._renderTexture.resize(
-        this._pixiRenderer.width,
-        this._pixiRenderer.height
-      )
-      this._oldWidth = this._pixiRenderer.width;
-      this._oldHeight = this._pixiRenderer.height;
+  if (
+    this._oldWidth !== this._pixiRenderer.screen.width ||
+    this._oldHeight !== this._pixiRenderer.screen.height
+  ) {
+    this._renderTexture.resize(
+      this._pixiRenderer.screen.width,
+      this._pixiRenderer.screen.height
+    );
+    if (this._pixiContainer.filters) {
+      this._pixiContainer.filterArea = this._pixiRenderer.screen;
+    }
+    this._oldWidth = this._pixiRenderer.screen.width;
+    this._oldHeight = this._pixiRenderer.screen.height;
   }
 
   var oldRenderTexture = this._pixiRenderer.renderTexture.current;
   var oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
 
   this._pixiRenderer.renderTexture.bind(this._renderTexture);
-  this._pixiRenderer.renderTexture.clear([0.25, 0.25, 0.25, 1.0]);
+  //TODO: Pass data for clear color.
+  this._pixiRenderer.renderTexture.clear([0.5, 0.5, 0.5, 1.0]);
 
   this._pixiRenderer.render(this._pixiContainer, this._renderTexture, false);
-  this._pixiRenderer.renderTexture.bind(oldRenderTexture, oldSourceFrame, undefined);
-}
+  this._pixiRenderer.renderTexture.bind(
+    oldRenderTexture,
+    oldSourceFrame,
+    undefined
+  );
+};
 
-gdjs.LayerPixiRenderer.prototype.getRenderTexture = function() {
-  if(!this._renderTexture) this.updateRenderTexture();
+gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
+  if (!this._renderTexture) this.updateRenderTexture();
   return this._renderTexture;
-}
+};
 
-gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function() {
-  if(!this._lightingSprite) {
+gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
+  if (!this._lightingSprite) {
     this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
     this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-    this._runtimeSceneRenderer.getPIXIContainer().addChild(this._lightingSprite);
+    // fix for blend mode when applying filter
+    if (this._pixiContainer.filters) {
+      this._pixiContainer.filterArea = new PIXI.Rectangle(
+        0,
+        0,
+        this._pixiRenderer.screen.width,
+        this._pixiRenderer.screen.height
+      );
+      for (var i = 0; i < this._pixiContainer.filters.length; i++) {
+        this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
+      }
+    }
+    this._runtimeSceneRenderer
+      .getPIXIContainer()
+      .addChild(this._lightingSprite);
   }
-}
+};
 
-gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function() {
+gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {
   return this._pixiContainer;
-}
+};
+
+gdjs.LayerPixiRenderer.prototype.syncWithBaseLayer = function () {
+  if (!this._baseLayer) {
+    this._baseLayer = this._runtimeSceneRenderer.getScene().getLayer('');
+    this._baseLayerCameraX = this._baseLayer.getCameraX();
+    this._baseLayerCameraY = this._baseLayer.getCameraY();
+  }
+  if (
+    this._baseLayer &&
+    (this._baseLayerCameraX !== this._baseLayer.getCameraX() ||
+      this._baseLayerCameraY !== this._baseLayer.getCameraY())
+  ) {
+    this._layer.setCameraX(this._baseLayer.getCameraX());
+    this._layer.setCameraY(this._baseLayer.getCameraY());
+    this._baseLayerCameraX = this._baseLayer.getCameraX();
+    this._baseLayerCameraY = this._baseLayer.getCameraY();
+  }
+};

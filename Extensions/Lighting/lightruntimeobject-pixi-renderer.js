@@ -22,11 +22,6 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     runtimeObject.y - this._radius,
   ]);
   this._indexBuffer = new Uint16Array([0, 1, 2, 2, 3, 0]);
-
-  this._layer = runtimeScene.getLayer("Light").getRenderer();
-  this._layer.addLayerToLighting();
-  
-
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -91,7 +86,11 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       this._debugLight.addChild(this._graphics);
     }
   }
-  console.log(this._layer.getPIXIContainer());
+
+  // There should be a layer named "Lights" already present for this to work.
+  // We might autogenerate this layer in future. There could be other ways to select the layer as well.
+  this._layer = runtimeScene.getLayer('Lights').getRenderer();
+  this._layer.addLayerToLighting();
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

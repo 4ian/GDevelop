@@ -89,3 +89,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function() {
 gdjs.RuntimeScenePixiRenderer.prototype.getPIXIRenderer = function() {
   return this._pixiRenderer;
 }
+
+gdjs.RuntimeScenePixiRenderer.prototype.getScene = function () {
+  return this._runtimeScene;
+}

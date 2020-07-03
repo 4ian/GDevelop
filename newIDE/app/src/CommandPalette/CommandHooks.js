@@ -1,39 +1,48 @@
 // @flow
 import * as React from 'react';
-import { type Command } from './CommandManager';
+import { type CommandWithOptions, type SimpleCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
-export const useCommand = (commandName: string, command: Command) => {
+/**
+ * React hook for dynamically registering and deregistering a simple command
+ */
+export const useCommand = (commandName: string, command: SimpleCommand) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, enabled } = command;
+  const { displayText, enabled, handler } = command;
   React.useEffect(
     () => {
-      if (!command.enabled) return;
-      if (command.handler) {
-        // Simple command with no options
-        commandManager.registerCommand(commandName, {
-          displayText: command.displayText,
-          enabled: command.enabled,
-          handler: command.handler,
-        });
-      } else {
-        // Command with options
-        commandManager.registerCommand(commandName, {
-          displayText: command.displayText,
-          enabled: command.enabled,
-          generateOptions: command.generateOptions,
-        });
-      }
+      if (!enabled) return;
+      commandManager.registerCommand(commandName, {
+        displayText,
+        enabled,
+        handler,
+      });
       return () => commandManager.deregisterCommand(commandName);
     },
-    [
-      commandManager,
-      commandName,
-      displayText,
-      enabled,
-      command.handler || command.generateOptions,
-    ]
+    [commandManager, commandName, displayText, enabled, handler]
+  );
+};
+
+/**
+ * React hook for dynamically registering and deregistering command with options
+ */
+export const useCommandWithOptions = <T>(
+  commandName: string,
+  command: CommandWithOptions<T>
+) => {
+  const commandManager = React.useContext(CommandsContext);
+  const { displayText, enabled, generateOptions } = command;
+  React.useEffect(
+    () => {
+      if (!enabled) return;
+      commandManager.registerCommand(commandName, {
+        displayText,
+        enabled,
+        generateOptions,
+      });
+    },
+    [commandManager, commandName, displayText, enabled, generateOptions]
   );
 };
 
@@ -71,10 +80,26 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
   );
 };
 
+/**
+ * React component for using useCommand hook in
+ * class components
+ */
 export const UseCommandHook = (props: {
   commandName: string,
-  command: Command,
+  command: SimpleCommand,
 }) => {
   useCommand(props.commandName, props.command);
+  return null;
+};
+
+/**
+ * React component for using useCommandWithOptions
+ * hook in class components
+ */
+export const UseCommandWithOptionsHook = (props: {
+  commandName: string,
+  command: CommandWithOptions<*>,
+}) => {
+  useCommandWithOptions(props.commandName, props.command);
   return null;
 };

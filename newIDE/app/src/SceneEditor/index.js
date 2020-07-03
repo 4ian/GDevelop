@@ -34,7 +34,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
-import { UseCommandHook } from '../CommandPalette/CommandHooks';
+import UseSceneEditorCommands from './UseSceneEditorCommands';
 
 import {
   type ResourceSource,
@@ -1029,42 +1029,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     };
     return (
       <div style={styles.container}>
-        <UseCommandHook
-          commandName={'EDIT_OBJECT'}
-          command={{
-            displayText: t`Edit object...`,
-            enabled: true,
-            generateOptions: () =>
-              enumerateObjects(project, layout).containerObjectsList.map(
-                item => ({
-                  text: item.object.getName(),
-                  value: item.object,
-                  iconSrc: ObjectsRenderingService.getThumbnail.bind(
-                    ObjectsRenderingService
-                  )(this.props.project, item.object),
-                  handler: () =>
-                    (this.props.onEditObject || this.editObject)(item.object),
-                })
-              ),
-          }}
-        />
-        <UseCommandHook
-          commandName={'EDIT_OBJECT_VARIABLES'}
-          command={{
-            displayText: t`Edit object variables...`,
-            enabled: true,
-            generateOptions: () =>
-              enumerateObjects(project, layout).containerObjectsList.map(
-                item => ({
-                  text: item.object.getName(),
-                  value: item.object,
-                  iconSrc: ObjectsRenderingService.getThumbnail.bind(
-                    ObjectsRenderingService
-                  )(this.props.project, item.object),
-                  handler: () => this.editObjectVariables(item.object),
-                })
-              ),
-          }}
+        <UseSceneEditorCommands
+          project={project}
+          layout={layout}
+          onEditObject={this.props.onEditObject || this.editObject}
+          onEditObjectVariables={this.editObjectVariables}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (

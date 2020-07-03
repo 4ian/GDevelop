@@ -3,7 +3,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type CommandHandler = () => void | Promise<void>;
 
-type BasicCommand = {|
+export type SimpleCommand = {|
   displayText: MessageDescriptor,
   enabled: boolean,
   handler: CommandHandler,
@@ -16,13 +16,13 @@ export type CommandOption<T> = {|
   iconSrc?: string,
 |};
 
-type CommandWithOptions<T> = {|
+export type CommandWithOptions<T> = {|
   displayText: MessageDescriptor,
   enabled: boolean,
   generateOptions: () => Array<CommandOption<T>>,
 |};
 
-export type Command = BasicCommand | CommandWithOptions<*>;
+export type Command = SimpleCommand | CommandWithOptions<*>;
 
 export type NamedCommand = {|
   name: string,

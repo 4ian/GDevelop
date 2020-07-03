@@ -34,6 +34,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
+import { UseCompoundCommandHook } from '../CommandPalette/CommandHooks';
 
 import {
   type ResourceSource,
@@ -1028,6 +1029,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     };
     return (
       <div style={styles.container}>
+        <UseCompoundCommandHook
+          commandName={'EDIT_OBJECT'}
+          command={{
+            displayText: `Edit object...`,
+            enabled: true,
+            options: enumerateObjects(project, layout).containerObjectsList.map(
+              item => ({
+                text: item.object.getName(),
+                value: item.object,
+                iconSrc: ObjectsRenderingService.getThumbnail.bind(
+                  ObjectsRenderingService
+                )(this.props.project, item.object),
+                handler: () =>
+                  (this.props.onEditObject || this.editObject)(item.object),
+              })
+            ),
+          }}
+        />
         <ResponsiveWindowMeasurer>
           {windowWidth => (
             <PreferencesContext.Consumer>

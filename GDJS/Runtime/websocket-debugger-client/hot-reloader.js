@@ -968,6 +968,8 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
   newLayers,
   runtimeScene
 ) {
+  // TODO: layer re-ordering and ensure the added layer is at the right position
+
   oldLayers.forEach((oldLayerData) => {
     const name = oldLayerData.name;
     const newLayerData = newLayers.filter(
@@ -1202,21 +1204,32 @@ gdjs.HotReloader.prototype._hotReloadRuntimeInstance = function (
   }
 
   // Check if size changed
+  var sizeChanged = false;
   if (newInstance.customSize) {
     if (!oldInstance.customSize) {
+      // A custom size was set
       runtimeObject.setWidth(newInstance.width);
       runtimeObject.setHeight(newInstance.height);
       somethingChanged = true;
+      sizeChanged = true;
     } else {
+      // The custom size was changed
       if (oldInstance.width !== newInstance.width) {
         runtimeObject.setWidth(newInstance.width);
         somethingChanged = true;
+        sizeChanged = true;
       }
       if (oldInstance.height !== newInstance.height) {
         runtimeObject.setHeight(newInstance.height);
         somethingChanged = true;
+        sizeChanged = true;
       }
     }
+  } else if (!newInstance.customSize && oldInstance.customSize) {
+    // The custom size was removed. Just flag the size as changed
+    // and hope the object will handle this in
+    // `extraInitializationFromInitialInstance`.
+    sizeChanged = true;
   }
 
   // Update variables
@@ -1249,7 +1262,7 @@ gdjs.HotReloader.prototype._hotReloadRuntimeInstance = function (
       return !oldStringProperty || oldStringProperty.value !== value;
     }
   );
-  if (numberPropertiesChanged || stringPropertiesChanged) {
+  if (numberPropertiesChanged || stringPropertiesChanged || sizeChanged) {
     runtimeObject.extraInitializationFromInitialInstance(newInstance);
     somethingChanged = true;
   }

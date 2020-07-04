@@ -104,9 +104,10 @@ gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
  * @private
  */
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);
+  else
+    this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {

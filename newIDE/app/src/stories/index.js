@@ -4296,7 +4296,6 @@ storiesOf('NewObjectDialog', module)
     />
   ));
 
-<<<<<<< HEAD
 storiesOf('CommandPalette', module)
   .addDecorator(muiDecorator)
   .add('commands', () => (
@@ -4360,7 +4359,8 @@ storiesOf('CommandPalette', module)
         />
       )}
     </I18n>
-=======
+  ));
+
 storiesOf('HotReloadPreviewButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4401,5 +4401,4 @@ storiesOf('HotReloadLogsDialog', module)
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
     />
->>>>>>> Add support for "hot reloading" of previews (apply changes to preview without restarting)
   ));

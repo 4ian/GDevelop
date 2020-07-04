@@ -42,16 +42,16 @@ gdjs.AnchorRuntimeBehavior.VerticalAnchor = {
 
 gdjs.AnchorRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
     if (oldBehaviorData.leftEdgeAnchor !== newBehaviorData.leftEdgeAnchor) {
-        this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
+        this._leftEdgeAnchor = newBehaviorData.leftEdgeAnchor;
     }
     if (oldBehaviorData.rightEdgeAnchor !== newBehaviorData.rightEdgeAnchor) {
-        this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
+        this._rightEdgeAnchor = newBehaviorData.rightEdgeAnchor;
     }
     if (oldBehaviorData.topEdgeAnchor !== newBehaviorData.topEdgeAnchor) {
-        this._topEdgeAnchor = behaviorData.topEdgeAnchor;
+        this._topEdgeAnchor = newBehaviorData.topEdgeAnchor;
     }
     if (oldBehaviorData.bottomEdgeAnchor !== newBehaviorData.bottomEdgeAnchor) {
-        this._bottomEdgeAnchor = behaviorData.bottomEdgeAnchor;
+        this._bottomEdgeAnchor = newBehaviorData.bottomEdgeAnchor;
     }
     if (oldBehaviorData.relativeToOriginalWindowSize !== newBehaviorData.relativeToOriginalWindowSize) {
         return false;

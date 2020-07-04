@@ -168,6 +168,8 @@ gdjs.TextRuntimeObject.prototype.extraInitializationFromInitialInstance = functi
     if ( initialInstanceData.customSize ) {
         this.setWrapping(true);
         this.setWrappingWidth(initialInstanceData.width);
+    } else {
+        this.setWrapping(false);
     }
 };
 

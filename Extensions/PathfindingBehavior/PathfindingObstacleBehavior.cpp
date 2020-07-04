@@ -18,7 +18,7 @@ void PathfindingObstacleBehavior::InitializeContent(
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 PathfindingObstacleBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Impassable obstacle")]
       .SetValue(behaviorContent.GetBoolAttribute("impassable") ? "true"
@@ -33,8 +33,7 @@ PathfindingObstacleBehavior::GetProperties(
 bool PathfindingObstacleBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project) {
+    const gd::String& value) {
   if (name == _("Impassable obstacle")) {
     behaviorContent.SetAttribute("impassable", (value != "0"));
     return true;

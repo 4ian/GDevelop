@@ -1,7 +1,7 @@
 // @flow
 import path from 'path';
 import { uploadObject } from '../../Utils/GDevelopServices/Preview';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type TextFileDescriptor = {|
   filePath: string,

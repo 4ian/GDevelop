@@ -12,7 +12,7 @@ gdjs.PixiFiltersTools.registerFilterCreator('Outline', {
   },
   updateStringParameter: function(filter, parameterName, value) {
     if (parameterName === 'color') {
-      filter.color = value.replace('#', '0x');
+      filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
   },
   updateBooleanParameter: function(filter, parameterName, value) {},

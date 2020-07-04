@@ -12,7 +12,7 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -35,7 +35,7 @@ import {
   getRemainingCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -77,7 +77,7 @@ const styles = {
 type State = {|
   popoverOpen: boolean,
   parametersDialogOpen: boolean,
-  selectedExpressionInfo: ?EnumeratedInstructionOrExpressionMetadata,
+  selectedExpressionInfo: ?EnumeratedExpressionMetadata,
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -204,9 +204,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
-  _handleExpressionChosen = (
-    expressionInfo: EnumeratedInstructionOrExpressionMetadata
-  ) => {
+  _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
     this.setState({
       popoverOpen: false,
       parametersDialogOpen: true,
@@ -215,7 +213,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   insertExpression = (
-    expressionInfo: EnumeratedInstructionOrExpressionMetadata,
+    expressionInfo: EnumeratedExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;

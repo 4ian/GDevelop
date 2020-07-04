@@ -94,13 +94,13 @@ export default class ResourcePropertiesEditor extends React.Component<
   };
 
   _renderResourcesProperties() {
-    const { resources, project } = this.props;
+    const { resources } = this.props;
     //TODO: Multiple resources support
-    const properties = resources[0].getProperties(project);
+    const properties = resources[0].getProperties();
     const resourceSchema = propertiesMapToSchema(
       properties,
-      resource => resource.getProperties(project),
-      (resource, name, value) => resource.updateProperty(name, value, project)
+      resource => resource.getProperties(),
+      (resource, name, value) => resource.updateProperty(name, value)
     );
 
     return (

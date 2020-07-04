@@ -7,7 +7,7 @@ import GDevelopJsInitializerDecorator, {
 } from './GDevelopJsInitializerDecorator';
 
 import { storiesOf, addDecorator } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { action, configureActions } from '@storybook/addon-actions';
 
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -191,6 +191,11 @@ import {
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
 import LayersList from '../LayersList';
+
+configureActions({
+  depth: 2,
+  limit: 20,
+});
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -2673,6 +2678,44 @@ storiesOf('EventsTree', module)
         </FixedHeightFlexContainer>
       </div>
     </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (no scope)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.emptyEventsList}
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'small'}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet', module)
@@ -3774,20 +3817,24 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div style={{ height: 200 }}>
-      <ValueStateHolder
-        initialValue={null}
-        render={(value, onChange) => (
-          <ResourcesList
-            onSelectResource={onChange}
-            selectedResource={value}
-            onDeleteResource={() => {}}
-            onRenameResource={() => {}}
-            project={testProject.project}
-          />
-        )}
-      />
-    </div>
+    <DragAndDropContextProvider>
+      <div style={{ height: 200 }}>
+        <ValueStateHolder
+          initialValue={null}
+          render={(value, onChange) => (
+            <ResourcesList
+              onSelectResource={onChange}
+              selectedResource={value}
+              onDeleteResource={() => {}}
+              onRenameResource={() => {}}
+              project={testProject.project}
+              onRemoveUnusedResources={() => {}}
+              onRemoveAllResourcesWithInvalidPath={() => {}}
+            />
+          )}
+        />
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsFunctionConfigurationEditor', module)
@@ -4051,18 +4098,28 @@ storiesOf('ProjectManager', module)
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={''}
       onChange={action('change')}
+      objectType=""
     />
   ))
-  .add('with a non existing behavior selected', () => (
+  .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
+      objectType=""
+    />
+  ))
+  .add('default, for a text object', () => (
+    <BehaviorTypeSelector
+      project={testProject.project}
+      value={''}
+      onChange={action('change')}
+      objectType="TextObject::Text"
     />
   ));
 

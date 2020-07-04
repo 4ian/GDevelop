@@ -43,7 +43,12 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
-    if (!project || !project.hasLayoutNamed(projectItemName)) return null;
+    if (
+      !project ||
+      !projectItemName ||
+      !project.hasLayoutNamed(projectItemName)
+    )
+      return null;
 
     return project.getLayout(projectItemName);
   }

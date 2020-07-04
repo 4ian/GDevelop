@@ -1,8 +1,9 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -10,8 +11,16 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -321,7 +330,6 @@ module.exports = {
         _('Desktop folder'),
         _('Get the path to the desktop folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -335,7 +343,6 @@ module.exports = {
         _('Documents folder'),
         _('Get the path to the documents folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -349,7 +356,6 @@ module.exports = {
         _('Pictures folder'),
         _('Get the path to the pictures folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -363,7 +369,6 @@ module.exports = {
         _('This games executable folder'),
         _('Get the path to this games executable folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -377,7 +382,6 @@ module.exports = {
         _('Userdata folder (For application settings)'),
         _('Get the path to userdata folder. (For application settings)'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -391,7 +395,6 @@ module.exports = {
         _('User\'s Home folder'),
         _('Get the path to the user home folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .getCodeExtraInformation()
@@ -404,7 +407,6 @@ module.exports = {
         _('Temp folder'),
         _('Get the path to temp folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -418,7 +420,6 @@ module.exports = {
         _('Path delimiter'),
         _('Get the operating system agnostic path delimiter.'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
       .getCodeExtraInformation()
@@ -427,7 +428,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
     return [];
   },
 };

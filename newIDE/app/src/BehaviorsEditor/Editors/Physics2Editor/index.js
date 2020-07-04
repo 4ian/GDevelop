@@ -91,12 +91,9 @@ export default class Physics2Editor extends React.Component<Props, State> {
   }
 
   render() {
-    const { behavior, behaviorContent, project } = this.props;
+    const { behavior, behaviorContent } = this.props;
 
-    const properties = behavior.getProperties(
-      behaviorContent.getContent(),
-      project
-    );
+    const properties = behavior.getProperties(behaviorContent.getContent());
     const bits = Array(16).fill(null);
     const shape = properties.get('shape').getValue();
     const layersValues = parseInt(properties.get('layers').getValue(), 10);
@@ -114,8 +111,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'bodyType',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -147,8 +143,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'bullet',
-                checked ? '1' : '0',
-                project
+                checked ? '1' : '0'
               );
               this.forceUpdate();
             }}
@@ -160,8 +155,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'fixedRotation',
-                checked ? '1' : '0',
-                project
+                checked ? '1' : '0'
               );
               this.forceUpdate();
             }}
@@ -173,8 +167,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'canSleep',
-                checked ? '1' : '0',
-                project
+                checked ? '1' : '0'
               );
               this.forceUpdate();
             }}
@@ -203,8 +196,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'shape',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -243,8 +235,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
-                  newValue,
-                  project
+                  newValue
                 );
                 this.forceUpdate();
               }}
@@ -264,8 +255,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
-                  newValue,
-                  project
+                  newValue
                 );
                 this.forceUpdate();
               }}
@@ -281,8 +271,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'polygonOrigin',
-                  newValue,
-                  project
+                  newValue
                 );
                 this.forceUpdate();
               }}
@@ -314,8 +303,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'shapeOffsetX',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -328,8 +316,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               this.props.behavior.updateProperty(
                 behaviorContent.getContent(),
                 'shapeOffsetY',
-                newValue,
-                this.props.project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -411,8 +398,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                       behavior.updateProperty(
                         behaviorContent.getContent(),
                         'vertices',
-                        JSON.stringify(vertices),
-                        project
+                        JSON.stringify(vertices)
                       );
                       this.forceUpdate();
                     }}
@@ -434,8 +420,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'vertices',
-                  JSON.stringify(vertices),
-                  project
+                  JSON.stringify(vertices)
                 );
                 this.forceUpdate();
               }}
@@ -447,8 +432,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'vertices',
-                  JSON.stringify(vertices),
-                  project
+                  JSON.stringify(vertices)
                 );
                 this.forceUpdate();
               }}
@@ -461,8 +445,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'vertices',
-                  JSON.stringify(vertices),
-                  project
+                  JSON.stringify(vertices)
                 );
                 this.forceUpdate();
               }}
@@ -474,8 +457,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 behavior.updateProperty(
                   behaviorContent.getContent(),
                   'vertices',
-                  JSON.stringify(vertices),
-                  project
+                  JSON.stringify(vertices)
                 );
                 this.forceUpdate();
               }}
@@ -491,8 +473,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'density',
-                parseFloat(newValue) > 0 ? newValue : '0',
-                project
+                parseFloat(newValue) > 0 ? newValue : '0'
               );
               this.forceUpdate();
             }}
@@ -505,8 +486,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'gravityScale',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -521,8 +501,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'friction',
-                parseFloat(newValue) > 0 ? newValue : '0',
-                project
+                parseFloat(newValue) > 0 ? newValue : '0'
               );
               this.forceUpdate();
             }}
@@ -535,8 +514,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'restitution',
-                parseFloat(newValue) > 0 ? newValue : '0',
-                project
+                parseFloat(newValue) > 0 ? newValue : '0'
               );
               this.forceUpdate();
             }}
@@ -551,8 +529,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'linearDamping',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -565,8 +542,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               behavior.updateProperty(
                 behaviorContent.getContent(),
                 'angularDamping',
-                newValue,
-                project
+                newValue
               );
               this.forceUpdate();
             }}
@@ -590,8 +566,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   this.props.behavior.updateProperty(
                     behaviorContent.getContent(),
                     'layers',
-                    newValue.toString(10),
-                    this.props.project
+                    newValue.toString(10)
                   );
                   this.forceUpdate();
                 }}
@@ -614,8 +589,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                   this.props.behavior.updateProperty(
                     behaviorContent.getContent(),
                     'masks',
-                    newValue.toString(10),
-                    this.props.project
+                    newValue.toString(10)
                   );
                   this.forceUpdate();
                 }}

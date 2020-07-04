@@ -38,12 +38,10 @@ class GD_EXTENSION_API AnchorBehavior : public Behavior {
 
 #if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializerElement& behaviorContent,
-      gd::Project& project) const override;
+      const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) override;
+                              const gd::String& value) override;
 #endif
 
   virtual void InitializeContent(

@@ -209,7 +209,7 @@ export default class SelectedInstances {
       this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);
       this.selectedRectangles[i].fillAlpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
-      this.selectedRectangles[i].angle = selectionRectangle.angle;
+      this.selectedRectangles[i].rotation = instance.getAngle();
       this.selectedRectangles[i].drawRect(
         selectionRectangle.x,
         selectionRectangle.y,

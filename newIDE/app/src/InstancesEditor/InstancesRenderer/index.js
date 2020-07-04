@@ -64,21 +64,12 @@ export default class InstancesRenderer {
 
         return layerRenderer.getInstanceHeight(instance);
       },
-      getInstanceAngle: instance => {
-
-        const layerName = instance.getLayer();
-        const layerRenderer = this.layersRenderers[layerName];
-        if (!layerRenderer) return instance.getAngle();
-
-        return layerRenderer.getInstanceAngle(instance);
-      },
       getInstanceRect: instance => {
         return {
           x: this.instanceMeasurer.getInstanceLeft(instance),
           y: this.instanceMeasurer.getInstanceTop(instance),
           width: this.instanceMeasurer.getInstanceWidth(instance),
           height: this.instanceMeasurer.getInstanceHeight(instance),
-          angle: this.instanceMeasurer.getInstanceAngle(instance),
         };
       },
     };

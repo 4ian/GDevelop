@@ -1,5 +1,5 @@
 //@flow
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export const ensureSingleOnceInstructions = (
   instructionsList: gdInstructionsList

@@ -1,6 +1,6 @@
 // @flow
 import path from 'path';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type BlobFileDescriptor = {|
   filePath: string,

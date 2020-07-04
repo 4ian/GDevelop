@@ -21,7 +21,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     runtimeObject.x - this._radius,
     runtimeObject.y - this._radius,
   ]);
-  this._indexBuffer = new Uint16Array([0, 1, 2, 2, 3, 0]);
+  this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
   this._shader = PIXI.Shader.from(
     `
     precision mediump float;
@@ -136,7 +136,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
   if (this._debugMode) this.updateGraphics();
-  this.updateVertexBufferObject();
+  this.updateBuffers();
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
@@ -165,12 +165,39 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
   }
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBufferObject = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
 
   var raycastResult = this.raycastTest();
+  // Fallback to simple quad when there are no obstacles around.
+  if(raycastResult.length === 0) {
+    if(!this._defaultVertexBuffer) {
+      this._defaultVertexBuffer = new Float32Array(8);
+    }
+    if(!this._defaultIndexBuffer) {
+      this._defaultIndexBuffer = new Uint16Array([
+        0, 1, 2, 0, 2, 3
+      ]);
+    }
+
+    this._defaultVertexBuffer[0] = this._object.x - this._radius;
+    this._defaultVertexBuffer[1] = this._object.y + this._radius;
+    this._defaultVertexBuffer[2] = this._object.x + this._radius;
+    this._defaultVertexBuffer[3] = this._object.y + this._radius;
+    this._defaultVertexBuffer[4] = this._object.x + this._radius;
+    this._defaultVertexBuffer[5] = this._object.y - this._radius;
+    this._defaultVertexBuffer[6] = this._object.x - this._radius;
+    this._defaultVertexBuffer[7] = this._object.y - this._radius;
+
+    this._light.geometry
+      .getBuffer('aVertexPosition')
+      .update(this._defaultVertexBuffer);
+    this._light.geometry.getIndex().update(this._defaultIndexBuffer);
+    return;
+  }
+
   var raycastResultLength = raycastResult.length;
 
   var isSubArrayUsed = false;
@@ -230,6 +257,9 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateVertexBufferObject = functio
 gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
   var result = [];
   this._manager.getAllObstaclesAround(this._object, this._radius, result);
+
+  // Bail out early if there are no obstales.
+  if(result.length === 0) return result;
 
   var noOfObstacles = result.length + 1;
   var obstacleHitBoxes = new Array(noOfObstacles);

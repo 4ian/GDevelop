@@ -65,7 +65,7 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function (visible) {
 gdjs.LayerPixiRenderer.prototype.updateTime = function () {
   if (this._renderTexture) {
     this.updateRenderTexture();
-    this.syncWithBaseLayer();
+    this._layer.syncWithBaseLayer();
   }
 
   for (var filterName in this._filters) {
@@ -336,22 +336,4 @@ gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
 
 gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {
   return this._pixiContainer;
-};
-
-gdjs.LayerPixiRenderer.prototype.syncWithBaseLayer = function () {
-  if (!this._baseLayer) {
-    this._baseLayer = this._runtimeSceneRenderer.getScene().getLayer('');
-    this._baseLayerCameraX = this._baseLayer.getCameraX();
-    this._baseLayerCameraY = this._baseLayer.getCameraY();
-  }
-  if (
-    this._baseLayer &&
-    (this._baseLayerCameraX !== this._baseLayer.getCameraX() ||
-      this._baseLayerCameraY !== this._baseLayer.getCameraY())
-  ) {
-    this._layer.setCameraX(this._baseLayer.getCameraX());
-    this._layer.setCameraY(this._baseLayer.getCameraY());
-    this._baseLayerCameraX = this._baseLayer.getCameraX();
-    this._baseLayerCameraY = this._baseLayer.getCameraY();
-  }
 };

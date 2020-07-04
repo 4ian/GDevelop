@@ -414,3 +414,12 @@ gdjs.Layer.prototype.getTimeScale = function() {
 gdjs.Layer.prototype.getElapsedTime = function() {
   return this._runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
 };
+
+/**
+ * Set the position of layer's camera to follow
+ * base layer's camera.
+ */
+gdjs.Layer.prototype.syncWithBaseLayer = function() {
+  this.setCameraX(this._runtimeScene.getLayer("").getCameraX());
+  this.setCameraY(this._runtimeScene.getLayer("").getCameraY());
+}

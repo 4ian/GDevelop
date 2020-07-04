@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import { t } from '@lingui/macro';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 import { type CommandOption } from '../CommandPalette/CommandManager';
@@ -40,15 +41,20 @@ const UseSceneEditorCommands = (props: Props) => {
   useCommandWithOptions('EDIT_OBJECT', {
     displayText: editObjectCommandText,
     enabled: true,
-    generateOptions: () =>
-      generateLayoutObjectsOptions(project, layout, onEditObject),
+    generateOptions: React.useCallback(
+      () => generateLayoutObjectsOptions(project, layout, onEditObject),
+      [project, layout, onEditObject]
+    ),
   });
 
   useCommandWithOptions('EDIT_OBJECT_VARIABLES', {
     displayText: editObjectVariablesCommandText,
     enabled: true,
-    generateOptions: () =>
-      generateLayoutObjectsOptions(project, layout, onEditObjectVariables),
+    generateOptions: React.useCallback(
+      () =>
+        generateLayoutObjectsOptions(project, layout, onEditObjectVariables),
+      [project, layout, onEditObjectVariables]
+    ),
   });
 
   return null;

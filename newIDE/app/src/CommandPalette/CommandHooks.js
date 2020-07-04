@@ -41,6 +41,7 @@ export const useCommandWithOptions = <T>(
         enabled,
         generateOptions,
       });
+      return () => commandManager.deregisterCommand(commandName);
     },
     [commandManager, commandName, displayText, enabled, generateOptions]
   );

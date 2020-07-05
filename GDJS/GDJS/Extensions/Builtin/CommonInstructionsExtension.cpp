@@ -329,7 +329,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String outputCode = codeGenerator.GenerateBooleanFullName(
                                         "conditionTrue", context) +
                                     ".val = ";
-            outputCode += "runtimeScene.getOnceTriggers().triggerOnce(" +
+            gd::String contextObjectName = codeGenerator.HasProjectAndLayout()
+                                               ? "runtimeScene"
+                                               : "eventsFunctionContext";
+            outputCode += contextObjectName +
+                          ".getOnceTriggers().triggerOnce(" +
                           gd::String::From(uniqueId) + ");\n";
             return outputCode;
           });

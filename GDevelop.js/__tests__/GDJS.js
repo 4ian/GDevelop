@@ -164,7 +164,7 @@ describe('libGD.js - GDJS related tests', function() {
       expect(code).toMatch('repeatCount');
 
       // Trigger once is used in a condition
-      expect(code).toMatch('runtimeScene.getOnceTriggers().triggerOnce');
+      expect(code).toMatch('eventsFunctionContext.getOnceTriggers().triggerOnce');
 
       // A variable have 42 added to it
       expect(code).toMatch('getVariables().get("ObjectVariable")).add(42)');

@@ -126,7 +126,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
           eventsFunction.GetParameters(), false),
       codeGenerator.GenerateEventsFunctionContext(
-          eventsFunction.GetParameters()),
+          eventsFunction.GetParameters(),
+          "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
@@ -140,6 +141,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     const gd::String& fullyQualifiedFunctionName,
+    const gd::String& onceTriggersVariable,
+    const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   gd::ObjectsContainer globalObjectsAndGroups;
@@ -152,10 +155,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   // Generate the code setting up the context of the function.
-  gd::String prelude =
+  gd::String fullPreludeCode =
+      preludeCode + "\n" +
+      "var that = this;\n" +
       // runtimeScene is supposed to be always accessible, read
       // it from the behavior
-      gd::String("var runtimeScene = this._runtimeScene;\n") +
+      "var runtimeScene = this._runtimeScene;\n" +
       // By convention of Behavior Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array
       // containing it (for faster access, without having to go through the
@@ -166,7 +171,11 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // as a parameter called "Behavior".
       "var Behavior = this.name;\n" +
       codeGenerator.GenerateEventsFunctionContext(
-          eventsFunction.GetParameters(), "Object", "Behavior");
+          eventsFunction.GetParameters(),
+          onceTriggersVariable,
+          // Pass the names of the parameters considered as the current
+          // object and behavior parameters:
+          "Object", "Behavior");
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       project,
@@ -174,7 +183,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
           eventsFunction.GetParameters(), true),
-      prelude,
+      fullPreludeCode,
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
@@ -207,6 +216,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const vector<gd::ParameterMetadata>& parameters,
+    const gd::String& onceTriggersVariable,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
   // When running in the context of a function generated from events, we
@@ -332,7 +342,12 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  },\n"
          // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
-         argumentsGetters + "    return \"\";\n" + "  }\n" + "};\n";
+         argumentsGetters + "    return \"\";\n" +
+         "  },\n" +
+         // Expose OnceTriggers (will be pointing either to the runtime scene ones,
+         // or the ones from the behavior):
+         "  getOnceTriggers: function() { return " + onceTriggersVariable + "; }\n" +
+         "};\n";
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(

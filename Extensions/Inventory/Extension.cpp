@@ -18,7 +18,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
         "with items in memory."),
       "Florian Rival",
       "Open source (MIT License)")
-      .SetExtensionHelpPath("all-features/inventory");
+      .SetExtensionHelpPath("/all-features/inventory");
 
 #if defined(GD_IDE_ONLY)
   extension

@@ -1729,6 +1729,7 @@ enum EventsFunction_FunctionType {
 
 interface EventsFunction {
     void EventsFunction();
+    EventsFunction Clone();
 
     [Ref] EventsFunction SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();

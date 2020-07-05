@@ -1123,53 +1123,61 @@ const MainFrame = (props: Props) => {
     [i18n, setState, state.editorTabs]
   );
 
-  const openExternalEvents = (name: string) => {
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        projectItemName: name,
-        renderEditorContainer: renderExternalEventsEditorContainer,
-        key: 'external events ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openExternalEvents = React.useCallback(
+    (name: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name,
+          projectItemName: name,
+          renderEditorContainer: renderExternalEventsEditorContainer,
+          key: 'external events ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState]
+  );
 
-  const openExternalLayout = (name: string) => {
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        projectItemName: name,
-        renderEditorContainer: renderExternalLayoutEditorContainer,
-        key: 'external layout ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openExternalLayout = React.useCallback(
+    (name: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name,
+          projectItemName: name,
+          renderEditorContainer: renderExternalLayoutEditorContainer,
+          key: 'external layout ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState, openProjectManager]
+  );
 
-  const openEventsFunctionsExtension = (
-    name: string,
-    initiallyFocusedFunctionName?: string,
-    initiallyFocusedBehaviorName?: ?string
-  ) => {
-    const { i18n } = props;
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name + ' ' + i18n._(t`(Extension)`),
-        projectItemName: name,
-        extraEditorProps: {
-          initiallyFocusedFunctionName,
-          initiallyFocusedBehaviorName,
-        },
-        renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
-        key: 'events functions extension ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openEventsFunctionsExtension = React.useCallback(
+    (
+      name: string,
+      initiallyFocusedFunctionName?: string,
+      initiallyFocusedBehaviorName?: ?string
+    ) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name + ' ' + i18n._(t`(Extension)`),
+          projectItemName: name,
+          extraEditorProps: {
+            initiallyFocusedFunctionName,
+            initiallyFocusedBehaviorName,
+          },
+          renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
+          key: 'events functions extension ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState, openProjectManager, i18n]
+  );
 
   const openResources = () => {
     const { i18n } = props;
@@ -1712,6 +1720,10 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onCloseProject: askToCloseProject,
     onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onOpenLayout: openLayout,
+    onOpenExternalEvents: openExternalEvents,
+    onOpenExternalLayout: openExternalLayout,
+    onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;

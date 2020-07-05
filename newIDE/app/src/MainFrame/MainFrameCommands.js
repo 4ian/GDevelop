@@ -1,7 +1,40 @@
 // @flow
+import * as React from 'react';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
-import { useCommand } from '../CommandPalette/CommandHooks';
+import {
+  useCommand,
+  useCommandWithOptions,
+} from '../CommandPalette/CommandHooks';
+import {
+  enumerateLayouts,
+  enumerateExternalEvents,
+  enumerateExternalLayouts,
+  enumerateEventsFunctionsExtensions,
+} from '../ProjectManager/EnumerateProjectItems';
+
+type Item =
+  | gdLayout
+  | gdExternalEvents
+  | gdExternalLayout
+  | gdEventsFunctionsExtension;
+
+/**
+ * Helper function to generate options list
+ * for each kind of project item
+ */
+const generateProjectItemOptions = <T: Item>(
+  project: ?gdProject,
+  enumerate: (project: gdProject) => Array<T>,
+  onOpen: string => void
+) => {
+  if (!project) return [];
+  return enumerate(project).map(item => ({
+    text: item.getName(),
+    handler: () => onOpen(item.getName()),
+    value: item,
+  }));
+};
 
 type CommandHandlers = {
   i18n: I18n,
@@ -18,6 +51,10 @@ type CommandHandlers = {
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
   onExportGame: () => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
+  onOpenExternalLayout: string => void,
+  onOpenEventsFunctionsExtension: string => void,
 };
 
 const quitAppText = t`Close GDevelop`;
@@ -31,6 +68,10 @@ const saveProjectText = t`Save project`;
 const saveProjectAsText = t`Save project as...`;
 const closeProjectText = t`Close project`;
 const exportGameText = t`Export game`;
+const openLayoutCommandText = t`Open scene...`;
+const openExternalEventsCommandText = t`Open external events...`;
+const openExternalLayoutCommandText = t`Open external layout...`;
+const openEventsFunctionsExtensionCommandText = t`Open extension...`;
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
   useCommand('QUIT_APP', {
@@ -97,6 +138,62 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     displayText: exportGameText,
     enabled: !!handlers.project,
     handler: handlers.onExportGame,
+  });
+
+  useCommandWithOptions('OPEN_LAYOUT', {
+    displayText: openLayoutCommandText,
+    enabled: !!handlers.project,
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateLayouts,
+          handlers.onOpenLayout
+        ),
+      [handlers.project, handlers.onOpenLayout]
+    ),
+  });
+
+  useCommandWithOptions('OPEN_EXTERNAL_EVENTS', {
+    displayText: openExternalEventsCommandText,
+    enabled: !!handlers.project,
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateExternalEvents,
+          handlers.onOpenExternalEvents
+        ),
+      [handlers.project, handlers.onOpenExternalEvents]
+    ),
+  });
+
+  useCommandWithOptions('OPEN_EXTERNAL_LAYOUT', {
+    displayText: openExternalLayoutCommandText,
+    enabled: !!handlers.project,
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateExternalLayouts,
+          handlers.onOpenExternalLayout
+        ),
+      [handlers.project, handlers.onOpenExternalLayout]
+    ),
+  });
+
+  useCommandWithOptions('OPEN_EXTENSION', {
+    displayText: openEventsFunctionsExtensionCommandText,
+    enabled: !!handlers.project,
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateEventsFunctionsExtensions,
+          handlers.onOpenEventsFunctionsExtension
+        ),
+      [handlers.project, handlers.onOpenEventsFunctionsExtension]
+    ),
   });
 };
 

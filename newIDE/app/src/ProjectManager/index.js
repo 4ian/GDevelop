@@ -44,7 +44,6 @@ import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import UseProjectManagerCommands from './UseProjectManagerCommands';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -709,15 +708,6 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
-        <UseProjectManagerCommands
-          project={project}
-          onOpenLayout={this.props.onOpenLayout}
-          onOpenExternalEvents={this.props.onOpenExternalEvents}
-          onOpenExternalLayout={this.props.onOpenExternalLayout}
-          onOpenEventsFunctionsExtension={
-            this.props.onOpenEventsFunctionsExtension
-          }
-        />
         <List style={styles.list}>
           {this._renderMenu()}
           <ProjectStructureItem

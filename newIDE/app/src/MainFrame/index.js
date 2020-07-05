@@ -1402,37 +1402,45 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const openFromFileMetadataWithStorageProvider = (
-    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
-  ) => {
-    const {
-      fileMetadata,
-      storageProviderName,
-    } = fileMetadataAndStorageProviderName;
-    const { storageProviders, getStorageProviderOperations } = props;
+  const openFromFileMetadataWithStorageProvider = React.useCallback(
+    (
+      fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+    ) => {
+      const {
+        fileMetadata,
+        storageProviderName,
+      } = fileMetadataAndStorageProviderName;
 
-    const storageProvider = storageProviders.filter(
-      storageProvider => storageProvider.internalName === storageProviderName
-    )[0];
+      const storageProvider = props.storageProviders.filter(
+        storageProvider => storageProvider.internalName === storageProviderName
+      )[0];
 
-    if (storageProvider) {
-      getStorageProviderOperations(storageProvider).then(() => {
-        openFromFileMetadata(fileMetadata)
-          .then(state => {
-            if (state)
-              openSceneOrProjectManager({
-                currentProject: state.currentProject,
-                editorTabs: state.editorTabs,
-              });
-          })
-          .catch(error => {
-            preferences.removeRecentProjectFile(
-              fileMetadataAndStorageProviderName
-            );
-          });
-      });
-    }
-  };
+      if (storageProvider) {
+        getStorageProviderOperations(storageProvider).then(() => {
+          openFromFileMetadata(fileMetadata)
+            .then(state => {
+              if (state)
+                openSceneOrProjectManager({
+                  currentProject: state.currentProject,
+                  editorTabs: state.editorTabs,
+                });
+            })
+            .catch(error => {
+              preferences.removeRecentProjectFile(
+                fileMetadataAndStorageProviderName
+              );
+            });
+        });
+      }
+    },
+    [
+      openFromFileMetadata,
+      openSceneOrProjectManager,
+      preferences,
+      props.storageProviders,
+      getStorageProviderOperations,
+    ]
+  );
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {

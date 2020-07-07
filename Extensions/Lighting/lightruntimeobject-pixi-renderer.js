@@ -1,7 +1,6 @@
 gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._object = runtimeObject;
   this._manager = runtimeObject.getObstaclesManager();
-  this._geometry = new PIXI.Geometry();
   this._radius = runtimeObject.getRadius();
   var objectColor = runtimeObject.getColor();
   this._color = [
@@ -10,6 +9,14 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
   this._debugMode = runtimeObject.getDebugMode();
+  this._texture =
+    runtimeObject._texture === ''
+      ? null
+      : runtimeScene
+          .getGame()
+          .getImageManager()
+          .getPIXITexture(runtimeObject._texture);
+
   this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
   this._vertexBuffer = new Float32Array([
     runtimeObject.x - this._radius,
@@ -22,47 +29,63 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     runtimeObject.y - this._radius,
   ]);
   this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
-  this._shader = PIXI.Shader.from(
-    `
-    precision mediump float;
-    attribute vec2 aVertexPosition;
 
-    uniform mat3 translationMatrix;
-    uniform mat3 projectionMatrix;
-    varying vec2 vPos;
+  var defaultVertexShader = `
+  precision mediump float;
+  attribute vec2 aVertexPosition;
 
-    void main() {
-        vPos = aVertexPosition;
-        gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-    }`,
-    `
-    precision mediump float;
-    uniform vec2 center;
-    uniform float radius;
-    uniform vec3 color;
-    uniform mat3 translationMatrix;
-    uniform mat3 projectionMatrix;
-    varying vec2 vPos;
+  uniform mat3 translationMatrix;
+  uniform mat3 projectionMatrix;
+  varying vec2 vPos;
 
-    void main() {
-        float l = length(vPos - center);
-        float intensity = 0.0;
-        if(l < radius)
-          intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
-        gl_FragColor = vec4(color*intensity, 1.0);
-    }
-    `,
-    {
-      center: this._center,
-      radius: this._radius,
-      color: this._color,
-    }
-  );
+  void main() {
+      vPos = aVertexPosition;
+      gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+  }`;
+
+  var defaultFragmentShader = `
+  precision mediump float;
+  uniform vec2 center;
+  uniform float radius;
+  uniform vec3 color;
+  varying vec2 vPos;
+
+  void main() {
+      float l = length(vPos - center);
+      float intensity = 0.0;
+      if(l < radius)
+        intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
+      gl_FragColor = vec4(color*intensity, 1.0);
+  }`;
+
+  var texturedFragmentShader = `
+  precision mediump float;
+  uniform vec2 center;
+  uniform float radius;
+  uniform vec3 color;
+  uniform sampler2D uSampler;
+  varying vec2 vPos;
+
+  void main() {
+      vec2 topleft = vec2(center.x - radius, center.y - radius);
+      vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+      gl_FragColor = vec4(color, 1.0) * texture2D(uSampler, texCoord);
+  }`;
+
+  var fragmentShader =
+    this._texture === null ? defaultFragmentShader : texturedFragmentShader;
+  var shader = PIXI.Shader.from(defaultVertexShader, fragmentShader, {
+    center: this._center,
+    radius: this._radius,
+    color: this._color,
+    uSampler: this._texture,
+  });
+  var geometry = new PIXI.Geometry();
   if (this._light === undefined) {
-    this._geometry
+    geometry
       .addAttribute('aVertexPosition', this._vertexBuffer, 2)
       .addIndex(this._indexBuffer);
-    this._light = new PIXI.Mesh(this._geometry, this._shader);
+    this._light = new PIXI.Mesh(geometry, shader);
   }
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
 
@@ -95,7 +118,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint = function (
+gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint = function (
   lightObject,
   angle,
   polygons
@@ -140,7 +163,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
-  var raycastResult = this.raycastTest();
+  var raycastResult = this.computeLightVertices();
   var vertices = new Array(2 * raycastResult.length + 2);
   vertices[0] = this._object.x;
   vertices[1] = this._object.y;
@@ -170,16 +193,14 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
 
-  var raycastResult = this.raycastTest();
+  var raycastResult = this.computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.
-  if(raycastResult.length === 0) {
-    if(!this._defaultVertexBuffer) {
+  if (raycastResult.length === 0) {
+    if (!this._defaultVertexBuffer) {
       this._defaultVertexBuffer = new Float32Array(8);
     }
-    if(!this._defaultIndexBuffer) {
-      this._defaultIndexBuffer = new Uint16Array([
-        0, 1, 2, 0, 2, 3
-      ]);
+    if (!this._defaultIndexBuffer) {
+      this._defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
     }
 
     this._defaultVertexBuffer[0] = this._object.x - this._radius;
@@ -200,6 +221,10 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
 
   var raycastResultLength = raycastResult.length;
 
+  // If the array buffer which is already allocated is atmost
+  // twice the size of memory required, we could avoid re-allocation
+  // and instead use a subarray. Otherwise, allocate new array buffers as
+  // there would be memory wastage.
   var isSubArrayUsed = false;
   var vertexBufferSubArray = null;
   var indexBufferSubArray = null;
@@ -221,6 +246,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
     }
   }
 
+  // When the allocated array buffer has less memory than
+  // required, we'll have to allocated new array buffers.
   if (this._vertexBuffer.length < 2 * raycastResultLength + 2) {
     this._vertexBuffer = new Float32Array(2 * raycastResultLength + 2);
     this._indexBuffer = new Uint16Array(3 * raycastResultLength);
@@ -254,12 +281,12 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   }
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype.computeLightVertices = function () {
   var result = [];
   this._manager.getAllObstaclesAround(this._object, this._radius, result);
 
   // Bail out early if there are no obstales.
-  if(result.length === 0) return result;
+  if (result.length === 0) return result;
 
   var noOfObstacles = result.length + 1;
   var obstacleHitBoxes = new Array(noOfObstacles);
@@ -289,7 +316,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     var ydiff = vertex[1] - this._object.y;
     var angle = Math.atan2(ydiff, xdiff);
 
-    var result = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+    var result = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
       this._object,
       angle,
       obstaclePolygons
@@ -302,7 +329,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
     }
 
     // TODO: Check whether we need to raycast these two extra rays or not.
-    var resultOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+    var resultOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
       this._object,
       angle + 0.0001,
       obstaclePolygons
@@ -313,7 +340,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.raycastTest = function () {
         angle: angle + 0.0001,
       });
     }
-    var resultOffsetRight = gdjs.LightRuntimeObjectPixiRenderer.getClosestIntersectionPoint(
+    var resultOffsetRight = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
       this._object,
       angle - 0.0001,
       obstaclePolygons

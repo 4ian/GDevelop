@@ -2,15 +2,17 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, lightObjectData);
 
   this._radius = lightObjectData.content.radius;
-  this._color = gdjs.LightRuntimeObject.hexToRGBColor(lightObjectData.content.color);
+  this._color = gdjs.LightRuntimeObject.hexToRGBColor(
+    lightObjectData.content.color
+  );
   this._debugMode = lightObjectData.content.debugMode;
+  this._texture = lightObjectData.content.texture;
 
   this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  else
-    this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
+  else this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
@@ -19,7 +21,7 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
 gdjs.LightRuntimeObject.hexToRGBColor = function (hex) {
   var hexNumber = parseInt(hex.replace('#', ''), 16);
   return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
-}
+};
 
 gdjs.LightRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
 gdjs.registerObject('Lighting::LightObject', gdjs.LightRuntimeObject);

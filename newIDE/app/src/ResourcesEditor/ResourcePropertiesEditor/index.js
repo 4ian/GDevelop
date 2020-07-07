@@ -113,7 +113,7 @@ export default class ResourcePropertiesEditor extends React.Component<
         style={styles.propertiesContainer}
         key={resources.map(resource => '' + resource.ptr).join(';')}
       >
-        {warningSizeSprite === 'WARNING_IMAGE_EXCEEDED_2048_PIXELS' && (
+        {warningSizeSprite === 'IMAGE_EXCEEDED_2048_PIXELS' && (
           <AlertMessage kind="error">
             <Trans>
               This resource are taller than 2048px wide, this reduce the

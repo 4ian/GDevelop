@@ -51,8 +51,8 @@ class UrlsCache {
 
   getStatusCode(project: gdProject, filename: string) {
     const cache = this._getProjectCache(project);
-    if(!cache[filename]) return;
-    return (cache[filename]["statusCode"] || {});
+    if(!cache) return {};
+    return cache[filename].statusCode || {};
   }
 
   setStatusCode(project: gdProject, filename: string, statusCode: string) {
@@ -159,12 +159,7 @@ export default class ResourcesLoader {
 
     return resourceName;
   }
-  /*
-    Can be: 
-    WARNING_IMAGE_EXCEEDED_2048_PIXELS
 
-
-  */
   static getStatusCode(project: gdProject, resourceName: string) {
     return this._cache.getStatusCode(project, resourceName);
   }
@@ -175,12 +170,5 @@ export default class ResourcesLoader {
     statusCode: string
   ) {
     this._cache.setStatusCode(project, resourceName, statusCode);
-  }
-
-  /*
-  Remove the file in the cache for refresh the image in the IDE
-  */
-  static burstUrl(project: gdProject, url: string) {
-    this._cache.burstUrl(project, url);
   }
 }

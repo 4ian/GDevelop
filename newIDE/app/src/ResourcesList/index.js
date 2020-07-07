@@ -12,7 +12,6 @@ import {
   createOrUpdateResource,
   getLocalResourceFullPath,
   getResourceFilePathStatus,
-  getResourceStatus,
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
@@ -366,25 +365,8 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
-  checkResourcesStatus = () => {
-    const { project } = this.props;
-    const resourcesManager = project.getResourcesManager();
-    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
-    const resourcesWithErrors = {};
-    resourceNames.forEach(resourceName => {
-      resourcesWithErrors[resourceName] = getResourceStatus(
-        project,
-        resourceName
-      );
-    });
-    this.setState({ resourcesWithErrors });
-    this.forceUpdateList();
-  };
-
   componentDidMount() {
-    //TODO rework les deux fonctions car là elle s'écrasent l'une l'autre.
     this.checkMissingPaths();
-    this.checkResourcesStatus();
   }
 
   render() {

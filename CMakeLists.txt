@@ -76,7 +76,9 @@ else()
 endif()
 
 # Mark some warnings as errors
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-stack-address")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-stack-address")
+endif()
 
 #Define common directories:
 set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR})

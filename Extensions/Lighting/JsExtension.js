@@ -58,6 +58,12 @@ module.exports = {
 
       if (propertyName === 'debugMode') {
         objectContent.debugMode = newValue === '1';
+        return true;
+      }
+
+      if (propertyName === 'texture') {
+        objectContent.texture = newValue;
+        return true;
       }
 
       return false;
@@ -76,8 +82,8 @@ module.exports = {
       objectProperties.set(
         'color',
         new gd.PropertyDescriptor(objectContent.color)
-        .setType('color')
-        .setLabel(_('Color'))
+          .setType('color')
+          .setLabel(_('Color'))
       );
 
       objectProperties.set(
@@ -87,6 +93,13 @@ module.exports = {
           .setLabel(_('Debug mode'))
       );
 
+      objectProperties
+        .getOrCreate('texture')
+        .setValue(objectContent.imageResource)
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Image resource'));
+
       return objectProperties;
     };
     lightObject.setRawJSONContent(
@@ -94,6 +107,7 @@ module.exports = {
         radius: 50,
         color: '#b4b4b4',
         debugMode: false,
+        texture: '',
       })
     );
 
@@ -105,6 +119,11 @@ module.exports = {
       project,
       layout
     ) {
+      // if (propertyName === 'My instance property') {
+      //   instance.setRawStringProperty('instanceprop1', newValue);
+      //   return true;
+      // }
+
       return false;
     };
     lightObject.getInitialInstanceProperties = function (
@@ -114,6 +133,10 @@ module.exports = {
       layout
     ) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
+
+      // instanceProperties
+      //   .getOrCreate('My instance property')
+      //   .setValue(instance.getRawStringProperty('instanceprop1'));
 
       return instanceProperties;
     };
@@ -187,14 +210,16 @@ module.exports = {
       );
       this._colorHex = parseInt(
         this._associatedObject
-        .getProperties(this.project)
-        .get('color')
-        .getValue()
-        .replace('#', ''), 16);
+          .getProperties(this.project)
+          .get('color')
+          .getValue()
+          .replace('#', ''),
+        16
+      );
       this._color = [
-        ((this._colorHex >> 16) & 0xff)/255, 
-        ((this._colorHex >> 8) & 0xff)/255, 
-        (this._colorHex & 0xff)/255,
+        ((this._colorHex >> 16) & 0xff) / 255,
+        ((this._colorHex >> 8) & 0xff) / 255,
+        (this._colorHex & 0xff) / 255,
       ];
       this._geometry = new PIXI.Geometry();
       this._shader = PIXI.Shader.from(

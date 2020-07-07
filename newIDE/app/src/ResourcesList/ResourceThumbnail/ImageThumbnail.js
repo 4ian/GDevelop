@@ -67,8 +67,9 @@ const ImageThumbnail = ({
 
   const _callbackImageThumbnailLoaded = (imageElement: HTMLImageElement) => {
     const existAlready = resourcesLoader.getStatusCode(project, resourceName);
-    if (existAlready === 'IMAGE_EXCEEDED_2048_PIXELS') {
+    if (existAlready === 'WARNING_IMAGE_EXCEEDED_2048_PIXELS') {
       setHasWarningSize(true);
+      return;
     } else {
       if (checkImageElementSize(imageElement)) {
         onSelect(selected);

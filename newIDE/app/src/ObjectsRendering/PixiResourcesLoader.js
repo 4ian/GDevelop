@@ -69,7 +69,7 @@ export default class PixiResourcesLoader {
               2048 ||
             loadedResources[resourceName].texture.baseTexture.realHeight > 2048
           ) {
-            statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
+            statusCode = 'WARNING_IMAGE_EXCEEDED_2048_PIXELS';
           }
           loadedTextures[resourceName] = {
             pixi: loadedResources[resourceName].texture,
@@ -231,7 +231,7 @@ export default class PixiResourcesLoader {
       loadedTextures[resourceName].pixi.texture.baseTexture.realWidth > 2048 ||
       loadedTextures[resourceName].pixi.texture.baseTexture.realHeight > 2048
     ) {
-      statusCode = 'IMAGE_EXCEEDED_2048_PIXELS';
+      statusCode = 'WARNING_IMAGE_EXCEEDED_2048_PIXELS';
     }
     return (loadedTextures[resourceName].statusCode = statusCode);
   }

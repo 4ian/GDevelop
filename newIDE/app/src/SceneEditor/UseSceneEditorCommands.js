@@ -1,13 +1,17 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
+import {
+  useCommand,
+  useCommandWithOptions,
+} from '../CommandPalette/CommandHooks';
 import { type CommandOption } from '../CommandPalette/CommandManager';
 import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
 const editObjectCommandText = t`Edit object...`;
 const editObjectVariablesCommandText = t`Edit object variables...`;
+const openScenePropertiesCommandText = t`Open scene properties`;
 
 /**
  * Helper function to generate options list
@@ -33,10 +37,23 @@ type Props = {
   layout: gdLayout,
   onEditObject: (object: gdObject) => void,
   onEditObjectVariables: (object: gdObject) => void,
+  onOpenSceneProperties: () => void,
 };
 
 const UseSceneEditorCommands = (props: Props) => {
-  const { project, layout, onEditObject, onEditObjectVariables } = props;
+  const {
+    project,
+    layout,
+    onEditObject,
+    onEditObjectVariables,
+    onOpenSceneProperties,
+  } = props;
+
+  useCommand('OPEN_SCENE_PROPERTIES', {
+    displayText: openScenePropertiesCommandText,
+    enabled: true,
+    handler: onOpenSceneProperties,
+  });
 
   useCommandWithOptions('EDIT_OBJECT', {
     displayText: editObjectCommandText,

@@ -6,13 +6,17 @@ import {
   useCommandWithOptions,
 } from '../CommandPalette/CommandHooks';
 import { type CommandOption } from '../CommandPalette/CommandManager';
-import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
+import {
+  enumerateObjects,
+  enumerateGroups,
+} from '../ObjectsList/EnumerateObjects';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
 const editObjectCommandText = t`Edit object...`;
 const editObjectVariablesCommandText = t`Edit object variables...`;
 const openScenePropertiesCommandText = t`Open scene properties`;
 const openSceneVariablesCommandText = t`Open scene variables`;
+const editObjectGroupCommandText = t`Edit object group...`;
 
 /**
  * Helper function to generate options list
@@ -40,6 +44,7 @@ type Props = {
   onEditObjectVariables: (object: gdObject) => void,
   onOpenSceneProperties: () => void,
   onOpenSceneVariables: () => void,
+  onEditObjectGroup: (group: gdObjectGroup) => void,
 };
 
 const UseSceneEditorCommands = (props: Props) => {
@@ -50,6 +55,7 @@ const UseSceneEditorCommands = (props: Props) => {
     onEditObjectVariables,
     onOpenSceneProperties,
     onOpenSceneVariables,
+    onEditObjectGroup,
   } = props;
 
   useCommand('OPEN_SCENE_PROPERTIES', {
@@ -80,6 +86,23 @@ const UseSceneEditorCommands = (props: Props) => {
       () =>
         generateLayoutObjectsOptions(project, layout, onEditObjectVariables),
       [project, layout, onEditObjectVariables]
+    ),
+  });
+
+  useCommandWithOptions('EDIT_OBJECT_GROUP', {
+    displayText: editObjectGroupCommandText,
+    enabled: true,
+    generateOptions: React.useCallback(
+      () =>
+        [
+          ...enumerateGroups(layout.getObjectGroups()),
+          ...enumerateGroups(project.getObjectGroups()),
+        ].map(group => ({
+          text: group.getName(),
+          value: group,
+          handler: () => onEditObjectGroup(group),
+        })),
+      [onEditObjectGroup, project, layout]
     ),
   });
 

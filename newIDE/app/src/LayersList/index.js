@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { Trans, t } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -19,8 +20,20 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
+import { UseCommandWithOptionsHook } from '../CommandPalette/CommandHooks';
 
 const SortableLayerRow = SortableElement(LayerRow);
+
+const mapLayers = <T>(
+  layersContainer: gdLayout,
+  callback: (layer: gdLayer, idx: number) => T
+): Array<T> => {
+  const layersCount = layersContainer.getLayersCount();
+  return mapReverseFor(0, layersCount, i => {
+    const layer = layersContainer.getLayerAt(i);
+    return callback(layer, i);
+  });
+};
 
 type LayersListBodyState = {|
   nameErrors: { [string]: boolean },
@@ -41,8 +54,8 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const { layersContainer, onEditEffects, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
-    const containerLayersList = mapReverseFor(0, layersCount, i => {
-      const layer = layersContainer.getLayerAt(i);
+
+    const containerLayersList = mapLayers(layersContainer, (layer, i) => {
       const layerName = layer.getName();
 
       return (
@@ -163,6 +176,23 @@ export default class LayersList extends Component<Props, State> {
 
     return (
       <Background>
+        <I18n>
+          {({ i18n }) => (
+            <UseCommandWithOptionsHook
+              commandName={'EDIT_LAYER_EFFECT'}
+              command={{
+                displayText: t`Edit layer effects...`,
+                enabled: true,
+                generateOptions: () =>
+                  mapLayers(this.props.layersContainer, layer => ({
+                    text: layer.getName() || i18n._(t`Base layer`),
+                    handler: () => this._editEffects(layer),
+                    value: layer,
+                  })),
+              }}
+            />
+          )}
+        </I18n>
         <ScrollView autoHideScrollbar>
           <FullSizeMeasurer>
             {({ width }) => (

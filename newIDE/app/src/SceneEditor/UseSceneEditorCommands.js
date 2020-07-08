@@ -12,6 +12,7 @@ import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService
 const editObjectCommandText = t`Edit object...`;
 const editObjectVariablesCommandText = t`Edit object variables...`;
 const openScenePropertiesCommandText = t`Open scene properties`;
+const openSceneVariablesCommandText = t`Open scene variables`;
 
 /**
  * Helper function to generate options list
@@ -38,6 +39,7 @@ type Props = {
   onEditObject: (object: gdObject) => void,
   onEditObjectVariables: (object: gdObject) => void,
   onOpenSceneProperties: () => void,
+  onOpenSceneVariables: () => void,
 };
 
 const UseSceneEditorCommands = (props: Props) => {
@@ -47,12 +49,19 @@ const UseSceneEditorCommands = (props: Props) => {
     onEditObject,
     onEditObjectVariables,
     onOpenSceneProperties,
+    onOpenSceneVariables,
   } = props;
 
   useCommand('OPEN_SCENE_PROPERTIES', {
     displayText: openScenePropertiesCommandText,
     enabled: true,
     handler: onOpenSceneProperties,
+  });
+
+  useCommand('OPEN_SCENE_VARIABLES', {
+    displayText: openSceneVariablesCommandText,
+    enabled: true,
+    handler: onOpenSceneVariables,
   });
 
   useCommandWithOptions('EDIT_OBJECT', {

@@ -1035,6 +1035,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onEditObject={this.props.onEditObject || this.editObject}
           onEditObjectVariables={this.editObjectVariables}
           onOpenSceneProperties={this.openSceneProperties}
+          onOpenSceneVariables={this.editLayoutVariables}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (

@@ -34,13 +34,19 @@ export type NamedCommandWithOptions<T> = {|
   ...CommandWithOptions<T>,
 |};
 
-export default class CommandManager {
+export interface CommandManagerInterface {
   commands: { [string]: Command };
-  _isScoped: boolean;
+
+  registerCommand: (commandName: string, command: Command) => void;
+  deregisterCommand: (commandName: string) => void;
+  getAllNamedCommands: () => Array<NamedCommand>;
+}
+
+export default class CommandManager implements CommandManagerInterface {
+  commands: { [string]: Command };
 
   constructor(scoped: ?boolean) {
     this.commands = {};
-    this._isScoped = scoped || false;
   }
 
   registerCommand = (commandName: string, command: Command) => {

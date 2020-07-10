@@ -1,6 +1,10 @@
 // @flow
 import * as React from 'react';
-import CommandManager from './CommandManager';
+import CommandManager, {
+  CommandManagerInterface,
+  type Command,
+  type NamedCommand,
+} from './CommandManager';
 import CommandsContext from './CommandsContext';
 import useRefInit from './UseRefInitHook';
 
@@ -9,31 +13,72 @@ type Props = {
   active: boolean,
 };
 
+class ScopedCommandManager implements CommandManagerInterface {
+  commands: { [string]: Command };
+  _centralManager: CommandManager;
+  isActive: boolean;
+
+  constructor(centralCommandManager: CommandManager) {
+    this.commands = {};
+    this.isActive = false;
+    this._centralManager = centralCommandManager;
+  }
+
+  setActive = (active: boolean) => {
+    this.isActive = active;
+  };
+
+  registerCommand = (commandName: string, command: Command) => {
+    this.commands[commandName] = command;
+    if (this.isActive)
+      this._centralManager.registerCommand(commandName, command);
+  };
+
+  deregisterCommand = (commandName: string) => {
+    delete this.commands[commandName];
+    if (this.isActive) this._centralManager.deregisterCommand(commandName);
+  };
+
+  registerAllCommandsToCentralManager = () => {
+    Object.keys(this.commands).forEach(commandName => {
+      this._centralManager.registerCommand(
+        commandName,
+        this.commands[commandName]
+      );
+    });
+  };
+
+  deregisterAllCommandsFromCentralManager = () => {
+    Object.keys(this.commands).forEach(commandName => {
+      this._centralManager.deregisterCommand(commandName);
+    });
+  };
+
+  getAllNamedCommands = () => {
+    return Object.keys(this.commands).map<NamedCommand>(commandName => {
+      const cmd = this.commands[commandName];
+      return { ...cmd, name: commandName };
+    });
+  };
+}
+
 const CommandsContextScopedProvider = (props: Props) => {
   const centralManager = React.useContext(CommandsContext);
-  const scopedManager = useRefInit(() => new CommandManager(true));
+  const scopedManager = useRefInit(
+    () => new ScopedCommandManager(centralManager)
+  );
 
   React.useEffect(
     () => {
       if (!props.active) return;
-      const scopedCommands = scopedManager.commands;
-      // Forward all registered commands to central manager
-      Object.keys(scopedCommands).forEach(commandName => {
-        console.warn(`SCOPED PROVIDER: Registering command ${commandName}`);
-        centralManager.registerCommand(
-          commandName,
-          scopedCommands[commandName]
-        );
-      });
+      scopedManager.setActive(true);
+      scopedManager.registerAllCommandsToCentralManager();
       return () => {
-        // Withdraw all registered commands from central manager
-        Object.keys(scopedCommands).forEach(commandName => {
-          console.warn(`SCOPED PROVIDER: Deregistering command ${commandName}`);
-          centralManager.deregisterCommand(commandName);
-        });
+        scopedManager.setActive(false);
+        scopedManager.deregisterAllCommandsFromCentralManager();
       };
     },
-    [props.active, centralManager, scopedManager.commands]
+    [props.active, scopedManager]
   );
 
   return (

@@ -1,43 +1,12 @@
 // @flow
-import * as React from 'react';
 import { t } from '@lingui/macro';
-import {
-  useCommand,
-  useCommandWithOptions,
-} from '../CommandPalette/CommandHooks';
-import { type CommandOption } from '../CommandPalette/CommandManager';
-import { mapReverseFor } from '../Utils/MapFor';
-import {
-  enumerateObjects,
-  enumerateGroups,
-} from '../ObjectsList/EnumerateObjects';
-import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import { useCommand } from '../CommandPalette/CommandHooks';
+import useObjectsListCommands from '../ObjectsList/UseObjectsListCommands';
+import useObjectGroupsListCommands from '../ObjectGroupsList/UseObjectGroupsListCommands';
+import useLayersListCommands from '../LayersList/UseLayersListCommands';
 
-const editObjectCommandText = t`Edit object...`;
-const editObjectVariablesCommandText = t`Edit object variables...`;
 const openScenePropertiesCommandText = t`Open scene properties`;
 const openSceneVariablesCommandText = t`Open scene variables`;
-const editObjectGroupCommandText = t`Edit object group...`;
-const editLayerEffectsCommandText = t`Edit layer effects...`;
-
-/**
- * Helper function to generate options list
- */
-const generateLayoutObjectsOptions = (
-  project: gdProject,
-  layout: gdLayout,
-  onChoose: (object: gdObject) => void
-): Array<CommandOption<gdObject>> => {
-  return enumerateObjects(project, layout).containerObjectsList.map(item => ({
-    text: item.object.getName(),
-    value: item.object,
-    handler: () => onChoose(item.object),
-    iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
-      project,
-      item.object
-    ),
-  }));
-};
 
 type Props = {
   project: gdProject,
@@ -74,59 +43,22 @@ const UseSceneEditorCommands = (props: Props) => {
     handler: onOpenSceneVariables,
   });
 
-  useCommandWithOptions('EDIT_OBJECT', {
-    displayText: editObjectCommandText,
-    enabled: true,
-    generateOptions: React.useCallback(
-      () => generateLayoutObjectsOptions(project, layout, onEditObject),
-      [project, layout, onEditObject]
-    ),
+  useObjectsListCommands({
+    project,
+    layout,
+    onEditObject,
+    onEditObjectVariables,
   });
 
-  useCommandWithOptions('EDIT_OBJECT_VARIABLES', {
-    displayText: editObjectVariablesCommandText,
-    enabled: true,
-    generateOptions: React.useCallback(
-      () =>
-        generateLayoutObjectsOptions(project, layout, onEditObjectVariables),
-      [project, layout, onEditObjectVariables]
-    ),
+  useObjectGroupsListCommands({
+    project,
+    layout,
+    onEditObjectGroup,
   });
 
-  useCommandWithOptions('EDIT_OBJECT_GROUP', {
-    displayText: editObjectGroupCommandText,
-    enabled: true,
-    generateOptions: React.useCallback(
-      () =>
-        [
-          ...enumerateGroups(layout.getObjectGroups()),
-          ...enumerateGroups(project.getObjectGroups()),
-        ].map(group => ({
-          text: group.getName(),
-          value: group,
-          handler: () => onEditObjectGroup(group),
-        })),
-      [onEditObjectGroup, project, layout]
-    ),
-  });
-
-  useCommandWithOptions('EDIT_LAYER_EFFECTS', {
-    displayText: editLayerEffectsCommandText,
-    enabled: true,
-    generateOptions: React.useCallback(
-      () => {
-        const layersCount = layout.getLayersCount();
-        return mapReverseFor(0, layersCount, i => {
-          const layer = layout.getLayerAt(i);
-          return {
-            value: layer,
-            text: layer.getName() || 'Base layer',
-            handler: () => onEditLayerEffects(layer),
-          };
-        });
-      },
-      [layout, onEditLayerEffects]
-    ),
+  useLayersListCommands({
+    layout,
+    onEditLayerEffects,
   });
 
   return null;

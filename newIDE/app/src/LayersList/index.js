@@ -1,11 +1,10 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow from './LayerRow';
-import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
@@ -19,20 +18,8 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
-import { UseCommandWithOptionsHook } from '../CommandPalette/CommandHooks';
 
 const SortableLayerRow = SortableElement(LayerRow);
-
-const mapLayers = <T>(
-  layersContainer: gdLayout,
-  callback: (layer: gdLayer, idx: number) => T
-): Array<T> => {
-  const layersCount = layersContainer.getLayersCount();
-  return mapReverseFor(0, layersCount, i => {
-    const layer = layersContainer.getLayerAt(i);
-    return callback(layer, i);
-  });
-};
 
 type LayersListBodyState = {|
   nameErrors: { [string]: boolean },
@@ -156,8 +143,6 @@ export default class LayersList extends Component<Props, State> {
   };
 
   render() {
-    const { project } = this.props;
-
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.

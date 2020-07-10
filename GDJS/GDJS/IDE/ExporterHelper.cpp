@@ -4,11 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDJS/IDE/ExporterHelper.h"
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <streambuf>
 #include <string>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
@@ -29,62 +31,9 @@
 
 namespace gdjs {
 
-// Nice tools functions
 static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
   if (std::find(container.begin(), container.end(), str) == container.end())
     container.push_back(str);
-}
-
-static void GenerateFontsDeclaration(
-    const gd::ResourcesManager &resourcesManager,
-    gd::AbstractFileSystem &fs,
-    const gd::String &outputDir,
-    gd::String &css,
-    gd::String &html,
-    gd::String urlPrefix = "") {
-  std::set<gd::String> files;
-  auto makeCSSDeclarationFor = [&urlPrefix](gd::String relativeFile) {
-    gd::String css;
-    css += "@font-face{ font-family : \"gdjs_font_";
-    css += relativeFile;
-    css += "\"; src : url('";
-    css += urlPrefix + relativeFile;
-    css += "') format('truetype'); }\n";
-
-    return css;
-  };
-
-  for (auto &resourceName : resourcesManager.GetAllResourceNames()) {
-    const gd::Resource &resource = resourcesManager.GetResource(resourceName);
-    if (resource.GetKind() != "font") continue;
-
-    gd::String relativeFile = resource.GetFile();
-    css += makeCSSDeclarationFor(relativeFile);
-    files.insert(relativeFile);
-  }
-
-  // Compatibility with GD <= 5.0-beta56
-  // Before, fonts were detected by scanning the export folder for .TTF files.
-  // Text Object (or anything using a font) was just declaring the font filename
-  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
-  // We still support this, the time everything is migrated to using font
-  // resources.
-  std::vector<gd::String> ttfFiles = fs.ReadDir(outputDir, ".TTF");
-  for (std::size_t i = 0; i < ttfFiles.size(); ++i) {
-    gd::String relativeFile = ttfFiles[i];
-    fs.MakeRelative(relativeFile, outputDir);
-
-    // Skip font files already in resources
-    if (files.find(relativeFile) != files.end()) continue;
-
-    css += makeCSSDeclarationFor(relativeFile);
-
-    // This is needed to trigger the loading of the fonts.
-    html += "<div style=\"font-family: 'gdjs_font_";
-    html += relativeFile;
-    html += "'; color: black;\">.</div>";
-  }
-  // end of compatibility code
 }
 
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
@@ -108,6 +57,13 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
   ExportResources(fs, exportedProject, exportDir);
+
+  // Compatibility with GD <= 5.0-beta56
+  // Stay compatible with text objects declaring their font as just a filename
+  // without a font resource - by manually adding these resources.
+  AddDeprecatedFontFilesToFontResources(
+      fs, exportedProject.GetResourcesManager(), exportDir);
+  // end of compatibility code
 
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
@@ -180,20 +136,8 @@ bool ExporterHelper::ExportPixiIndexFile(
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
-  // Generate custom declarations for font resources
-  gd::String customCss;
-  gd::String customHtml;  // Custom HTML is only needed for the deprecated way
-                          // of loading fonts
-  GenerateFontsDeclaration(project.GetResourcesManager(),
-                           fs,  // File system is only needed for the deprecated
-                                // way of loading fonts
-                           exportDir,
-                           customCss,
-                           customHtml);
-
   // Generate the file
-  if (!CompleteIndexFile(
-          str, customCss, customHtml, exportDir, includesFiles, additionalSpec))
+  if (!CompleteIndexFile(str, exportDir, includesFiles, additionalSpec))
     return false;
 
   // Write the index.html file
@@ -210,7 +154,8 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
   auto getIconFilename = [&resourceManager, &platformSpecificAssets](
-      const gd::String &platform, const gd::String &name) {
+                             const gd::String &platform,
+                             const gd::String &name) {
     const gd::String &file =
         resourceManager.GetResource(platformSpecificAssets.Get(platform, name))
             .GetFile();
@@ -344,17 +289,10 @@ bool ExporterHelper::ExportCocos2dFiles(
     // Generate custom declarations for font resources
     gd::String customCss;
     gd::String customHtml;
-    GenerateFontsDeclaration(project.GetResourcesManager(),
-                             fs,
-                             exportDir + "/res",
-                             customCss,
-                             customHtml,
-                             "res/");
 
     // Generate the file
     std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(
-            str, customCss, customHtml, exportDir, noIncludesInThisFile, "")) {
+    if (!CompleteIndexFile(str, exportDir, noIncludesInThisFile, "")) {
       lastError = "Unable to complete Cocos2d-JS index.html file.";
       return false;
     }
@@ -481,8 +419,6 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
 bool ExporterHelper::CompleteIndexFile(
     gd::String &str,
-    gd::String customCss,
-    gd::String customHtml,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     gd::String additionalSpec) {
@@ -514,8 +450,8 @@ bool ExporterHelper::CompleteIndexFile(
                          "\" crossorigin=\"anonymous\"></script>\n";
   }
 
-  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)
-            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", customHtml)
+  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
+            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
             .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
             .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
 
@@ -614,21 +550,23 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
                                     bool cocosRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("pixi-renderer") != gd::String::npos ||
-          it->find("pixi-filter") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("pixi-renderer") != gd::String::npos ||
+          includeFile.find("pixi-filter") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
   if (cocosRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("cocos-renderer") != gd::String::npos ||
-          it->find("cocos-shader") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("cocos-renderer") != gd::String::npos ||
+          includeFile.find("cocos-shader") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
 }
@@ -741,6 +679,37 @@ void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
                                      gd::String exportDir) {
   gd::ProjectResourcesCopier::CopyAllResourcesTo(
       project, fs, exportDir, true, false, false);
+}
+
+void ExporterHelper::AddDeprecatedFontFilesToFontResources(
+    gd::AbstractFileSystem &fs,
+    gd::ResourcesManager &resourcesManager,
+    const gd::String &exportDir,
+    gd::String urlPrefix) {
+  // Compatibility with GD <= 5.0-beta56
+  //
+  // Before, fonts were detected by scanning the export folder for .TTF files.
+  // Text Object (or anything using a font) was just declaring the font filename
+  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
+  //
+  // To still support this, the time everything is migrated to using font
+  // resources, we manually declare font resources for each ".TTF" file, using
+  // the name of the file as the resource name.
+  std::vector<gd::String> ttfFiles = fs.ReadDir(exportDir, ".TTF");
+  for (std::size_t i = 0; i < ttfFiles.size(); ++i) {
+    gd::String relativeFile = ttfFiles[i];
+    fs.MakeRelative(relativeFile, exportDir);
+
+    // Create a resource named like the file (to emulate the old behavior).
+    gd::FontResource fontResource;
+    fontResource.SetName(relativeFile);
+    fontResource.SetFile(urlPrefix + relativeFile);
+
+    // Note that if a resource with this name already exists, it won't be
+    // overwritten - which is expected.
+    resourcesManager.AddResource(fontResource);
+  }
+  // end of compatibility code
 }
 
 }  // namespace gdjs

@@ -26,7 +26,7 @@ import {
   type ExportState,
   SetupExportHeader,
 } from '../GenericExporters/OnlineElectronExport';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,

@@ -133,15 +133,14 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           GetAllExpressionsForBehavior(
               "PathfindingBehavior::PathfindingObstacleBehavior");
 
-      autActions["PathfindingObstacleBehavior::Cost"]
+      autActions["PathfindingBehavior::Cost"]
           .SetFunctionName("setCost")
           .SetGetter("getCost");
-      autConditions["PathfindingObstacleBehavior::Cost"].SetFunctionName(
-          "getCost");
-      autActions["PathfindingObstacleBehavior::SetImpassable"].SetFunctionName(
+      autConditions["PathfindingBehavior::Cost"].SetFunctionName("getCost");
+      autActions["PathfindingBehavior::SetImpassable"].SetFunctionName(
           "setImpassable");
-      autConditions["PathfindingObstacleBehavior::IsImpassable"]
-          .SetFunctionName("isImpassable");
+      autConditions["PathfindingBehavior::IsImpassable"].SetFunctionName(
+          "isImpassable");
 
       autExpressions["Cost"].SetFunctionName("getCost");
     }

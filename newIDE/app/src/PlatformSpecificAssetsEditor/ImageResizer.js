@@ -1,14 +1,18 @@
 //@flow
-import optionalRequire from '../Utils/OptionalRequire';
-const Jimp = optionalRequire('jimp');
+import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+const lazyRequireJimp = optionalLazyRequire('jimp');
 
-export const isResizeSupported = () => !!Jimp;
+export const isResizeSupported = () => {
+  const Jimp = lazyRequireJimp();
+  return !!Jimp;
+};
 
 export const resizeImage = (
   inputFile: string,
   outputFile: string,
   { width, height }: { width: number, height: number }
 ): Promise<any> => {
+  const Jimp = lazyRequireJimp();
   if (!Jimp) return Promise.resolve(false);
 
   return Jimp.read(inputFile)

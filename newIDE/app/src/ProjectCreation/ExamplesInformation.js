@@ -418,6 +418,43 @@ module.exports = {
       }
     ]
   },
+  "board-walk-with-raycast": {
+    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      }
+    ]
+  },
   "bomb-the-crate": {
     "description": "A basic bomberman like game, where the player can move on the map, drop bombs and destroy crates on the map.",
     "usedExtensions": [
@@ -1111,10 +1148,6 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
@@ -1125,6 +1158,10 @@ module.exports = {
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "System information",
@@ -3839,6 +3876,51 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "tabbed-menu-with-layers": {
+    "description": "Example showing how to create a menu with multiple tabs.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

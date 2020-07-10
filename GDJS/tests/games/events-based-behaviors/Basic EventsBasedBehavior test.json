@@ -8,6 +8,7 @@
   },
   "properties": {
     "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -130,7 +131,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.6614
       },
       "objectsGroups": [],
       "variables": [],
@@ -143,8 +144,8 @@
           "locked": false,
           "name": "NewObject",
           "width": 0,
-          "x": 176.184,
-          "y": 90.6953,
+          "x": 45,
+          "y": 17,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -158,8 +159,8 @@
           "locked": false,
           "name": "NewObject2",
           "width": 0,
-          "x": 168,
-          "y": 156,
+          "x": 37,
+          "y": 82,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -173,9 +174,129 @@
           "locked": false,
           "name": "NewObject3",
           "width": 0,
-          "x": 171,
-          "y": 219,
+          "x": 40,
+          "y": 145,
           "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject4",
+          "width": 0,
+          "x": 40,
+          "y": 211,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject6",
+          "width": 0,
+          "x": 43,
+          "y": 314,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject5",
+          "width": 0,
+          "x": 41,
+          "y": 262,
+          "zOrder": 6,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject7",
+          "width": 0,
+          "x": 49,
+          "y": 375,
+          "zOrder": 7,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject8",
+          "width": 0,
+          "x": 48,
+          "y": 416,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject9",
+          "width": 0,
+          "x": 52,
+          "y": 448,
+          "zOrder": 9,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject10",
+          "width": 0,
+          "x": 51,
+          "y": 491,
+          "zOrder": 10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject11",
+          "width": 0,
+          "x": 51,
+          "y": 550,
+          "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -195,7 +316,8 @@
             {
               "name": "MyBehavior",
               "type": "NewEventsFunctionsExtension::MyBehavior",
-              "BooleanTestProperty": true
+              "BooleanTestProperty": true,
+              "SuffixText": "! (success 1)"
             }
           ],
           "string": "Text",
@@ -222,7 +344,7 @@
               "type": "NewEventsFunctionsExtension::MyBehavior"
             }
           ],
-          "string": "Text2",
+          "string": "Text2, should not be modified (success 2)",
           "font": "",
           "characterSize": 20,
           "color": {
@@ -258,6 +380,224 @@
             "g": 255,
             "r": 255
           }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject4",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! - success (4)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            },
+            {
+              "name": "ThirdBehavior",
+              "type": "NewEventsFunctionsExtension::ThirdBehavior"
+            }
+          ],
+          "string": "This should be changed by MyBehavior, using ThirdBehavior on the same object. (seeing this is a FAIL)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject5",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! (success 5)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            }
+          ],
+          "string": "This should be changed by MyBehavior, using ThirdBehavior of NewObject6. (seeing this is a FAIL)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject6",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "ThirdBehavior",
+              "type": "NewEventsFunctionsExtension::ThirdBehavior"
+            }
+          ],
+          "string": "Unmodified text, just having ThirdBehavior (success 6)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject7",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "BehaviorUsingMyBehaviorFromOtherExtension",
+              "type": "NewExtension::BehaviorUsingMyBehaviorFromOtherExtension"
+            },
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! (success 7)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            }
+          ],
+          "string": "This should be changed by MyBehavior, using \"BehaviorUsingMyBehaviorFromOtherExtension\" of the same object. (seeing this is a FAIL)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject8",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "ThirdBehavior",
+              "type": "NewEventsFunctionsExtension::ThirdBehavior"
+            }
+          ],
+          "string": "Unmodified text, just having ThirdBehavior (success 8)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject9",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! (success 9)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            }
+          ],
+          "string": "SHould be Modified by a function (seeing this is a FAIL)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject10",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! (success 10)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            }
+          ],
+          "string": "SHould be Modified by NewObject 8 (seeing this is a FAIL)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewObject11",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "MyBehavior",
+              "type": "NewEventsFunctionsExtension::MyBehavior",
+              "SuffixText": "! (success 11)",
+              "AddedNumber": 1,
+              "BooleanTestProperty": true
+            }
+          ],
+          "string": "This should rotate (if not FAIL, otherwise success 11)",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
         }
       ],
       "events": [
@@ -273,7 +613,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Should display Hello World 42!",
+          "comment": "Should display Hello World 42! (success 1)",
           "comment2": ""
         },
         {
@@ -333,6 +673,184 @@
             }
           ],
           "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Other objects should be modified using a behavior (\"Third Behavior\" or \"BehaviorUsingMyBehaviorFromOtherExtension\") taking another behavior (\"MyBehavior\") as parameter.",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewEventsFunctionsExtension::ThirdBehavior::Function"
+              },
+              "parameters": [
+                "NewObject4",
+                "ThirdBehavior",
+                "NewObject4",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewEventsFunctionsExtension::ThirdBehavior::Function"
+              },
+              "parameters": [
+                "NewObject6",
+                "ThirdBehavior",
+                "NewObject5",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewExtension::BehaviorUsingMyBehaviorFromOtherExtension::Function"
+              },
+              "parameters": [
+                "NewObject7",
+                "BehaviorUsingMyBehaviorFromOtherExtension",
+                "NewObject7",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewEventsFunctionsExtension::ThirdBehavior::Function2"
+              },
+              "parameters": [
+                "NewObject8",
+                "ThirdBehavior",
+                "NewObject10",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Modify an object using a behavior as a parameter",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewEventsFunctionsExtension::FunctionUsingMyBehavior"
+              },
+              "parameters": [
+                "",
+                "NewObject9",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "NewObject11",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "NewEventsFunctionsExtension::FunctionActivatingMyBehavior"
+              },
+              "parameters": [
+                "",
+                "NewObject11",
+                "MyBehavior",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         }
       ],
       "layers": [
@@ -356,12 +874,20 @@
       ],
       "behaviorsSharedData": [
         {
+          "name": "BehaviorUsingMyBehaviorFromOtherExtension",
+          "type": "NewExtension::BehaviorUsingMyBehaviorFromOtherExtension"
+        },
+        {
           "name": "MyBehavior",
           "type": "NewEventsFunctionsExtension::MyBehavior"
         },
         {
           "name": "SecondBehavior",
           "type": "NewEventsFunctionsExtension::SecondBehavior"
+        },
+        {
+          "name": "ThirdBehavior",
+          "type": "NewEventsFunctionsExtension::ThirdBehavior"
         }
       ]
     }
@@ -377,7 +903,115 @@
       "shortDescription": "",
       "tags": "",
       "version": "",
-      "eventsFunctions": [],
+      "eventsFunctions": [
+        {
+          "description": "Modify an object using MyBehavior",
+          "fullName": "Modify an object using MyBehavior",
+          "functionType": "Action",
+          "name": "FunctionUsingMyBehavior",
+          "sentence": "Modify _PARAM1_ using its behavior (_PARAM2_)",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "NewEventsFunctionsExtension::MyBehavior::Function"
+                  },
+                  "parameters": [
+                    "TheObject",
+                    "TheMyBehaviorToUse",
+                    "\"Changed by a free function\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "",
+              "longDescription": "",
+              "name": "TheObject",
+              "optional": false,
+              "supplementaryInformation": "TextObject::Text",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "",
+              "longDescription": "",
+              "name": "TheMyBehaviorToUse",
+              "optional": false,
+              "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "",
+          "fullName": "Activate MyBehavior",
+          "functionType": "Action",
+          "name": "FunctionActivatingMyBehavior",
+          "sentence": "Activate MyBehavior of _PARAM1_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "MyObject",
+                    "SomeMyBehavior",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "",
+              "longDescription": "",
+              "name": "MyObject",
+              "optional": false,
+              "supplementaryInformation": "TextObject::Text",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "",
+              "longDescription": "",
+              "name": "SomeMyBehavior",
+              "optional": false,
+              "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
       "eventsBasedBehaviors": [
         {
           "description": "",
@@ -444,6 +1078,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
@@ -453,6 +1088,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -462,6 +1098,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "",
+                  "longDescription": "",
                   "name": "Text",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -490,7 +1127,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "50",
+                        "2",
                         ""
                       ],
                       "subInstructions": []
@@ -504,6 +1141,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
@@ -513,6 +1151,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -554,6 +1193,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
@@ -563,6 +1203,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -603,6 +1244,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "TextObject::Text",
@@ -612,6 +1254,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
@@ -621,6 +1264,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "A number",
+                  "longDescription": "",
                   "name": "Value",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -635,6 +1279,7 @@
               "value": "!",
               "type": "String",
               "label": "Suffix text to be appended",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SuffixText"
@@ -643,6 +1288,7 @@
               "value": "1",
               "type": "Number",
               "label": "Number to be added",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "AddedNumber"
@@ -651,6 +1297,7 @@
               "value": "true",
               "type": "Boolean",
               "label": "Boolean test property",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "BooleanTestProperty"
@@ -695,6 +1342,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -704,6 +1352,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::SecondBehavior",
@@ -713,7 +1362,366 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "MyBehavior to use",
+                  "longDescription": "",
                   "name": "MyBehavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "name": "ThirdBehavior",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "Modify text using MyBehavior",
+              "functionType": "Action",
+              "name": "Function",
+              "sentence": "Using _PARAM0_, modify text of _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::Function"
+                      },
+                      "parameters": [
+                        "AnotherObject",
+                        "AnotherMyBehavior",
+                        "\"Hello I was modified from ThirdBehavior\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::ThirdBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Any object",
+                  "longDescription": "",
+                  "name": "AnotherObject",
+                  "optional": false,
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "A \"MyBehavior\" behavior for the previous object",
+                  "longDescription": "",
+                  "name": "AnotherMyBehavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "",
+              "fullName": "Modify text using MyBehavior, using an intermediate function",
+              "functionType": "Action",
+              "name": "Function2",
+              "sentence": "Using _PARAM0_, modify text of _PARAM2_ (with an intermediate function)",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::ThirdBehavior::Function"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "SomeTextObject",
+                        "SomeMyBehavior",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::ThirdBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "SomeTextObject",
+                  "optional": false,
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "SomeMyBehavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "name": "FourthBehaviorUsing3rdBehavior",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "Modify text using ThirdBehavior and MyBehavior",
+              "functionType": "Action",
+              "name": "Function",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::ThirdBehavior::Function"
+                      },
+                      "parameters": [
+                        "IntermediateObject",
+                        "TheThirdBehaviorForIntermediateObject",
+                        "ObjectWithMyBehavior",
+                        "TheMyBehaviorToUse",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::FourthBehaviorUsing3rdBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "IntermediateObject",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "TheThirdBehaviorForIntermediateObject",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::ThirdBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "ObjectWithMyBehavior",
+                  "optional": false,
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "",
+                  "longDescription": "",
+                  "name": "TheMyBehaviorToUse",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": []
+        }
+      ]
+    },
+    {
+      "author": "",
+      "description": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "name": "NewExtension",
+      "shortDescription": "",
+      "tags": "",
+      "version": "",
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "",
+          "fullName": "",
+          "name": "BehaviorUsingMyBehaviorFromOtherExtension",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "Modify text using MyBehavior",
+              "functionType": "Action",
+              "name": "Function",
+              "sentence": "Using _PARAM0_, modify text of _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "NewEventsFunctionsExtension::MyBehavior::Function"
+                      },
+                      "parameters": [
+                        "AnotherObject",
+                        "AnotherMyBehavior",
+                        "\"Hello I was modified from BehaviorUsingMyBehaviorFrom[...]\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewExtension::BehaviorUsingMyBehaviorFromOtherExtension",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Any object",
+                  "longDescription": "",
+                  "name": "AnotherObject",
+                  "optional": false,
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "A \"MyBehavior\" behavior for the previous object",
+                  "longDescription": "",
+                  "name": "AnotherMyBehavior",
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
                   "type": "behavior"

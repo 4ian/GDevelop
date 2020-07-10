@@ -4,7 +4,7 @@ import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog from '../UI/Dialog';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export class ObjectGroupEditorDialog extends Component {
   render() {

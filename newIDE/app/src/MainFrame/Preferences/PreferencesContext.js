@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -130,6 +131,10 @@ export type PreferencesValues = {|
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  autoOpenMostRecentProject: boolean,
+  hasProjectOpened: boolean,
+  useCommandPalette: boolean,
 |};
 
 /**
@@ -162,6 +167,18 @@ export type Preferences = {|
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => void,
+  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  getAutoOpenMostRecentProject: () => boolean,
+  setAutoOpenMostRecentProject: (enabled: boolean) => void,
+  hadProjectOpenedDuringLastSession: () => boolean,
+  setHasProjectOpened: (enabled: boolean) => void,
+  setUseCommandPalette: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -181,6 +198,10 @@ export const initialPreferences = {
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
+    recentProjectFiles: [],
+    autoOpenMostRecentProject: true,
+    hasProjectOpened: false,
+    useCommandPalette: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -203,6 +224,18 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
+  getRecentProjectFiles: () => [],
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  getAutoOpenMostRecentProject: () => true,
+  setAutoOpenMostRecentProject: () => {},
+  hadProjectOpenedDuringLastSession: () => false,
+  setHasProjectOpened: () => {},
+  setUseCommandPalette: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

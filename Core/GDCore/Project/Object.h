@@ -139,8 +139,7 @@ class GD_CORE_API Object {
    * \return a std::map with properties names as key.
    * \see gd::PropertyDescriptor
    */
-  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const;
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties() const;
 
   /**
    * \brief Called when the IDE wants to update a custom property of the object
@@ -148,8 +147,7 @@ class GD_CORE_API Object {
    * \return false if the new value cannot be set
    */
   virtual bool UpdateProperty(const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) {
+                              const gd::String& value) {
     return false;
   };
   ///@}

@@ -57,7 +57,7 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<
@@ -76,7 +76,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     ) => cb(true),
   };
 
-  sortableList: ?SortableVirtualizedItemList<gdEventsFunction>;
+  sortableList: ?SortableVirtualizedItemList<gdEventsBasedBehavior>;
   state: State = {
     renamedEventsBasedBehavior: null,
     searchText: '',

@@ -33,16 +33,23 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
 
   double GetGravity() const { return gravity; };
   double GetMaxFallingSpeed() const { return maxFallingSpeed; };
+  double GetLadderClimbingSpeed() const { return ladderClimbingSpeed; };
   double GetAcceleration() const { return acceleration; };
   double GetDeceleration() const { return deceleration; };
   double GetMaxSpeed() const { return maxSpeed; };
   double GetJumpSpeed() const { return jumpSpeed; };
+  double GetCurrentFallSpeed() const { return currentFallSpeed; };
+  double GetCurrentSpeed() const { return currentSpeed; };
+  double GetCurrentJumpSpeed() const { return currentJumpSpeed; };
   double GetSlopeMaxAngle() const { return slopeMaxAngle; };
+  bool CanGrabPlatforms() const { return canGrabPlatforms; };
+  bool CanJump() const { return canJump; };
 
   void SetGravity(double gravity_) { gravity = gravity_; };
   void SetMaxFallingSpeed(double maxFallingSpeed_) {
     maxFallingSpeed = maxFallingSpeed_;
   };
+  void SetLadderClimbingSpeed(double ladderClimbingSpeed_) { ladderClimbingSpeed = ladderClimbingSpeed_; };
   void SetAcceleration(double acceleration_) { acceleration = acceleration_; };
   void SetDeceleration(double deceleration_) { deceleration = deceleration_; };
   void SetMaxSpeed(double maxSpeed_) { maxSpeed = maxSpeed_; };
@@ -180,6 +187,7 @@ class GD_EXTENSION_API PlatformerObjectRuntimeBehavior
                            ///< X and Y axis.
   double gravity;          ///< In pixels.seconds^-2
   double maxFallingSpeed;  ///< In pixels.seconds^-1
+  double ladderClimbingSpeed; ///<In pixels.seconds^-1
   double acceleration;     ///< In pixels.seconds^-2
   double deceleration;     ///< In pixels.seconds^-2
   double maxSpeed;         ///< In pixels.seconds^-1

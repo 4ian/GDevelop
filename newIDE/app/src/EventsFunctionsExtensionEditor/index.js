@@ -38,14 +38,10 @@ import EditorNavigator, {
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
-import {
-  type PreviewButtonSettings,
-  emptyPreviewButtonSettings,
-} from '../MainFrame/Toolbar/PreviewButtons';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -65,8 +61,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
-  unsavedChanges?: UnsavedChanges,
-  previewButtonSettings: PreviewButtonSettings,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -630,10 +625,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 globalObjectsContainer={this._globalObjectsContainer}
                 objectsContainer={this._objectsContainer}
                 events={selectedEventsFunction.getEvents()}
-                showPreviewButton={false}
-                onPreview={options => {}}
-                previewButtonSettings={emptyPreviewButtonSettings}
-                showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
                 resourceSources={this.props.resourceSources}
@@ -643,9 +634,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.props.openInstructionOrExpression
                 }
                 setToolbar={this.props.setToolbar}
-                onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
-                onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
+                onOpenSettings={this._editOptions}
                 unsavedChanges={this.props.unsavedChanges}
               />
             </Background>

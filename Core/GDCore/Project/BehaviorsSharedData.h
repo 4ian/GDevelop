@@ -64,8 +64,7 @@ class GD_CORE_API BehaviorsSharedData {
    * \see gd::PropertyDescriptor
    */
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializerElement& behaviorSharedDataContent,
-      gd::Project& project) const;
+      const gd::SerializerElement& behaviorSharedDataContent) const;
 
   /**
    * \brief Called when the IDE wants to update a property of the shared data
@@ -75,8 +74,7 @@ class GD_CORE_API BehaviorsSharedData {
    */
   virtual bool UpdateProperty(gd::SerializerElement& behaviorSharedDataContent,
                               const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) {
+                              const gd::String& value) {
     return false;
   };
 #endif

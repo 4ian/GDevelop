@@ -19,7 +19,7 @@ type Props = {|
   onCreateNewProject: () => void,
 |};
 
-export default ({
+const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
@@ -86,3 +86,5 @@ export default ({
     </I18n>
   );
 };
+
+export default OpenFromStorageProviderDialog;

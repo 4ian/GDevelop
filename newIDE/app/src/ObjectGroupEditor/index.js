@@ -6,7 +6,7 @@ import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: ?gdProject,

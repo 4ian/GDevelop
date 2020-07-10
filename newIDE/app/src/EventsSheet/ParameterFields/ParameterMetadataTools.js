@@ -1,6 +1,6 @@
 // @flow
 import { type ExpressionParameters } from './ParameterFieldCommons';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Given an instruction or an expression and a parameter number,
@@ -54,4 +54,19 @@ export const getLastObjectParameterValue = ({
   }
 
   return objectName;
+};
+
+export const getLastObjectParameterObjectType = (
+  parameters: gdVectorParameterMetadata,
+  parameterIndex: number
+) => {
+  const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
+    parameters,
+    parameterIndex
+  );
+  if (objectParameterIndex < 0 || objectParameterIndex >= parameters.size()) {
+    return '';
+  }
+
+  return parameters.at(objectParameterIndex).getExtraInfo();
 };

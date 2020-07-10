@@ -20,7 +20,7 @@ import {
 import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ExportState = null;
 

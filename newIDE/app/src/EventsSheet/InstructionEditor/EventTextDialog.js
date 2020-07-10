@@ -10,7 +10,7 @@ import ColorPicker, { type RGBColor } from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   sizeTextField: {

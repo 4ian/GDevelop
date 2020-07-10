@@ -39,7 +39,10 @@ bool Exporter::ExportLayoutForPixiPreview(gd::Project& project,
                                           gd::Layout& layout,
                                           gd::String exportDir) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, "");
+  gd::SerializerElement options;
+  options.AddChild("isPreview").SetBoolValue(true);
+
+  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, gd::Serializer::ToJSON(options));
 }
 
 bool Exporter::ExportExternalLayoutForPixiPreview(
@@ -49,6 +52,7 @@ bool Exporter::ExportExternalLayoutForPixiPreview(
     gd::String exportDir) {
   gd::SerializerElement options;
   options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
+  options.AddChild("isPreview").SetBoolValue(true);
 
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   return helper.ExportLayoutForPixiPreview(
@@ -80,6 +84,13 @@ bool Exporter::ExportWholePixiProject(
     // Export the resources (before generating events as some resources
     // filenames may be updated)
     helper.ExportResources(fs, exportedProject, exportDir);
+
+    // Compatibility with GD <= 5.0-beta56
+    // Stay compatible with text objects declaring their font as just a filename
+    // without a font resource - by manually adding these resources.
+    helper.AddDeprecatedFontFilesToFontResources(
+        fs, exportedProject.GetResourcesManager(), exportDir);
+    // end of compatibility code
 
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
@@ -173,6 +184,13 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   // Export the resources (before generating events as some resources filenames
   // may be updated)
   helper.ExportResources(fs, exportedProject, exportDir + "/res");
+
+  // Compatibility with GD <= 5.0-beta56
+  // Stay compatible with text objects declaring their font as just a filename
+  // without a font resource - by manually adding these resources.
+  helper.AddDeprecatedFontFilesToFontResources(
+      fs, exportedProject.GetResourcesManager(), exportDir + "/res", "res/");
+  // end of compatibility code
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);

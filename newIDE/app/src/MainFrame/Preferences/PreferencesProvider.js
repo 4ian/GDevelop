@@ -14,6 +14,7 @@ import {
 } from './PreferencesContext';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -53,6 +54,16 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setLastUsedPath: this._setLastUsedPath.bind(this),
     getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this),
     setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
+    getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
+    insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
+    removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
+    getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
+    setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
+    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
+      this
+    ),
+    setHasProjectOpened: this._setHasProjectOpened.bind(this),
+    setUseCommandPalette: this._setUseCommandPalette.bind(this),
   };
 
   componentDidMount() {
@@ -338,6 +349,86 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             [name]: node,
           },
         },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getRecentProjectFiles() {
+    return this.state.values.recentProjectFiles;
+  }
+
+  _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          recentProjectFiles: recents,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    let recentProjectFiles = this._getRecentProjectFiles();
+    const isNotNewRecentFile = recentFile =>
+      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+    this._setRecentProjectFiles(
+      [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
+        0,
+        5
+      )
+    );
+  }
+
+  _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
+    const isNotSadPathRecentFile = recentFileItem =>
+      JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
+    this._setRecentProjectFiles(
+      [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
+        0,
+        5
+      )
+    );
+  }
+
+  _getAutoOpenMostRecentProject() {
+    return this.state.values.autoOpenMostRecentProject;
+  }
+
+  _setAutoOpenMostRecentProject(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autoOpenMostRecentProject: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _hadProjectOpenedDuringLastSession() {
+    return this.state.values.hasProjectOpened;
+  }
+
+  _setHasProjectOpened(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hasProjectOpened: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseCommandPalette(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, useCommandPalette: enabled },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

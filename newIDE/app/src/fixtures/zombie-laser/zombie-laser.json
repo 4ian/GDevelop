@@ -2210,7 +2210,8 @@
             "g": 0,
             "r": 234
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Background",

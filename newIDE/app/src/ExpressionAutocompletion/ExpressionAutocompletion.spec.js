@@ -3,7 +3,7 @@ import {
   getAutocompletionsFromDescriptions,
   insertAutocompletionInExpression,
 } from '.';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const makeTestContext = () => {
   const project = gd.ProjectHelper.createNewGDJSProject();

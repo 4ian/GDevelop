@@ -390,17 +390,17 @@ interface Behavior {
     Behavior Clone();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-[JSImplementation="Behavior"]
+[JSImplementation=Behavior]
 interface BehaviorJsImplementation {
     void BehaviorJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
@@ -420,17 +420,17 @@ interface BehaviorContent {
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
-[JSImplementation="BehaviorsSharedData"]
+[JSImplementation=BehaviorsSharedData]
 interface BehaviorSharedDataJsImplementation {
     void BehaviorSharedDataJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
@@ -438,7 +438,7 @@ interface gdObject {
     // /!\ We need to call it gdObject to avoid messing up with javascript Object
     //     global in glue.js!
     void gdObject([Const] DOMString name);
-    // [Value] UniquePtrObject Clone(); Not exposed
+    [Value] UniquePtrObject Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
@@ -447,8 +447,8 @@ interface gdObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -472,13 +472,13 @@ interface UniquePtrObject {
     gdObject release();
 };
 
-[JSImplementation="gdObject"]
+[JSImplementation=gdObject]
 interface ObjectJsImplementation {
     void ObjectJsImplementation();
     [Value] UniquePtrObject Clone();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -656,6 +656,7 @@ NamedPropertyDescriptor implements PropertyDescriptor;
 interface MapStringPropertyDescriptor {
     void MapStringPropertyDescriptor();
 
+    [Ref] PropertyDescriptor MAP_getOrCreate([Const] DOMString name);
     [Ref] PropertyDescriptor MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] PropertyDescriptor prop);
     boolean MAP_has([Const] DOMString name);
@@ -678,8 +679,8 @@ interface Resource {
     void SetMetadata([Const] DOMString metadata);
     [Const, Ref] DOMString GetMetadata();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -801,7 +802,7 @@ interface HighestZOrderFinder {
 
 interface InitialInstanceFunctor {};
 interface InitialInstanceJSFunctorWrapper {};
-[JSImplementation="InitialInstanceJSFunctorWrapper"]
+[JSImplementation=InitialInstanceJSFunctorWrapper]
 interface InitialInstanceJSFunctor {
     void InitialInstanceJSFunctor();
 
@@ -1728,6 +1729,7 @@ enum EventsFunction_FunctionType {
 
 interface EventsFunction {
     void EventsFunction();
+    EventsFunction Clone();
 
     [Ref] EventsFunction SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
@@ -1856,7 +1858,7 @@ interface EventsFunctionsExtension {
 interface AbstractFileSystem {
 };
 
-[JSImplementation="AbstractFileSystem"]
+[JSImplementation=AbstractFileSystem]
 interface AbstractFileSystemJS {
     void AbstractFileSystemJS();
 
@@ -1918,7 +1920,7 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] Project project, [Ref] Layout layout);
+    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer);
     [Const, Ref] EventsContext GetEventsContext();
 
     //Inherited from ArbitraryEventsWorker
@@ -1927,7 +1929,7 @@ interface EventsContextAnalyzer {
 
 interface ArbitraryResourceWorker {
 };
-[JSImplementation="ArbitraryResourceWorker"]
+[JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
     void ArbitraryResourceWorkerJS();
 
@@ -2179,6 +2181,9 @@ interface ShapePainterObject {
     void SetCoordinatesRelative();
     boolean AreCoordinatesAbsolute();
 
+    void SetClearBetweenFrames(boolean value);
+    boolean IsClearedBetweenFrames();
+
     void SetOutlineSize(float size);
     float GetOutlineSize();
 
@@ -2216,8 +2221,8 @@ interface SkeletonObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);

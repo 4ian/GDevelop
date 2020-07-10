@@ -14,7 +14,7 @@ import {
   enumerateFreeInstructions,
   filterInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, ListItem } from '../../UI/List';
 import SearchBar from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
@@ -31,7 +31,7 @@ import TagChips from '../../UI/TagChips';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
 import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
-import { renderInstructionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
+import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
 import {
   buildTagsMenuTemplate,
@@ -66,10 +66,7 @@ type Props = {|
   isCondition: boolean,
   focusOnMount?: boolean,
   chosenInstructionType: ?string,
-  onChooseInstruction: (
-    type: string,
-    EnumeratedInstructionOrExpressionMetadata
-  ) => void,
+  onChooseInstruction: (type: string, EnumeratedInstructionMetadata) => void,
   chosenObjectName: ?string,
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
@@ -88,7 +85,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItem>();
 
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
+  instructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
   );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
@@ -329,7 +326,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         )}
                       {!isSearching &&
                         currentTab === 'free-instructions' &&
-                        renderInstructionTree({
+                        renderInstructionOrExpressionTree({
                           instructionTreeNode: this.instructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,

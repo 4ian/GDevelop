@@ -23,7 +23,7 @@ type Props = {|
   onEditObjectByName: string => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -175,10 +175,6 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 object ? object.getVariables() : null
               }
               variablesContainer={instance.getVariables()}
-              onSizeUpdated={
-                () =>
-                  this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
-              }
               ref={this._instanceVariablesList}
             />
           </Column>

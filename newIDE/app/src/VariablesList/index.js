@@ -22,7 +22,7 @@ import {
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
@@ -44,6 +44,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
+  commitVariableValueOnBlur?: Boolean,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -202,7 +203,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const isStructure = variable.isStructure();
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
@@ -216,8 +217,9 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        commitVariableValueOnBlur={commitVariableValueOnBlur}
         errorText={
-          this.state.nameErrors[variable.ptr]
+          this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'
             : undefined
         }

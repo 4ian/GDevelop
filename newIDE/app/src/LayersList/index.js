@@ -119,7 +119,7 @@ type Props = {|
     newName: string,
     cb: (done: boolean) => void
   ) => void,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -166,6 +166,8 @@ export default class LayersList extends Component<Props, State> {
         <ScrollView autoHideScrollbar>
           <FullSizeMeasurer>
             {({ width }) => (
+              // TODO: The list is costly to render when there are many layers, consider
+              // using SortableVirtualizedItemList.
               <SortableLayersListBody
                 key={listKey}
                 layersContainer={this.props.layersContainer}

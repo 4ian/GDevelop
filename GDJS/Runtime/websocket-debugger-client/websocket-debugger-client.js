@@ -27,7 +27,7 @@ gdjs.IDebuggerClient.prototype.sendRuntimeGameDump = function() {}
 /**
  * Start profiling.
  */
-gdjs.IDebuggerClient.prototype.sendProfilerStrated = function() {}
+gdjs.IDebuggerClient.prototype.sendProfilerStarted = function() {}
 
 /**
  * Stop profiling.

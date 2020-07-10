@@ -6,6 +6,7 @@ import {
   useCommandWithOptions,
 } from '../CommandPalette/CommandHooks';
 import { type CommandOption } from '../CommandPalette/CommandManager';
+import { mapReverseFor } from '../Utils/MapFor';
 import {
   enumerateObjects,
   enumerateGroups,
@@ -17,6 +18,7 @@ const editObjectVariablesCommandText = t`Edit object variables...`;
 const openScenePropertiesCommandText = t`Open scene properties`;
 const openSceneVariablesCommandText = t`Open scene variables`;
 const editObjectGroupCommandText = t`Edit object group...`;
+const editLayerEffectsCommandText = t`Edit layer effects...`;
 
 /**
  * Helper function to generate options list
@@ -45,6 +47,7 @@ type Props = {
   onOpenSceneProperties: () => void,
   onOpenSceneVariables: () => void,
   onEditObjectGroup: (group: gdObjectGroup) => void,
+  onEditLayerEffects: (layer: gdLayer) => void,
 };
 
 const UseSceneEditorCommands = (props: Props) => {
@@ -56,6 +59,7 @@ const UseSceneEditorCommands = (props: Props) => {
     onOpenSceneProperties,
     onOpenSceneVariables,
     onEditObjectGroup,
+    onEditLayerEffects,
   } = props;
 
   useCommand('OPEN_SCENE_PROPERTIES', {
@@ -103,6 +107,25 @@ const UseSceneEditorCommands = (props: Props) => {
           handler: () => onEditObjectGroup(group),
         })),
       [onEditObjectGroup, project, layout]
+    ),
+  });
+
+  useCommandWithOptions('EDIT_LAYER_EFFECTS', {
+    displayText: editLayerEffectsCommandText,
+    enabled: true,
+    generateOptions: React.useCallback(
+      () => {
+        const layersCount = layout.getLayersCount();
+        return mapReverseFor(0, layersCount, i => {
+          const layer = layout.getLayerAt(i);
+          return {
+            value: layer,
+            text: layer.getName() || 'Base layer',
+            handler: () => onEditLayerEffects(layer),
+          };
+        });
+      },
+      [layout, onEditLayerEffects]
     ),
   });
 

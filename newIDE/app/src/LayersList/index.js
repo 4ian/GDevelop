@@ -1,5 +1,4 @@
 // @flow
-import { I18n } from '@lingui/react';
 import { Trans, t } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -54,8 +53,8 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const { layersContainer, onEditEffects, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
-
-    const containerLayersList = mapLayers(layersContainer, (layer, i) => {
+    const containerLayersList = mapReverseFor(0, layersCount, i => {
+      const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
 
       return (
@@ -126,6 +125,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
+  onEditLayerEffects: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -140,16 +140,6 @@ type State = {|
 |};
 
 export default class LayersList extends Component<Props, State> {
-  state = {
-    effectsEditedLayer: null,
-  };
-
-  _editEffects = (effectsEditedLayer: ?gdLayer) => {
-    this.setState({
-      effectsEditedLayer,
-    });
-  };
-
   _addLayer = () => {
     const { layersContainer } = this.props;
     const name = newNameGenerator('Layer', name =>
@@ -167,7 +157,6 @@ export default class LayersList extends Component<Props, State> {
 
   render() {
     const { project } = this.props;
-    const { effectsEditedLayer } = this.state;
 
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -176,30 +165,13 @@ export default class LayersList extends Component<Props, State> {
 
     return (
       <Background>
-        <I18n>
-          {({ i18n }) => (
-            <UseCommandWithOptionsHook
-              commandName={'EDIT_LAYER_EFFECT'}
-              command={{
-                displayText: t`Edit layer effects...`,
-                enabled: true,
-                generateOptions: () =>
-                  mapLayers(this.props.layersContainer, layer => ({
-                    text: layer.getName() || i18n._(t`Base layer`),
-                    handler: () => this._editEffects(layer),
-                    value: layer,
-                  })),
-              }}
-            />
-          )}
-        </I18n>
         <ScrollView autoHideScrollbar>
           <FullSizeMeasurer>
             {({ width }) => (
               <SortableLayersListBody
                 key={listKey}
                 layersContainer={this.props.layersContainer}
-                onEditEffects={layer => this._editEffects(layer)}
+                onEditEffects={this.props.onEditLayerEffects}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
@@ -227,20 +199,6 @@ export default class LayersList extends Component<Props, State> {
               />
             </Line>
           </Column>
-          {effectsEditedLayer && (
-            <EffectsListDialog
-              project={project}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              effectsContainer={effectsEditedLayer}
-              onApply={() =>
-                this.setState({
-                  effectsEditedLayer: null,
-                })
-              }
-            />
-          )}
         </ScrollView>
       </Background>
     );

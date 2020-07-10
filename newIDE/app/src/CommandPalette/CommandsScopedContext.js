@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import CommandManager, {
+import {
   CommandManagerInterface,
   type Command,
   type NamedCommand,
@@ -8,17 +8,12 @@ import CommandManager, {
 import CommandsContext from './CommandsContext';
 import useRefInit from './UseRefInitHook';
 
-type Props = {
-  children: React.Node,
-  active: boolean,
-};
-
 class ScopedCommandManager implements CommandManagerInterface {
   commands: { [string]: Command };
-  _centralManager: CommandManager;
+  _centralManager: CommandManagerInterface;
   isActive: boolean;
 
-  constructor(centralCommandManager: CommandManager) {
+  constructor(centralCommandManager) {
     this.commands = {};
     this.isActive = false;
     this._centralManager = centralCommandManager;
@@ -61,6 +56,11 @@ class ScopedCommandManager implements CommandManagerInterface {
     });
   };
 }
+
+type Props = {
+  children: React.Node,
+  active: boolean,
+};
 
 const CommandsContextScopedProvider = (props: Props) => {
   const centralManager = React.useContext(CommandsContext);

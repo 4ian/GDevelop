@@ -90,10 +90,11 @@ export default ({
                   },
                 ];
 
-                if(isLightingLayer) menuTemplate.splice(2, 0, {
-                  label: i18n._(t`Edit lighting layer`),
-                  click: openLightingLayerDialog,
-                });
+                if (isLightingLayer)
+                  menuTemplate.splice(2, 0, {
+                    label: i18n._(t`Edit lighting layer`),
+                    click: openLightingLayerDialog,
+                  });
                 return menuTemplate;
               }}
             />
@@ -114,16 +115,15 @@ export default ({
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
               />
-              {isLightingLayer &&
+              {isLightingLayer && (
                 <IconButton
                   size="small"
                   onClick={openLightingLayerDialog}
                   tooltip={t`Open Lighting layer settings`}
                 >
                   <EmojiObjectsIcon />
-
                 </IconButton>
-              }
+              )}
               <IconButton
                 size="small"
                 onClick={onRemove}

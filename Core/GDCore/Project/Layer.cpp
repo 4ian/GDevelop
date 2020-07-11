@@ -13,7 +13,7 @@ namespace gd {
 Camera Layer::badCamera;
 Effect Layer::badEffect;
 
-Layer::Layer() : isVisible(true) {}
+Layer::Layer() : isVisible(true), isLightingLayer(false), syncWithBaseLayer(false) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -29,6 +29,11 @@ void Layer::SetCameraCount(std::size_t n) {
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("visibility", GetVisibility());
+  element.SetAttribute("lightingLayer", GetLightingLayer());
+  element.SetAttribute("syncWithBaseLayer", GetSyncWithBaseLayer());
+  element.SetAttribute("r", (int)GetAmbientLightColorRed());
+  element.SetAttribute("g", (int)GetAmbientLightColorGreen());
+  element.SetAttribute("b", (int)GetAmbientLightColorBlue());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -61,6 +66,11 @@ void Layer::SerializeTo(SerializerElement& element) const {
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
+  SetLightingLayer(element.GetBoolAttribute("lightingLayer", false));
+  SetSyncWithBaseLayer(element.GetBoolAttribute("syncWithBaseLayer", false));
+  SetAmbientLightColor(element.GetIntAttribute("r", 127), 
+                       element.GetIntAttribute("g", 127),
+                       element.GetIntAttribute("b", 127));
 
   // Compatibility with GD <= 3.3
   if (element.HasChild("Camera")) {

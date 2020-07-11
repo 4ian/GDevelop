@@ -5,6 +5,14 @@ declare class gdLayer {
   getName(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
+  setLightingLayer(lightingLayer: boolean): void;
+  getLightingLayer(): boolean;
+  setSyncWithBaseLayer(syncWithBaseLayer: boolean): void;
+  getSyncWithBaseLayer(): boolean;
+  setAmbientLightColor(r: number, g: number, b: number): void;
+  getAmbientLightColorRed(): number;
+  getAmbientLightColorGreen(): number;
+  getAmbientLightColorBlue(): number;
   hasEffectNamed(name: string): boolean;
   getEffect(name: string): gdEffect;
   getEffectAt(index: number): gdEffect;

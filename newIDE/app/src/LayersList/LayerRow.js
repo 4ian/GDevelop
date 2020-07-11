@@ -15,6 +15,7 @@ import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
 import Badge from '../UI/Badge';
+import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
 
 type Props = {|
   layerName: string,
@@ -26,6 +27,7 @@ type Props = {|
   effectsCount: number,
   onEditEffects: () => void,
   width: number,
+  isLightingLayer: boolean,
 |};
 
 export default ({
@@ -38,6 +40,8 @@ export default ({
   onEditEffects,
   onChangeVisibility,
   width,
+  isLightingLayer,
+  openLightingLayerDialog,
 }: Props) => (
   <I18n>
     {({ i18n }) => (
@@ -66,24 +70,32 @@ export default ({
                   <MoreVert />
                 </IconButton>
               }
-              buildMenuTemplate={() => [
-                {
-                  label: i18n._(t`Edit effects (${effectsCount})`),
-                  click: onEditEffects,
-                },
-                {
-                  type: 'checkbox',
-                  label: i18n._(t`Visible`),
-                  checked: isVisible,
-                  click: () => onChangeVisibility(!isVisible),
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Delete`),
-                  enabled: !!layerName,
-                  click: onRemove,
-                },
-              ]}
+              buildMenuTemplate={() => {
+                const menuTemplate = [
+                  {
+                    label: i18n._(t`Edit effects (${effectsCount})`),
+                    click: onEditEffects,
+                  },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Visible`),
+                    checked: isVisible,
+                    click: () => onChangeVisibility(!isVisible),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Delete`),
+                    enabled: !!layerName,
+                    click: onRemove,
+                  },
+                ];
+
+                if(isLightingLayer) menuTemplate.splice(2, 0, {
+                  label: i18n._(t`Edit lighting layer`),
+                  click: openLightingLayerDialog,
+                });
+                return menuTemplate;
+              }}
             />
           ) : (
             <React.Fragment>
@@ -102,6 +114,16 @@ export default ({
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
               />
+              {isLightingLayer &&
+                <IconButton
+                  size="small"
+                  onClick={openLightingLayerDialog}
+                  tooltip={t`Open Lighting layer settings`}
+                >
+                  <EmojiObjectsIcon />
+
+                </IconButton>
+              }
               <IconButton
                 size="small"
                 onClick={onRemove}

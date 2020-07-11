@@ -46,69 +46,73 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const containerLayersList = mapReverseFor(0, layersCount, i => {
       const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
-      // TODO: const isLightingLayer = layer.someFunctionCall()
-      // to determine if it's a lighting layer or not.
-      const isLightingLayer = true;
+      const isLightingLayer = layer.getLightingLayer();
 
       return (
         <React.Fragment>
-        <SortableLayerRow
-          index={layersCount - 1 - i}
-          key={'layer-' + layerName}
-          layer={layer}
-          layerName={layerName}
-          nameError={this.state.nameErrors[layerName]}
-          effectsCount={layer.getEffectsCount()}
-          onEditEffects={() => onEditEffects(layer)}
-          isLightingLayer={isLightingLayer}
-          openLightingLayerDialog={() => this.setState({
-            ...this.state,
-            isLightingLayerDialogOpen: true,
-          })}
-          onBlur={event => {
-            const newName = event.target.value;
-            if (layerName === newName) return;
-
-            let success = true;
-            if (layersContainer.hasLayerNamed(newName)) {
-              success = false;
-            } else {
-              this.props.onRenameLayer(layerName, newName, doRename => {
-                if (doRename)
-                  layersContainer.getLayer(layerName).setName(newName);
-              });
+          <SortableLayerRow
+            index={layersCount - 1 - i}
+            key={'layer-' + layerName}
+            layer={layer}
+            layerName={layerName}
+            nameError={this.state.nameErrors[layerName]}
+            effectsCount={layer.getEffectsCount()}
+            onEditEffects={() => onEditEffects(layer)}
+            isLightingLayer={isLightingLayer}
+            openLightingLayerDialog={() =>
+              this.setState({
+                ...this.state,
+                isLightingLayerDialogOpen: true,
+              })
             }
+            onBlur={event => {
+              const newName = event.target.value;
+              if (layerName === newName) return;
 
-            this.setState({
-              nameErrors: {
-                ...this.state.nameErrors,
-                [layerName]: !success,
-              },
-            });
-          }}
-          onRemove={() => {
-            this.props.onRemoveLayer(layerName, doRemove => {
-              if (!doRemove) return;
+              let success = true;
+              if (layersContainer.hasLayerNamed(newName)) {
+                success = false;
+              } else {
+                this.props.onRenameLayer(layerName, newName, doRename => {
+                  if (doRename)
+                    layersContainer.getLayer(layerName).setName(newName);
+                });
+              }
 
-              layersContainer.removeLayer(layerName);
+              this.setState({
+                nameErrors: {
+                  ...this.state.nameErrors,
+                  [layerName]: !success,
+                },
+              });
+            }}
+            onRemove={() => {
+              this.props.onRemoveLayer(layerName, doRemove => {
+                if (!doRemove) return;
+
+                layersContainer.removeLayer(layerName);
+                this._onLayerModified();
+              });
+            }}
+            isVisible={layer.getVisibility()}
+            onChangeVisibility={visible => {
+              layer.setVisibility(visible);
               this._onLayerModified();
-            });
-          }}
-          isVisible={layer.getVisibility()}
-          onChangeVisibility={visible => {
-            layer.setVisibility(visible);
-            this._onLayerModified();
-          }}
-          width={width}
-        />
-        <LightingLayerDialog
-          layer={layer}
-          open={this.state.isLightingLayerDialogOpen}
-          closeLightingLayerDialog={() => this.setState({
-            ...this.state,
-            isLightingLayerDialogOpen: false,
-          })}
-        />
+            }}
+            width={width}
+          />
+          {isLightingLayer && (
+            <LightingLayerDialog
+              layer={layer}
+              open={this.state.isLightingLayerDialogOpen}
+              closeLightingLayerDialog={() =>
+                this.setState({
+                  ...this.state,
+                  isLightingLayerDialogOpen: false,
+                })
+              }
+            />
+          )}
         </React.Fragment>
       );
     });

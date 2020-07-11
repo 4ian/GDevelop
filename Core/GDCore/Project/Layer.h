@@ -51,6 +51,26 @@ class GD_CORE_API Layer {
    */
   bool GetVisibility() const { return isVisible; }
 
+  /**
+   * \brief Change if layer is lighting layer or not.
+   */
+  void SetLightingLayer(bool isLightingLayer_) { isLightingLayer = isLightingLayer_; }
+
+  /**
+   * \brief Return true if layer is a lighting layer.
+   */
+  bool GetLightingLayer() const { return isLightingLayer; }
+
+  /**
+   * \brief Change if layer follows the base layer or not.
+   */
+  void SetSyncWithBaseLayer(bool syncWithBaseLayer_) { syncWithBaseLayer = syncWithBaseLayer_; }
+
+  /**
+   * \brief Return true if layer follows the base layer.
+   */
+  bool GetSyncWithBaseLayer() const { return syncWithBaseLayer; }
+
   /** \name Cameras
    */
   ///@{
@@ -95,6 +115,30 @@ class GD_CORE_API Layer {
   inline void AddCamera(const Camera& camera) { cameras.push_back(camera); };
 
   ///@}
+
+  /**
+   * Get the ambient light color red component
+   */
+  unsigned int GetAmbientLightColorRed() const { return ambientLightColorR; }
+
+  /**
+   * Get the ambient light color green component
+   */
+  unsigned int GetAmbientLightColorGreen() const { return ambientLightColorG; }
+
+  /**
+   * Get the ambient light color blue component
+   */
+  unsigned int GetAmbientLightColorBlue() const { return ambientLightColorB; }
+
+  /**
+   * Set the ambient light color
+   */
+  void SetAmbientLightColor(unsigned int r, unsigned int g, unsigned int b) {
+    ambientLightColorR = r;
+    ambientLightColorG = g;
+    ambientLightColorB = b;
+  }
 
   /** \name Effects
    */
@@ -177,6 +221,11 @@ class GD_CORE_API Layer {
  private:
   gd::String name;                  ///< The name of the layer
   bool isVisible;                   ///< True if the layer is visible
+  bool isLightingLayer;             ///< True if the layer has lighting properties
+  bool syncWithBaseLayer;           ///< True if the layer automatically follows the base layer
+  unsigned int ambientLightColorR;     ///< Ambient light color Red component
+  unsigned int ambientLightColorG;     ///< Ambient light color Green component
+  unsigned int ambientLightColorB;     ///< Ambient light color Blue component
   std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
   std::vector<std::shared_ptr<gd::Effect>>
       effects;  ///< The effects applied to the layer.

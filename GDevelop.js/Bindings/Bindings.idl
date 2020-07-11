@@ -611,6 +611,15 @@ interface Layer {
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+    void SetLightingLayer(boolean lightingLayer);
+    boolean GetLightingLayer();
+    void SetSyncWithBaseLayer(boolean syncWithBaseLayer);
+    boolean GetSyncWithBaseLayer();
+
+    void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
+    unsigned long GetAmbientLightColorRed();
+    unsigned long GetAmbientLightColorGreen();
+    unsigned long GetAmbientLightColorBlue();
 
     boolean HasEffectNamed([Const] DOMString name);
     [Ref] Effect GetEffect([Const] DOMString name);

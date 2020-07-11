@@ -18,6 +18,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
+import LightingLayerDialog from './LightingLayerDialog';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -28,6 +29,7 @@ type LayersListBodyState = {|
 class LayersListBody extends Component<*, LayersListBodyState> {
   state = {
     nameErrors: {},
+    isLightingLayerDialogOpen: false,
   };
 
   _onLayerModified = () => {
@@ -43,8 +45,12 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const containerLayersList = mapReverseFor(0, layersCount, i => {
       const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
+      // TODO: const isLightingLayer = layer.someFunctionCall()
+      // to determine if it's a lighting layer or not.
+      const isLightingLayer = true;
 
       return (
+        <React.Fragment>
         <SortableLayerRow
           index={layersCount - 1 - i}
           key={'layer-' + layerName}
@@ -53,6 +59,11 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           nameError={this.state.nameErrors[layerName]}
           effectsCount={layer.getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
+          isLightingLayer={isLightingLayer}
+          openLightingLayerDialog={() => this.setState({
+            ...this.state,
+            isLightingLayerDialogOpen: true,
+          })}
           onBlur={event => {
             const newName = event.target.value;
             if (layerName === newName) return;
@@ -89,6 +100,15 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           }}
           width={width}
         />
+        <LightingLayerDialog
+          layer={layer}
+          open={this.state.isLightingLayerDialogOpen}
+          closeLightingLayerDialog={() => this.setState({
+            ...this.state,
+            isLightingLayerDialogOpen: false,
+          })}
+        />
+        </React.Fragment>
       );
     });
 

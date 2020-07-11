@@ -14,7 +14,7 @@ export const themes = {
   'GDevelop default': DefaultTheme,
   Dark: DarkTheme,
   Nord: NordTheme,
-  'Solarized Dark': SolarizedDarkTheme, 
+  'Solarized Dark': SolarizedDarkTheme,
 };
 
 export const getTheme = (themeName: string): Theme =>

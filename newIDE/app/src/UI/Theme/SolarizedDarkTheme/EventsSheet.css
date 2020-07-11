@@ -10,7 +10,7 @@
     Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
-  background-color: #2E3440;
+  background-color: #224ea7;
 }
 
 /**
@@ -46,7 +46,7 @@
  * Background and default text color of content of an event
  */
 .gd-events-sheet-nord-theme .rst__rowContents {
-  background-color: #2E3440;
+  background-color: rgb(26, 86, 206);
   color: #ECEFF4;
 }
 

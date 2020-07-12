@@ -35,10 +35,14 @@ StringInstructionsExtension::StringInstructionsExtension() {
       "gdjs.evtTools.string.strFind");
   GetAllExpressions()["StrRFind"].SetFunctionName(
       "gdjs.evtTools.string.strRFind");
+  GetAllExpressions()["StrFindLast"].SetFunctionName(
+      "gdjs.evtTools.string.strFindLast");
   GetAllExpressions()["StrFindFrom"].SetFunctionName(
       "gdjs.evtTools.string.strFindFrom");
   GetAllExpressions()["StrRFindFrom"].SetFunctionName(
       "gdjs.evtTools.string.strRFindFrom");
+  GetAllExpressions()["StrFindLastFrom"].SetFunctionName(
+      "gdjs.evtTools.string.strFindLastFrom");
 
   StripUnimplementedInstructionsAndExpressions();
 }

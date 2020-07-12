@@ -1,45 +1,46 @@
 /* Mosaic layout */
-.mosaic-gd-nord-theme.mosaic {
-    background-color: #3B4252 !important;
-  }
+/* Mosaic layout */
+.mosaic-gd-solarized-dark-theme.mosaic {
+  background-color: #002B36 !important;
+}
 
-  /* Mosaic window and tile */
-  .mosaic-gd-nord-theme .mosaic-window-toolbar {
-    background: #5e81ac !important;
-  }
+/* Mosaic window and tile */
+.mosaic-gd-solarized-dark-theme .mosaic-window-toolbar {
+  background: #2799b9 !important;
+}
 
-  .mosaic-gd-nord-theme .mosaic-window-body {
-    background: #3B4252 !important;
-  }
+.mosaic-gd-solarized-dark-theme .mosaic-window-body {
+  background: #002B36 !important;
+}
 
-  .mosaic-gd-nord-theme .mosaic-window .mosaic-window-title {
-    color: #ECEFF4 !important;
-    font-weight: 400 !important;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 15px; /* Same as ClosableTabs font size */
-  }
+.mosaic-gd-solarized-dark-theme .mosaic-window .mosaic-window-title {
+  color: #ECEFF4 !important;
+  font-weight: 400 !important;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px; /* Same as ClosableTabs font size */
+}
 
-  /* Hovered titlebar background */
-  .mosaic-gd-nord-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
-  .mosaic-gd-nord-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
-    background: #81A1C1 !important;
-  }
+/* Hovered titlebar background */
+.mosaic-gd-solarized-dark-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-solarized-dark-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+  background: #2799b9 !important;
+}
 
-  .mosaic-gd-nord-theme .mosaic-split.-column {
-    background-color: #3B4252 !important;
-  }
+.mosaic-gd-solarized-dark-theme .mosaic-split.-column {
+  background-color: #002B36 !important;
+}
 
-  /* Separator draggable background */
-  .mosaic-gd-nord-theme .mosaic-split.-column .mosaic-split-line {
-    height: 1px;
-    border-top: 1px solid #888888 !important;
-    width: 25px;
-    margin: auto;
-    bottom: 1px;
-  }
+/* Separator draggable background */
+.mosaic-gd-solarized-dark-theme .mosaic-split.-column .mosaic-split-line {
+  height: 1px;
+  border-top: 1px solid #002B36 !important;
+  width: 25px;
+  margin: auto;
+  bottom: 1px;
+}
 
-  .mosaic-gd-nord-theme .mosaic-split:hover .mosaic-split-line {
-    border-color: #88C0D0 !important;
-    box-shadow: none !important;
-    cursor: ns-resize;
-  }
+.mosaic-gd-solarized-dark-theme .mosaic-split:hover .mosaic-split-line {
+  border-color: #88C0D0 !important;
+  box-shadow: none !important;
+  cursor: ns-resize;
+}

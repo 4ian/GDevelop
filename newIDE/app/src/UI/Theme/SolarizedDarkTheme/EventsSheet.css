@@ -3,159 +3,163 @@
  * This also overwrite the default react-sortable-tree css.
  */
 
- .gd-events-sheet-nord-theme.events-tree {
+.gd-events-sheet-solarized-dark-theme.events-tree {
   /* Use the fonts provided by the operating system(s) as possible. */
   /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
-  background-color: #224ea7;
+  background: #00212B;
 }
 
 /**
  * Ensure scroll is only on Y direction, preventing the display
  * of horizontal scrollbar.
  */
-.gd-events-sheet-nord-theme .rst__virtualScrollOverride {
+.gd-events-sheet-solarized-dark-theme .rst__virtualScrollOverride {
   overflow-x: hidden !important;
 }
-
+ 
 /**
  * Draggable handle on the left of an event
  */
-.gd-events-sheet-nord-theme .rst__moveHandle {
-  background: #81A1C1 !important;
+.gd-events-sheet-solarized-dark-theme .rst__moveHandle {
+  background: #2799b9 !important;
 }
 
-.gd-events-sheet-nord-theme .rst__moveHandle:hover {
-  background-color: #88C0D0 !important;
+.gd-events-sheet-solarized-dark-theme .rst__moveHandle:hover {
+  background-color: #047AA6 !important;
 }
 
 /**
  * Scaffolding lines on the left
  */
-.gd-events-sheet-nord-theme .rst__lineHalfHorizontalRight::before,
-.gd-events-sheet-nord-theme .rst__lineFullVertical::after,
-.gd-events-sheet-nord-theme .rst__lineHalfVerticalTop::after,
-.gd-events-sheet-nord-theme .rst__lineHalfVerticalBottom::after {
-  background-color: #D8DEE9;
+.gd-events-sheet-solarized-dark-theme .rst__lineHalfHorizontalRight::before,
+.gd-events-sheet-solarized-dark-theme .rst__lineFullVertical::after,
+.gd-events-sheet-solarized-dark-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet-solarized-dark-theme .rst__lineHalfVerticalBottom::after {
+  background-color: #aaa;
 }
 
 /**
  * Background and default text color of content of an event
  */
-.gd-events-sheet-nord-theme .rst__rowContents {
-  background-color: rgb(26, 86, 206);
-  color: #ECEFF4;
+.gd-events-sheet-solarized-dark-theme .rst__rowContents {
+  background-color: #00212B;
+  color: rgb(209, 209, 209);
 }
 
 /**
  * Selectable area (instructions)
  */
-.gd-events-sheet-nord-theme .selectable:hover {
+.gd-events-sheet-solarized-dark-theme .selectable:hover {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.gd-events-sheet-nord-theme .selectable.selected {
+.gd-events-sheet-solarized-dark-theme .selectable.selected {
   background-color: rgba(0, 0, 0, 0.2);
-  border: 1px #88C0D0 solid !important;
+  border: 1px #4ab0e4 dashed !important;
 }
 
 /**
  * Large selectable area (events)
  */
-.gd-events-sheet-nord-theme .large-selectable {
-  border: 1px #2E3440 solid !important;
+.gd-events-sheet-solarized-dark-theme .large-selectable {
+  border: 1px #00212B solid !important;
 }
-.gd-events-sheet-nord-theme .large-selectable.large-selected {
-  border: 1px #88C0D0 solid !important;
+.gd-events-sheet-solarized-dark-theme .large-selectable.large-selected {
+  border: 1px #4ab0e4 dashed !important;
 }
 
 /**
  * Conditions and actions containers
  */
-.gd-events-sheet-nord-theme .conditions-container {
-  background: #3B4252;
-  border: 1px solid #3B4252;
+
+.gd-events-sheet-solarized-dark-theme .conditions-container {
+  background: #002B36;
+  color: rgb(209, 209, 209);
+  border: 1px solid #002B36;
+  border-right-color: #00212B;
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
-.gd-events-sheet-nord-theme .conditions-container.small-width-container {
-  border-right-color: #3B4252;
-  border-bottom-color: #2E3440;
+.gd-events-sheet-solarized-dark-theme .conditions-container.small-width-container {
+  border-right-color: #002B36;
+  border-bottom-color: black;
 }
 
-.gd-events-sheet-nord-theme .actions-container {
-  background: #2E3440;
+.gd-events-sheet-solarized-dark-theme .actions-container {
+  background: #00212B;
+  color: rgb(209, 209, 209);
   padding-left: 5px;
   padding-right: 5px;
   min-width: 0; /* Prevent container to growing outside its parent */
 }
-.gd-events-sheet-nord-theme .actions-container.small-width-container {
+.gd-events-sheet-solarized-dark-theme .actions-container.small-width-container {
   padding-left: 20px;
 }
 
-.gd-events-sheet-nord-theme .sub-instructions-container {
+.gd-events-sheet-solarized-dark-theme .sub-instructions-container {
   margin-left: 9px;
   margin-top: 1px;
   border-right: none;
-  border-left: 1px solid #2E3440;
+  border-left: 1px solid #00212B;
 }
 
 /**
  * Instructions parameters color scheme
  */
-.gd-events-sheet-nord-theme .instruction-parameter {
-  color: #8FBCBB;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter {
+  color: #219186;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.expression {
-  color: #A3BE8C;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.expression {
+  color: #859900;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.object,
-.gd-events-sheet-nord-theme .instruction-parameter.objectPtr,
-.gd-events-sheet-nord-theme .instruction-parameter.objectList,
-.gd-events-sheet-nord-theme .instruction-parameter.objectListWithoutPicking {
-  color: #5E81AC;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.object,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectList,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectListWithoutPicking {
+  color: #268BD2;
   font-weight: bold;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.behavior {
-  color: rgb(119, 119, 119);
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.behavior {
+  color: #ff9200;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.operator {
-  color: #B48EAD;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.operator {
+  color: #D33682;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.objectvar {
-  color: #D08770;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectvar {
+  color: #18dcf2;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.scenevar {
-  color: #D08770;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.scenevar {
+  color: #18dcf2;
 }
 
-.gd-events-sheet-nord-theme .instruction-parameter.globalvar {
-  color: #D08770;
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.globalvar {
+  color: #18dcf2;
 }
 
-.gd-events-sheet-nord-theme
+.gd-events-sheet-solarized-dark-theme
   .instruction-parameter
   .instruction-invalid-parameter {
-  color: #BF616A;
-  text-decoration: #BF616A underline wavy;
+  color: #c00000;
+  text-decoration: #c00000 underline wavy;
 }
 
-.gd-events-sheet-nord-theme
+.gd-events-sheet-solarized-dark-theme
   .instruction-parameter
   .instruction-missing-parameter {
   display: inline-flex;
-  background-color: rgba(243, 0, 12, 0.15);
-  border-bottom: 1px dashed #BF616A;
+  background-color: rgba(238, 255, 0, 0.05);
+  border-bottom: 1px dashed #c00000;
   min-width: 25px;
   min-height: 14px;
 }
@@ -163,27 +167,21 @@
 /**
  * Search results highlight
  */
-.gd-events-sheet-nord-theme.with-search-results .rst__moveHandle {
-  background: #d3d3d3 !important;
-  border: 1px solid #d3d3d3 !important;
+.gd-events-sheet-solarized-dark-theme .rst__rowSearchMatch {
+  outline: none;
+  border-left: solid 3px #18dcf2;
 }
 
-.gd-events-sheet-nord-theme .rst__rowSearchMatch {
+.gd-events-sheet-solarized-dark-theme .rst__rowSearchFocus {
   outline: none;
-  border-left: solid 3px #88C0D0
-  ;
-}
-
-.gd-events-sheet-nord-theme .rst__rowSearchFocus {
-  outline: none;
-  border-left: solid 5px #88C0D0;
+  border-left: solid 5px #18dcf2;
 }
 
 /**
 * Drag'n'drop indicator (events)
 */
-.gd-events-sheet-nord-theme .drop-indicator {
-  border-top: 2px solid #4C566A;
+.gd-events-sheet-solarized-dark-theme .drop-indicator {
+  border-top: 2px solid #18dcf2;
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -191,8 +189,8 @@
   box-sizing: 'border-box';
 }
 
-.gd-events-sheet-nord-theme .cant-drop-indicator {
-  border-top: 2px solid #BF616A;
+.gd-events-sheet-solarized-dark-theme .cant-drop-indicator {
+  border-top: 2px solid #ff5c5c;
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -203,15 +201,19 @@
 /**
 * Skinning the "Link" event
 */
-.gd-events-sheet-nord-theme .link-container {
-  background: #2E3440;
+.gd-events-sheet-solarized-dark-theme .link-container {
+  background: #00212B;
 }
-.gd-events-sheet-nord-theme .link-container .selectable {
-  color: #81A1C1;
+.gd-events-sheet-solarized-dark-theme .link-container span {
+  color: rgb(155, 155, 155);
+}
+.gd-events-sheet-solarized-dark-theme .link-container .selectable {
+  color: #268BD2;
+  font-weight: bold;
 }
 
 /* Theming icons */
-.gd-events-sheet-nord-theme .icon {
+.gd-events-sheet-solarized-dark-theme .icon {
   padding-right: 2px;
   width: 16px;
   height: 16px;

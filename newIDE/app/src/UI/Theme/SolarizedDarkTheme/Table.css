@@ -1,7 +1,7 @@
 /* This is the styling applied to large tables (like the one used for InstancesList).
  * It mimics the Material UI Tables style. */
 
- .gd-table-nord-theme {
+ .gd-table-solarized-dark-theme {
   /* Use the fonts provided by the operating system(s) as possible. */
   /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -10,30 +10,30 @@
   color: #ECEFF4;
 }
 
-.gd-table-nord-theme .tableHeaderRow,
-.gd-table-nord-theme .tableEvenRow,
-.gd-table-nord-theme .tableSelectedRow,
-.gd-table-nord-theme .tableOddRow {
+.gd-table-solarized-dark-theme .tableHeaderRow,
+.gd-table-solarized-dark-theme .tableEvenRow,
+.gd-table-solarized-dark-theme .tableSelectedRow,
+.gd-table-solarized-dark-theme .tableOddRow {
   font-size: 13px;
   border-bottom: 1px solid #3B4252;
 }
-.gd-table-nord-theme .tableOddRow {
+.gd-table-solarized-dark-theme .tableOddRow {
   background-color: #3B4252;
 }
-.gd-table-nord-theme .tableEvenRow {
+.gd-table-solarized-dark-theme .tableEvenRow {
   background-color: #2E3440;
 }
-.gd-table-nord-theme .tableSelectedRow {
-  background-color: #88C0D0; /*OS X selection*/
+.gd-table-solarized-dark-theme .tableSelectedRow {
+  background-color: rgb(6, 172, 218); /*OS X selection*/
   color: #2E3440;
 }
-.gd-table-nord-theme .tableHeaderColumn {
+.gd-table-solarized-dark-theme .tableHeaderColumn {
   text-transform: none;
   font-weight: 600;
   font-size: 12px;
   color: #D8DEE9;
 }
-.gd-table-nord-theme .tableColumn {
+.gd-table-solarized-dark-theme .tableColumn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -6,7 +6,7 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
-
+  
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';
 const notSoWhite = '#CCC';
@@ -48,7 +48,7 @@ const gdevelopTheme = {
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#047AA6',
+    separatorColor: '#003847',
   },
   closableTabs: {
     fontFamily,
@@ -90,10 +90,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-dark-theme', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet-dark-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-dark-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-dark-theme', // See Markdown.css
+  mosaicRootClassName: 'mosaic-gd-solarized-dark-theme', // See Mosaic.css
+  eventsSheetRootClassName: 'gd-events-sheet-solarized-dark-theme', // See EventsSheet.css
+  tableRootClassName: 'gd-table-solarized-dark-theme', // See Table.css
+  markdownRootClassName: 'gd-markdown-solarized-dark-theme', // See Markdown.css
   gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(70%) brightness(90%)',
 };
 

@@ -6,7 +6,7 @@ import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 import './Markdown.css';
-  
+
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';
 const notSoWhite = '#CCC';

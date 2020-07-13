@@ -8,6 +8,7 @@ import {
   loadProjectEventsFunctionsExtensions,
   type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
+  unloadProjectEventsFunctionsExtension,
 } from '.';
 import {
   type EventsFunctionsExtensionWriter,
@@ -44,6 +45,9 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       this
     ),
     unloadProjectEventsFunctionsExtensions: this._unloadProjectEventsFunctionsExtensions.bind(
+      this
+    ),
+    unloadProjectEventsFunctionsExtension: this._unloadProjectEventsFunctionsExtension.bind(
       this
     ),
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
@@ -111,6 +115,13 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {
     unloadProjectEventsFunctionsExtensions(project);
+  }
+
+  _unloadProjectEventsFunctionsExtension(
+    project: gdProject,
+    extensionName: string
+  ) {
+    unloadProjectEventsFunctionsExtension(project, extensionName);
   }
 
   _reloadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {

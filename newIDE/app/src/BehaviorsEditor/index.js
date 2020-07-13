@@ -141,7 +141,7 @@ export default class BehaviorsEditor extends Component {
                       <Trans>Unknown behavior</Trans>{' '}
                     </MiniToolbarText>
                     <Column noMargin expand>
-                      <TextField value={behaviorName} disabled />
+                      <TextField margin="none" value={behaviorName} disabled />
                     </Column>
                     <IconButton
                       onClick={() => this._onRemoveBehavior(behaviorName)}

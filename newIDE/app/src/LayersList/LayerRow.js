@@ -28,6 +28,7 @@ type Props = {|
   onEditEffects: () => void,
   width: number,
   isLightingLayer: boolean,
+  openLightingLayerDialog: () => void,
 |};
 
 export default ({
@@ -95,6 +96,7 @@ export default ({
                     label: i18n._(t`Edit lighting layer`),
                     click: openLightingLayerDialog,
                   });
+
                 return menuTemplate;
               }}
             />

@@ -23,7 +23,7 @@ type Props = {
   canAddSubEvent: boolean,
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
-  onAddEvent: (eventType: string) => void,
+  onAddEvent: (eventType: string) => Array<gdBaseEvent>,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,
@@ -62,7 +62,9 @@ const ToolbarCommands = (props: Props) => {
       () =>
         props.allEventsMetadata.map(metadata => ({
           text: metadata.fullName,
-          handler: () => onAddEvent(metadata.type),
+          handler: () => {
+            onAddEvent(metadata.type);
+          },
           value: metadata,
         })),
       [props.allEventsMetadata, onAddEvent]

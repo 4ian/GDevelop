@@ -14,7 +14,7 @@ type Props = {|
   canAddSubEvent: boolean,
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
-  onAddEvent: (eventType: string) => void,
+  onAddEvent: (eventType: string) => Array<gdBaseEvent>,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,
@@ -58,7 +58,9 @@ export class Toolbar extends PureComponent<Props> {
               this.props.allEventsMetadata.map(metadata => {
                 return {
                   label: metadata.fullName,
-                  click: () => this.props.onAddEvent(metadata.type),
+                  click: () => {
+                    this.props.onAddEvent(metadata.type);
+                  },
                 };
               })
             }

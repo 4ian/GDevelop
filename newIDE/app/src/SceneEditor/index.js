@@ -326,6 +326,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.editObjectByName(selectedInstanceObjectName);
   };
 
+  editLayerEffects = (layer: gdLayer) => {
+    this.setState({ effectsEditedLayer: layer });
+  };
+
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
   };
@@ -1043,9 +1047,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onOpenSceneProperties={this.openSceneProperties}
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
-          onEditLayerEffects={layer =>
-            this.setState({ effectsEditedLayer: layer })
-          }
+          onEditLayerEffects={this.editLayerEffects}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (

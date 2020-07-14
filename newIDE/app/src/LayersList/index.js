@@ -25,6 +25,7 @@ const SortableLayerRow = SortableElement(LayerRow);
 
 type LayersListBodyState = {|
   nameErrors: { [string]: boolean },
+  isLightingLayerDialogOpen: boolean,
 |};
 
 class LayersListBody extends Component<*, LayersListBodyState> {

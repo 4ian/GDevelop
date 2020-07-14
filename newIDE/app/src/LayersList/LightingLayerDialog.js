@@ -7,14 +7,24 @@ import ColorField from '../UI/ColorField';
 import { Column, Line, Spacer } from '../UI/Grid';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Text from '../UI/Text';
+import { type RGBColor, type ColorResult } from '../UI/ColorField/ColorPicker';
 
 type Props = {
-  open: Boolean,
+  open: boolean,
   layer: gdLayer,
   closeLightingLayerDialog: () => void,
 };
 
 const LightingLayerDialog = (props: Props) => {
+  const [color, setColor] = React.useState<RGBColor>({
+    r: props.layer.getAmbientLightColorRed(),
+    g: props.layer.getAmbientLightColorGreen(),
+    b: props.layer.getAmbientLightColorBlue(),
+  });
+  const [followBaseLayer, setFollowBaseLayer] = React.useState(
+    props.layer.getSyncWithBaseLayer()
+  );
+
   const actions = [
     <FlatButton
       label={<Trans>Cancel</Trans>}
@@ -26,7 +36,9 @@ const LightingLayerDialog = (props: Props) => {
       primary
       keyboardFocused
       onClick={() => {
-        //TODO: Change properties
+        props.layer.setAmbientLightColor(color.r, color.g, color.b);
+        props.layer.setSyncWithBaseLayer(followBaseLayer);
+        props.closeLightingLayerDialog();
       }}
       key={'Apply'}
     />,
@@ -40,7 +52,12 @@ const LightingLayerDialog = (props: Props) => {
     >
       <Column>
         <Line>
-          <InlineCheckbox />
+          <InlineCheckbox
+            checked={true}
+            onCheck={(e, checked) => {
+              setFollowBaseLayer(checked);
+            }}
+          />
           <Text>
             <Trans>Automatically follow the base layer.</Trans>
           </Text>
@@ -51,6 +68,9 @@ const LightingLayerDialog = (props: Props) => {
             fullWidth
             floatingLabelText={<Trans>Ambient light color</Trans>}
             disableAlpha
+            onChange={(color: ColorResult) => {
+              setColor(color.rgb);
+            }}
           />
         </Line>
       </Column>

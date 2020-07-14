@@ -7,7 +7,7 @@
     "version": "GDJS_GAME_VERSION",
     "dependencies": {},
     "devDependencies": {
-      "electron": "3.0.9"
+      "electron": "9.1.0"
     },
     "build": {
         "directories": {

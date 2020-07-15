@@ -89,6 +89,8 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
         this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
         //console.log("Created layer : \""+name+"\".");
+        if(layerData.lightingLayer) 
+            this._lightingLayer = this._layers.get(layerData.name);
     }
 
     //Load variables
@@ -731,6 +733,17 @@ gdjs.RuntimeScene.prototype.getLayer = function(name) {
 
     return this._layers.get("");
 };
+
+/**
+ * Get the lighting layer if it exists.
+ * @returns {gdjs.Layer} The layer, or the base layer.
+ */
+gdjs.RuntimeScene.prototype.getLightingLayer = function() {
+    if(this._lightingLayer)
+        return this._lightingLayer;
+        
+    return this._layers.get("");
+}
 
 /**
  * Check if a layer exists

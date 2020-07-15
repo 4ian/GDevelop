@@ -68,6 +68,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -139,6 +140,12 @@ type State = {|
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
   showInstancesInfoBar: boolean,
+  showObjectEditorInfoBar: boolean,
+  objectEditorInfoBar: {|
+    identifier: AlertMessageIdentifier,
+    message?: string,
+    touchScreenMessage?: string,
+  |},
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -188,6 +195,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       showPropertiesInfoBar: false,
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
+      showObjectEditorInfoBar: false,
+      objectEditorInfoBar: {
+        identifier: 'object-editor-default',
+        message: '',
+        touchScreenMessage: '',
+      },
 
       selectedObjectTags: [],
     };
@@ -1080,6 +1093,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             open
             object={this.state.editedObjectWithContext.object}
             project={project}
+            layout={layout}
+            showInfoBar={() =>
+              this.setState({
+                showObjectEditorInfoBar: true,
+              })
+            }
+            setInfoBar={infoBarObject =>
+              this.setState({
+                objectEditorInfoBar: infoBarObject,
+              })
+            }
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
@@ -1110,6 +1134,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
           />
         )}
+        <InfoBar
+          identifier={this.state.objectEditorInfoBar.identifier}
+          message={<Trans>{this.state.objectEditorInfoBar.message}</Trans>}
+          touchScreenMessage={
+            <Trans>{this.state.objectEditorInfoBar.touchScreenMessage}</Trans>
+          }
+          show={this.state.showObjectEditorInfoBar}
+        />
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}

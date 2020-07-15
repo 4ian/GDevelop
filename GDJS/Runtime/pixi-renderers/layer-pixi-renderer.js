@@ -24,6 +24,7 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
   this._oldWidth = this._pixiRenderer.screen.width;
   this._oldHeight = this._pixiRenderer.screen.height;
+  this._clearColor = layer.getClearColor();
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
   this._setupFilters();
 };
@@ -297,7 +298,7 @@ gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
 
   this._pixiRenderer.renderTexture.bind(this._renderTexture);
   //TODO: Pass data for clear color.
-  this._pixiRenderer.renderTexture.clear([0.5, 0.5, 0.5, 1.0]);
+  this._pixiRenderer.renderTexture.clear(this._clearColor);
 
   this._pixiRenderer.render(this._pixiContainer, this._renderTexture, false);
   this._pixiRenderer.renderTexture.bind(

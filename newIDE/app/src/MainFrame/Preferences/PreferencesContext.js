@@ -6,6 +6,8 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
+  | 'object-editor-default'
+  | 'automatic-lighting-layer'
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
@@ -15,6 +17,7 @@ export type AlertMessageIdentifier =
   | 'empty-events-based-behavior-explanation'
   | 'too-much-effects'
   | 'effects-usage'
+  | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
   | 'instance-drag-n-drop-explanation'
   | 'objects-panel-explanation'
@@ -71,6 +74,14 @@ export const allAlertMessages: Array<{
   {
     key: 'effects-usage',
     label: <Trans>Using effects</Trans>,
+  },
+  {
+    key: 'lighting-layer-usage',
+    label: <Trans>Using lighting layer</Trans>,
+  },
+  {
+    key: 'automatic-lighting-layer',
+    label: <Trans>Automatic creation of lighting layer</Trans>,
   },
   {
     key: 'resource-properties-panel-explanation',

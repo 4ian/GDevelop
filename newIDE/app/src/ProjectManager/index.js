@@ -44,6 +44,7 @@ import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ProjectManagerCommands from './ProjectManagerCommands';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -309,7 +310,17 @@ export default class ProjectManager extends React.Component<Props, State> {
     layoutVariablesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: Props) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (
+      nextState.projectPropertiesDialogOpen !==
+      this.state.projectPropertiesDialogOpen
+    )
+      return true;
+    if (
+      nextState.projectVariablesEditorOpen !==
+      this.state.projectVariablesEditorOpen
+    )
+      return true;
     // Rendering the component is (super) costly (~20ms) as it iterates over
     // every project layouts/external layouts/external events,
     // so the prop freezeUpdate allow to ask the component to stop
@@ -323,6 +334,18 @@ export default class ProjectManager extends React.Component<Props, State> {
       if (this._searchBar) this._searchBar.focus();
     }
   }
+
+  _openProjectProperties = () => {
+    this.setState({
+      projectPropertiesDialogOpen: true,
+    });
+  };
+
+  _openProjectVariables = () => {
+    this.setState({
+      projectVariablesEditorOpen: true,
+    });
+  };
 
   _onEditName = (kind: ?string, name: string) => {
     this.setState({
@@ -708,6 +731,13 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
+        <ProjectManagerCommands
+          project={this.props.project}
+          onOpenProjectProperties={this._openProjectProperties}
+          onOpenProjectVariables={this._openProjectVariables}
+          onOpenResources={this.props.onOpenResources}
+          onOpenIconsDialog={this.props.onOpenPlatformSpecificAssets}
+        />
         <List style={styles.list}>
           {this._renderMenu()}
           <ProjectStructureItem
@@ -727,17 +757,13 @@ export default class ProjectManager extends React.Component<Props, State> {
                 key="properties"
                 primaryText={<Trans>Properties</Trans>}
                 leftIcon={<SettingsApplications />}
-                onClick={() =>
-                  this.setState({ projectPropertiesDialogOpen: true })
-                }
+                onClick={this._openProjectProperties}
               />,
               <ListItem
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
                 leftIcon={<VariableTree />}
-                onClick={() =>
-                  this.setState({ projectVariablesEditorOpen: true })
-                }
+                onClick={this._openProjectVariables}
               />,
               <ListItem
                 key="icons"

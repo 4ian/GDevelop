@@ -735,8 +735,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           project={this.props.project}
           onOpenProjectProperties={this._openProjectProperties}
           onOpenProjectVariables={this._openProjectVariables}
-          onOpenResources={this.props.onOpenResources}
-          onOpenIconsDialog={this.props.onOpenPlatformSpecificAssets}
+          onOpenResourcesDialog={this.props.onOpenResources}
+          onOpenPlatformSpecificAssetsDialog={
+            this.props.onOpenPlatformSpecificAssets
+          }
         />
         <List style={styles.list}>
           {this._renderMenu()}

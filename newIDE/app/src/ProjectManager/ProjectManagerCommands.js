@@ -4,15 +4,15 @@ import { useCommand } from '../CommandPalette/CommandHooks';
 
 const openProjectPropertiesCommandText = t`Open project properties`;
 const openProjectVariablesCommandText = t`Edit global variables`;
-const openIconsCommandText = t`Open game icons`;
+const openPlatformSpecificAssetsCommandText = t`Open project icons`;
 const openResourcesCommandText = t`Open project resources`;
 
 type Props = {
   project: ?gdProject,
   onOpenProjectProperties: () => void,
   onOpenProjectVariables: () => void,
-  onOpenIconsDialog: () => void,
-  onOpenResources: () => void,
+  onOpenResourcesDialog: () => void,
+  onOpenPlatformSpecificAssetsDialog: () => void,
 };
 
 const ProjectManagerCommands = (props: Props) => {
@@ -28,16 +28,16 @@ const ProjectManagerCommands = (props: Props) => {
     handler: props.onOpenProjectVariables,
   });
 
-  useCommand('OPEN_ICONS', {
-    displayText: openIconsCommandText,
+  useCommand('OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG', {
+    displayText: openPlatformSpecificAssetsCommandText,
     enabled: !!props.project,
-    handler: props.onOpenIconsDialog,
+    handler: props.onOpenPlatformSpecificAssetsDialog,
   });
 
-  useCommand('OPEN_RESOURCES', {
+  useCommand('OPEN_PROJECT_RESOURCES', {
     displayText: openResourcesCommandText,
     enabled: !!props.project,
-    handler: props.onOpenResources,
+    handler: props.onOpenResourcesDialog,
   });
 
   return null;

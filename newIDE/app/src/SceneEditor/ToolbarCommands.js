@@ -10,6 +10,9 @@ const toggleLayersPanelCommandText = t`Open the layers editor`;
 const undoCommandText = t`Undo the last changes`;
 const redoCommandText = t`Redo the last changes`;
 const deleteSelectionCommandText = t`Delete the selected instances from the scene`;
+const toggleWindowMaskCommandText = t`Toggle mask`;
+const toggleGridCommandText = t`Toggle grid`;
+const setupGridCommandText = t`Setup grid`;
 
 type Props = {
   openObjectsList: () => void,
@@ -23,6 +26,9 @@ type Props = {
   canRedo: boolean,
   deleteSelection: () => void,
   canDeleteSelection: boolean,
+  toggleWindowMask: () => void,
+  toggleGrid: () => void,
+  setupGrid: () => void,
 };
 
 const ToolbarCommands = (props: Props) => {
@@ -72,6 +78,24 @@ const ToolbarCommands = (props: Props) => {
     displayText: deleteSelectionCommandText,
     enabled: props.canDeleteSelection,
     handler: props.deleteSelection,
+  });
+
+  useCommand('TOGGLE_WINDOW_MASK', {
+    displayText: toggleWindowMaskCommandText,
+    enabled: true,
+    handler: props.toggleWindowMask,
+  });
+
+  useCommand('TOGGLE_GRID', {
+    displayText: toggleGridCommandText,
+    enabled: true,
+    handler: props.toggleGrid,
+  });
+
+  useCommand('OPEN_SETUP_GRID', {
+    displayText: setupGridCommandText,
+    enabled: true,
+    handler: props.setupGrid,
   });
 
   return null;

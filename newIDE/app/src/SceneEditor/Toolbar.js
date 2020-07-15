@@ -47,6 +47,9 @@ export class Toolbar extends PureComponent<Props> {
           redo={this.props.redo}
           canRedo={this.props.canRedo}
           deleteSelection={this.props.deleteSelection}
+          toggleWindowMask={this.props.toggleWindowMask}
+          toggleGrid={this.props.toggleGrid}
+          setupGrid={this.props.openSetupGrid}
           canDeleteSelection={
             this.props.instancesSelection.getSelectedInstances().length !== 0
           }

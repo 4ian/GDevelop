@@ -42,7 +42,7 @@ gdjs.evtTools.p2p._onConnection = function(connection) {
  */
 gdjs.evtTools.p2p.connect = function(id) {
   var connection = gdjs.evtTools.p2p.peer.connect(id);
-  gdjs.evtTools.p2p._onConnection(connection);
+  connection.on("open", () => gdjs.evtTools.p2p._onConnection(connection));
 }
 
 /**

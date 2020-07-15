@@ -18,7 +18,7 @@ void DestroyOutsideBehavior::InitializeContent(gd::SerializerElement& content) {
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 DestroyOutsideBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   properties["extraBorder"]
@@ -33,8 +33,7 @@ DestroyOutsideBehavior::GetProperties(
 bool DestroyOutsideBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project) {
+    const gd::String& value) {
   if (name == "extraBorder")
     behaviorContent.SetAttribute("extraBorder", value.To<double>());
   else

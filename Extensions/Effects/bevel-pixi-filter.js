@@ -20,10 +20,10 @@ gdjs.PixiFiltersTools.registerFilterCreator('Bevel', {
   },
   updateStringParameter: function(filter, parameterName, value) {
     if (parameterName === 'lightColor') {
-      filter.lightColor = value.replace('#', '0x');
+      filter.lightColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
     if (parameterName === 'shadowColor') {
-      filter.shadowColor = value.replace('#', '0x');
+      filter.shadowColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
     }
   },
   updateBooleanParameter: function(filter, parameterName, value) {},

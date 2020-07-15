@@ -34,8 +34,7 @@ BehaviorSharedDataJsImplementation* BehaviorSharedDataJsImplementation::Clone()
 }
 std::map<gd::String, gd::PropertyDescriptor>
 BehaviorSharedDataJsImplementation::GetProperties(
-    const gd::SerializerElement& behaviorSharedDataContent,
-    gd::Project&) const {
+    const gd::SerializerElement& behaviorSharedDataContent) const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -63,8 +62,7 @@ BehaviorSharedDataJsImplementation::GetProperties(
 bool BehaviorSharedDataJsImplementation::UpdateProperty(
     gd::SerializerElement& behaviorSharedDataContent,
     const gd::String& arg0,
-    const gd::String& arg1,
-    Project&) {
+    const gd::String& arg1) {
   EM_ASM_INT(
       {
         var self = Module['getCache'](

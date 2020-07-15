@@ -16,6 +16,8 @@ import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import { isMacLike } from '../../Utils/Platform';
 
 type Props = {|
   onClose: Function,
@@ -258,12 +260,24 @@ const PreferencesDialog = ({ onClose }: Props) => {
             <Trans>Command Palette</Trans>
           </Text>
           <Line>
-            <Toggle
-              onToggle={(e, check) => setUseCommandPalette(check)}
-              toggled={values.useCommandPalette}
-              labelPosition="right"
-              label={<Trans>Enable command palette (Experimental)</Trans>}
-            />
+            <Column noMargin>
+              <Toggle
+                onToggle={(e, check) => setUseCommandPalette(check)}
+                toggled={values.useCommandPalette}
+                labelPosition="right"
+                label={<Trans>Enable command palette (experimental)</Trans>}
+              />
+              <FormHelperText>
+                <Trans>
+                  Open the command palette with{' '}
+                  {isMacLike() ? 'Cmd + P' : 'Ctrl + P'}.
+                </Trans>{' '}
+                <Trans>
+                  This is an experimental feature, new commands will be added in
+                  the next versions.
+                </Trans>
+              </FormHelperText>
+            </Column>
           </Line>
         </Column>
       )}

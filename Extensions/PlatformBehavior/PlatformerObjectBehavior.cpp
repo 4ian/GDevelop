@@ -49,7 +49,7 @@ void PlatformerObjectBehavior::InitializeContent(
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 PlatformerObjectBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   properties[_("Gravity")].SetValue(
@@ -102,8 +102,7 @@ PlatformerObjectBehavior::GetProperties(
 bool PlatformerObjectBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project) {
+    const gd::String& value) {
   if (name == _("Default controls"))
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
   else if (name == _("Round coordinates"))

@@ -776,7 +776,7 @@ const MainFrame = (props: Props) => {
   };
 
   const deleteEventsFunctionsExtension = (
-    externalLayout: gdEventsFunctionsExtension
+    eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = state;
     const { i18n, eventsFunctionsExtensionsState } = props;
@@ -793,18 +793,26 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
         state.editorTabs,
-        externalLayout
+        eventsFunctionsExtension
       ),
     })).then(state => {
-      currentProject.removeEventsFunctionsExtension(externalLayout.getName());
-      _onProjectItemModified();
-    });
+      // Unload the Platform extension that was generated from the events
+      // functions extension.
+      const extensionName = eventsFunctionsExtension.getName();
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
+        currentProject,
+        extensionName
+      );
 
-    // Reload extensions to make sure the deleted extension is removed
-    // from the platform
-    eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-      currentProject
-    );
+      currentProject.removeEventsFunctionsExtension(extensionName);
+      _onProjectItemModified();
+
+      // Reload extensions to make sure any extension that would have been relying
+      // on the unloaded extension is updated.
+      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+    });
   };
 
   const renameLayout = (oldName: string, newName: string) => {

@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/InstructionsList.h"
@@ -42,12 +43,11 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    *
    * \return JavaScript code
    */
-  static gd::String GenerateLayoutCode(
-      gd::Project& project,
-      const gd::Layout& scene,
-      const gd::String& codeNamespace,
-      std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+  static gd::String GenerateLayoutCode(gd::Project& project,
+                                       const gd::Layout& scene,
+                                       const gd::String& codeNamespace,
+                                       std::set<gd::String>& includeFiles,
+                                       bool compilationForRuntime = false);
 
   /**
    * Generate JavaScript for executing events of an events based function.
@@ -76,6 +76,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
+   * \param onceTriggersVariable The code to access the variable holding OnceTriggers.
+   * \param preludeCode The code to run just before the events generated code.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
    *
@@ -86,6 +88,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       const gd::String& fullyQualifiedFunctionName,
+      const gd::String& onceTriggersVariable,
+      const gd::String& preludeCode,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
@@ -233,7 +237,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateGetBehaviorNameCode(const gd::String& behaviorName);
+  virtual gd::String GenerateGetBehaviorNameCode(
+      const gd::String& behaviorName);
 
   virtual gd::String GenerateGetVariable(
       const gd::String& variableName,
@@ -328,6 +333,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::String& onceTriggersVariable,
       const gd::String& thisObjectName = "",
       const gd::String& thisBehaviorName = "");
 

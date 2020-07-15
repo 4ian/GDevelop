@@ -153,6 +153,8 @@ export default class LayersList extends Component<Props, State> {
         <ScrollView autoHideScrollbar>
           <FullSizeMeasurer>
             {({ width }) => (
+              // TODO: The list is costly to render when there are many layers, consider
+              // using SortableVirtualizedItemList.
               <SortableLayersListBody
                 key={listKey}
                 layersContainer={this.props.layersContainer}

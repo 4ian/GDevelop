@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class Project;
@@ -112,8 +113,7 @@ class GD_CORE_API Resource {
    * \return a std::map with properties names as key.
    * \see gd::PropertyDescriptor
    */
-  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const;
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties() const;
 
   /**
    * \brief Called when the IDE wants to update a custom property of the
@@ -122,8 +122,7 @@ class GD_CORE_API Resource {
    * \return false if the new value cannot be set
    */
   virtual bool UpdateProperty(const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) {
+                              const gd::String& value) {
     return false;
   };
 ///@}
@@ -178,11 +177,9 @@ class GD_CORE_API ImageResource : public Resource {
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
 
-  std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const override;
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name,
-                      const gd::String& value,
-                      gd::Project& project) override;
+                      const gd::String& value) override;
 
   /**
    * \brief Serialize the object
@@ -315,11 +312,9 @@ class GD_CORE_API JsonResource : public Resource {
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
 
-  std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const override;
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name,
-                      const gd::String& value,
-                      gd::Project& project) override;
+                      const gd::String& value) override;
 
   void SerializeTo(SerializerElement& element) const override;
 #endif

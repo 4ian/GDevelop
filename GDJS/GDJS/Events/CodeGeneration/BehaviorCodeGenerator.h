@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "GDCore/Project/EventsBasedBehavior.h"
 namespace gd {
 class NamedPropertyDescriptor;
@@ -56,7 +57,6 @@ class BehaviorCodeGenerator {
     return "_set" + propertyName;
   }
 
-
  private:
   gd::String GenerateRuntimeBehaviorTemplateCode(
       const gd::String& extensionName,
@@ -77,8 +77,14 @@ class BehaviorCodeGenerator {
   gd::String GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace);
+  gd::String GenerateDefaultDoStepPreEventsFunctionCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace);
+  gd::String GenerateDoStepPreEventsPreludeCode();
 
   gd::Project& project;
+
+  static gd::String doStepPreEventsFunctionName;
 };
 
 }  // namespace gdjs

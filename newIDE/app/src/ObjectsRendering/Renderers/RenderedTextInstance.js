@@ -81,7 +81,10 @@ RenderedTextInstance.prototype.update = function() {
       })
       .catch(err => {
         // Ignore errors
-        console.warn('Unable to load font family', err);
+        console.warn(
+          'Unable to load font family for RenderedTextInstance',
+          err
+        );
       });
   }
 

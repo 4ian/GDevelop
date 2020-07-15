@@ -11,6 +11,8 @@ import { Tabs, Tab } from '../UI/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
+import ObjectsAdditionalService from './ObjectsAdditionalService';
+import { type InfoBarDetails } from './ObjectsAdditionalService';
 
 type StateType = {|
   currentTab: string,
@@ -43,6 +45,16 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         keyboardFocused
         onClick={() => {
           this.props.onApply();
+          const infoBar: ?InfoBarDetails = ObjectsAdditionalService.runAdditionalService(
+            this.props.object,
+            this.props.project,
+            this.props.layout
+          );
+          if (infoBar !== null) {
+            console.log(infoBar);
+            this.props.setInfoBar(infoBar);
+            this.props.showInfoBar();
+          }
           // Do the renaming *after* applying changes, as "withSerializableObject"
           // HOC will unserialize the object to apply modifications, which will
           // override the name.

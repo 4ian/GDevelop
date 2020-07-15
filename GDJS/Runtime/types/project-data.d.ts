@@ -88,6 +88,11 @@ export interface LayerData {
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
+  r: number;
+  g: number;
+  b: number;
+  isLightingLayer: boolean;
+  syncWithBaseLayer: boolean;
 }
 
 export interface CameraData {

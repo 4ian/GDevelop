@@ -9,13 +9,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
   this._debugMode = runtimeObject.getDebugMode();
-  this._texture =
-    runtimeObject._texture === ''
-      ? null
-      : runtimeScene
-          .getGame()
-          .getImageManager()
-          .getPIXITexture(runtimeObject._texture);
+  this._texture = null;
+    // runtimeObject._texture === ''
+    //   ? null
+    //   : runtimeScene
+    //       .getGame()
+    //       .getImageManager()
+    //       .getPIXITexture(runtimeObject._texture);
 
   this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
   this._vertexBuffer = new Float32Array([
@@ -78,7 +78,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     center: this._center,
     radius: this._radius,
     color: this._color,
-    uSampler: this._texture,
+    //uSampler: this._texture,
   });
   var geometry = new PIXI.Geometry();
   if (this._light === undefined) {
@@ -110,9 +110,8 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     }
   }
 
-  // There should be a layer named "Lights" already present for this to work.
-  // We might autogenerate this layer in future. There could be other ways to select the layer as well.
-  this._layer = runtimeScene.getLayer('Lights').getRenderer();
+  this._layer = runtimeScene.getLightingLayer().getRenderer();
+  console.log(this._layer);
   this._layer.addLayerToLighting();
 };
 
@@ -283,7 +282,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.computeLightVertices = function () {
   var result = [];
-  this._manager.getAllObstaclesAround(this._object, this._radius, result);
+  if(this._manager)
+    this._manager.getAllObstaclesAround(this._object, this._radius, result);
 
   // Bail out early if there are no obstales.
   if (result.length === 0) return result;

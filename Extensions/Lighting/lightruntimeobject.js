@@ -8,7 +8,8 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   this._debugMode = lightObjectData.content.debugMode;
   this._texture = lightObjectData.content.texture;
 
-  this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
+  if(gdjs.LightObstaclesManager)
+    this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -66,8 +67,16 @@ gdjs.LightRuntimeObject.prototype.setY = function (y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
 };
 
+/**
+ * Returns light obstacles manager, or null if there's
+ * no object with light obstacle behavior. Always perform a null check
+ * before using it.
+ */
 gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
-  return this._obstacleManager;
+  if(this._obstacleManager)
+    return this._obstacleManager;
+  
+  return null;
 };
 
 gdjs.LightRuntimeObject.prototype.getDebugMode = function () {

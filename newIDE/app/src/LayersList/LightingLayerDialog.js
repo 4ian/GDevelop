@@ -8,6 +8,7 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Text from '../UI/Text';
 import { type RGBColor, type ColorResult } from '../UI/ColorField/ColorPicker';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
 type Props = {
   open: boolean,
@@ -36,6 +37,7 @@ const LightingLayerDialog = (props: Props) => {
       primary
       keyboardFocused
       onClick={() => {
+        console.log(props.layer.getName());
         props.layer.setAmbientLightColor(color.r, color.g, color.b);
         props.layer.setSyncWithBaseLayer(followBaseLayer);
         props.closeLightingLayerDialog();
@@ -52,8 +54,23 @@ const LightingLayerDialog = (props: Props) => {
     >
       <Column>
         <Line>
+          <DismissableAlertMessage
+            kind='info'
+            identifier='lighting-layer-usage'
+          >
+            <Trans>
+              Lighting layer introduces ambient light in the scene. There should be only one 
+              lighting layer per scene. Ideally all the lights should be in the lighting 
+              layer and in most of the cases lighting layer should follow the base layer. 
+              Also note that lighting layer is created only after a light object is created, 
+              if you accidently delete this layer, create a new light object.
+            </Trans>
+          </DismissableAlertMessage>
+        </Line>
+        <Spacer />
+        <Line>
           <InlineCheckbox
-            checked={true}
+            checked={followBaseLayer}
             onCheck={(e, checked) => {
               setFollowBaseLayer(checked);
             }}
@@ -68,6 +85,7 @@ const LightingLayerDialog = (props: Props) => {
             fullWidth
             floatingLabelText={<Trans>Ambient light color</Trans>}
             disableAlpha
+            color={color}
             onChange={(color: ColorResult) => {
               setColor(color.rgb);
             }}

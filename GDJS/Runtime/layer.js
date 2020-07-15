@@ -32,6 +32,11 @@ gdjs.Layer = function(layerData, runtimeScene) {
     .getGameResolutionHeight();
   this._runtimeScene = runtimeScene;
 
+  // Lighting layer properties.
+  this._isLightingLayer = layerData.lightingLayer;
+  this._followBaseLayer = layerData.syncWithBaseLayer;
+  this._clearColor = [layerData.r/255, layerData.g/255, layerData.b/255, 1.0];
+
   // @ts-ignore - assume the proper renderer is passed
   this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
   this.show(!this._hidden);
@@ -84,6 +89,7 @@ gdjs.Layer.prototype.getRuntimeScene = function() {
  */
 gdjs.Layer.prototype.update = function(runtimeScene) {
   return this._renderer.updateTime();
+  if(this._followBaseLayer) this.syncWithBaseLayer();
 };
 
 /**
@@ -422,4 +428,11 @@ gdjs.Layer.prototype.getElapsedTime = function() {
 gdjs.Layer.prototype.syncWithBaseLayer = function() {
   this.setCameraX(this._runtimeScene.getLayer("").getCameraX());
   this.setCameraY(this._runtimeScene.getLayer("").getCameraY());
+}
+
+/**
+ * Return the clear color of layer.
+ */
+gdjs.Layer.prototype.getClearColor = function() {
+  return this._clearColor;
 }

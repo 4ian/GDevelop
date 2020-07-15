@@ -47,7 +47,8 @@ export default {
 
         return {
           identifier: 'automatic-lighting-layer',
-          message: 'Lighting layer created! Ideally put Light 0bjects in this layer.',
+          message:
+            'Lighting layer created! Ideally put Light 0bjects in this layer.',
           touchScreenMessage: 'Lighting layer created!',
         };
       }

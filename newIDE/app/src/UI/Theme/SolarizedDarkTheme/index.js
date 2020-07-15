@@ -11,14 +11,13 @@ const almostWhite = '#EEE';
 const lightWhite = '#DDD';
 const notSoWhite = '#CCC';
 const solarizedDark1 = '#047AA6';
-const solarizedDark2 = '#047AA6';
 
 // Use the fonts provided by the operating system(s) as possible.
 // If you update this font list, be sure to do it in all the other places using fonts in the codebase.
 const fontFamily =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
 
-const systemSelectionColor = '#4c92ff'; //OS X selection
+const systemSelectionColor = '#047AA6'; //OS X selection
 
 /**
  * The background color of the main window
@@ -110,9 +109,9 @@ const muiTheme = createMuiTheme({
       default: backgroundColor,
     },
     primary: {
-      light: lighten(solarizedDark2, 0.05),
-      main: solarizedDark2,
-      dark: darken(solarizedDark2, 0.05),
+      light: lighten(solarizedDark1, 0.05),
+      main: solarizedDark1,
+      dark: darken(solarizedDark1, 0.05),
       contrastText: '#fff',
     },
     secondary: {

@@ -15,23 +15,23 @@
 .gd-table-solarized-dark-theme .tableSelectedRow,
 .gd-table-solarized-dark-theme .tableOddRow {
   font-size: 13px;
-  border-bottom: 1px solid #3B4252;
+  border-bottom: 1px solid #002B36;
 }
 .gd-table-solarized-dark-theme .tableOddRow {
-  background-color: #3B4252;
+  background-color: #002B36;
 }
 .gd-table-solarized-dark-theme .tableEvenRow {
-  background-color: #2E3440;
+  background-color: #00212B;
 }
 .gd-table-solarized-dark-theme .tableSelectedRow {
-  background-color: rgb(6, 172, 218); /*OS X selection*/
-  color: #2E3440;
+  background-color: #047AA6; 
+  color: #002B36;
 }
 .gd-table-solarized-dark-theme .tableHeaderColumn {
   text-transform: none;
   font-weight: 600;
   font-size: 12px;
-  color: #D8DEE9;
+  color: rgb(216, 233, 217);
 }
 .gd-table-solarized-dark-theme .tableColumn {
   white-space: nowrap;

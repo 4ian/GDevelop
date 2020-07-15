@@ -1,5 +1,4 @@
 /* Mosaic layout */
-/* Mosaic layout */
 .mosaic-gd-solarized-dark-theme.mosaic {
   background-color: #002B36 !important;
 }
@@ -40,7 +39,7 @@
 }
 
 .mosaic-gd-solarized-dark-theme .mosaic-split:hover .mosaic-split-line {
-  border-color: #88C0D0 !important;
+  border-color: rgb(92, 118, 126) !important;
   box-shadow: none !important;
   cursor: ns-resize;
 }

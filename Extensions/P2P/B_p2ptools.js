@@ -9,7 +9,7 @@ gdjs.evtTools.p2p = {
   /**
    * The p2p client.
    */
-  peer: new Peer(),
+  peer: new Peer({debug: 1}), // Enable logging of critical errors
 
   /**
    * All connected p2p clients, keyed by their id.

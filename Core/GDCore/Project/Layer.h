@@ -59,17 +59,17 @@ class GD_CORE_API Layer {
   /**
    * \brief Return true if layer is a lighting layer.
    */
-  bool GetLightingLayer() const { return isLightingLayer; }
+  bool IsLightingLayer() const { return isLightingLayer; }
 
   /**
    * \brief Change if layer follows the base layer or not.
    */
-  void SetSyncWithBaseLayer(bool syncWithBaseLayer_) { syncWithBaseLayer = syncWithBaseLayer_; }
+  void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) { followBaseLayerCamera = followBaseLayerCamera_; }
 
   /**
    * \brief Return true if layer follows the base layer.
    */
-  bool GetSyncWithBaseLayer() const { return syncWithBaseLayer; }
+  bool IsFollowingBaseLayerCamera() const { return followBaseLayerCamera; }
 
   /** \name Cameras
    */
@@ -222,7 +222,7 @@ class GD_CORE_API Layer {
   gd::String name;                  ///< The name of the layer
   bool isVisible;                   ///< True if the layer is visible
   bool isLightingLayer;             ///< True if the layer has lighting properties
-  bool syncWithBaseLayer;           ///< True if the layer automatically follows the base layer
+  bool followBaseLayerCamera;           ///< True if the layer automatically follows the base layer
   unsigned int ambientLightColorR;     ///< Ambient light color Red component
   unsigned int ambientLightColorG;     ///< Ambient light color Green component
   unsigned int ambientLightColorB;     ///< Ambient light color Blue component

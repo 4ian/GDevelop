@@ -13,7 +13,7 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 type Props = {
   open: boolean,
   layer: gdLayer,
-  closeLightingLayerDialog: () => void,
+  onClose: () => void,
 };
 
 const LightingLayerDialog = (props: Props) => {
@@ -23,13 +23,13 @@ const LightingLayerDialog = (props: Props) => {
     b: props.layer.getAmbientLightColorBlue(),
   });
   const [followBaseLayer, setFollowBaseLayer] = React.useState(
-    props.layer.getSyncWithBaseLayer()
+    props.layer.isFollowingBaseLayerCamera()
   );
 
   const actions = [
     <FlatButton
       label={<Trans>Cancel</Trans>}
-      onClick={props.closeLightingLayerDialog}
+      onClick={props.onClose}
       key={'Cancel'}
     />,
     <FlatButton
@@ -39,8 +39,8 @@ const LightingLayerDialog = (props: Props) => {
       onClick={() => {
         console.log(props.layer.getName());
         props.layer.setAmbientLightColor(color.r, color.g, color.b);
-        props.layer.setSyncWithBaseLayer(followBaseLayer);
-        props.closeLightingLayerDialog();
+        props.layer.setFollowBaseLayerCamera(followBaseLayer);
+        props.onClose();
       }}
       key={'Apply'}
     />,

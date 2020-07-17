@@ -89,7 +89,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
         this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
         //console.log("Created layer : \""+name+"\".");
-        if(layerData.lightingLayer) 
+        if(layerData.isLightingLayer) 
             this._lightingLayer = this._layers.get(layerData.name);
     }
 

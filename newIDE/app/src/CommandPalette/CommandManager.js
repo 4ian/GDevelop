@@ -43,7 +43,7 @@ export interface CommandManagerInterface {
 export default class CommandManager implements CommandManagerInterface {
   commands: { [string]: Command };
 
-  constructor(scoped: ?boolean) {
+  constructor() {
     this.commands = {};
   }
 

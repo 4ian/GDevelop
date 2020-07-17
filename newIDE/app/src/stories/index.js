@@ -4283,30 +4283,30 @@ storiesOf('CommandPalette', module)
       {({ i18n }) => (
         <AutocompletePicker
           i18n={i18n}
-          items={[
-            {
-              name: 'OPEN_PROJECT',
-              displayText: t`Open project`,
-              enabled: true,
-              handler: () => {},
-            },
-            {
-              name: 'SAVE_PROJECT',
-              displayText: t`Save project`,
-              enabled: true,
-              handler: () => {},
-            },
-            {
-              name: 'EDIT_OBJECT',
-              displayText: t`Edit object...`,
-              enabled: true,
-              handler: () => {},
-            },
-          ]}
-          onClose={() => {}}
-          onSelect={(item: NamedCommand) =>
-            action(`Open command ${item.name}`)()
+          items={
+            ([
+              {
+                name: 'OPEN_PROJECT',
+                displayText: t`Open project`,
+                enabled: true,
+                handler: () => {},
+              },
+              {
+                name: 'SAVE_PROJECT',
+                displayText: t`Save project`,
+                enabled: true,
+                handler: () => {},
+              },
+              {
+                name: 'EDIT_OBJECT',
+                displayText: t`Edit object...`,
+                enabled: true,
+                handler: () => {},
+              },
+            ]: Array<NamedCommand>)
           }
+          onClose={() => {}}
+          onSelect={action('Open command')}
           placeholder="Start typing a command..."
         />
       )}
@@ -4317,30 +4317,30 @@ storiesOf('CommandPalette', module)
       {({ i18n }) => (
         <AutocompletePicker
           i18n={i18n}
-          items={[
-            {
-              text: 'Player',
-              value: 1,
-              handler: () => {},
-              iconSrc: 'res/unknown32.png',
-            },
-            {
-              text: 'Platform',
-              value: 2,
-              handler: () => {},
-              iconSrc: 'res/unknown32.png',
-            },
-            {
-              text: 'Enemy',
-              value: 3,
-              handler: () => {},
-              iconSrc: 'res/unknown32.png',
-            },
-          ]}
-          onClose={() => {}}
-          onSelect={(item: CommandOption<any>) =>
-            action(`Select option ${item.text}`)()
+          items={
+            ([
+              {
+                text: 'Player',
+                value: 1,
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Platform',
+                value: 2,
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Enemy',
+                value: 3,
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+            ]: Array<CommandOption<number>>)
           }
+          onClose={() => {}}
+          onSelect={action('Select command option')}
           placeholder="Edit object..."
         />
       )}

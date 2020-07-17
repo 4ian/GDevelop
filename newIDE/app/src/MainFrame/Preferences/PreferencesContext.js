@@ -6,8 +6,10 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
-  | 'object-editor-default'
+  | 'default-additional-services-object'
+  | 'default-additional-services-instances'
   | 'automatic-lighting-layer'
+  | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
@@ -82,6 +84,10 @@ export const allAlertMessages: Array<{
   {
     key: 'automatic-lighting-layer',
     label: <Trans>Automatic creation of lighting layer</Trans>,
+  },
+  {
+    key: 'object-moved-in-lighting-layer',
+    label: <Trans>Light object automatically put in lighting layer</Trans>,
   },
   {
     key: 'resource-properties-panel-explanation',

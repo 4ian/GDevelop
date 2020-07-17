@@ -36,6 +36,8 @@ import {
   getTagsFromString,
 } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import ObjectsAdditionalService from '../SceneEditor/ObjectsAdditionalService';
+import { type InfoBarDetails } from '../SceneEditor/ObjectsAdditionalService';
 
 const styles = {
   listContainer: {
@@ -86,6 +88,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectNames: Array<string>,
+  onAdditionalServiceComplete: (infoBarDetails: InfoBarDetails) => void,
 
   selectedObjectTags: SelectedTags,
   getAllObjectTags: () => Tags,
@@ -167,6 +170,21 @@ export default class ObjectsList extends React.Component<Props, State> {
       objectsContainer.getObjectsCount()
     );
     object.setTags(getStringFromTags(this.props.selectedObjectTags));
+
+    const additionalService = ObjectsAdditionalService.getServices(
+      object,
+      objectsContainer,
+      false
+    );
+    if (additionalService) {
+      additionalService.onObjectAdded(object, project, objectsContainer);
+      const infoBarDetails = additionalService.getInfoBarDetails(
+        'onObjectAdded'
+      );
+      if (infoBarDetails) {
+        this.props.onAdditionalServiceComplete(infoBarDetails);
+      }
+    }
 
     this.setState(
       {

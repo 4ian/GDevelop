@@ -25,6 +25,7 @@ import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
+import { type InfoBarDetails } from '../SceneEditor/ObjectsAdditionalService';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -47,6 +48,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  onAdditionalServiceComplete: (infoBarDetails: InfoBarDetails) => void,
   selectedObjectNames: Array<string>,
   onContextMenu: (x: number, y: number) => void,
   onCopy: () => void,
@@ -249,6 +251,7 @@ export default class InstancesEditor extends Component<Props> {
     this._instancesAdder = new InstancesAdder({
       instances: this.props.initialInstances,
       options: this.props.options,
+      onAdditionalServiceComplete: this.props.onAdditionalServiceComplete,
     });
 
     this._mountEditorComponents(this.props);
@@ -463,7 +466,12 @@ export default class InstancesEditor extends Component<Props> {
     pos /*: [number, number] */,
     objectNames /*: Array<string> */
   ) => {
-    this._instancesAdder.addInstances(pos, objectNames);
+    this._instancesAdder.addInstances(
+      pos,
+      objectNames,
+      this.props.project,
+      this.props.layout
+    );
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -767,7 +775,9 @@ export default class InstancesEditor extends Component<Props> {
           );
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
-            this.props.selectedObjectNames
+            this.props.selectedObjectNames,
+            this.props.project,
+            this.props.layout
           );
         }}
         drop={monitor => {

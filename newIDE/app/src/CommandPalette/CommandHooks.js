@@ -27,9 +27,9 @@ export const useCommand = (commandName: string, command: SimpleCommand) => {
 /**
  * React hook for dynamically registering and deregistering command with options
  */
-export const useCommandWithOptions = <T>(
+export const useCommandWithOptions = <OptionType>(
   commandName: string,
-  command: CommandWithOptions<T>
+  command: CommandWithOptions<OptionType>
 ) => {
   const commandManager = React.useContext(CommandsContext);
   const { displayText, enabled, generateOptions } = command;
@@ -97,9 +97,9 @@ export const UseCommandHook = (props: {|
  * React component for using useCommandWithOptions
  * hook in class components
  */
-export const UseCommandWithOptionsHook = <T>(props: {|
+export const UseCommandWithOptionsHook = <OptionType>(props: {|
   commandName: string,
-  command: CommandWithOptions<T>,
+  command: CommandWithOptions<OptionType>,
 |}) => {
   useCommandWithOptions(props.commandName, props.command);
   return null;

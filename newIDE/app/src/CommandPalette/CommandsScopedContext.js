@@ -11,27 +11,27 @@ import useRefInit from './UseRefInitHook';
 class ScopedCommandManager implements CommandManagerInterface {
   commands: { [string]: Command };
   _centralManager: CommandManagerInterface;
-  isActive: boolean;
+  _isActive: boolean;
 
   constructor(centralCommandManager) {
     this.commands = {};
-    this.isActive = false;
+    this._isActive = false;
     this._centralManager = centralCommandManager;
   }
 
   setActive = (active: boolean) => {
-    this.isActive = active;
+    this._isActive = active;
   };
 
   registerCommand = (commandName: string, command: Command) => {
     this.commands[commandName] = command;
-    if (this.isActive)
+    if (this._isActive)
       this._centralManager.registerCommand(commandName, command);
   };
 
   deregisterCommand = (commandName: string) => {
     delete this.commands[commandName];
-    if (this.isActive) this._centralManager.deregisterCommand(commandName);
+    if (this._isActive) this._centralManager.deregisterCommand(commandName);
   };
 
   registerAllCommandsToCentralManager = () => {
@@ -57,10 +57,10 @@ class ScopedCommandManager implements CommandManagerInterface {
   };
 }
 
-type Props = {
+type Props = {|
   children: React.Node,
   active: boolean,
-};
+|};
 
 const CommandsContextScopedProvider = (props: Props) => {
   const centralManager = React.useContext(CommandsContext);

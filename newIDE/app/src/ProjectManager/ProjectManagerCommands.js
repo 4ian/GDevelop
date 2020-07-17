@@ -7,13 +7,13 @@ const openProjectVariablesCommandText = t`Edit global variables`;
 const openPlatformSpecificAssetsCommandText = t`Open project icons`;
 const openResourcesCommandText = t`Open project resources`;
 
-type Props = {
+type Props = {|
   project: ?gdProject,
   onOpenProjectProperties: () => void,
   onOpenProjectVariables: () => void,
   onOpenResourcesDialog: () => void,
   onOpenPlatformSpecificAssetsDialog: () => void,
-};
+|};
 
 const ProjectManagerCommands = (props: Props) => {
   useCommand('OPEN_PROJECT_PROPERTIES', {

@@ -6,10 +6,10 @@ import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 
 const editLayerEffectsCommandText = t`Edit layer effects...`;
 
-type Props = {
+type Props = {|
   layout: gdLayout,
   onEditLayerEffects: (layer: gdLayer) => void,
-};
+|};
 
 const useLayersListCommands = (props: Props) => {
   const { layout, onEditLayerEffects } = props;

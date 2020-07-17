@@ -85,10 +85,10 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
  * React component for using useCommand hook in
  * class components
  */
-export const UseCommandHook = (props: {
+export const UseCommandHook = (props: {|
   commandName: string,
   command: SimpleCommand,
-}) => {
+|}) => {
   useCommand(props.commandName, props.command);
   return null;
 };
@@ -97,10 +97,10 @@ export const UseCommandHook = (props: {
  * React component for using useCommandWithOptions
  * hook in class components
  */
-export const UseCommandWithOptionsHook = (props: {
+export const UseCommandWithOptionsHook = <T>(props: {|
   commandName: string,
-  command: CommandWithOptions<*>,
-}) => {
+  command: CommandWithOptions<T>,
+|}) => {
   useCommandWithOptions(props.commandName, props.command);
   return null;
 };

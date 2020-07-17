@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type I18n } from '@lingui/core';
+import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from '../../UI/ListIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -13,13 +13,13 @@ import { type NamedCommand, type CommandOption } from '../CommandManager';
 
 type Item = NamedCommand | CommandOption<*>;
 
-type Props<T> = {
+type Props<T> = {|
   onClose: () => void,
   onSelect: (item: T) => void,
   items: Array<T>,
   placeholder: MessageDescriptor,
-  i18n: I18n,
-};
+  i18n: I18nType,
+|};
 
 const AutocompletePicker = (
   props: Props<NamedCommand> | Props<CommandOption<*>>

@@ -6,11 +6,11 @@ import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 
 const editObjectGroupCommandText = t`Edit object group...`;
 
-type Props = {
+type Props = {|
   project: gdProject,
   layout: gdLayout,
   onEditObjectGroup: (group: gdObjectGroup) => void,
-};
+|};
 
 const useObjectGroupsListCommands = (props: Props) => {
   const { project, layout, onEditObjectGroup } = props;

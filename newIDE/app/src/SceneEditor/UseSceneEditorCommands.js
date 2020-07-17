@@ -8,7 +8,7 @@ import useLayersListCommands from '../LayersList/UseLayersListCommands';
 const openScenePropertiesCommandText = t`Open scene properties`;
 const openSceneVariablesCommandText = t`Open scene variables`;
 
-type Props = {
+type Props = {|
   project: gdProject,
   layout: gdLayout,
   onEditObject: (object: gdObject) => void,
@@ -17,7 +17,7 @@ type Props = {
   onOpenSceneVariables: () => void,
   onEditObjectGroup: (group: gdObjectGroup) => void,
   onEditLayerEffects: (layer: gdLayer) => void,
-};
+|};
 
 const UseSceneEditorCommands = (props: Props) => {
   const {

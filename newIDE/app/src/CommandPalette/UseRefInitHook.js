@@ -6,7 +6,7 @@ const useRefInit = <T>(init: () => T): T => {
 
   let instance = instanceRef.current;
   if (instance !== null) return instance;
-  // Lazy init
+  // Lazily create the ref object
   let newInstance = init();
   instanceRef.current = newInstance;
   return newInstance;

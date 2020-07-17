@@ -25,12 +25,12 @@ const generateLayoutObjectsOptions = (
   }));
 };
 
-type Props = {
+type Props = {|
   project: gdProject,
   layout: gdLayout,
   onEditObject: (object: gdObject) => void,
   onEditObjectVariables: (object: gdObject) => void,
-};
+|};
 
 const useObjectsListCommands = (props: Props) => {
   const { project, layout, onEditObject, onEditObjectVariables } = props;

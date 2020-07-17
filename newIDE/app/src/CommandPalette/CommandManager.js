@@ -22,7 +22,7 @@ export type CommandWithOptions<T> = {|
   generateOptions: () => Array<CommandOption<T>>,
 |};
 
-export type Command = SimpleCommand | CommandWithOptions<*>;
+export type Command = SimpleCommand | CommandWithOptions<any>;
 
 export type NamedCommand = {|
   name: string,
@@ -35,8 +35,6 @@ export type NamedCommandWithOptions<T> = {|
 |};
 
 export interface CommandManagerInterface {
-  commands: { [string]: Command };
-
   registerCommand: (commandName: string, command: Command) => void;
   deregisterCommand: (commandName: string) => void;
   getAllNamedCommands: () => Array<NamedCommand>;

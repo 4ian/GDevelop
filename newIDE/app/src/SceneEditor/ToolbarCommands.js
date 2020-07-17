@@ -14,7 +14,7 @@ const toggleWindowMaskCommandText = t`Toggle mask`;
 const toggleGridCommandText = t`Toggle grid`;
 const setupGridCommandText = t`Setup grid`;
 
-type Props = {
+type Props = {|
   openObjectsList: () => void,
   openObjectGroupsList: () => void,
   openPropertiesPanel: () => void,
@@ -29,7 +29,7 @@ type Props = {
   toggleWindowMask: () => void,
   toggleGrid: () => void,
   setupGrid: () => void,
-};
+|};
 
 const ToolbarCommands = (props: Props) => {
   useCommand('OPEN_OBJECTS_PANEL', {

@@ -326,7 +326,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.editObjectByName(selectedInstanceObjectName);
   };
 
-  editLayerEffects = (layer: gdLayer) => {
+  editLayerEffects = (layer: ?gdLayer) => {
     this.setState({ effectsEditedLayer: layer });
   };
 
@@ -924,9 +924,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
-            onEditLayerEffects={layer =>
-              this.setState({ effectsEditedLayer: layer })
-            }
+            onEditLayerEffects={this.editLayerEffects}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}

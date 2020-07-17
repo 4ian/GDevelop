@@ -17,7 +17,7 @@ const deleteSelectionCommandText = t`Delete the selected event(s)`;
 const searchEventsCommandText = t`Search in events`;
 const openSettingsCommandText = t`Open settings`;
 
-type Props = {
+type Props = {|
   onAddStandardEvent: () => void,
   onAddSubEvent: () => void,
   canAddSubEvent: boolean,
@@ -32,7 +32,7 @@ type Props = {
   canRedo: boolean,
   onToggleSearchPanel: () => void,
   onOpenSettings?: ?() => void,
-};
+|};
 
 const ToolbarCommands = (props: Props) => {
   const { onAddEvent } = props;

@@ -36,7 +36,7 @@ const generateProjectItemOptions = <T: Item>(
   }));
 };
 
-type CommandHandlers = {
+type CommandHandlers = {|
   i18n: I18n,
   project: ?gdProject,
   previewEnabled: boolean,
@@ -55,7 +55,7 @@ type CommandHandlers = {
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
-};
+|};
 
 const quitAppText = t`Close GDevelop`;
 const openProjectManagerText = t`Open project manager`;

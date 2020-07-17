@@ -66,7 +66,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
+import { type InfoBarDetails } from './ObjectsAdditionalService';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -137,12 +137,9 @@ type State = {|
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
   showInstancesInfoBar: boolean,
-  showObjectEditorInfoBar: boolean,
-  objectEditorInfoBar: {|
-    identifier: AlertMessageIdentifier,
-    message?: string,
-    touchScreenMessage?: string,
-  |},
+
+  objectsListAdditionalServiceInfoBar: InfoBarDetails,
+  instancesEditorAdditionalServiceInfoBar: InfoBarDetails,
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -191,9 +188,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       showPropertiesInfoBar: false,
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
-      showObjectEditorInfoBar: false,
-      objectEditorInfoBar: {
-        identifier: 'object-editor-default',
+
+      objectsListAdditionalServiceInfoBar: {
+        show: false,
+        identifier: 'default-additional-services-object',
+        message: '',
+        touchScreenMessage: '',
+      },
+      instancesEditorAdditionalServiceInfoBar: {
+        show: false,
+        identifier: 'default-additional-services-instances',
         message: '',
         touchScreenMessage: '',
       },
@@ -965,6 +969,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             onInstancesMoved={this._onInstancesMoved}
             onInstancesResized={this._onInstancesResized}
             onInstancesRotated={this._onInstancesRotated}
+            onAdditionalServiceComplete={(infoBarDetails: InfoBarDetails) => {
+              if (infoBarDetails) {
+                this.setState({
+                  instancesEditorAdditionalServiceInfoBar: infoBarDetails,
+                });
+              }
+            }}
             selectedObjectNames={this.state.selectedObjectNames}
             onContextMenu={this._onContextMenu}
             onCopy={() => this.copySelection({ useLastCursorPosition: true })}
@@ -1004,6 +1015,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             project={project}
             objectsContainer={layout}
             selectedObjectNames={this.state.selectedObjectNames}
+            onAdditionalServiceComplete={(infoBarDetails: InfoBarDetails) => {
+              if (infoBarDetails) {
+                this.setState({
+                  objectsListAdditionalServiceInfoBar: infoBarDetails,
+                });
+              }
+            }}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             canRenameObject={this._canObjectOrGroupUseNewName}
@@ -1075,16 +1093,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             object={this.state.editedObjectWithContext.object}
             project={project}
             layout={layout}
-            showInfoBar={() =>
-              this.setState({
-                showObjectEditorInfoBar: true,
-              })
-            }
-            setInfoBar={infoBarObject =>
-              this.setState({
-                objectEditorInfoBar: infoBarObject,
-              })
-            }
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
@@ -1115,14 +1123,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
           />
         )}
-        <InfoBar
-          identifier={this.state.objectEditorInfoBar.identifier}
-          message={<Trans>{this.state.objectEditorInfoBar.message}</Trans>}
-          touchScreenMessage={
-            <Trans>{this.state.objectEditorInfoBar.touchScreenMessage}</Trans>
-          }
-          show={this.state.showObjectEditorInfoBar}
-        />
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}
@@ -1281,6 +1281,33 @@ export default class SceneEditor extends React.Component<Props, State> {
             onClose={() => this.editLayoutVariables(false)}
           />
         )}
+        <InfoBar
+          show={this.state.objectsListAdditionalServiceInfoBar.show}
+          identifier={this.state.objectsListAdditionalServiceInfoBar.identifier}
+          message={this.state.objectsListAdditionalServiceInfoBar.message}
+          touchScreenMessage={
+            this.state.objectsListAdditionalServiceInfoBar.touchScreenMessage
+          }
+        />
+        <InfoBar
+          show={this.state.instancesEditorAdditionalServiceInfoBar.show}
+          identifier={
+            this.state.instancesEditorAdditionalServiceInfoBar.identifier
+          }
+          message={
+            <Trans>
+              {this.state.instancesEditorAdditionalServiceInfoBar.message}
+            </Trans>
+          }
+          touchScreenMessage={
+            <Trans>
+              {
+                this.state.instancesEditorAdditionalServiceInfoBar
+                  .touchScreenMessage
+              }
+            </Trans>
+          }
+        />
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [

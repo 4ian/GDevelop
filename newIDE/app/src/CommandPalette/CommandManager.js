@@ -5,7 +5,6 @@ type CommandHandler = () => void | Promise<void>;
 
 export type SimpleCommand = {|
   displayText: MessageDescriptor,
-  enabled: boolean,
   handler: CommandHandler,
 |};
 
@@ -18,7 +17,6 @@ export type CommandOption<T> = {|
 
 export type CommandWithOptions<T> = {|
   displayText: MessageDescriptor,
-  enabled: boolean,
   generateOptions: () => Array<CommandOption<T>>,
 |};
 

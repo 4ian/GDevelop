@@ -34,18 +34,16 @@ type Props = {|
 
 const useObjectsListCommands = (props: Props) => {
   const { project, layout, onEditObject, onEditObjectVariables } = props;
-  useCommandWithOptions('EDIT_OBJECT', {
+  useCommandWithOptions('EDIT_OBJECT', true, {
     displayText: editObjectCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () => generateLayoutObjectsOptions(project, layout, onEditObject),
       [project, layout, onEditObject]
     ),
   });
 
-  useCommandWithOptions('EDIT_OBJECT_VARIABLES', {
+  useCommandWithOptions('EDIT_OBJECT_VARIABLES', true, {
     displayText: editObjectVariablesCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () =>
         generateLayoutObjectsOptions(project, layout, onEditObjectVariables),

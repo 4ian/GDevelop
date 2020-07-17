@@ -15,9 +15,8 @@ type Props = {|
 const useObjectGroupsListCommands = (props: Props) => {
   const { project, layout, onEditObjectGroup } = props;
 
-  useCommandWithOptions('EDIT_OBJECT_GROUP', {
+  useCommandWithOptions('EDIT_OBJECT_GROUP', true, {
     displayText: editObjectGroupCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () =>
         [

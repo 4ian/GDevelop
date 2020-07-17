@@ -16,27 +16,23 @@ type Props = {|
 |};
 
 const ProjectManagerCommands = (props: Props) => {
-  useCommand('OPEN_PROJECT_PROPERTIES', {
+  useCommand('OPEN_PROJECT_PROPERTIES', !!props.project, {
     displayText: openProjectPropertiesCommandText,
-    enabled: !!props.project,
     handler: props.onOpenProjectProperties,
   });
 
-  useCommand('OPEN_PROJECT_VARIABLES', {
+  useCommand('OPEN_PROJECT_VARIABLES', !!props.project, {
     displayText: openProjectVariablesCommandText,
-    enabled: !!props.project,
     handler: props.onOpenProjectVariables,
   });
 
-  useCommand('OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG', {
+  useCommand('OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG', !!props.project, {
     displayText: openPlatformSpecificAssetsCommandText,
-    enabled: !!props.project,
     handler: props.onOpenPlatformSpecificAssetsDialog,
   });
 
-  useCommand('OPEN_PROJECT_RESOURCES', {
+  useCommand('OPEN_PROJECT_RESOURCES', !!props.project, {
     displayText: openResourcesCommandText,
-    enabled: !!props.project,
     handler: props.onOpenResourcesDialog,
   });
 

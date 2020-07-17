@@ -14,9 +14,8 @@ type Props = {|
 const useLayersListCommands = (props: Props) => {
   const { layout, onEditLayerEffects } = props;
 
-  useCommandWithOptions('EDIT_LAYER_EFFECTS', {
+  useCommandWithOptions('EDIT_LAYER_EFFECTS', true, {
     displayText: editLayerEffectsCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () => {
         const layersCount = layout.getLayersCount();

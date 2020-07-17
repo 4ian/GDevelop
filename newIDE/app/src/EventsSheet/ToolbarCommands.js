@@ -37,27 +37,23 @@ type Props = {|
 const ToolbarCommands = (props: Props) => {
   const { onAddEvent } = props;
 
-  useCommand('ADD_STANDARD EVENT', {
+  useCommand('ADD_STANDARD EVENT', true, {
     displayText: addEmptyEventCommandText,
-    enabled: true,
     handler: props.onAddStandardEvent,
   });
 
-  useCommand('ADD_SUBEVENT', {
+  useCommand('ADD_SUBEVENT', props.canAddSubEvent, {
     displayText: addSubEventCommandText,
-    enabled: props.canAddSubEvent,
     handler: props.onAddSubEvent,
   });
 
-  useCommand('ADD_COMMENT_EVENT', {
+  useCommand('ADD_COMMENT_EVENT', true, {
     displayText: addCommentCommandText,
-    enabled: true,
     handler: props.onAddCommentEvent,
   });
 
-  useCommandWithOptions('CHOOSE_AND_ADD_EVENT', {
+  useCommandWithOptions('CHOOSE_AND_ADD_EVENT', true, {
     displayText: chooseAndAddEventCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () =>
         props.allEventsMetadata.map(metadata => ({
@@ -71,33 +67,28 @@ const ToolbarCommands = (props: Props) => {
     ),
   });
 
-  useCommand('DELETE_SELECTION', {
+  useCommand('DELETE_SELECTION', props.canRemove, {
     displayText: deleteSelectionCommandText,
-    enabled: props.canRemove,
     handler: props.onRemove,
   });
 
-  useCommand('UNDO', {
+  useCommand('UNDO', props.canUndo, {
     displayText: undoCommandText,
-    enabled: props.canUndo,
     handler: props.undo,
   });
 
-  useCommand('REDO', {
+  useCommand('REDO', props.canRedo, {
     displayText: redoCommandText,
-    enabled: props.canRedo,
     handler: props.redo,
   });
 
-  useCommand('SEARCH_EVENTS', {
+  useCommand('SEARCH_EVENTS', true, {
     displayText: searchEventsCommandText,
-    enabled: true,
     handler: props.onToggleSearchPanel,
   });
 
-  useCommand('OPEN_SETTINGS', {
+  useCommand('OPEN_SETTINGS', !!props.onOpenSettings, {
     displayText: openSettingsCommandText,
-    enabled: !!props.onOpenSettings,
     handler: props.onOpenSettings || (() => {}),
   });
 

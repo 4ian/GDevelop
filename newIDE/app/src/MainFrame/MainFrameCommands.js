@@ -74,75 +74,63 @@ const openExternalLayoutCommandText = t`Open external layout...`;
 const openEventsFunctionsExtensionCommandText = t`Open extension...`;
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
-  useCommand('QUIT_APP', {
+  useCommand('QUIT_APP', true, {
     displayText: quitAppText,
-    enabled: true,
     handler: handlers.onCloseApp,
   });
 
-  useCommand('OPEN_PROJECT_MANAGER', {
+  useCommand('OPEN_PROJECT_MANAGER', !!handlers.project, {
     displayText: openProjectManagerText,
-    enabled: !!handlers.project,
     handler: handlers.onOpenProjectManager,
   });
 
-  useCommand('LAUNCH_PREVIEW', {
+  useCommand('LAUNCH_PREVIEW', handlers.previewEnabled, {
     displayText: launchPreviewText,
-    enabled: handlers.previewEnabled,
     handler: handlers.onLaunchPreview,
   });
 
-  useCommand('LAUNCH_DEBUG_PREVIEW', {
+  useCommand('LAUNCH_DEBUG_PREVIEW', handlers.previewEnabled, {
     displayText: launchDebugPreviewText,
-    enabled: handlers.previewEnabled,
     handler: handlers.onLaunchDebugPreview,
   });
 
-  useCommand('OPEN_START_PAGE', {
+  useCommand('OPEN_START_PAGE', true, {
     displayText: openStartPageText,
-    enabled: true,
     handler: handlers.onOpenStartPage,
   });
 
-  useCommand('CREATE_NEW_PROJECT', {
+  useCommand('CREATE_NEW_PROJECT', true, {
     displayText: createNewProjectText,
-    enabled: true,
     handler: handlers.onCreateProject,
   });
 
-  useCommand('OPEN_PROJECT', {
+  useCommand('OPEN_PROJECT', true, {
     displayText: openProjectText,
-    enabled: true,
     handler: handlers.onOpenProject,
   });
 
-  useCommand('SAVE_PROJECT', {
+  useCommand('SAVE_PROJECT', !!handlers.project, {
     displayText: saveProjectText,
-    enabled: !!handlers.project,
     handler: handlers.onSaveProject,
   });
 
-  useCommand('SAVE_PROJECT_AS', {
+  useCommand('SAVE_PROJECT_AS', !!handlers.project, {
     displayText: saveProjectAsText,
-    enabled: !!handlers.project,
     handler: handlers.onSaveProjectAs,
   });
 
-  useCommand('CLOSE_PROJECT', {
+  useCommand('CLOSE_PROJECT', !!handlers.project, {
     displayText: closeProjectText,
-    enabled: !!handlers.project,
     handler: handlers.onCloseProject,
   });
 
-  useCommand('EXPORT_GAME', {
+  useCommand('EXPORT_GAME', !!handlers.project, {
     displayText: exportGameText,
-    enabled: !!handlers.project,
     handler: handlers.onExportGame,
   });
 
-  useCommandWithOptions('OPEN_LAYOUT', {
+  useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {
     displayText: openLayoutCommandText,
-    enabled: !!handlers.project,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -154,9 +142,8 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  useCommandWithOptions('OPEN_EXTERNAL_EVENTS', {
+  useCommandWithOptions('OPEN_EXTERNAL_EVENTS', !!handlers.project, {
     displayText: openExternalEventsCommandText,
-    enabled: !!handlers.project,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -168,9 +155,8 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  useCommandWithOptions('OPEN_EXTERNAL_LAYOUT', {
+  useCommandWithOptions('OPEN_EXTERNAL_LAYOUT', !!handlers.project, {
     displayText: openExternalLayoutCommandText,
-    enabled: !!handlers.project,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -182,9 +168,8 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  useCommandWithOptions('OPEN_EXTENSION', {
+  useCommandWithOptions('OPEN_EXTENSION', !!handlers.project, {
     displayText: openEventsFunctionsExtensionCommandText,
-    enabled: !!handlers.project,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(

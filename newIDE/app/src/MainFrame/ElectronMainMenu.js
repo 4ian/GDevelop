@@ -338,9 +338,8 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     [i18n, language, project, recentProjectFiles]
   );
 
-  useCommandWithOptions('OPEN_RECENT_PROJECT', {
+  useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
     displayText: openRecentProjectCommandText,
-    enabled: true,
     generateOptions: React.useCallback(
       () =>
         recentProjectFiles.map(item => ({

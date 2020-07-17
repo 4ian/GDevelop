@@ -31,15 +31,13 @@ const UseSceneEditorCommands = (props: Props) => {
     onEditLayerEffects,
   } = props;
 
-  useCommand('OPEN_SCENE_PROPERTIES', {
+  useCommand('OPEN_SCENE_PROPERTIES', true, {
     displayText: openScenePropertiesCommandText,
-    enabled: true,
     handler: onOpenSceneProperties,
   });
 
-  useCommand('OPEN_SCENE_VARIABLES', {
+  useCommand('OPEN_SCENE_VARIABLES', true, {
     displayText: openSceneVariablesCommandText,
-    enabled: true,
     handler: onOpenSceneVariables,
   });
 

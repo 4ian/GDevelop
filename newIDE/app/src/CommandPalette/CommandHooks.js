@@ -7,15 +7,18 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 /**
  * React hook for dynamically registering and deregistering a simple command
  */
-export const useCommand = (commandName: string, command: SimpleCommand) => {
+export const useCommand = (
+  commandName: string,
+  enabled: boolean,
+  command: SimpleCommand
+) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, enabled, handler } = command;
+  const { displayText, handler } = command;
   React.useEffect(
     () => {
       if (!enabled) return;
       commandManager.registerCommand(commandName, {
         displayText,
-        enabled,
         handler,
       });
       return () => commandManager.deregisterCommand(commandName);
@@ -29,16 +32,16 @@ export const useCommand = (commandName: string, command: SimpleCommand) => {
  */
 export const useCommandWithOptions = <OptionType>(
   commandName: string,
+  enabled: boolean,
   command: CommandWithOptions<OptionType>
 ) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, enabled, generateOptions } = command;
+  const { displayText, generateOptions } = command;
   React.useEffect(
     () => {
       if (!enabled) return;
       commandManager.registerCommand(commandName, {
         displayText,
-        enabled,
         generateOptions,
       });
       return () => commandManager.deregisterCommand(commandName);
@@ -86,10 +89,11 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
  * class components
  */
 export const UseCommandHook = (props: {|
-  commandName: string,
+  name: string,
+  enabled: boolean,
   command: SimpleCommand,
 |}) => {
-  useCommand(props.commandName, props.command);
+  useCommand(props.name, props.enabled, props.command);
   return null;
 };
 
@@ -98,9 +102,10 @@ export const UseCommandHook = (props: {|
  * hook in class components
  */
 export const UseCommandWithOptionsHook = <OptionType>(props: {|
-  commandName: string,
+  name: string,
+  enabled: boolean,
   command: CommandWithOptions<OptionType>,
 |}) => {
-  useCommandWithOptions(props.commandName, props.command);
+  useCommandWithOptions(props.name, props.enabled, props.command);
   return null;
 };

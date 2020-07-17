@@ -32,69 +32,58 @@ type Props = {|
 |};
 
 const ToolbarCommands = (props: Props) => {
-  useCommand('OPEN_OBJECTS_PANEL', {
+  useCommand('OPEN_OBJECTS_PANEL', true, {
     displayText: openObjectsListCommandText,
-    enabled: true,
     handler: props.openObjectsList,
   });
 
-  useCommand('OPEN_OBJECT_GROUPS_PANEL', {
+  useCommand('OPEN_OBJECT_GROUPS_PANEL', true, {
     displayText: openObjectGroupsListCommandText,
-    enabled: true,
     handler: props.openObjectGroupsList,
   });
 
-  useCommand('OPEN_PROPERTIES_PANEL', {
+  useCommand('OPEN_PROPERTIES_PANEL', true, {
     displayText: openPropertiesPanelCommandText,
-    enabled: true,
     handler: props.openPropertiesPanel,
   });
 
-  useCommand('TOGGLE_INSTANCES_PANEL', {
+  useCommand('TOGGLE_INSTANCES_PANEL', true, {
     displayText: toggleInstancesPanelCommandText,
-    enabled: true,
     handler: props.toggleInstancesList,
   });
 
-  useCommand('TOGGLE_LAYERS_PANEL', {
+  useCommand('TOGGLE_LAYERS_PANEL', true, {
     displayText: toggleLayersPanelCommandText,
-    enabled: true,
     handler: props.toggleLayersList,
   });
 
-  useCommand('UNDO', {
+  useCommand('UNDO', props.canUndo, {
     displayText: undoCommandText,
-    enabled: props.canUndo,
     handler: props.undo,
   });
 
-  useCommand('REDO', {
+  useCommand('REDO', props.canRedo, {
     displayText: redoCommandText,
-    enabled: props.canRedo,
     handler: props.redo,
   });
 
-  useCommand('DELETE_INSTANCES', {
+  useCommand('DELETE_INSTANCES', props.canDeleteSelection, {
     displayText: deleteSelectionCommandText,
-    enabled: props.canDeleteSelection,
     handler: props.deleteSelection,
   });
 
-  useCommand('TOGGLE_WINDOW_MASK', {
+  useCommand('TOGGLE_WINDOW_MASK', true, {
     displayText: toggleWindowMaskCommandText,
-    enabled: true,
     handler: props.toggleWindowMask,
   });
 
-  useCommand('TOGGLE_GRID', {
+  useCommand('TOGGLE_GRID', true, {
     displayText: toggleGridCommandText,
-    enabled: true,
     handler: props.toggleGrid,
   });
 
-  useCommand('OPEN_SETUP_GRID', {
+  useCommand('OPEN_SETUP_GRID', true, {
     displayText: setupGridCommandText,
-    enabled: true,
     handler: props.setupGrid,
   });
 

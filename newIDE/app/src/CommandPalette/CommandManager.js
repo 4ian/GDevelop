@@ -3,18 +3,41 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type CommandHandler = () => void | Promise<void>;
 
-export type Command = {|
+export type SimpleCommand = {|
   displayText: MessageDescriptor,
-  enabled: boolean,
   handler: CommandHandler,
 |};
+
+export type CommandOption = {|
+  handler: CommandHandler,
+  text: string,
+  iconSrc?: string,
+|};
+
+export type CommandWithOptions = {|
+  displayText: MessageDescriptor,
+  generateOptions: () => Array<CommandOption>,
+|};
+
+export type Command = SimpleCommand | CommandWithOptions;
 
 export type NamedCommand = {|
   name: string,
   ...Command,
 |};
 
-export default class CommandManager {
+export type NamedCommandWithOptions = {|
+  name: string,
+  ...CommandWithOptions,
+|};
+
+export interface CommandManagerInterface {
+  registerCommand: (commandName: string, command: Command) => void;
+  deregisterCommand: (commandName: string) => void;
+  getAllNamedCommands: () => Array<NamedCommand>;
+}
+
+export default class CommandManager implements CommandManagerInterface {
   commands: { [string]: Command };
 
   constructor() {

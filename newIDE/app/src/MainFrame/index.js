@@ -103,6 +103,7 @@ import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette from '../CommandPalette/CommandPalette';
+import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
 
@@ -1130,53 +1131,61 @@ const MainFrame = (props: Props) => {
     [i18n, setState, state.editorTabs]
   );
 
-  const openExternalEvents = (name: string) => {
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        projectItemName: name,
-        renderEditorContainer: renderExternalEventsEditorContainer,
-        key: 'external events ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openExternalEvents = React.useCallback(
+    (name: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name,
+          projectItemName: name,
+          renderEditorContainer: renderExternalEventsEditorContainer,
+          key: 'external events ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState]
+  );
 
-  const openExternalLayout = (name: string) => {
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name,
-        projectItemName: name,
-        renderEditorContainer: renderExternalLayoutEditorContainer,
-        key: 'external layout ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openExternalLayout = React.useCallback(
+    (name: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name,
+          projectItemName: name,
+          renderEditorContainer: renderExternalLayoutEditorContainer,
+          key: 'external layout ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState, openProjectManager]
+  );
 
-  const openEventsFunctionsExtension = (
-    name: string,
-    initiallyFocusedFunctionName?: string,
-    initiallyFocusedBehaviorName?: ?string
-  ) => {
-    const { i18n } = props;
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: name + ' ' + i18n._(t`(Extension)`),
-        projectItemName: name,
-        extraEditorProps: {
-          initiallyFocusedFunctionName,
-          initiallyFocusedBehaviorName,
-        },
-        renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
-        key: 'events functions extension ' + name,
-      }),
-    }));
-    openProjectManager(false);
-  };
+  const openEventsFunctionsExtension = React.useCallback(
+    (
+      name: string,
+      initiallyFocusedFunctionName?: string,
+      initiallyFocusedBehaviorName?: ?string
+    ) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: name + ' ' + i18n._(t`(Extension)`),
+          projectItemName: name,
+          extraEditorProps: {
+            initiallyFocusedFunctionName,
+            initiallyFocusedBehaviorName,
+          },
+          renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
+          key: 'events functions extension ' + name,
+        }),
+      }));
+      openProjectManager(false);
+    },
+    [setState, openProjectManager, i18n]
+  );
 
   const openResources = () => {
     const { i18n } = props;
@@ -1409,37 +1418,45 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const openFromFileMetadataWithStorageProvider = (
-    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
-  ) => {
-    const {
-      fileMetadata,
-      storageProviderName,
-    } = fileMetadataAndStorageProviderName;
-    const { storageProviders, getStorageProviderOperations } = props;
+  const openFromFileMetadataWithStorageProvider = React.useCallback(
+    (
+      fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+    ) => {
+      const {
+        fileMetadata,
+        storageProviderName,
+      } = fileMetadataAndStorageProviderName;
 
-    const storageProvider = storageProviders.filter(
-      storageProvider => storageProvider.internalName === storageProviderName
-    )[0];
+      const storageProvider = props.storageProviders.filter(
+        storageProvider => storageProvider.internalName === storageProviderName
+      )[0];
 
-    if (storageProvider) {
-      getStorageProviderOperations(storageProvider).then(() => {
-        openFromFileMetadata(fileMetadata)
-          .then(state => {
-            if (state)
-              openSceneOrProjectManager({
-                currentProject: state.currentProject,
-                editorTabs: state.editorTabs,
-              });
-          })
-          .catch(error => {
-            preferences.removeRecentProjectFile(
-              fileMetadataAndStorageProviderName
-            );
-          });
-      });
-    }
-  };
+      if (storageProvider) {
+        getStorageProviderOperations(storageProvider).then(() => {
+          openFromFileMetadata(fileMetadata)
+            .then(state => {
+              if (state)
+                openSceneOrProjectManager({
+                  currentProject: state.currentProject,
+                  editorTabs: state.editorTabs,
+                });
+            })
+            .catch(error => {
+              preferences.removeRecentProjectFile(
+                fileMetadataAndStorageProviderName
+              );
+            });
+        });
+      }
+    },
+    [
+      openFromFileMetadata,
+      openSceneOrProjectManager,
+      preferences,
+      props.storageProviders,
+      getStorageProviderOperations,
+    ]
+  );
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -1711,6 +1728,10 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onCloseProject: askToCloseProject,
     onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onOpenLayout: openLayout,
+    onOpenExternalEvents: openExternalEvents,
+    onOpenExternalLayout: openExternalLayout,
+    onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;
@@ -1860,63 +1881,65 @@ const MainFrame = (props: Props) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
         return (
           <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-            <ErrorBoundary>
-              {editorTab.renderEditorContainer({
-                isActive: isCurrentTab,
-                extraEditorProps: editorTab.extraEditorProps,
-                project: currentProject,
-                ref: editorRef => (editorTab.editorRef = editorRef),
-                setToolbar: setEditorToolbar,
-                onChangeSubscription: () => openSubscriptionDialog(true),
-                projectItemName: editorTab.projectItemName,
-                setPreviewedLayout,
-                onOpenExternalEvents: openExternalEvents,
-                previewDebuggerServer:
-                  _previewLauncher.current &&
-                  _previewLauncher.current.getPreviewDebuggerServer(),
-                onOpenLayout: name =>
-                  openLayout(name, {
-                    openEventsEditor: true,
-                    openSceneEditor: false,
-                  }),
-                resourceSources: props.resourceSources,
-                onChooseResource,
-                resourceExternalEditors,
-                onCreateEventsFunction,
-                openInstructionOrExpression,
-                unsavedChanges: props.unsavedChanges,
-                canOpen: !!props.storageProviders.filter(
-                  ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
-                ).length,
-                onOpen: () => chooseProject(),
-                onCreate: () => openCreateDialog(),
-                onOpenProjectManager: () => openProjectManager(true),
-                onCloseProject: () => askToCloseProject(),
-                onOpenAboutDialog: () => openAboutDialog(true),
-                onOpenHelpFinder: () => openHelpFinderDialog(true),
-                onOpenLanguageDialog: () => openLanguageDialog(true),
-                onLoadEventsFunctionsExtensions: () => {
-                  eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                    currentProject
-                  );
-                },
-                onDeleteResource: (
-                  resource: gdResource,
-                  cb: boolean => void
-                ) => {
-                  // TODO: Project wide refactoring of objects/events using the resource
-                  cb(true);
-                },
-                onRenameResource: (
-                  resource: gdResource,
-                  newName: string,
-                  cb: boolean => void
-                ) => {
-                  // TODO: Project wide refactoring of objects/events using the resource
-                  cb(true);
-                },
-              })}
-            </ErrorBoundary>
+            <CommandsContextScopedProvider active={isCurrentTab}>
+              <ErrorBoundary>
+                {editorTab.renderEditorContainer({
+                  isActive: isCurrentTab,
+                  extraEditorProps: editorTab.extraEditorProps,
+                  project: currentProject,
+                  ref: editorRef => (editorTab.editorRef = editorRef),
+                  setToolbar: setEditorToolbar,
+                  onChangeSubscription: () => openSubscriptionDialog(true),
+                  projectItemName: editorTab.projectItemName,
+                  setPreviewedLayout,
+                  onOpenExternalEvents: openExternalEvents,
+                  previewDebuggerServer:
+                    _previewLauncher.current &&
+                    _previewLauncher.current.getPreviewDebuggerServer(),
+                  onOpenLayout: name =>
+                    openLayout(name, {
+                      openEventsEditor: true,
+                      openSceneEditor: false,
+                    }),
+                  resourceSources: props.resourceSources,
+                  onChooseResource,
+                  resourceExternalEditors,
+                  onCreateEventsFunction,
+                  openInstructionOrExpression,
+                  unsavedChanges: props.unsavedChanges,
+                  canOpen: !!props.storageProviders.filter(
+                    ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
+                  ).length,
+                  onOpen: () => chooseProject(),
+                  onCreate: () => openCreateDialog(),
+                  onOpenProjectManager: () => openProjectManager(true),
+                  onCloseProject: () => askToCloseProject(),
+                  onOpenAboutDialog: () => openAboutDialog(true),
+                  onOpenHelpFinder: () => openHelpFinderDialog(true),
+                  onOpenLanguageDialog: () => openLanguageDialog(true),
+                  onLoadEventsFunctionsExtensions: () => {
+                    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                      currentProject
+                    );
+                  },
+                  onDeleteResource: (
+                    resource: gdResource,
+                    cb: boolean => void
+                  ) => {
+                    // TODO: Project wide refactoring of objects/events using the resource
+                    cb(true);
+                  },
+                  onRenameResource: (
+                    resource: gdResource,
+                    newName: string,
+                    cb: boolean => void
+                  ) => {
+                    // TODO: Project wide refactoring of objects/events using the resource
+                    cb(true);
+                  },
+                })}
+              </ErrorBoundary>
+            </CommandsContextScopedProvider>
           </TabContentContainer>
         );
       })}

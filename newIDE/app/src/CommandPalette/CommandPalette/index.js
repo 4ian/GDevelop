@@ -80,7 +80,7 @@ const CommandPalette = (props: Props) => {
             <AutocompletePicker
               i18n={i18n}
               items={selectedCommand.generateOptions()}
-              placeholder={t`Pick an option...`}
+              placeholder={selectedCommand.displayText}
               onClose={props.onClose}
               onSelect={handleOptionChoose}
             />

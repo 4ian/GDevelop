@@ -30,10 +30,10 @@ export const useCommand = (
 /**
  * React hook for dynamically registering and deregistering command with options
  */
-export const useCommandWithOptions = <OptionType>(
+export const useCommandWithOptions = (
   commandName: string,
   enabled: boolean,
-  command: CommandWithOptions<OptionType>
+  command: CommandWithOptions
 ) => {
   const commandManager = React.useContext(CommandsContext);
   const { displayText, generateOptions } = command;
@@ -101,10 +101,10 @@ export const UseCommandHook = (props: {|
  * React component for using useCommandWithOptions
  * hook in class components
  */
-export const UseCommandWithOptionsHook = <OptionType>(props: {|
+export const UseCommandWithOptionsHook = (props: {|
   name: string,
   enabled: boolean,
-  command: CommandWithOptions<OptionType>,
+  command: CommandWithOptions,
 |}) => {
   useCommandWithOptions(props.name, props.enabled, props.command);
   return null;

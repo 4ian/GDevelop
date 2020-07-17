@@ -24,7 +24,6 @@ const useObjectGroupsListCommands = (props: Props) => {
           ...enumerateGroups(project.getObjectGroups()),
         ].map(group => ({
           text: group.getName(),
-          value: group,
           handler: () => onEditObjectGroup(group),
         })),
       [onEditObjectGroup, project, layout]

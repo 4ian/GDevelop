@@ -61,7 +61,6 @@ const ToolbarCommands = (props: Props) => {
           handler: () => {
             onAddEvent(metadata.type);
           },
-          value: metadata,
         })),
       [props.allEventsMetadata, onAddEvent]
     ),

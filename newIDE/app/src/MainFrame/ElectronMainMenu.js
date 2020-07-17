@@ -345,7 +345,6 @@ const ElectronMainMenu = (props: MainMenuProps) => {
         recentProjectFiles.map(item => ({
           text: item.fileMetadata.fileIdentifier,
           handler: () => onOpenRecentFile(item),
-          value: item,
         })),
       [onOpenRecentFile, recentProjectFiles]
     ),

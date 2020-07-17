@@ -22,7 +22,6 @@ const useLayersListCommands = (props: Props) => {
         return mapReverseFor(0, layersCount, i => {
           const layer = layout.getLayerAt(i);
           return {
-            value: layer,
             text: layer.getName() || 'Base layer',
             handler: () => onEditLayerEffects(layer),
           };

@@ -32,7 +32,6 @@ const generateProjectItemOptions = <T: Item>(
   return enumerate(project).map(item => ({
     text: item.getName(),
     handler: () => onOpen(item.getName()),
-    value: item,
   }));
 };
 

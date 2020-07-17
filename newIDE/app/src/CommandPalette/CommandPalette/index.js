@@ -32,7 +32,7 @@ const CommandPalette = (props: Props) => {
   const [
     selectedCommand,
     selectCommand,
-  ] = React.useState<null | NamedCommandWithOptions<*>>(null);
+  ] = React.useState<null | NamedCommandWithOptions>(null);
 
   const handleCommandChoose = (command: NamedCommand) => {
     if (command.handler) {
@@ -47,7 +47,7 @@ const CommandPalette = (props: Props) => {
     }
   };
 
-  const handleOptionChoose = <T>(option: CommandOption<T>) => {
+  const handleOptionChoose = (option: CommandOption) => {
     option.handler();
     props.onClose();
   };

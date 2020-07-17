@@ -8,28 +8,27 @@ export type SimpleCommand = {|
   handler: CommandHandler,
 |};
 
-export type CommandOption<T> = {|
-  value: T,
+export type CommandOption = {|
   handler: CommandHandler,
   text: string,
   iconSrc?: string,
 |};
 
-export type CommandWithOptions<T> = {|
+export type CommandWithOptions = {|
   displayText: MessageDescriptor,
-  generateOptions: () => Array<CommandOption<T>>,
+  generateOptions: () => Array<CommandOption>,
 |};
 
-export type Command = SimpleCommand | CommandWithOptions<any>;
+export type Command = SimpleCommand | CommandWithOptions;
 
 export type NamedCommand = {|
   name: string,
   ...Command,
 |};
 
-export type NamedCommandWithOptions<T> = {|
+export type NamedCommandWithOptions = {|
   name: string,
-  ...CommandWithOptions<T>,
+  ...CommandWithOptions,
 |};
 
 export interface CommandManagerInterface {

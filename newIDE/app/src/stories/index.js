@@ -4318,23 +4318,20 @@ storiesOf('CommandPalette', module)
             ([
               {
                 text: 'Player',
-                value: 1,
                 handler: () => {},
                 iconSrc: 'res/unknown32.png',
               },
               {
                 text: 'Platform',
-                value: 2,
                 handler: () => {},
                 iconSrc: 'res/unknown32.png',
               },
               {
                 text: 'Enemy',
-                value: 3,
                 handler: () => {},
                 iconSrc: 'res/unknown32.png',
               },
-            ]: Array<CommandOption<number>>)
+            ]: Array<CommandOption>)
           }
           onClose={() => {}}
           onSelect={action('Select command option')}

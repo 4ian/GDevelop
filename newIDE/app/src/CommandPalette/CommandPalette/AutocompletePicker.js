@@ -11,7 +11,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
 import { type NamedCommand, type CommandOption } from '../CommandManager';
 
-type Item = NamedCommand | CommandOption<any>;
+type Item = NamedCommand | CommandOption;
 
 type Props<T> = {|
   onClose: () => void,
@@ -22,7 +22,7 @@ type Props<T> = {|
 |};
 
 const AutocompletePicker = (
-  props: Props<NamedCommand> | Props<CommandOption<any>>
+  props: Props<NamedCommand> | Props<CommandOption>
 ) => {
   const [open, setOpen] = React.useState(true);
 

@@ -13,10 +13,9 @@ const generateLayoutObjectsOptions = (
   project: gdProject,
   layout: gdLayout,
   onChoose: (object: gdObject) => void
-): Array<CommandOption<gdObject>> => {
+): Array<CommandOption> => {
   return enumerateObjects(project, layout).containerObjectsList.map(item => ({
     text: item.object.getName(),
-    value: item.object,
     handler: () => onChoose(item.object),
     iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
       project,

@@ -33,7 +33,7 @@ export default {
       let hasLightingLayer = false;
       for (let i = 0; i < layout.getLayersCount(); i++) {
         const layer = layout.getLayerAt(i);
-        if (layer.getLightingLayer()) {
+        if (layer.isLightingLayer()) {
           hasLightingLayer = true;
           break;
         }
@@ -42,7 +42,7 @@ export default {
         layout.insertNewLayer('Lighting', layout.getLayersCount());
         const lightingLayer: gdLayer = layout.getLayer('Lighting');
         lightingLayer.setLightingLayer(true);
-        lightingLayer.setSyncWithBaseLayer(true);
+        lightingLayer.setFollowBaseLayerCamera(true);
         lightingLayer.setAmbientLightColor(128, 128, 128);
 
         return {

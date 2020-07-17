@@ -6,9 +6,9 @@ declare class gdLayer {
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
   setLightingLayer(lightingLayer: boolean): void;
-  getLightingLayer(): boolean;
-  setSyncWithBaseLayer(syncWithBaseLayer: boolean): void;
-  getSyncWithBaseLayer(): boolean;
+  isLightingLayer(): boolean;
+  setFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;
+  isFollowingBaseLayerCamera(): boolean;
   setAmbientLightColor(r: number, g: number, b: number): void;
   getAmbientLightColorRed(): number;
   getAmbientLightColorGreen(): number;

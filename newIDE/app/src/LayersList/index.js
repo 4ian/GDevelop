@@ -44,9 +44,9 @@ class LayersListBody extends Component<*, LayersListBodyState> {
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
-      const layer = layersContainer.getLayerAt(i);
+      const layer: gdLayer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
-      const isLightingLayer = layer.getLightingLayer();
+      const isLightingLayer = layer.isLightingLayer();
 
       return (
         <React.Fragment>
@@ -105,9 +105,8 @@ class LayersListBody extends Component<*, LayersListBodyState> {
             <LightingLayerDialog
               layer={layer}
               open={this.state.isLightingLayerDialogOpen}
-              closeLightingLayerDialog={() =>
+              onClose={() =>
                 this.setState({
-                  ...this.state,
                   isLightingLayerDialogOpen: false,
                 })
               }

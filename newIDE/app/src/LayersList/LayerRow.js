@@ -71,34 +71,32 @@ export default ({
                   <MoreVert />
                 </IconButton>
               }
-              buildMenuTemplate={() => {
-                const menuTemplate = [
-                  {
-                    label: i18n._(t`Edit effects (${effectsCount})`),
-                    click: onEditEffects,
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Visible`),
-                    checked: isVisible,
-                    click: () => onChangeVisibility(!isVisible),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Delete`),
-                    enabled: !!layerName,
-                    click: onRemove,
-                  },
-                ];
-
-                if (isLightingLayer)
-                  menuTemplate.splice(2, 0, {
-                    label: i18n._(t`Edit lighting layer`),
-                    click: openLightingLayerDialog,
-                  });
-
-                return menuTemplate;
-              }}
+              buildMenuTemplate={() => [
+                {
+                  label: i18n._(t`Edit effects (${effectsCount})`),
+                  click: onEditEffects,
+                },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Visible`),
+                  checked: isVisible,
+                  click: () => onChangeVisibility(!isVisible),
+                },
+                ...(isLightingLayer
+                  ? [
+                      {
+                        label: i18n._(t`Edit lighting layer`),
+                        click: openLightingLayerDialog,
+                      },
+                    ]
+                  : []),
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Delete`),
+                  enabled: !!layerName,
+                  click: onRemove,
+                },
+              ]}
             />
           ) : (
             <React.Fragment>

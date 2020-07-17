@@ -612,9 +612,9 @@ interface Layer {
     void SetVisibility(boolean visible);
     boolean GetVisibility();
     void SetLightingLayer(boolean lightingLayer);
-    boolean GetLightingLayer();
-    void SetSyncWithBaseLayer(boolean syncWithBaseLayer);
-    boolean GetSyncWithBaseLayer();
+    boolean IsLightingLayer();
+    void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);
+    boolean IsFollowingBaseLayerCamera();
 
     void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetAmbientLightColorRed();

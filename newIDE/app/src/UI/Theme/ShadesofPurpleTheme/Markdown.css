@@ -1,0 +1,48 @@
+/* This is the styling applied to markdown (like the one used for Changelog). */
+
+.gd-markdown-Shades-of-Purple-theme {
+    /* Use the fonts provided by the operating system(s) as possible. */
+    /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  }
+  .gd-markdown-Shades-of-Purple-theme.standalone-text-container {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme h1 {
+    margin-bottom: 10px;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme h2 {
+    margin-bottom: 10px;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme ul {
+    word-break: break-word;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme blockquote {
+    border-left: 5px solid #D8DEE9;
+    padding-left: 15px;
+    margin-left: 20px;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme a {
+    color: rgb(238, 244, 236);
+    cursor: pointer;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme code {
+    font-family: "Lucida Console", Monaco, monospace;
+    -webkit-user-select: text;
+    user-select: text;
+    cursor: text;
+  }
+  
+  .gd-markdown-Shades-of-Purple-theme img {
+    max-width: 100%;
+  }
+  

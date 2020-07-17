@@ -1,0 +1,45 @@
+/* Mosaic layout */
+.mosaic-gd-Shades-of-Purple-theme.mosaic {
+    background-color: #222244 !important;
+  }
+
+  /* Mosaic window and tile */
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-window-toolbar {
+    background: #FAD000 !important;
+  }
+
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-window-body {
+    background: #3B4252 !important;
+  }
+
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-window .mosaic-window-title {
+    color: #1E1E3F !important;
+    font-weight: 400 !important;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 15px; /* Same as ClosableTabs font size */
+  }
+
+  /* Hovered titlebar background */
+  .mosaic-gd-Shades-of-Purple-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+  .mosaic-gd-Shades-of-Purple-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+    background: #FFEE80 !important;
+  }
+
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-split.-column {
+    background-color: #3B4252 !important;
+  }
+
+  /* Separator draggable background */
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-split.-column .mosaic-split-line {
+    height: 1px;
+    border-top: 1px solid #1E1E3F !important;
+    width: 25px;
+    margin: auto;
+    bottom: 1px;
+  }
+
+  .mosaic-gd-Shades-of-Purple-theme .mosaic-split:hover .mosaic-split-line {
+    border-color: #88C0D0 !important;
+    box-shadow: none !important;
+    cursor: ns-resize;
+  }

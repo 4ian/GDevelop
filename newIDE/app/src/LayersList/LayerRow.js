@@ -28,7 +28,7 @@ type Props = {|
   onEditEffects: () => void,
   width: number,
   isLightingLayer: boolean,
-  openLightingLayerDialog: () => void,
+  onEditLighting: () => void,
 |};
 
 export default ({
@@ -42,7 +42,7 @@ export default ({
   onChangeVisibility,
   width,
   isLightingLayer,
-  openLightingLayerDialog,
+  onEditLighting,
 }: Props) => (
   <I18n>
     {({ i18n }) => (
@@ -85,8 +85,8 @@ export default ({
                 ...(isLightingLayer
                   ? [
                       {
-                        label: i18n._(t`Edit lighting layer`),
-                        click: openLightingLayerDialog,
+                        label: i18n._(t`Edit lighting properties`),
+                        click: onEditLighting,
                       },
                     ]
                   : []),
@@ -118,7 +118,7 @@ export default ({
               {isLightingLayer && (
                 <IconButton
                   size="small"
-                  onClick={openLightingLayerDialog}
+                  onClick={onEditLighting}
                   tooltip={t`Open Lighting layer settings`}
                 >
                   <EmojiObjectsIcon />

@@ -11,7 +11,6 @@ import { type RGBColor, type ColorResult } from '../UI/ColorField/ColorPicker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
 type Props = {
-  open: boolean,
   layer: gdLayer,
   onClose: () => void,
 };
@@ -47,7 +46,7 @@ const LightingLayerDialog = (props: Props) => {
   return (
     <Dialog
       noMargin
-      open={props.open}
+      open={!!props.layer}
       title={<Trans>Lighting layer settings</Trans>}
       actions={actions}
     >

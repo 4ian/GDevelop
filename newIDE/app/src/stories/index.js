@@ -1557,7 +1557,6 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
                     onChangeSelectedObjectTags={() => {}}
-                    onAdditionalServiceComplete={infoBarDetails => {}}
                     getAllObjectTags={() => []}
                     canRenameObject={() => true}
                     onDeleteObject={(objectWithContext, cb) => cb(true)}
@@ -3208,7 +3207,6 @@ storiesOf('ObjectsList', module)
             selectedObjectNames={[]}
             selectedObjectTags={[]}
             onChangeSelectedObjectTags={selectedObjectTags => {}}
-            onAdditionalServiceComplete={infoBarDetails => {}}
             getAllObjectTags={() => []}
             canRenameObject={() => true}
             onDeleteObject={(objectWithContext, cb) => cb(true)}
@@ -3234,7 +3232,6 @@ storiesOf('ObjectsList', module)
             onChangeSelectedObjectTags={action(
               'on change selected object tags'
             )}
-            onAdditionalServiceComplete={infoBarDetails => {}}
             getAllObjectTags={() => [
               'Tag1',
               'Tag2',

@@ -24,7 +24,13 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
   this._oldWidth = this._pixiRenderer.screen.width;
   this._oldHeight = this._pixiRenderer.screen.height;
+
+  this._isLightingLayer = layer.isLightingLayer();
+  if(this._isLightingLayer) {
+    this.addLayerToLighting();
+  }
   this._clearColor = layer.getClearColor();
+  
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
   this._setupFilters();
 };

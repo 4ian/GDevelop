@@ -6,8 +6,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
-  | 'default-additional-services-object'
-  | 'default-additional-services-instances'
+  | 'default-additional-work'
   | 'automatic-lighting-layer'
   | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'

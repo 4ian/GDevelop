@@ -174,7 +174,6 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       () => {
         if (onEditObject) {
-          console.log('inside the callback');
           onEditObject(object);
           onObjectCreated(object);
           onObjectSelected(name);

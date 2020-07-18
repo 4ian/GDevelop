@@ -20,10 +20,11 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._filters = {};
   this._layer = layer;
   this._renderTexture = null;
+  this._lightingSprite = null;
   this._runtimeSceneRenderer = runtimeSceneRenderer;
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
-  this._oldWidth = this._pixiRenderer.screen.width;
-  this._oldHeight = this._pixiRenderer.screen.height;
+  this._oldWidth = null;
+  this._oldHeight = null;
   this._isLightingLayer = layer.isLightingLayer();
   this._clearColor = layer.getClearColor();
   
@@ -273,18 +274,25 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
 };
 
 gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
+  if(!this._pixiRenderer) return;
+
   if (!this._renderTexture) {
-    var width = this._pixiRenderer.screen.width;
-    var height = this._pixiRenderer.screen.height;
+    this._oldWidth = this._pixiRenderer.screen.width;
+    this._oldHeight = this._pixiRenderer.screen.height;
+
+    var width = this._oldWidth;
+    var height = this._oldHeight;
     var resolution = this._pixiRenderer.resolution;
+    // @ts-ignore PIXI isn't typed for now.
     this._renderTexture = PIXI.RenderTexture.create({
       width,
       height,
       resolution,
     });
+    // @ts-ignore PIXI isn't typed for now.
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
   }
-
+  
   if (
     this._oldWidth !== this._pixiRenderer.screen.width ||
     this._oldHeight !== this._pixiRenderer.screen.height
@@ -321,10 +329,14 @@ gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
 };
 
 gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
+    if(!this._pixiRenderer) return;
+    // @ts-ignore PIXI isn't typed for now.
     this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
+    // @ts-ignore PIXI isn't typed for now.
     this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
     // fix for blend mode when applying filter
     if (this._pixiContainer.filters) {
+      // @ts-ignore PIXI isn't typed for now.
       this._pixiContainer.filterArea = new PIXI.Rectangle(
         0,
         0,
@@ -332,6 +344,7 @@ gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
         this._pixiRenderer.screen.height
       );
       for (var i = 0; i < this._pixiContainer.filters.length; i++) {
+        // @ts-ignore PIXI isn't typed for now.
         this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
       }
     }

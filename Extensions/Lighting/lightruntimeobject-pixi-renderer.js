@@ -109,10 +109,6 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       this._debugLight.addChild(this._graphics);
     }
   }
-
-  this._layer = runtimeScene.getLightingLayer().getRenderer();
-  console.log(this._layer);
-  this._layer.addLayerToLighting();
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

@@ -1,13 +1,10 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
-import ObjectsAdditionalService from '../SceneEditor/ObjectsAdditionalService';
-import { type InfoBarDetails } from '../SceneEditor/ObjectsAdditionalService';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   instances: gdInitialInstancesContainer,
   options: Object,
-  onAdditionalServiceComplete: (infoBarDetails: InfoBarDetails) => void,
 |};
 
 const roundPositionsToGrid = (
@@ -42,41 +39,18 @@ const roundPositionsToGrid = (
 export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
-  _onAdditionalServiceComplete: (infobarDetails: InfoBarDetails) => void;
   _options: Object;
   _zOrderFinder = new gd.HighestZOrderFinder();
 
-  constructor({ instances, options, onAdditionalServiceComplete }: Props) {
+  constructor({ instances, options }: Props) {
     this._instances = instances;
     this._options = options;
     this._temporaryInstances = [];
-    this._onAdditionalServiceComplete = onAdditionalServiceComplete;
   }
 
   setOptions(options: Object) {
     this._options = options;
   }
-
-  onAddInstanceAdditionalservice = (
-    instance: gdInitialInstance,
-    project: gdProject,
-    layout: gdLayout
-  ) => {
-    const additionalService = ObjectsAdditionalService.getServices(
-      instance,
-      layout,
-      true
-    );
-    if (additionalService) {
-      additionalService.onInstanceAdded(instance, project, layout);
-      const infoBarDetails = additionalService.getInfoBarDetails(
-        'onInstanceAdded'
-      );
-      if (infoBarDetails) {
-        this._onAdditionalServiceComplete(infoBarDetails);
-      }
-    }
-  };
 
   /**
    * Immediately create new instance at the specified position
@@ -84,25 +58,23 @@ export default class InstancesAdder {
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>,
-    project: gdProject,
-    layout: gdLayout
-  ) => {
+    objectNames: Array<string>
+  ): Array<gdInitialInstance> => {
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
     const newPos = roundPositionsToGrid(pos, this._options);
-    objectNames.map(objectName => {
+    const addedInstances = objectNames.map(objectName => {
       const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
       instance.setZOrder(zOrder);
 
-      this.onAddInstanceAdditionalservice(instance, project, layout);
-
       return instance;
     });
+
+    return addedInstances;
   };
 
   /**
@@ -111,19 +83,12 @@ export default class InstancesAdder {
    */
   createOrUpdateTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>,
-    project: gdProject,
-    layout: gdLayout
+    objectNames: Array<string>
   ) => {
     if (!objectNames.length) return;
 
     if (!this._temporaryInstances.length) {
-      this._createTemporaryInstancesFromObjectNames(
-        pos,
-        objectNames,
-        project,
-        layout
-      );
+      this._createTemporaryInstancesFromObjectNames(pos, objectNames);
     } else {
       this.updateTemporaryInstancePositions(pos);
     }
@@ -131,9 +96,7 @@ export default class InstancesAdder {
 
   _createTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>,
-    project: gdProject,
-    layout: gdLayout
+    objectNames: Array<string>
   ) => {
     this.deleteTemporaryInstances();
 
@@ -147,8 +110,6 @@ export default class InstancesAdder {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
       instance.setZOrder(zOrder);
-
-      this.onAddInstanceAdditionalservice(instance, project, layout);
 
       return instance;
     });
@@ -164,6 +125,8 @@ export default class InstancesAdder {
       instance.setX(Math.round(newPos[0]));
       instance.setY(Math.round(newPos[1]));
     });
+
+    return this._temporaryInstances;
   };
 
   /**

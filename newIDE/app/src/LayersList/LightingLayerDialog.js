@@ -37,7 +37,6 @@ const LightingLayerDialog = (props: Props) => {
       primary
       keyboardFocused
       onClick={() => {
-        console.log(props.layer.getName());
         props.layer.setAmbientLightColor(color.r, color.g, color.b);
         props.layer.setFollowBaseLayerCamera(followBaseLayer);
         props.onClose();

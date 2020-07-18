@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 
 /*
@@ -9,53 +10,51 @@ import { type AlertMessageIdentifier } from '../MainFrame/Preferences/Preference
  */
 
 export type InfoBarDetails = {
+  show: boolean,
   identifier: AlertMessageIdentifier,
   message: string,
   touchScreenMessage: string,
-  show: boolean,
 };
 
 type InfoBarEvent = 'onObjectAdded' | 'onInstanceAdded';
 
-type AdditionalServices = {
-  onObjectAdded: (
-    object: gdObject,
-    project: gdProject,
-    layout: gdLayout
-  ) => void,
-  onInstanceAdded: (
-    instance: gdInitialInstance,
-    project: gdProject,
-    layout: gdLayout
-  ) => void,
-  getInfoBarDetails: (infoBarEvent: InfoBarEvent) => InfoBarDetails,
-};
-
 export default {
-  getServices(
-    objectOrInstance: gdObject | gdInitialInstance,
+  onObjectAdded(
+    object: gdObject,
     layout: gdLayout,
-    isInstance: boolean
-  ): ?AdditionalServices {
-    let objectTypeServices = null;
-    if (isInstance) {
-      objectTypeServices = this.objectType[
-        // $FlowFixMe
-        layout.getObject(objectOrInstance.getObjectName()).getType()
-      ];
-    } else {
-      // $FlowFixMe
-      objectTypeServices = this.objectType[objectOrInstance.getType()];
+    project: gdProject
+  ): ?InfoBarDetails {
+    const services = this.objectType[object.getType()];
+    if (services) {
+      services.onObjectAdded(object, layout, project);
+      return services.getInfoBarDetails('onObjectAdded');
     }
-    return objectTypeServices;
+
+    return null;
+  },
+
+  onInstanceAdded(
+    instance: gdInitialInstance,
+    layout: gdLayout,
+    project: gdProject
+  ): ?InfoBarDetails {
+    const services = this.objectType[
+      layout.getObject(instance.getObjectName()).getType()
+    ];
+    if (services) {
+      services.onInstanceAdded(instance, layout, project);
+      return services.getInfoBarDetails('onInstanceAdded');
+    }
+
+    return null;
   },
 
   objectType: {
     'Lighting::LightObject': {
       onObjectAdded: (
         object: gdObject,
-        project: gdProject,
-        layout: gdLayout
+        layout: gdLayout,
+        project: gdProject
       ) => {
         let hasLightingLayer = false;
         for (let i = 0; i < layout.getLayersCount(); i++) {
@@ -76,8 +75,8 @@ export default {
 
       onInstanceAdded: (
         instance: gdInitialInstance,
-        project: gdProject,
-        layout: gdLayout
+        layout: gdLayout,
+        project: gdProject
       ) => {
         let lightingLayer = null;
         for (let i = 0; i < layout.getLayersCount(); i++) {
@@ -97,8 +96,8 @@ export default {
           return {
             show: true,
             identifier: 'automatic-lighting-layer',
-            message: 'Lighting Layer created!',
-            touchScreenMessage: 'Lighting Layer created!',
+            message: t`Lighting Layer created!`,
+            touchScreenMessage: t`Lighting Layer created!`,
           };
         }
 
@@ -106,8 +105,8 @@ export default {
           return {
             show: true,
             identifier: 'object-moved-in-lighting-layer',
-            message: 'Light Object is added in lighting layer!',
-            touchScreenMessage: 'Light Object is added in lighting layer!',
+            message: t`Light Object is added in lighting layer!`,
+            touchScreenMessage: t`Light Object is added in lighting layer!`,
           };
         }
 

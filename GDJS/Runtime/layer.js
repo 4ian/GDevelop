@@ -441,3 +441,7 @@ gdjs.Layer.prototype.syncWithBaseLayer = function () {
 gdjs.Layer.prototype.getClearColor = function () {
   return this._clearColor;
 };
+
+gdjs.Layer.prototype.isLightingLayer = function () {
+  return this._isLightingLayer;
+}

@@ -93,8 +93,8 @@ gdjs.Layer.prototype.getRuntimeScene = function () {
  * @param {gdjs.RuntimeScene} runtimeScene The scene the layer belongs to.
  */
 gdjs.Layer.prototype.update = function (runtimeScene) {
+  if (this._followBaseLayerCamera) this.syncWithBaseLayer();
   return this._renderer.updateTime();
-  if (this._followBaseLayer) this.syncWithBaseLayer();
 };
 
 /**

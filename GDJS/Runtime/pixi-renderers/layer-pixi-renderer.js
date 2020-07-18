@@ -24,11 +24,7 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
   this._oldWidth = this._pixiRenderer.screen.width;
   this._oldHeight = this._pixiRenderer.screen.height;
-
   this._isLightingLayer = layer.isLightingLayer();
-  if(this._isLightingLayer) {
-    this.addLayerToLighting();
-  }
   this._clearColor = layer.getClearColor();
   
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
@@ -72,12 +68,17 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function (visible) {
 gdjs.LayerPixiRenderer.prototype.updateTime = function () {
   if (this._renderTexture) {
     this.updateRenderTexture();
-    this._layer.syncWithBaseLayer();
   }
 
   for (var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
+  }
+
+  // Add Layer to lighting after adding effects to the layer,
+  // so that we can fix the blend mode.
+  if(!this._lightingSprite && this._isLightingLayer) {
+    this.addLayerToLighting();
   }
 };
 
@@ -320,7 +321,6 @@ gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
 };
 
 gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
-  if (!this._lightingSprite) {
     this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
     this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
     // fix for blend mode when applying filter
@@ -338,7 +338,6 @@ gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
     this._runtimeSceneRenderer
       .getPIXIContainer()
       .addChild(this._lightingSprite);
-  }
 };
 
 gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {

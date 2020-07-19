@@ -88,7 +88,7 @@ gdjs.evtTools.string.strLen = function(str) {
 };
 
 /**
- * Search in a string
+ * Search the first occurence in a string (return the position of the result, from the beginning of the string, or -1 if not found)
  * @private
  */
 gdjs.evtTools.string.strFind = function(str, what) {
@@ -96,15 +96,24 @@ gdjs.evtTools.string.strFind = function(str, what) {
 };
 
 /**
- * Reverse search in a string
+ * Search the last occurence in a string (return the position of the result, from the beginning of the string, or -1 if not found)
  * @private
+ * @deprecated
  */
 gdjs.evtTools.string.strRFind = function(str, what) {
     return str.lastIndexOf(what);
 };
 
 /**
- * Search in a string, starting from a specified position.
+ * Search the last occurence in a string (return the position of the result, from the beginning of the string, or -1 if not found)
+ * @private
+ */
+gdjs.evtTools.string.strFindLast = function(str, what) {
+    return str.lastIndexOf(what);
+};
+
+/**
+ * Search the first occurence in a string, starting from a specified position (return the position of the result, from the beginning of the string, or -1 if not found)
  * @private
  */
 gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
@@ -112,9 +121,18 @@ gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
 };
 
 /**
- * Reverse search in a string, starting from a specified position.
+ * Search the last occurence in a string, starting from a specified position (return the position of the result, from the beginning of the string, or -1 if not found)
  * @private
+ * @deprecated
  */
 gdjs.evtTools.string.strRFindFrom = function(str, what, pos) {
+    return str.lastIndexOf(what, pos);
+};
+
+/**
+ * Search the last occurence in a string, starting from a specified position (return the position of the result, from the beginning of the string, or -1 if not found)
+ * @private
+ */
+gdjs.evtTools.string.strFindLastFrom = function(str, what, pos) {
     return str.lastIndexOf(what, pos);
 };

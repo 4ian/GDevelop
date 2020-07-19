@@ -46,11 +46,17 @@ StringInstructionsExtension::StringInstructionsExtension() {
   GetAllExpressions()["StrRFind"]
       .SetFunctionName("GDpriv::StringTools::StrRFind")
       .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+  GetAllExpressions()["StrFindLast"]
+      .SetFunctionName("GDpriv::StringTools::StrFindLast")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
   GetAllExpressions()["StrFindFrom"]
       .SetFunctionName("GDpriv::StringTools::StrFindFrom")
       .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
   GetAllExpressions()["StrRFindFrom"]
       .SetFunctionName("GDpriv::StringTools::StrRFindFrom")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+  GetAllExpressions()["StrFindLastFrom"]
+      .SetFunctionName("GDpriv::StringTools::StrFindLastFrom")
       .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
 #endif
 }

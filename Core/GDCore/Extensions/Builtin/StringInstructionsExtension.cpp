@@ -121,7 +121,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
-      .SetHidden();
+      .SetHidden(); // Deprecated, see StrFindLast instead.
 
   extension
       .AddExpression("StrFindLast",
@@ -162,7 +162,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddParameter("expression",
                     _("Position of the last character in the string to be "
                       "considered in the search"))
-      .SetHidden();
+      .SetHidden(); // Deprecated, see StrFindLastFrom instead.
 
   extension
       .AddExpression(

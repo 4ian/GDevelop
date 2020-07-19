@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 
 /**
  * Create a renderer for an type of object displayed as an icon
@@ -27,7 +27,7 @@ export default function makeRenderer(iconPath) {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new PIXI.Sprite(PIXI.Texture.fromImage(iconPath));
+      this._pixiObject = new PIXI.Sprite(PIXI.Texture.from(iconPath));
       this._pixiContainer.addChild(this._pixiObject);
     }
 

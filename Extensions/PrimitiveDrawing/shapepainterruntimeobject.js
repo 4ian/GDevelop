@@ -140,8 +140,8 @@ gdjs.ShapePainterRuntimeObject.prototype.drawPathMoveTo = function(x1, y1) {
     this._renderer.drawPathMoveTo(x1, y1);
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1, thickness) {
-    this._renderer.drawPathLineTo(x1, y1, thickness);
+gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1) {
+    this._renderer.drawPathLineTo(x1, y1, this._outlineSize);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathBezierCurveTo = function(cpX, cpY, cpX2, cpY2, toX, toY) {

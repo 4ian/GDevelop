@@ -78,7 +78,7 @@ int GD_API StrFind(const gd::String& str, const gd::String& findwhat) {
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrRFind(const gd::String& str, const gd::String& findwhat) {
+int GD_API StrFindLast(const gd::String& str, const gd::String& findwhat) {
   size_t pos = str.rfind(findwhat);
 
   if (pos != gd::String::npos) return pos;
@@ -100,7 +100,7 @@ int GD_API StrFindFrom(const gd::String& str,
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrRFindFrom(const gd::String& str,
+int GD_API StrFindLastFrom(const gd::String& str,
                         const gd::String& findwhat,
                         std::size_t start) {
   size_t pos = str.rfind(findwhat, start);

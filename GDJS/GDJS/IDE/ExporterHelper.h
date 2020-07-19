@@ -14,6 +14,7 @@ class Project;
 class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
+class ResourcesManager;
 }  // namespace gd
 class wxProgressDialog;
 
@@ -157,18 +158,15 @@ class ExporterHelper {
    * content.
    *
    * \param indexFileContent The source of the index.html file.
-   * \param customCss "<!-- GDJS_CUSTOM_STYLE -->" will be replaced by the
-   * content of the string. \param customHtml "<!-- GDJS_CUSTOM_HTML -->" will
-   * be replaced by the content of the string. \param exportDir The directory
-   * where the project must be generated. \param codeFilesIncludes "<!--
-   * GDJS_CODE_FILES -->" will be replaced by HTML tags to include the filenames
-   * contained inside the vector. \param additionalSpec The string
-   * "GDJS_ADDITIONAL_SPEC" surrounded by comments marks will be replaced by the
-   * content of the string.
+   * \param exportDir The directory where the project must be generated.
+   * \param includesFiles "<!--GDJS_CODE_FILES -->" will be
+   * replaced by HTML tags to include the filenames
+   * contained inside the vector.
+   * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC"
+   * surrounded by comments marks will be replaced by the
+   * content of this string.
    */
   bool CompleteIndexFile(gd::String &indexFileContent,
-                         gd::String customCss,
-                         gd::String customHtml,
                          gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
                          gd::String additionalSpec);
@@ -231,6 +229,12 @@ class ExporterHelper {
   void SetCodeOutputDirectory(gd::String codeOutputDir_) {
     codeOutputDir = codeOutputDir_;
   }
+
+  static void AddDeprecatedFontFilesToFontResources(
+    gd::AbstractFileSystem &fs,
+    gd::ResourcesManager &resourcesManager,
+    const gd::String &exportDir,
+    gd::String urlPrefix = "");
 
   gd::AbstractFileSystem
       &fs;  ///< The abstract file system to be used for exportation.

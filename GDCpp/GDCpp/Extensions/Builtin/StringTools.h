@@ -25,11 +25,11 @@ gd::String GD_API ToLowerCase(const gd::String& str);
 gd::String GD_API StrRepeat(const gd::String& str, std::size_t repCount);
 std::size_t GD_API StrLen(const gd::String& str);
 int GD_API StrFind(const gd::String& str, const gd::String& findwhat);
-int GD_API StrRFind(const gd::String& str, const gd::String& findwhat);
+int GD_API StrFindLast(const gd::String& str, const gd::String& findwhat);
 int GD_API StrFindFrom(const gd::String& str,
                        const gd::String& findwhat,
                        std::size_t start);
-int GD_API StrRFindFrom(const gd::String& str,
+int GD_API StrFindLastFrom(const gd::String& str,
                         const gd::String& findwhat,
                         std::size_t start);
 

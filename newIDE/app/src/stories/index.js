@@ -191,6 +191,11 @@ import {
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
 import LayersList from '../LayersList';
+import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
+import {
+  type NamedCommand,
+  type CommandOption,
+} from '../CommandPalette/CommandManager';
 
 configureActions({
   depth: 2,
@@ -4185,6 +4190,7 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      onEditLayerEffects={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4204,6 +4210,7 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
+        onEditLayerEffects={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4267,4 +4274,69 @@ storiesOf('NewObjectDialog', module)
       onClose={action('close')}
       onChoose={action('choose')}
     />
+  ));
+
+storiesOf('CommandPalette', module)
+  .addDecorator(muiDecorator)
+  .add('commands', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                name: 'OPEN_PROJECT',
+                displayText: t`Open project`,
+                handler: () => {},
+              },
+              {
+                name: 'SAVE_PROJECT',
+                displayText: t`Save project`,
+                handler: () => {},
+              },
+              {
+                name: 'EDIT_OBJECT',
+                displayText: t`Edit object...`,
+                handler: () => {},
+              },
+            ]: Array<NamedCommand>)
+          }
+          onClose={() => {}}
+          onSelect={action('Open command')}
+          placeholder="Start typing a command..."
+        />
+      )}
+    </I18n>
+  ))
+  .add('command options', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                text: 'Player',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Platform',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Enemy',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+            ]: Array<CommandOption>)
+          }
+          onClose={() => {}}
+          onSelect={action('Select command option')}
+          placeholder="Edit object..."
+        />
+      )}
+    </I18n>
   ));

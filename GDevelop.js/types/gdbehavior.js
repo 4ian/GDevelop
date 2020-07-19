@@ -3,8 +3,8 @@ declare class gdBehavior {
   constructor(): void;
   clone(): gdBehavior;
   getTypeName(): string;
-  getProperties(behaviorContent: gdSerializerElement, project: gdProject): gdMapStringPropertyDescriptor;
-  updateProperty(behaviorContent: gdSerializerElement, name: string, value: string, project: gdProject): boolean;
+  getProperties(behaviorContent: gdSerializerElement): gdMapStringPropertyDescriptor;
+  updateProperty(behaviorContent: gdSerializerElement, name: string, value: string): boolean;
   initializeContent(behaviorContent: gdSerializerElement): void;
   delete(): void;
   ptr: number;

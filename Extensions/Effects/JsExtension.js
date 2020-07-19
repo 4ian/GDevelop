@@ -627,7 +627,7 @@ module.exports = {
     glowProperties
       .getOrCreate('color')
       .setValue('#ffffff')
-      .setLabel(_('Color of the outline)'))
+      .setLabel(_('Color (color of the outline)'))
       .setType('color');
 
     const godrayEffect = extension

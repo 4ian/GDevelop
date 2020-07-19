@@ -48,11 +48,9 @@ class GD_CORE_API SpriteObject : public gd::Object {
 #if defined(GD_IDE_ONLY)
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
-  std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const override;
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name,
-                      const gd::String& value,
-                      gd::Project& project) override;
+                      const gd::String& value) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
       const gd::InitialInstance& position,

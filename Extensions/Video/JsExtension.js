@@ -566,7 +566,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
       const videoResource = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('videoResource')
         .getValue();
 
@@ -583,7 +583,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
       const videoResource = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('videoResource')
         .getValue();
       if (videoResource !== this._videoResource) {
@@ -603,7 +603,7 @@ module.exports = {
 
       // Update opacity
       const opacity = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('Opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;

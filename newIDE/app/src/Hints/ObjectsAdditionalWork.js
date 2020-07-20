@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 /*
  * Define additional logic which executes after an object/instance has been created.
@@ -65,7 +66,10 @@ export default {
           }
         }
         if (!hasLightingLayer) {
-          layout.insertNewLayer('Lighting', layout.getLayersCount());
+          const name = newNameGenerator('Lighting', name =>
+            layout.hasLayerNamed(name)
+          );
+          layout.insertNewLayer(name, layout.getLayersCount());
           const lightingLayer: gdLayer = layout.getLayer('Lighting');
           lightingLayer.setLightingLayer(true);
           lightingLayer.setFollowBaseLayerCamera(true);

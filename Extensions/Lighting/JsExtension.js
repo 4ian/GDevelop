@@ -32,7 +32,7 @@ module.exports = {
         'LightObstacleBehavior',
         _('This behavior makes the object an obstacle to light'),
         '',
-        'CppPlatform/Extensions/topdownmovementicon.png',
+        'CppPlatform/Extensions/lightObstacleIcon32.png',
         'LightObstacleBehavior',
         lightObstacleBehavior,
         new gd.BehaviorsSharedData()
@@ -95,7 +95,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('texture')
-        .setValue(objectContent.imageResource)
+        .setValue(objectContent.texture)
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Image resource'));

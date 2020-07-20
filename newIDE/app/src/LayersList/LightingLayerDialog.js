@@ -60,9 +60,7 @@ const LightingLayerDialog = (props: Props) => {
               Lighting layer introduces ambient light in the scene. There should
               be only one lighting layer per scene. Ideally all the lights
               should be in the lighting layer and in most of the cases lighting
-              layer should follow the base layer. Also note that lighting layer
-              is created only after a light object is created, if you accidently
-              delete this layer, create a new light object.
+              layer should follow the base layer.
             </Trans>
           </DismissableAlertMessage>
         </Line>

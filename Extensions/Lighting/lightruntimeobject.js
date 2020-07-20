@@ -6,7 +6,12 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
     lightObjectData.content.color
   );
   this._debugMode = lightObjectData.content.debugMode;
-  this._texture = lightObjectData.content.texture;
+  this._texture = lightObjectData.content.texture === ''
+                    ? null
+                    : runtimeScene
+                      .getGame()
+                      .getImageManager()
+                      .getPIXITexture(lightObjectData.content.texture);
 
   if(gdjs.LightObstaclesManager)
     this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
@@ -82,3 +87,7 @@ gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
 gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
   return this._debugMode;
 };
+
+gdjs.LightRuntimeObject.prototype.getPIXITexture = function () {
+  return this._texture;
+}

@@ -93,7 +93,7 @@ gdjs.Layer.prototype.getRuntimeScene = function () {
  * @param {gdjs.RuntimeScene} runtimeScene The scene the layer belongs to.
  */
 gdjs.Layer.prototype.update = function (runtimeScene) {
-  if (this._followBaseLayerCamera) this.syncWithBaseLayer();
+  if (this._followBaseLayerCamera) this.followBaseLayer();
   return this._renderer.updateTime();
 };
 
@@ -430,7 +430,7 @@ gdjs.Layer.prototype.getElapsedTime = function () {
  * Set the position of layer's camera to follow
  * base layer's camera.
  */
-gdjs.Layer.prototype.syncWithBaseLayer = function () {
+gdjs.Layer.prototype.followBaseLayer = function () {
   this.setCameraX(this._runtimeScene.getLayer('').getCameraX());
   this.setCameraY(this._runtimeScene.getLayer('').getCameraY());
 };

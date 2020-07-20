@@ -9,13 +9,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
   this._debugMode = runtimeObject.getDebugMode();
-  this._texture = null;
-    // runtimeObject._texture === ''
-    //   ? null
-    //   : runtimeScene
-    //       .getGame()
-    //       .getImageManager()
-    //       .getPIXITexture(runtimeObject._texture);
+  this._texture = runtimeObject.getPIXITexture();
 
   this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
   this._vertexBuffer = new Float32Array([
@@ -74,12 +68,15 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
   var fragmentShader =
     this._texture === null ? defaultFragmentShader : texturedFragmentShader;
-  var shader = PIXI.Shader.from(defaultVertexShader, fragmentShader, {
+  var shaderUniforms = {
     center: this._center,
     radius: this._radius,
     color: this._color,
-    //uSampler: this._texture,
-  });
+  }
+  if(this._texture) {
+    shaderUniforms.uSampler = this._texture;
+  }
+  var shader = PIXI.Shader.from(defaultVertexShader, fragmentShader, shaderUniforms);
   var geometry = new PIXI.Geometry();
   if (this._light === undefined) {
     geometry

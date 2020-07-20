@@ -6,7 +6,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
 import {
@@ -134,13 +134,31 @@ type Props = {|
 type State = {|
   effectsEditedLayer: ?gdLayer,
   lightingEditedLayer: ?gdLayer,
+  isLightingLayerPresent: boolean,
 |};
 
 export default class LayersList extends Component<Props, State> {
   state = {
     effectsEditedLayer: null,
     lightingEditedLayer: null,
+    isLightingLayerPresent: false,
   };
+
+  componentDidMount() {
+    const isLayerPresent = this._isLightingLayerPresent();
+    if (this.state.isLightingLayerPresent !== isLayerPresent)
+      this.setState({
+        isLightingLayerPresent: isLayerPresent,
+      });
+  }
+
+  componentDidUpdate(prevProp: Props, prevState: State) {
+    const isLayerPresent = this._isLightingLayerPresent();
+    if (prevState.isLightingLayerPresent !== isLayerPresent)
+      this.setState({
+        isLightingLayerPresent: isLayerPresent,
+      });
+  }
 
   _editEffects = (effectsEditedLayer: ?gdLayer) => {
     this.setState({
@@ -163,6 +181,33 @@ export default class LayersList extends Component<Props, State> {
     this._onLayerModified();
   };
 
+  _isLightingLayerPresent = () => {
+    const { layersContainer } = this.props;
+    const layersCount = layersContainer.getLayersCount();
+    for (let i = 0; i < layersCount; i++) {
+      const layer = layersContainer.getLayerAt(i);
+      if (layer.isLightingLayer()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  _addLightingLayer = () => {
+    const { layersContainer } = this.props;
+    if (!this._isLightingLayerPresent()) {
+      const name = newNameGenerator('Lighting', name =>
+        layersContainer.hasLayerNamed(name)
+      );
+      layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      const lightingLayer = layersContainer.getLayer(name);
+      lightingLayer.setLightingLayer(true);
+      lightingLayer.setFollowBaseLayerCamera(true);
+      lightingLayer.setAmbientLightColor(128, 128, 128);
+      this._onLayerModified();
+    }
+  };
+
   _onLayerModified = () => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
@@ -171,7 +216,11 @@ export default class LayersList extends Component<Props, State> {
 
   render() {
     const { project } = this.props;
-    const { effectsEditedLayer, lightingEditedLayer } = this.state;
+    const {
+      effectsEditedLayer,
+      lightingEditedLayer,
+      isLightingLayerPresent,
+    } = this.state;
 
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -209,6 +258,14 @@ export default class LayersList extends Component<Props, State> {
           </FullSizeMeasurer>
           <Column>
             <Line justifyContent="flex-end" expand>
+              <RaisedButton
+                label={<Trans>Add lighting layer</Trans>}
+                primary
+                disabled={isLightingLayerPresent}
+                onClick={this._addLightingLayer}
+                icon={<Add />}
+              />
+              <Spacer />
               <RaisedButton
                 label={<Trans>Add a layer</Trans>}
                 primary

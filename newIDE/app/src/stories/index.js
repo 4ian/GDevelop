@@ -1107,6 +1107,30 @@ storiesOf('UI Building Blocks/AlertMessage', module)
       inimicus.
     </AlertMessage>
   ))
+  .add('long text with icon', () => (
+    <AlertMessage
+      kind="info"
+      renderLeftIcon={() => (
+        <img
+          src="res/tutorial_icons/tween-behavior.jpg"
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            maxWidth: 128,
+            maxHeight: 128,
+          }}
+        />
+      )}
+      onHide={() => {}}
+    >
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
   .add('warning', () => (
     <AlertMessage kind="warning">
       Hello World, this is an alert text

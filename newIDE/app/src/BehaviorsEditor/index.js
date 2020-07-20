@@ -22,6 +22,9 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { getBehaviorTutorialHints } from '../Hints';
+import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
+import { ColumnStackLayout } from '../UI/Layout';
 const gd: libGDevelop = global.gd;
 
 const AddBehaviorLine = ({ onAdd }) => (
@@ -137,9 +140,8 @@ export default class BehaviorsEditor extends Component<Props, State> {
         {allBehaviorNames
           .map((behaviorName, index) => {
             const behaviorContent = object.getBehavior(behaviorName);
-            const behavior = gd.JsPlatform.get().getBehavior(
-              behaviorContent.getTypeName()
-            );
+            const behaviorTypeName = behaviorContent.getTypeName();
+            const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
             if (isNullPtr(gd, behavior)) {
               return (
                 <div key={index}>
@@ -168,8 +170,9 @@ export default class BehaviorsEditor extends Component<Props, State> {
             }
 
             const BehaviorComponent = BehaviorsEditorService.getEditor(
-              behaviorContent.getTypeName()
+              behaviorTypeName
             );
+            const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
 
             return (
               <div key={index}>
@@ -196,6 +199,18 @@ export default class BehaviorsEditor extends Component<Props, State> {
                   </IconButton>
                   <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
                 </MiniToolbar>
+                {tutorialHints.length ? (
+                  <Line>
+                    <ColumnStackLayout expand>
+                      {tutorialHints.map(tutorialHint => (
+                        <DismissableTutorialMessage
+                          key={tutorialHint.identifier}
+                          tutorialHint={tutorialHint}
+                        />
+                      ))}
+                    </ColumnStackLayout>
+                  </Line>
+                ) : null}
                 <Line>
                   <BehaviorComponent
                     behavior={behavior}

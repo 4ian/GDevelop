@@ -6,10 +6,11 @@ import Paper from '@material-ui/core/Paper';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import Error from '@material-ui/icons/Error';
-import { Line } from './Grid';
+import { Spacer } from './Grid';
 import FlatButton from './FlatButton';
 import Text from './Text';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import { ResponsiveLineStackLayout } from './Layout';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -20,6 +21,7 @@ type Props = {|
   kind: 'info' | 'warning' | 'error',
   children: React.Node,
   onHide?: () => void,
+  renderLeftIcon?: () => React.Node,
   renderRightButton?: () => React.Node,
 |};
 
@@ -27,34 +29,50 @@ type Props = {|
  * Show an hint, warning or other message. If you want to allow the user
  * to permanently hide the hint/alert/message, see DismissableAlertMessage.
  */
-const AlertMessage = ({ kind, children, onHide, renderRightButton }: Props) => (
+const AlertMessage = ({
+  kind,
+  children,
+  onHide,
+  renderRightButton,
+  renderLeftIcon,
+}: Props) => (
   <Paper>
     <ThemeConsumer>
       {muiTheme => (
-        <Line noMargin alignItems="center">
-          {kind === 'info' && <Info style={styles.icon} />}
-          {kind === 'warning' && (
-            <Warning
-              style={{
-                ...styles.icon,
-                color: muiTheme.message.warning,
-              }}
-            />
-          )}
-          {kind === 'error' && (
-            <Error
-              style={{
-                ...styles.icon,
-                color: muiTheme.message.error,
-              }}
-            />
+        <ResponsiveLineStackLayout noMargin alignItems="center">
+          {renderLeftIcon ? (
+            <React.Fragment>
+              <Spacer />
+              {renderLeftIcon()}
+              <Spacer />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              {kind === 'info' && <Info style={styles.icon} />}
+              {kind === 'warning' && (
+                <Warning
+                  style={{
+                    ...styles.icon,
+                    color: muiTheme.message.warning,
+                  }}
+                />
+              )}
+              {kind === 'error' && (
+                <Error
+                  style={{
+                    ...styles.icon,
+                    color: muiTheme.message.error,
+                  }}
+                />
+              )}
+            </React.Fragment>
           )}
           <Text style={styles.content}>{children}</Text>
           {renderRightButton && renderRightButton()}
           {onHide && (
             <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
           )}
-        </Line>
+        </ResponsiveLineStackLayout>
       )}
     </ThemeConsumer>
   </Paper>

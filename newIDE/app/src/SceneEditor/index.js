@@ -1272,9 +1272,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 effectsEditedLayer: null,
               })
             }
-            hotReloadPreviewButtonProps={
-              this.props.hotReloadPreviewButtonProps
-            }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {this.state.scenePropertiesDialogOpen && (

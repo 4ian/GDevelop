@@ -18,7 +18,11 @@ import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExterna
 import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import Window from '../../Utils/Window';
-import { getExtraInstructionInformation } from '../../Hints';
+import {
+  getExtraInstructionInformation,
+  getInstructionTutorialHints,
+} from '../../Hints';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../UI/IconButton';
@@ -213,6 +217,7 @@ export default class InstructionParametersEditor extends React.Component<
     const instructionExtraInformation = getExtraInstructionInformation(
       instructionType
     );
+    const tutorialHints = getInstructionTutorialHints(instructionType);
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
@@ -254,6 +259,18 @@ export default class InstructionParametersEditor extends React.Component<
                 </AlertMessage>
               </Line>
             )}
+            {tutorialHints.length ? (
+              <Line>
+                <ColumnStackLayout expand>
+                  {tutorialHints.map(tutorialHint => (
+                    <DismissableTutorialMessage
+                      key={tutorialHint.identifier}
+                      tutorialHint={tutorialHint}
+                    />
+                  ))}
+                </ColumnStackLayout>
+              </Line>
+            ) : null}
             <Spacer />
             <div key={instructionType} style={styles.parametersContainer}>
               <ColumnStackLayout noMargin>

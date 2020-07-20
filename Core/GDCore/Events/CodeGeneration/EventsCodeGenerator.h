@@ -321,7 +321,7 @@ class GD_CORE_API EventsCodeGenerator {
    * group.
    *
    * Get a list containing the "real" objects name when the events refers to \a
-   * objectName :<br> If \a objectName if really an object, the list will only
+   * objectName :<br> If \a objectName is really an object, the list will only
    * contains \a objectName unchanged.<br> If \a objectName is a group, the list
    * will contains all the objects of the group.<br> If \a objectName is the
    * "current" object in the context ( i.e: The object being used for launching

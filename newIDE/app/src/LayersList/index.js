@@ -18,7 +18,6 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
-import LightingLayerDialog from './LightingLayerDialog';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -41,13 +40,13 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const {
       layersContainer,
       onEditEffects,
-      width,
       onEditLighting,
+      width,
     } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
-      const layer: gdLayer = layersContainer.getLayerAt(i);
+      const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
       const isLightingLayer = layer.isLightingLayer();
 
@@ -57,11 +56,11 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           key={'layer-' + layerName}
           layer={layer}
           layerName={layerName}
+          isLightingLayer={isLightingLayer}
           nameError={this.state.nameErrors[layerName]}
           effectsCount={layer.getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
           onEditLighting={() => onEditLighting(layer)}
-          isLightingLayer={isLightingLayer}
           onBlur={event => {
             const newName = event.target.value;
             if (layerName === newName) return;
@@ -122,6 +121,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
+  onEditLightingLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -133,99 +133,53 @@ type Props = {|
 
 type State = {|
   effectsEditedLayer: ?gdLayer,
-  lightingEditedLayer: ?gdLayer,
-  isLightingLayerPresent: boolean,
 |};
 
+const hasLightingLayer = (layout: gdLayout) => {
+  const layersCount = layout.getLayersCount();
+  let isLightingLayerPresent = false;
+  mapReverseFor(0, layersCount, i => {
+    const layer = layout.getLayerAt(i);
+    if (layer.isLightingLayer()) isLightingLayerPresent = true;
+  });
+  return isLightingLayerPresent;
+};
+
 export default class LayersList extends Component<Props, State> {
-  state = {
-    effectsEditedLayer: null,
-    lightingEditedLayer: null,
-    isLightingLayerPresent: false,
-  };
-
-  componentDidMount() {
-    const isLayerPresent = this._isLightingLayerPresent();
-    if (this.state.isLightingLayerPresent !== isLayerPresent)
-      this.setState({
-        isLightingLayerPresent: isLayerPresent,
-      });
-  }
-
-  componentDidUpdate(prevProp: Props, prevState: State) {
-    const isLayerPresent = this._isLightingLayerPresent();
-    if (prevState.isLightingLayerPresent !== isLayerPresent)
-      this.setState({
-        isLightingLayerPresent: isLayerPresent,
-      });
-  }
-
-  _editEffects = (effectsEditedLayer: ?gdLayer) => {
-    this.setState({
-      effectsEditedLayer,
-    });
-  };
-
-  _editLighting = (lightingEditedLayer: ?gdLayer) => {
-    this.setState({
-      lightingEditedLayer,
-    });
-  };
-
   _addLayer = () => {
     const { layersContainer } = this.props;
     const name = newNameGenerator('Layer', name =>
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
-    this._onLayerModified();
-  };
-
-  _isLightingLayerPresent = () => {
-    const { layersContainer } = this.props;
-    const layersCount = layersContainer.getLayersCount();
-    for (let i = 0; i < layersCount; i++) {
-      const layer = layersContainer.getLayerAt(i);
-      if (layer.isLightingLayer()) {
-        return true;
-      }
-    }
-    return false;
+    this.onLayerModified();
   };
 
   _addLightingLayer = () => {
     const { layersContainer } = this.props;
-    if (!this._isLightingLayerPresent()) {
-      const name = newNameGenerator('Lighting', name =>
-        layersContainer.hasLayerNamed(name)
-      );
-      layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
-      const lightingLayer = layersContainer.getLayer(name);
-      lightingLayer.setLightingLayer(true);
-      lightingLayer.setFollowBaseLayerCamera(true);
-      lightingLayer.setAmbientLightColor(128, 128, 128);
-      this._onLayerModified();
-    }
+    const name = newNameGenerator('Lighting', name =>
+      layersContainer.hasLayerNamed(name)
+    );
+    layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+    const layer = layersContainer.getLayer(name);
+    layer.setLightingLayer(true);
+    layer.setFollowBaseLayerCamera(true);
+    layer.setAmbientLightColor(128, 128, 128);
+    this.onLayerModified();
   };
 
-  _onLayerModified = () => {
+  onLayerModified = () => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
   render() {
-    const { project } = this.props;
-    const {
-      effectsEditedLayer,
-      lightingEditedLayer,
-      isLightingLayerPresent,
-    } = this.state;
-
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = this.props.layersContainer.ptr;
+    const isLightingLayerPresent = hasLightingLayer(this.props.layersContainer);
 
     return (
       <Background>
@@ -237,8 +191,8 @@ export default class LayersList extends Component<Props, State> {
               <SortableLayersListBody
                 key={listKey}
                 layersContainer={this.props.layersContainer}
-                onEditEffects={layer => this._editEffects(layer)}
-                onEditLighting={layer => this._editLighting(layer)}
+                onEditEffects={this.props.onEditLayerEffects}
+                onEditLighting={this.props.onEditLightingLayer}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
@@ -247,7 +201,7 @@ export default class LayersList extends Component<Props, State> {
                     layersCount - 1 - oldIndex,
                     layersCount - 1 - newIndex
                   );
-                  this._onLayerModified();
+                  this.onLayerModified();
                 }}
                 helperClass="sortable-helper"
                 useDragHandle
@@ -274,30 +228,6 @@ export default class LayersList extends Component<Props, State> {
               />
             </Line>
           </Column>
-          {effectsEditedLayer && (
-            <EffectsListDialog
-              project={project}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              effectsContainer={effectsEditedLayer}
-              onApply={() =>
-                this.setState({
-                  effectsEditedLayer: null,
-                })
-              }
-            />
-          )}
-          {lightingEditedLayer && (
-            <LightingLayerDialog
-              layer={lightingEditedLayer}
-              onClose={() => {
-                this.setState({
-                  lightingEditedLayer: null,
-                });
-              }}
-            />
-          )}
         </ScrollView>
       </Background>
     );

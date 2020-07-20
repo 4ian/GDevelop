@@ -4191,6 +4191,7 @@ storiesOf('LayersList', module)
       }}
       resourceSources={[]}
       onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4211,6 +4212,7 @@ storiesOf('LayersList', module)
         }}
         resourceSources={[]}
         onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}

@@ -14,8 +14,8 @@ import TextField from '../UI/TextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
-import Badge from '../UI/Badge';
 import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
+import Badge from '../UI/Badge';
 
 type Props = {|
   layerName: string,
@@ -23,12 +23,12 @@ type Props = {|
   onBlur: () => void,
   onRemove: () => void,
   isVisible: boolean,
+  isLightingLayer: boolean,
   onChangeVisibility: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
-  width: number,
-  isLightingLayer: boolean,
   onEditLighting: () => void,
+  width: number,
 |};
 
 export default ({
@@ -119,7 +119,7 @@ export default ({
                 <IconButton
                   size="small"
                   onClick={onEditLighting}
-                  tooltip={t`Open Lighting layer settings`}
+                  tooltip={t`Edit lighting properties`}
                 >
                   <EmojiObjectsIcon />
                 </IconButton>

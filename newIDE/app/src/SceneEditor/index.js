@@ -14,6 +14,7 @@ import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEdito
 import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
+import LightingLayerDialog from '../LayersList/LightingLayerDialog';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
@@ -125,6 +126,7 @@ type State = {|
   onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
   layerRemoved: ?string,
   effectsEditedLayer: ?gdLayer,
+  lightingEditLayer: ?gdLayer,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
@@ -160,6 +162,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenu;
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
+  _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
 
   constructor(props: Props) {
@@ -174,6 +177,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       effectsEditedLayer: null,
+      lightingEditLayer: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
       variablesEditedObject: null,
@@ -338,6 +342,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   editLayerEffects = (layer: ?gdLayer) => {
     this.setState({ effectsEditedLayer: layer });
+  };
+
+  editLightingLayer = (layer: ?gdLayer) => {
+    this.setState({ lightingEditLayer: layer });
   };
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
@@ -621,6 +629,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
             if (this.editor) this.editor.forceRemount();
+            this.forceUpdateLayersList();
             this.updateToolbar();
           }
         );
@@ -887,6 +896,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this._objectsList) this._objectsList.forceUpdateList();
   };
 
+  forceUpdateLayersList = () => {
+    if (this._layersList) this._layersList.onLayerModified();
+  };
+
   forceUpdatePropertiesEditor = () => {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   };
@@ -976,10 +989,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
             onEditLayerEffects={this.editLayerEffects}
+            onEditLightingLayer={this.editLightingLayer}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
+            ref={layersList => (this._layersList = layersList)}
           />
         ),
       },
@@ -1097,6 +1112,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
           onEditLayerEffects={this.editLayerEffects}
+          onEditLightingLayer={this.editLightingLayer}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (
@@ -1311,6 +1327,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() =>
               this.setState({
                 effectsEditedLayer: null,
+              })
+            }
+          />
+        )}
+        {!!this.state.lightingEditLayer && (
+          <LightingLayerDialog
+            layer={this.state.lightingEditLayer}
+            onClose={() =>
+              this.setState({
+                lightingEditLayer: null,
               })
             }
           />

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type CommandWithOptions, type SimpleCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import isDialogOpen from '../UI/OpenedDialogChecker';
 
 /**
  * React hook for dynamically registering and deregistering a simple command
@@ -63,18 +64,7 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
           if (!values.useCommandPalette) return;
           // Don't open browser's print dialog if palette is enabled
           e.preventDefault();
-          // If currently focused element is inside MainFrame div, we can
-          // be sure that no dialog or overlay is opened.
-          // But clicking on some empty spaces like in properties panel leads
-          // to <body> element getting focused, so we also need to check if
-          // currently focused element is <body>.
-          const body = document.body;
-          const activeEl = document.activeElement;
-          const mainFrame = document.querySelector('div.main-frame');
-          const isInMainframe = mainFrame && mainFrame.contains(activeEl);
-          const isBody = activeEl === body;
-          if (!isBody && !isInMainframe) return;
-          onOpen();
+          if (!isDialogOpen()) onOpen();
         }
       };
       document.addEventListener('keydown', handler);

@@ -104,6 +104,7 @@ import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandH
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import useKeyboardShortcuts from '../ShortcutManager/UseKeyboardShortcuts';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
 
@@ -1698,6 +1699,8 @@ const MainFrame = (props: Props) => {
       status: 'update-available',
       message: 'Update available',
     });
+
+  useKeyboardShortcuts({});
 
   useKeyboardShortcutForCommandPalette(
     React.useCallback(() => openCommandPalette(true), [])

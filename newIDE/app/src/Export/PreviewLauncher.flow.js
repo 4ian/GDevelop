@@ -52,10 +52,17 @@ export type PreviewDebuggerServerCallbacks = {|
   onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
 |};
 
+/** The address to be used to communicate with the debugger server using WebSockets. */
+export type ServerAddress = {
+  address: string,
+  port: number,
+};
+
 /** Interface to run a debugger server for previews. */
 export type PreviewDebuggerServer = {|
-  startServer: () => void,
+  startServer: () => Promise<void>,
   getServerState: () => 'started' | 'stopped',
+  getServerAddress: () => ?ServerAddress,
   getExistingDebuggerIds: () => Array<DebuggerId>,
   sendMessage: (id: DebuggerId, message: Object) => void,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,

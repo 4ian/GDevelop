@@ -9,7 +9,6 @@ import { findGDJS } from '../../../GameEngineFinder/LocalGDJSFinder';
 import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
-import { findLocalIp } from './LocalIpFinder';
 import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
 import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
@@ -121,15 +120,15 @@ export default class LocalPreviewLauncher extends React.Component<
 
             setTimeout(() => this._checkSubscription());
           });
-          ipcRenderer.on('local-network-ips', (event, ipAddresses) => {
+          ipcRenderer.on('local-network-ip', (event, ipAddress) => {
             this.setState({
-              networkPreviewHost: findLocalIp(ipAddresses),
+              networkPreviewHost: ipAddress,
             });
           });
           ipcRenderer.send('serve-folder', {
             root: gamePath,
           });
-          ipcRenderer.send('get-local-network-ips');
+          ipcRenderer.send('get-local-network-ip');
         }
       }
     );
@@ -159,54 +158,71 @@ export default class LocalPreviewLauncher extends React.Component<
     // Start the debugger server for previews. Even if not used,
     // useful if the user opens the Debugger editor later, or want to
     // hot reload.
-    this.getPreviewDebuggerServer().startServer();
-
-    return this._prepareExporter().then(({ outputDir, exporter }) => {
-      timeFunction(
-        () => {
-          const previewExportOptions = new gd.PreviewExportOptions(
-            project,
-            outputDir
-          );
-          previewExportOptions.setLayoutName(layout.getName());
-          if (externalLayout) {
-            previewExportOptions.setExternalLayoutName(
-              externalLayout.getName()
+    return this.getPreviewDebuggerServer()
+      .startServer()
+      .catch(err => {
+        // Ignore any error when running the debugger server - the preview
+        // can still work without it.
+        console.error(
+          'Unable to start the Debugger Server for the preview:',
+          err
+        );
+      })
+      .then(() => this._prepareExporter())
+      .then(({ outputDir, exporter }) => {
+        timeFunction(
+          () => {
+            const previewExportOptions = new gd.PreviewExportOptions(
+              project,
+              outputDir
             );
-          }
+            previewExportOptions.setLayoutName(layout.getName());
+            if (externalLayout) {
+              previewExportOptions.setExternalLayoutName(
+                externalLayout.getName()
+              );
+            }
 
-          const includeFileHashs = this.props.getIncludeFileHashs();
-          for (const includeFile in includeFileHashs) {
-            const hash = includeFileHashs[includeFile];
-            previewExportOptions.setIncludeFileHash(includeFile, hash);
-          }
+            const previewDebuggerServerAddress = this.getPreviewDebuggerServer().getServerAddress();
+            if (previewDebuggerServerAddress) {
+              previewExportOptions.setDebuggerServerAddress(
+                previewDebuggerServerAddress.address,
+                '' + previewDebuggerServerAddress.port
+              );
+            }
 
-          const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-          const shouldHotReload =
-            previewOptions.hotReload && !!debuggerIds.length;
+            const includeFileHashs = this.props.getIncludeFileHashs();
+            for (const includeFile in includeFileHashs) {
+              const hash = includeFileHashs[includeFile];
+              previewExportOptions.setIncludeFileHash(includeFile, hash);
+            }
 
-          previewExportOptions.setProjectDataOnlyExport(
-            // Only export project data if asked and if a hot-reloading is being done.
-            shouldHotReload && previewOptions.projectDataOnlyExport
-          );
+            const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+            const shouldHotReload =
+              previewOptions.hotReload && !!debuggerIds.length;
 
-          exporter.exportProjectForPixiPreview(previewExportOptions);
-          previewExportOptions.delete();
-          exporter.delete();
+            previewExportOptions.setProjectDataOnlyExport(
+              // Only export project data if asked and if a hot-reloading is being done.
+              shouldHotReload && previewOptions.projectDataOnlyExport
+            );
 
-          if (shouldHotReload) {
-            debuggerIds.forEach(debuggerId => {
-              this.getPreviewDebuggerServer().sendMessage(debuggerId, {
-                command: 'hotReload',
+            exporter.exportProjectForPixiPreview(previewExportOptions);
+            previewExportOptions.delete();
+            exporter.delete();
+
+            if (shouldHotReload) {
+              debuggerIds.forEach(debuggerId => {
+                this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+                  command: 'hotReload',
+                });
               });
-            });
-          } else {
-            this._openPreviewWindow(project, outputDir, previewOptions);
-          }
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
+            } else {
+              this._openPreviewWindow(project, outputDir, previewOptions);
+            }
+          },
+          time => console.info(`Preview took ${time}ms`)
+        );
+      });
   };
 
   getPreviewDebuggerServer() {

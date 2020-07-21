@@ -35,6 +35,16 @@ struct PreviewExportOptions {
       : project(project_), exportPath(exportPath_), projectDataOnlyExport(false) {};
 
   /**
+   * \brief Set the address of the debugger server that the game should reach out to,
+   * using WebSockets.
+   */
+  PreviewExportOptions &SetDebuggerServerAddress(const gd::String& address, const gd::String& port) {
+    debuggerServerAddress = address;
+    debuggerServerPort = port;
+    return *this;
+  }
+
+  /**
    * \brief Set the layout to be run first in the previewed game
    */
   PreviewExportOptions &SetLayoutName(const gd::String &layoutName_) {
@@ -73,6 +83,8 @@ struct PreviewExportOptions {
 
   gd::Project &project;
   gd::String exportPath;
+  gd::String debuggerServerAddress;
+  gd::String debuggerServerPort;
   gd::String layoutName;
   gd::String externalLayoutName;
   std::map<gd::String, int> includeFileHashes;

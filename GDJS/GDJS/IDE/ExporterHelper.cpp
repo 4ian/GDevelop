@@ -109,6 +109,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
+  runtimeGameOptions.AddChild("debuggerServerAddress")
+      .SetStringValue(options.debuggerServerAddress);
+  runtimeGameOptions.AddChild("debuggerServerPort")
+      .SetStringValue(options.debuggerServerPort);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");

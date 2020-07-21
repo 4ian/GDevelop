@@ -225,14 +225,11 @@ export default class Debugger extends React.Component<Props, State> {
 
   _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
     const { previewDebuggerServer } = this.props;
-    previewDebuggerServer.sendMessage(
-      id,
-      JSON.stringify({
-        command: 'call',
-        path,
-        args,
-      })
-    );
+    previewDebuggerServer.sendMessage(id, {
+      command: 'call',
+      path,
+      args,
+    });
 
     setTimeout(() => this._refresh(id), 100);
     return true;

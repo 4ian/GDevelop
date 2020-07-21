@@ -18,6 +18,8 @@
  * @property {string=} injectExternalLayout The name of the external layout to create in the scene at position 0;0.
  * @property {RuntimeGameOptionsScriptFile[]=} scriptFiles Script files, used for hot-reloading.
  * @property {boolean=} projectDataOnlyExport if true, export is a partial preview without events.
+ * @property {string=} debuggerServerAddress The address of the debugger server, to reach out using WebSocket.
+ * @property {string=} debuggerServerPort The port of the debugger server, to reach out using WebSocket.
  */
 
 /**
@@ -74,9 +76,9 @@ gdjs.RuntimeGame = function(data, options) {
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;
 
-  /** 
+  /**
    * Optional client to connect to a debugger
-   * @type {?gdjs.IDebuggerClient} 
+   * @type {?gdjs.IDebuggerClient}
    */
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)

@@ -102,9 +102,10 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette from '../CommandPalette/CommandPalette';
+import CommandPalette, {
+  type CommandPaletteInterface,
+} from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
-import useKeyboardShortcuts from '../ShortcutManager/UseKeyboardShortcuts';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import { type PreviewState } from './PreviewState.flow';
 
@@ -227,9 +228,7 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
-    false
-  );
+  const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1700,10 +1699,8 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  useKeyboardShortcuts({});
-
   useKeyboardShortcutForCommandPalette(
-    React.useCallback(() => openCommandPalette(true), [])
+    commandPaletteRef.current ? commandPaletteRef.current.open : () => {}
   );
 
   useMainFrameCommands({
@@ -1946,6 +1943,7 @@ const MainFrame = (props: Props) => {
           </TabContentContainer>
         );
       })}
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal show={showLoader} />
       <HelpFinder
         open={helpFinderDialogOpen}
@@ -2060,9 +2058,6 @@ const MainFrame = (props: Props) => {
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
-      )}
-      {commandPaletteOpen && (
-        <CommandPalette open onClose={() => openCommandPalette(false)} />
       )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog

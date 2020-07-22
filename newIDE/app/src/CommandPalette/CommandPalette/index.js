@@ -19,76 +19,88 @@ const useStyles = makeStyles({
   },
 });
 
-type Props = {|
-  open: boolean,
-  onClose: () => void,
+export type CommandPaletteInterface = {|
+  open: (open?: boolean) => void,
+  launchCommand: (commandName: string) => void,
 |};
 
-const CommandPalette = (props: Props) => {
-  const classes = useStyles();
-  const commandManager = React.useContext(CommandsContext);
-  const [commandPickerOpen, openCommandPicker] = React.useState(true);
-  const [optionPickerOpen, openOptionPicker] = React.useState(false);
-  const [
-    selectedCommand,
-    selectCommand,
-  ] = React.useState<null | NamedCommandWithOptions>(null);
+type PaletteMode = 'closed' | 'command' | 'option';
 
-  const handleCommandChoose = (command: NamedCommand) => {
-    if (command.handler) {
-      // Simple command
-      command.handler();
-      props.onClose();
-    } else {
-      // Command with options
-      selectCommand(command);
-      openCommandPicker(false);
-      openOptionPicker(true);
-    }
-  };
+const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
+  (props, ref) => {
+    const classes = useStyles();
+    const commandManager = React.useContext(CommandsContext);
+    const [mode, setMode] = React.useState<PaletteMode>('closed');
+    const [
+      selectedCommand,
+      selectCommand,
+    ] = React.useState<null | NamedCommandWithOptions>(null);
 
-  const handleOptionChoose = (option: CommandOption) => {
-    option.handler();
-    props.onClose();
-  };
+    const handleCommandChoose = (command: NamedCommand) => {
+      if (command.handler) {
+        // Simple command
+        command.handler();
+        setMode('closed');
+      } else {
+        // Command with options
+        selectCommand(command);
+        setMode('option');
+      }
+    };
 
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          onClose={props.onClose}
-          aria-label="command-palette"
-          open={props.open}
-          fullWidth
-          hideBackdrop
-          maxWidth="sm"
-          classes={classes}
-          transitionDuration={0}
-        >
-          {commandPickerOpen && (
-            // Command picker
-            <AutocompletePicker
-              i18n={i18n}
-              items={commandManager.getAllNamedCommands()}
-              placeholder={t`Start typing a command...`}
-              onClose={props.onClose}
-              onSelect={handleCommandChoose}
-            />
-          )}
-          {optionPickerOpen && selectedCommand && (
-            // Command options picker
-            <AutocompletePicker
-              i18n={i18n}
-              items={selectedCommand.generateOptions()}
-              placeholder={selectedCommand.displayText}
-              onClose={props.onClose}
-              onSelect={handleOptionChoose}
-            />
-          )}
-        </Dialog>
-      )}
-    </I18n>
-  );
-};
+    const handleOptionChoose = (option: CommandOption) => {
+      option.handler();
+      setMode('closed');
+    };
+
+    React.useImperativeHandle(ref, () => ({
+      open: (open? = true) => {
+        setMode('command');
+      },
+      launchCommand: commandName => {
+        // not implemented yet
+        console.log('Received order for command', commandName);
+      },
+    }));
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            onClose={() => setMode('closed')}
+            aria-label="command-palette"
+            open={mode !== 'closed'}
+            fullWidth
+            hideBackdrop
+            maxWidth="sm"
+            classes={classes}
+            transitionDuration={0}
+          >
+            {mode === 'command' && (
+              // Command picker
+              <AutocompletePicker
+                i18n={i18n}
+                items={commandManager.getAllNamedCommands()}
+                placeholder={t`Start typing a command...`}
+                onClose={() => setMode('closed')}
+                onSelect={handleCommandChoose}
+              />
+            )}
+            {mode === 'option' && selectedCommand && (
+              // Command options picker
+              <AutocompletePicker
+                i18n={i18n}
+                items={selectedCommand.generateOptions()}
+                placeholder={selectedCommand.displayText}
+                onClose={() => setMode('closed')}
+                onSelect={handleOptionChoose}
+              />
+            )}
+          </Dialog>
+        )}
+      </I18n>
+    );
+  }
+);
 
 export default CommandPalette;

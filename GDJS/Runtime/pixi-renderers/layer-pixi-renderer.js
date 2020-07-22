@@ -273,6 +273,11 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
   return gdjs.PixiFiltersTools.isEffectEnabled(filter);
 };
 
+/**
+ * Updates the render texture, if it exists. 
+ * Also, render texture is cleared with a specified clear color.  
+ * Not to be called outside of updateTime method in most cases.
+ */
 gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
   if(!this._pixiRenderer) return;
 
@@ -323,11 +328,19 @@ gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
   );
 };
 
+/**
+ * Creates the render texture of pixi container and returns it.
+ */
 gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
   if (!this._renderTexture) this.updateRenderTexture();
   return this._renderTexture;
 };
 
+/**
+ * Creates a sprite with the render texture of pixi container,
+ * and replaces the container with sprite in runtimeScene's pixi container.
+ * Used only in lighting for now as the sprite could have MULTIPLY blend mode.
+ */
 gdjs.LayerPixiRenderer.prototype.replaceContainerWithSprite = function () {
     if(!this._pixiRenderer) return;
     // @ts-ignore PIXI isn't typed for now.

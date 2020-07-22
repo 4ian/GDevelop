@@ -1,19 +1,21 @@
 gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, lightObjectData);
 
-  this._radius = lightObjectData.content.radius;
+  this._radius =
+    lightObjectData.content.radius > 0 ? lightObjectData.content.radius : 1;
   this._color = gdjs.LightRuntimeObject.hexToRGBColor(
     lightObjectData.content.color
   );
   this._debugMode = lightObjectData.content.debugMode;
-  this._texture = lightObjectData.content.texture === ''
-                    ? null
-                    : runtimeScene
-                      .getGame()
-                      .getImageManager()
-                      .getPIXITexture(lightObjectData.content.texture);
+  this._texture =
+    lightObjectData.content.texture === ''
+      ? null
+      : runtimeScene
+          .getGame()
+          .getImageManager()
+          .getPIXITexture(lightObjectData.content.texture);
 
-  if(gdjs.LightObstaclesManager)
+  if (gdjs.LightObstaclesManager)
     this._obstacleManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
@@ -78,9 +80,7 @@ gdjs.LightRuntimeObject.prototype.setY = function (y) {
  * before using it.
  */
 gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
-  if(this._obstacleManager)
-    return this._obstacleManager;
-  
+  if (this._obstacleManager) return this._obstacleManager;
   return null;
 };
 
@@ -90,4 +90,4 @@ gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
 
 gdjs.LightRuntimeObject.prototype.getPIXITexture = function () {
   return this._texture;
-}
+};

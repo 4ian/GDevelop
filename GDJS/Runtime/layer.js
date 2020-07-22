@@ -436,12 +436,15 @@ gdjs.Layer.prototype.followBaseLayer = function () {
 };
 
 /**
- * Return the clear color of layer.
+ * @return {number[]} the clear color of layer in the range of [0, 1].
  */
 gdjs.Layer.prototype.getClearColor = function () {
   return this._clearColor;
 };
 
+/**
+ * @return {boolean} true if it is a lighting layer, false otherwise.
+ */
 gdjs.Layer.prototype.isLightingLayer = function () {
   return this._isLightingLayer;
 }

@@ -208,6 +208,7 @@ module.exports = {
           .get('radius')
           .getValue()
       );
+      if(this._radius <= 0) this._radius = 1;
       this._colorHex = parseInt(
         this._associatedObject
           .getProperties(this.project)

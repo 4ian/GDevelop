@@ -137,12 +137,11 @@ type State = {|
 
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
-  let isLightingLayerPresent = false;
-  mapReverseFor(0, layersCount, i => {
-    const layer = layout.getLayerAt(i);
-    if (layer.isLightingLayer()) isLightingLayerPresent = true;
-  });
-  return isLightingLayerPresent;
+  return (
+    mapReverseFor(0, layersCount, i =>
+      layout.getLayerAt(i).isLightingLayer()
+    ).filter(Boolean).length > 0
+  );
 };
 
 export default class LayersList extends Component<Props, State> {

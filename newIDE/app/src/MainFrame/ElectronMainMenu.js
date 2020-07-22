@@ -1,11 +1,14 @@
 // @flow
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
+import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
 import { type MainMenuProps } from './MainMenu.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+const openRecentProjectCommandText = t`Open recent project...`;
 
 type MainMenuEvent =
   | 'main-menu-open'
@@ -305,7 +308,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
  * Create and update the editor main menu using Electron APIs.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
-  const { i18n, project, recentProjectFiles } = props;
+  const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
@@ -334,6 +337,18 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     },
     [i18n, language, project, recentProjectFiles]
   );
+
+  useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
+    displayText: openRecentProjectCommandText,
+    generateOptions: React.useCallback(
+      () =>
+        recentProjectFiles.map(item => ({
+          text: item.fileMetadata.fileIdentifier,
+          handler: () => onOpenRecentFile(item),
+        })),
+      [onOpenRecentFile, recentProjectFiles]
+    ),
+  });
 
   return null;
 };

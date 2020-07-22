@@ -104,11 +104,11 @@ gdjs.sk.SlotPixiRenderer.prototype.loadAsSprite = function(texture){
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
-    this.renderer = new PIXI.mesh.Mesh(texture,
+    this.renderer = new PIXI.SimpleMesh(texture,
                                        new Float32Array(vertices),
                                        new Float32Array(uvs),
                                        new Uint16Array(triangles),
-                                       PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
+                                       PIXI.DRAW_MODES.TRIANGLES);
 
     this.renderer.uploadUvTransform = true;
     this.renderer.z = 0;

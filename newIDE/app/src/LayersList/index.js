@@ -5,7 +5,6 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow from './LayerRow';
-import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
@@ -113,6 +112,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
+  onEditLayerEffects: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -127,16 +127,6 @@ type State = {|
 |};
 
 export default class LayersList extends Component<Props, State> {
-  state = {
-    effectsEditedLayer: null,
-  };
-
-  _editEffects = (effectsEditedLayer: ?gdLayer) => {
-    this.setState({
-      effectsEditedLayer,
-    });
-  };
-
   _addLayer = () => {
     const { layersContainer } = this.props;
     const name = newNameGenerator('Layer', name =>
@@ -153,9 +143,6 @@ export default class LayersList extends Component<Props, State> {
   };
 
   render() {
-    const { project } = this.props;
-    const { effectsEditedLayer } = this.state;
-
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -171,7 +158,7 @@ export default class LayersList extends Component<Props, State> {
               <SortableLayersListBody
                 key={listKey}
                 layersContainer={this.props.layersContainer}
-                onEditEffects={layer => this._editEffects(layer)}
+                onEditEffects={this.props.onEditLayerEffects}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
@@ -199,20 +186,6 @@ export default class LayersList extends Component<Props, State> {
               />
             </Line>
           </Column>
-          {effectsEditedLayer && (
-            <EffectsListDialog
-              project={project}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              effectsContainer={effectsEditedLayer}
-              onApply={() =>
-                this.setState({
-                  effectsEditedLayer: null,
-                })
-              }
-            />
-          )}
         </ScrollView>
       </Background>
     );

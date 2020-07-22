@@ -402,6 +402,16 @@ export const unloadProjectEventsFunctionsExtensions = (
 };
 
 /**
+ * Unload a single extension providing events functions of a project
+ */
+export const unloadProjectEventsFunctionsExtension = (
+  project: gdProject,
+  extensionName: string
+): void => {
+  gd.JsPlatform.get().removeExtension(extensionName);
+};
+
+/**
  * Given metadata about an instruction or an expression, tells if this was created
  * from an event function.
  */

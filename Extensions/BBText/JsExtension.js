@@ -465,6 +465,7 @@ module.exports = {
 
       const bbTextStyles = {
         default: {
+          // Use a default font family the time for the resource font to be loaded.
           fontFamily: 'Arial',
           fontSize: '24px',
           fill: '#cccccc',
@@ -501,36 +502,23 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const rawText = this._associatedObject
-        .getProperties()
-        .get('text')
-        .getValue();
+      const properties = this._associatedObject.getProperties();
+
+      const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {
-        this._pixiObject.setText(rawText);
+        this._pixiObject.text = rawText;
       }
 
-      const opacity = this._associatedObject
-        .getProperties()
-        .get('opacity')
-        .getValue();
+      const opacity = properties.get('opacity').getValue();
       this._pixiObject.alpha = opacity / 255;
 
-      const color = this._associatedObject
-        .getProperties()
-        .get('color')
-        .getValue();
+      const color = properties.get('color').getValue();
       this._pixiObject.textStyles.default.fill = color;
 
-      const fontSize = this._associatedObject
-        .getProperties()
-        .get('fontSize')
-        .getValue();
+      const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
 
-      const fontResourceName = this._associatedObject
-        .getProperties()
-        .get('fontFamily')
-        .getValue();
+      const fontResourceName = properties.get('fontFamily').getValue();
 
       if (this._fontResourceName !== fontResourceName) {
         this._fontResourceName = fontResourceName;
@@ -540,26 +528,24 @@ module.exports = {
           .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
             this._pixiObject.textStyles.default.fontFamily = fontFamily;
+            this._pixiObject.dirty = true;
           })
           .catch((err) => {
             // Ignore errors
-            console.warn('Unable to load font family', err);
+            console.warn(
+              'Unable to load font family for RenderedBBTextInstance',
+              err
+            );
           });
       }
 
-      const wordWrap = this._associatedObject
-        .getProperties()
-        .get('wordWrap')
-        .getValue();
+      const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap !== this._pixiObject._style.wordWrap) {
-        this._pixiObject._style.wordWrap = wordWrap === 'true';
+        this._pixiObject._style.wordWrap = wordWrap;
         this._pixiObject.dirty = true;
       }
 
-      const align = this._associatedObject
-        .getProperties()
-        .get('align')
-        .getValue();
+      const align = properties.get('align').getValue();
       if (align !== this._pixiObject._style.align) {
         this._pixiObject._style.align = align;
         this._pixiObject.dirty = true;
@@ -577,7 +563,7 @@ module.exports = {
         const customWidth = this._instance.getCustomWidth();
         if (
           this._pixiObject &&
-          this._pixiObject.textStyles.default.wordWrapWidth !== customWidth
+          this._pixiObject._style.wordWrapWidth !== customWidth
         ) {
           this._pixiObject._style.wordWrapWidth = customWidth;
           this._pixiObject.dirty = true;

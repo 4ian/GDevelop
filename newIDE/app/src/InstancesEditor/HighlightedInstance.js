@@ -1,5 +1,5 @@
 import transformRect from '../Utils/TransformRect';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 
 export default class InstancesSelection {
   constructor({ instanceMeasurer, toCanvasCoordinates }) {
@@ -46,7 +46,7 @@ export default class InstancesSelection {
     this.highlightRectangle.visible = true;
     this.highlightRectangle.clear();
     this.highlightRectangle.beginFill(0xeeeeff);
-    this.highlightRectangle.fillAlpha = 0.1;
+    this.highlightRectangle.fill.alpha = 0.1;
     this.highlightRectangle.alpha = 0.8;
     this.highlightRectangle.lineStyle(1, 0x000000, 1);
     this.highlightRectangle.drawRect(

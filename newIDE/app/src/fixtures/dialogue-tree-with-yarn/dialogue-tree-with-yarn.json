@@ -5470,7 +5470,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -5506,7 +5506,7 @@
             "fontSize": "20",
             "visible": false,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
             "align": "left",
             "wordWrap": true
           }

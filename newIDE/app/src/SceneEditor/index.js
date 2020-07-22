@@ -14,6 +14,7 @@ import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEdito
 import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
+import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
@@ -34,6 +35,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
+import UseSceneEditorCommands from './UseSceneEditorCommands';
 
 import {
   type ResourceSource,
@@ -120,6 +122,7 @@ type State = {|
   layerRemoveDialogOpen: boolean,
   onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
   layerRemoved: ?string,
+  effectsEditedLayer: ?gdLayer,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
@@ -167,6 +170,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
+      effectsEditedLayer: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
       variablesEditedObject: null,
@@ -320,6 +324,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getSelectedInstances()[0]
       .getObjectName();
     this.editObjectByName(selectedInstanceObjectName);
+  };
+
+  editLayerEffects = (layer: ?gdLayer) => {
+    this.setState({ effectsEditedLayer: layer });
   };
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
@@ -916,6 +924,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
+            onEditLayerEffects={this.editLayerEffects}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
@@ -1028,6 +1037,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     };
     return (
       <div style={styles.container}>
+        <UseSceneEditorCommands
+          project={project}
+          layout={layout}
+          onEditObject={this.props.onEditObject || this.editObject}
+          onEditObjectVariables={this.editObjectVariables}
+          onOpenSceneProperties={this.openSceneProperties}
+          onOpenSceneVariables={this.editLayoutVariables}
+          onEditObjectGroup={this.editGroup}
+          onEditLayerEffects={this.editLayerEffects}
+        />
         <ResponsiveWindowMeasurer>
           {windowWidth => (
             <PreferencesContext.Consumer>
@@ -1228,6 +1247,20 @@ export default class SceneEditor extends React.Component<Props, State> {
             layersContainer={layout}
             layerRemoved={this.state.layerRemoved}
             onClose={this.state.onCloseLayerRemoveDialog}
+          />
+        )}
+        {!!this.state.effectsEditedLayer && (
+          <EffectsListDialog
+            project={project}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+            effectsContainer={this.state.effectsEditedLayer}
+            onApply={() =>
+              this.setState({
+                effectsEditedLayer: null,
+              })
+            }
           />
         )}
         {this.state.scenePropertiesDialogOpen && (

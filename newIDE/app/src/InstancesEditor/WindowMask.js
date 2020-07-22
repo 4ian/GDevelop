@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 
 export default class WindowBorder {
@@ -50,7 +50,7 @@ export default class WindowBorder {
     this.pixiRectangle.beginFill(0x000000);
     this.pixiRectangle.lineStyle(1, 0x000000, 1);
     this.pixiRectangle.alpha = 1;
-    this.pixiRectangle.fillAlpha = 0;
+    this.pixiRectangle.fill.alpha = 0;
     this.pixiRectangle.drawRect(
       displayedRectangle.x,
       displayedRectangle.y,

@@ -33,16 +33,16 @@ const defaultShortcuts = {
 export const useKeyboardShortcuts = (onRunCommand: string => void) => {
   React.useEffect(() => {
     const handler = (e: SyntheticKeyboardEvent<>) => {
-      e.preventDefault();
       // Disable shortcuts when a dialog or overlay is open
       if (isDialogOpen()) return;
+      // Convert event object to shortcut string
       const shortcutString = getShortcutStringFromEvent(e);
-      shortcutString && console.log(shortcutString);
-      // Get corresponding command and run callback
+      // Get corresponding command name and run callback
       const commandName = Object.keys(defaultShortcuts).find(
         name => defaultShortcuts[name] === shortcutString
       );
       if (!commandName) return;
+      e.preventDefault();
       console.log('Detected shortcut for', commandName);
       onRunCommand(commandName);
     };

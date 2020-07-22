@@ -52,7 +52,7 @@ class UrlsCache {
   getStatusCode(project: gdProject, filename: string) {
     const cache = this._getProjectCache(project);
     if(!cache[filename]) return;
-    return (cache[filename]["statusCode"] || {});
+    return (cache[filename]["statusCode"] || "");
   }
 
   setStatusCode(project: gdProject, filename: string, statusCode: string) {

@@ -132,9 +132,11 @@ export const getResourceStatus = (
 ) => {
   const codeStatus = ResourcesLoader.getStatusCode(project, resourceName);
 
-  if (codeStatus.indexOf('ERROR')) return 'error';
-  if (codeStatus.indexOf('WARNING')) return 'warning';
+  if (!codeStatus) return;
 
-  // The resource path seems ok
-  return '';
+  return codeStatus.indexOf('ERROR')
+    ? 'error'
+    : codeStatus.indexOf('WARNING')
+    ? 'warning'
+    : ''; // The resource path seems ok if no status
 };

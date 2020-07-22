@@ -897,7 +897,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   forceUpdateLayersList = () => {
-    if (this._layersList) this._layersList.onLayerModified();
+    if (this._layersList) this._layersList.forceUpdate();
   };
 
   forceUpdatePropertiesEditor = () => {

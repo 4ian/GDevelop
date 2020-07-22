@@ -79,7 +79,7 @@ gdjs.LayerPixiRenderer.prototype.updateTime = function () {
   // Add Layer to lighting after adding effects to the layer,
   // so that we can fix the blend mode.
   if(!this._lightingSprite && this._isLightingLayer) {
-    this.addLayerToLighting();
+    this.replaceContainerWithSprite();
   }
 };
 
@@ -328,7 +328,7 @@ gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
   return this._renderTexture;
 };
 
-gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
+gdjs.LayerPixiRenderer.prototype.replaceContainerWithSprite = function () {
     if(!this._pixiRenderer) return;
     // @ts-ignore PIXI isn't typed for now.
     this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
@@ -348,9 +348,10 @@ gdjs.LayerPixiRenderer.prototype.addLayerToLighting = function () {
         this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
       }
     }
-    this._runtimeSceneRenderer
-      .getPIXIContainer()
-      .addChild(this._lightingSprite);
+    var sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();
+    var index = sceneContainer.getChildIndex(this._pixiContainer);
+    sceneContainer.addChildAt(this._lightingSprite, index);
+    sceneContainer.removeChild(this._pixiContainer);
 };
 
 gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {

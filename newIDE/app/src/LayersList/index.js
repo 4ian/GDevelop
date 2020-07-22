@@ -152,7 +152,7 @@ export default class LayersList extends Component<Props, State> {
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
-    this.onLayerModified();
+    this._onLayerModified();
   };
 
   _addLightingLayer = () => {
@@ -165,10 +165,10 @@ export default class LayersList extends Component<Props, State> {
     layer.setLightingLayer(true);
     layer.setFollowBaseLayerCamera(true);
     layer.setAmbientLightColor(128, 128, 128);
-    this.onLayerModified();
+    this._onLayerModified();
   };
 
-  onLayerModified = () => {
+  _onLayerModified = () => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
@@ -201,7 +201,7 @@ export default class LayersList extends Component<Props, State> {
                     layersCount - 1 - oldIndex,
                     layersCount - 1 - newIndex
                   );
-                  this.onLayerModified();
+                  this._onLayerModified();
                 }}
                 helperClass="sortable-helper"
                 useDragHandle

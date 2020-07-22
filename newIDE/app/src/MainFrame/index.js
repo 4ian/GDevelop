@@ -100,6 +100,7 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
+import { useKeyboardShortcuts } from '../CommandPalette/Shortcuts';
 import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
@@ -1698,6 +1699,12 @@ const MainFrame = (props: Props) => {
       status: 'update-available',
       message: 'Update available',
     });
+
+  useKeyboardShortcuts(
+    commandPaletteRef.current
+      ? commandPaletteRef.current.launchCommand
+      : () => {}
+  );
 
   useKeyboardShortcutForCommandPalette(
     commandPaletteRef.current ? commandPaletteRef.current.open : () => {}

@@ -58,8 +58,9 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
         setMode('command');
       },
       launchCommand: commandName => {
-        // not implemented yet
-        console.log('Received order for command', commandName);
+        const command = commandManager.commands[commandName];
+        if (!command) return;
+        handleCommandChoose(command);
       },
     }));
 

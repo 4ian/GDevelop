@@ -45,7 +45,10 @@ gdjs.HotReloader.groupByPersistentUuid = function (objectsWithPersistentId) {
  */
 gdjs.HotReloader.prototype._canReloadScriptFile = function (srcFilename) {
   function endsWith(str, suffix) {
-    return str.indexOf(suffix) === str.length - suffix.length;
+    var suffixPosition = str.indexOf(suffix);
+    return (
+      suffixPosition !== -1 && suffixPosition === str.length - suffix.length
+    );
   }
 
   // Never reload .h script files, as they are leaking by mistake from C++ extensions.
@@ -82,7 +85,10 @@ gdjs.HotReloader.prototype._canReloadScriptFile = function (srcFilename) {
  */
 gdjs.HotReloader.prototype._reloadScript = function (srcFilename) {
   function endsWith(str, suffix) {
-    return str.indexOf(suffix) === str.length - suffix.length;
+    var suffixPosition = str.indexOf(suffix);
+    return (
+      suffixPosition !== -1 && suffixPosition === str.length - suffix.length
+    );
   }
 
   if (!this._canReloadScriptFile(srcFilename)) {

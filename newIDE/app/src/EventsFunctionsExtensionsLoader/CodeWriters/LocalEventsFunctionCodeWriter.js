@@ -15,6 +15,7 @@ const fs = optionalRequire('fs');
 export const makeLocalEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
+  // The generated code for extensions will be stored in a temporary directory
   const outputDir = os.tmpdir() + '/GDGeneratedEventsFunctions';
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
@@ -37,9 +38,9 @@ export const makeLocalEventsFunctionCodeWriter = ({
       code: string
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
-        const filepath = getPathFor(functionCodeNamespace);
-        onWriteFile({ includeFile: filepath, content: code });
-        fs.writeFile(filepath, code, err => {
+        const includeFile = getPathFor(functionCodeNamespace);
+        onWriteFile({ includeFile, content: code });
+        fs.writeFile(includeFile, code, err => {
           if (err) return reject(err);
 
           resolve();
@@ -51,9 +52,9 @@ export const makeLocalEventsFunctionCodeWriter = ({
       code: string
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
-        const filepath = getPathFor(behaviorCodeNamespace);
-        onWriteFile({ includeFile: filepath, content: code });
-        fs.writeFile(filepath, code, err => {
+        const includeFile = getPathFor(behaviorCodeNamespace);
+        onWriteFile({ includeFile, content: code });
+        fs.writeFile(includeFile, code, err => {
           if (err) return reject(err);
 
           resolve();

@@ -117,10 +117,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
   scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+
   for (const auto &includeFile : includesFiles) {
     auto hashIt = options.includeFileHashes.find(includeFile);
+    gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
     scriptFilesElement.AddChild("scriptFile")
-        .SetStringAttribute("path", includeFile)
+        .SetStringAttribute("path", scriptSrc)
         .SetIntAttribute(
             "hash",
             hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
@@ -132,7 +134,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath, false);
+  ExportIncludesAndLibs(includesFiles, options.exportPath);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -344,15 +346,21 @@ bool ExporterHelper::ExportCocos2dFiles(
   {
     gd::String includeFilesStr = "";
     bool first = true;
-    for (auto &file : includesFiles) {
-      if (!fs.FileExists(exportDir + "/src/" + file)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + file << "."
+    for (auto &include : includesFiles) {
+      gd::String scriptSrc = GetExportedIncludeFilename(include);
+
+      // Sanity check if the file exists - if not skip it to avoid
+      // including it in the list of scripts.
+      gd::String absoluteFilename = scriptSrc;
+      fs.MakeAbsolute(absoluteFilename, exportDir + "/src");
+      if (!fs.FileExists(absoluteFilename)) {
+        std::cout << "Warning: Unable to find " << absoluteFilename << "."
                   << std::endl;
         continue;
       }
 
       includeFilesStr +=
-          gd::String(first ? "" : ", ") + "\"src/" + file + "\"\n";
+          gd::String(first ? "" : ", ") + "\"src/" + scriptSrc + "\"\n";
       first = false;
     }
 
@@ -462,25 +470,17 @@ bool ExporterHelper::CompleteIndexFile(
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
-  for (std::vector<gd::String>::const_iterator it = includesFiles.begin();
-       it != includesFiles.end();
-       ++it) {
-    gd::String scriptSrc = "";
-    if (fs.IsAbsolute(*it)) {
-      // Most of the time, script source are file paths relative to GDJS root or
-      // have been copied in the output directory, so they are relative. It's
-      // still useful to test here for absolute files as the exporter could be
-      // configured with a file system dealing with URL.
-      scriptSrc = *it;
-    } else {
-      if (!fs.FileExists(exportDir + "/" + *it)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + *it << "."
-                  << std::endl;
-        continue;
-      }
+  for (auto& include: includesFiles) {
+    gd::String scriptSrc = GetExportedIncludeFilename(include);
 
-      scriptSrc = exportDir + "/" + *it;
-      fs.MakeRelative(scriptSrc, exportDir);
+    // Sanity check if the file exists - if not skip it to avoid
+    // including it in the list of scripts.
+    gd::String absoluteFilename = scriptSrc;
+    fs.MakeAbsolute(absoluteFilename, exportDir);
+    if (!fs.FileExists(absoluteFilename)) {
+      std::cout << "Warning: Unable to find " << absoluteFilename << "."
+                << std::endl;
+      continue;
     }
 
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
@@ -673,38 +673,51 @@ bool ExporterHelper::ExportExternalSourceFiles(
   return true;
 }
 
+gd::String ExporterHelper::GetExportedIncludeFilename(
+    const gd::String& include) {
+  if (!fs.IsAbsolute(include)) {
+    // By convention, an include file that is relative is relative to
+    // the "<GDJS Root>/Runtime" folder, and will have the same relative
+    // path when exported.
+
+    // We still do this seemingly useless relative to absolute to relative
+    // conversion, because some filesystems are using a URL for gdjsRoot, and
+    // will convert the relative include to an absolute URL.
+    gd::String relativeInclude = gdjsRoot + "/Runtime/" + include;
+    fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+    return relativeInclude;
+  } else {
+    // Note: all the code generated from events are generated in another
+    // folder and fall in this case:
+    return fs.FileNameFrom(include);
+  }
+}
+
 bool ExporterHelper::ExportIncludesAndLibs(
-    std::vector<gd::String> &includesFiles,
-    gd::String exportDir,
-    bool /*minify*/) {
-  for (std::vector<gd::String>::iterator include = includesFiles.begin();
-       include != includesFiles.end();
-       ++include) {
-    if (!fs.IsAbsolute(*include)) {
-      gd::String source = gdjsRoot + "/Runtime/" + *include;
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir) {
+  for (auto& include : includesFiles) {
+    if (!fs.IsAbsolute(include)) {
+      // By convention, an include file that is relative is relative to
+      // the "<GDJS Root>/Runtime" folder, and will have the same relative
+      // path when exported.
+      gd::String source = gdjsRoot + "/Runtime/" + include;
       if (fs.FileExists(source)) {
-        gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
+        gd::String path = fs.DirNameFrom(exportDir + "/" + include);
         if (!fs.DirExists(path)) fs.MkDir(path);
 
-        fs.CopyFile(source, exportDir + "/" + *include);
-
-        gd::String relativeInclude = source;
-        fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-        *include = relativeInclude;
+        fs.CopyFile(source, exportDir + "/" + include);
       } else {
-        std::cout << "Could not find GDJS include file " << *include
+        std::cout << "Could not find GDJS include file " << include
                   << std::endl;
       }
     } else {
       // Note: all the code generated from events are generated in another
       // folder and fall in this case:
-
-      if (fs.FileExists(*include)) {
-        fs.CopyFile(*include, exportDir + "/" + fs.FileNameFrom(*include));
-        *include = fs.FileNameFrom(
-            *include);  // Ensure filename is relative to the export dir.
+      if (fs.FileExists(include)) {
+        fs.CopyFile(include, exportDir + "/" + fs.FileNameFrom(include));
       } else {
-        std::cout << "Could not find include file " << *include << std::endl;
+        std::cout << "Could not find include file " << include << std::endl;
       }
     }
   }

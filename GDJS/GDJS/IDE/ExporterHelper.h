@@ -153,22 +153,14 @@ class ExporterHelper {
                       std::vector<gd::String> &includesFiles);
 
   /**
-   * \brief Copy all the includes files and the standard libraries files to the
-   * export directory.
-   *
-   * The includes files are also modified so as to be relative to the export
-   * directory ( Files with absolute filenames are copied into the export
-   * directory and their path are stripped ).
+   * \brief Copy all the specified files to the
+   * export directory. Relative files are copied from "<GDJS root>/Runtime" directory.
    *
    * \param includesFiles A vector with filenames to be copied.
-   * \param exportDir The directory where the preview must be created.
-   * \param minify If true, the includes files must be merged into one file
-   * using Google Closure Compiler. ( includesFiles parameter will be updated
-   * with the new filename )
+   * \param exportDir The directory where the files mus tbe copied.
    */
-  bool ExportIncludesAndLibs(std::vector<gd::String> &includesFiles,
-                             gd::String exportDir,
-                             bool minify);
+  bool ExportIncludesAndLibs(const std::vector<gd::String> &includesFiles,
+                             gd::String exportDir);
 
   /**
    * \brief Generate the events JS code, and save them to the export directory.
@@ -293,6 +285,12 @@ class ExporterHelper {
    * \param options The options to generate the preview.
    */
   bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
+
+  /**
+   * \brief Given an include file, returns the name of the file to reference
+   * in the exported game.
+   */
+  gd::String GetExportedIncludeFilename(const gd::String& include);
 
   /**
    * \brief Change the directory where code files are generated.

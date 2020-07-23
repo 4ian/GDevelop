@@ -52,7 +52,6 @@ bool Exporter::ExportWholePixiProject(
 
   auto exportProject = [this, &exportedProject, &exportOptions, &helper](
                            gd::String exportDir) {
-    bool minify = exportOptions["minify"];
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -115,7 +114,7 @@ bool Exporter::ExportWholePixiProject(
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
-    helper.ExportIncludesAndLibs(includesFiles, exportDir, minify);
+    helper.ExportIncludesAndLibs(includesFiles, exportDir);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
@@ -219,7 +218,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
+  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src");
 
   if (!helper.ExportCocos2dFiles(
           project, exportDir, debugMode, includesFiles)) {

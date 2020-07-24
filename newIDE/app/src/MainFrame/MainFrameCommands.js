@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { type I18n } from '@lingui/core';
-import { t } from '@lingui/macro';
 import {
   useCommand,
   useCommandWithOptions,

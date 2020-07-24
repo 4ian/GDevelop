@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 

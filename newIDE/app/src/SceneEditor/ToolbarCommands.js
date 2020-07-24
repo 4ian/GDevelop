@@ -1,5 +1,4 @@
 // @flow
-import { t } from '@lingui/macro';
 import { useCommand } from '../CommandPalette/CommandHooks';
 
 type Props = {|

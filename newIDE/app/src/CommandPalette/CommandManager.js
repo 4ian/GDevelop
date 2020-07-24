@@ -1,5 +1,4 @@
 // @flow
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type CommandName } from './CommandsList';
 
 type CommandHandler = () => void | Promise<void>;

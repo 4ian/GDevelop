@@ -4,27 +4,25 @@ import { type CommandWithOptions, type SimpleCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import isDialogOpen from '../UI/OpenedDialogChecker';
+import { type CommandName } from './CommandsList';
 
 /**
  * React hook for dynamically registering and deregistering a simple command
  */
 export const useCommand = (
-  commandName: string,
+  commandName: CommandName,
   enabled: boolean,
   command: SimpleCommand
 ) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, handler } = command;
+  const { handler } = command;
   React.useEffect(
     () => {
       if (!enabled) return;
-      commandManager.registerCommand(commandName, {
-        displayText,
-        handler,
-      });
+      commandManager.registerCommand(commandName, { handler });
       return () => commandManager.deregisterCommand(commandName);
     },
-    [commandManager, commandName, displayText, enabled, handler]
+    [commandManager, commandName, enabled, handler]
   );
 };
 
@@ -32,22 +30,19 @@ export const useCommand = (
  * React hook for dynamically registering and deregistering command with options
  */
 export const useCommandWithOptions = (
-  commandName: string,
+  commandName: CommandName,
   enabled: boolean,
   command: CommandWithOptions
 ) => {
   const commandManager = React.useContext(CommandsContext);
-  const { displayText, generateOptions } = command;
+  const { generateOptions } = command;
   React.useEffect(
     () => {
       if (!enabled) return;
-      commandManager.registerCommand(commandName, {
-        displayText,
-        generateOptions,
-      });
+      commandManager.registerCommand(commandName, { generateOptions });
       return () => commandManager.deregisterCommand(commandName);
     },
-    [commandManager, commandName, displayText, enabled, generateOptions]
+    [commandManager, commandName, enabled, generateOptions]
   );
 };
 
@@ -79,7 +74,7 @@ export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
  * class components
  */
 export const UseCommandHook = (props: {|
-  name: string,
+  name: CommandName,
   enabled: boolean,
   command: SimpleCommand,
 |}) => {
@@ -92,7 +87,7 @@ export const UseCommandHook = (props: {|
  * hook in class components
  */
 export const UseCommandWithOptionsHook = (props: {|
-  name: string,
+  name: CommandName,
   enabled: boolean,
   command: CommandWithOptions,
 |}) => {

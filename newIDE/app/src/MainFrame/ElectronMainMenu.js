@@ -8,8 +8,6 @@ import { type MainMenuProps } from './MainMenu.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-const openRecentProjectCommandText = t`Open recent project...`;
-
 type MainMenuEvent =
   | 'main-menu-open'
   | 'main-menu-open-recent'
@@ -339,7 +337,6 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   );
 
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
-    displayText: openRecentProjectCommandText,
     generateOptions: React.useCallback(
       () =>
         recentProjectFiles.map(item => ({

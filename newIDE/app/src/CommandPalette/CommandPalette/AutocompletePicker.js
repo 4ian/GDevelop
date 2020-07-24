@@ -10,6 +10,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
 import { type NamedCommand, type CommandOption } from '../CommandManager';
+import commandsList from '../CommandsList';
 
 type Item = NamedCommand | CommandOption;
 
@@ -37,7 +38,7 @@ const AutocompletePicker = (
 
   const getItemText = (item: Item) => {
     if (item.text) return item.text;
-    else if (item.displayText) return props.i18n._(item.displayText);
+    else if (item.name) return props.i18n._(commandsList[item.name]);
   };
 
   const getItemIcon = (item: Item) => {

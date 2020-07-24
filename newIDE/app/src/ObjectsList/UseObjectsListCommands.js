@@ -6,9 +6,6 @@ import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 import { type CommandOption } from '../CommandPalette/CommandManager';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
-const editObjectCommandText = t`Edit object...`;
-const editObjectVariablesCommandText = t`Edit object variables...`;
-
 const generateLayoutObjectsOptions = (
   project: gdProject,
   layout: gdLayout,
@@ -34,7 +31,6 @@ type Props = {|
 const useObjectsListCommands = (props: Props) => {
   const { project, layout, onEditObject, onEditObjectVariables } = props;
   useCommandWithOptions('EDIT_OBJECT', true, {
-    displayText: editObjectCommandText,
     generateOptions: React.useCallback(
       () => generateLayoutObjectsOptions(project, layout, onEditObject),
       [project, layout, onEditObject]
@@ -42,7 +38,6 @@ const useObjectsListCommands = (props: Props) => {
   });
 
   useCommandWithOptions('EDIT_OBJECT_VARIABLES', true, {
-    displayText: editObjectVariablesCommandText,
     generateOptions: React.useCallback(
       () =>
         generateLayoutObjectsOptions(project, layout, onEditObjectVariables),

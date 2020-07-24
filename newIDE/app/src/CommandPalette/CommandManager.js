@@ -1,10 +1,10 @@
 // @flow
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type CommandName } from './CommandsList';
 
 type CommandHandler = () => void | Promise<void>;
 
 export type SimpleCommand = {|
-  displayText: MessageDescriptor,
   handler: CommandHandler,
 |};
 
@@ -15,7 +15,6 @@ export type CommandOption = {|
 |};
 
 export type CommandWithOptions = {|
-  displayText: MessageDescriptor,
   generateOptions: () => Array<CommandOption>,
 |};
 
@@ -38,13 +37,13 @@ export interface CommandManagerInterface {
 }
 
 export default class CommandManager implements CommandManagerInterface {
-  commands: { [string]: Command };
+  commands: { [CommandName]: Command };
 
   constructor() {
     this.commands = {};
   }
 
-  registerCommand = (commandName: string, command: Command) => {
+  registerCommand = (commandName: CommandName, command: Command) => {
     if (this.commands[commandName])
       return console.warn(
         `Tried to register command ${commandName}, but it is already registered.`
@@ -52,7 +51,7 @@ export default class CommandManager implements CommandManagerInterface {
     this.commands[commandName] = command;
   };
 
-  deregisterCommand = (commandName: string) => {
+  deregisterCommand = (commandName: CommandName) => {
     if (!this.commands[commandName])
       return console.warn(
         `Tried to deregister command ${commandName}, but it is not registered.`

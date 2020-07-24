@@ -8,7 +8,7 @@ const MODIFIER_KEYS = ['Control', 'Shift', 'Meta', 'Alt'];
 /**
  * Creates a keyboard shortcut string from a keyboard event object
  */
-const getShortcutStringFromEvent = (e: SyntheticKeyboardEvent<>): ?string => {
+const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
   // If the key pressed is a modifier key, exit
   if (MODIFIER_KEYS.includes(e.key)) return null;
 
@@ -31,22 +31,26 @@ const defaultShortcuts = {
  * callback with corresponding command
  */
 export const useKeyboardShortcuts = (onRunCommand: string => void) => {
-  React.useEffect(() => {
-    const handler = (e: SyntheticKeyboardEvent<>) => {
-      // Disable shortcuts when a dialog or overlay is open
-      if (isDialogOpen()) return;
-      // Convert event object to shortcut string
-      const shortcutString = getShortcutStringFromEvent(e);
-      // Get corresponding command name and run callback
-      const commandName = Object.keys(defaultShortcuts).find(
-        name => defaultShortcuts[name] === shortcutString
-      );
-      if (!commandName) return;
-      e.preventDefault();
-      console.log('Detected shortcut for', commandName);
-      onRunCommand(commandName);
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  });
+  React.useEffect(
+    () => {
+      const handler = (e: KeyboardEvent) => {
+        // Disable shortcuts when a dialog or overlay is open
+        if (isDialogOpen()) return;
+        // Convert event object to shortcut string
+        const shortcutString = getShortcutStringFromEvent(e);
+        // Get corresponding command name and run callback
+        const commandName = Object.keys(defaultShortcuts).find(
+          name => defaultShortcuts[name] === shortcutString
+        );
+        if (!commandName) return;
+        e.preventDefault();
+        console.log('Detected shortcut for', commandName);
+        onRunCommand(commandName);
+      };
+
+      document.addEventListener('keydown', handler);
+      return () => document.removeEventListener('keydown', handler);
+    },
+    [onRunCommand]
+  );
 };

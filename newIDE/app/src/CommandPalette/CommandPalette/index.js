@@ -11,6 +11,7 @@ import {
   type CommandOption,
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
+import commandsList from '../CommandsList';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -92,7 +93,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               <AutocompletePicker
                 i18n={i18n}
                 items={selectedCommand.generateOptions()}
-                placeholder={selectedCommand.displayText}
+                placeholder={commandsList[selectedCommand.name]}
                 onClose={() => setMode('closed')}
                 onSelect={handleOptionChoose}
               />

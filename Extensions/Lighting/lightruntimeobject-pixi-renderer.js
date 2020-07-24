@@ -1,3 +1,11 @@
+/**
+ * Pixi renderer for light runtime objects.
+ *
+ * @memberof gdjs
+ * @constructor LightRuntimeObjectPixiRenderer
+ * @param {gdjs.LightRuntimeObject} runtimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene
+ */
 gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._object = runtimeObject;
   this._manager = runtimeObject.getObstaclesManager();
@@ -10,8 +18,9 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   ];
   this._debugMode = runtimeObject.getDebugMode();
   this._texture = runtimeObject.getPIXITexture();
-
   this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
+
+  this._defaultVertexBuffer = new Float32Array(8);
   this._vertexBuffer = new Float32Array([
     runtimeObject.x - this._radius,
     runtimeObject.y + this._radius,
@@ -23,8 +32,65 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     runtimeObject.y - this._radius,
   ]);
   this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
+  var fragmentShader =
+    this._texture === null
+      ? gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader
+      : gdjs.LightRuntimeObjectPixiRenderer.texturedFragmentShader;
+  var shaderUniforms = {
+    center: this._center,
+    radius: this._radius,
+    color: this._color,
+  };
+  if (this._texture) {
+    shaderUniforms.uSampler = this._texture;
+  }
+  var shader = PIXI.Shader.from(
+    gdjs.LightRuntimeObjectPixiRenderer.defaultVertexShader,
+    fragmentShader,
+    shaderUniforms
+  );
+  var geometry = new PIXI.Geometry();
+  if (this._light === undefined) {
+    geometry
+      .addAttribute('aVertexPosition', this._vertexBuffer, 2)
+      .addIndex(this._indexBuffer);
+    this._light = new PIXI.Mesh(geometry, shader);
+  }
+  this._light.blendMode = PIXI.BLEND_MODES.ADD;
+  this._debugLight = null;
+  this._debugGraphics = null;
 
-  var defaultVertexShader = `
+  if (this._debugMode) {
+    this._debugGraphics = new PIXI.Graphics();
+    this._debugGraphics
+      .lineStyle(1, 0xff0000, 1)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x - this._radius, this._object.y + this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x + this._radius, this._object.y + this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x + this._radius, this._object.y - this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x - this._radius, this._object.y - this._radius);
+
+    this._debugLight = new PIXI.Container();
+    this._debugLight.addChild(this._light);
+    this._debugLight.addChild(this._graphics);
+  }
+};
+
+gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
+
+gdjs.LightRuntimeObjectPixiRenderer._defaultIndexBuffer = new Uint16Array([
+  0,
+  1,
+  2,
+  0,
+  2,
+  3,
+]);
+
+gdjs.LightRuntimeObjectPixiRenderer.defaultVertexShader = `
   precision mediump float;
   attribute vec2 aVertexPosition;
 
@@ -37,7 +103,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
   }`;
 
-  var defaultFragmentShader = `
+gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader = `
   precision mediump float;
   uniform vec2 center;
   uniform float radius;
@@ -52,7 +118,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       gl_FragColor = vec4(color*intensity, 1.0);
   }`;
 
-  var texturedFragmentShader = `
+gdjs.LightRuntimeObjectPixiRenderer.texturedFragmentShader = `
   precision mediump float;
   uniform vec2 center;
   uniform float radius;
@@ -66,51 +132,16 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       gl_FragColor = vec4(color, 1.0) * texture2D(uSampler, texCoord);
   }`;
 
-  var fragmentShader =
-    this._texture === null ? defaultFragmentShader : texturedFragmentShader;
-  var shaderUniforms = {
-    center: this._center,
-    radius: this._radius,
-    color: this._color,
-  }
-  if(this._texture) {
-    shaderUniforms.uSampler = this._texture;
-  }
-  var shader = PIXI.Shader.from(defaultVertexShader, fragmentShader, shaderUniforms);
-  var geometry = new PIXI.Geometry();
-  if (this._light === undefined) {
-    geometry
-      .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-      .addIndex(this._indexBuffer);
-    this._light = new PIXI.Mesh(geometry, shader);
-  }
-  this._light.blendMode = PIXI.BLEND_MODES.ADD;
-
-  if (this._debugMode) {
-    if (this._graphics === undefined) {
-      this._graphics = new PIXI.Graphics();
-      this._graphics
-        .lineStyle(1, 0xff0000, 1)
-        .moveTo(this._object.x, this._object.y)
-        .lineTo(this._object.x - this._radius, this._object.y + this._radius)
-        .moveTo(this._object.x, this._object.y)
-        .lineTo(this._object.x + this._radius, this._object.y + this._radius)
-        .moveTo(this._object.x, this._object.y)
-        .lineTo(this._object.x + this._radius, this._object.y - this._radius)
-        .moveTo(this._object.x, this._object.y)
-        .lineTo(this._object.x - this._radius, this._object.y - this._radius);
-    }
-    if (this._debugLight === undefined) {
-      this._debugLight = new PIXI.Container();
-      this._debugLight.addChild(this._light);
-      this._debugLight.addChild(this._graphics);
-    }
-  }
+gdjs.LightRuntimeObjectPixiRenderer._verticesWithAngleComparator = function (
+  vertexWithAngleA,
+  vertexWithAngleB
+) {
+  if (vertexWithAngleA.angle < vertexWithAngleB.angle) return -1;
+  if (vertexWithAngleA.angle === vertexWithAngleB.angle) return 0;
+  if (vertexWithAngleA.angle > vertexWithAngleB.angle) return 1;
 };
 
-gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
-
-gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint = function (
+gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function (
   lightObject,
   angle,
   polygons
@@ -150,12 +181,12 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
-  if (this._debugMode) this.updateGraphics();
+  if (this._debugMode) this.updateDebugGraphics();
   this.updateBuffers();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateGraphics = function () {
-  var raycastResult = this.computeLightVertices();
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugGraphics = function () {
+  var raycastResult = this._computeLightVertices();
   var vertices = new Array(2 * raycastResult.length + 2);
   vertices[0] = this._object.x;
   vertices[1] = this._object.y;
@@ -185,16 +216,9 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
 
-  var raycastResult = this.computeLightVertices();
+  var raycastResult = this._computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.
   if (raycastResult.length === 0) {
-    if (!this._defaultVertexBuffer) {
-      this._defaultVertexBuffer = new Float32Array(8);
-    }
-    if (!this._defaultIndexBuffer) {
-      this._defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
-    }
-
     this._defaultVertexBuffer[0] = this._object.x - this._radius;
     this._defaultVertexBuffer[1] = this._object.y + this._radius;
     this._defaultVertexBuffer[2] = this._object.x + this._radius;
@@ -207,7 +231,9 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
     this._light.geometry
       .getBuffer('aVertexPosition')
       .update(this._defaultVertexBuffer);
-    this._light.geometry.getIndex().update(this._defaultIndexBuffer);
+    this._light.geometry
+      .getIndex()
+      .update(gdjs.LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
     return;
   }
 
@@ -273,23 +299,28 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   }
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.computeLightVertices = function () {
-  var result = [];
-  if(this._manager)
-    this._manager.getAllObstaclesAround(this._object, this._radius, result);
+gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function () {
+  var lightObstacles = [];
+  if (this._manager)
+    this._manager.getAllObstaclesAround(
+      this._object,
+      this._radius,
+      lightObstacles
+    );
 
-  // Bail out early if there are no obstales.
-  if (result.length === 0) return result;
+  // Bail out early if there are no obstacles.
+  if (lightObstacles.length === 0) return lightObstacles;
 
-  var noOfObstacles = result.length + 1;
-  var obstacleHitBoxes = new Array(noOfObstacles);
+  // Adding 1 to the count since light object itself acts as a light obstacle.
+  var obstaclesCount = lightObstacles.length + 1;
+  var obstacleHitBoxes = new Array(obstaclesCount);
   obstacleHitBoxes[0] = this._object.getHitBoxes();
-  for (var i = 0; i < noOfObstacles - 1; i++) {
-    obstacleHitBoxes[i + 1] = result[i].owner.getHitBoxes();
+  for (var i = 0; i < obstaclesCount - 1; i++) {
+    obstacleHitBoxes[i + 1] = lightObstacles[i].owner.getHitBoxes();
   }
 
   var obstaclePolygons = [];
-  for (var i = 0; i < noOfObstacles; i++) {
+  for (var i = 0; i < obstaclesCount; i++) {
     var noOfHitBoxes = obstacleHitBoxes[i].length;
     for (var j = 0; j < noOfHitBoxes; j++)
       obstaclePolygons.push(obstacleHitBoxes[i][j]);
@@ -298,65 +329,64 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.computeLightVertices = function ()
   var flattenVertices = [];
   for (var i = 0; i < obstaclePolygons.length; i++) {
     var vertices = obstaclePolygons[i].vertices;
-    var noOfVertices = vertices.length;
-    for (var j = 0; j < noOfVertices; j++) flattenVertices.push(vertices[j]);
+    var verticesCount = vertices.length;
+    for (var j = 0; j < verticesCount; j++) flattenVertices.push(vertices[j]);
   }
 
-  var _raycastResult = [];
-
-  for (var vertex of flattenVertices) {
-    var xdiff = vertex[0] - this._object.x;
-    var ydiff = vertex[1] - this._object.y;
+  var closestVertices = [];
+  var flattenVerticesCount = flattenVertices.length;
+  for (var i = 0; i < flattenVerticesCount; i++) {
+    var xdiff = flattenVertices[i][0] - this._object.x;
+    var ydiff = flattenVertices[i][1] - this._object.y;
     var angle = Math.atan2(ydiff, xdiff);
 
-    var result = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
+    var closestVertex = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle,
       obstaclePolygons
     );
-    if (result) {
-      _raycastResult.push({
-        vertex: result,
+    if (closestVertex) {
+      closestVertices.push({
+        vertex: closestVertex,
         angle: angle,
       });
     }
 
     // TODO: Check whether we need to raycast these two extra rays or not.
-    var resultOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
+    var closestVertexOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle + 0.0001,
       obstaclePolygons
     );
-    if (resultOffsetLeft) {
-      _raycastResult.push({
-        vertex: resultOffsetLeft,
+    if (closestVertexOffsetLeft) {
+      closestVertices.push({
+        vertex: closestVertexOffsetLeft,
         angle: angle + 0.0001,
       });
     }
-    var resultOffsetRight = gdjs.LightRuntimeObjectPixiRenderer.computeClosestIntersectionPoint(
+    var closestVertexOffsetRight = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle - 0.0001,
       obstaclePolygons
     );
-    if (resultOffsetRight) {
-      _raycastResult.push({
-        vertex: resultOffsetRight,
+    if (closestVertexOffsetRight) {
+      closestVertices.push({
+        vertex: closestVertexOffsetRight,
         angle: angle - 0.0001,
       });
     }
   }
 
-  _raycastResult.sort(function (a, b) {
-    if (a.angle < b.angle) return -1;
-    if (a.angle === b.angle) return 0;
-    if (a.angle > b.angle) return 1;
-  });
+  closestVertices.sort(
+    gdjs.LightRuntimeObjectPixiRenderer._verticesWithAngleComparator
+  );
 
-  var filteredRaycastResult = [_raycastResult[0].vertex];
-  for (var i = 1; i < _raycastResult.length; i++) {
-    if (_raycastResult[i].angle !== _raycastResult[i - 1].angle)
-      filteredRaycastResult.push(_raycastResult[i].vertex);
+  var filteredVerticesResult = [closestVertices[0].vertex];
+  var closestVerticesCount = closestVertices.length;
+  for (var i = 1; i < closestVerticesCount; i++) {
+    if (closestVertices[i].angle !== closestVertices[i - 1].angle)
+      filteredVerticesResult.push(closestVertices[i].vertex);
   }
 
-  return filteredRaycastResult;
+  return filteredVerticesResult;
 };

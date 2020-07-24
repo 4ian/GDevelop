@@ -27,9 +27,14 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._oldHeight = null;
   this._isLightingLayer = layer.isLightingLayer();
   this._clearColor = layer.getClearColor();
-  
+
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
   this._setupFilters();
+
+  // Add the sprite after filters are applied so that the blend mode could be fixed.
+  if (this._isLightingLayer) {
+    this._replaceContainerWithSprite();
+  }
 };
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
@@ -66,20 +71,14 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function (visible) {
   this._pixiContainer.visible = !!visible;
 };
 
-gdjs.LayerPixiRenderer.prototype.updateTime = function () {
+gdjs.LayerPixiRenderer.prototype.update = function () {
   if (this._renderTexture) {
-    this.updateRenderTexture();
+    this._updateRenderTexture();
   }
 
   for (var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
-  }
-
-  // Add Layer to lighting after adding effects to the layer,
-  // so that we can fix the blend mode.
-  if(!this._lightingSprite && this._isLightingLayer) {
-    this.replaceContainerWithSprite();
   }
 };
 
@@ -274,12 +273,12 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
 };
 
 /**
- * Updates the render texture, if it exists. 
- * Also, render texture is cleared with a specified clear color.  
- * Not to be called outside of updateTime method in most cases.
+ * Updates the render texture, if it exists.
+ * Also, render texture is cleared with a specified clear color.
+ * @private not to be called outside the update method in most cases.
  */
-gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
-  if(!this._pixiRenderer) return;
+gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
+  if (!this._pixiRenderer) return;
 
   if (!this._renderTexture) {
     this._oldWidth = this._pixiRenderer.screen.width;
@@ -297,7 +296,7 @@ gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
     // @ts-ignore PIXI isn't typed for now.
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
   }
-  
+
   if (
     this._oldWidth !== this._pixiRenderer.screen.width ||
     this._oldHeight !== this._pixiRenderer.screen.height
@@ -332,39 +331,39 @@ gdjs.LayerPixiRenderer.prototype.updateRenderTexture = function () {
  * Creates the render texture of pixi container and returns it.
  */
 gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
-  if (!this._renderTexture) this.updateRenderTexture();
+  if (!this._renderTexture) this._updateRenderTexture();
   return this._renderTexture;
 };
 
 /**
  * Creates a sprite with the render texture of pixi container,
  * and replaces the container with sprite in runtimeScene's pixi container.
- * Used only in lighting for now as the sprite could have MULTIPLY blend mode.
+ * @private used only in lighting for now as the sprite could have MULTIPLY blend mode.
  */
-gdjs.LayerPixiRenderer.prototype.replaceContainerWithSprite = function () {
-    if(!this._pixiRenderer) return;
+gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
+  if (!this._pixiRenderer) return;
+  // @ts-ignore PIXI isn't typed for now.
+  this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
+  // @ts-ignore PIXI isn't typed for now.
+  this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+  // fix for blend mode when applying filter
+  if (this._pixiContainer.filters) {
     // @ts-ignore PIXI isn't typed for now.
-    this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
-    // @ts-ignore PIXI isn't typed for now.
-    this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-    // fix for blend mode when applying filter
-    if (this._pixiContainer.filters) {
+    this._pixiContainer.filterArea = new PIXI.Rectangle(
+      0,
+      0,
+      this._pixiRenderer.screen.width,
+      this._pixiRenderer.screen.height
+    );
+    for (var i = 0; i < this._pixiContainer.filters.length; i++) {
       // @ts-ignore PIXI isn't typed for now.
-      this._pixiContainer.filterArea = new PIXI.Rectangle(
-        0,
-        0,
-        this._pixiRenderer.screen.width,
-        this._pixiRenderer.screen.height
-      );
-      for (var i = 0; i < this._pixiContainer.filters.length; i++) {
-        // @ts-ignore PIXI isn't typed for now.
-        this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
-      }
+      this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
     }
-    var sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();
-    var index = sceneContainer.getChildIndex(this._pixiContainer);
-    sceneContainer.addChildAt(this._lightingSprite, index);
-    sceneContainer.removeChild(this._pixiContainer);
+  }
+  var sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();
+  var index = sceneContainer.getChildIndex(this._pixiContainer);
+  sceneContainer.addChildAt(this._lightingSprite, index);
+  sceneContainer.removeChild(this._pixiContainer);
 };
 
 gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {

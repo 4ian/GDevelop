@@ -94,7 +94,7 @@ gdjs.Layer.prototype.getRuntimeScene = function () {
  */
 gdjs.Layer.prototype.update = function (runtimeScene) {
   if (this._followBaseLayerCamera) this.followBaseLayer();
-  return this._renderer.updateTime();
+  return this._renderer.update();
 };
 
 /**
@@ -427,15 +427,18 @@ gdjs.Layer.prototype.getElapsedTime = function () {
 };
 
 /**
- * Set the position of layer's camera to follow
- * base layer's camera.
+ * Change the position, rotation and scale (zoom) of the layer camera to be the same as the base layer camera.
  */
 gdjs.Layer.prototype.followBaseLayer = function () {
-  this.setCameraX(this._runtimeScene.getLayer('').getCameraX());
-  this.setCameraY(this._runtimeScene.getLayer('').getCameraY());
+  var baseLayer = this._runtimeScene.getLayer('');
+  this.setCameraX(baseLayer.getCameraX());
+  this.setCameraY(baseLayer.getCameraY());
+  this.setCameraRotation(baseLayer.getCameraRotation());
+  this.setCameraZoom(baseLayer.getCameraZoom());
 };
 
 /**
+ * The clear color is defined in the format [r, g, b, a], with components in the range of [0, 1].
  * @return {number[]} the clear color of layer in the range of [0, 1].
  */
 gdjs.Layer.prototype.getClearColor = function () {
@@ -443,8 +446,9 @@ gdjs.Layer.prototype.getClearColor = function () {
 };
 
 /**
+ * Return true if the layer is a lighting layer, false otherwise.
  * @return {boolean} true if it is a lighting layer, false otherwise.
  */
 gdjs.Layer.prototype.isLightingLayer = function () {
   return this._isLightingLayer;
-}
+};

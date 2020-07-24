@@ -1,5 +1,29 @@
+// @flow
+/**
+ * This is a declaration of an extension for GDevelop 5.
+ *
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
+ *
+ * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
+ * ⚠️ If you make a change and the extension is not loaded, open the developer console
+ * and search for any errors.
+ *
+ * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
+ */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'Lighting',
@@ -11,7 +35,7 @@ module.exports = {
       'MIT'
     );
 
-    var lightObstacleBehavior = new gd.BehaviorJsImplementation();
+    const lightObstacleBehavior = new gd.BehaviorJsImplementation();
     lightObstacleBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -20,7 +44,7 @@ module.exports = {
       return false;
     };
     lightObstacleBehavior.getProperties = function (behaviorContent) {
-      var behaviorProperties = new gd.MapStringPropertyDescriptor();
+      const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       return behaviorProperties;
     };
@@ -30,7 +54,9 @@ module.exports = {
         'LightObstacleBehavior',
         _('Light Obstacle Behavior'),
         'LightObstacleBehavior',
-        _('This behavior makes the object an obstacle to light'),
+        _(
+          'This behavior makes the object an obstacle to the light. The light emitted by light objects will be stopped by the object.'
+        ),
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',
         'LightObstacleBehavior',
@@ -39,7 +65,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
 
-    var lightObject = new gd.ObjectJsImplementation();
+    const lightObject = new gd.ObjectJsImplementation();
 
     lightObject.updateProperty = function (
       objectContent,
@@ -70,7 +96,7 @@ module.exports = {
     };
 
     lightObject.getProperties = function (objectContent) {
-      var objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
         'radius',
@@ -119,11 +145,6 @@ module.exports = {
       project,
       layout
     ) {
-      // if (propertyName === 'My instance property') {
-      //   instance.setRawStringProperty('instanceprop1', newValue);
-      //   return true;
-      // }
-
       return false;
     };
     lightObject.getInitialInstanceProperties = function (
@@ -132,11 +153,7 @@ module.exports = {
       project,
       layout
     ) {
-      var instanceProperties = new gd.MapStringPropertyDescriptor();
-
-      // instanceProperties
-      //   .getOrCreate('My instance property')
-      //   .setValue(instance.getRawStringProperty('instanceprop1'));
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
 
       return instanceProperties;
     };
@@ -145,7 +162,9 @@ module.exports = {
       .addObject(
         'LightObject',
         _('Light'),
-        _('An object displaying a light on screen.'),
+        _(
+          'Displays a light on the scene, with a customizable radius and color. Add then the Light Obstacle behavior to the objects that must act as obstacle to the lights.'
+        ),
         'CppPlatform/Extensions/lightIcon32.png',
         lightObject
       )
@@ -165,7 +184,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/extensions/extend-gdevelop',
+        helpPagePath: '/objects/light',
       })
     );
   },
@@ -179,7 +198,7 @@ module.exports = {
     const PIXI = objectsRenderingService.PIXI;
 
     /**
-     * Renderer for instances of DummyObject inside the IDE.
+     * Renderer for instances of LightObject inside the IDE.
      *
      * @extends RenderedInstance
      * @class RenderedLightObjectInstance
@@ -208,7 +227,7 @@ module.exports = {
           .get('radius')
           .getValue()
       );
-      if(this._radius <= 0) this._radius = 1;
+      if (this._radius <= 0) this._radius = 1;
       this._colorHex = parseInt(
         this._associatedObject
           .getProperties(this.project)
@@ -222,8 +241,9 @@ module.exports = {
         ((this._colorHex >> 8) & 0xff) / 255,
         (this._colorHex & 0xff) / 255,
       ];
-      this._geometry = new PIXI.Geometry();
-      this._shader = PIXI.Shader.from(
+
+      const geometry = new PIXI.Geometry();
+      const shader = PIXI.Shader.from(
         `
     precision mediump float;
     attribute vec2 aVertexPosition;
@@ -260,24 +280,23 @@ module.exports = {
           color: this._color,
         }
       );
-      this._geometry
-        .addAttribute(
-          'aVertexPosition',
-          [
-            this._instance.getX() - this._radius,
-            this._instance.getY() + this._radius,
-            this._instance.getX() + this._radius,
-            this._instance.getY() + this._radius,
-            this._instance.getX() + this._radius,
-            this._instance.getY() - this._radius,
-            this._instance.getX() - this._radius,
-            this._instance.getY() - this._radius,
-          ],
-          2
-        )
+
+      this._vertexBuffer = new Float32Array([
+        this._instance.getX() - this._radius,
+        this._instance.getY() + this._radius,
+        this._instance.getX() + this._radius,
+        this._instance.getY() + this._radius,
+        this._instance.getX() + this._radius,
+        this._instance.getY() - this._radius,
+        this._instance.getX() - this._radius,
+        this._instance.getY() - this._radius,
+      ]);
+
+      geometry
+        .addAttribute('aVertexPosition', this._vertexBuffer, 2)
         .addIndex([0, 1, 2, 2, 3, 0]);
-      //Setup the PIXI object:
-      this._pixiObject = new PIXI.Mesh(this._geometry, this._shader);
+
+      this._pixiObject = new PIXI.Mesh(geometry, shader);
       this._pixiObject.blendMode = PIXI.BLEND_MODES.ADD;
       this._pixiContainer.addChild(this._pixiObject);
       this.update();
@@ -305,20 +324,19 @@ module.exports = {
         this._instance.getX(),
         this._instance.getY(),
       ]);
+
+      this._vertexBuffer[0] = this._instance.getX() - this._radius;
+      this._vertexBuffer[1] = this._instance.getY() + this._radius;
+      this._vertexBuffer[2] = this._instance.getX() + this._radius;
+      this._vertexBuffer[3] = this._instance.getY() + this._radius;
+      this._vertexBuffer[4] = this._instance.getX() + this._radius;
+      this._vertexBuffer[5] = this._instance.getY() - this._radius;
+      this._vertexBuffer[6] = this._instance.getX() - this._radius;
+      this._vertexBuffer[7] = this._instance.getY() - this._radius;
+
       this._pixiObject.geometry
         .getBuffer('aVertexPosition')
-        .update(
-          new Float32Array([
-            this._instance.getX() - this._radius,
-            this._instance.getY() + this._radius,
-            this._instance.getX() + this._radius,
-            this._instance.getY() + this._radius,
-            this._instance.getX() + this._radius,
-            this._instance.getY() - this._radius,
-            this._instance.getX() - this._radius,
-            this._instance.getY() - this._radius,
-          ])
-        );
+        .update(this._vertexBuffer);
     };
 
     /**

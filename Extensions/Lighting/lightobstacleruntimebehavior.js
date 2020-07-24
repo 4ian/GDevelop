@@ -1,3 +1,9 @@
+/**
+ * @memberof gdjs
+ * @class LightObstaclesManager
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {*} sharedData
+ */
 gdjs.LightObstaclesManager = function (runtimeScene, sharedData) {
   this._obstacleRBush = new rbush(9, [
     '.owner.getAABB().min[0]',
@@ -48,6 +54,13 @@ gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
   result.push.apply(result, nearbyPlatforms);
 };
 
+/**
+ * @memberof gdjs
+ * @class LightObstacleRuntimeBehavior
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {*} behaviorData
+ * @param {gdjs.RuntimeObject} owner
+ */
 gdjs.LightObstacleRuntimeBehavior = function (
   runtimeScene,
   behaviorData,
@@ -59,7 +72,6 @@ gdjs.LightObstacleRuntimeBehavior = function (
   this._oldY = 0;
   this._oldWidth = 0;
   this._oldHeight = 0;
-
   this._manager = gdjs.LightObstaclesManager.getManager(runtimeScene);
   this._registeredInManager = false;
 };
@@ -72,13 +84,10 @@ gdjs.registerBehavior(
   gdjs.LightObstacleRuntimeBehavior
 );
 
-gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function () {};
-
 gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
   runtimeScene
 ) {
-  // This is run at every frame, before events are launched.
-  // Make sure the platform is or is not in the platforms manager.
+  // Make sure the obstacle is or is not in the obstacles manager.
   if (!this.activated() && this._registeredInManager) {
     this._manager.removeObstacle(this);
     this._registeredInManager = false;
@@ -103,10 +112,4 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
     this._oldWidth = this.owner.getWidth();
     this._oldHeight = this.owner.getHeight();
   }
-};
-
-gdjs.LightObstacleRuntimeBehavior.prototype.doStepPostEvents = function (
-  runtimeScene
-) {
-  // This is run at every frame, after events are launched.
 };

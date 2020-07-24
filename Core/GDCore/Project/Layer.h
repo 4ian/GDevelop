@@ -52,22 +52,22 @@ class GD_CORE_API Layer {
   bool GetVisibility() const { return isVisible; }
 
   /**
-   * \brief Change if layer is lighting layer or not.
+   * \brief Set if the layer is a lightining layer or not.
    */
   void SetLightingLayer(bool isLightingLayer_) { isLightingLayer = isLightingLayer_; }
 
   /**
-   * \brief Return true if layer is a lighting layer.
+   * \brief Return true if the layer is a lighting layer.
    */
   bool IsLightingLayer() const { return isLightingLayer; }
 
   /**
-   * \brief Change if layer follows the base layer or not.
+   * \brief Set if the layer automatically follows the base layer or not.
    */
   void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) { followBaseLayerCamera = followBaseLayerCamera_; }
 
   /**
-   * \brief Return true if layer follows the base layer.
+   * \brief Return true if the layer follows the base layer.
    */
   bool IsFollowingBaseLayerCamera() const { return followBaseLayerCamera; }
 
@@ -117,22 +117,22 @@ class GD_CORE_API Layer {
   ///@}
 
   /**
-   * Get the ambient light color red component
+   * Get the ambient light color red component.
    */
   unsigned int GetAmbientLightColorRed() const { return ambientLightColorR; }
 
   /**
-   * Get the ambient light color green component
+   * Get the ambient light color green component.
    */
   unsigned int GetAmbientLightColorGreen() const { return ambientLightColorG; }
 
   /**
-   * Get the ambient light color blue component
+   * Get the ambient light color blue component.
    */
   unsigned int GetAmbientLightColorBlue() const { return ambientLightColorB; }
 
   /**
-   * Set the ambient light color
+   * Set the ambient light color.
    */
   void SetAmbientLightColor(unsigned int r, unsigned int g, unsigned int b) {
     ambientLightColorR = r;
@@ -221,7 +221,7 @@ class GD_CORE_API Layer {
  private:
   gd::String name;                  ///< The name of the layer
   bool isVisible;                   ///< True if the layer is visible
-  bool isLightingLayer;             ///< True if the layer has lighting properties
+  bool isLightingLayer;             ///< True if the layer is used to display lights and renders an ambient light.
   bool followBaseLayerCamera;           ///< True if the layer automatically follows the base layer
   unsigned int ambientLightColorR;     ///< Ambient light color Red component
   unsigned int ambientLightColorG;     ///< Ambient light color Green component

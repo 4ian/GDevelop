@@ -37,32 +37,49 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       selectCommand,
     ] = React.useState<null | NamedCommandWithOptions>(null);
 
-    const handleCommandChoose = (command: NamedCommand) => {
-      if (command.handler) {
-        // Simple command
-        command.handler();
-        setMode('closed');
-      } else {
-        // Command with options
-        selectCommand(command);
-        setMode('option');
-      }
-    };
+    // Takes a command and if simple command, executes handler
+    // If command with options, opens options of the palette
+    const handleCommandChoose = React.useCallback(
+      (command: NamedCommand) => {
+        if (command.handler) {
+          // Simple command
+          command.handler();
+          setMode('closed');
+        } else {
+          // Command with options
+          selectCommand(command);
+          setMode('option');
+        }
+      },
+      [selectCommand, setMode]
+    );
 
+    // Executes handler of a command option and closes palette
     const handleOptionChoose = (option: CommandOption) => {
       option.handler();
       setMode('closed');
     };
 
-    React.useImperativeHandle(ref, () => ({
-      open: (open? = true) => {
-        setMode('command');
-      },
-      launchCommand: commandName => {
+    // Opens the palette in command mode
+    const openPalette = React.useCallback((open? = true) => {
+      if (open) setMode('command');
+      else setMode('closed');
+    }, []);
+
+    // Takes command name, gets command object from
+    // manager and launches command accordingly
+    const launchCommand = React.useCallback(
+      commandName => {
         const command = commandManager.commands[commandName];
         if (!command) return;
-        handleCommandChoose(command);
+        handleCommandChoose({ ...command, name: commandName });
       },
+      [handleCommandChoose, commandManager.commands]
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      open: openPalette,
+      launchCommand,
     }));
 
     return (
@@ -82,7 +99,9 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               // Command picker
               <AutocompletePicker
                 i18n={i18n}
-                items={commandManager.getAllNamedCommands()}
+                items={
+                  (commandManager.getAllNamedCommands(): Array<NamedCommand>)
+                }
                 placeholder={t`Start typing a command...`}
                 onClose={() => setMode('closed')}
                 onSelect={handleCommandChoose}

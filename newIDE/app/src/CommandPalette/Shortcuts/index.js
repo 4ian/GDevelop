@@ -1,29 +1,39 @@
 // @flow
 import * as React from 'react';
-import isDialogOpen from '../UI/OpenedDialogChecker';
-
-// Values of `e.key` for modifier keys
-const MODIFIER_KEYS = ['Control', 'Shift', 'Meta', 'Alt'];
+import isDialogOpen from '../../UI/OpenedDialogChecker';
+import defaultShortcuts from './DefaultShortcuts';
 
 /**
  * Creates a keyboard shortcut string from a keyboard event object
+ * Returns null if event does not correspond to valid shortcut press
  */
 const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
-  // If the key pressed is a modifier key, exit
-  if (MODIFIER_KEYS.includes(e.key)) return null;
+  // Check if action key is alphabet, number, Function row key, +, -, = or Tab
+  let isValidActionKey = false;
+  if (e.code >= 'KeyA' && e.code <= 'KeyZ') isValidActionKey = true;
+  if (e.code >= 'Digit0' && e.code <= 'Digit9') isValidActionKey = true;
+  if (
+    (e.code >= 'F1' && e.code <= 'F9') ||
+    (e.code >= 'F10' && e.code <= 'F12')
+  )
+    isValidActionKey = true;
+  if (
+    e.code === 'NumpadAdd' ||
+    e.code === 'NumpadSubtract' ||
+    e.code === 'Equal' ||
+    e.code === 'Minus' ||
+    e.code === 'Tab'
+  )
+    isValidActionKey = true;
+  if (!isValidActionKey) return console.log('Invalid shortcut');
 
   const shortcutStringPieces = [];
   if (e.ctrlKey || e.metaKey) shortcutStringPieces.push('CmdOrCtrl');
   if (e.shiftKey) shortcutStringPieces.push('Shift');
   if (e.altKey) shortcutStringPieces.push('Alt');
-  shortcutStringPieces.push(e.key.toUpperCase());
+  shortcutStringPieces.push(e.code);
+  console.log('SHORTCUT PRESSED:', shortcutStringPieces.join('+'));
   return shortcutStringPieces.join('+');
-};
-
-const defaultShortcuts = {
-  LAUNCH_PREVIEW: 'F5',
-  LAUNCH_DEBUG_PREVIEW: 'CmdOrCtrl+F5',
-  EDIT_OBJECT: 'CmdOrCtrl+Shift+O',
 };
 
 /**
@@ -33,6 +43,7 @@ const defaultShortcuts = {
 export const useKeyboardShortcuts = (onRunCommand: string => void) => {
   React.useEffect(
     () => {
+      console.log('KEYBOARD SHORTCUT HOOK RUN!');
       const handler = (e: KeyboardEvent) => {
         // Disable shortcuts when a dialog or overlay is open
         if (isDialogOpen()) return;

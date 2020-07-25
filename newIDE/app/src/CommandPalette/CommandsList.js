@@ -1,8 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
-const CommandsList: { [string]: MessageDescriptor } = {
+const CommandsList = {
   // General commands
   QUIT_APP: t`Close GDevelop`,
   OPEN_PROJECT_MANAGER: t`Open project manager`,

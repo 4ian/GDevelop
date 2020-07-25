@@ -5,11 +5,12 @@ import {
   type Command,
   type NamedCommand,
 } from './CommandManager';
+import { type CommandName } from './CommandsList';
 import CommandsContext from './CommandsContext';
 import useRefInit from './UseRefInitHook';
 
 class ScopedCommandManager implements CommandManagerInterface {
-  commands: { [string]: Command };
+  commands: { [CommandName]: Command };
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
 
@@ -23,13 +24,13 @@ class ScopedCommandManager implements CommandManagerInterface {
     this._isActive = active;
   };
 
-  registerCommand = (commandName: string, command: Command) => {
+  registerCommand = (commandName: CommandName, command: Command) => {
     this.commands[commandName] = command;
     if (this._isActive)
       this._centralManager.registerCommand(commandName, command);
   };
 
-  deregisterCommand = (commandName: string) => {
+  deregisterCommand = (commandName: CommandName) => {
     delete this.commands[commandName];
     if (this._isActive) this._centralManager.deregisterCommand(commandName);
   };

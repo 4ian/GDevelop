@@ -20,18 +20,18 @@ export type CommandWithOptions = {|
 export type Command = SimpleCommand | CommandWithOptions;
 
 export type NamedCommand = {|
-  name: string,
+  name: CommandName,
   ...Command,
 |};
 
 export type NamedCommandWithOptions = {|
-  name: string,
+  name: CommandName,
   ...CommandWithOptions,
 |};
 
 export interface CommandManagerInterface {
-  registerCommand: (commandName: string, command: Command) => void;
-  deregisterCommand: (commandName: string) => void;
+  registerCommand: (commandName: CommandName, command: Command) => void;
+  deregisterCommand: (commandName: CommandName) => void;
   getAllNamedCommands: () => Array<NamedCommand>;
 }
 

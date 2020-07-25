@@ -198,6 +198,7 @@ const MainFrame = (props: Props) => {
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
     false
   );
+  const [isSavingProject, setIsSavingProject] = React.useState<boolean>(false);
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
@@ -1477,12 +1478,20 @@ const MainFrame = (props: Props) => {
       saveUiSettings(state.editorTabs);
 
       getStorageProviderOperations().then(storageProviderOperations => {
-        if (!storageProviderOperations.onSaveProjectAs) {
+        const { onSaveProjectAs } = storageProviderOperations;
+        if (!onSaveProjectAs) {
           return;
         }
 
-        storageProviderOperations
-          .onSaveProjectAs(currentProject, currentFileMetadata)
+        // Protect against concurrent saves, which can trigger issues with the
+        // file system.
+        if (isSavingProject) {
+          console.info('Project is already being saved, not triggering save.');
+          return;
+        }
+        setIsSavingProject(true);
+
+        onSaveProjectAs(currentProject, currentFileMetadata)
           .then(
             ({ wasSaved, fileMetadata }) => {
               if (wasSaved) {
@@ -1506,11 +1515,14 @@ const MainFrame = (props: Props) => {
                 err
               );
             }
-          );
+          )
+          .catch(() => {})
+          .then(() => setIsSavingProject(false));
       });
     },
     [
       i18n,
+      isSavingProject,
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
@@ -1563,26 +1575,38 @@ const MainFrame = (props: Props) => {
         saveUiSettings(state.editorTabs);
         _showSnackMessage(i18n._(t`Saving...`));
 
-        onSaveProject(currentProject, currentFileMetadata).then(
-          ({ wasSaved }) => {
-            if (wasSaved) {
-              if (props.unsavedChanges)
-                props.unsavedChanges.sealUnsavedChanges();
-              _showSnackMessage(i18n._(t`Project properly saved`));
+        // Protect against concurrent saves, which can trigger issues with the
+        // file system.
+        if (isSavingProject) {
+          console.info('Project is already being saved, not triggering save.');
+          return;
+        }
+        setIsSavingProject(true);
+
+        onSaveProject(currentProject, currentFileMetadata)
+          .then(
+            ({ wasSaved }) => {
+              if (wasSaved) {
+                if (props.unsavedChanges)
+                  props.unsavedChanges.sealUnsavedChanges();
+                _showSnackMessage(i18n._(t`Project properly saved`));
+              }
+            },
+            err => {
+              showErrorBox(
+                i18n._(
+                  t`Unable to save the project! Please try again by choosing another location.`
+                ),
+                err
+              );
             }
-          },
-          err => {
-            showErrorBox(
-              i18n._(
-                t`Unable to save the project! Please try again by choosing another location.`
-              ),
-              err
-            );
-          }
-        );
+          )
+          .catch(() => {})
+          .then(() => setIsSavingProject(false));
       });
     },
     [
+      isSavingProject,
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,

@@ -1,9 +1,24 @@
+// @ts-check
+
+/**
+ * The renderer for a gdjs.RuntimeScene using Pixi.js.
+ * @class RuntimeScenePixiRenderer
+ * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {gdjs.RuntimeGamePixiRenderer} runtimeGameRenderer
+ */
 gdjs.RuntimeScenePixiRenderer = function(runtimeScene, runtimeGameRenderer) {
   this._pixiRenderer = runtimeGameRenderer
     ? runtimeGameRenderer.getPIXIRenderer()
     : null;
   this._runtimeScene = runtimeScene;
   this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
+
+  /** @type {?PIXI.Graphics} */
+  this._debugDraw = null;
+
+  /** @type {?PIXI.Text} */
+  this._profilerText = null;
 };
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
@@ -47,6 +62,10 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
   this._profilerText.text = outputs.join("\n");
 };
 
+/**
+ * @param {gdjs.RuntimeObject[]} instances
+ * @param {Object.<string, number[]>} layersCameraCoordinates
+ */
 gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, layersCameraCoordinates) {
   if (!this._debugDraw) {
     this._debugDraw = new PIXI.Graphics();
@@ -75,10 +94,12 @@ gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, la
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.hideCursor = function() {
+  if (!this._pixiRenderer) return;
   this._pixiRenderer.view.style.cursor = "none";
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.showCursor = function() {
+  if (!this._pixiRenderer) return;
   this._pixiRenderer.view.style.cursor = "";
 };
 

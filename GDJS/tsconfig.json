@@ -17,6 +17,7 @@
     "tests/benchmarks/**/*.js"
   ],
   "exclude": [
+    "Runtime/pixi-renderers/pixi.js",
     "Runtime/Cocos2d",
     "Runtime/Cordova",
     "Runtime/Electron",

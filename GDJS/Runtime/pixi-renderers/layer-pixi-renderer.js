@@ -14,7 +14,6 @@
  * @param {gdjs.RuntimeScenePixiRenderer} runtimeSceneRenderer The scene renderer
  */
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
-  // @ts-ignore
   this._pixiContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
@@ -122,6 +121,7 @@ gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
   child.zOrder = zOrder; //Extend the pixi object with a z order.
 
   for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
+    // @ts-ignore
     if (this._pixiContainer.children[i].zOrder >= zOrder) {
       //TODO : Dichotomic search
       this._pixiContainer.addChildAt(child, i);

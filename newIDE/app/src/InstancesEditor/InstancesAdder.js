@@ -119,7 +119,9 @@ export default class InstancesAdder {
    * Update the temporary instances  positions
    * (specified in scene coordinates). Useful when dragging these instances.
    */
-  updateTemporaryInstancePositions = (pos: [number, number]) => {
+  updateTemporaryInstancePositions = (
+    pos: [number, number]
+  ): Array<gdInitialInstance> => {
     const newPos = roundPositionsToGrid(pos, this._options);
     this._temporaryInstances.forEach(instance => {
       instance.setX(Math.round(newPos[0]));

@@ -213,7 +213,6 @@ export default class LayersList extends Component<Props, State> {
             <Line justifyContent="flex-end" expand>
               <RaisedButton
                 label={<Trans>Add lighting layer</Trans>}
-                primary
                 disabled={isLightingLayerPresent}
                 onClick={this._addLightingLayer}
                 icon={<Add />}

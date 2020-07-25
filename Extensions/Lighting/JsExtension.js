@@ -36,6 +36,7 @@ module.exports = {
     );
 
     const lightObstacleBehavior = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     lightObstacleBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -43,11 +44,15 @@ module.exports = {
     ) {
       return false;
     };
+
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     lightObstacleBehavior.getProperties = function (behaviorContent) {
       const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       return behaviorProperties;
     };
+
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     lightObstacleBehavior.initializeContent = function (behaviorContent) {};
     extension
       .addBehavior(
@@ -67,6 +72,7 @@ module.exports = {
 
     const lightObject = new gd.ObjectJsImplementation();
 
+    // $FlowExpectedError - ignore Flow warning as we're creating an object.
     lightObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -95,6 +101,7 @@ module.exports = {
       return false;
     };
 
+    // $FlowExpectedError - ignore Flow warning as we're creating an object.
     lightObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -137,6 +144,7 @@ module.exports = {
       })
     );
 
+    // $FlowExpectedError - ignore Flow warning as we're creating an object.
     lightObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -147,6 +155,8 @@ module.exports = {
     ) {
       return false;
     };
+
+    // $FlowExpectedError - ignore Flow warning as we're creating an object.
     lightObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -176,11 +186,16 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function (gd, extension) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
 
-  registerEditorConfigurations: function (objectsEditorService) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -193,7 +208,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (objectsRenderingService) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 

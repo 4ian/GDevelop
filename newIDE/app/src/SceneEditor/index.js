@@ -69,7 +69,7 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import ObjectsAdditionalWork from '../Hints/ObjectsAdditionalWork';
+import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 const gd: libGDevelop = global.gd;
 
@@ -143,6 +143,7 @@ type State = {|
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
   showInstancesInfoBar: boolean,
+  showAdditionalWorkInfoBar: boolean,
   additionalWorkInfoBar: InfoBarDetails,
 
   // State for tags of objects:
@@ -196,8 +197,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
 
+      showAdditionalWorkInfoBar: false,
       additionalWorkInfoBar: {
-        show: false,
         identifier: 'default-additional-work',
         message: '',
         touchScreenMessage: '',
@@ -471,7 +472,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const instances = this.editor.addInstances(pos, [objectName]);
     instances.forEach(instance => {
-      const infoBarDetails = ObjectsAdditionalWork.onInstanceAdded(
+      const infoBarDetails = onInstanceAdded(
         instance,
         this.props.layout,
         this.props.project
@@ -479,6 +480,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (infoBarDetails) {
         this.setState({
           additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
         });
       }
     });
@@ -494,7 +496,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
     instances.forEach(instance => {
-      const infoBarDetails = ObjectsAdditionalWork.onInstanceAdded(
+      const infoBarDetails = onInstanceAdded(
         instance,
         this.props.layout,
         this.props.project
@@ -502,6 +504,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (infoBarDetails) {
         this.setState({
           additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
         });
       }
     });
@@ -588,7 +591,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectCreated = (object: gdObject) => {
-    const infoBarDetails = ObjectsAdditionalWork.onObjectAdded(
+    const infoBarDetails = onObjectAdded(
       object,
       this.props.layout,
       this.props.project
@@ -596,6 +599,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (infoBarDetails) {
       this.setState({
         additionalWorkInfoBar: infoBarDetails,
+        showAdditionalWorkInfoBar: true,
       });
     }
 
@@ -1363,7 +1367,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         <I18n>
           {({ i18n }) => (
             <InfoBar
-              show={this.state.additionalWorkInfoBar.show}
+              show={this.state.showAdditionalWorkInfoBar}
               identifier={this.state.additionalWorkInfoBar.identifier}
               message={i18n._(this.state.additionalWorkInfoBar.message)}
               touchScreenMessage={i18n._(

@@ -4,16 +4,15 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Text from '../UI/Text';
 import { type RGBColor, type ColorResult } from '../UI/ColorField/ColorPicker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
-type Props = {
+type Props = {|
   layer: gdLayer,
   onClose: () => void,
-};
+|};
 
 const LightingLayerDialog = (props: Props) => {
   const [color, setColor] = React.useState<RGBColor>({
@@ -50,45 +49,32 @@ const LightingLayerDialog = (props: Props) => {
       title={<Trans>Lighting layer settings</Trans>}
       actions={actions}
     >
-      <Column>
-        <Line>
-          <DismissableAlertMessage
-            kind="info"
-            identifier="lighting-layer-usage"
-          >
-            <Trans>
-              Lighting layer introduces ambient light in the scene. There should
-              be only one lighting layer per scene. Ideally all the lights
-              should be in the lighting layer and in most of the cases lighting
-              layer should follow the base layer.
-            </Trans>
-          </DismissableAlertMessage>
-        </Line>
-        <Spacer />
-        <Line>
-          <InlineCheckbox
-            checked={followBaseLayer}
-            onCheck={(e, checked) => {
-              setFollowBaseLayer(checked);
-            }}
-          />
-          <Text>
-            <Trans>Automatically follow the base layer.</Trans>
-          </Text>
-        </Line>
-        <Spacer />
-        <Line>
-          <ColorField
-            fullWidth
-            floatingLabelText={<Trans>Ambient light color</Trans>}
-            disableAlpha
-            color={color}
-            onChange={(color: ColorResult) => {
-              setColor(color.rgb);
-            }}
-          />
-        </Line>
-      </Column>
+      <ColumnStackLayout>
+        <DismissableAlertMessage kind="info" identifier="lighting-layer-usage">
+          <Trans>
+            Lighting layer introduces ambient light in the scene. There should
+            be only one lighting layer per scene. Ideally all the lights should
+            be in the lighting layer and in most of the cases lighting layer
+            should follow the base layer.
+          </Trans>
+        </DismissableAlertMessage>
+        <InlineCheckbox
+          label={<Trans>Automatically follow the base layer.</Trans>}
+          checked={followBaseLayer}
+          onCheck={(e, checked) => {
+            setFollowBaseLayer(checked);
+          }}
+        />
+        <ColorField
+          fullWidth
+          floatingLabelText={<Trans>Ambient light color</Trans>}
+          disableAlpha
+          color={color}
+          onChange={(color: ColorResult) => {
+            setColor(color.rgb);
+          }}
+        />
+      </ColumnStackLayout>
     </Dialog>
   );
 };

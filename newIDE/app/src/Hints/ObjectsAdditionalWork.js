@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 /*
  * Define additional logic which executes after an object/instance has been created.
@@ -10,112 +11,97 @@ import newNameGenerator from '../Utils/NewNameGenerator';
  * and add it in hints/explaination list.
  */
 
-export type InfoBarDetails = {
-  show: boolean,
+export type InfoBarDetails = {|
   identifier: AlertMessageIdentifier,
-  message: string,
-  touchScreenMessage: string,
-};
+  message: MessageDescriptor,
+  touchScreenMessage: MessageDescriptor,
+|};
 
 type InfoBarEvent = 'onObjectAdded' | 'onInstanceAdded';
 
-export default {
-  onObjectAdded(
-    object: gdObject,
-    layout: gdLayout,
-    project: gdProject
-  ): ?InfoBarDetails {
-    const services = this.objectType[object.getType()];
-    if (services) {
-      services.onObjectAdded(object, layout, project);
-      return services.getInfoBarDetails('onObjectAdded');
-    }
+export const onObjectAdded = (
+  object: gdObject,
+  layout: gdLayout,
+  project: gdProject
+): ?InfoBarDetails => {
+  const services = objectType[object.getType()];
+  if (services) {
+    services.onObjectAdded(object, layout, project);
+    return services.getInfoBarDetails('onObjectAdded');
+  }
 
-    return null;
-  },
+  return null;
+};
 
-  onInstanceAdded(
-    instance: gdInitialInstance,
-    layout: gdLayout,
-    project: gdProject
-  ): ?InfoBarDetails {
-    const services = this.objectType[
-      layout.getObject(instance.getObjectName()).getType()
-    ];
-    if (services) {
-      services.onInstanceAdded(instance, layout, project);
-      return services.getInfoBarDetails('onInstanceAdded');
-    }
+export const onInstanceAdded = (
+  instance: gdInitialInstance,
+  layout: gdLayout,
+  project: gdProject
+): ?InfoBarDetails => {
+  const services =
+    objectType[layout.getObject(instance.getObjectName()).getType()];
+  if (services) {
+    services.onInstanceAdded(instance, layout, project);
+    return services.getInfoBarDetails('onInstanceAdded');
+  }
 
-    return null;
-  },
+  return null;
+};
 
-  objectType: {
-    'Lighting::LightObject': {
-      onObjectAdded: (
-        object: gdObject,
-        layout: gdLayout,
-        project: gdProject
-      ) => {
-        let hasLightingLayer = false;
-        for (let i = 0; i < layout.getLayersCount(); i++) {
-          const layer = layout.getLayerAt(i);
-          if (layer.isLightingLayer()) {
-            hasLightingLayer = true;
-            break;
-          }
-        }
-        if (!hasLightingLayer) {
-          const name = newNameGenerator('Lighting', name =>
-            layout.hasLayerNamed(name)
-          );
-          layout.insertNewLayer(name, layout.getLayersCount());
-          const lightingLayer: gdLayer = layout.getLayer('Lighting');
-          lightingLayer.setLightingLayer(true);
-          lightingLayer.setFollowBaseLayerCamera(true);
-          lightingLayer.setAmbientLightColor(128, 128, 128);
-        }
-      },
+const getLightingLayer = (layout: gdLayout): ?gdLayer => {
+  for (let i = 0; i < layout.getLayersCount(); i++) {
+    const layer = layout.getLayerAt(i);
+    if (layer.isLightingLayer()) return layer;
+  }
 
-      onInstanceAdded: (
-        instance: gdInitialInstance,
-        layout: gdLayout,
-        project: gdProject
-      ) => {
-        let lightingLayer = null;
-        for (let i = 0; i < layout.getLayersCount(); i++) {
-          const layer = layout.getLayerAt(i);
-          if (layer.isLightingLayer()) {
-            lightingLayer = layer;
-            break;
-          }
-        }
-        if (lightingLayer) {
-          instance.setLayer(lightingLayer.getName());
-        }
-      },
+  return null;
+};
 
-      getInfoBarDetails: (infoBarEvent: InfoBarEvent): ?InfoBarDetails => {
-        if (infoBarEvent === 'onObjectAdded') {
-          return {
-            show: true,
-            identifier: 'automatic-lighting-layer',
-            message: t`Lighting Layer created!`,
-            touchScreenMessage: t`Lighting Layer created!`,
-          };
-        }
+const objectType = {
+  'Lighting::LightObject': {
+    onObjectAdded: (object: gdObject, layout: gdLayout, project: gdProject) => {
+      const lightingLayer = getLightingLayer(layout);
+      if (lightingLayer === null) {
+        const name = newNameGenerator('Lighting', name =>
+          layout.hasLayerNamed(name)
+        );
+        layout.insertNewLayer(name, layout.getLayersCount());
+        const layer: gdLayer = layout.getLayer('Lighting');
+        layer.setLightingLayer(true);
+        layer.setFollowBaseLayerCamera(true);
+        layer.setAmbientLightColor(128, 128, 128);
+      }
+    },
 
-        if (infoBarEvent === 'onInstanceAdded') {
-          return {
-            show: true,
-            identifier: 'object-moved-in-lighting-layer',
-            message: t`Light Object is added in lighting layer!`,
-            touchScreenMessage: t`Light Object is added in lighting layer!`,
-          };
-        }
+    onInstanceAdded: (
+      instance: gdInitialInstance,
+      layout: gdLayout,
+      project: gdProject
+    ) => {
+      const lightingLayer = getLightingLayer(layout);
+      if (lightingLayer) {
+        instance.setLayer(lightingLayer.getName());
+      }
+    },
 
-        return null;
-      },
+    getInfoBarDetails: (infoBarEvent: InfoBarEvent): ?InfoBarDetails => {
+      if (infoBarEvent === 'onObjectAdded') {
+        return {
+          identifier: 'automatic-lighting-layer',
+          message: t`Lighting Layer created!`,
+          touchScreenMessage: t`Lighting Layer created!`,
+        };
+      }
+
+      if (infoBarEvent === 'onInstanceAdded') {
+        return {
+          identifier: 'object-moved-in-lighting-layer',
+          message: t`Light Object is added in lighting layer!`,
+          touchScreenMessage: t`Light Object is added in lighting layer!`,
+        };
+      }
+
+      return null;
     },
   },
 };

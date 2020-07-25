@@ -53,6 +53,7 @@ const extractCommitsFromGit = () => {
         const forceHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
           lowerCaseMessage.includes("don't show in changelog");
+        const forDev = lowerCaseMessage.includes('developer changelog');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
 
         return {
@@ -60,6 +61,7 @@ const extractCommitsFromGit = () => {
           authorEmail: commit.authorEmail.trim(),
           authorNickname: '',
           isFix,
+          forDev,
           hidden:
             forceHide ||
             (commit.authorEmail === 'Florian.Rival@gmail.com' && shouldHide),
@@ -142,7 +144,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in changelog/i;
+  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in|developer) changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0
@@ -183,8 +185,9 @@ const formatHiddenCommitMessage = commit => {
 
   const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
   const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
+  const devCommits = displayedCommits.filter(commit => commit.forDev);
   const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix);
+  const improvementsCommits = displayedCommits.filter(commit => { return !commit.isFix && !commit.forDev});
 
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
@@ -199,4 +202,11 @@ const formatHiddenCommitMessage = commit => {
 
   shell.echo(`\n## 🐛 Bug fixes\n`);
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
+
+  if (devCommits) {
+    shell.echo(`\n<details>\n`);
+    shell.echo(`\n<summary> 🛠 Developers</summary>\n`);
+    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
+    shell.echo(`\n</details>\n`);
+  }
 })();

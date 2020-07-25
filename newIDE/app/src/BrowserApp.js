@@ -38,7 +38,7 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      eventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter()}
+      makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
     >

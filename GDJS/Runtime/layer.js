@@ -21,7 +21,7 @@ gdjs.Layer = function (layerData, runtimeScene) {
   this._zoomFactor = 1;
   this._timeScale = 1;
   this._hidden = !layerData.visibility;
-  this._effectsData = layerData.effects || [];
+  this._initialEffectsData = layerData.effects || [];
   this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
   this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
   this._cachedGameResolutionWidth = runtimeScene
@@ -45,7 +45,10 @@ gdjs.Layer = function (layerData, runtimeScene) {
   // @ts-ignore - assume the proper renderer is passed
   this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
   this.show(!this._hidden);
-  this._setEffectsDefaultParameters();
+
+  for(var i = 0;i < layerData.effects.length;++i) {
+    this.addEffect(layerData.effects[i]);
+  }
 };
 
 gdjs.Layer.prototype.getRenderer = function () {
@@ -286,8 +289,12 @@ gdjs.Layer.prototype.getHeight = function () {
   return this._cachedGameResolutionHeight;
 };
 
-gdjs.Layer.prototype.getEffectsData = function () {
-  return this._effectsData;
+/**
+ * Return the initial effects data for the layer. Only to
+ * be used by renderers.
+ */
+gdjs.Layer.prototype.getInitialEffectsData = function() {
+  return this._initialEffectsData;
 };
 
 /**
@@ -296,7 +303,29 @@ gdjs.Layer.prototype.getEffectsData = function () {
  */
 gdjs.Layer.prototype.addEffect = function (effectData) {
   this._renderer.addEffect(effectData);
-};
+
+  for (var name in effectData.doubleParameters) {
+    this.setEffectDoubleParameter(
+      effectData.name,
+      name,
+      effectData.doubleParameters[name]
+    );
+  }
+  for (var name in effectData.stringParameters) {
+    this.setEffectStringParameter(
+      effectData.name,
+      name,
+      effectData.stringParameters[name]
+    );
+  }
+  for (var name in effectData.booleanParameters) {
+    this.setEffectBooleanParameter(
+      effectData.name,
+      name,
+      effectData.booleanParameters[name]
+    );
+  }
+}
 
 /**
  * Remove the effect with the specified name
@@ -373,33 +402,6 @@ gdjs.Layer.prototype.isEffectEnabled = function (name) {
  */
 gdjs.Layer.prototype.hasEffect = function (name) {
   return this._renderer.hasEffect(name);
-};
-
-gdjs.Layer.prototype._setEffectsDefaultParameters = function () {
-  for (var i = 0; i < this._effectsData.length; ++i) {
-    var effectData = this._effectsData[i];
-    for (var name in effectData.doubleParameters) {
-      this.setEffectDoubleParameter(
-        effectData.name,
-        name,
-        effectData.doubleParameters[name]
-      );
-    }
-    for (var name in effectData.stringParameters) {
-      this.setEffectStringParameter(
-        effectData.name,
-        name,
-        effectData.stringParameters[name]
-      );
-    }
-    for (var name in effectData.booleanParameters) {
-      this.setEffectBooleanParameter(
-        effectData.name,
-        name,
-        effectData.booleanParameters[name]
-      );
-    }
-  }
 };
 
 /**

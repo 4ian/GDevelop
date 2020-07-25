@@ -28,6 +28,17 @@ gdjs.DummyRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
 
+gdjs.DummyRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  // Compare previous and new data for the object and update it accordingly.
+  // This is useful for "hot-reloading".
+  if (oldObjectData.content.property1 !== newObjectData.content.property1) {
+    this._property1 = newObjectData.content.property1;
+    this._renderer.updateText();
+  }
+
+  return true;
+};
+
 /**
  * Called once during the game loop, before events and rendering.
  * @param {gdjs.RuntimeScene} runtimeScene The gdjs.RuntimeScene the object belongs to.
@@ -108,7 +119,6 @@ gdjs.DummyRuntimeObject.prototype.getOpacity = function() {
 gdjs.DummyRuntimeObject.prototype.getText = function() {
   return this._property1;
 };
-
 
 /**
  * A dummy method that can be called from events

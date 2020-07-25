@@ -29,9 +29,8 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._clearColor = layer.getClearColor();
 
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
-  this._setupFilters();
+  this._pixiContainer.filters = [];
 
-  // Add the sprite after filters are applied so that the blend mode could be fixed.
   if (this._isLightingLayer) {
     this._replaceContainerWithSprite();
   }
@@ -79,18 +78,6 @@ gdjs.LayerPixiRenderer.prototype.update = function () {
   for (var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
-  }
-};
-
-gdjs.LayerPixiRenderer.prototype._setupFilters = function () {
-  var effectsData = this._layer.getEffectsData();
-  if (effectsData.length === 0) {
-    return;
-  }
-
-  this._pixiContainer.filters = [];
-  for (var i = 0; i < effectsData.length; ++i) {
-    this.addEffect(effectsData[i]);
   }
 };
 
@@ -346,20 +333,7 @@ gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
   this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
   // @ts-ignore PIXI isn't typed for now.
   this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-  // fix for blend mode when applying filter
-  if (this._pixiContainer.filters) {
-    // @ts-ignore PIXI isn't typed for now.
-    this._pixiContainer.filterArea = new PIXI.Rectangle(
-      0,
-      0,
-      this._pixiRenderer.screen.width,
-      this._pixiRenderer.screen.height
-    );
-    for (var i = 0; i < this._pixiContainer.filters.length; i++) {
-      // @ts-ignore PIXI isn't typed for now.
-      this._pixiContainer.filters[i].blendMode = PIXI.BLEND_MODES.ADD;
-    }
-  }
+
   var sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();
   var index = sceneContainer.getChildIndex(this._pixiContainer);
   sceneContainer.addChildAt(this._lightingSprite, index);

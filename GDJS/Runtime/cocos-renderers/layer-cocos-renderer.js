@@ -4,50 +4,87 @@
  * This project is released under the MIT License.
  */
 
-gdjs.LayerCocosRenderer = function (layer, runtimeSceneRenderer) {
-  var CocosLayer = cc.Layer.extend({
-    ctor: function () {
-      this._super();
-      return true;
-    },
-  });
+gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
+{
+    var CocosLayer = cc.Layer.extend({
+        ctor:function () {
+            this._super();
+            return true;
+        }
+    });
 
-  this._layer = layer;
-  this.convertYPosition = runtimeSceneRenderer.convertYPosition;
+    this._layer = layer;
+    this.convertYPosition = runtimeSceneRenderer.convertYPosition;
 
-  var effects = this._layer.getEffectsData();
-  if (effects.length === 0) {
-    this._cocosLayer = new CocosLayer();
-    runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
-  } else {
-    var game = runtimeSceneRenderer._runtimeScene.getGame();
-    this._renderTexture = new cc.RenderTexture(
-      game.getGameResolutionWidth(),
-      game.getGameResolutionHeight()
-    );
-    this._renderTexture.setPosition(
-      cc.p(
-        game.getGameResolutionWidth() / 2,
-        game.getGameResolutionHeight() / 2
-      )
-    );
-    this._renderTexture.retain();
+    // Read effects from the layer as we can't dynamically add effects
+    // in Cocos2d-JS.
+    var effects = this._layer.getInitialEffectsData();
+    if (effects.length === 0) {
+        this._cocosLayer = new CocosLayer();
+        runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
+    } else {
+        var game = runtimeSceneRenderer._runtimeScene.getGame();
+        this._renderTexture = new cc.RenderTexture(
+            game.getGameResolutionWidth(), game.getGameResolutionHeight());
+        this._renderTexture.setPosition(cc.p(
+            game.getGameResolutionWidth() / 2, game.getGameResolutionHeight() / 2));
+        this._renderTexture.retain();
 
-    this._cocosLayer = new CocosLayer();
-    this._cocosLayer.retain();
-    runtimeSceneRenderer.getCocosScene().addChild(this._renderTexture);
+        this._cocosLayer = new CocosLayer();
+        this._cocosLayer.retain();
+        runtimeSceneRenderer.getCocosScene().addChild(this._renderTexture);
 
-    this._makeShaders();
-  }
-};
+        this._makeShaders();
+    }
+}
 
 gdjs.LayerRenderer = gdjs.LayerCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.LayerCocosRenderer.prototype.onSceneUnloaded = function () {
-  this._unloaded = true;
-  if (this._shaders) {
-    for (var i = 0; i < this._shaders.length; ++i) {
-      this._shaders[i].shader.release();
+gdjs.LayerCocosRenderer.prototype.onSceneUnloaded = function() {
+    this._unloaded = true;
+    if (this._shaders) {
+        for(var i = 0;i < this._shaders.length;++i) {
+            this._shaders[i].shader.release();
+        }
+    }
+    if (this._renderTexture) {
+        // this._cocosLayer.release(); //TODO
+        // this._renderTexture.release(); //TODO
+    }
+}
+
+gdjs.LayerCocosRenderer.prototype._makeShaders = function() {
+    if (this._shaders) {
+        console.log('Shaders are already made for this layer');
+        return;
+    } else if (!this._renderTexture) {
+        console.log('You can\'t apply shaders on a layer that is not using a cc.RenderTexture');
+        return;
+    }
+
+    var effects = this._layer.getInitialEffectsData();
+    if (effects.length === 0) {
+        return;
+    } else if (effects.length > 1) {
+        console.log('Only a single effect by Layer is supported for now by Cocos2d-JS renderer');
+    }
+
+    var effect = gdjs.CocosTools.getEffect(effects[0].effectType);
+    if (!effect) {
+        console.log('Shader \"' + effects[0].name + '\" not found');
+        return;
+    }
+
+    var theShader = {
+        name: effects[0].name,
+        shader: effect.makeShader(),
+        uniforms: {}
+    };
+    theShader.shader.retain();
+    for (var i = 0;i < effect.uniformNames.length;++i) {
+        var name = effect.uniformNames[i];
+        theShader.uniforms[name] =
+            theShader.shader.getUniformLocationForName(name);
     }
   }
   if (this._renderTexture) {
@@ -208,8 +245,9 @@ gdjs.LayerCocosRenderer.prototype.enableEffect = function (name, value) {
   // Unimplemented
 };
 
-gdjs.LayerCocosRenderer.prototype.addEffect = function (effectData) {
-  // Unimplemented
+gdjs.LayerCocosRenderer.prototype.addEffect = function(effectData) {
+    // Unimplemented - adding effects is not supported in Cocos2d-JS.
+    // All effects are supposed to be added to the layer at its creation.
 };
 
 gdjs.LayerCocosRenderer.prototype.removeEffect = function (effect) {

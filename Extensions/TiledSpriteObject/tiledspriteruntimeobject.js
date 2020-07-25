@@ -43,6 +43,20 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.registerObject("TiledSpriteObject::TiledSprite", gdjs.TiledSpriteRuntimeObject);
 
+gdjs.TiledSpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.texture !== newObjectData.texture) {
+        this.setTexture(newObjectData.texture, this._runtimeScene);
+    }
+    if (oldObjectData.width !== newObjectData.width) {
+        this.setWidth(newObjectData.width);
+    }
+    if (oldObjectData.height !== newObjectData.height) {
+        this.setHeight(newObjectData.height);
+    }
+
+    return true;
+};
+
 gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };

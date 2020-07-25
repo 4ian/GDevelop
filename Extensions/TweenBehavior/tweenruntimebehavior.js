@@ -58,6 +58,11 @@ gdjs.TweenRuntimeBehavior.easings = [
   'easeTo',
 ];
 
+gdjs.TweenRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  // Nothing to update.
+  return true;
+}
+
 /**
  * A tween being played in a behavior.
  * @param {shifty.Tweenable} instance The Shifty tween that is played

@@ -559,7 +559,9 @@ export default class InstancesEditor extends Component<Props> {
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
       for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
-        this.props.initialInstances.insertInitialInstance(instance);
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
       }
     } else {
       this.props.instancesSelection.selectInstance(

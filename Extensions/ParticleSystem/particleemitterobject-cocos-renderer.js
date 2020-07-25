@@ -194,7 +194,7 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
 
     this.started = false;
 
-    var renderer = runtimeScene.getLayer("").getRenderer();
+    var renderer = runtimeScene.getLayer(runtimeObject.getLayer()).getRenderer();
     renderer.addRendererObject(this.renderer, runtimeObject.getZOrder());
     this._convertYPosition = renderer.convertYPosition;
 };

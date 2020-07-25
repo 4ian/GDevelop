@@ -147,6 +147,43 @@ gdjs.PhysicsRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 gdjs.PhysicsRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.registerBehavior("PhysicsBehavior::PhysicsBehavior", gdjs.PhysicsRuntimeBehavior);
 
+gdjs.PhysicsRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.dynamic !== newBehaviorData.dynamic) {
+        if (newBehaviorData.dynamic) this.setDynamic();
+        else this.setStatic();
+    }
+    if (oldBehaviorData.angularDamping !== newBehaviorData.angularDamping) {
+        this.setAngularDamping(newBehaviorData.angularDamping);
+    }
+    if (oldBehaviorData.linearDamping !== newBehaviorData.linearDamping) {
+        this.setLinearDamping(newBehaviorData.linearDamping);
+    }
+    if (oldBehaviorData.isBullet !== newBehaviorData.isBullet) {
+        if (newBehaviorData.isBullet) this.setAsBullet();
+        else this.dontSetAsBullet();
+    }
+    if (oldBehaviorData.fixedRotation !== newBehaviorData.fixedRotation) {
+        if (newBehaviorData.fixedRotation) this.setFixedRotation();
+        else this.setFreeRotation();
+    }
+
+    // TODO: make these properties updatable.
+    if (oldBehaviorData.massDensity !== newBehaviorData.massDensity) {
+        return false;
+    }
+    if (oldBehaviorData.averageFriction !== newBehaviorData.averageFriction) {
+        return false;
+    }
+    if (oldBehaviorData.averageRestitution !== newBehaviorData.averageRestitution) {
+        return false;
+    }
+    if (oldBehaviorData.shapeType !== newBehaviorData.shapeType) {
+        return false;
+    }
+
+    return true;
+}
+
 gdjs.PhysicsRuntimeBehavior.prototype.onDeActivate = function() {
 	if ( this._box2DBody !== null ) {
 		this._sharedData.world.DestroyBody(this._box2DBody);

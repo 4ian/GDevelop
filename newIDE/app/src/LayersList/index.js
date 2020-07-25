@@ -18,6 +18,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -129,6 +130,9 @@ type Props = {|
     cb: (done: boolean) => void
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|

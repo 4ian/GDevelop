@@ -19,6 +19,7 @@ export type EventsFunctionsExtensionsState = {|
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
   ensureLoadFinished: () => Promise<void>,
+  getIncludeFileHashs: () => { [string]: number },
 |};
 
 const defaultState = {
@@ -32,6 +33,7 @@ const defaultState = {
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
   ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
+  getIncludeFileHashs: () => ({}),
 };
 
 const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(

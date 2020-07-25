@@ -95,6 +95,11 @@ describe('gdjs.RuntimeScene integration tests', function () {
       visibility: true,
       cameras: [],
       effects: [],
+      isLightingLayer: false,
+      followBaseLayerCamera: false,
+      ambientLightColorR: 128,
+      ambientLightColorG: 128,
+      ambientLightColorB: 128,
     });
     expect(runtimeScene.hasLayer('')).to.be(true);
     expect(runtimeScene.hasLayer('MyLayer')).to.be(true);

@@ -109,6 +109,8 @@ gdjs.LayerPixiRenderer.prototype.addEffect = function (effectData) {
     update: filterCreator.update,
   };
 
+  // @ts-ignore PIXI isn't typed for now.
+  if (this._isLightingLayer) filter.pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
   this._pixiContainer.filters = (this._pixiContainer.filters || []).concat(
     filter.pixiFilter
   );
@@ -292,9 +294,6 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
       this._pixiRenderer.screen.width,
       this._pixiRenderer.screen.height
     );
-    if (this._pixiContainer.filters) {
-      this._pixiContainer.filterArea = this._pixiRenderer.screen;
-    }
     this._oldWidth = this._pixiRenderer.screen.width;
     this._oldHeight = this._pixiRenderer.screen.height;
   }

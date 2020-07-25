@@ -1159,7 +1159,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             open
             object={this.state.editedObjectWithContext.object}
             project={project}
-            layout={layout}
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}

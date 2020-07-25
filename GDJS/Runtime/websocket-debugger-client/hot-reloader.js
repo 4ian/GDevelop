@@ -968,8 +968,6 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
   newLayers,
   runtimeScene
 ) {
-  // TODO: layer re-ordering and ensure the added layer is at the right position
-
   oldLayers.forEach((oldLayerData) => {
     const name = oldLayerData.name;
     const newLayerData = newLayers.filter(
@@ -995,6 +993,9 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
       runtimeScene.addLayer(newLayerData);
     }
   });
+  newLayers.forEach((newLayerData, index) => {
+    runtimeScene.setLayerIndex(newLayerData.name, index);
+  })
 };
 
 /**

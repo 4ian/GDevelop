@@ -21,6 +21,7 @@ declare class gdInitialInstance {
   getCustomWidth(): number;
   setCustomHeight(height: number): void;
   getCustomHeight(): number;
+  resetPersistentUuid(): gdInitialInstance;
   updateCustomProperty(name: string, value: string, project: gdProject, layout: gdLayout): void;
   getCustomProperties(project: gdProject, layout: gdLayout): gdMapStringPropertyDescriptor;
   getRawFloatProperty(name: string): number;

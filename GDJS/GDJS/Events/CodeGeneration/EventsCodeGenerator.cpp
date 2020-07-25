@@ -63,8 +63,6 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
   gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
-  codeGenerator.AddAllObjectsIncludeFiles();
-
   // "Booleans" used by conditions
   gd::String globalConditionsBooleans =
       codeGenerator.GenerateAllConditionsBooleanDeclarations();
@@ -327,9 +325,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  createObject: function(objectName) {\n"
          "    var objectsList = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
-         // TODO: we could speed this up by storing a map of object names, but the
-         // cost of creating/storing it for each events function might not be
-         // worth it.
+         // TODO: we could speed this up by storing a map of object names, but
+         // the cost of creating/storing it for each events function might not
+         // be worth it.
          "    if (objectsList) {\n" +
          "      return parentEventsFunctionContext ?\n" +
          "        "
@@ -394,33 +392,6 @@ EventsCodeGenerator::GenerateAllObjectsDeclarationsAndResets(
     generateDeclarations(objectsAndGroups.GetObject(i));
 
   return std::make_pair(globalObjectLists, globalObjectListsReset);
-}
-
-void EventsCodeGenerator::AddAllObjectsIncludeFiles() {
-  auto addIncludeFiles = [this](const gd::Object& object) {
-    gd::String type = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), object.GetName());
-
-    // Ensure needed files are included for the object type and its behaviors.
-    const gd::ObjectMetadata& metadata =
-        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-    AddIncludeFiles(metadata.includeFiles);
-
-    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      const gd::BehaviorMetadata& metadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              JsPlatform::Get(),
-              object.GetBehavior(behaviors[j]).GetTypeName());
-      AddIncludeFiles(metadata.includeFiles);
-    }
-  };
-
-  for (std::size_t i = 0; i < globalObjectsAndGroups.GetObjectsCount(); ++i)
-    addIncludeFiles(globalObjectsAndGroups.GetObject(i));
-
-  for (std::size_t i = 0; i < objectsAndGroups.GetObjectsCount(); ++i)
-    addIncludeFiles(objectsAndGroups.GetObject(i));
 }
 
 gd::String EventsCodeGenerator::GenerateAllConditionsBooleanDeclarations() {
@@ -839,15 +810,17 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
                                   : "runtimeScene, eventsFunctionContext";
 
   // Generate a unique name for the function.
+  gd::String uniqueId =
+      gd::String::From(GenerateSingleUsageUniqueIdForEventsList());
   gd::String functionName =
-      GetCodeNamespaceAccessor() + "eventsList" + gd::String::From(&events);
+      GetCodeNamespaceAccessor() + "eventsList" + uniqueId;
+
   // The only local parameters are runtimeScene and context.
   // List of objects, conditions booleans and any variables used by events
   // are stored in static variables that are globally available by the whole
   // code.
   AddCustomCodeOutsideMain(functionName + " = function(" + parametersCode +
-                           ") {\n" + code + "\n" + "}; //End of " +
-                           functionName + "\n");
+                           ") {\n" + code + "\n" + "};");
 
   // Replace the code of the events by the call to the function. This does not
   // interfere with the objects picking as the lists are in static variables

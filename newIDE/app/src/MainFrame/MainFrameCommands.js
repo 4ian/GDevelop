@@ -39,9 +39,11 @@ type CommandHandlers = {|
   i18n: I18n,
   project: ?gdProject,
   previewEnabled: boolean,
+  hasPreviewsRunning: boolean,
   onOpenProjectManager: () => void,
   onLaunchPreview: () => void | Promise<void>,
   onLaunchDebugPreview: () => void,
+  onHotReloadPreview: () => void,
   onOpenStartPage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
@@ -59,6 +61,7 @@ type CommandHandlers = {|
 const quitAppText = t`Close GDevelop`;
 const openProjectManagerText = t`Open project manager`;
 const launchPreviewText = t`Launch preview`;
+const launchPreviewNewWindowText = t`Launch another preview in a new window`;
 const launchDebugPreviewText = t`Launch preview with debugger and profiler`;
 const openStartPageText = t`Open start page`;
 const createNewProjectText = t`Create a new project`;
@@ -84,8 +87,15 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommand('LAUNCH_PREVIEW', handlers.previewEnabled, {
-    displayText: launchPreviewText,
+    displayText: handlers.hasPreviewsRunning
+      ? launchPreviewNewWindowText
+      : launchPreviewText,
     handler: handlers.onLaunchPreview,
+  });
+
+  useCommand('HOT_RELOAD_PREVIEW', handlers.hasPreviewsRunning, {
+    displayText: t`Apply changes to the running preview`,
+    handler: handlers.onHotReloadPreview,
   });
 
   useCommand('LAUNCH_DEBUG_PREVIEW', handlers.previewEnabled, {

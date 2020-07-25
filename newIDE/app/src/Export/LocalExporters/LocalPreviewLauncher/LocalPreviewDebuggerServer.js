@@ -4,11 +4,13 @@ import {
   type PreviewDebuggerServerCallbacks,
   type PreviewDebuggerServer,
   type DebuggerId,
+  type ServerAddress,
 } from '../../PreviewLauncher.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 let debuggerServerState: 'started' | 'stopped' = 'stopped';
+let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
 
@@ -29,61 +31,89 @@ const removeServerListeners = () => {
  */
 export const LocalPreviewDebuggerServer: PreviewDebuggerServer = {
   startServer: () => {
-    if (!ipcRenderer) return;
-    if (debuggerServerState === 'started') return;
+    if (!ipcRenderer) return Promise.reject();
+    if (debuggerServerState === 'started') return Promise.resolve();
 
-    debuggerServerState = 'stopped';
-    removeServerListeners();
+    const serverStartPromise = new Promise((resolve, reject) => {
+      let serverStartPromiseCompleted = false;
+      debuggerServerState = 'stopped';
+      debuggerServerAddress = null;
+      removeServerListeners();
 
-    ipcRenderer.on('debugger-error-received', (event, err) => {
-      callbacksList.forEach(({ onErrorReceived }) => onErrorReceived(err));
-    });
+      ipcRenderer.on('debugger-error-received', (event, err) => {
+        if (!serverStartPromiseCompleted) {
+          reject(err);
+          serverStartPromiseCompleted = true;
+        }
 
-    ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
-      const debuggerIdIndex = debuggerIds.indexOf(id);
-      if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
+        callbacksList.forEach(({ onErrorReceived }) => onErrorReceived(err));
+      });
 
-      callbacksList.forEach(({ onConnectionClosed }) =>
-        onConnectionClosed({
-          id,
-          debuggerIds,
-        })
-      );
-    });
+      ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
+        const debuggerIdIndex = debuggerIds.indexOf(id);
+        if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
 
-    ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
-      debuggerIds.push(id);
-      callbacksList.forEach(({ onConnectionOpened }) =>
-        onConnectionOpened({
-          id,
-          debuggerIds,
-        })
-      );
-    });
-
-    ipcRenderer.on('debugger-start-server-done', event => {
-      console.info('Local preview debugger started');
-      debuggerServerState = 'started';
-      callbacksList.forEach(({ onServerStateChanged }) =>
-        onServerStateChanged()
-      );
-    });
-
-    ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
-      console.info('Processing message received for debugger');
-      try {
-        const parsedMessage = JSON.parse(message);
-        callbacksList.forEach(({ onHandleParsedMessage }) =>
-          onHandleParsedMessage({ id, parsedMessage })
+        callbacksList.forEach(({ onConnectionClosed }) =>
+          onConnectionClosed({
+            id,
+            debuggerIds,
+          })
         );
-      } catch (e) {
-        console.warn(
-          'Error while parsing message received from debugger client:',
-          e
+      });
+
+      ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
+        debuggerIds.push(id);
+        callbacksList.forEach(({ onConnectionOpened }) =>
+          onConnectionOpened({
+            id,
+            debuggerIds,
+          })
         );
-      }
+      });
+
+      ipcRenderer.on('debugger-start-server-done', (event, { address }) => {
+        console.info('Local preview debugger started');
+        debuggerServerState = 'started';
+        debuggerServerAddress = address;
+        if (!serverStartPromiseCompleted) {
+          resolve();
+          serverStartPromiseCompleted = true;
+        }
+
+        callbacksList.forEach(({ onServerStateChanged }) =>
+          onServerStateChanged()
+        );
+      });
+
+      ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
+        console.info('Processing message received for debugger');
+        try {
+          const parsedMessage = JSON.parse(message);
+          callbacksList.forEach(({ onHandleParsedMessage }) =>
+            onHandleParsedMessage({ id, parsedMessage })
+          );
+        } catch (e) {
+          console.warn(
+            'Error while parsing message received from debugger client:',
+            e
+          );
+        }
+      });
+      ipcRenderer.send('debugger-start-server');
     });
-    ipcRenderer.send('debugger-start-server');
+
+    // Consider the start of the server as a failure if not completed/errored
+    // after 5s.
+    const serverStartTimeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(
+          new Error(
+            'Debugger server not started or errored after 5s - aborting.'
+          )
+        );
+      }, 5000);
+    });
+    return Promise.race([serverStartPromise, serverStartTimeoutPromise]);
   },
   sendMessage: (id: DebuggerId, message: Object) => {
     if (!ipcRenderer) return;
@@ -98,6 +128,7 @@ export const LocalPreviewDebuggerServer: PreviewDebuggerServer = {
     });
   },
   getServerState: () => debuggerServerState,
+  getServerAddress: () => debuggerServerAddress,
   getExistingDebuggerIds: () => debuggerIds,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => {
     callbacksList.push(callbacks);

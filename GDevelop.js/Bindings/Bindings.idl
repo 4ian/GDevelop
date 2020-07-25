@@ -756,6 +756,8 @@ interface InitialInstance {
     void SetCustomHeight(float height);
     float GetCustomHeight();
 
+    [Ref] InitialInstance ResetPersistentUuid();
+
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
     float GetRawFloatProperty([Const] DOMString name);
@@ -2365,12 +2367,21 @@ interface EventsFunctionsExtensionCodeGenerator {
 };
 
 [Prefix="gdjs::"]
+interface PreviewExportOptions {
+    void PreviewExportOptions([Ref] Project project, [Const] DOMString outputPath);
+    [Ref] PreviewExportOptions SetDebuggerServerAddress([Const] DOMString address, [Const] DOMString port);
+    [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
+    [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
+    [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
+    [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+};
+
+[Prefix="gdjs::"]
 interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);
 
-    boolean ExportLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Const] DOMString exportDir);
-    boolean ExportExternalLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Ref] ExternalLayout externalLayout, [Const] DOMString exportDir);
+    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions);
 
     boolean ExportWholeCocos2dProject([Ref] Project project, boolean debugMode, [Const] DOMString exportDir);

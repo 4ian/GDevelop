@@ -196,6 +196,10 @@ import {
   type NamedCommand,
   type CommandOption,
 } from '../CommandPalette/CommandManager';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 
 configureActions({
   depth: 2,
@@ -219,6 +223,11 @@ const buildFakeMenuTemplate = () => [
     click: action('click option 2'),
   },
 ];
+
+const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
+  hasPreviewsRunning: false,
+  launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+};
 
 storiesOf('Welcome', module)
   .addDecorator(muiDecorator)
@@ -1565,6 +1574,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     }
                     onObjectCreated={() => {}}
                     onObjectSelected={() => {}}
+                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   />
                 </TabContentContainer>
               }
@@ -3212,6 +3222,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3242,6 +3253,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3341,6 +3353,10 @@ storiesOf('BehaviorsEditor', module)
       <BehaviorsEditor
         project={testProject.project}
         object={testProject.spriteObjectWithBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
   ));
@@ -3957,7 +3973,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4056,6 +4072,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('Error in functions', () => (
@@ -4097,6 +4114,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ));
 
@@ -4166,7 +4184,7 @@ storiesOf('ExtensionsSearchDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4198,6 +4216,7 @@ storiesOf('LayersList', module)
         cb(true);
       }}
       layersContainer={testProject.testLayout}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('small width and height', () => (
@@ -4218,6 +4237,7 @@ storiesOf('LayersList', module)
           cb(true);
         }}
         layersContainer={testProject.testLayout}
+        hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       />
     </div>
   ));
@@ -4339,4 +4359,46 @@ storiesOf('CommandPalette', module)
         />
       )}
     </I18n>
+  ));
+
+storiesOf('HotReloadPreviewButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={false}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ))
+  .add('with preview(s) running', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={true}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ));
+
+storiesOf('HotReloadLogsDialog', module)
+  .addDecorator(muiDecorator)
+  .add('with an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'error',
+          message: 'Oops, something could not be hot-reloaded.',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ))
+  .add('without an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'info',
+          message: 'Everything is fine',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
   ));

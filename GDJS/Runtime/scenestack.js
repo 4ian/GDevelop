@@ -98,11 +98,11 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
     this._wasFirstSceneLoaded = true;
 
-    //Optionally create the objects from an external layout.
+    // Optionally create the objects from an external layout.
     if (externalLayoutName) {
         var externalLayoutData = this._runtimeGame.getExternalLayoutData(externalLayoutName);
         if (externalLayoutData)
-            newScene.createObjectsFrom(externalLayoutData.instances, 0, 0);
+            newScene.createObjectsFrom(externalLayoutData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
     }
 
     this._stack.push(newScene);

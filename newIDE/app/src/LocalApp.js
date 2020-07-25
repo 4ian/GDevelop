@@ -39,7 +39,7 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      eventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter()}
+      makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >

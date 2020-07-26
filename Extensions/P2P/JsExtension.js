@@ -38,12 +38,13 @@ module.exports = {
         'OnEvent',
         _('Event triggered by peer'),
         _('Triggers once when a connected client sends the event'),
-        _('Event _PARAM0_ received from other client'),
+        _('Event _PARAM0_ received from other client (data loss: _PARAM1_)'),
         _('P2P (experimental)'),
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .addParameter('string', _('Event name'), '', false)
+      .addParameter('yesorno', _('Data loss allowed?'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')

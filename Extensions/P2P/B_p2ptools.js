@@ -9,12 +9,12 @@ gdjs.evtTools.p2p = {
   /**
    * The peer to peer configuration.
    */
-  peerConfig: {debug:1},
+  peerConfig: {debug:1}, // Enable logging of critical errors
 
   /**
    * The p2p client.
    */
-  peer: null, // Enable logging of critical errors
+  peer: null,
 
   /**
    * All connected p2p clients, keyed by their id.
@@ -30,6 +30,11 @@ gdjs.evtTools.p2p = {
    * Contains the latest data sent with each event.
    */
   lastEventData: {},
+
+  /**
+   * Tells how to handle an event (with or without data loss)
+   */
+  eventHandling: {},
 }
 
 gdjs.evtTools.p2p._reloadPeerJS = function() {
@@ -43,8 +48,16 @@ gdjs.evtTools.p2p._onConnection = function(connection) {
   gdjs.evtTools.p2p.connections[connection.peer] = connection;
   connection.on("data", function(data) {
     if(data.eventName === undefined) return;
-    gdjs.evtTools.p2p.triggeredEvents[data.eventName] = true;
-    gdjs.evtTools.p2p.lastEventData[data.eventName] = data.data;
+    var dataLoss = gdjs.evtTools.p2p.eventHandling[data.eventName];
+
+    if (typeof dataLoss === "undefined" || dataLoss === false) {
+      if(typeof gdjs.evtTools.p2p.lastEventData[data.eventName] !== "object")
+        gdjs.evtTools.p2p.lastEventData[data.eventName] = [];
+      gdjs.evtTools.p2p.lastEventData[data.eventName].push(data.data);
+    } else {
+      gdjs.evtTools.p2p.triggeredEvents[data.eventName] = true;
+      gdjs.evtTools.p2p.lastEventData[data.eventName] = data.data;
+    }
   });
 }
 
@@ -59,12 +72,26 @@ gdjs.evtTools.p2p.connect = function(id) {
 
 /**
  * Returns true when the event got triggered by another p2p client.
+ * @param {string} eventName
+ * @param {boolean} dataLoss Is data loss allowed (accelerates event handling when true)?
  * @returns {boolean}
  */
-gdjs.evtTools.p2p.onEvent = function(eventName) {
-  var returnValue = gdjs.evtTools.p2p.triggeredEvents[eventName];
-  gdjs.evtTools.p2p.triggeredEvents[eventName] = false;
-  return returnValue;
+gdjs.evtTools.p2p.onEvent = function(eventName, _dataLoss) {
+  var dataLoss = gdjs.evtTools.p2p.eventHandling[eventName];
+  if (dataLoss == undefined) {
+    gdjs.evtTools.p2p.eventHandling[eventName] = _dataLoss;
+    return gdjs.evtTools.p2p.onEvent(eventName, _dataLoss);
+  }
+  if(dataLoss) {
+    var returnValue = gdjs.evtTools.p2p.triggeredEvents[eventName];
+    if(typeof returnValue === "undefined") return false;
+    gdjs.evtTools.p2p.triggeredEvents[eventName] = false;
+    return returnValue;
+  } else {
+    var returnValue = gdjs.evtTools.p2p.lastEventData[eventName];
+    if(typeof returnValue === "undefined") return false;
+    return returnValue.length !== 0;
+  }
 }
 
 /**
@@ -165,3 +192,10 @@ gdjs.evtTools.p2p._callback = function() {
   gdjs.callbacksRuntimeScenePostEvents.splice(index, 1);
 }
 gdjs.callbacksRuntimeScenePostEvents.push(gdjs.evtTools.p2p._callback);
+
+gdjs.callbacksRuntimeScenePostEvents.push(function() {
+  for(var i in gdjs.evtTools.p2p.lastEventData) {
+    if(typeof gdjs.evtTools.p2p.lastEventData[i] === "object" && gdjs.evtTools.p2p.lastEventData[i].length > 0)
+      gdjs.evtTools.p2p.lastEventData[i].length--;
+  }
+})

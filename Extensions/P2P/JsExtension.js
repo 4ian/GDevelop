@@ -79,6 +79,21 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.onError');
+    
+    extension
+      .addCondition(
+        'OnDisconnection',
+        _('Peer disconnected'),
+        _('Triggers once when a peer disconnects.'),
+        _('P2P peer disconnected'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.onDisconnect');
 
     extension
       .addAction(
@@ -236,7 +251,7 @@ module.exports = {
     extension
       .addStrExpression(
         'GetError',
-        _('Get lats error'),
+        _('Get last error'),
         _('Gets the description of the last P2P error'),
         _('P2P (experimental)'),
         'JsPlatform/Extensions/p2picon.svg'
@@ -245,6 +260,19 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.getLastError');
+
+    extension
+      .addStrExpression(
+        'GetDisconnectedPeer',
+        _('Get disconnected peer'),
+        _('Gets the id of the latest peer that has disconnected.'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.getDisconnectedPeer');
 
     return extension;
   },

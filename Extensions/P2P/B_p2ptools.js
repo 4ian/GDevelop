@@ -13,6 +13,7 @@ gdjs.evtTools.p2p = {
 
   /**
    * The p2p client.
+   * @type {?Peer}
    */
   peer: null,
 
@@ -50,12 +51,25 @@ gdjs.evtTools.p2p = {
    * Last error's message.
    */
   lastError: "",
+
+  /**
+   * True if a peer diconnected.
+   */
+  peerDisconnected: false,
+
+  /**
+   * The last peer that has disconnected.
+   */
+  disconnectedPeer: "",
 }
 
 gdjs.evtTools.p2p._reloadPeerJS = function() {
-  if (gdjs.evtTools.p2p.peer != undefined) gdjs.evtTools.p2p.peer.destroy();
-  gdjs.evtTools.p2p.ready = false;
-  gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig)
+  if(gdjs.evtTools.p2p.peer == null) {
+    gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig);
+  } else {
+    gdjs.evtTools.p2p.peer.disconnect();
+    gdjs.evtTools.p2p.peer.constructor(gdjs.evtTools.p2p.peerConfig);
+  }
   gdjs.evtTools.p2p.peer.on("open", function() {
     gdjs.evtTools.p2p.ready = true;
   });
@@ -83,6 +97,28 @@ gdjs.evtTools.p2p._onConnection = function(connection) {
       gdjs.evtTools.p2p.lastEventData[data.eventName] = data.data;
     }
   });
+  connection.on("error", function() {
+    // Close event is only for graceful disconnection, also handle error aka ungraceful disconnection
+    gdjs.evtTools.p2p._onDisconnect(connection.peer);
+  });
+  connection.on("close", function() {
+    gdjs.evtTools.p2p._onDisconnect(connection.peer);
+  });
+  // Regularly check for disconnection as the built in way is not reliable.
+  var disconnectChecker = function() {
+    if (connection.peerConnection.connectionState == "failed" || connection.peerConnection.connectionState == "disconnected") {
+      gdjs.evtTools.p2p._onDisconnect(connection.peer);
+    } else {
+      setTimeout(disconnectChecker, 500);
+    }
+  }
+  disconnectChecker();
+}
+
+gdjs.evtTools.p2p._onDisconnect = function(connectionID) {
+  gdjs.evtTools.p2p.peerDisconnected = true;
+  gdjs.evtTools.p2p.disconnectedPeer = connectionID;
+  delete gdjs.evtTools.p2p.connections[connectionID];
 }
 
 /**
@@ -97,7 +133,7 @@ gdjs.evtTools.p2p.connect = function(id) {
 /**
  * Returns true when the event got triggered by another p2p client.
  * @param {string} eventName
- * @param {boolean} dataLoss Is data loss allowed (accelerates event handling when true)?
+ * @param {boolean} _dataLoss Is data loss allowed (accelerates event handling when true)?
  * @returns {boolean}
  */
 gdjs.evtTools.p2p.onEvent = function(eventName, _dataLoss) {
@@ -197,7 +233,7 @@ gdjs.evtTools.p2p.getEventVariable = function(eventName, variable) {
  * @param {string} host The host of the broker server
  * @param {number} port
  * @param {string} path The path (part of the url after the host) to the broker server
- * @param {string} [key] Optional password to connect to the broker server
+ * @param {string} key Optional password to connect to the broker server
  * @param {boolean} ssl Use ssl?
  */
 gdjs.evtTools.p2p.useCustomBrokerServer = function(host, port, path, key, ssl) {
@@ -219,7 +255,7 @@ gdjs.evtTools.p2p.useCustomBrokerServer = function(host, port, path, key, ssl) {
  * @returns {string}
  */
 gdjs.evtTools.p2p.getCurrentId = function() {
-  if(gdjs.evtTools.p2p.peer == undefined) return false;
+  if(gdjs.evtTools.p2p.peer == undefined) return "";
   return gdjs.evtTools.p2p.peer.id || "";
 }
 
@@ -242,6 +278,20 @@ gdjs.evtTools.p2p.onError = function() {
 
 gdjs.evtTools.p2p.getLastError = function() {
   return gdjs.evtTools.p2p.lastError;
+}
+
+/**
+ * Returns true once a peer disconnected.
+ * @returns {boolean}
+ */
+gdjs.evtTools.p2p.onDisconnect = function() {
+  var returnValue = gdjs.evtTools.p2p.peerDisconnected;
+  gdjs.evtTools.p2p.peerDisconnected = false;
+  return returnValue;
+}
+
+gdjs.evtTools.p2p.getDisconnectedPeer = function() {
+  return gdjs.evtTools.p2p.disconnectedPeer;
 }
 
 // Initialize PeerJS after running the events a first time to let the user select another server

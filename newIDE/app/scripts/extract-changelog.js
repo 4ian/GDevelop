@@ -52,6 +52,7 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('package-lock.json');
         const forceHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
+          lowerCaseMessage.includes("pull request") ||
           lowerCaseMessage.includes("don't show in changelog");
         const forDev = lowerCaseMessage.includes('developer changelog');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
@@ -144,7 +145,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in|developer) changelog/i;
+  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in|in the|developer) changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0
@@ -187,8 +188,7 @@ const formatHiddenCommitMessage = commit => {
   const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
   const devCommits = displayedCommits.filter(commit => commit.forDev);
   const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => { return !commit.isFix && !commit.forDev});
-
+  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix && !commit.forDev);
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
       .map(formatHiddenCommitMessage)
@@ -204,9 +204,11 @@ const formatHiddenCommitMessage = commit => {
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
 
   if (devCommits) {
-    shell.echo(`\n<details>\n`);
-    shell.echo(`\n<summary> 🛠 Developers</summary>\n`);
-    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
-    shell.echo(`\n</details>\n`);
+    shell.echo(`\n<details>`);
+    shell.echo(`<summary> 🛠 Developers</summary>`);
+    shell.echo(`<ul>`);
+    shell.echo(devCommits.map(e => '<li>'+formatCommitMessage(e)+'</li>').join('\n').replace(`*`,``));
+    shell.echo(`</ul>`);
+    shell.echo(`</details>\n`);
   }
 })();

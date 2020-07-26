@@ -35,7 +35,7 @@ export const MarkdownText = (props: Props) => {
 
   return (
     <ReactMarkdown
-      escapeHtml
+      escapeHtml={false}
       source={props.source}
       className={classNames({
         [gdevelopTheme.markdownRootClassName]: true,

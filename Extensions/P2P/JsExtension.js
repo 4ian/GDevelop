@@ -51,6 +51,21 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.p2p.onEvent');
 
     extension
+      .addCondition(
+        'IsReady',
+        _('Is P2P ready'),
+        _('True if the peer-to-peer extension initialized and is ready to use.'),
+        _('Is P2P ready?'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.isReady');
+
+    extension
       .addAction(
         'Connect',
         _('Connect to another client'),

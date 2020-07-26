@@ -69,6 +69,11 @@ const jsExtensions = [
     },
   },
   {
+    name: 'BitmapText',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BitmapText/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Effects',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
     objectsRenderingServiceModules: {},

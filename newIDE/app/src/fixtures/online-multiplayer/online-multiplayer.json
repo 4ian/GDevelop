@@ -130,15 +130,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/online-multiplayer/void-1.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "void-1.png",
-        "smoothed": true,
-        "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
         "file": "https://resources.gdevelop-app.com/examples/online-multiplayer/Assets/void.png",
         "kind": "image",
         "metadata": "",
@@ -292,8 +283,8 @@
           "locked": false,
           "name": "ConnectButton",
           "width": 0,
-          "x": 289,
-          "y": 503,
+          "x": 448,
+          "y": 500,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -307,9 +298,84 @@
           "locked": false,
           "name": "ConnectText",
           "width": 0,
-          "x": 342,
-          "y": 513,
+          "x": 503,
+          "y": 510,
           "zOrder": 6,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Copy",
+          "width": 0,
+          "x": 294,
+          "y": 210,
+          "zOrder": 7,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "CopyText",
+          "width": 0,
+          "x": 363,
+          "y": 220,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Paste",
+          "width": 0,
+          "x": 138,
+          "y": 500,
+          "zOrder": 9,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "PasteText",
+          "width": 0,
+          "x": 201,
+          "y": 510,
+          "zOrder": 10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "ErrorText",
+          "width": 0,
+          "x": 162,
+          "y": 289,
+          "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -465,6 +531,86 @@
           ]
         },
         {
+          "group": "",
+          "name": "Copy",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\textEntry.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "group": "",
+          "name": "Paste",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\textEntry.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "bold": false,
           "group": "",
           "italic": false,
@@ -483,9 +629,150 @@
             "g": 0,
             "r": 0
           }
+        },
+        {
+          "bold": false,
+          "group": "",
+          "italic": false,
+          "name": "CopyText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Copy",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "group": "",
+          "italic": false,
+          "name": "PasteText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Paste",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "group": "",
+          "italic": false,
+          "name": "ErrorText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Error",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 255
+          }
         }
       ],
       "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Use a custom server",
+          "comment2": ""
+        },
+        {
+          "disabled": true,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "P2P::UseOwnBroker"
+              },
+              "parameters": [
+                "\"localhost\"",
+                "9000",
+                "\"/\"",
+                "\"\"",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "ErrorText",
+                "=",
+                "\"\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
         {
           "colorB": 228,
           "colorG": 176,
@@ -509,11 +796,11 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Handle text entry",
+              "comment": "Handle text entry (with sanitization)",
               "comment2": ""
             },
             {
-              "disabled": false,
+              "disabled": true,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
@@ -551,6 +838,84 @@
                     "idEntryText",
                     "=",
                     "idEntry.String()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Handle text entry (without sanitization)",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "idText",
+                    "=",
+                    "P2P::GetID()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "idEntryText",
+                    "=",
+                    "idEntry.String()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "P2P::IsReady"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "idText",
+                    "=",
+                    "\"Connecting to server...\""
                   ],
                   "subInstructions": []
                 }
@@ -711,7 +1076,7 @@
                   },
                   "parameters": [
                     "\"connected\"",
-                    ""
+                    "\"\""
                   ],
                   "subInstructions": []
                 }
@@ -744,7 +1109,8 @@
                     "value": "P2P::OnEvent"
                   },
                   "parameters": [
-                    "\"connected\""
+                    "\"connected\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -757,7 +1123,7 @@
                   },
                   "parameters": [
                     "\"connected\"",
-                    ""
+                    "\"\""
                   ],
                   "subInstructions": []
                 },
@@ -770,6 +1136,172 @@
                     "",
                     "\"Menu\"",
                     "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Copy and Pasting",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "Copy",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisBouton"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Clipboard::WriteText"
+                  },
+                  "parameters": [
+                    "",
+                    "P2P::GetID()",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "Paste",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisBouton"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextEntryObject::String"
+                  },
+                  "parameters": [
+                    "idEntry",
+                    "+",
+                    "Clipboard::ReadText()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Error Handling",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "P2P::OnError"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "ErrorText",
+                    "=",
+                    "P2P::GetError()"
                   ],
                   "subInstructions": []
                 }
@@ -1248,7 +1780,7 @@
               },
               "parameters": [
                 "\"Chat\"",
-                ""
+                "\"\""
               ],
               "subInstructions": []
             },
@@ -1347,7 +1879,7 @@
               },
               "parameters": [
                 "\"SyncBtns\"",
-                ""
+                "\"\""
               ],
               "subInstructions": []
             },
@@ -1392,7 +1924,8 @@
                 "value": "P2P::OnEvent"
               },
               "parameters": [
-                "\"Chat\""
+                "\"Chat\"",
+                "yes"
               ],
               "subInstructions": []
             }
@@ -1424,7 +1957,8 @@
                 "value": "P2P::OnEvent"
               },
               "parameters": [
-                "\"SyncBtns\""
+                "\"SyncBtns\"",
+                "yes"
               ],
               "subInstructions": []
             }
@@ -1940,7 +2474,8 @@
                 "value": "P2P::OnEvent"
               },
               "parameters": [
-                "\"check\""
+                "\"check\"",
+                "yes"
               ],
               "subInstructions": []
             },
@@ -1984,7 +2519,8 @@
                 "value": "P2P::OnEvent"
               },
               "parameters": [
-                "\"uncheck\""
+                "\"uncheck\"",
+                "yes"
               ],
               "subInstructions": []
             },
@@ -2691,7 +3227,8 @@
                     "value": "P2P::OnEvent"
                   },
                   "parameters": [
-                    "\"message\""
+                    "\"message\"",
+                    ""
                   ],
                   "subInstructions": []
                 }
@@ -2740,6 +3277,68 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "@Bouh",
+      "description": "Expression returning the content of the clipboard. Works only on Windows, macOS and Linux (not on iOS/Android or web games).",
+      "extensionNamespace": "",
+      "fullName": "Clipboard",
+      "name": "Clipboard",
+      "shortDescription": "Expression returning the content of the clipboard. Works only on Windows, macOS and Linux (not on iOS/Android or web games).",
+      "tags": "clipboard, pasteboard",
+      "version": "0.0.1",
+      "eventsFunctions": [
+        {
+          "description": "Read the text from the clipboard (Windows, macOS, Linux only)",
+          "fullName": "Get text from the clipboard (Windows, macOS, Linux)",
+          "functionType": "StringExpression",
+          "name": "ReadText",
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\neventsFunctionContext.returnValue = electron.clipboard.readText();\n",
+              "parameterObjects": "",
+              "useStrict": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Write the text in the clipboard (Windows, macOS, Linux only)",
+          "fullName": "Write text to the clipboard (Windows, macOS, Linux)",
+          "functionType": "Action",
+          "name": "WriteText",
+          "sentence": "Write _PARAM1_ to clipboard",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\nelectron.clipboard.writeText(eventsFunctionContext.getArgument(\"text\"));\n",
+              "parameterObjects": "",
+              "useStrict": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Text to write to clipboard",
+              "longDescription": "",
+              "name": "text",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    },
     {
       "author": "Arthur Pacaud (arthuro555)",
       "description": "Have multiple expressions that remove unwanted characters from a string (non-alphanumerical characters, new Lines...)",

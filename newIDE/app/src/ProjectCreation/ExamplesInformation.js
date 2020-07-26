@@ -2548,6 +2548,14 @@ module.exports = {
         "name": "Sprite"
       },
       {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Peer-to-Peer communication (experimental)",
+        "name": "P2P"
+      },
+      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
       },
@@ -2568,12 +2576,8 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Peer-to-Peer communication (experimental)",
-        "name": "P2P"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Variable features",

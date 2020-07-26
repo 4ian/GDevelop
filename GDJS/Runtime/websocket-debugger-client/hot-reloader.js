@@ -97,19 +97,16 @@ gdjs.HotReloader.prototype._reloadScript = function (srcFilename) {
       message:
         'Not reloading ' + srcFilename + ' as it is blocked for hot-reloading.',
     });
-    // @ts-ignore - Promise not supported in ES5 mode.
     return Promise.resolve();
   }
 
   const head = document.getElementsByTagName('head')[0];
   if (!head) {
-    // @ts-ignore - Promise not supported in ES5 mode.
     return Promise.reject(
       new Error('No head element found, are you in a navigator?')
     );
   }
 
-  // @ts-ignore - Promise not supported in ES5 mode.
   return new Promise((resolve, reject) => {
     const existingScriptElement = this._reloadedScriptElement[srcFilename];
     if (existingScriptElement) head.removeChild(existingScriptElement);
@@ -187,7 +184,6 @@ gdjs.HotReloader.prototype.hotReload = function () {
     // the new scripts, potentially replacing the code of the free functions from
     // extensions (which is fine) and registering updated behaviors (which will
     // need to be re-instantiated in runtime objects).
-    // @ts-ignore - Promise not supported in ES5 mode.
     return this.reloadScriptFiles(
       newProjectData,
       oldScriptFiles,
@@ -341,7 +337,6 @@ gdjs.HotReloader.prototype.reloadScriptFiles = function (
     }
   }
 
-  // @ts-ignore - Promise not supported in ES5 mode.
   return Promise.all(reloadPromises);
 };
 
@@ -357,7 +352,6 @@ gdjs.HotReloader.prototype._hotReloadRuntimeGame = function (
   changedRuntimeBehaviors,
   runtimeGame
 ) {
-  // @ts-ignore - Promise not supported in ES5 mode.
   return new Promise((resolve) => {
     // Update project data and re-load assets (sound/image/font/json managers
     // will take care of reloading only what is needed).
@@ -974,8 +968,6 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
   newLayers,
   runtimeScene
 ) {
-  // TODO: layer re-ordering and ensure the added layer is at the right position
-
   oldLayers.forEach((oldLayerData) => {
     const name = oldLayerData.name;
     const newLayerData = newLayers.filter(
@@ -1001,6 +993,9 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
       runtimeScene.addLayer(newLayerData);
     }
   });
+  newLayers.forEach((newLayerData, index) => {
+    runtimeScene.setLayerIndex(newLayerData.name, index);
+  })
 };
 
 /**

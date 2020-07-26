@@ -7,10 +7,11 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
+import { VideoTutorials } from './VideoTutorials';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials',
+  currentTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials',
   outputPath: string,
 |};
 
@@ -40,7 +41,9 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
     outputPath: '',
   };
 
-  _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
+  _onChangeTab = (
+    newTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials'
+  ) => {
     this.setState({
       currentTab: newTab,
     });
@@ -81,6 +84,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <Tab label={<Trans>Starters</Trans>} value="starters" />
             <Tab label={<Trans>Examples</Trans>} value="examples" />
             <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
+            <Tab label={<Trans>Videos</Trans>} value="video-tutorials" />
           </Tabs>
           {this.state.currentTab === 'starters' && (
             <StartersComponent
@@ -101,6 +105,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             />
           )}
           {this.state.currentTab === 'tutorials' && <Tutorials />}
+          {this.state.currentTab === 'video-tutorials' && <VideoTutorials />}
         </Column>
       </Dialog>
     );

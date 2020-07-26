@@ -193,3 +193,8 @@ gdjs.LayerCocosRenderer.prototype.removeEffect = function(effect) {
 gdjs.LayerCocosRenderer.prototype.isEffectEnabled = function(name) {
     return this.hasEffect(name);
 };
+
+
+gdjs.LayerCocosRenderer.prototype.setLayerIndex = function(layer, index) {
+    // Unimplemented
+};

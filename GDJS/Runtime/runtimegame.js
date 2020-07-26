@@ -16,7 +16,7 @@
  * @property {boolean=} forceFullscreen if true, force fullscreen.
  * @property {boolean=} isPreview if true, game is run as a preview launched from an editor.
  * @property {string=} injectExternalLayout The name of the external layout to create in the scene at position 0;0.
- * @property {RuntimeGameOptionsScriptFile[]=} scriptFiles Script files, used for hot-reloading.
+ * @property {RuntimeGameOptionsScriptFile[]} [scriptFiles] Script files, used for hot-reloading.
  * @property {boolean=} projectDataOnlyExport if true, export is a partial preview without events.
  * @property {string=} debuggerServerAddress The address of the debugger server, to reach out using WebSocket.
  * @property {string=} debuggerServerPort The port of the debugger server, to reach out using WebSocket.

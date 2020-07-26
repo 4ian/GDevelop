@@ -1,9 +1,25 @@
+// @ts-check
+
+/**
+ * The renderer for a gdjs.RuntimeScene using Pixi.js.
+ * @class RuntimeScenePixiRenderer
+ * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {gdjs.RuntimeGamePixiRenderer} runtimeGameRenderer
+ */
 gdjs.RuntimeScenePixiRenderer = function (runtimeScene, runtimeGameRenderer) {
   this._pixiRenderer = runtimeGameRenderer
     ? runtimeGameRenderer.getPIXIRenderer()
     : null;
   this._runtimeScene = runtimeScene;
-  this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
+  this._pixiContainer = new PIXI.Container(); // Contains the layers of the scene (and, optionally, debug PIXI objects).
+  this._pixiContainer.sortableChildren = true;
+
+  /** @type {?PIXI.Graphics} */
+  this._debugDraw = null;
+
+  /** @type {?PIXI.Text} */
+  this._profilerText = null;
 };
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
@@ -37,6 +53,7 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function () {
       stroke: '#FFF',
       strokeThickness: 1,
     });
+    // Add on top of all layers:
     this._pixiContainer.addChild(this._profilerText);
   }
 
@@ -47,12 +64,17 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function () {
   this._profilerText.text = outputs.join('\n');
 };
 
+/**
+ * @param {gdjs.RuntimeObject[]} instances
+ * @param {Object.<string, number[]>} layersCameraCoordinates
+ */
 gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function (
   instances,
   layersCameraCoordinates
 ) {
   if (!this._debugDraw) {
     this._debugDraw = new PIXI.Graphics();
+    // Add on top of all layers:
     this._pixiContainer.addChild(this._debugDraw);
   }
   /** @type PIXI.Graphics */
@@ -83,10 +105,12 @@ gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function (
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.hideCursor = function () {
+  if (!this._pixiRenderer) return;
   this._pixiRenderer.view.style.cursor = 'none';
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.showCursor = function () {
+  if (!this._pixiRenderer) return;
   this._pixiRenderer.view.style.cursor = '';
 };
 
@@ -96,4 +120,26 @@ gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function () {
 
 gdjs.RuntimeScenePixiRenderer.prototype.getPIXIRenderer = function () {
   return this._pixiRenderer;
+};
+
+/**
+ * @param {gdjs.Layer} layer
+ * @param {number} index
+ */
+gdjs.RuntimeScenePixiRenderer.prototype.setLayerIndex = function (
+  layer,
+  index
+) {
+  /** @type {gdjs.LayerPixiRenderer} */
+  // @ts-ignore - assume the renderer is the correct one
+  var layerPixiRenderer = layer.getRenderer();
+  var layerPixiObject = layerPixiRenderer.getRendererObject();
+
+  if (layer.isLightingLayer())
+    layerPixiObject = layerPixiRenderer.getLightingSprite();
+
+  if (this._pixiContainer.children.indexOf(layerPixiObject) === index) return;
+
+  this._pixiContainer.removeChild(layerPixiObject);
+  this._pixiContainer.addChildAt(layerPixiObject, index);
 };

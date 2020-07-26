@@ -817,6 +817,20 @@ gdjs.RuntimeScene.prototype.removeLayer = function(layerName) {
 }
 
 /**
+ * Change the position of a layer.
+ *
+ * @param {string} layerName The name of the layer to reorder
+ * @param {number} index The new position in the list of layers
+ */
+gdjs.RuntimeScene.prototype.setLayerIndex = function(layerName, index) {
+    /** @type {gdjs.Layer} */
+    var layer = this._layers.get(layerName);
+    if (!layer) return;
+
+    this._renderer.setLayerIndex(layer, index);
+};
+
+/**
  * Fill the array passed as argument with the names of all layers
  * @param {string[]} result The array where to put the layer names
  */

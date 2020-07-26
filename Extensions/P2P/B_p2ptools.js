@@ -38,6 +38,7 @@ gdjs.evtTools.p2p = {
 }
 
 gdjs.evtTools.p2p._reloadPeerJS = function() {
+  if (gdjs.evtTools.p2p.peer) gdjs.evtTools.p2p.peer.destroy();
   gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig)
   gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);
   gdjs.evtTools.p2p.peer.on("close", gdjs.evtTools.p2p._reloadPeerJS);
@@ -150,7 +151,13 @@ gdjs.evtTools.p2p.sendVariableToAll = function(eventName, variable) {
  * @returns {string} - The data as JSON.
  */
 gdjs.evtTools.p2p.getEventData = function(eventName) {
-  return gdjs.evtTools.p2p.lastEventData[eventName];
+  var dataLoss = gdjs.evtTools.p2p.eventHandling[eventName];
+  if (typeof dataLoss === "undefined" || dataLoss === false) {
+    var event = gdjs.evtTools.p2p.lastEventData[eventName];
+    return event[event.length - 1];
+  } else {
+    return gdjs.evtTools.p2p.lastEventData[eventName];
+  }
 }
 
 /**
@@ -159,7 +166,7 @@ gdjs.evtTools.p2p.getEventData = function(eventName) {
  * @param {gdjs.Variable} variable - The variable where to store the variable content.
  */
 gdjs.evtTools.p2p.getEventVariable = function(eventName, variable) {
-  gdjs.evtTools.network.jsonToVariableStructure(gdjs.evtTools.p2p.lastEventData[eventName], variable);
+  gdjs.evtTools.network.jsonToVariableStructure(gdjs.evtTools.p2p.getEventData(eventName), variable);
 }
 
 /**

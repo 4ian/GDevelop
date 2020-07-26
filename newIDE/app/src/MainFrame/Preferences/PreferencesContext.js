@@ -30,7 +30,8 @@ export type EditorMosaicName =
   | 'scene-editor-small'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor';
+  | 'events-functions-extension-editor'
+  | 'p2p-broker-recommendation';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -107,6 +108,10 @@ export const allAlertMessages: Array<{
   {
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
+  },
+  {
+    key: 'p2p-broker-recommendation',
+    label: <Trans>Peer to peer broker server recommendation</Trans>,
   },
 ];
 

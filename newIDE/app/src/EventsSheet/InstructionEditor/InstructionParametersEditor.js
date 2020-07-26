@@ -17,6 +17,7 @@ import {
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import Window from '../../Utils/Window';
 import {
   getExtraInstructionInformation,
@@ -254,9 +255,18 @@ export default class InstructionParametersEditor extends React.Component<
             </Line>
             {instructionExtraInformation && (
               <Line>
-                <AlertMessage kind={instructionExtraInformation.kind}>
-                  {i18n._(instructionExtraInformation.message)}
-                </AlertMessage>
+                {instructionExtraInformation.identifier === undefined ? (
+                  <AlertMessage kind={instructionExtraInformation.kind}>
+                    {i18n._(instructionExtraInformation.message)}
+                  </AlertMessage>
+                  ) : 
+                  <DismissableAlertMessage 
+                    kind={instructionExtraInformation.kind}
+                    identifier={instructionExtraInformation.identifier}
+                  >
+                    {i18n._(instructionExtraInformation.message)}
+                  </DismissableAlertMessage>
+                }
               </Line>
             )}
             {tutorialHints.length ? (

@@ -40,14 +40,28 @@ gdjs.evtTools.p2p = {
    * True if PeerJS is initialized and ready.
    */
   ready: false,
+
+  /**
+   * True if an error occured.
+   */
+  error: false,
+
+  /**
+   * Last error's message.
+   */
+  lastError: "",
 }
 
 gdjs.evtTools.p2p._reloadPeerJS = function() {
-  if (gdjs.evtTools.p2p.peer) gdjs.evtTools.p2p.peer.destroy();
+  if (gdjs.evtTools.p2p.peer != undefined) gdjs.evtTools.p2p.peer.destroy();
   gdjs.evtTools.p2p.ready = false;
   gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig)
   gdjs.evtTools.p2p.peer.on("open", function() {
     gdjs.evtTools.p2p.ready = true;
+  });
+  gdjs.evtTools.p2p.peer.on("error", function(errorMessage) {
+    gdjs.evtTools.p2p.error = true;
+    gdjs.evtTools.p2p.lastError = errorMessage;
   });
   gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);
   gdjs.evtTools.p2p.peer.on("close", gdjs.evtTools.p2p._reloadPeerJS);
@@ -199,12 +213,36 @@ gdjs.evtTools.p2p.useCustomBrokerServer = function(host, port, path, key, ssl) {
   gdjs.evtTools.p2p._reloadPeerJS();
 }
 
+/**
+ * Returns the own current peer ID
+ * @see Peer.id
+ * @returns {string}
+ */
 gdjs.evtTools.p2p.getCurrentId = function() {
   if(gdjs.evtTools.p2p.peer == undefined) return false;
   return gdjs.evtTools.p2p.peer.id || "";
 }
 
+/**
+ * Returns true once PeerJS is initialized
+ * @see gdjs.evtTools.p2p.ready
+ * @returns {boolean}
+ */
 gdjs.evtTools.p2p.isReady = function() {return gdjs.evtTools.p2p.ready;}
+
+/**
+ * Returns true once when there is an error.
+ * @returns {boolean}
+ */
+gdjs.evtTools.p2p.onError = function() {
+  var returnValue = gdjs.evtTools.p2p.error;
+  gdjs.evtTools.p2p.error = false;
+  return returnValue;
+}
+
+gdjs.evtTools.p2p.getLastError = function() {
+  return gdjs.evtTools.p2p.lastError;
+}
 
 // Initialize PeerJS after running the events a first time to let the user select another server
 gdjs.evtTools.p2p._callback = function() {

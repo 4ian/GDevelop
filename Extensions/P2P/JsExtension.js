@@ -66,6 +66,21 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.p2p.isReady');
 
     extension
+      .addCondition(
+        'OnError',
+        _('An error occured'),
+        _('Triggers once when an error occurs.'),
+        _('P2P error occured'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.onError');
+
+    extension
       .addAction(
         'Connect',
         _('Connect to another client'),
@@ -217,6 +232,19 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.getCurrentId');
+
+    extension
+      .addStrExpression(
+        'GetError',
+        _('Get lats error'),
+        _('Gets the description of the last P2P error'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.getLastError');
 
     return extension;
   },

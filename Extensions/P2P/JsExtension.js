@@ -67,6 +67,26 @@ module.exports = {
 
     extension
       .addAction(
+        'UseOwnBroker',
+        _('Connect to own broker server'),
+        _('Connects to your own broker server.'),
+        _('Connect to broker server http://_PARAM0_:_PARAM1_/'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('Host'), '', false)
+      .addParameter('number', _('Port'), '', false)
+      .addParameter('string', _('Path'), '', false)
+      .addParameter('string', _('Key'), '', false)
+      .addParameter('yesorno', _('SSl enabled?'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.useCustomBrokerServer');
+
+    extension
+      .addAction(
         'SendToAll',
         _('Trigger event on all connected clients'),
         _('Triggers an event on all connected clients'),

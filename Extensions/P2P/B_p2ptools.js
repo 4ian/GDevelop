@@ -7,9 +7,14 @@
  */
 gdjs.evtTools.p2p = {
   /**
+   * The peer to peer configuration.
+   */
+  peerConfig: {debug:1},
+
+  /**
    * The p2p client.
    */
-  peer: new Peer({debug: 1}), // Enable logging of critical errors
+  peer: null, // Enable logging of critical errors
 
   /**
    * All connected p2p clients, keyed by their id.
@@ -25,6 +30,13 @@ gdjs.evtTools.p2p = {
    * Contains the latest data sent with each event.
    */
   lastEventData: {},
+}
+
+gdjs.evtTools.p2p._reloadPeerJS = function() {
+  gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig)
+  gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);
+  gdjs.evtTools.p2p.peer.on("close", gdjs.evtTools.p2p._reloadPeerJS);
+  gdjs.evtTools.p2p.peer.on("disconnected", gdjs.evtTools.p2p.peer.reconnect);
 }
 
 gdjs.evtTools.p2p._onConnection = function(connection) {
@@ -123,7 +135,33 @@ gdjs.evtTools.p2p.getEventVariable = function(eventName, variable) {
   gdjs.evtTools.network.jsonToVariableStructure(gdjs.evtTools.p2p.lastEventData[eventName], variable);
 }
 
+/**
+ * Connects to a custom broker server.
+ * @param {string} host The host of the broker server
+ * @param {number} port
+ * @param {string} path The path (part of the url after the host) to the broker server
+ * @param {string} [key] Optional password to connect to the broker server
+ * @param {boolean} ssl Use ssl?
+ */
+gdjs.evtTools.p2p.useCustomBrokerServer = function(host, port, path, key, ssl) {
+  key = key.length === 0 ? "peerjs" : key; // All servers have "peerjs" as default key
+  gdjs.evtTools.p2p.peerConfig = {
+    debug: 1,
+    host,
+    port,
+    path,
+    secure: ssl,
+    key,
+  };
+  gdjs.evtTools.p2p._reloadPeerJS();
+}
+
 gdjs.evtTools.p2p.getCurrentId = function() {return gdjs.evtTools.p2p.peer.id || "";}
 
-
-gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);
+// Initialize PeerJS after running the events a first time to let the user select another server
+gdjs.evtTools.p2p._callback = function() {
+  gdjs.evtTools.p2p._reloadPeerJS();
+  var index = gdjs.callbacksRuntimeScenePostEvents.indexOf(gdjs.evtTools.p2p._callback);
+  gdjs.callbacksRuntimeScenePostEvents.splice(index, 1);
+}
+gdjs.callbacksRuntimeScenePostEvents.push(gdjs.evtTools.p2p._callback);

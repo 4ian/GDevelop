@@ -18,8 +18,13 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
   this._layer = layer;
+
+  /** @type {?PIXI.RenderTexture} */
   this._renderTexture = null;
+
+  /** @type {?PIXI.Sprite} */
   this._lightingSprite = null;
+
   this._runtimeSceneRenderer = runtimeSceneRenderer;
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
   this._oldWidth = null;
@@ -116,7 +121,6 @@ gdjs.LayerPixiRenderer.prototype.addEffect = function (effectData) {
     update: filterCreator.update,
   };
 
-  // @ts-ignore PIXI isn't typed for now.
   if (this._isLightingLayer) filter.pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
   this._pixiContainer.filters = (this._pixiContainer.filters || []).concat(
     filter.pixiFilter
@@ -272,7 +276,7 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
 /**
  * Updates the render texture, if it exists.
  * Also, render texture is cleared with a specified clear color.
- * @private not to be called outside the update method in most cases.
+ * not to be called outside the update method in most cases.
  */
 gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
   if (!this._pixiRenderer) return;
@@ -284,13 +288,11 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
     var width = this._oldWidth;
     var height = this._oldHeight;
     var resolution = this._pixiRenderer.resolution;
-    // @ts-ignore PIXI isn't typed for now.
     this._renderTexture = PIXI.RenderTexture.create({
       width,
       height,
       resolution,
     });
-    // @ts-ignore PIXI isn't typed for now.
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
   }
 
@@ -323,6 +325,7 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
 
 /**
  * Creates the render texture of pixi container and returns it.
+ * @returns {?PIXI.RenderTexture} RenderTexture of the container.
  */
 gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
   if (!this._renderTexture) this._updateRenderTexture();
@@ -336,9 +339,10 @@ gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
  */
 gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
   if (!this._pixiRenderer) return;
-  // @ts-ignore PIXI isn't typed for now.
-  this._lightingSprite = new PIXI.Sprite(this.getRenderTexture());
-  // @ts-ignore PIXI isn't typed for now.
+
+  this._updateRenderTexture();
+  if (!this._renderTexture) return;
+  this._lightingSprite = new PIXI.Sprite(this._renderTexture);
   this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
 
   var sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();

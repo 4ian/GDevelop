@@ -78,18 +78,18 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Musics will only be played if the user has interacted with the game before (by clicking/touching it or pressing a key on the keyboard). This is due to browser limitations. Make sure to have the user interact with the game before using this action.`,
     };
   }
-  if (type === "P2P::OnEvent") {
+  if (type === 'P2P::OnEvent') {
     return {
       kind: 'info',
-      message: t`Read the wiki page for more info about the dataloss mode.`
-    }
+      message: t`Read the wiki page for more info about the dataloss mode.`,
+    };
   }
   if (type.indexOf('P2P::') === 0) {
     return {
       kind: 'warning',
       message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
-      identifier: 'p2p-broker-recommendation'
-    }
+      identifier: 'p2p-broker-recommendation',
+    };
   }
 
   return null;

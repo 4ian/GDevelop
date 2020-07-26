@@ -259,14 +259,14 @@ export default class InstructionParametersEditor extends React.Component<
                   <AlertMessage kind={instructionExtraInformation.kind}>
                     {i18n._(instructionExtraInformation.message)}
                   </AlertMessage>
-                  ) : 
-                  <DismissableAlertMessage 
+                ) : (
+                  <DismissableAlertMessage
                     kind={instructionExtraInformation.kind}
                     identifier={instructionExtraInformation.identifier}
                   >
                     {i18n._(instructionExtraInformation.message)}
                   </DismissableAlertMessage>
-                }
+                )}
               </Line>
             )}
             {tutorialHints.length ? (

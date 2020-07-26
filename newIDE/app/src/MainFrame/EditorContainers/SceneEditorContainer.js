@@ -96,6 +96,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         isActive={isActive}
+        hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />
     );
   }

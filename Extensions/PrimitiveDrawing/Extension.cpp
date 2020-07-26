@@ -342,7 +342,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("ClearBetweenFrames",
                 _("Clear between frames"),
                 _("Activate (or deactivate) the clearing of the rendered shape at the beginning of each frame."),
-                _("Clear the rendered image of _PARAM0_ between each frame: PARAM1"),
+                _("Clear the rendered image of _PARAM0_ between each frame: _PARAM1_"),
                 _("Setup"),
                 "res/actions/visibilite24.png",
                 "res/actions/visibilite.png")

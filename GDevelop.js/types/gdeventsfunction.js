@@ -5,6 +5,7 @@ declare class gdEventsFunction {
   static Expression: 2;
   static StringExpression: 3;
   constructor(): void;
+  clone(): gdEventsFunction;
   setDescription(description: string): gdEventsFunction;
   getDescription(): string;
   setName(name: string): gdEventsFunction;

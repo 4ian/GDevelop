@@ -4,11 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDJS/IDE/Exporter.h"
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <streambuf>
 #include <string>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -35,28 +37,10 @@ Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
 
 Exporter::~Exporter() {}
 
-bool Exporter::ExportLayoutForPixiPreview(gd::Project& project,
-                                          gd::Layout& layout,
-                                          gd::String exportDir) {
+bool Exporter::ExportProjectForPixiPreview(
+    const PreviewExportOptions& options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  gd::SerializerElement options;
-  options.AddChild("isPreview").SetBoolValue(true);
-
-  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, gd::Serializer::ToJSON(options));
-}
-
-bool Exporter::ExportExternalLayoutForPixiPreview(
-    gd::Project& project,
-    gd::Layout& layout,
-    gd::ExternalLayout& externalLayout,
-    gd::String exportDir) {
-  gd::SerializerElement options;
-  options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
-  options.AddChild("isPreview").SetBoolValue(true);
-
-  ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportLayoutForPixiPreview(
-      project, layout, exportDir, gd::Serializer::ToJSON(options));
+  return helper.ExportProjectForPixiPreview(options);
 }
 
 bool Exporter::ExportWholePixiProject(
@@ -68,7 +52,6 @@ bool Exporter::ExportWholePixiProject(
 
   auto exportProject = [this, &exportedProject, &exportOptions, &helper](
                            gd::String exportDir) {
-    bool minify = exportOptions["minify"];
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -95,7 +78,11 @@ bool Exporter::ExportWholePixiProject(
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
 
-    // Export effects (after engine libraries as they auto-register themselves to the engine)
+    // Export files for object and behaviors
+    helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
+    // Export effects (after engine libraries as they auto-register themselves
+    // to the engine)
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
@@ -120,13 +107,14 @@ bool Exporter::ExportWholePixiProject(
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
-    helper.ExportToJSON(
-        fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+    gd::SerializerElement noRuntimeGameOptions;
+    helper.ExportProjectData(
+        fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
-    helper.ExportIncludesAndLibs(includesFiles, exportDir, minify);
+    helper.ExportIncludesAndLibs(includesFiles, exportDir);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
@@ -195,7 +183,11 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);
 
-  // Export effects (after engine libraries as they auto-register themselves to the engine)
+  // Export files for object and behaviors
+  helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
+  // Export effects (after engine libraries as they auto-register themselves to
+  // the engine)
   helper.ExportEffectIncludes(exportedProject, includesFiles);
 
   // Export events
@@ -219,13 +211,14 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   gd::ProjectStripper::StripProjectForExport(exportedProject);
 
   //...and export it
-  helper.ExportToJSON(
-      fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+    gd::SerializerElement noRuntimeGameOptions;
+  helper.ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
+  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src");
 
   if (!helper.ExportCocos2dFiles(
           project, exportDir, debugMode, includesFiles)) {

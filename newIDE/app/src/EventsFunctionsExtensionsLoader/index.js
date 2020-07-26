@@ -21,6 +21,15 @@ export type EventsFunctionCodeWriter = {|
   writeBehaviorCode: (behaviorName: string, code: string) => Promise<void>,
 |};
 
+export type IncludeFileContent = {|
+  includeFile: string,
+  content: string,
+|};
+
+export type EventsFunctionCodeWriterCallbacks = {|
+  onWriteFile: IncludeFileContent => void,
+|};
+
 type Options = {|
   skipCodeGeneration?: boolean,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
@@ -399,6 +408,16 @@ export const unloadProjectEventsFunctionsExtensions = (
       );
     })
   );
+};
+
+/**
+ * Unload a single extension providing events functions of a project
+ */
+export const unloadProjectEventsFunctionsExtension = (
+  project: gdProject,
+  extensionName: string
+): void => {
+  gd.JsPlatform.get().removeExtension(extensionName);
 };
 
 /**

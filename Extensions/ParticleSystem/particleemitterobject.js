@@ -24,17 +24,19 @@
  * @property {number} particleBlue2
  * @property {number} particleSize1
  * @property {number} particleSize2
- * @property {number} sizeParam
+ * @property {number} particleAngle1
+ * @property {number} particleAngle2
+ * @property {string} sizeParam
  * @property {number} particleAlpha1
  * @property {number} particleAlpha2
  * @property {string} rendererType
  * @property {number} rendererParam1
- * @property {number} rendererParam1
+ * @property {number} rendererParam2
  * @property {string} textureParticleName Resource name for image in particle
  * @property {number} flow
  * @property {number} tank
  * @property {boolean} destroyWhenNoParticles Destroy the object when there is no particles?
- * 
+ *
  * @typedef {ObjectData & ParticleEmitterObjectDataType} ParticleEmitterObjectData
  */
 
@@ -107,7 +109,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
     /** @type {number} */
     this.size2 = particleObjectData.particleSize2;
 
-    /** @type {number} */
+    /** @type {string} */
     this.sizeParam = particleObjectData.sizeParam;
 
     /** @type {number} */
@@ -121,7 +123,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
 
     /** @type {number} */
     this.rendererParam1 = particleObjectData.rendererParam1;
-    
+
     /** @type {number} */
     this.rendererParam2 = particleObjectData.rendererParam2;
 
@@ -183,6 +185,116 @@ gdjs.ParticleEmitterObject.prototype.setAngle = function(angle){
 
 gdjs.ParticleEmitterObject.prototype.getRendererObject = function(){
     return this._renderer.getRendererObject();
+};
+
+/**
+ * @param {ParticleEmitterObjectData} oldObjectData
+ * @param {ParticleEmitterObjectData} newObjectData
+ */
+gdjs.ParticleEmitterObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.emissionEditionSimpleMode !== newObjectData.emissionEditionSimpleMode) {
+        this.singleAngle = newObjectData.emissionEditionSimpleMode;
+        this._angleDirty = true;
+    }
+    if (oldObjectData.emitterAngleA !== newObjectData.emitterAngleA) {
+        this.setEmitterAngleA(newObjectData.emitterAngleA);
+    }
+    if (oldObjectData.emitterAngleB !== newObjectData.emitterAngleB) {
+        this.setEmitterAngleB(newObjectData.emitterAngleB);
+    }
+    if (oldObjectData.emitterForceMin !== newObjectData.emitterForceMin) {
+        this.setEmitterForceMin(newObjectData.emitterForceMin);
+    }
+    if (oldObjectData.emitterForceMax !== newObjectData.emitterForceMax) {
+        this.setEmitterForceMax(newObjectData.emitterForceMax);
+    }
+    if (oldObjectData.zoneRadius !== newObjectData.zoneRadius) {
+        this.setZoneRadius(newObjectData.zoneRadius);
+    }
+    if (oldObjectData.particleLifeTimeMin !== newObjectData.particleLifeTimeMin) {
+        this.setParticleLifeTimeMin(newObjectData.particleLifeTimeMin);
+    }
+    if (oldObjectData.particleLifeTimeMax !== newObjectData.particleLifeTimeMax) {
+        this.setParticleLifeTimeMax(newObjectData.particleLifeTimeMax);
+    }
+    if (oldObjectData.particleGravityX !== newObjectData.particleGravityX) {
+        this.setParticleGravityX(newObjectData.particleGravityX);
+    }
+    if (oldObjectData.particleGravityY !== newObjectData.particleGravityY) {
+        this.setParticleGravityY(newObjectData.particleGravityY);
+    }
+    if (oldObjectData.particleRed1 !== newObjectData.particleRed1) {
+        this.setParticleRed1(newObjectData.particleRed1);
+    }
+    if (oldObjectData.particleRed2 !== newObjectData.particleRed2) {
+        this.setParticleRed2(newObjectData.particleRed2);
+    }
+    if (oldObjectData.particleGreen1 !== newObjectData.particleGreen1) {
+        this.setParticleGreen1(newObjectData.particleGreen1);
+    }
+    if (oldObjectData.particleGreen2 !== newObjectData.particleGreen2) {
+        this.setParticleGreen2(newObjectData.particleGreen2);
+    }
+    if (oldObjectData.particleBlue1 !== newObjectData.particleBlue1) {
+        this.setParticleBlue1(newObjectData.particleBlue1);
+    }
+    if (oldObjectData.particleBlue2 !== newObjectData.particleBlue2) {
+        this.setParticleBlue2(newObjectData.particleBlue2);
+    }
+    if (oldObjectData.particleSize1 !== newObjectData.particleSize1) {
+        this.setParticleSize1(newObjectData.particleSize1);
+    }
+    if (oldObjectData.particleSize2 !== newObjectData.particleSize2) {
+        this.setParticleSize2(newObjectData.particleSize2);
+    }
+    if (oldObjectData.sizeParam !== newObjectData.sizeParam) {
+        this.sizeParam = newObjectData.sizeParam;
+        this._sizeDirty = true;
+    }
+    if (oldObjectData.particleAlpha1 !== newObjectData.particleAlpha1) {
+        this.setParticleAlpha1(newObjectData.particleAlpha1);
+    }
+    if (oldObjectData.particleAlpha2 !== newObjectData.particleAlpha2) {
+        this.setParticleAlpha2(newObjectData.particleAlpha2);
+    }
+    if (oldObjectData.textureParticleName !== newObjectData.textureParticleName) {
+        this.setTexture(newObjectData.textureParticleName, this._runtimeScene);
+    }
+    if (oldObjectData.flow !== newObjectData.flow) {
+        this.setFlow(newObjectData.flow);
+    }
+    if (oldObjectData.tank !== newObjectData.tank) {
+        this.setTank(newObjectData.tank);
+    }
+    if (oldObjectData.destroyWhenNoParticles !== newObjectData.destroyWhenNoParticles) {
+        this.destroyWhenNoParticles = newObjectData.destroyWhenNoParticles;
+    }
+
+    if (oldObjectData.particleSizeRandomness1 !== newObjectData.particleSizeRandomness1 ||
+        oldObjectData.particleSizeRandomness2 !== newObjectData.particleSizeRandomness2 ||
+        oldObjectData.particleAngle1 !== newObjectData.particleAngle1 ||
+        oldObjectData.particleAngle2 !== newObjectData.particleAngle2 ||
+        oldObjectData.maxParticleNb !== newObjectData.maxParticleNb ||
+        oldObjectData.additive !== newObjectData.additive ||
+        oldObjectData.rendererType !== newObjectData.rendererType ||
+        oldObjectData.rendererParam1 !== newObjectData.rendererParam1 ||
+        oldObjectData.rendererParam2 !== newObjectData.rendererParam2) {
+        // Destroy the renderer, ensure it's removed from the layer.
+        var layer = this._runtimeScene.getLayer(this.layer);
+        layer.getRenderer().removeRendererObject(this._renderer.getRendererObject());
+        this._renderer.destroy();
+
+        // and recreate the renderer, which will add itself to the layer.
+        this._renderer = new gdjs.ParticleEmitterObjectRenderer(this._runtimeScene, this, newObjectData);
+
+        // Consider every state dirty as the renderer was just re-created, so it needs
+        // to be repositioned, angle updated, etc...
+        this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
+        this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
+        this._alphaDirty = this._flowDirty = this._textureDirty = true;
+    }
+
+    return true;
 };
 
 gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){

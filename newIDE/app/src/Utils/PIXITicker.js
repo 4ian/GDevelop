@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 
 // PIXI has a ticker that is used by PIXI InteractionManager, and which
 // frequently check if interaction happened. We may want to disable it
@@ -8,7 +8,7 @@ import * as PIXI from 'pixi.js';
  *  Stop the PIXI Ticker used to monitor interactions
  */
 export const stopPIXITicker = () => {
-  const ticker = PIXI.ticker && PIXI.ticker.shared;
+  const ticker = PIXI.Ticker && PIXI.Ticker.shared;
   if (ticker) ticker.stop();
 };
 
@@ -20,7 +20,7 @@ export const startPIXITicker = () => {
   // call stopPIXITicker during the same tick (for example, when switching
   // between SceneEditor tabs).
   setTimeout(() => {
-    const ticker = PIXI.ticker && PIXI.ticker.shared;
+    const ticker = PIXI.Ticker && PIXI.Ticker.shared;
     if (ticker) ticker.start();
   }, 50);
 };

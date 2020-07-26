@@ -2767,6 +2767,63 @@ module.exports = {
       }
     ]
   },
+  "particle-effects-demo": {
+    "description": "",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
   "particles-explosions": {
     "description": "Create explosion effects with the particles engine.",
     "usedExtensions": [

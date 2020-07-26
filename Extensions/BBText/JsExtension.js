@@ -506,7 +506,7 @@ module.exports = {
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {
-        this._pixiObject.setText(rawText);
+        this._pixiObject.text = rawText;
       }
 
       const opacity = properties.get('opacity').getValue();

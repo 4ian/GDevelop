@@ -1,5 +1,5 @@
 // @flow
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 
 /**
  * Add a 'doubleclick' event to the given PIXI DisplayObject,

@@ -2,6 +2,10 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { mapVector } from '../Utils/MapFor';
+import {
+  enumerateNamedPropertyDescriptorsList,
+  toGdPropertyDescriptor,
+} from './EnumerateProperties';
 const gd: libGDevelop = global.gd;
 
 // This file contains the logic to declare extension metadata from
@@ -36,11 +40,24 @@ export const declareBehaviorMetadata = (
 ): gdBehaviorMetadata => {
   const generatedBehavior = new gd.BehaviorJsImplementation();
 
-  // The functions below are keeping a reference to eventsBasedBehavior.
+  // We enumerate the properties of the behavior from a list of gdNamedPropertyDescriptor
+  // to an array of JavaScript objects. This is important to ensure that the functions
+  // below are not keeping any reference to eventsBasedBehavior.
+  //
+  // We could in theory keep a reference to eventsBasedBehavior, and avoid using
+  // `enumerateNamedPropertyDescriptorsList` and `toGdPropertyDescriptor`.
   // This should be safe as if eventsBasedBehavior is deleted (i.e: the behavior
-  // is removed from its extension), then extension will be re-generated.
-
-  // Declare the properties of the behavior:
+  // is removed from its extension), then the extension will be re-generated.
+  //
+  // In practice, we don't want to risk keeping this references, because if at some point
+  // we delete the eventsBasedBehavior and forget to remove the extension, then the
+  // extension will use a deleted object and crash the app. Instead, we convert the
+  // properties to an array of JavaScript objects, so that we're guaranteed that the
+  // lifetime of these properties is the same as the lifetime of these functions (i.e:
+  // we use the JS garbage collector).
+  const enumeratedProperties = enumerateNamedPropertyDescriptorsList(
+    eventsBasedBehavior.getPropertyDescriptors()
+  );
 
   // $FlowExpectedError - we're creating a behavior
   generatedBehavior.updateProperty = function(
@@ -48,55 +65,57 @@ export const declareBehaviorMetadata = (
     propertyName: string,
     newValue: string
   ) {
-    let propertyFound = false;
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      if (property.getName() === propertyName) {
-        propertyFound = true;
-        const element = behaviorContent.addChild(propertyName);
-        const propertyType: string = property.getType();
+    const enumeratedProperty = enumeratedProperties.find(
+      enumeratedProperty => enumeratedProperty.name === propertyName
+    );
+    if (!enumeratedProperty) return false;
 
-        if (propertyType === 'String' || propertyType === 'Choice') {
-          element.setStringValue(newValue);
-        } else if (propertyType === 'Number') {
-          element.setDoubleValue(parseFloat(newValue));
-        } else if (propertyType === 'Boolean') {
-          element.setBoolValue(newValue === '1');
-        }
-      }
-    });
+    const element = behaviorContent.addChild(propertyName);
+    const propertyType: string = enumeratedProperty.type;
 
-    return propertyFound;
+    if (propertyType === 'String' || propertyType === 'Choice') {
+      element.setStringValue(newValue);
+    } else if (propertyType === 'Number') {
+      element.setDoubleValue(parseFloat(newValue));
+    } else if (propertyType === 'Boolean') {
+      element.setBoolValue(newValue === '1');
+    }
+
+    return true;
   };
 
   // $FlowExpectedError - we're creating a behavior
   generatedBehavior.getProperties = function(behaviorContent) {
     var behaviorProperties = new gd.MapStringPropertyDescriptor();
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      const newProperty = property.toPropertyDescriptor();
-      const propertyType: string = newProperty.getType();
 
-      if (behaviorContent.hasChild(property.getName())) {
+    enumeratedProperties.forEach(enumeratedProperty => {
+      const propertyName = enumeratedProperty.name;
+      const propertyType = enumeratedProperty.type;
+      const newProperty = toGdPropertyDescriptor(
+        enumeratedProperty,
+        behaviorProperties.getOrCreate(propertyName)
+      );
+
+      if (behaviorContent.hasChild(propertyName)) {
         if (propertyType === 'String' || propertyType === 'Choice') {
           newProperty.setValue(
-            behaviorContent.getChild(property.getName()).getStringValue()
+            behaviorContent.getChild(propertyName).getStringValue()
           );
         } else if (propertyType === 'Number') {
           newProperty.setValue(
-            '' + behaviorContent.getChild(property.getName()).getDoubleValue()
+            '' + behaviorContent.getChild(propertyName).getDoubleValue()
           );
         } else if (propertyType === 'Boolean') {
           newProperty.setValue(
-            behaviorContent.getChild(property.getName()).getBoolValue()
+            behaviorContent.getChild(propertyName).getBoolValue()
               ? 'true'
               : 'false'
           );
         }
       } else {
         // No value was serialized for this property. `newProperty`
-        // will have the default value coming from `property`.
+        // will have the default value coming from `enumeratedProperty`.
       }
-
-      behaviorProperties.set(property.getName(), newProperty);
     });
 
     return behaviorProperties;
@@ -104,16 +123,16 @@ export const declareBehaviorMetadata = (
 
   // $FlowExpectedError - we're creating a behavior
   generatedBehavior.initializeContent = function(behaviorContent) {
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      const element = behaviorContent.addChild(property.getName());
-      const propertyType: string = property.getType();
+    enumeratedProperties.forEach(enumeratedProperty => {
+      const element = behaviorContent.addChild(enumeratedProperty.name);
+      const propertyType: string = enumeratedProperty.type;
 
       if (propertyType === 'String' || propertyType === 'Choice') {
-        element.setStringValue(property.getValue());
+        element.setStringValue(enumeratedProperty.value);
       } else if (propertyType === 'Number') {
-        element.setDoubleValue(parseFloat(property.getValue()) || 0);
+        element.setDoubleValue(parseFloat(enumeratedProperty.value) || 0);
       } else if (propertyType === 'Boolean') {
-        element.setBoolValue(property.getValue() === 'true');
+        element.setBoolValue(enumeratedProperty.value === 'true');
       }
     });
   };

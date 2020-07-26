@@ -44,7 +44,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
-  commitVariableValueOnBlur?: Boolean,
+  commitVariableValueOnBlur?: boolean,
 |};
 type State = {|
   nameErrors: { [string]: string },

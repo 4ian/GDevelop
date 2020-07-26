@@ -23,6 +23,14 @@ gdjs.DummyWithSharedDataRuntimeBehavior = function(runtimeScene, behaviorData, o
 gdjs.DummyWithSharedDataRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.registerBehavior("MyDummyExtension::DummyBehaviorWithSharedData", gdjs.DummyRuntimeBehavior);
 
+gdjs.DummyWithSharedDataRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.property1 !== newBehaviorData.property1) {
+        this._textToSet = newBehaviorData.property1;
+    }
+
+    return true;
+}
+
 gdjs.DummyWithSharedDataRuntimeBehavior.prototype.onDeActivate = function() {
 };
 

@@ -68,13 +68,12 @@ import exampleFile63 from '../../fixtures/multitouch/multitouch.json';
 import exampleFile64 from '../../fixtures/object-gravity/object-gravity.json';
 import exampleFile65 from '../../fixtures/object-selection/object-selection.json';
 import exampleFile66 from '../../fixtures/objects-timers/objects-timers.json';
-import exampleFile67 from '../../fixtures/online-multiplayer/online-multiplayer.json';
 import exampleFile68 from '../../fixtures/open-url-in-browser/open-url-in-browser.json';
 import exampleFile69 from '../../fixtures/pairs/pairs.json';
-import exampleFile70 from '../../fixtures/parallax/parallax.json';
-import exampleFile71 from '../../fixtures/parallax-scrolling/parallax-scrolling.json';
-import exampleFile72 from '../../fixtures/parse-json-from-api/parse-json-from-api.json';
-import exampleFile73 from '../../fixtures/parse-json-string/parse-json-string.json';
+import exampleFile70 from '../../fixtures/parallax-scrolling/parallax-scrolling.json';
+import exampleFile71 from '../../fixtures/parse-json-from-api/parse-json-from-api.json';
+import exampleFile72 from '../../fixtures/parse-json-string/parse-json-string.json';
+import exampleFile73 from '../../fixtures/particle-effects-demo/particle-effects-demo.json';
 import exampleFile74 from '../../fixtures/particles-explosions/particles-explosions.json';
 import exampleFile75 from '../../fixtures/particles-various-effects/particles-various-effects.json';
 import exampleFile76 from '../../fixtures/pathfinding/pathfinding.json';
@@ -189,13 +188,13 @@ export default {
   'example://object-gravity': exampleFile64,
   'example://object-selection': exampleFile65,
   'example://objects-timers': exampleFile66,
-  'example://online-multiplayer': exampleFile67,
-  'example://open-url-in-browser': exampleFile68,
-  'example://pairs': exampleFile69,
-  'example://parallax': exampleFile70,
-  'example://parallax-scrolling': exampleFile71,
-  'example://parse-json-from-api': exampleFile72,
-  'example://parse-json-string': exampleFile73,
+  'example://open-url-in-browser': exampleFile67,
+  'example://pairs': exampleFile68,
+  'example://parallax': exampleFile69,
+  'example://parallax-scrolling': exampleFile70,
+  'example://parse-json-from-api': exampleFile71,
+  'example://parse-json-string': exampleFile72,
+  'example://particle-effects-demo': exampleFile73,
   'example://particles-explosions': exampleFile74,
   'example://particles-various-effects': exampleFile75,
   'example://pathfinding': exampleFile76,

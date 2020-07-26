@@ -200,7 +200,6 @@ module.exports = {
       .setDescription(
         _('Alter the rendered image with the specified blend mode.')
       )
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-alpha.js')
       .addIncludeFile('Extensions/Effects/blending-mode-pixi-filter.js');
     const blendingModeProperties = blendingModeEffect.getProperties();
     blendingModeProperties
@@ -240,7 +239,7 @@ module.exports = {
       .setLabel(_('Resolution'))
       .setType('number');
     blurProperties
-      .getOrCreate('resolution')
+      .getOrCreate('kernelSize')
       .setValue('5')
       .setLabel(_('Kernel size (one of these values: 5, 7, 9, 11, 13, 15)'))
       .setType('number');
@@ -847,8 +846,8 @@ module.exports = {
       .setDescription(
         _("Applies a pixelate effect, making display objects appear 'blocky'.")
       )
-      .addIncludeFile('Extensions/Effects/pixelate-pixi-filter.js')
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-pixelate.js');
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-pixelate.js')
+      .addIncludeFile('Extensions/Effects/pixelate-pixi-filter.js');
     const pixelateProperties = pixelateEffect.getProperties();
     pixelateProperties
       .getOrCreate('size')
@@ -901,8 +900,8 @@ module.exports = {
           'Applies a reflection effect to simulate the reflection on water with waves.'
         )
       )
-      .addIncludeFile('Extensions/Effects/reflection-pixi-filter.js')
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-reflection.js');
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-reflection.js')
+      .addIncludeFile('Extensions/Effects/reflection-pixi-filter.js');
     const reflectionProperties = reflectionEffect.getProperties();
     reflectionProperties
       .getOrCreate('mirror')

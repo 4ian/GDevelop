@@ -4,6 +4,10 @@ import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import defaultShortcuts, {
+  type ShortcutMap,
+} from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -135,6 +139,7 @@ export type PreferencesValues = {|
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
   useCommandPalette: boolean,
+  shortcutMap: ShortcutMap,
 |};
 
 /**
@@ -179,6 +184,8 @@ export type Preferences = {|
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
   setUseCommandPalette: (enabled: boolean) => void,
+  resetShortcutsToDefault: () => void,
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
 |};
 
 export const initialPreferences = {
@@ -202,6 +209,7 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     useCommandPalette: false,
+    shortcutMap: defaultShortcuts,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -236,6 +244,8 @@ export const initialPreferences = {
   hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
   setUseCommandPalette: (enabled: boolean) => {},
+  resetShortcutsToDefault: () => {},
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

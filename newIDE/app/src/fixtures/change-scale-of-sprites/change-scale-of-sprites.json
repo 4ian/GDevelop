@@ -153,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "9aff5d24-f21c-4c02-b781-6c5452bd939c",
           "width": 0,
           "x": 15.1197,
           "y": 19.1174,
@@ -164,7 +165,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "sprite",
           "tags": "",
           "type": "Sprite",
@@ -205,7 +205,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

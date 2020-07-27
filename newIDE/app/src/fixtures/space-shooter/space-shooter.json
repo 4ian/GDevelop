@@ -1185,6 +1185,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "51de6d99-9d67-4d92-8435-4f1668b1aeba",
           "width": 0,
           "x": 14,
           "y": 36,
@@ -1200,6 +1201,7 @@
           "layer": "Background",
           "locked": false,
           "name": "SpaceBackground",
+          "persistentUuid": "decfbe49-c4be-4ba3-8314-35699f101d29",
           "width": 320,
           "x": 0,
           "y": 0,
@@ -1215,6 +1217,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "8e109869-8ba7-486c-bd46-f511230cca84",
           "width": 0,
           "x": 256,
           "y": 44,
@@ -1235,6 +1238,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "6928e964-f18b-477e-bc40-1faccf3b9b86",
           "width": 0,
           "x": 839,
           "y": 67,
@@ -1250,6 +1254,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "3d8ae16e-26dd-47e9-b0d7-668b49dd357f",
           "width": 0,
           "x": 877,
           "y": 70,
@@ -1270,6 +1275,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "e4a94acf-a73b-433c-9446-54f4ea178279",
           "width": 0,
           "x": 220,
           "y": 33,
@@ -1285,6 +1291,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "d067ada6-adbc-497c-b4d5-e3c010078fba",
           "width": 0,
           "x": 240,
           "y": 72,
@@ -1305,6 +1312,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "60f381bb-ffab-418f-9218-c7c5874d9bfe",
           "width": 0,
           "x": 681,
           "y": 81,
@@ -1320,6 +1328,7 @@
           "layer": "",
           "locked": false,
           "name": "HealthPack",
+          "persistentUuid": "98addffe-30e9-4748-a75d-aa576088d637",
           "width": 0,
           "x": 304,
           "y": 44,
@@ -1335,6 +1344,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "a4667c1d-fcd5-4cbf-83fc-8c4b82c1c867",
           "width": 0,
           "x": 687,
           "y": 43,
@@ -1350,6 +1360,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "c4bfaa21-92ca-4e24-9e67-efba19e73535",
           "width": 0,
           "x": 659,
           "y": 20,
@@ -1365,6 +1376,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
+          "persistentUuid": "5af10bb8-a27f-47d6-b63a-400938de531a",
           "width": 0,
           "x": 394,
           "y": 62,
@@ -1380,6 +1392,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
+          "persistentUuid": "ecf87610-5be7-4e6d-8593-a9a0ac620c61",
           "width": 0,
           "x": -184,
           "y": 0,
@@ -1395,6 +1408,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
+          "persistentUuid": "24f69992-c2ce-4513-a41a-8c712a9b2cc9",
           "width": 0,
           "x": 335,
           "y": 13,
@@ -1410,6 +1424,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "434f1976-c347-4250-bf4f-3d6e0a8275cb",
           "width": 0,
           "x": 848,
           "y": 41,
@@ -1430,6 +1445,7 @@
           "layer": "",
           "locked": false,
           "name": "AttackFlame",
+          "persistentUuid": "c891a990-6a98-4533-a020-86caff9d3ddc",
           "width": 0,
           "x": 21,
           "y": -8,
@@ -1445,6 +1461,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
+          "persistentUuid": "07bddce0-c009-4ca8-ad84-ac1a88823d89",
           "width": 0,
           "x": 1055,
           "y": 0,
@@ -1460,6 +1477,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "ee14bd21-1904-44df-91c7-ae7c7f720670",
           "width": 0,
           "x": 427,
           "y": 17,
@@ -1475,6 +1493,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "27c88ce4-c3df-445e-b6a6-f522eab378ce",
           "width": 0,
           "x": 454,
           "y": 43,
@@ -1495,6 +1514,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "84940891-e4e0-4420-9d6b-c8bcc827edfd",
           "width": 0,
           "x": 430,
           "y": 69,
@@ -1515,6 +1535,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "d035c6ac-8b64-476f-8d0f-123cee7aae54",
           "width": 0,
           "x": 888,
           "y": 47,
@@ -1530,6 +1551,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "ac50217a-bcd4-4db9-96d4-5e815b290e17",
           "width": 0,
           "x": 815,
           "y": 46,
@@ -1550,6 +1572,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "738d2c80-5f9d-46e2-9c84-0e358d1b5b90",
           "width": 0,
           "x": 791,
           "y": 72,
@@ -1570,6 +1593,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "7c381255-70d3-4db9-b8c7-5516b9ef91bb",
           "width": 0,
           "x": 788,
           "y": 20,
@@ -1585,6 +1609,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
+          "persistentUuid": "d168e5cf-67c0-48e0-b853-75b74dd18500",
           "width": 0,
           "x": 876,
           "y": 24,
@@ -1600,6 +1625,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "f5bf9957-83c0-4bf1-8293-75b2a0035abf",
           "width": 0,
           "x": 558,
           "y": 81,
@@ -1615,6 +1641,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "28650d09-8872-4d68-8d8b-98e260eaf37e",
           "width": 0,
           "x": 564,
           "y": 47,
@@ -1630,6 +1657,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "b540c271-ad34-4a45-8c31-c6d27478cb1d",
           "width": 0,
           "x": 536,
           "y": 13,
@@ -1645,6 +1673,7 @@
           "layer": "UI",
           "locked": false,
           "name": "LifebarContainer",
+          "persistentUuid": "9d32c2f9-15c0-42f4-b2c1-13e9d13f1fd4",
           "width": 0,
           "x": 2,
           "y": 1,
@@ -1660,6 +1689,7 @@
           "layer": "UI",
           "locked": false,
           "name": "Lifebar",
+          "persistentUuid": "f4b9be13-50f8-44aa-8c2b-419a9bf54bd4",
           "width": 0,
           "x": 21,
           "y": 4,
@@ -1675,6 +1705,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerAttackArea",
+          "persistentUuid": "cef86c23-2627-460c-bf05-e39f3b44d8d4",
           "width": 0,
           "x": 56,
           "y": -59,
@@ -1690,6 +1721,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
+          "persistentUuid": "1761ac8a-684d-4029-b6d8-f19899e617b8",
           "width": 45,
           "x": 574,
           "y": -9,
@@ -1705,6 +1737,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical2",
+          "persistentUuid": "2ca03be3-4c94-40dd-9edb-67a2a9cc44a4",
           "width": 32,
           "x": 480,
           "y": 81,
@@ -1720,6 +1753,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
+          "persistentUuid": "fb8e8040-b9c2-4868-bbca-a051ae2d7c62",
           "width": 45,
           "x": 53,
           "y": 82,
@@ -1735,6 +1769,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
+          "persistentUuid": "448f16e2-cc4a-4c03-9591-1102d941fbbe",
           "width": 45,
           "x": 436,
           "y": 83,
@@ -1750,6 +1785,7 @@
           "layer": "UI",
           "locked": false,
           "name": "ChangeButton",
+          "persistentUuid": "b7a8a1db-b9c3-491a-8074-f7f260f8ffb1",
           "width": 0,
           "x": 126,
           "y": -7,
@@ -1765,6 +1801,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBody",
+          "persistentUuid": "a3d638f2-7434-4957-9041-a6b5de6c680f",
           "width": 0,
           "x": 1204,
           "y": 0,
@@ -1780,6 +1817,7 @@
           "layer": "",
           "locked": false,
           "name": "BossTopArm",
+          "persistentUuid": "dd4a9ab5-706e-477e-a758-38e8193f391c",
           "width": 0,
           "x": 1172,
           "y": 0,
@@ -1795,6 +1833,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBottomArm",
+          "persistentUuid": "1856b00f-4de6-4528-ac6b-f92ecf395533",
           "width": 0,
           "x": 1172,
           "y": 45,
@@ -1810,6 +1849,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBackground",
+          "persistentUuid": "92c70c8c-848b-46a9-904a-3b37c463d1e5",
           "width": 0,
           "x": 1092,
           "y": 0,
@@ -1825,6 +1865,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
+          "persistentUuid": "d25c802c-94e1-4ca6-b042-97e067a72f22",
           "width": 0,
           "x": 462,
           "y": 0,
@@ -1840,6 +1881,7 @@
           "layer": "UI",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "4a60b8f0-53c7-4a49-8379-aeec308bf7cf",
           "width": 0,
           "x": 31,
           "y": 39,
@@ -1855,6 +1897,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
+          "persistentUuid": "28f4a602-52c0-4859-806b-54d1447ad2d4",
           "width": 0,
           "x": 996,
           "y": 29,
@@ -1870,6 +1913,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
+          "persistentUuid": "42c25ee9-09b9-499f-a098-e615fb836020",
           "width": 0,
           "x": 730,
           "y": 30,
@@ -1885,6 +1929,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
+          "persistentUuid": "3a6a2fce-bc36-4335-af65-eae9c0a005bb",
           "width": 0,
           "x": 938,
           "y": 28,
@@ -1900,6 +1945,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "85fa1264-81e6-44a0-b07f-e333d0434bff",
           "width": 0,
           "x": 1092,
           "y": 70,
@@ -1915,6 +1961,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
+          "persistentUuid": "2d61ad0d-1c8b-45f9-bc50-3ac02e1bfd47",
           "width": 0,
           "x": 1075,
           "y": 44,
@@ -1930,6 +1977,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
+          "persistentUuid": "b5b38dc5-9316-4274-b298-e9feb3f66b30",
           "width": 0,
           "x": 658,
           "y": 61,
@@ -1945,6 +1993,7 @@
           "layer": "",
           "locked": false,
           "name": "HealthPack",
+          "persistentUuid": "2f204736-05a5-4eb6-a565-d85181ca28e6",
           "width": 0,
           "x": 972,
           "y": 39,
@@ -1960,6 +2009,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
+          "persistentUuid": "c743b87f-3eab-4705-ad6a-3de189dc3562",
           "width": 0,
           "x": 1039,
           "y": 16,
@@ -1971,7 +2021,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -3103,7 +3152,6 @@
           ]
         },
         {
-          "group": "",
           "height": 90,
           "name": "SpaceBackground",
           "tags": "Background",
@@ -3114,7 +3162,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "name": "CorridorBackground",
           "tags": "Background",
           "type": "Sprite",
@@ -3154,7 +3201,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Asteroid",
           "tags": "",
           "type": "Sprite",
@@ -3263,7 +3309,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Enemy2",
           "tags": "",
           "type": "Sprite",
@@ -3503,7 +3548,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerBullet",
           "tags": "",
           "type": "Sprite",
@@ -3548,7 +3592,6 @@
           ]
         },
         {
-          "group": "",
           "name": "HealthPack",
           "tags": "",
           "type": "Sprite",
@@ -3664,7 +3707,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Explosion",
           "tags": "",
           "type": "Sprite",
@@ -3789,7 +3831,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Enemy3",
           "tags": "",
           "type": "Sprite",
@@ -3854,7 +3895,6 @@
           ]
         },
         {
-          "group": "",
           "name": "EnemyBullet",
           "tags": "",
           "type": "Sprite",
@@ -3928,7 +3968,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Enemy1",
           "tags": "",
           "type": "Sprite",
@@ -4079,7 +4118,6 @@
           ]
         },
         {
-          "group": "",
           "name": "AttackFlame",
           "tags": "",
           "type": "Sprite",
@@ -4136,7 +4174,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LifebarContainer",
           "tags": "",
           "type": "Sprite",
@@ -4176,7 +4213,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Lifebar",
           "tags": "",
           "type": "Sprite",
@@ -4216,7 +4252,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerAttackArea",
           "tags": "",
           "type": "Sprite",
@@ -4276,7 +4311,6 @@
         },
         {
           "bottomMargin": 2,
-          "group": "",
           "height": 32,
           "leftMargin": 8,
           "name": "TilesMechanical2",
@@ -4292,7 +4326,6 @@
         },
         {
           "bottomMargin": 1,
-          "group": "",
           "height": 32,
           "leftMargin": 9,
           "name": "TilesMechanical1",
@@ -4307,7 +4340,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "name": "ChangeButton",
           "tags": "",
           "type": "Sprite",
@@ -4347,7 +4379,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BossBody",
           "tags": "",
           "type": "Sprite",
@@ -4539,7 +4570,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BossTopArm",
           "tags": "",
           "type": "Sprite",
@@ -5324,7 +5354,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BossBottomArm",
           "tags": "",
           "type": "Sprite",
@@ -6109,7 +6138,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BossSuperLaser",
           "tags": "",
           "type": "Sprite",
@@ -6166,7 +6194,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BossBackground",
           "tags": "",
           "type": "Sprite",
@@ -6206,7 +6233,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Fade",
           "tags": "",
           "type": "Sprite",
@@ -6246,7 +6272,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GameOver",
           "tags": "",
           "type": "Sprite",

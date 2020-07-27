@@ -149,6 +149,7 @@
           "layer": "",
           "locked": false,
           "name": "text_display",
+          "persistentUuid": "d35a5e23-8738-4304-b5a2-45c7cf272b75",
           "width": 0,
           "x": 50,
           "y": 50,
@@ -161,7 +162,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "text_display",
           "smoothed": false,

@@ -195,7 +195,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.6774
+        "zoomFactor": 0.6054
       },
       "objectsGroups": [],
       "variables": [],
@@ -207,6 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "WelcomeText",
+          "persistentUuid": "db9fbdf7-7181-4bdf-b573-f190e26f7c00",
           "width": 0,
           "x": 10,
           "y": 30,
@@ -222,9 +223,10 @@
           "layer": "",
           "locked": false,
           "name": "idText",
+          "persistentUuid": "2b9960c9-0c9c-428d-9ef8-2b3b2398b943",
           "width": 0,
-          "x": 276,
-          "y": 149,
+          "x": 111,
+          "y": 138,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -237,9 +239,10 @@
           "layer": "",
           "locked": false,
           "name": "idEntryText",
+          "persistentUuid": "64b18cf5-80f0-466e-807e-f70f1e75b043",
           "width": 0,
-          "x": 218,
-          "y": 424,
+          "x": 165,
+          "y": 425,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -252,9 +255,10 @@
           "layer": "",
           "locked": false,
           "name": "idEntrySprite",
-          "width": 387,
-          "x": 202,
-          "y": 408,
+          "persistentUuid": "92e0e0df-3fc2-4b05-99b4-bf3b0de3a67a",
+          "width": 477,
+          "x": 149,
+          "y": 407,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -267,8 +271,9 @@
           "layer": "",
           "locked": false,
           "name": "idEntry",
+          "persistentUuid": "222fdc3f-9bb3-45c7-922f-c902e5680d07",
           "width": 0,
-          "x": 536,
+          "x": 571,
           "y": 420,
           "zOrder": 4,
           "numberProperties": [],
@@ -282,6 +287,7 @@
           "layer": "",
           "locked": false,
           "name": "ConnectButton",
+          "persistentUuid": "402e1261-30e8-43a9-9928-77693c528ed7",
           "width": 0,
           "x": 448,
           "y": 500,
@@ -297,6 +303,7 @@
           "layer": "",
           "locked": false,
           "name": "ConnectText",
+          "persistentUuid": "8de67bc4-7940-4ecc-ba1b-c24a3374992e",
           "width": 0,
           "x": 503,
           "y": 510,
@@ -312,6 +319,7 @@
           "layer": "",
           "locked": false,
           "name": "Copy",
+          "persistentUuid": "a976db91-91a3-4bbe-809e-37e97a22c664",
           "width": 0,
           "x": 294,
           "y": 210,
@@ -327,6 +335,7 @@
           "layer": "",
           "locked": false,
           "name": "CopyText",
+          "persistentUuid": "bbdca1d7-0d85-477b-82ed-229a67cba787",
           "width": 0,
           "x": 363,
           "y": 220,
@@ -342,6 +351,7 @@
           "layer": "",
           "locked": false,
           "name": "Paste",
+          "persistentUuid": "12fa0f87-1255-49e0-a475-40e104b8a6e8",
           "width": 0,
           "x": 138,
           "y": 500,
@@ -357,6 +367,7 @@
           "layer": "",
           "locked": false,
           "name": "PasteText",
+          "persistentUuid": "ec836e06-7255-4945-bbe9-f3b8fb984762",
           "width": 0,
           "x": 201,
           "y": 510,
@@ -372,9 +383,10 @@
           "layer": "",
           "locked": false,
           "name": "ErrorText",
+          "persistentUuid": "ea4b93a6-a8e4-4371-8f2e-f6e6cc4ae93b",
           "width": 0,
-          "x": 162,
-          "y": 289,
+          "x": 124,
+          "y": 288,
           "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
@@ -384,7 +396,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "WelcomeText",
           "smoothed": true,
@@ -404,7 +415,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "idText",
           "smoothed": true,
@@ -423,7 +433,6 @@
           }
         },
         {
-          "group": "",
           "name": "idEntry",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -432,7 +441,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "idEntryText",
           "smoothed": true,
@@ -451,7 +459,6 @@
           }
         },
         {
-          "group": "",
           "name": "idEntrySprite",
           "tags": "",
           "type": "Sprite",
@@ -491,7 +498,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ConnectButton",
           "tags": "",
           "type": "Sprite",
@@ -531,7 +537,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Copy",
           "tags": "",
           "type": "Sprite",
@@ -571,7 +576,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Paste",
           "tags": "",
           "type": "Sprite",
@@ -612,7 +616,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ConnectText",
           "smoothed": true,
@@ -632,7 +635,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "CopyText",
           "smoothed": true,
@@ -652,7 +654,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "PasteText",
           "smoothed": true,
@@ -672,7 +673,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ErrorText",
           "smoothed": true,
@@ -744,6 +744,21 @@
         {
           "disabled": false,
           "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Use default server",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -761,13 +776,9 @@
             {
               "type": {
                 "inverted": false,
-                "value": "TextObject::String"
+                "value": "P2P::UseDefaultBroker"
               },
-              "parameters": [
-                "ErrorText",
-                "=",
-                "\"\""
-              ],
+              "parameters": [],
               "subInstructions": []
             }
           ],
@@ -784,6 +795,38 @@
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "ErrorText",
+                    "=",
+                    "\"\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
             {
               "disabled": false,
               "folded": false,
@@ -1369,6 +1412,7 @@
           "layer": "",
           "locked": false,
           "name": "Connected",
+          "persistentUuid": "7c3e3132-7ef7-4541-ae2f-b76af5306952",
           "width": 0,
           "x": 232,
           "y": 22,
@@ -1384,6 +1428,7 @@
           "layer": "",
           "locked": false,
           "name": "ChooseGame",
+          "persistentUuid": "cf37a38a-aa5f-4261-a528-2223ecf46801",
           "width": 0,
           "x": 247,
           "y": 76,
@@ -1399,6 +1444,7 @@
           "layer": "",
           "locked": false,
           "name": "icon",
+          "persistentUuid": "140101ce-3acf-462b-929f-3bdcbdca3b6c",
           "width": 0,
           "x": 156,
           "y": 206,
@@ -1414,6 +1460,7 @@
           "layer": "",
           "locked": false,
           "name": "icon",
+          "persistentUuid": "ba3e7dd5-bfd2-4d76-a9e5-5f6cbdc98df3",
           "width": 0,
           "x": 543,
           "y": 206,
@@ -1434,6 +1481,7 @@
           "layer": "",
           "locked": false,
           "name": "chat",
+          "persistentUuid": "6f92c32b-6d49-48e8-bf63-83ea70b880b2",
           "width": 0,
           "x": 182,
           "y": 290,
@@ -1449,6 +1497,7 @@
           "layer": "",
           "locked": false,
           "name": "syncbtn",
+          "persistentUuid": "4e3808c1-b215-4188-a896-b92a1d938cc5",
           "width": 0,
           "x": 499,
           "y": 290,
@@ -1464,6 +1513,7 @@
           "layer": "",
           "locked": false,
           "name": "Hitbox",
+          "persistentUuid": "27c45ab5-3139-4670-962e-7a91c93af185",
           "width": 284,
           "x": 452,
           "y": 187,
@@ -1484,6 +1534,7 @@
           "layer": "",
           "locked": false,
           "name": "Hitbox",
+          "persistentUuid": "4a31ec56-1860-42ea-998d-ca22e818495b",
           "width": 284,
           "x": 65,
           "y": 186,
@@ -1496,7 +1547,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Connected",
           "smoothed": true,
@@ -1516,7 +1566,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": true,
           "name": "ChooseGame",
           "smoothed": true,
@@ -1535,7 +1584,6 @@
           }
         },
         {
-          "group": "",
           "name": "icon",
           "tags": "",
           "type": "Sprite",
@@ -1605,7 +1653,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "chat",
           "smoothed": true,
@@ -1625,7 +1672,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "syncbtn",
           "smoothed": true,
@@ -1644,7 +1690,6 @@
           }
         },
         {
-          "group": "",
           "name": "Hitbox",
           "tags": "",
           "type": "Sprite",
@@ -1978,6 +2023,15 @@
             }
           ],
           "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "Disconnection"
         }
       ],
       "layers": [
@@ -2037,6 +2091,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "eb1f3515-2a0d-4d2d-bf79-347d1b4e4342",
           "width": 0,
           "x": 48,
           "y": 88,
@@ -2057,6 +2112,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "9ee119e3-92a9-45de-b207-100d11fe6ef1",
           "width": 0,
           "x": 349,
           "y": 90,
@@ -2077,6 +2133,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "6e1231f1-f96d-4a0b-976d-f50bbfe493b0",
           "width": 0,
           "x": 701,
           "y": 88,
@@ -2097,6 +2154,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "fa5c6eea-d11c-4a6f-96e7-64167e0ebb2d",
           "width": 0,
           "x": 701,
           "y": 439,
@@ -2117,6 +2175,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "8966eeb2-c578-4299-8ea8-fb0bf2b6964a",
           "width": 0,
           "x": 353,
           "y": 434,
@@ -2137,6 +2196,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "eaaa038c-3016-4374-9fad-084f1539c031",
           "width": 0,
           "x": 50,
           "y": 441,
@@ -2157,6 +2217,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "9d9ff8e9-7e80-4e02-9d89-ed570af12ff7",
           "width": 0,
           "x": 193,
           "y": 262,
@@ -2177,6 +2238,7 @@
           "layer": "",
           "locked": false,
           "name": "checkbox",
+          "persistentUuid": "7043a1f3-e000-49c2-9107-6f552097798f",
           "width": 0,
           "x": 559,
           "y": 274,
@@ -2193,7 +2255,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "checkbox",
           "tags": "",
           "type": "Sprite",
@@ -2552,6 +2613,15 @@
             }
           ],
           "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "Disconnection"
         }
       ],
       "layers": [
@@ -2611,6 +2681,7 @@
           "layer": "",
           "locked": false,
           "name": "Chat",
+          "persistentUuid": "5ad5388f-b427-4ec8-9d6c-9f1a874b4359",
           "width": 0,
           "x": 368,
           "y": 7,
@@ -2626,6 +2697,7 @@
           "layer": "",
           "locked": false,
           "name": "ChatBox",
+          "persistentUuid": "5f2f3009-7186-4186-b74f-e9c08fefdd04",
           "width": 664,
           "x": 76,
           "y": 66,
@@ -2641,6 +2713,7 @@
           "layer": "",
           "locked": false,
           "name": "ChatBoxSprite",
+          "persistentUuid": "51196764-54f8-4094-8155-b9e0e64009f9",
           "width": 724,
           "x": 47,
           "y": 38,
@@ -2656,6 +2729,7 @@
           "layer": "",
           "locked": false,
           "name": "EntrySprite",
+          "persistentUuid": "85ba2dce-fc45-45a4-a9ed-dfb87c5ffdd7",
           "width": 634,
           "x": 58,
           "y": 547,
@@ -2671,6 +2745,7 @@
           "layer": "",
           "locked": false,
           "name": "SendButton",
+          "persistentUuid": "20451529-023b-41a4-8340-ae553c4ccb6e",
           "width": 49,
           "x": 702,
           "y": 549,
@@ -2686,6 +2761,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
+          "persistentUuid": "3c72c24b-6abb-48ef-bfbf-340bc3b1a661",
           "width": 0,
           "x": 81,
           "y": 558,
@@ -2701,6 +2777,7 @@
           "layer": "",
           "locked": false,
           "name": "Entry",
+          "persistentUuid": "090902e6-747a-4cfd-8dc5-2bdfb05be5e8",
           "width": 0,
           "x": 639,
           "y": 553,
@@ -2713,7 +2790,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": true,
           "name": "Chat",
           "smoothed": true,
@@ -2733,7 +2809,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ChatBox",
           "smoothed": true,
@@ -2752,7 +2827,6 @@
           }
         },
         {
-          "group": "",
           "name": "ChatBoxSprite",
           "tags": "",
           "type": "Sprite",
@@ -2792,7 +2866,6 @@
           ]
         },
         {
-          "group": "",
           "name": "EntrySprite",
           "tags": "",
           "type": "Sprite",
@@ -2832,7 +2905,6 @@
           ]
         },
         {
-          "group": "",
           "name": "SendButton",
           "tags": "",
           "type": "Sprite",
@@ -2873,7 +2945,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "EntryText",
           "smoothed": true,
@@ -2892,7 +2963,6 @@
           }
         },
         {
-          "group": "",
           "name": "Entry",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -3251,6 +3321,172 @@
             }
           ],
           "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "Disconnection"
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Disconnected",
+      "name": "Disconnected",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 0.8268
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "disconnected",
+          "persistentUuid": "a34e81aa-eb85-4b16-a1fb-6c4f2db188d8",
+          "width": 0,
+          "x": 110,
+          "y": 17,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "pressAnyKey",
+          "persistentUuid": "6890532d-0fd2-4d8b-9a51-764daf53af17",
+          "width": 0,
+          "x": 102,
+          "y": 308,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "bold": true,
+          "italic": false,
+          "name": "disconnected",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": " You have been disconnected \nfrom the other game instance!",
+          "font": "",
+          "characterSize": 40,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": true,
+          "name": "pressAnyKey",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Press any key to return to connection screen",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "AnyKeyPressed"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"Connect\"",
+                "yes"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         }
       ],
       "layers": [
@@ -3275,7 +3511,62 @@
       "behaviorsSharedData": []
     }
   ],
-  "externalEvents": [],
+  "externalEvents": [
+    {
+      "associatedLayout": "Connect",
+      "lastChangeTimeStamp": 0,
+      "name": "Disconnection",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Or"
+              },
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "P2P::OnError"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "P2P::OnDisconnection"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"Disconnected\"",
+                "yes"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
   "eventsFunctionsExtensions": [
     {
       "author": "@Bouh",

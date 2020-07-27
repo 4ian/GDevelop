@@ -481,6 +481,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "Inventory_title",
+          "persistentUuid": "0eede262-0669-49a5-978e-14e918cbf285",
           "width": 86,
           "x": 358,
           "y": 29,
@@ -496,6 +497,7 @@
           "layer": "",
           "locked": false,
           "name": "item_apple",
+          "persistentUuid": "fa564606-5984-4c21-af0e-ef866d5a0799",
           "width": 0,
           "x": 16,
           "y": 330,
@@ -520,6 +522,7 @@
           "layer": "",
           "locked": false,
           "name": "item_pearl",
+          "persistentUuid": "8ba3497b-6546-4d0f-8044-f8339bc05e4f",
           "width": 0,
           "x": 642,
           "y": 107,
@@ -544,6 +547,7 @@
           "layer": "",
           "locked": false,
           "name": "item_orange",
+          "persistentUuid": "60d44e2c-c22b-4d3f-b7ff-63940692eb07",
           "width": 0,
           "x": 641,
           "y": 314,
@@ -568,6 +572,7 @@
           "layer": "",
           "locked": false,
           "name": "item_apple",
+          "persistentUuid": "4338f593-4037-46e1-a2d4-0100d78d99ee",
           "width": 0,
           "x": 15,
           "y": 239,
@@ -592,6 +597,7 @@
           "layer": "",
           "locked": false,
           "name": "item_pearl",
+          "persistentUuid": "cdde349e-d195-436b-96d7-1c3cdcdf57c5",
           "width": 0,
           "x": 644,
           "y": 176,
@@ -616,6 +622,7 @@
           "layer": "",
           "locked": false,
           "name": "item_orange",
+          "persistentUuid": "63c49ac1-7e24-4f3d-aa1b-483b68bc41c7",
           "width": 0,
           "x": 640,
           "y": 240,
@@ -640,6 +647,7 @@
           "layer": "",
           "locked": false,
           "name": "item_banana",
+          "persistentUuid": "bdec7da9-e372-45b4-addb-442b2107cd38",
           "width": 0,
           "x": 15,
           "y": 66,
@@ -664,6 +672,7 @@
           "layer": "",
           "locked": false,
           "name": "item_banana",
+          "persistentUuid": "689873c1-0abc-48de-802b-e636eee04c7c",
           "width": 0,
           "x": 11,
           "y": 147,
@@ -688,6 +697,7 @@
           "layer": "",
           "locked": false,
           "name": "item_cherry",
+          "persistentUuid": "ed0ea0f1-3399-40e9-8cfb-3425326da1bc",
           "width": 0,
           "x": 729,
           "y": 82,
@@ -712,6 +722,7 @@
           "layer": "",
           "locked": false,
           "name": "item_cherry",
+          "persistentUuid": "c6b6692a-51c3-474c-949b-b9c68a03dfc6",
           "width": 0,
           "x": 720,
           "y": 10,
@@ -736,6 +747,7 @@
           "layer": "",
           "locked": false,
           "name": "item_grape",
+          "persistentUuid": "37395310-eb91-4499-a242-c768638c58f7",
           "width": 0,
           "x": 106,
           "y": 247,
@@ -760,6 +772,7 @@
           "layer": "",
           "locked": false,
           "name": "item_grape",
+          "persistentUuid": "e52f9de7-7ff8-40ad-b910-6aa2c2c383bf",
           "width": 0,
           "x": 104,
           "y": 323,
@@ -784,6 +797,7 @@
           "layer": "",
           "locked": false,
           "name": "item_raspberry",
+          "persistentUuid": "36f4465e-92c6-42a7-ba23-9aad141d4365",
           "width": 0,
           "x": 727,
           "y": 321,
@@ -808,6 +822,7 @@
           "layer": "",
           "locked": false,
           "name": "item_raspberry",
+          "persistentUuid": "7290e2fc-9aa0-4914-b53e-f2ef022875fe",
           "width": 0,
           "x": 643,
           "y": 26,
@@ -832,6 +847,7 @@
           "layer": "",
           "locked": false,
           "name": "item_strawberry",
+          "persistentUuid": "a59169d6-c747-474b-b73c-7adc929580a8",
           "width": 0,
           "x": 728,
           "y": 246,
@@ -856,6 +872,7 @@
           "layer": "",
           "locked": false,
           "name": "item_strawberry",
+          "persistentUuid": "c77ba26c-b458-4bb2-a036-ee82da433687",
           "width": 0,
           "x": 729,
           "y": 161,
@@ -880,6 +897,7 @@
           "layer": "",
           "locked": false,
           "name": "item_watermelon",
+          "persistentUuid": "fe0a19c3-ff4e-4401-8d35-b16faa7aff69",
           "width": 0,
           "x": 103,
           "y": 162,
@@ -904,6 +922,7 @@
           "layer": "",
           "locked": false,
           "name": "item_watermelon",
+          "persistentUuid": "0a7d73b0-d4b5-402e-9529-7454aa9e153b",
           "width": 0,
           "x": 105,
           "y": 78,
@@ -928,6 +947,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_bin",
+          "persistentUuid": "ceee6ea4-abfc-4bb2-a88e-67d7e406218b",
           "width": 0,
           "x": 348,
           "y": 262,
@@ -943,6 +963,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "bbf130fa-6f90-4e35-8764-658bc7841eaa",
           "width": 0,
           "x": 224,
           "y": 192,
@@ -958,6 +979,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "43abb314-2964-45c6-b9d2-165ef7f6c774",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -973,6 +995,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "7c114ef7-3598-4c7f-84ae-3a31a42e5d08",
           "width": 0,
           "x": 321,
           "y": 96,
@@ -988,6 +1011,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "2277ecee-45a0-4987-9549-78b3dc618918",
           "width": 0,
           "x": 416,
           "y": 96,
@@ -1003,6 +1027,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "89a6f013-7ed4-4299-abc4-c1b3b38994a4",
           "width": 0,
           "x": 512,
           "y": 96,
@@ -1018,6 +1043,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "e5bbeb9a-83ab-4fa3-bc9a-8756525253b6",
           "width": 0,
           "x": 512,
           "y": 192,
@@ -1033,6 +1059,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "64957c5f-e5e0-4c0c-b388-671c761f72cc",
           "width": 0,
           "x": 416,
           "y": 192,
@@ -1048,6 +1075,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
+          "persistentUuid": "b6154f72-c928-4d5f-b11c-0bd273de7326",
           "width": 0,
           "x": 320,
           "y": 191,
@@ -1063,6 +1091,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_background",
+          "persistentUuid": "757ea7fd-08b3-4def-8849-4d48848340df",
           "width": 360,
           "x": 220,
           "y": 30,
@@ -1078,6 +1107,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "dd4f6d93-6341-4903-b0b1-1728d39355aa",
           "width": 0,
           "x": 100,
           "y": 439,
@@ -1093,6 +1123,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "save_text",
+          "persistentUuid": "796b0536-c3f2-4af7-9711-97e76a52e6ec",
           "width": 0,
           "x": 264,
           "y": 334,
@@ -1108,6 +1139,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "load_text",
+          "persistentUuid": "b0eb145a-517c-4e3b-8554-39373531a577",
           "width": 0,
           "x": 488,
           "y": 334,
@@ -1123,6 +1155,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "button_background",
+          "persistentUuid": "7a47465f-35ba-4c21-9776-069f382d20a6",
           "width": 64,
           "x": 480,
           "y": 330,
@@ -1138,6 +1171,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "button_background",
+          "persistentUuid": "02ac1b84-6d5a-4caf-8786-a23e6e6a4125",
           "width": 64,
           "x": 256,
           "y": 330,
@@ -1149,7 +1183,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "inventory_background",
           "tags": "",
           "type": "Sprite",
@@ -1189,7 +1222,6 @@
           ]
         },
         {
-          "group": "",
           "name": "inventory_slot",
           "tags": "",
           "type": "Sprite",
@@ -1686,7 +1718,6 @@
           ]
         },
         {
-          "group": "",
           "name": "inventory_bin",
           "tags": "",
           "type": "Sprite",
@@ -1793,7 +1824,6 @@
           ]
         },
         {
-          "group": "",
           "name": "button_background",
           "tags": "",
           "type": "Sprite",
@@ -1833,7 +1863,6 @@
           ]
         },
         {
-          "group": "",
           "name": "pointer_dragobject",
           "tags": "",
           "type": "Sprite",
@@ -2306,7 +2335,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "slot_text",
           "smoothed": true,
@@ -2326,7 +2354,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": true,
           "name": "Inventory_title",
           "smoothed": true,
@@ -2346,7 +2373,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "debug",
           "smoothed": true,
@@ -2366,7 +2392,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -2386,7 +2411,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "save_text",
           "smoothed": true,
@@ -2406,7 +2430,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "load_text",
           "smoothed": true,
@@ -2425,7 +2448,6 @@
           }
         },
         {
-          "group": "",
           "name": "item_apple",
           "tags": "",
           "type": "Sprite",
@@ -2484,7 +2506,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_banana",
           "tags": "",
           "type": "Sprite",
@@ -2543,7 +2564,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_cherry",
           "tags": "",
           "type": "Sprite",
@@ -2602,7 +2622,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_grape",
           "tags": "",
           "type": "Sprite",
@@ -2661,7 +2680,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_orange",
           "tags": "",
           "type": "Sprite",
@@ -2720,7 +2738,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_pearl",
           "tags": "",
           "type": "Sprite",
@@ -2779,7 +2796,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_raspberry",
           "tags": "",
           "type": "Sprite",
@@ -2838,7 +2854,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_strawberry",
           "tags": "",
           "type": "Sprite",
@@ -2897,7 +2912,6 @@
           ]
         },
         {
-          "group": "",
           "name": "item_watermelon",
           "tags": "",
           "type": "Sprite",

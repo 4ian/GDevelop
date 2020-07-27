@@ -186,6 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "new",
+          "persistentUuid": "56120a01-5e96-4fef-a388-227f73cdf167",
           "width": 102,
           "x": 332.376,
           "y": 209.327,
@@ -201,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "load",
+          "persistentUuid": "49750e67-1fcf-48a1-8813-091dad4cf949",
           "width": 109,
           "x": 332.376,
           "y": 305.327,
@@ -216,6 +218,7 @@
           "layer": "",
           "locked": false,
           "name": "new_button",
+          "persistentUuid": "9d1ea9e8-20d4-4f9b-919d-3957b8fa9e2a",
           "width": 128,
           "x": 320,
           "y": 192,
@@ -231,6 +234,7 @@
           "layer": "",
           "locked": false,
           "name": "load_button",
+          "persistentUuid": "f647bbec-e9ff-4551-810c-9e9fb7386785",
           "width": 128,
           "x": 320,
           "y": 288,
@@ -246,6 +250,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "879b2014-a596-43e9-a2c3-3e70d1f2263e",
           "width": 0,
           "x": 4.99999,
           "y": 13,
@@ -257,7 +262,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "load_button",
           "tags": "",
           "type": "Sprite",
@@ -316,7 +320,6 @@
           ]
         },
         {
-          "group": "",
           "name": "new_button",
           "tags": "",
           "type": "Sprite",
@@ -376,7 +379,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "load",
           "smoothed": true,
@@ -396,7 +398,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "new",
           "smoothed": true,
@@ -416,7 +417,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -666,6 +666,7 @@
           "layer": "",
           "locked": false,
           "name": "character1",
+          "persistentUuid": "c6e1a764-a4c4-49e4-a7ee-34493340b1c2",
           "width": 0,
           "x": 193,
           "y": 129,
@@ -686,6 +687,7 @@
           "layer": "",
           "locked": false,
           "name": "character2",
+          "persistentUuid": "e05bfdc8-922d-40fc-abc5-8d489e55c5bc",
           "width": 0,
           "x": 335,
           "y": 276,
@@ -706,6 +708,7 @@
           "layer": "",
           "locked": false,
           "name": "character3",
+          "persistentUuid": "0f7e2de9-afda-4cdf-9821-1670f2e120db",
           "width": 0,
           "x": 483,
           "y": 121,
@@ -726,6 +729,7 @@
           "layer": "",
           "locked": false,
           "name": "save_button",
+          "persistentUuid": "b2bbf12d-23e3-400f-a68c-da06b2e462d8",
           "width": 128,
           "x": 640,
           "y": 512,
@@ -741,6 +745,7 @@
           "layer": "",
           "locked": false,
           "name": "save",
+          "persistentUuid": "cfcf94e7-f43a-4f66-a1ab-6d6fef3ce7ac",
           "width": 53,
           "x": 672,
           "y": 533,
@@ -756,6 +761,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "1b23c115-876c-4ce2-aa0c-099010b2fc30",
           "width": 0,
           "x": 6.00001,
           "y": 7.99999,
@@ -771,6 +777,7 @@
           "layer": "",
           "locked": false,
           "name": "highscore",
+          "persistentUuid": "a04f4aeb-81af-4b74-af37-2f788cce1222",
           "width": 0,
           "x": 504,
           "y": 477,
@@ -786,6 +793,7 @@
           "layer": "",
           "locked": false,
           "name": "back_button",
+          "persistentUuid": "1f1e41c6-98f5-4ad2-93bc-05e22a0c800d",
           "width": 128,
           "x": 503,
           "y": 512,
@@ -801,6 +809,7 @@
           "layer": "",
           "locked": false,
           "name": "Back",
+          "persistentUuid": "b52a1bb2-fd68-4fad-be25-0ff14099c224",
           "width": 0,
           "x": 544,
           "y": 533,
@@ -812,7 +821,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "character1",
           "tags": "",
           "type": "Sprite",
@@ -876,7 +884,6 @@
           ]
         },
         {
-          "group": "",
           "name": "character2",
           "tags": "",
           "type": "Sprite",
@@ -940,7 +947,6 @@
           ]
         },
         {
-          "group": "",
           "name": "character3",
           "tags": "",
           "type": "Sprite",
@@ -1004,7 +1010,6 @@
           ]
         },
         {
-          "group": "",
           "name": "save_button",
           "tags": "",
           "type": "Sprite",
@@ -1064,7 +1069,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "save",
           "smoothed": true,
@@ -1084,7 +1088,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -1103,7 +1106,6 @@
           }
         },
         {
-          "group": "",
           "name": "back_button",
           "tags": "",
           "type": "Sprite",
@@ -1144,7 +1146,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "highscore",
           "smoothed": true,
@@ -1164,7 +1165,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Back",
           "smoothed": true,

@@ -156,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "04c47f9c-1e9f-412e-8e26-a4c2de699bc0",
           "width": 0,
           "x": 155,
           "y": 63,
@@ -171,6 +172,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "5f0a82be-ee71-401f-a6b1-7ed03d91ced7",
           "width": 0,
           "x": 364,
           "y": 247,
@@ -183,7 +185,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -202,7 +203,6 @@
           }
         },
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -394,6 +394,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "22d10ab5-8814-4993-a54d-60caed91a4ee",
           "width": 0,
           "x": 93,
           "y": 58,
@@ -409,6 +410,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "8638736c-85e0-4ab9-9d70-475b0bc69c71",
           "width": 0,
           "x": 356,
           "y": 275,
@@ -421,7 +423,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -440,7 +441,6 @@
           }
         },
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -666,6 +666,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "86798fb4-e154-410a-ad5d-41206788cddd",
           "width": 0,
           "x": 193,
           "y": 68,
@@ -681,6 +682,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "9eb3e53a-a2ef-4385-ae13-739e72682d91",
           "width": 0,
           "x": 361,
           "y": 298,
@@ -693,7 +695,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -712,7 +713,6 @@
           }
         },
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",

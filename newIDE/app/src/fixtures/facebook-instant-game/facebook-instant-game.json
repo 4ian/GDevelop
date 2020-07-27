@@ -219,6 +219,7 @@
           "layer": "",
           "locked": false,
           "name": "lives",
+          "persistentUuid": "d143c1a1-1ed5-4a1a-b39d-f2034d5254b9",
           "width": 0,
           "x": 153,
           "y": 11,
@@ -234,6 +235,7 @@
           "layer": "",
           "locked": false,
           "name": "Save_BTN",
+          "persistentUuid": "edd4f22e-6ac9-40b2-83bc-447feb1438c3",
           "width": 0,
           "x": 88,
           "y": 363,
@@ -249,6 +251,7 @@
           "layer": "",
           "locked": false,
           "name": "player_name",
+          "persistentUuid": "cf502d95-d4ee-4adb-8f6e-7ebc83c106c9",
           "width": 0,
           "x": 150,
           "y": 112,
@@ -264,6 +267,7 @@
           "layer": "",
           "locked": false,
           "name": "player_id",
+          "persistentUuid": "2f0d24bc-e539-4306-8264-40a4c64d78e7",
           "width": 0,
           "x": 152,
           "y": 149,
@@ -279,6 +283,7 @@
           "layer": "",
           "locked": false,
           "name": "rank_player",
+          "persistentUuid": "94417635-a8b5-413e-afdd-1201a4686f33",
           "width": 0,
           "x": 153,
           "y": 68,
@@ -294,6 +299,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "72610e48-59b3-447b-950e-b90e6af0a701",
           "width": 98,
           "x": 152,
           "y": 37,
@@ -309,6 +315,7 @@
           "layer": "",
           "locked": false,
           "name": "Score_add_BTN",
+          "persistentUuid": "554c452e-62d9-46d2-8277-297229680848",
           "width": 0,
           "x": 1,
           "y": 306,
@@ -324,6 +331,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Score",
+          "persistentUuid": "8da9088e-78c5-46d3-927f-155e8be676c6",
           "width": 0,
           "x": 73,
           "y": 36,
@@ -339,6 +347,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Name_Player",
+          "persistentUuid": "6d7e1939-3279-43f1-bcbe-2ecb56b3edfd",
           "width": 0,
           "x": 6,
           "y": 112,
@@ -354,6 +363,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Rank_Player",
+          "persistentUuid": "ac94d5ab-cf10-4b70-8432-1df0cf8563a2",
           "width": 0,
           "x": 13,
           "y": 68,
@@ -369,6 +379,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Player_ID",
+          "persistentUuid": "b63790d1-6267-4162-ac0e-9886718a7a3b",
           "width": 0,
           "x": 39,
           "y": 147,
@@ -384,6 +395,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Lives",
+          "persistentUuid": "71909c6d-ccb4-4595-9833-304335e1318b",
           "width": 0,
           "x": 77,
           "y": 10,
@@ -399,6 +411,7 @@
           "layer": "",
           "locked": false,
           "name": "Lives_sub_BTN",
+          "persistentUuid": "afa9a7f1-8e43-4bc7-a67b-3ee6c48d398f",
           "width": 0,
           "x": 168,
           "y": 249,
@@ -419,6 +432,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Error",
+          "persistentUuid": "544d97bb-1b9f-4c43-94bf-b43388bd01d4",
           "width": 0,
           "x": 0,
           "y": 178,
@@ -434,6 +448,7 @@
           "layer": "",
           "locked": false,
           "name": "error",
+          "persistentUuid": "f131004f-0c75-46bc-9063-c07d77b9b93b",
           "width": 0,
           "x": 2,
           "y": 204,
@@ -449,6 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "Score_sub_BTN",
+          "persistentUuid": "fd9d05e5-f0e3-49d2-9c45-5ec480a0b376",
           "width": 0,
           "x": 168,
           "y": 306,
@@ -464,6 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "Lives_add_BTN",
+          "persistentUuid": "e9d0eaf6-3a58-4cc6-9c3c-bf92ace8644b",
           "width": 0,
           "x": 1,
           "y": 249,
@@ -479,6 +496,7 @@
           "layer": "",
           "locked": false,
           "name": "Ad_load_interstitial",
+          "persistentUuid": "c9f609dc-8799-43b7-9c29-c06cf660868b",
           "width": 0,
           "x": 472,
           "y": 51,
@@ -494,6 +512,7 @@
           "layer": "",
           "locked": false,
           "name": "Ad_show_interstitial",
+          "persistentUuid": "e46a35e1-eb17-49ce-a750-58f5ead9754a",
           "width": 0,
           "x": 472,
           "y": 128,
@@ -509,6 +528,7 @@
           "layer": "",
           "locked": false,
           "name": "Ad_load_video",
+          "persistentUuid": "e70a2992-5e16-4e71-8de8-0e4c7ed7cd00",
           "width": 0,
           "x": 472,
           "y": 205,
@@ -524,6 +544,7 @@
           "layer": "",
           "locked": false,
           "name": "Ad_show_video",
+          "persistentUuid": "2b636579-4aa3-4901-91fa-71893b9c0922",
           "width": 0,
           "x": 472,
           "y": 282,
@@ -539,6 +560,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Ad_show_video",
+          "persistentUuid": "3ce0f849-b1ba-42a4-a5dd-c649eb93643f",
           "width": 0,
           "x": 503,
           "y": 293,
@@ -554,6 +576,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Ad_show_interstitial",
+          "persistentUuid": "897abcea-c254-499d-a6e9-4e08f07e65dd",
           "width": 0,
           "x": 484,
           "y": 143,
@@ -569,6 +592,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Ad_load_interstitial",
+          "persistentUuid": "b890c879-b15f-4e0c-98d6-b0690f3c982c",
           "width": 0,
           "x": 486,
           "y": 65,
@@ -584,6 +608,7 @@
           "layer": "",
           "locked": false,
           "name": "Text_Ad_load_video",
+          "persistentUuid": "2a0523d5-5e86-46a3-842b-961f0b177de7",
           "width": 0,
           "x": 504,
           "y": 217,
@@ -595,7 +620,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Save_BTN",
           "tags": "",
           "type": "Sprite",
@@ -635,7 +659,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Lives_add_BTN",
           "tags": "",
           "type": "Sprite",
@@ -675,7 +698,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Lives_sub_BTN",
           "tags": "",
           "type": "Sprite",
@@ -715,7 +737,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Score_sub_BTN",
           "tags": "",
           "type": "Sprite",
@@ -755,7 +776,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Score_add_BTN",
           "tags": "",
           "type": "Sprite",
@@ -796,7 +816,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Score",
           "smoothed": true,
@@ -816,7 +835,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -836,7 +854,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Name_Player",
           "smoothed": true,
@@ -856,7 +873,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "player_name",
           "smoothed": true,
@@ -876,7 +892,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Rank_Player",
           "smoothed": true,
@@ -896,7 +911,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "rank_player",
           "smoothed": true,
@@ -916,7 +930,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Player_ID",
           "smoothed": true,
@@ -936,7 +949,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "player_id",
           "smoothed": true,
@@ -956,7 +968,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Lives",
           "smoothed": true,
@@ -976,7 +987,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "lives",
           "smoothed": true,
@@ -996,7 +1006,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Text_Error",
           "smoothed": true,
@@ -1016,7 +1025,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "error",
           "smoothed": true,
@@ -1035,7 +1043,6 @@
           }
         },
         {
-          "group": "",
           "name": "Ad_show_video",
           "tags": "",
           "type": "Sprite",
@@ -1075,7 +1082,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Ad_show_interstitial",
           "tags": "",
           "type": "Sprite",
@@ -1115,7 +1121,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Ad_load_video",
           "tags": "",
           "type": "Sprite",
@@ -1155,7 +1160,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Ad_load_interstitial",
           "tags": "",
           "type": "Sprite",
@@ -1196,7 +1200,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Text_Ad_load_interstitial",
           "smoothed": true,
@@ -1216,7 +1219,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Text_Ad_show_interstitial",
           "smoothed": true,
@@ -1236,7 +1238,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Text_Ad_load_video",
           "smoothed": true,
@@ -1256,7 +1257,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Text_Ad_show_video",
           "smoothed": true,

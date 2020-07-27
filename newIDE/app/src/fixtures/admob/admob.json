@@ -393,6 +393,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "c1d30a67-e8b3-4561-b8fc-c594e931b50d",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -408,6 +409,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "5d770757-7f4e-4f6c-a5e0-4550572a53c1",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -423,6 +425,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAtTop",
+          "persistentUuid": "141cc875-8167-45bb-bbf4-e1bc938f8395",
           "width": 100,
           "x": 500,
           "y": 80,
@@ -438,6 +441,7 @@
           "layer": "",
           "locked": false,
           "name": "Show",
+          "persistentUuid": "c17274c0-8ae0-4284-aab3-72fae836784d",
           "width": 100,
           "x": 500,
           "y": 160,
@@ -453,6 +457,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAtTopAndDisplay",
+          "persistentUuid": "cd6037ca-e75e-4480-bd3c-16c19fbe1071",
           "width": 220,
           "x": 500,
           "y": 240,
@@ -468,6 +473,7 @@
           "layer": "",
           "locked": false,
           "name": "Remove",
+          "persistentUuid": "0b594601-81c6-488d-a6da-dc10bd00b2b5",
           "width": 220,
           "x": 500,
           "y": 400,
@@ -483,6 +489,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "aa9575f0-31e4-49ae-8c13-6278476d3926",
           "width": 0,
           "x": 580,
           "y": 420,
@@ -498,6 +505,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "1568c831-903c-4146-9b31-0c2e2bacd188",
           "width": 0,
           "x": 520,
           "y": 100,
@@ -513,6 +521,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "57ce2a78-ceac-4e3f-a9f2-6ab99b916c9d",
           "width": 0,
           "x": 520,
           "y": 180,
@@ -528,6 +537,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "48833a22-1ac9-43f8-a800-0a1f9e62cd8f",
           "width": 0,
           "x": 580,
           "y": 260,
@@ -543,6 +553,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToInterstitials",
+          "persistentUuid": "8a71b4e4-8606-4928-b17f-8278a6b2caa7",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -558,6 +569,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToRewardVideos",
+          "persistentUuid": "38830609-9e54-489c-b379-ef9179fddaf6",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -573,6 +585,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "f7cab4e5-a528-461e-bf6d-56da5dbee2df",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -588,6 +601,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "f006a65d-914a-4f29-9ed9-c051858c6cb9",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -603,6 +617,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAtBottom",
+          "persistentUuid": "e4a623cd-bfa6-4f40-acc9-666d3396d855",
           "width": 100,
           "x": 620,
           "y": 80,
@@ -618,6 +633,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "bf925906-1d0d-4519-b8f9-1cba9e602671",
           "width": 0,
           "x": 640,
           "y": 100,
@@ -633,6 +649,7 @@
           "layer": "",
           "locked": false,
           "name": "Hide",
+          "persistentUuid": "6036fd21-5ffb-4081-a75d-b7e7e4bfc3d3",
           "width": 100,
           "x": 620,
           "y": 160,
@@ -648,6 +665,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "e55a6361-6231-48e1-a63c-7136f581598a",
           "width": 0,
           "x": 640,
           "y": 180,
@@ -663,6 +681,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAtBottomAndDisplay",
+          "persistentUuid": "2a786695-7945-450b-87fa-87b1fa4393d2",
           "width": 220,
           "x": 500,
           "y": 320,
@@ -678,6 +697,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "9e7c178e-0d7d-4133-8158-a905bf680487",
           "width": 0,
           "x": 580,
           "y": 340,
@@ -693,6 +713,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "26bf0b4d-9555-41f0-bebf-faab0d0b87c1",
           "width": 0,
           "x": 300,
           "y": 20,
@@ -704,7 +725,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -745,7 +765,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -764,7 +783,6 @@
           }
         },
         {
-          "group": "",
           "name": "LoadAtTop",
           "tags": "",
           "type": "Sprite",
@@ -804,7 +822,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LoadAtBottom",
           "tags": "",
           "type": "Sprite",
@@ -844,7 +861,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Show",
           "tags": "",
           "type": "Sprite",
@@ -884,7 +900,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Hide",
           "tags": "",
           "type": "Sprite",
@@ -924,7 +939,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LoadAtTopAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -964,7 +978,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LoadAtBottomAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -1004,7 +1017,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Remove",
           "tags": "",
           "type": "Sprite",
@@ -1045,7 +1057,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -1065,7 +1076,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -1084,7 +1094,6 @@
           }
         },
         {
-          "group": "",
           "name": "GoToInterstitials",
           "tags": "",
           "type": "Sprite",
@@ -1124,7 +1133,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GoToRewardVideos",
           "tags": "",
           "type": "Sprite",
@@ -2306,6 +2314,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "6bb75f27-c799-46dc-8617-d083b17e1db3",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -2321,6 +2330,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "57c124ce-38b5-4e5b-82e6-e65cec1c4f2b",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -2336,6 +2346,7 @@
           "layer": "",
           "locked": false,
           "name": "Load",
+          "persistentUuid": "725f8e12-e095-4079-88ff-8eed4055999c",
           "width": 100,
           "x": 500,
           "y": 80,
@@ -2351,6 +2362,7 @@
           "layer": "",
           "locked": false,
           "name": "Display",
+          "persistentUuid": "1cec7d92-6291-46c8-8128-56a3b2c173e3",
           "width": 100,
           "x": 620,
           "y": 80,
@@ -2366,6 +2378,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAndDisplay",
+          "persistentUuid": "230c66ae-387d-479c-a747-bfe3f14cc41d",
           "width": 220,
           "x": 500,
           "y": 200,
@@ -2381,6 +2394,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "9944ce58-3acf-4ea0-a829-62911bc0ecf6",
           "width": 0,
           "x": 520,
           "y": 100,
@@ -2396,6 +2410,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "f80fb336-80ea-41c5-9b3f-adaa4e083434",
           "width": 0,
           "x": 640,
           "y": 100,
@@ -2411,6 +2426,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "cd868eac-e859-4dea-80ae-e7782e15fa54",
           "width": 0,
           "x": 580,
           "y": 220,
@@ -2426,6 +2442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToBanners",
+          "persistentUuid": "3f0bfbc4-6fac-4a0c-992a-9ef7e58bd692",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -2441,6 +2458,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToRewardVideos",
+          "persistentUuid": "b3499ee2-35f1-4106-93b7-a62ebce704fd",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -2456,6 +2474,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "9b28d6ab-afaa-42fd-931c-7d040d8aeca6",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -2471,6 +2490,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "777269f9-0d35-4b7a-99cd-82d18a535a2e",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -2486,6 +2506,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "cef12a2f-d8d3-44de-92ed-f903b3e88fe7",
           "width": 0,
           "x": 240,
           "y": 20,
@@ -2497,7 +2518,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -2538,7 +2558,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -2557,7 +2576,6 @@
           }
         },
         {
-          "group": "",
           "name": "Load",
           "tags": "",
           "type": "Sprite",
@@ -2597,7 +2615,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Display",
           "tags": "",
           "type": "Sprite",
@@ -2637,7 +2654,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LoadAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -2678,7 +2694,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -2698,7 +2713,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -2717,7 +2731,6 @@
           }
         },
         {
-          "group": "",
           "name": "GoToBanners",
           "tags": "",
           "type": "Sprite",
@@ -2757,7 +2770,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GoToRewardVideos",
           "tags": "",
           "type": "Sprite",
@@ -3559,6 +3571,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "ecd52c50-935c-45d2-9428-51a01fb0a8f0",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -3574,6 +3587,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "825edac0-23a6-406e-a992-ae9d283544dc",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -3589,6 +3603,7 @@
           "layer": "",
           "locked": false,
           "name": "Load",
+          "persistentUuid": "8d5a6f3c-b0c4-44db-abdb-b58b9ea0a178",
           "width": 100,
           "x": 500,
           "y": 80,
@@ -3604,6 +3619,7 @@
           "layer": "",
           "locked": false,
           "name": "Display",
+          "persistentUuid": "e8d190a6-c3a7-4c45-83e9-f485cfcce29b",
           "width": 100,
           "x": 620,
           "y": 80,
@@ -3619,6 +3635,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAndDisplay",
+          "persistentUuid": "3f7f3edd-421a-4fde-b1a1-64fc9edadae3",
           "width": 220,
           "x": 500,
           "y": 200,
@@ -3634,6 +3651,7 @@
           "layer": "",
           "locked": false,
           "name": "ClaimReward",
+          "persistentUuid": "52d2efc5-eea5-4ae7-9aea-14f5c7485791",
           "width": 220,
           "x": 500,
           "y": 320,
@@ -3649,6 +3667,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "9efdab3a-e960-4e3e-83fc-44b91ad198c7",
           "width": 0,
           "x": 580,
           "y": 340,
@@ -3664,6 +3683,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "ce1e9e82-e83f-4369-8cc2-885b5c44ab5f",
           "width": 0,
           "x": 520,
           "y": 100,
@@ -3679,6 +3699,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "c0eef14c-58d5-4210-9112-21d90b96c8c5",
           "width": 0,
           "x": 640,
           "y": 100,
@@ -3694,6 +3715,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "8585cb3e-6e88-4fb1-81b6-cbee2df72da5",
           "width": 0,
           "x": 580,
           "y": 220,
@@ -3709,6 +3731,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToBanners",
+          "persistentUuid": "70ad3669-fd9b-4b4d-a4ea-79da4c914b51",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -3724,6 +3747,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToInterstitials",
+          "persistentUuid": "6a5fadab-542a-4328-bfcd-fb11a8a9e42d",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -3739,6 +3763,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "feb7383a-8905-4af8-a4da-803ea15d114c",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -3754,6 +3779,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "a4f92bd9-186b-45a7-bf62-9d55b48ae93e",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -3769,6 +3795,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "3cb3a2fb-c93d-42a2-964b-078901faf76d",
           "width": 0,
           "x": 220,
           "y": 20,
@@ -3780,7 +3807,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -3821,7 +3847,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
@@ -3840,7 +3865,6 @@
           }
         },
         {
-          "group": "",
           "name": "Load",
           "tags": "",
           "type": "Sprite",
@@ -3880,7 +3904,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Display",
           "tags": "",
           "type": "Sprite",
@@ -3920,7 +3943,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LoadAndDisplay",
           "tags": "",
           "type": "Sprite",
@@ -3960,7 +3982,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ClaimReward",
           "tags": "",
           "type": "Sprite",
@@ -4001,7 +4022,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Title",
           "smoothed": true,
@@ -4021,7 +4041,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
@@ -4040,7 +4059,6 @@
           }
         },
         {
-          "group": "",
           "name": "GoToBanners",
           "tags": "",
           "type": "Sprite",
@@ -4080,7 +4098,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GoToInterstitials",
           "tags": "",
           "type": "Sprite",

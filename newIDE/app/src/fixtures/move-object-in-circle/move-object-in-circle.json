@@ -159,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "Char1",
+          "persistentUuid": "b6f8140e-22dc-44c0-92cb-a8075d93c863",
           "width": 0,
           "x": 242,
           "y": 344,
@@ -174,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "Char2",
+          "persistentUuid": "600757fe-8b83-4ced-a38f-33924e3cb6a1",
           "width": 0,
           "x": 525,
           "y": 357,
@@ -189,6 +191,7 @@
           "layer": "",
           "locked": false,
           "name": "InfoText1",
+          "persistentUuid": "355cddd3-1767-48f1-80e3-f1061f7c259f",
           "width": 0,
           "x": 198,
           "y": 81,
@@ -204,6 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "InfoText2",
+          "persistentUuid": "eb612c66-30f9-401b-8962-75163cdc6eee",
           "width": 0,
           "x": 474,
           "y": 81,
@@ -215,7 +219,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Char1",
           "tags": "",
           "type": "Sprite",
@@ -274,7 +277,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Char2",
           "tags": "",
           "type": "Sprite",
@@ -334,7 +336,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "InfoText1",
           "smoothed": true,
@@ -354,7 +355,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "InfoText2",
           "smoothed": true,

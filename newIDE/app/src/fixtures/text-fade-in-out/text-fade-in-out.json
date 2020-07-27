@@ -146,6 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
+          "persistentUuid": "ca987986-fb6f-4f0f-8179-8fab1916fbf5",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -158,7 +159,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "FadeOutText",
           "smoothed": true,
@@ -329,6 +329,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
+          "persistentUuid": "f1bdc73a-27cc-4f06-bd90-928133c10f16",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -341,7 +342,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "FadeInOutText",
           "smoothed": true,
@@ -512,6 +512,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
+          "persistentUuid": "fb2f9dd8-64bc-4a22-87e9-d26c1e093a73",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -524,7 +525,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "FadeInText",
           "smoothed": true,

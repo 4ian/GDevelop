@@ -717,6 +717,7 @@
           "layer": "",
           "locked": false,
           "name": "a",
+          "persistentUuid": "9becf82d-b3cb-42e5-b1f8-ce9520cb35df",
           "width": 64,
           "x": 112,
           "y": 272,
@@ -737,6 +738,7 @@
           "layer": "",
           "locked": false,
           "name": "q",
+          "persistentUuid": "be9c2db5-1adb-4335-8bb9-6e6d13381d83",
           "width": 64,
           "x": 80,
           "y": 208,
@@ -757,6 +759,7 @@
           "layer": "",
           "locked": false,
           "name": "w",
+          "persistentUuid": "dd87ed9b-9f94-4414-aaef-e08d4f4b05b0",
           "width": 64,
           "x": 144,
           "y": 208,
@@ -777,6 +780,7 @@
           "layer": "",
           "locked": false,
           "name": "e",
+          "persistentUuid": "3e8664e0-8d51-430c-adaa-2af15b70c184",
           "width": 64,
           "x": 208,
           "y": 208,
@@ -797,6 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "r",
+          "persistentUuid": "f593d1c6-56de-4115-8348-da23f8f556a5",
           "width": 64,
           "x": 272,
           "y": 208,
@@ -817,6 +822,7 @@
           "layer": "",
           "locked": false,
           "name": "t",
+          "persistentUuid": "6daebc7c-2219-47f2-9f56-972169baee27",
           "width": 64,
           "x": 336,
           "y": 208,
@@ -837,6 +843,7 @@
           "layer": "",
           "locked": false,
           "name": "y",
+          "persistentUuid": "60dd76dd-b596-4155-9c81-48814fa1288f",
           "width": 64,
           "x": 400,
           "y": 208,
@@ -857,6 +864,7 @@
           "layer": "",
           "locked": false,
           "name": "u",
+          "persistentUuid": "fd73482e-c271-4edd-8e05-30a2ff83ae0f",
           "width": 64,
           "x": 464,
           "y": 208,
@@ -877,6 +885,7 @@
           "layer": "",
           "locked": false,
           "name": "i",
+          "persistentUuid": "c3f72d51-6929-405e-b227-3270ebdde3fe",
           "width": 64,
           "x": 528,
           "y": 208,
@@ -897,6 +906,7 @@
           "layer": "",
           "locked": false,
           "name": "o",
+          "persistentUuid": "9b4eb785-b75c-488c-887b-eaaacfa81ed1",
           "width": 64,
           "x": 592,
           "y": 208,
@@ -917,6 +927,7 @@
           "layer": "",
           "locked": false,
           "name": "p",
+          "persistentUuid": "3262e1b6-a4cc-4bc9-9958-1f8587d28621",
           "width": 64,
           "x": 656,
           "y": 208,
@@ -937,6 +948,7 @@
           "layer": "",
           "locked": false,
           "name": "s",
+          "persistentUuid": "83af4b9e-93a1-49cb-974b-ff064541c773",
           "width": 64,
           "x": 176,
           "y": 272,
@@ -957,6 +969,7 @@
           "layer": "",
           "locked": false,
           "name": "d",
+          "persistentUuid": "3f97d156-0a7b-4de3-8833-da63a0607454",
           "width": 64,
           "x": 240,
           "y": 272,
@@ -977,6 +990,7 @@
           "layer": "",
           "locked": false,
           "name": "f",
+          "persistentUuid": "559b1f69-ccb4-4b42-a940-a6513c358e60",
           "width": 64,
           "x": 304,
           "y": 272,
@@ -997,6 +1011,7 @@
           "layer": "",
           "locked": false,
           "name": "g",
+          "persistentUuid": "257c197d-2c34-4767-996a-6294c3b9f9be",
           "width": 64,
           "x": 368,
           "y": 272,
@@ -1017,6 +1032,7 @@
           "layer": "",
           "locked": false,
           "name": "h",
+          "persistentUuid": "c7884238-793e-4406-8f08-095f2b3e8b5d",
           "width": 64,
           "x": 432,
           "y": 272,
@@ -1037,6 +1053,7 @@
           "layer": "",
           "locked": false,
           "name": "j",
+          "persistentUuid": "cb098633-9c86-46a4-b6fb-2e1f2d584917",
           "width": 64,
           "x": 496,
           "y": 272,
@@ -1057,6 +1074,7 @@
           "layer": "",
           "locked": false,
           "name": "k",
+          "persistentUuid": "f2c4d306-0abe-4b34-86ea-18e6a527da70",
           "width": 64,
           "x": 560,
           "y": 272,
@@ -1077,6 +1095,7 @@
           "layer": "",
           "locked": false,
           "name": "l",
+          "persistentUuid": "4084eec9-250a-4e57-8ecc-2d1d12397f92",
           "width": 64,
           "x": 624,
           "y": 272,
@@ -1097,6 +1116,7 @@
           "layer": "",
           "locked": false,
           "name": "z",
+          "persistentUuid": "9a8ff3be-c733-4b0f-a5ea-58db55ab23e6",
           "width": 64,
           "x": 176,
           "y": 336,
@@ -1117,6 +1137,7 @@
           "layer": "",
           "locked": false,
           "name": "x",
+          "persistentUuid": "83a00563-cfb4-4808-993c-cdc49f973866",
           "width": 64,
           "x": 240,
           "y": 336,
@@ -1137,6 +1158,7 @@
           "layer": "",
           "locked": false,
           "name": "c",
+          "persistentUuid": "2eb2d804-5816-4edd-be74-9611145ef945",
           "width": 64,
           "x": 304,
           "y": 336,
@@ -1157,6 +1179,7 @@
           "layer": "",
           "locked": false,
           "name": "v",
+          "persistentUuid": "cb6aee1b-44bc-4693-9615-b71261aa59ce",
           "width": 64,
           "x": 368,
           "y": 336,
@@ -1177,6 +1200,7 @@
           "layer": "",
           "locked": false,
           "name": "b",
+          "persistentUuid": "0692128d-f2e2-4865-964f-cdef1e3faaa3",
           "width": 64,
           "x": 432,
           "y": 336,
@@ -1197,6 +1221,7 @@
           "layer": "",
           "locked": false,
           "name": "n",
+          "persistentUuid": "7d306859-401d-486d-8995-e8caa6809f7d",
           "width": 64,
           "x": 496,
           "y": 336,
@@ -1217,6 +1242,7 @@
           "layer": "",
           "locked": false,
           "name": "m",
+          "persistentUuid": "8d56d312-a24b-4dc8-9ede-90c573bac0c9",
           "width": 64,
           "x": 560,
           "y": 336,
@@ -1237,6 +1263,7 @@
           "layer": "",
           "locked": false,
           "name": "space",
+          "persistentUuid": "209bb27a-6403-411f-bdfa-7c0315344b50",
           "width": 192,
           "x": 304,
           "y": 400,
@@ -1257,6 +1284,7 @@
           "layer": "",
           "locked": false,
           "name": "txt_keys_pressed",
+          "persistentUuid": "38538722-666f-4571-9e76-111998c8789b",
           "width": 0,
           "x": 0,
           "y": 32,
@@ -1272,6 +1300,7 @@
           "layer": "",
           "locked": false,
           "name": "time",
+          "persistentUuid": "ae10df01-d0fc-47db-a957-ff406c8f81d1",
           "width": 0,
           "x": 0,
           "y": 64,
@@ -1283,7 +1312,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "a",
           "tags": "",
           "type": "Sprite",
@@ -1352,7 +1380,6 @@
           ]
         },
         {
-          "group": "",
           "name": "b",
           "tags": "",
           "type": "Sprite",
@@ -1421,7 +1448,6 @@
           ]
         },
         {
-          "group": "",
           "name": "c",
           "tags": "",
           "type": "Sprite",
@@ -1490,7 +1516,6 @@
           ]
         },
         {
-          "group": "",
           "name": "d",
           "tags": "",
           "type": "Sprite",
@@ -1559,7 +1584,6 @@
           ]
         },
         {
-          "group": "",
           "name": "e",
           "tags": "",
           "type": "Sprite",
@@ -1628,7 +1652,6 @@
           ]
         },
         {
-          "group": "",
           "name": "f",
           "tags": "",
           "type": "Sprite",
@@ -1697,7 +1720,6 @@
           ]
         },
         {
-          "group": "",
           "name": "g",
           "tags": "",
           "type": "Sprite",
@@ -1766,7 +1788,6 @@
           ]
         },
         {
-          "group": "",
           "name": "h",
           "tags": "",
           "type": "Sprite",
@@ -1835,7 +1856,6 @@
           ]
         },
         {
-          "group": "",
           "name": "i",
           "tags": "",
           "type": "Sprite",
@@ -1904,7 +1924,6 @@
           ]
         },
         {
-          "group": "",
           "name": "j",
           "tags": "",
           "type": "Sprite",
@@ -1973,7 +1992,6 @@
           ]
         },
         {
-          "group": "",
           "name": "k",
           "tags": "",
           "type": "Sprite",
@@ -2042,7 +2060,6 @@
           ]
         },
         {
-          "group": "",
           "name": "l",
           "tags": "",
           "type": "Sprite",
@@ -2111,7 +2128,6 @@
           ]
         },
         {
-          "group": "",
           "name": "m",
           "tags": "",
           "type": "Sprite",
@@ -2180,7 +2196,6 @@
           ]
         },
         {
-          "group": "",
           "name": "n",
           "tags": "",
           "type": "Sprite",
@@ -2249,7 +2264,6 @@
           ]
         },
         {
-          "group": "",
           "name": "o",
           "tags": "",
           "type": "Sprite",
@@ -2318,7 +2332,6 @@
           ]
         },
         {
-          "group": "",
           "name": "p",
           "tags": "",
           "type": "Sprite",
@@ -2387,7 +2400,6 @@
           ]
         },
         {
-          "group": "",
           "name": "q",
           "tags": "",
           "type": "Sprite",
@@ -2456,7 +2468,6 @@
           ]
         },
         {
-          "group": "",
           "name": "r",
           "tags": "",
           "type": "Sprite",
@@ -2525,7 +2536,6 @@
           ]
         },
         {
-          "group": "",
           "name": "s",
           "tags": "",
           "type": "Sprite",
@@ -2594,7 +2604,6 @@
           ]
         },
         {
-          "group": "",
           "name": "t",
           "tags": "",
           "type": "Sprite",
@@ -2663,7 +2672,6 @@
           ]
         },
         {
-          "group": "",
           "name": "u",
           "tags": "",
           "type": "Sprite",
@@ -2732,7 +2740,6 @@
           ]
         },
         {
-          "group": "",
           "name": "v",
           "tags": "",
           "type": "Sprite",
@@ -2801,7 +2808,6 @@
           ]
         },
         {
-          "group": "",
           "name": "w",
           "tags": "",
           "type": "Sprite",
@@ -2870,7 +2876,6 @@
           ]
         },
         {
-          "group": "",
           "name": "x",
           "tags": "",
           "type": "Sprite",
@@ -2939,7 +2944,6 @@
           ]
         },
         {
-          "group": "",
           "name": "y",
           "tags": "",
           "type": "Sprite",
@@ -3008,7 +3012,6 @@
           ]
         },
         {
-          "group": "",
           "name": "z",
           "tags": "",
           "type": "Sprite",
@@ -3077,7 +3080,6 @@
           ]
         },
         {
-          "group": "",
           "name": "space",
           "tags": "",
           "type": "Sprite",
@@ -3147,7 +3149,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "txt_keys_pressed",
           "smoothed": true,
@@ -3167,7 +3168,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "time",
           "smoothed": true,
@@ -4129,6 +4129,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
+          "persistentUuid": "14d43975-c0e1-4ae6-94e4-d8cac52f1598",
           "width": 0,
           "x": 296.485,
           "y": 67.7129,
@@ -4144,6 +4145,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "893d3b27-f979-42fb-b2e7-aedd7ac49217",
           "width": 0,
           "x": 176.694,
           "y": 160,
@@ -4159,6 +4161,7 @@
           "layer": "",
           "locked": false,
           "name": "playagain",
+          "persistentUuid": "d111ed28-c34a-4a3d-bdd7-92c37f5f9170",
           "width": 0,
           "x": 326.434,
           "y": 253.287,
@@ -4171,7 +4174,6 @@
       "objects": [
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "gameover",
           "smoothed": true,
@@ -4191,7 +4193,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -4211,7 +4212,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "playagain",
           "smoothed": true,

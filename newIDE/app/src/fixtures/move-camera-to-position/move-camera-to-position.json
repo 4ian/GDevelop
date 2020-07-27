@@ -162,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "object",
+          "persistentUuid": "35ea6d40-6504-4492-9e03-2a1c75810ebc",
           "width": 44.9999,
           "x": 595.5,
           "y": 506,
@@ -177,6 +178,7 @@
           "layer": "message",
           "locked": false,
           "name": "message",
+          "persistentUuid": "0758fbcb-613d-4cc2-a5d6-d669b85eca9a",
           "width": 0,
           "x": 63.1257,
           "y": 26.697,
@@ -192,6 +194,7 @@
           "layer": "",
           "locked": true,
           "name": "background",
+          "persistentUuid": "e28c6d8a-5883-410d-bdd3-76262469d0da",
           "width": 3240.43,
           "x": -1275.2,
           "y": -1136.78,
@@ -203,7 +206,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "object",
           "tags": "",
           "type": "Sprite",
@@ -268,7 +270,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -287,7 +288,6 @@
           }
         },
         {
-          "group": "",
           "height": 32,
           "name": "background",
           "tags": "",

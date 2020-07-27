@@ -178,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "Description",
+          "persistentUuid": "1c7b6074-eef7-4a57-9434-4bef49c28747",
           "width": 0,
           "x": 26,
           "y": 14,
@@ -193,6 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "GDLogo",
+          "persistentUuid": "92a54166-dc56-408b-8efb-d251d1a816db",
           "width": 0,
           "x": 246,
           "y": 140,
@@ -208,6 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "d2ca0bbb-8738-424d-9af0-ea036755ec38",
           "width": 216,
           "x": 293,
           "y": 413,
@@ -223,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "ScreenshotPath",
+          "persistentUuid": "3f6b052c-53e8-420d-879d-c61c6292cef9",
           "width": 0,
           "x": 381,
           "y": 288,
@@ -234,7 +238,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "GDLogo",
           "tags": "",
           "type": "Sprite",
@@ -275,7 +278,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Description",
           "smoothed": true,
@@ -294,7 +296,6 @@
           }
         },
         {
-          "group": "",
           "name": "Button",
           "tags": "",
           "type": "Sprite",
@@ -335,7 +336,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ScreenshotPath",
           "smoothed": true,

@@ -464,6 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
+          "persistentUuid": "b6d086f5-f3f4-480e-bb9a-df6c03ae36f0",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -479,6 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
+          "persistentUuid": "1e536c96-ac97-4f68-b3fd-d7897fe7a90b",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -490,7 +492,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "GameTitle",
           "tags": "",
           "type": "Sprite",
@@ -541,7 +542,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ButtonStart",
           "tags": "",
           "type": "Sprite",
@@ -860,6 +860,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
+          "persistentUuid": "69e801ca-f838-44a7-a1dc-9f88096c6f97",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -875,6 +876,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "16945b68-42d6-4256-8461-d73ca2c61351",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -890,6 +892,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
+          "persistentUuid": "954d4e53-59d4-4e04-80b6-4fb0e0593563",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -905,6 +908,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "56ec9b82-d992-4eca-82b1-e1890e05b171",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -920,6 +924,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
+          "persistentUuid": "dd83aa0d-1c63-4446-a55b-2462befa17ef",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -935,6 +940,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
+          "persistentUuid": "4ab5af0f-a31b-4947-a8c5-91b041516236",
           "width": 0,
           "x": 110,
           "y": 406,
@@ -946,7 +952,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Monster",
           "tags": "",
           "type": "Sprite",
@@ -1227,7 +1232,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Shape1",
           "tags": "",
           "type": "Sprite",
@@ -1267,7 +1271,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Shape2",
           "tags": "",
           "type": "Sprite",
@@ -1307,7 +1310,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Shape3",
           "tags": "",
           "type": "Sprite",
@@ -1347,7 +1349,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Shape4",
           "tags": "",
           "type": "Sprite",
@@ -1388,7 +1389,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -1407,7 +1407,6 @@
           }
         },
         {
-          "group": "",
           "name": "Obstacle",
           "tags": "",
           "type": "Sprite",
@@ -1464,7 +1463,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Life",
           "tags": "",
           "type": "Sprite",
@@ -1591,7 +1589,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GameOver",
           "tags": "",
           "type": "Sprite",
@@ -1631,7 +1628,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ButtonTryAgain",
           "tags": "",
           "type": "Sprite",
@@ -1729,7 +1725,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ButtonMainMenu",
           "tags": "",
           "type": "Sprite",
@@ -1844,7 +1839,6 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
-          "group": "",
           "maxParticleNb": 10,
           "name": "Shape4Explosion",
           "particleAlpha1": 255,
@@ -1902,7 +1896,6 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
-          "group": "",
           "maxParticleNb": 10,
           "name": "Shape3Explosion",
           "particleAlpha1": 255,
@@ -1960,7 +1953,6 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
-          "group": "",
           "maxParticleNb": 10,
           "name": "Shape2Explosion",
           "particleAlpha1": 255,
@@ -2018,7 +2010,6 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
-          "group": "",
           "maxParticleNb": 10,
           "name": "Shape1Explosion",
           "particleAlpha1": 255,

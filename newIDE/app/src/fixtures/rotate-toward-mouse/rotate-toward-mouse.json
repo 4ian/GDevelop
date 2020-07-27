@@ -171,6 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "558e98a6-78fd-471c-b3da-993a18db78af",
           "width": 0,
           "x": 335.312,
           "y": 292.07,
@@ -182,7 +183,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",

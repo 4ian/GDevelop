@@ -153,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "697f04ab-b1bf-4612-a44e-e66fa479077d",
           "width": 0,
           "x": 288,
           "y": 64,
@@ -168,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "MousePointer",
+          "persistentUuid": "b20311f4-b1dc-4f28-97ea-b110dc31756c",
           "width": 0,
           "x": 369,
           "y": 214,
@@ -179,7 +181,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "MousePointer",
           "tags": "",
           "type": "Sprite",
@@ -220,7 +221,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

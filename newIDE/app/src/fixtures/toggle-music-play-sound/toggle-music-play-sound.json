@@ -240,6 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
+          "persistentUuid": "32317365-20c2-4ec2-bea7-523bfe360b4d",
           "width": 0,
           "x": 288,
           "y": 224,
@@ -255,6 +256,7 @@
           "layer": "",
           "locked": false,
           "name": "play",
+          "persistentUuid": "cf6e3f84-e6aa-4caa-9f5e-0635f71a96e7",
           "width": 0,
           "x": 384,
           "y": 320,
@@ -270,6 +272,7 @@
           "layer": "",
           "locked": false,
           "name": "pause",
+          "persistentUuid": "2e554cef-6e6f-4c78-ab11-c39d591d62f1",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -285,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "mute",
+          "persistentUuid": "e3caa24b-5f70-4988-8adb-241d51d5ace2",
           "width": 0,
           "x": 320,
           "y": 320,
@@ -300,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "track_info",
+          "persistentUuid": "ae138e70-a5af-45e1-9874-8eb90b76bef8",
           "width": 0,
           "x": 341.773,
           "y": 224,
@@ -315,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_background",
+          "persistentUuid": "6fb8bab1-7fec-4ece-acd9-9046ccd28c06",
           "width": 0,
           "x": 307,
           "y": 293,
@@ -330,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_slider",
+          "persistentUuid": "f04a2954-5668-4855-9ed7-c51227292595",
           "width": 0,
           "x": 307,
           "y": 278,
@@ -345,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "slider_button",
+          "persistentUuid": "a8ae282c-6523-4fbb-acf8-6f25da5cfec4",
           "width": 0,
           "x": 538,
           "y": 273,
@@ -356,7 +364,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "play",
           "tags": "",
           "type": "Sprite",
@@ -396,7 +403,6 @@
           ]
         },
         {
-          "group": "",
           "name": "pause",
           "tags": "",
           "type": "Sprite",
@@ -436,7 +442,6 @@
           ]
         },
         {
-          "group": "",
           "name": "mute",
           "tags": "",
           "type": "Sprite",
@@ -505,7 +510,6 @@
           ]
         },
         {
-          "group": "",
           "name": "music",
           "tags": "",
           "type": "Sprite",
@@ -575,7 +579,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "track_info",
           "smoothed": true,
@@ -594,7 +597,6 @@
           }
         },
         {
-          "group": "",
           "name": "volume_background",
           "tags": "",
           "type": "Sprite",
@@ -634,7 +636,6 @@
           ]
         },
         {
-          "group": "",
           "name": "volume_slider",
           "tags": "",
           "type": "Sprite",
@@ -680,7 +681,6 @@
           ]
         },
         {
-          "group": "",
           "name": "slider_button",
           "tags": "",
           "type": "Sprite",

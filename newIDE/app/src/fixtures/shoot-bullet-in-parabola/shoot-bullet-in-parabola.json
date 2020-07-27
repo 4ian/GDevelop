@@ -171,6 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Source",
+          "persistentUuid": "23c5d563-3d0a-4be9-95fc-c4f45496b88b",
           "width": 0,
           "x": 658.399,
           "y": 247.805,
@@ -186,6 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "78df1560-8436-4f41-bc2e-b1f5863ae6e2",
           "width": 0,
           "x": 56.3788,
           "y": 532.427,
@@ -201,6 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "34d16c15-f5d7-40b3-96fd-db161e24b648",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -212,7 +215,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Source",
           "tags": "",
           "type": "Sprite",
@@ -271,7 +273,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",
@@ -335,7 +336,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -395,7 +395,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

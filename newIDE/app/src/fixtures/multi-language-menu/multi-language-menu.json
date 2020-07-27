@@ -171,6 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "NewGameText",
+          "persistentUuid": "34141e93-adcb-4883-9ada-d311ac3cd9fc",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -186,6 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadGameText",
+          "persistentUuid": "ed134a12-dc22-41dd-855f-a80827c40067",
           "width": 0,
           "x": 320,
           "y": 128,
@@ -201,6 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "ExitText",
+          "persistentUuid": "1877f377-32fa-4ff5-b9a6-c7ee354bbdd8",
           "width": 0,
           "x": 352,
           "y": 192,
@@ -216,6 +219,7 @@
           "layer": "",
           "locked": false,
           "name": "SettingsText",
+          "persistentUuid": "65aa349f-3a94-4e15-a82c-b20373feb972",
           "width": 0,
           "x": 334,
           "y": 161,
@@ -231,6 +235,7 @@
           "layer": "",
           "locked": false,
           "name": "MenuTitleText",
+          "persistentUuid": "38acb4c2-b22f-4e45-a573-2178c78d44de",
           "width": 0,
           "x": 241,
           "y": 22,
@@ -243,7 +248,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "NewGameText",
           "smoothed": true,
@@ -263,7 +267,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "LoadGameText",
           "smoothed": true,
@@ -283,7 +286,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ExitText",
           "smoothed": true,
@@ -303,7 +305,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "SettingsText",
           "smoothed": true,
@@ -323,7 +324,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "MenuTitleText",
           "smoothed": true,
@@ -925,6 +925,7 @@
           "layer": "",
           "locked": false,
           "name": "MenuTitle",
+          "persistentUuid": "792b9047-c718-4ebc-a9ed-da260cb1c359",
           "width": 0,
           "x": 273,
           "y": 35,
@@ -940,6 +941,7 @@
           "layer": "",
           "locked": false,
           "name": "SelectLangText",
+          "persistentUuid": "fb2021fd-183d-4b8f-8d6e-93f004b87b3e",
           "width": 0,
           "x": 10,
           "y": 141,
@@ -955,6 +957,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionEnglishText",
+          "persistentUuid": "a7f12b36-a34d-4b02-862d-cab74ad45483",
           "width": 0,
           "x": 13,
           "y": 186,
@@ -970,6 +973,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionHungarianText",
+          "persistentUuid": "0692a5d0-d2c9-4907-a720-d335ca4aff4b",
           "width": 0,
           "x": 13,
           "y": 218,
@@ -985,6 +989,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionFrenchText",
+          "persistentUuid": "16930d0d-9d34-414b-b233-840840fc57c2",
           "width": 0,
           "x": 13,
           "y": 250,
@@ -1000,6 +1005,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionSpanishText",
+          "persistentUuid": "f34a59fa-19fe-4ce8-ba08-3eb7badc2367",
           "width": 0,
           "x": 13,
           "y": 282,
@@ -1015,6 +1021,7 @@
           "layer": "",
           "locked": false,
           "name": "BackToMenuText",
+          "persistentUuid": "ed4bde44-1e49-4a7c-8208-41463d946579",
           "width": 0,
           "x": 7,
           "y": 569,
@@ -1027,7 +1034,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "MenuTitle",
           "smoothed": true,
@@ -1047,7 +1053,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "SelectLangText",
           "smoothed": true,
@@ -1067,7 +1072,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "OptionEnglishText",
           "smoothed": true,
@@ -1087,7 +1091,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "OptionHungarianText",
           "smoothed": true,
@@ -1107,7 +1110,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "OptionFrenchText",
           "smoothed": true,
@@ -1127,7 +1129,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "OptionSpanishText",
           "smoothed": true,
@@ -1147,7 +1148,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "BackToMenuText",
           "smoothed": true,

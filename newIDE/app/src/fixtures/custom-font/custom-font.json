@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "433642ae-7383-4651-8465-8024f8eafc60",
           "width": 0,
           "x": 336,
           "y": 289,
@@ -155,7 +156,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -284,6 +284,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "f653b7f8-8708-41a6-a451-7058ab35c6bb",
           "width": 0,
           "x": 2,
           "y": 265,
@@ -296,7 +297,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

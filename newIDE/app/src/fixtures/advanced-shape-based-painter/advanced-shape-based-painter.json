@@ -322,6 +322,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "f718226c-dddc-4eca-86bd-966a9421d633",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -342,6 +343,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "3cb8d6e4-c2b7-4061-ba01-81c92fd14570",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -362,6 +364,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "0166fc6b-f8c3-4920-967f-1e96ba97807a",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -382,6 +385,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "580fd1e9-b710-4fc0-a688-0340382e4061",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -402,6 +406,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "5d6eebe0-c63e-4ca9-bfc0-04d859fdf0b5",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -422,6 +427,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "506cd7ed-e313-41eb-9bc0-f855c63ca786",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -433,7 +439,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Drawer",
           "tags": "",
           "type": "PrimitiveDrawing::Drawer",
@@ -477,7 +482,6 @@
           "clearBetweenFrames": true
         },
         {
-          "group": "",
           "name": "Shapes",
           "tags": "",
           "type": "Sprite",
@@ -680,7 +684,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BarSelect",
           "tags": "",
           "type": "Sprite",
@@ -749,7 +752,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

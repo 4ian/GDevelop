@@ -178,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
+          "persistentUuid": "6452ce4a-dffe-499d-b595-464a52e51edf",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -193,6 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
+          "persistentUuid": "40248e6c-2b40-4a10-bc0e-f6cdcaa09ac9",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -208,6 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "182eeffa-ef39-4a0d-8eab-80d78fd7f1b7",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,
@@ -219,7 +222,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "logo",
           "tags": "",
           "type": "Sprite",
@@ -260,7 +262,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "person",
           "smoothed": true,
@@ -280,7 +281,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

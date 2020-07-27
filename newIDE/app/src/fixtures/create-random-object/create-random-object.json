@@ -270,6 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "74662c7d-f521-449f-9962-480e70b44ca6",
           "width": 0,
           "x": 173,
           "y": 42,
@@ -281,7 +282,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Object1",
           "tags": "",
           "type": "Sprite",
@@ -321,7 +321,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object2",
           "tags": "",
           "type": "Sprite",
@@ -361,7 +360,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object3",
           "tags": "",
           "type": "Sprite",
@@ -401,7 +399,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object4",
           "tags": "",
           "type": "Sprite",
@@ -441,7 +438,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object5",
           "tags": "",
           "type": "Sprite",
@@ -481,7 +477,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object6",
           "tags": "",
           "type": "Sprite",
@@ -521,7 +516,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object7",
           "tags": "",
           "type": "Sprite",
@@ -561,7 +555,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object8",
           "tags": "",
           "type": "Sprite",
@@ -601,7 +594,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object9",
           "tags": "",
           "type": "Sprite",
@@ -641,7 +633,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Object10",
           "tags": "",
           "type": "Sprite",
@@ -682,7 +673,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,

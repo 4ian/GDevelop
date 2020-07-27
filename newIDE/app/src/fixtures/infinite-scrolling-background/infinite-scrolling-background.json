@@ -153,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "bd589c3e-95b4-4c21-b61e-ada8912a718d",
           "width": 0,
           "x": 960,
           "y": 0,
@@ -168,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "273869b4-a4b3-4e7d-ab38-7088b61e2811",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -179,7 +181,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "background",
           "tags": "",
           "type": "Sprite",

@@ -153,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateOnce",
+          "persistentUuid": "ebf29bbb-a3d7-44bc-97d9-bb6b158d0f65",
           "width": 0,
           "x": 224,
           "y": 256,
@@ -168,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateMulti",
+          "persistentUuid": "1b659d37-f9c6-4179-b41a-0745bbe84de9",
           "width": 0,
           "x": 224,
           "y": 416,
@@ -183,6 +185,7 @@
           "layer": "",
           "locked": false,
           "name": "StopVibration",
+          "persistentUuid": "f8815dc5-f3f4-4f02-b3c9-a7d6e21ca70f",
           "width": 0,
           "x": 224,
           "y": 576,
@@ -198,6 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "ae746b30-eb7c-49b7-9b57-4f9f1948f720",
           "width": 416,
           "x": 192,
           "y": 544,
@@ -213,6 +217,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "06fd9390-285c-4674-99f5-297677eee770",
           "width": 416,
           "x": 192,
           "y": 224,
@@ -228,6 +233,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "c73bb5ba-1fc5-4cc4-9f72-640e3415f7e1",
           "width": 416,
           "x": 192,
           "y": 384,
@@ -243,6 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
+          "persistentUuid": "610679df-83c8-40c2-b8fc-dab3746ef8b1",
           "width": 0,
           "x": 32,
           "y": 64,
@@ -255,7 +262,6 @@
       "objects": [
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "title",
           "smoothed": true,
@@ -275,7 +281,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "VibrateOnce",
           "smoothed": true,
@@ -295,7 +300,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "VibrateMulti",
           "smoothed": true,
@@ -315,7 +319,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "StopVibration",
           "smoothed": true,
@@ -334,7 +337,6 @@
           }
         },
         {
-          "group": "",
           "name": "background",
           "tags": "",
           "type": "Sprite",

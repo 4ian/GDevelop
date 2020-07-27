@@ -225,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
+          "persistentUuid": "9cdb17f8-ef75-47d2-828d-1cdfb5a0a4c8",
           "width": 0,
           "x": 10,
           "y": 25,
@@ -240,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
+          "persistentUuid": "dc6b5a54-dc50-44cb-8ce1-980b3ddf11e1",
           "width": 0,
           "x": 10,
           "y": 135,
@@ -255,6 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "Desktop",
+          "persistentUuid": "aa411c50-471d-4cba-8f50-ddb4197cc717",
           "width": 0,
           "x": 100,
           "y": 50,
@@ -270,6 +273,7 @@
           "layer": "",
           "locked": false,
           "name": "Documents",
+          "persistentUuid": "2472a10a-8ada-4292-b991-1004aaece75d",
           "width": 0,
           "x": 100,
           "y": 160,
@@ -285,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDocuments",
+          "persistentUuid": "71ada35a-272e-48f2-95da-40d721f49452",
           "width": 400,
           "x": 10,
           "y": 120,
@@ -300,6 +305,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
+          "persistentUuid": "b194bf82-1d35-415e-a3df-e5a8f2b386af",
           "width": 0,
           "x": 415,
           "y": 126,
@@ -315,6 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
+          "persistentUuid": "05e2a635-1a14-45e5-802c-fca6543f5898",
           "width": 0,
           "x": 512.867,
           "y": 338.5,
@@ -330,6 +337,7 @@
           "layer": "",
           "locked": false,
           "name": "CreateMessage",
+          "persistentUuid": "99e02d20-4737-48d6-94c6-019515961894",
           "width": 0,
           "x": 300,
           "y": 300,
@@ -345,6 +353,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDesktop",
+          "persistentUuid": "7dc06d6d-849f-4a1e-bbe6-ac71d17830d5",
           "width": 400,
           "x": 10,
           "y": 10,
@@ -356,7 +365,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -397,7 +405,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Desktop",
           "smoothed": true,
@@ -417,7 +424,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Documents",
           "smoothed": true,
@@ -436,7 +442,6 @@
           }
         },
         {
-          "group": "",
           "name": "HowerDesktop",
           "tags": "",
           "type": "Sprite",
@@ -476,7 +481,6 @@
           ]
         },
         {
-          "group": "",
           "name": "HowerDocuments",
           "tags": "",
           "type": "Sprite",
@@ -517,7 +521,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "CreateMessage",
           "smoothed": true,
@@ -830,6 +833,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDesktop",
+          "persistentUuid": "3575da66-b482-4372-8f0c-589ef261a571",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -845,6 +849,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
+          "persistentUuid": "b2000352-e7a6-490f-85d5-00f107d8b6e1",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -856,7 +861,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -897,7 +901,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "NewFileDesktop",
           "smoothed": true,
@@ -916,7 +919,6 @@
           }
         },
         {
-          "group": "",
           "name": "DirInput",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -925,7 +927,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "DirName",
           "smoothed": true,
@@ -945,7 +946,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ErrorMessage",
           "smoothed": true,
@@ -964,7 +964,6 @@
           }
         },
         {
-          "group": "",
           "name": "CreateButton",
           "tags": "",
           "type": "Sprite",
@@ -1428,6 +1427,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDocuments",
+          "persistentUuid": "2f0ab377-38b8-4db3-9aa8-fb8c7c4912cc",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -1443,6 +1443,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
+          "persistentUuid": "e53c5f47-3542-42fd-8cb0-3b24f57f56d5",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1454,7 +1455,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Dir",
           "tags": "",
           "type": "Sprite",
@@ -1495,7 +1495,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "NewFileDocuments",
           "smoothed": true,
@@ -1514,7 +1513,6 @@
           }
         },
         {
-          "group": "",
           "name": "DirInput",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -1523,7 +1521,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "DirName",
           "smoothed": true,
@@ -1543,7 +1540,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ErrorMessage",
           "smoothed": true,
@@ -1562,7 +1558,6 @@
           }
         },
         {
-          "group": "",
           "name": "CreateButton",
           "tags": "",
           "type": "Sprite",

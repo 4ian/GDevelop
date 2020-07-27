@@ -156,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "12951617-5001-4489-9d32-cc3e47a8c7d8",
           "width": 0,
           "x": 63,
           "y": 28,
@@ -167,7 +168,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Marker",
           "tags": "",
           "type": "Sprite",
@@ -232,7 +232,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Explanation",
           "smoothed": true,

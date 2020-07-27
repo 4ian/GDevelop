@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TimerText",
+          "persistentUuid": "d864d4f1-5f4a-4d76-bea9-57221b0c479c",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -155,7 +156,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "TimerText",
           "smoothed": true,
@@ -479,6 +479,7 @@
           "layer": "",
           "locked": false,
           "name": "GOText",
+          "persistentUuid": "8e8c6c56-c512-4ae3-99a8-22533c740873",
           "width": 0,
           "x": 136,
           "y": 245,
@@ -491,7 +492,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "GOText",
           "smoothed": true,

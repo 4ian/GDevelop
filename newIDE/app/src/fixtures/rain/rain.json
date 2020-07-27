@@ -201,6 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_1",
+          "persistentUuid": "0da53fc4-ac3e-45d0-8604-5e48ac4850f9",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -221,6 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_2",
+          "persistentUuid": "974074f9-acf1-45ae-bfb8-f73f88fb685d",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -241,6 +243,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_3",
+          "persistentUuid": "dc6e3fcc-72ef-480f-affd-fb508c7ac9f9",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -261,6 +264,7 @@
           "layer": "",
           "locked": false,
           "name": "logo_inrain",
+          "persistentUuid": "182964a7-6085-4882-8327-42518eadce3e",
           "width": 0,
           "x": 906,
           "y": 666,
@@ -277,7 +281,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "nuages_1",
           "tags": "",
           "type": "Sprite",
@@ -336,7 +339,6 @@
           ]
         },
         {
-          "group": "",
           "name": "nuages_2",
           "tags": "",
           "type": "Sprite",
@@ -395,7 +397,6 @@
           ]
         },
         {
-          "group": "",
           "name": "nuages_3",
           "tags": "",
           "type": "Sprite",
@@ -454,7 +455,6 @@
           ]
         },
         {
-          "group": "",
           "name": "goutte",
           "tags": "",
           "type": "Sprite",
@@ -519,7 +519,6 @@
           ]
         },
         {
-          "group": "",
           "name": "logo_inrain",
           "tags": "",
           "type": "Sprite",

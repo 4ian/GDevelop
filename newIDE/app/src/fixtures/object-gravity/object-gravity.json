@@ -209,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
+          "persistentUuid": "8ded9135-6af1-4950-a7ff-b6cf6b2ac1ef",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -224,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
+          "persistentUuid": "83232e70-0860-4f33-8b0d-e077e58ef8bd",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -239,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "ba42c8b8-69bf-4c2c-a5e0-554faf204685",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -254,6 +257,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
+          "persistentUuid": "40d421b6-bd32-4624-8a79-dbcc51411288",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -269,6 +273,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
+          "persistentUuid": "e8d9c3fb-48a7-43b5-b8e9-ca283bb43b44",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -284,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
+          "persistentUuid": "d2d4772f-10d4-4470-9cbd-58bcebbb7f6f",
           "width": 0,
           "x": 620,
           "y": 427,
@@ -295,7 +301,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Planet",
           "tags": "",
           "type": "Sprite",
@@ -378,7 +383,6 @@
           ]
         },
         {
-          "group": "",
           "name": "SpaceGuy",
           "tags": "",
           "type": "Sprite",
@@ -462,7 +466,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Message",
           "smoothed": true,
@@ -481,7 +484,6 @@
           }
         },
         {
-          "group": "",
           "name": "BtnLeft",
           "tags": "",
           "type": "Sprite",
@@ -521,7 +523,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BtnRight",
           "tags": "",
           "type": "Sprite",
@@ -561,7 +562,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BtnJump",
           "tags": "",
           "type": "Sprite",

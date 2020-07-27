@@ -161,6 +161,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyPressed",
+          "persistentUuid": "92fdcc38-a7c7-424e-9b09-f856b5d4dc6b",
           "width": 0,
           "x": 64,
           "y": 192,
@@ -176,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyText",
+          "persistentUuid": "8830783c-edcc-40e5-a704-da772a4f7ac4",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -191,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "5f2b5fde-a5a7-402c-8c05-a097a816b6aa",
           "width": 0,
           "x": 356.5,
           "y": 439.5,
@@ -206,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "5e8cb97a-0501-4b73-b800-d85866d31299",
           "width": 0,
           "x": 113,
           "y": 323,
@@ -221,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyUsed",
+          "persistentUuid": "ec6dd212-feb1-4a98-bff1-0a4365c296a8",
           "width": 0,
           "x": 64,
           "y": 224,
@@ -236,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyText",
+          "persistentUuid": "9cc34855-24fb-47f8-89de-a4d086db6ebb",
           "width": 0,
           "x": 256,
           "y": 224,
@@ -248,7 +254,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "LastKeyPressed",
           "smoothed": true,
@@ -268,7 +273,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "LastKeyText",
           "smoothed": true,
@@ -287,7 +291,6 @@
           }
         },
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -347,7 +350,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
@@ -367,7 +369,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "CurrentKeyUsed",
           "smoothed": true,
@@ -387,7 +388,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "CurrentKeyText",
           "smoothed": true,

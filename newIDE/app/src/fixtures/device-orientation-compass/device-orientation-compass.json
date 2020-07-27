@@ -162,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "compass",
+          "persistentUuid": "815c8b05-8b53-4109-acb6-8d835fff6d64",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -177,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "needle",
+          "persistentUuid": "0d399fe4-ffd6-4938-9ea3-665c8d364ed4",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -188,7 +190,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "compass",
           "tags": "",
           "type": "Sprite",
@@ -228,7 +229,6 @@
           ]
         },
         {
-          "group": "",
           "name": "needle",
           "tags": "",
           "type": "Sprite",

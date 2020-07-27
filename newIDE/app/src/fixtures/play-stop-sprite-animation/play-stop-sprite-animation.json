@@ -207,6 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "6f89ae38-ae7c-4979-8eeb-64a9befcc9d0",
           "width": 0,
           "x": 331,
           "y": 298,
@@ -222,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "7831c6b1-c2d0-4495-8785-64d086003601",
           "width": 0,
           "x": 113,
           "y": 33,
@@ -237,6 +239,7 @@
           "layer": "",
           "locked": false,
           "name": "pause_message",
+          "persistentUuid": "c448e989-b771-4e14-be2c-cb86893b2474",
           "width": 0,
           "x": 192,
           "y": 432,
@@ -252,6 +255,7 @@
           "layer": "",
           "locked": false,
           "name": "animation_message",
+          "persistentUuid": "519f1626-4c34-49b4-9a4e-ad0776bb0eac",
           "width": 0,
           "x": 341,
           "y": 250,
@@ -263,7 +267,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -401,7 +404,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,
@@ -421,7 +423,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "pause_message",
           "smoothed": true,
@@ -441,7 +442,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "animation_message",
           "smoothed": true,

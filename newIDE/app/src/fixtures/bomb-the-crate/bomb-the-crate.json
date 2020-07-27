@@ -431,6 +431,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall1",
+          "persistentUuid": "b9492b0e-4188-46c6-96b2-5e99e573ba16",
           "width": 64,
           "x": 0,
           "y": 0,
@@ -446,6 +447,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall2",
+          "persistentUuid": "b3051ec2-b3d1-4d81-a8bb-eecf9ecdeb86",
           "width": 896,
           "x": 0,
           "y": 576,
@@ -461,6 +463,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall2",
+          "persistentUuid": "ec4f4c73-e0fe-432f-af44-5905661ef4fb",
           "width": 832,
           "x": 64,
           "y": 0,
@@ -476,6 +479,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall1",
+          "persistentUuid": "d12615da-99be-4678-810b-1c0167902e83",
           "width": 64,
           "x": 832,
           "y": 64,
@@ -491,6 +495,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "49203b10-9223-40b7-bcdc-df2b65b9aebc",
           "width": 0,
           "x": 768,
           "y": 512,
@@ -506,6 +511,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "6c73937e-452f-4a16-825f-82470701825d",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -521,6 +527,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "2fc3c241-f17b-43bd-aac8-c91452bc1cd7",
           "width": 0,
           "x": 128,
           "y": 128,
@@ -536,6 +543,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "0cfc5c8b-e25a-44f6-a2a0-2c48c809c5c0",
           "width": 0,
           "x": 256,
           "y": 320,
@@ -551,6 +559,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "d320d0d5-8ce5-4265-96ef-4b1fba605182",
           "width": 0,
           "x": 128,
           "y": 448,
@@ -566,6 +575,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "aa23b659-1009-46bc-a9f3-0780c2a60f9b",
           "width": 0,
           "x": 704,
           "y": 128,
@@ -581,6 +591,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "534c72cc-28d8-43f2-9819-e356ef2616e8",
           "width": 0,
           "x": 704,
           "y": 448,
@@ -596,6 +607,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "88aa160c-4f5c-46c3-a293-b2215bc75ae5",
           "width": 0,
           "x": 640,
           "y": 320,
@@ -611,6 +623,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "95a6da31-b8b8-4ae0-a457-9e0b5e37adc2",
           "width": 0,
           "x": 128,
           "y": 256,
@@ -626,6 +639,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "e4a63814-d6d9-45c8-ab84-6948c9039a89",
           "width": 0,
           "x": 448,
           "y": 64,
@@ -641,6 +655,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "2356db95-40fa-48fe-83fb-9b54106b2c2d",
           "width": 0,
           "x": 512,
           "y": 512,
@@ -656,6 +671,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "99e883bc-b408-4d67-92c6-63cdf219e4a0",
           "width": 0,
           "x": 704,
           "y": 192,
@@ -671,6 +687,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "168f7c29-c1e0-4380-b213-1bebfa85b6ff",
           "width": 0,
           "x": 64,
           "y": 66,
@@ -686,6 +703,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "310fc367-b082-4479-ae98-49bdfe422c5e",
           "width": 0,
           "x": 192,
           "y": 448,
@@ -701,6 +719,7 @@
           "layer": "UI",
           "locked": true,
           "name": "NewObject",
+          "persistentUuid": "f38e57aa-aadc-4afa-b3c3-cf00fd0bf4a8",
           "width": 0,
           "x": 68,
           "y": 524,
@@ -716,6 +735,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Grass",
+          "persistentUuid": "47008b54-226a-4608-9bf0-676c5456d179",
           "width": 768,
           "x": 64,
           "y": 64,
@@ -731,6 +751,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "40605dec-366b-4e06-af10-9f84ab62e4fa",
           "width": 0,
           "x": 512,
           "y": 256,
@@ -746,6 +767,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "337ca05b-5624-496d-adc3-6bf7e3e0cf5d",
           "width": 0,
           "x": 448,
           "y": 192,
@@ -757,7 +779,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Bomb",
           "tags": "",
           "type": "Sprite",
@@ -911,7 +932,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Crate",
           "tags": "",
           "type": "Sprite",
@@ -951,7 +971,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Fire",
           "tags": "",
           "type": "Sprite",
@@ -1047,7 +1066,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Wall",
           "tags": "",
           "type": "Sprite",
@@ -1087,7 +1105,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1715,7 +1732,6 @@
           ]
         },
         {
-          "group": "",
           "height": 64,
           "name": "Tile_Grass",
           "tags": "",
@@ -1726,7 +1742,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "height": 64,
           "name": "Tile_Wall1",
           "tags": "",
@@ -1737,7 +1752,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "height": 64,
           "name": "Tile_Wall2",
           "tags": "",
@@ -1748,7 +1762,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "name": "Right_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1807,7 +1820,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Left_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1866,7 +1878,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Up_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1925,7 +1936,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Down_Fire",
           "tags": "",
           "type": "Sprite",
@@ -1985,7 +1995,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "NewObject",
           "smoothed": true,

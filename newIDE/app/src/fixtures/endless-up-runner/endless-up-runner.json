@@ -477,6 +477,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerSprite",
+          "persistentUuid": "9aa30b60-5fde-4f8e-86f3-30075bb33574",
           "width": 0,
           "x": 112,
           "y": 387,
@@ -492,6 +493,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ba99093c-e158-4ee4-921f-86e72c694e53",
           "width": 0,
           "x": 280,
           "y": 460,
@@ -512,6 +514,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "7c5a24aa-f950-4025-aace-7c0586ae653b",
           "width": 0,
           "x": -70,
           "y": 460,
@@ -532,6 +535,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "3174d0ff-8bd0-464b-8354-bf721c090ef3",
           "width": 0,
           "x": 70,
           "y": 460,
@@ -552,6 +556,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "3db96571-7213-4e50-abf5-273ca2f9b958",
           "width": 0,
           "x": 140,
           "y": 460,
@@ -572,6 +577,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "c6e68bc1-0e7e-46a8-9c3d-264eaaf2e811",
           "width": 0,
           "x": 210,
           "y": 460,
@@ -592,6 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "5ff5b83f-4521-4478-a13b-a9749809731b",
           "width": 0,
           "x": 0,
           "y": 460,
@@ -612,6 +619,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "bd81a556-bc48-4107-a07e-6e576d929d99",
           "width": 0,
           "x": 111,
           "y": 350,
@@ -632,6 +640,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "890de5d1-8b62-43d2-be3c-b54a1cad5fcb",
           "width": 0,
           "x": 230,
           "y": 240,
@@ -652,6 +661,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "09daff5f-20f5-4b3c-9375-3a3d5bbdc5c1",
           "width": 0,
           "x": 0,
           "y": 130,
@@ -672,6 +682,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "48c43854-3e1f-453b-a59d-1a0e9c39039e",
           "width": 0,
           "x": 167,
           "y": 423,
@@ -687,6 +698,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "0df73eb0-7367-4641-b381-f8bd3791fc79",
           "width": 0,
           "x": 110,
           "y": 20,
@@ -707,6 +719,7 @@
           "layer": "Pause",
           "locked": false,
           "name": "BlackMask",
+          "persistentUuid": "898433e5-6b78-4b67-a99b-48915ff07df7",
           "width": 300,
           "x": 0,
           "y": 0,
@@ -722,6 +735,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "PauseButton",
+          "persistentUuid": "a92b5584-cf38-4a48-943f-c190b9785b00",
           "width": 0,
           "x": 240,
           "y": 10,
@@ -737,6 +751,7 @@
           "layer": "Pause",
           "locked": false,
           "name": "PlayButton",
+          "persistentUuid": "d5d70727-7b81-4242-8b10-78006a081511",
           "width": 0,
           "x": 125,
           "y": 200,
@@ -752,6 +767,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "BlackMask",
+          "persistentUuid": "55fe6cc5-bb00-421a-9c7d-ddb889314f74",
           "width": 300,
           "x": 0,
           "y": 0,
@@ -767,6 +783,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "RestartButton",
+          "persistentUuid": "bb65ba81-5167-4916-9f0a-6e616ef47982",
           "width": 0,
           "x": 125,
           "y": 300,
@@ -782,6 +799,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ScoreText",
+          "persistentUuid": "cab62ba1-de34-4638-aae1-e5917826e1bf",
           "width": 0,
           "x": 10,
           "y": 3,
@@ -797,6 +815,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerFeet",
+          "persistentUuid": "fd1b17ef-825d-4029-8a8c-31c1ff9def49",
           "width": 0,
           "x": 158,
           "y": 449,
@@ -812,6 +831,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "2b1361cd-4239-443e-92f3-553a056e7b99",
           "width": 130,
           "x": 120,
           "y": 268,
@@ -837,6 +857,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "22ee69fe-1009-4315-9e3f-7084547f55d6",
           "width": 147,
           "x": 78,
           "y": 432,
@@ -862,6 +883,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "709dd0af-6205-4b0d-ae23-3d3f4a8ce41c",
           "width": 115,
           "x": 0,
           "y": 0,
@@ -887,6 +909,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "3c622025-78f9-469f-8621-a3a5572ae9ea",
           "width": 115,
           "x": 0,
           "y": 320,
@@ -912,6 +935,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "8f0560f3-bf7a-4658-a5c6-37a272e1cf31",
           "width": 115,
           "x": 184,
           "y": 320,
@@ -937,6 +961,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "8f8adbf2-9d63-4d07-8ba3-9109c077a15f",
           "width": 171,
           "x": 64,
           "y": -134,
@@ -962,6 +987,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "74ab34ec-53ad-4a50-880d-81a5839af86c",
           "width": 93,
           "x": 80,
           "y": 230,
@@ -987,6 +1013,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "35a0a29d-6996-4523-8754-3a71873de598",
           "width": 154,
           "x": 75,
           "y": 64,
@@ -1012,6 +1039,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "9ed8cd76-cf7d-4839-ae42-4f203a5f0445",
           "width": 66,
           "x": 232,
           "y": 99,
@@ -1037,6 +1065,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "241e6059-f74f-4701-869e-35f1bc1e0488",
           "width": 123,
           "x": -16,
           "y": 68,
@@ -1062,6 +1091,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "FinalScoreTitle",
+          "persistentUuid": "3382c7d7-4a9d-4b72-ad66-a5a93de08ceb",
           "width": 0,
           "x": 78,
           "y": 40,
@@ -1077,6 +1107,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "FinalScore",
+          "persistentUuid": "7d569611-ab53-4c1e-9660-a67a38e8507e",
           "width": 0,
           "x": 135,
           "y": 102,
@@ -1092,6 +1123,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "NewRecord",
+          "persistentUuid": "e36d1f55-93db-4ca8-bbf4-bedaadeb3198",
           "width": 0,
           "x": 4,
           "y": 175,
@@ -1107,6 +1139,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "BestScore",
+          "persistentUuid": "ee8335c2-20d3-4835-b524-4b3ea72a9628",
           "width": 0,
           "x": 113,
           "y": 242,
@@ -1122,6 +1155,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
+          "persistentUuid": "7e77e588-e00d-4c49-8a60-e535c3d6b3c9",
           "width": 150,
           "x": 1,
           "y": 1,
@@ -1137,6 +1171,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "9bbcce30-875f-435e-8a69-360b9c24b6a9",
           "width": 150,
           "x": 150,
           "y": 0,
@@ -1152,6 +1187,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "4dcff70d-a07a-476d-b90a-36d9d337404a",
           "width": 300,
           "x": 0,
           "y": 420,
@@ -1167,6 +1203,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
+          "persistentUuid": "f0ddd790-fa0b-4824-8d4b-254525a89843",
           "width": 171,
           "x": 62,
           "y": -415,
@@ -1188,7 +1225,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -1256,7 +1292,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerFeet",
           "tags": "",
           "type": "Sprite",
@@ -1296,7 +1331,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerSprite",
           "tags": "",
           "type": "Sprite",
@@ -1542,7 +1576,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -1590,7 +1623,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Rock",
           "tags": "",
           "type": "Sprite",
@@ -1631,7 +1663,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ScoreText",
           "smoothed": true,
@@ -1650,7 +1681,6 @@
           }
         },
         {
-          "group": "",
           "name": "BlackMask",
           "tags": "",
           "type": "Sprite",
@@ -1690,7 +1720,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PauseButton",
           "tags": "",
           "type": "Sprite",
@@ -1730,7 +1759,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Spring",
           "tags": "",
           "type": "Sprite",
@@ -1799,7 +1827,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayButton",
           "tags": "",
           "type": "Sprite",
@@ -1839,7 +1866,6 @@
           ]
         },
         {
-          "group": "",
           "name": "RestartButton",
           "tags": "",
           "type": "Sprite",
@@ -1879,7 +1905,6 @@
           ]
         },
         {
-          "group": "",
           "name": "TutorialTips",
           "tags": "",
           "type": "Sprite",
@@ -2239,7 +2264,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "FinalScoreTitle",
           "smoothed": true,
@@ -2259,7 +2283,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "FinalScore",
           "smoothed": true,
@@ -2279,7 +2302,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "NewRecord",
           "smoothed": true,
@@ -2299,7 +2321,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "BestScore",
           "smoothed": true,
@@ -2318,7 +2339,6 @@
           }
         },
         {
-          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -2358,7 +2378,6 @@
           ]
         },
         {
-          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -2398,7 +2417,6 @@
           ]
         },
         {
-          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",

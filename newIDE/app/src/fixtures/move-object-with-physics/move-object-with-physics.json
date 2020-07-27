@@ -162,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "35dd9121-cf0e-4a9a-8008-e6e69d1e8a62",
           "width": 0,
           "x": 336.849,
           "y": 241.534,
@@ -177,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a746c0f6-709b-4162-9d3b-5219572db581",
           "width": 0,
           "x": 117.085,
           "y": 1.20455,
@@ -188,7 +190,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "coin",
           "tags": "",
           "type": "Sprite",
@@ -228,7 +229,6 @@
           ]
         },
         {
-          "group": "",
           "name": "kenney",
           "tags": "",
           "type": "Sprite",
@@ -269,7 +269,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

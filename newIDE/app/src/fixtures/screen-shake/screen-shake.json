@@ -288,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "076da622-f154-443d-9f06-b6e004d5a0a2",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -303,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "d5190e79-ed1f-4094-bb55-cceac9b9d28b",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -318,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "e82f38a2-9975-4296-8c9e-3a14cd3185ab",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -333,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "24bf580c-367b-4221-8d82-fc203a5f884a",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -348,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "dfb98333-c1d1-4427-bfab-7fd5c7b24b4d",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -363,6 +368,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "cd6d83ed-a9ad-4f31-a857-6da30204354c",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -378,6 +384,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "7ac9f66e-3501-48b5-bdc1-726f87312fe4",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -398,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "f8343441-7d05-4c12-bfce-a84596e12631",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -413,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "5a7e08de-3bee-401f-86b3-43c0b65ee04f",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -433,6 +442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "dd129935-55d4-4c78-82bd-87d63e741b1c",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -444,7 +454,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Player",
           "tags": "",
           "type": "Sprite",
@@ -743,7 +752,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -810,7 +818,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -829,7 +836,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -905,7 +911,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",

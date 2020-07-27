@@ -177,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "a2dd52ec-0278-4199-bf75-fc11c08ef355",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -197,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "237420ea-605c-4ec9-90ec-a1eb83a37209",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -208,7 +210,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -273,7 +274,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Tank",
           "tags": "",
           "type": "Sprite",
@@ -338,7 +338,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",
@@ -578,6 +577,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "4b5e564b-0074-48b0-b0b9-ce55f25ad376",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -598,6 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "fb92fd12-b526-4ce2-86c0-f900bf03f982",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -618,6 +619,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "0cc85b8c-2de0-4096-81ce-99b3701f63bb",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -638,6 +640,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "70aaefe7-8f01-461a-9028-ea07b1b1e90b",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -649,7 +652,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Bullet",
           "tags": "",
           "type": "Sprite",
@@ -714,7 +716,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Tank",
           "tags": "",
           "type": "Sprite",
@@ -779,7 +780,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Target",
           "tags": "",
           "type": "Sprite",

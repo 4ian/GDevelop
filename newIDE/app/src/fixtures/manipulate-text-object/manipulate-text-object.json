@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "change_text",
+          "persistentUuid": "3a942828-957f-4b1c-a057-2117fc64990d",
           "width": 0,
           "x": 10.9457,
           "y": 205.185,
@@ -158,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_text",
+          "persistentUuid": "67e8ee7a-2e76-4839-a880-71e029bc5d18",
           "width": 0,
           "x": 117.72,
           "y": 309.31,
@@ -173,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_text",
+          "persistentUuid": "eb6b1e69-12a8-49ae-b285-013c062fd882",
           "width": 0,
           "x": 206.035,
           "y": 411.212,
@@ -185,7 +188,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "change_text",
           "smoothed": true,
@@ -205,7 +207,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "hide_text",
           "smoothed": true,
@@ -225,7 +226,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "drag_text",
           "smoothed": true,

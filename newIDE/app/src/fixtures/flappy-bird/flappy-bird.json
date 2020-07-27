@@ -721,6 +721,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "ddfe316d-78ec-4197-9d1c-13e150b9991e",
           "width": 50,
           "x": 261,
           "y": 165,
@@ -736,6 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "Start",
+          "persistentUuid": "bc86243e-0756-463e-88e3-dfd0ab88b0fd",
           "width": 100,
           "x": 100,
           "y": 410,
@@ -751,6 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "Label_flappy_bird",
+          "persistentUuid": "b99b30ac-7411-4f6d-8afc-68bb55954c71",
           "width": 100,
           "x": 100,
           "y": 159,
@@ -766,6 +769,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "e2622b5f-3310-4940-8cde-214938e69d0f",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -781,6 +785,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "0671e764-af66-4b08-9c03-09eacee4b468",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -796,6 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "Rate",
+          "persistentUuid": "c4f82213-d7b5-4c7d-aae9-9ad48efd17e4",
           "width": 0,
           "x": 300,
           "y": 410,
@@ -811,6 +817,7 @@
           "layer": "",
           "locked": false,
           "name": "ytchannel",
+          "persistentUuid": "d6b263c7-575a-4291-8452-41ea3d52c4f5",
           "width": 0,
           "x": 259,
           "y": 483,
@@ -822,7 +829,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Label_flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -873,7 +879,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -958,7 +963,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Start",
           "tags": "",
           "type": "Sprite",
@@ -998,7 +1002,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Rate",
           "tags": "",
           "type": "Sprite",
@@ -1038,7 +1041,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Rect_black",
           "tags": "",
           "type": "Sprite",
@@ -1078,7 +1080,6 @@
           ]
         },
         {
-          "group": "",
           "height": 32,
           "name": "Ground",
           "tags": "",
@@ -1089,7 +1090,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "height": 32,
           "name": "Background_day",
           "tags": "",
@@ -1101,7 +1101,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ytchannel",
           "smoothed": true,
@@ -1558,6 +1557,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "54fda4c7-e6b6-4b2e-b042-d155e397c2c1",
           "width": 0,
           "x": 184,
           "y": 237,
@@ -1573,6 +1573,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "45600b0a-2136-483c-a50e-3ab2f4764546",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -1588,6 +1589,7 @@
           "layer": "",
           "locked": false,
           "name": "Bottom_pipe",
+          "persistentUuid": "8aa077d6-3385-43ab-bff9-ca38074ae4d3",
           "width": 0,
           "x": 442,
           "y": 290,
@@ -1603,6 +1605,7 @@
           "layer": "",
           "locked": false,
           "name": "Top_pipe",
+          "persistentUuid": "9dee7fde-9865-4d43-a5c6-fde167f7630e",
           "width": 0,
           "x": 442,
           "y": 170,
@@ -1618,6 +1621,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird_score",
+          "persistentUuid": "688af6f1-844d-4c4b-ad1a-05390175966e",
           "width": 0,
           "x": 189,
           "y": 84,
@@ -1633,6 +1637,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "e975d75e-2a3d-4870-b221-6b711f716641",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -1648,6 +1653,7 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
+          "persistentUuid": "77262b54-5db0-4ce0-af11-44415e4cb3ab",
           "width": 100,
           "x": 152,
           "y": 272,
@@ -1663,6 +1669,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "d4c76cef-97c7-4782-a871-7cf846b766e5",
           "width": 405,
           "x": -3,
           "y": -11,
@@ -1674,7 +1681,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "Flappy_bird",
           "tags": "",
           "type": "Sprite",
@@ -1775,7 +1781,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Top_pipe",
           "tags": "",
           "type": "Sprite",
@@ -1821,7 +1826,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Bottom_pipe",
           "tags": "",
           "type": "Sprite",
@@ -1868,7 +1872,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Flappy_bird_score_two",
           "smoothed": true,
@@ -1888,7 +1891,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Flappy_bird_score",
           "smoothed": true,
@@ -1908,7 +1910,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Flappy_bird_hscore",
           "smoothed": true,
@@ -1927,7 +1928,6 @@
           }
         },
         {
-          "group": "",
           "name": "Menu_button",
           "tags": "",
           "type": "Sprite",
@@ -1967,7 +1967,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Share_button",
           "tags": "",
           "type": "Sprite",
@@ -2007,7 +2006,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Restart_button",
           "tags": "",
           "type": "Sprite",
@@ -2047,7 +2045,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Panel_score",
           "tags": "",
           "type": "Sprite",
@@ -2098,7 +2095,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Border",
           "tags": "",
           "type": "Sprite",
@@ -2138,7 +2134,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Flash",
           "tags": "",
           "type": "Sprite",
@@ -2186,7 +2181,6 @@
           ]
         },
         {
-          "group": "",
           "name": "label_game_over",
           "tags": "",
           "type": "Sprite",
@@ -2237,7 +2231,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Instructions",
           "tags": "",
           "type": "Sprite",
@@ -2277,7 +2270,6 @@
           ]
         },
         {
-          "group": "",
           "height": 32,
           "name": "Background_day",
           "tags": "",
@@ -2288,7 +2280,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "height": 32,
           "name": "Ground",
           "tags": "",
@@ -2307,7 +2298,6 @@
           ]
         },
         {
-          "group": "",
           "name": "New_hscore",
           "tags": "",
           "type": "Sprite",

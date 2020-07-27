@@ -162,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "6cd8776d-72b6-476c-a9d6-1532ee686051",
           "width": 0,
           "x": 173.207,
           "y": 3.75557,
@@ -173,7 +174,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "coin",
           "tags": "",
           "type": "Sprite",
@@ -214,7 +214,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "message",
           "smoothed": true,

@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
+          "persistentUuid": "ac790f73-d44b-40ea-9967-71c150464d48",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -158,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
+          "persistentUuid": "e3eff0d2-2bf4-4e23-97bf-046e79077f10",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -169,7 +171,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "TextEntry",
           "tags": "",
           "type": "TextEntryObject::TextEntry",
@@ -178,7 +179,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "EntryText",
           "smoothed": true,

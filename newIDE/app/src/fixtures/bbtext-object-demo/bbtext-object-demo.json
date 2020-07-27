@@ -148,6 +148,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
+          "persistentUuid": "bbf4d3ad-cf6a-4de4-8f2b-ee471d204c1e",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -163,6 +164,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
+          "persistentUuid": "fe714c8e-dd8c-4d4f-ab61-54889d273da0",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -178,6 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "38fa82d4-80bc-4a22-8ecf-fdd0b181045f",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -193,6 +196,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "d052324d-3960-4f8b-9d0a-0fb677ecf65c",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -208,6 +212,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
+          "persistentUuid": "20efc8ae-a637-474c-970d-32dc22c660eb",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -223,6 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
+          "persistentUuid": "b03956ce-658b-41a8-b9a5-8d470efb486d",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -238,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
+          "persistentUuid": "47203716-ebe9-4d70-a978-3521a002073d",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -253,6 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
+          "persistentUuid": "d074e165-2d69-4548-9f7f-5a1bd745a135",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -265,7 +273,6 @@
       "objects": [
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "line",
           "smoothed": true,
@@ -285,7 +292,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "another_line",
           "smoothed": true,
@@ -304,7 +310,6 @@
           }
         },
         {
-          "group": "",
           "name": "change_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -322,7 +327,6 @@
           }
         },
         {
-          "group": "",
           "name": "hide_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -340,7 +344,6 @@
           }
         },
         {
-          "group": "",
           "name": "drag_bbtext",
           "tags": "",
           "type": "BBText::BBText",
@@ -363,7 +366,6 @@
           }
         },
         {
-          "group": "",
           "name": "wrapping_demo",
           "tags": "",
           "type": "BBText::BBText",
@@ -386,7 +388,6 @@
           }
         },
         {
-          "group": "",
           "name": "about",
           "tags": "",
           "type": "BBText::BBText",

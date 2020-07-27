@@ -821,6 +821,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "808e12f6-dad4-45f0-ab35-6ab36259e2dd",
           "width": 1703,
           "x": -228,
           "y": 572,
@@ -836,6 +837,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "5bb05249-a6d5-4120-ae63-0fe5ec4c5671",
           "width": 75,
           "x": -122,
           "y": 359,
@@ -851,6 +853,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "66ec1a54-4ab8-416d-8429-e52e955c4a42",
           "width": 0,
           "x": 339,
           "y": 478,
@@ -866,6 +869,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "c4565fe6-beb1-4994-b6e5-bf8b79267047",
           "width": 0,
           "x": 2181.78,
           "y": 59.0157,
@@ -886,6 +890,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "c3a9308a-5157-47b0-bb46-1491c7f048f3",
           "width": 0,
           "x": 151.785,
           "y": 182.016,
@@ -901,6 +906,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "6d737df3-a88c-4a91-88c7-593fc747bad2",
           "width": 0,
           "x": 1195,
           "y": 10,
@@ -921,6 +927,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "71cc51f1-1bef-43a5-8380-0c8ffee49575",
           "width": 0,
           "x": 3690,
           "y": 381,
@@ -936,6 +943,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "bfa4a3f0-4610-4f6c-8315-2cb8bd8450f0",
           "width": 0,
           "x": 1258.78,
           "y": 357.015,
@@ -956,6 +964,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "231fa440-1c6f-4c2a-be2c-c48f7e61ae48",
           "width": 0,
           "x": 664.784,
           "y": 170.016,
@@ -971,6 +980,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "f650ad35-2a4b-4a88-be49-08552d547488",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -986,6 +996,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
+          "persistentUuid": "4000cf91-64c0-4d49-96e2-dc0d2df17dc6",
           "width": 0,
           "x": 4,
           "y": -6,
@@ -1001,6 +1012,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
+          "persistentUuid": "db141c21-e407-4e9e-b907-7c6548ba525a",
           "width": 97.5489,
           "x": 33,
           "y": 448,
@@ -1016,6 +1028,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "acbcf5d7-b4d3-4d52-a200-5d0124bd2b2f",
           "width": 94.1152,
           "x": 146,
           "y": 447,
@@ -1031,6 +1044,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ArrowButtonsBg",
+          "persistentUuid": "43db5428-e07b-4fdb-a7a4-ba4b2b6620f9",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -1046,6 +1060,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "934c2940-f684-4263-88da-e5157ef0a1e8",
           "width": 107.992,
           "x": 635,
           "y": 456,
@@ -1061,6 +1076,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "HealthBarFrame",
+          "persistentUuid": "fc59a7ed-8a00-4878-804f-44871d0d6221",
           "width": 0,
           "x": 154,
           "y": 11,
@@ -1076,6 +1092,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "HealthBar",
+          "persistentUuid": "6aec9e4b-eeeb-4513-a21e-6aef8bae47b9",
           "width": 0,
           "x": 155,
           "y": 50,
@@ -1091,6 +1108,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerGreen",
+          "persistentUuid": "39f995ae-b0b4-4741-b25c-73a81876b18f",
           "width": 0,
           "x": 392,
           "y": 476,
@@ -1106,6 +1124,7 @@
           "layer": "",
           "locked": false,
           "name": "Snow",
+          "persistentUuid": "5fc4c924-34cd-4188-b242-9a8c41c8385f",
           "width": 2576,
           "x": 1663,
           "y": 575,
@@ -1121,6 +1140,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "KeyIcon",
+          "persistentUuid": "bb48c2da-87c5-466c-90ea-8886646ef78d",
           "width": 0,
           "x": 747,
           "y": 11,
@@ -1136,6 +1156,7 @@
           "layer": "",
           "locked": false,
           "name": "Win",
+          "persistentUuid": "39aa78a8-35c2-45eb-b400-d194c2897aac",
           "width": 0,
           "x": 3679,
           "y": 504,
@@ -1151,6 +1172,7 @@
           "layer": "",
           "locked": false,
           "name": "Betabox",
+          "persistentUuid": "282713c7-83ea-4773-9759-a5b6282960fc",
           "width": 600,
           "x": -264,
           "y": 132,
@@ -1166,6 +1188,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "a214ed08-0f46-459a-a9b7-d33a16ce25ac",
           "width": 0,
           "x": 1016,
           "y": 540,
@@ -1181,6 +1204,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "055deef9-273b-47c1-9eca-4ae258a2c9ee",
           "width": 0,
           "x": 943,
           "y": 542,
@@ -1196,6 +1220,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "62022ccf-84de-432b-b962-c6a37341df09",
           "width": 0,
           "x": 1176,
           "y": 539,
@@ -1211,6 +1236,7 @@
           "layer": "",
           "locked": false,
           "name": "Spikes",
+          "persistentUuid": "ced08cb0-90aa-4676-9967-207af15a67f1",
           "width": 0,
           "x": 3132,
           "y": 507,
@@ -1226,6 +1252,7 @@
           "layer": "",
           "locked": false,
           "name": "Sign",
+          "persistentUuid": "d7df5e70-7f9c-459c-8724-c55899934483",
           "width": 314,
           "x": 964,
           "y": 273,
@@ -1241,6 +1268,7 @@
           "layer": "",
           "locked": false,
           "name": "Key",
+          "persistentUuid": "b56a699c-a151-414d-b848-2ae4ed35438b",
           "width": 0,
           "x": 2245,
           "y": 489,
@@ -1256,6 +1284,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "981ad463-5010-4c4d-818a-076a4462a6e0",
           "width": 2545,
           "x": 2801,
           "y": 179,
@@ -1271,6 +1300,7 @@
           "layer": "",
           "locked": false,
           "name": "Lava",
+          "persistentUuid": "d2edc9f5-7a15-4526-92b4-20420409f06e",
           "width": 187,
           "x": 1475,
           "y": 584,
@@ -1286,6 +1316,7 @@
           "layer": "",
           "locked": false,
           "name": "KeyBlock",
+          "persistentUuid": "6920b145-b55d-424a-9ba1-7c004b1fe153",
           "width": 307,
           "x": 2797,
           "y": 253,
@@ -1301,6 +1332,7 @@
           "layer": "",
           "locked": false,
           "name": "Loops",
+          "persistentUuid": "f0b675ad-35ab-4b04-99d0-b9a63a9cde6b",
           "width": 291,
           "x": 971,
           "y": 332,
@@ -1316,6 +1348,7 @@
           "layer": "",
           "locked": false,
           "name": "Sign",
+          "persistentUuid": "6306716b-b823-4041-a88f-3b0711835a0b",
           "width": 289,
           "x": 1722,
           "y": 278,
@@ -1331,6 +1364,7 @@
           "layer": "",
           "locked": false,
           "name": "Variables",
+          "persistentUuid": "86032d3e-cd4b-46b9-a810-8c1ebb5f443e",
           "width": 259,
           "x": 1734,
           "y": 320,
@@ -1346,6 +1380,7 @@
           "layer": "",
           "locked": false,
           "name": "Spring",
+          "persistentUuid": "d37565a0-7b44-4f67-bd99-99d684f4f583",
           "width": 0,
           "x": 3401,
           "y": 503,
@@ -1361,6 +1396,7 @@
           "layer": "",
           "locked": false,
           "name": "Spikes",
+          "persistentUuid": "e6da06ba-c274-4d9e-b745-4ab53f0a7fa1",
           "width": 0,
           "x": 3406,
           "y": 252,
@@ -1376,6 +1412,7 @@
           "layer": "",
           "locked": false,
           "name": "Sign",
+          "persistentUuid": "72299096-b912-448e-8523-78759806166b",
           "width": 289,
           "x": 2496,
           "y": 279,
@@ -1391,6 +1428,7 @@
           "layer": "",
           "locked": false,
           "name": "IF",
+          "persistentUuid": "15b3aba0-60ba-46ba-80a1-055b977682f8",
           "width": 280,
           "x": 2500,
           "y": 321,
@@ -1406,6 +1444,7 @@
           "layer": "",
           "locked": false,
           "name": "Sign",
+          "persistentUuid": "068a9124-b2ea-4e01-86e7-1e97af7ceab4",
           "width": 289,
           "x": 3904,
           "y": 303,
@@ -1421,6 +1460,7 @@
           "layer": "",
           "locked": false,
           "name": "MakeAGame",
+          "persistentUuid": "ca135d9c-7122-4373-a0df-2bd3811f5f8e",
           "width": 236,
           "x": 3932,
           "y": 363,
@@ -1436,6 +1476,7 @@
           "layer": "",
           "locked": false,
           "name": "BetaboxFront",
+          "persistentUuid": "3df9cf45-2924-49fa-b70a-b809e9cefa5a",
           "width": 600,
           "x": -263,
           "y": 132,
@@ -1451,6 +1492,7 @@
           "layer": "",
           "locked": false,
           "name": "MovingPlatform",
+          "persistentUuid": "1e6df61d-a356-4e4b-bff6-6600b64f377e",
           "width": 117,
           "x": 4235,
           "y": 550,
@@ -1466,6 +1508,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "398ee57b-7ac5-4f02-94a5-cd982d978707",
           "width": 0,
           "x": 4230,
           "y": 571,
@@ -1481,6 +1524,7 @@
           "layer": "",
           "locked": false,
           "name": "Snow",
+          "persistentUuid": "99243aef-aca8-4eb5-afa8-ad89f5267858",
           "width": 1142,
           "x": 4741,
           "y": 571,
@@ -1496,6 +1540,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "f72a3838-1b97-45f2-86e1-daff72e9e719",
           "width": 0,
           "x": 4708,
           "y": 573,
@@ -1511,6 +1556,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "346658ab-fedb-4cc0-baaa-dc283b8acd78",
           "width": 0,
           "x": 4597,
           "y": 417,
@@ -1526,6 +1572,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "1c94673f-2caa-4843-b44d-a1587172a570",
           "width": 0,
           "x": 4233,
           "y": 425,
@@ -1541,6 +1588,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "09ce6ca9-6db7-4d34-83f8-f8d9cac1d3aa",
           "width": 0,
           "x": 4711,
           "y": 417,
@@ -1556,6 +1604,7 @@
           "layer": "",
           "locked": false,
           "name": "Ladder",
+          "persistentUuid": "0a093aa1-4e8b-45cd-89b2-97d02254c596",
           "width": 70,
           "x": 5354,
           "y": 91,
@@ -1571,6 +1620,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "2764d61b-82c9-4ac0-abab-3dd6f15242c8",
           "width": 0,
           "x": 4902,
           "y": 107,
@@ -1586,6 +1636,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "0b102a20-f226-4c9d-99df-8e690407b030",
           "width": 0,
           "x": 4830,
           "y": 107,
@@ -1601,6 +1652,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "5ec6bbcb-c509-4b1d-b258-c797d8c42933",
           "width": 0,
           "x": 4829,
           "y": 35,
@@ -1621,6 +1673,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "26f09532-999d-4632-89e6-02231db2409c",
           "width": 0,
           "x": 4321,
           "y": 45,
@@ -1636,6 +1689,7 @@
           "layer": "",
           "locked": false,
           "name": "ChangeCharacter",
+          "persistentUuid": "2b29e4e0-b726-4fde-861c-cc23a41a15c2",
           "width": 0,
           "x": 103,
           "y": 658,
@@ -1651,6 +1705,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "bf084ded-3942-4cd7-b08f-8c8d6ee96fe1",
           "width": 0,
           "x": 4312,
           "y": 418,
@@ -1666,6 +1721,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "cf2299ce-84cd-41a6-945f-7dd61aea9661",
           "width": 0,
           "x": 4018,
           "y": 110,
@@ -1681,6 +1737,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "1a08d615-6b2b-44d5-89a9-1c473fda8219",
           "width": 0,
           "x": 5693,
           "y": 500,
@@ -1701,6 +1758,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "9f93fd74-913f-4e3b-b41d-b1654bc49a45",
           "width": 0,
           "x": 4683,
           "y": 147,
@@ -1716,6 +1774,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "c1c98728-7f80-4d14-b40c-5506daf975a5",
           "width": 0,
           "x": 4458,
           "y": 145,
@@ -1731,6 +1790,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "17794b63-c771-4909-a26c-3a81e596be3a",
           "width": 0,
           "x": 4801,
           "y": 151,
@@ -1746,6 +1806,7 @@
           "layer": "",
           "locked": false,
           "name": "Ladder",
+          "persistentUuid": "ba8c8622-7d2f-42eb-964b-be514f864d5d",
           "width": 70,
           "x": 2898,
           "y": -563,
@@ -1761,6 +1822,7 @@
           "layer": "",
           "locked": false,
           "name": "Snow",
+          "persistentUuid": "4628b569-afa4-4cc1-975d-c1870a9b67da",
           "width": 2468,
           "x": 2979,
           "y": -534,
@@ -1776,6 +1838,7 @@
           "layer": "",
           "locked": false,
           "name": "Lava",
+          "persistentUuid": "f5792202-ca53-4764-8fc1-d76e102a25eb",
           "width": 506,
           "x": 4240,
           "y": 600,
@@ -1791,6 +1854,7 @@
           "layer": "",
           "locked": false,
           "name": "Lava",
+          "persistentUuid": "6319ae40-3b40-4737-8544-cbe65f50c430",
           "width": 424,
           "x": 3337,
           "y": 103,
@@ -1806,6 +1870,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "bdb2d4d4-4398-4a81-8e3a-b3e9acb4fb53",
           "width": 74,
           "x": 3761,
           "y": 99,
@@ -1821,6 +1886,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "741e94b3-0572-477f-8b22-b9a3d2e59639",
           "width": 70,
           "x": 3268,
           "y": 101,
@@ -1836,6 +1902,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "504cb1fb-046f-445f-9552-7799e1f459ec",
           "width": 0,
           "x": 3619,
           "y": -19,
@@ -1851,6 +1918,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "313d2c6c-5b92-446d-99e6-b305d5316af5",
           "width": 0,
           "x": 3429,
           "y": -99,
@@ -1866,6 +1934,7 @@
           "layer": "",
           "locked": false,
           "name": "Sign",
+          "persistentUuid": "5cafe428-c8ac-48dc-9d49-05ad9a80937f",
           "width": 289,
           "x": 4955,
           "y": -117,
@@ -1881,6 +1950,7 @@
           "layer": "",
           "locked": false,
           "name": "Experiment",
+          "persistentUuid": "ac97f76a-d037-4a0d-9119-f00b4f7ac9d5",
           "width": 229,
           "x": 4984,
           "y": -60,
@@ -1896,6 +1966,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "7ac01d76-5c12-4768-ac04-90901cf31104",
           "width": 390,
           "x": -122,
           "y": 362,
@@ -1907,7 +1978,6 @@
       ],
       "objects": [
         {
-          "group": "",
           "name": "PlayerPink",
           "tags": "",
           "type": "Sprite",
@@ -2235,7 +2305,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerGreen",
           "tags": "",
           "type": "Sprite",
@@ -2569,7 +2638,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerBlue",
           "tags": "",
           "type": "Sprite",
@@ -2904,7 +2972,6 @@
         },
         {
           "bottomMargin": 0,
-          "group": "",
           "height": 128,
           "leftMargin": 0,
           "name": "Box",
@@ -2927,7 +2994,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Platform",
           "tags": "",
           "type": "Sprite",
@@ -3042,7 +3108,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Jumpthru",
           "tags": "",
           "type": "Sprite",
@@ -3109,7 +3174,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "Snow",
           "tags": "",
@@ -3128,7 +3192,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "Stone",
           "tags": "",
@@ -3147,7 +3210,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "TiledGrassPlatform",
           "tags": "",
@@ -3166,7 +3228,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "TiledCastlePlatform",
           "tags": "",
@@ -3185,7 +3246,6 @@
           ]
         },
         {
-          "group": "",
           "name": "PlayerHitBox",
           "tags": "",
           "type": "Sprite",
@@ -3261,7 +3321,6 @@
           ]
         },
         {
-          "group": "",
           "height": 70,
           "name": "Ladder",
           "tags": "",
@@ -3280,7 +3339,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GoLeft",
           "tags": "",
           "type": "Sprite",
@@ -3339,7 +3397,6 @@
           ]
         },
         {
-          "group": "",
           "name": "GoRight",
           "tags": "",
           "type": "Sprite",
@@ -3398,7 +3455,6 @@
           ]
         },
         {
-          "group": "",
           "name": "MovingPlatform",
           "tags": "",
           "type": "Sprite",
@@ -3465,7 +3521,6 @@
           ]
         },
         {
-          "group": "",
           "name": "SlimeWalk",
           "tags": "",
           "type": "Sprite",
@@ -3630,7 +3685,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Fly",
           "tags": "",
           "type": "Sprite",
@@ -3790,7 +3844,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Cloud",
           "tags": "",
           "type": "Sprite",
@@ -3945,7 +3998,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BackgroundObjects",
           "tags": "",
           "type": "Sprite",
@@ -4100,7 +4152,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Coin",
           "tags": "",
           "type": "Sprite",
@@ -4159,7 +4210,6 @@
           ]
         },
         {
-          "group": "",
           "name": "CoinIcon",
           "tags": "",
           "type": "Sprite",
@@ -4218,7 +4268,6 @@
           ]
         },
         {
-          "group": "",
           "name": "KeyIcon",
           "tags": "",
           "type": "Sprite",
@@ -4287,7 +4336,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Win",
           "tags": "",
           "type": "Sprite",
@@ -4357,7 +4405,6 @@
         },
         {
           "bottomMargin": 0,
-          "group": "",
           "height": 128,
           "leftMargin": 0,
           "name": "Sign",
@@ -4372,7 +4419,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "name": "Spikes",
           "tags": "",
           "type": "Sprite",
@@ -4431,7 +4477,6 @@
           ]
         },
         {
-          "group": "",
           "height": 32,
           "name": "Lava",
           "tags": "",
@@ -4442,7 +4487,6 @@
           "behaviors": []
         },
         {
-          "group": "",
           "name": "Key",
           "tags": "",
           "type": "Sprite",
@@ -4483,7 +4527,6 @@
         },
         {
           "bottomMargin": 0,
-          "group": "",
           "height": 64,
           "leftMargin": 0,
           "name": "KeyBlock",
@@ -4506,7 +4549,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Spring",
           "tags": "",
           "type": "Sprite",
@@ -4600,7 +4642,6 @@
           ]
         },
         {
-          "group": "",
           "name": "Betabox",
           "tags": "",
           "type": "Sprite",
@@ -4640,7 +4681,6 @@
           ]
         },
         {
-          "group": "",
           "name": "BetaboxFront",
           "tags": "",
           "type": "Sprite",
@@ -4680,7 +4720,6 @@
           ]
         },
         {
-          "group": "",
           "name": "ArrowButtonsBg",
           "tags": "",
           "type": "Sprite",
@@ -4739,7 +4778,6 @@
           ]
         },
         {
-          "group": "",
           "name": "JumpButton",
           "tags": "",
           "type": "Sprite",
@@ -4808,7 +4846,6 @@
           ]
         },
         {
-          "group": "",
           "name": "RightButton",
           "tags": "",
           "type": "Sprite",
@@ -4867,7 +4904,6 @@
           ]
         },
         {
-          "group": "",
           "name": "LeftButton",
           "tags": "",
           "type": "Sprite",
@@ -4926,7 +4962,6 @@
           ]
         },
         {
-          "group": "",
           "name": "HealthBar",
           "tags": "",
           "type": "Sprite",
@@ -4966,7 +5001,6 @@
           ]
         },
         {
-          "group": "",
           "name": "HealthBarFrame",
           "tags": "",
           "type": "Sprite",
@@ -5023,7 +5057,6 @@
           "friction": 2,
           "gravityEditionSimpleMode": true,
           "greenParam": "Random",
-          "group": "",
           "maxParticleNb": 300,
           "name": "WinConfetti",
           "particleAlpha1": 255,
@@ -5065,7 +5098,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Score",
           "smoothed": true,
@@ -5085,7 +5117,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Loops",
           "smoothed": true,
@@ -5105,7 +5136,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "Variables",
           "smoothed": true,
@@ -5125,7 +5155,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "IF",
           "smoothed": true,
@@ -5145,7 +5174,6 @@
         },
         {
           "bold": true,
-          "group": "",
           "italic": false,
           "name": "MakeAGame",
           "smoothed": true,
@@ -5165,7 +5193,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "ChangeCharacter",
           "smoothed": true,
@@ -5185,7 +5212,6 @@
         },
         {
           "bold": false,
-          "group": "",
           "italic": false,
           "name": "Experiment",
           "smoothed": true,

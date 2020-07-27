@@ -23,15 +23,15 @@ export type AlertMessageIdentifier =
   | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
-  | 'lifecycle-events-function-included-only-if-extension-used';
+  | 'lifecycle-events-function-included-only-if-extension-used'
+  | 'p2p-broker-recommendation';
 
 export type EditorMosaicName =
   | 'scene-editor'
   | 'scene-editor-small'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor'
-  | 'p2p-broker-recommendation';
+  | 'events-functions-extension-editor';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,

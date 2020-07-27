@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
-export type Hint = {| kind: 'warning' | 'info', message: MessageDescriptor |};
+export type Hint = {| kind: 'warning' | 'info', message: MessageDescriptor, identifier: ?string |};
 export type TutorialHint = {|
   kind: 'tutorial' | 'video-tutorial',
   name: string,

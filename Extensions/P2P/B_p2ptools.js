@@ -63,13 +63,9 @@ gdjs.evtTools.p2p = {
   disconnectedPeer: "",
 }
 
-gdjs.evtTools.p2p._reloadPeerJS = function() {
-  if(gdjs.evtTools.p2p.peer == null) {
-    gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig);
-  } else {
-    gdjs.evtTools.p2p.peer.disconnect();
-    gdjs.evtTools.p2p.peer.constructor(gdjs.evtTools.p2p.peerConfig);
-  }
+gdjs.evtTools.p2p.loadPeerJS = function() {
+  if(gdjs.evtTools.p2p.peer != null) return;
+  gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig);
   gdjs.evtTools.p2p.peer.on("open", function() {
     gdjs.evtTools.p2p.ready = true;
   });
@@ -78,7 +74,10 @@ gdjs.evtTools.p2p._reloadPeerJS = function() {
     gdjs.evtTools.p2p.lastError = errorMessage;
   });
   gdjs.evtTools.p2p.peer.on("connection", gdjs.evtTools.p2p._onConnection);
-  gdjs.evtTools.p2p.peer.on("close", gdjs.evtTools.p2p._reloadPeerJS);
+  gdjs.evtTools.p2p.peer.on("close", function() {
+    gdjs.evtTools.p2p.peer = null;
+    gdjs.evtTools.p2p.loadPeerJS();
+  });
   gdjs.evtTools.p2p.peer.on("disconnected", gdjs.evtTools.p2p.peer.reconnect);
 }
 
@@ -246,7 +245,14 @@ gdjs.evtTools.p2p.useCustomBrokerServer = function(host, port, path, key, ssl) {
     secure: ssl,
     key,
   };
-  gdjs.evtTools.p2p._reloadPeerJS();
+  gdjs.evtTools.p2p.loadPeerJS();
+}
+
+/**
+ * Use default broker server. NOT RECOMMENDED.
+ */
+gdjs.evtTools.p2p.useDefaultBrokerServer = function() {
+  gdjs.evtTools.p2p.loadPeerJS();
 }
 
 /**
@@ -293,14 +299,6 @@ gdjs.evtTools.p2p.onDisconnect = function() {
 gdjs.evtTools.p2p.getDisconnectedPeer = function() {
   return gdjs.evtTools.p2p.disconnectedPeer;
 }
-
-// Initialize PeerJS after running the events a first time to let the user select another server
-gdjs.evtTools.p2p._callback = function() {
-  gdjs.evtTools.p2p._reloadPeerJS();
-  var index = gdjs.callbacksRuntimeScenePostEvents.indexOf(gdjs.evtTools.p2p._callback);
-  gdjs.callbacksRuntimeScenePostEvents.splice(index, 1);
-}
-gdjs.callbacksRuntimeScenePostEvents.push(gdjs.evtTools.p2p._callback);
 
 gdjs.callbacksRuntimeScenePostEvents.push(function() {
   for(var i in gdjs.evtTools.p2p.lastEventData) {

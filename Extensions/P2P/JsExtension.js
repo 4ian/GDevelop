@@ -133,6 +133,21 @@ module.exports = {
 
     extension
       .addAction(
+        'UseDefaultBroker',
+        _('Connect to default broker server'),
+        _('Connects to the default broker server.'),
+        _('Connect to default broker server'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.useDefaultBrokerServer');
+
+    extension
+      .addAction(
         'SendToAll',
         _('Trigger event on all connected clients'),
         _('Triggers an event on all connected clients'),

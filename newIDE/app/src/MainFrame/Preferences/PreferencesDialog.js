@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n } from '@lingui/core';
 
 import React from 'react';
 import SelectField from '../../UI/SelectField';
@@ -18,12 +19,14 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { isMacLike } from '../../Utils/Platform';
+import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 
 type Props = {|
+  i18n: I18n,
   onClose: Function,
 |};
 
-const PreferencesDialog = ({ onClose }: Props) => {
+const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const {
     values,
@@ -41,6 +44,8 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
     setUseCommandPalette,
+    resetShortcutsToDefault,
+    setShortcutForCommand,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -63,6 +68,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab label={<Trans>Preferences</Trans>} value="preferences" />
         <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
+        <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
       </Tabs>
       {currentTab === 'preferences' && (
         <Column>
@@ -300,6 +306,21 @@ const PreferencesDialog = ({ onClose }: Props) => {
               ))}
             </Column>
           </Line>
+        </Column>
+      )}
+      {currentTab === 'shortcuts' && (
+        <Column>
+          <Line>
+            <RaisedButton
+              label={<Trans>Reset all shortcuts to default</Trans>}
+              onClick={resetShortcutsToDefault}
+            />
+          </Line>
+          <ShortcutsList
+            i18n={i18n}
+            shortcutMap={values.shortcutMap}
+            onEdit={setShortcutForCommand}
+          />
         </Column>
       )}
     </Dialog>

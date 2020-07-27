@@ -100,7 +100,7 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcuts } from '../CommandPalette/Shortcuts';
+import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
@@ -2075,7 +2075,10 @@ const MainFrame = (props: Props) => {
         />
       )}
       {preferencesDialogOpen && (
-        <PreferencesDialog onClose={() => openPreferencesDialog(false)} />
+        <PreferencesDialog
+          i18n={props.i18n}
+          onClose={() => openPreferencesDialog(false)}
+        />
       )}
       {languageDialogOpen && (
         <LanguageDialog

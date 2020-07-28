@@ -43,7 +43,9 @@ type CommandHandlers = {|
   onOpenProjectManager: () => void,
   onLaunchPreview: () => void | Promise<void>,
   onLaunchDebugPreview: () => void,
+  onLaunchNetworkPreview: () => void,
   onHotReloadPreview: () => void,
+  allowNetworkPreview: boolean,
   onOpenStartPage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
@@ -63,6 +65,7 @@ const openProjectManagerText = t`Open project manager`;
 const launchPreviewText = t`Launch preview`;
 const launchPreviewNewWindowText = t`Launch another preview in a new window`;
 const launchDebugPreviewText = t`Launch preview with debugger and profiler`;
+const launchNetworkPreviewText = t`Launch network preview over WiFi/LAN`;
 const openStartPageText = t`Open start page`;
 const createNewProjectText = t`Create a new project`;
 const openProjectText = t`Open project`;
@@ -98,10 +101,23 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onHotReloadPreview,
   });
 
-  useCommand('LAUNCH_DEBUG_PREVIEW', handlers.previewEnabled, {
-    displayText: launchDebugPreviewText,
-    handler: handlers.onLaunchDebugPreview,
-  });
+  useCommand(
+    'LAUNCH_DEBUG_PREVIEW',
+    handlers.previewEnabled && handlers.allowNetworkPreview,
+    {
+      displayText: launchDebugPreviewText,
+      handler: handlers.onLaunchDebugPreview,
+    }
+  );
+
+  useCommand(
+    'LAUNCH_NETWORK_PREVIEW',
+    handlers.previewEnabled && handlers.allowNetworkPreview,
+    {
+      displayText: launchNetworkPreviewText,
+      handler: handlers.onLaunchNetworkPreview,
+    }
+  );
 
   useCommand('OPEN_START_PAGE', true, {
     displayText: openStartPageText,

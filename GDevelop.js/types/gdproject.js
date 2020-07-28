@@ -33,6 +33,7 @@ declare class gdProject extends gdObjectsContainer {
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getUsedExtensions(): gdVectorString;
+  getExtensionPropertiesManager(): gdExtensionPropertiesManager;
   addPlatform(platform: gdPlatform): void;
   getCurrentPlatform(): gdPlatform;
   getPlatformSpecificAssets(): gdPlatformSpecificAssets;

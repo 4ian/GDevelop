@@ -1796,9 +1796,13 @@ const MainFrame = (props: Props) => {
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
     hasPreviewsRunning,
+    allowNetworkPreview:
+      !!_previewLauncher.current &&
+      _previewLauncher.current.canDoNetworkPreview(),
     onLaunchPreview: launchNewPreview,
     onHotReloadPreview: launchHotReloadPreview,
     onLaunchDebugPreview: launchDebuggerAndPreview,
+    onLaunchNetworkPreview: launchNetworkPreview,
     onOpenStartPage: openStartPage,
     onCreateProject: openCreateDialog,
     onOpenProject: chooseProject,

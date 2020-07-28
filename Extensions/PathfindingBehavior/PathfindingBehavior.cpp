@@ -26,7 +26,7 @@ void PathfindingBehavior::InitializeContent(
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   properties[_("Allows diagonals")]
@@ -57,8 +57,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
 
 bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                          const gd::String& name,
-                                         const gd::String& value,
-                                         gd::Project& project) {
+                                         const gd::String& value) {
   if (name == _("Allows diagonals")) {
     behaviorContent.SetAttribute("allowDiagonals", (value != "0"));
     return true;

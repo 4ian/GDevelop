@@ -15,7 +15,10 @@ import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
+import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import { isMacLike } from '../../Utils/Platform';
 
 type Props = {|
   onClose: Function,
@@ -29,6 +32,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setCodeEditorThemeName,
     setAutoDownloadUpdates,
     showAlertMessage,
+    showTutorialHint,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -37,6 +41,8 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
+    setAutoOpenMostRecentProject,
+    setUseCommandPalette,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -225,6 +231,18 @@ const PreferencesDialog = ({ onClose }: Props) => {
               label={<Trans>Auto-save project on Preview</Trans>}
             />
           </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
+              toggled={values.autoOpenMostRecentProject}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Automatically re-open the project edited during last session
+                </Trans>
+              }
+            />
+          </Line>
           {Window.isDev() && (
             <Line>
               <Toggle
@@ -240,6 +258,29 @@ const PreferencesDialog = ({ onClose }: Props) => {
               />
             </Line>
           )}
+          <Text size="title">
+            <Trans>Command Palette</Trans>
+          </Text>
+          <Line>
+            <Column noMargin>
+              <Toggle
+                onToggle={(e, check) => setUseCommandPalette(check)}
+                toggled={values.useCommandPalette}
+                labelPosition="right"
+                label={<Trans>Enable command palette (experimental)</Trans>}
+              />
+              <FormHelperText>
+                <Trans>
+                  Open the command palette with{' '}
+                  {isMacLike() ? 'Cmd + P' : 'Ctrl + P'}.
+                </Trans>{' '}
+                <Trans>
+                  This is an experimental feature, new commands will be added in
+                  the next versions.
+                </Trans>
+              </FormHelperText>
+            </Column>
+          </Line>
         </Column>
       )}
       {currentTab === 'hints' && (
@@ -256,6 +297,19 @@ const PreferencesDialog = ({ onClose }: Props) => {
                     toggled={!values.hiddenAlertMessages[key]}
                     labelPosition="right"
                     label={label}
+                  />
+                </Line>
+              ))}
+              <Text>
+                <Trans>Show link to tutorials:</Trans>
+              </Text>
+              {getAllTutorialHints().map(({ identifier, name }) => (
+                <Line key={identifier}>
+                  <Toggle
+                    onToggle={(e, check) => showTutorialHint(identifier, check)}
+                    toggled={!values.hiddenTutorialHints[identifier]}
+                    labelPosition="right"
+                    label={name}
                   />
                 </Line>
               ))}

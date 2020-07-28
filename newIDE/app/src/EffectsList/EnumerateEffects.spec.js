@@ -2,7 +2,7 @@
 import { enumerateEffectsMetadata } from './EnumerateEffects';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { makeTestProject } from '../fixtures/TestProject';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 describe('EnumerateEffects', () => {
   it('can enumerate effects', () => {

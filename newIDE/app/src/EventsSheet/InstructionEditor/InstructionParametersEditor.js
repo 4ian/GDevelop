@@ -18,7 +18,11 @@ import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExterna
 import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import Window from '../../Utils/Window';
-import { getExtraInstructionInformation } from '../../Hints';
+import {
+  getExtraInstructionInformation,
+  getInstructionTutorialHints,
+} from '../../Hints';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../UI/IconButton';
@@ -27,7 +31,8 @@ import { getObjectParameterIndex } from '../../InstructionOrExpression/Enumerate
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './NewInstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
-const gd = global.gd;
+import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   // When displaying parameters, take all the height:
@@ -79,26 +84,6 @@ type Props = {|
 type State = {|
   isDirty: boolean,
 |};
-
-export const setupInstruction = (
-  instruction: gdInstruction,
-  instructionMetadata: gdInstructionMetadata,
-  objectName: ?string
-) => {
-  instruction.setParametersCount(instructionMetadata.getParametersCount());
-
-  if (objectName) {
-    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-    if (objectParameterIndex === -1) {
-      console.error(
-        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
-      );
-      return;
-    }
-
-    instruction.setParameter(objectParameterIndex, objectName);
-  }
-};
 
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
@@ -232,11 +217,18 @@ export default class InstructionParametersEditor extends React.Component<
     const instructionExtraInformation = getExtraInstructionInformation(
       instructionType
     );
+    const tutorialHints = getInstructionTutorialHints(instructionType);
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
 
-    setupInstruction(instruction, instructionMetadata, objectName);
+    setupInstructionParameters(
+      globalObjectsContainer,
+      objectsContainer,
+      instruction,
+      instructionMetadata,
+      objectName
+    );
 
     let parameterFieldIndex = 0;
     return (
@@ -267,6 +259,18 @@ export default class InstructionParametersEditor extends React.Component<
                 </AlertMessage>
               </Line>
             )}
+            {tutorialHints.length ? (
+              <Line>
+                <ColumnStackLayout expand>
+                  {tutorialHints.map(tutorialHint => (
+                    <DismissableTutorialMessage
+                      key={tutorialHint.identifier}
+                      tutorialHint={tutorialHint}
+                    />
+                  ))}
+                </ColumnStackLayout>
+              </Line>
+            ) : null}
             <Spacer />
             <div key={instructionType} style={styles.parametersContainer}>
               <ColumnStackLayout noMargin>

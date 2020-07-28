@@ -5,7 +5,7 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
 
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
     if ( this._tiledSprite === undefined ) {
-        this._tiledSprite = new PIXI.extras.TilingSprite(texture, 1024, 1024);
+        this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
     } else {
         this._tiledSprite.texture = texture;
     }

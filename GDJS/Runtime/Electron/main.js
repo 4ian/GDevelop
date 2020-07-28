@@ -16,13 +16,10 @@ function createWindow() {
     height: 600 /*GDJS_WINDOW_HEIGHT*/,
     useContentSize: true,
     title: "GDJS_GAME_NAME",
-    backgroundColor: '#000000'
-    // To be added once upgraded to Electron 8+
-    // (or custom events to be written for each usage of electron
-    // in the game engine):
-    // ,webPreferences: {
-    //   nodeIntegration: true,
-    // }
+    backgroundColor: '#000000',
+    webPreferences: {
+      nodeIntegration: true,
+    }
   });
 
   // Open external link in the OS default browser
@@ -45,6 +42,14 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+// Should be set to true, which will be the default value in future Electron
+// versions, but then causes an issue on Windows where the `fs` module stops	
+// working in the renderer process after a reload.
+// See https://github.com/electron/electron/issues/22119
+// For now, out of caution, disable this as we rely heavily on `fs` in the 
+// renderer process.
+app.allowRendererProcessReuse = false;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

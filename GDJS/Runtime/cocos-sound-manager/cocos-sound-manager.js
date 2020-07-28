@@ -67,6 +67,15 @@ gdjs.CocosSoundManager = function(resources)
 gdjs.SoundManager = gdjs.CocosSoundManager; //Register the class to let the engine use it.
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.CocosSoundManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
+
+/**
  * Return the file associated to the given sound name.
  *
  * Names and files are loaded from resources when preloadAudio is called. If no

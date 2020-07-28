@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
-const gd = global.gd;
+import * as PIXI from 'pixi.js-legacy';
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for gd.PanelSpriteObject
@@ -80,7 +80,7 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   );
 
   this._tiled = panelSprite.isTiled();
-  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
+  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.TilingSprite;
 
   if (!this._pixiObject) {
     this._pixiObject = new PIXI.Container();
@@ -210,7 +210,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     this._textureName
   );
 
-  if (texture.noFrame) {
+  if (!texture.baseTexture.valid) {
     //Post pone texture update if texture is not loaded
     const renderer = this;
     texture.on('update', function() {

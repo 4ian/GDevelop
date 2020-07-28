@@ -14,7 +14,7 @@ import Window from '../../../../Utils/Window';
 import styles from './styles';
 import PointRow from './PointRow';
 import AddPointRow from './AddPointRow';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableAddPointRow = SortableElement(AddPointRow);
 const SortablePointRow = SortableElement(PointRow);

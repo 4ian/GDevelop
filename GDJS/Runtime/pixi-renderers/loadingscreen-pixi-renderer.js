@@ -32,7 +32,7 @@ gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreen
     });
     this._websiteText.position.y = this._pixiRenderer.height / 2 + 100;
 
-    this._splashImage = new PIXI.Sprite.fromImage(gdjs.splashImage);
+    this._splashImage = new PIXI.Sprite.from(gdjs.splashImage);
     this._splashImage.position.x = this._pixiRenderer.width / 2;
     this._splashImage.position.y = this._pixiRenderer.height / 2;
     this._splashImage.anchor.x = 0.5;

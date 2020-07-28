@@ -34,6 +34,7 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       outlineColorG(0),
       outlineColorB(0),
       outlineOpacity(255),
+      clearBetweenFrames(true),
       absoluteCoordinates(false) {}
 
 ShapePainterObject::ShapePainterObject(gd::String name_) : gd::Object(name_) {}
@@ -72,6 +73,7 @@ void ShapePainterObjectBase::DoUnserializeFrom(
       element.GetChild("absoluteCoordinates", 0, "AbsoluteCoordinates")
           .GetValue()
           .GetBool();
+  clearBetweenFrames = element.HasChild("clearBetweenFrames") ? element.GetChild("clearBetweenFrames").GetValue().GetBool() : true;
 }
 
 void ShapePainterObject::DoUnserializeFrom(
@@ -94,6 +96,7 @@ void ShapePainterObjectBase::DoSerializeTo(
       .SetAttribute("g", (int)outlineColorG)
       .SetAttribute("b", (int)outlineColorB);
   element.AddChild("absoluteCoordinates").SetValue(absoluteCoordinates);
+  element.AddChild("clearBetweenFrames").SetValue(clearBetweenFrames);
 }
 
 void ShapePainterObject::DoSerializeTo(gd::SerializerElement& element) const {

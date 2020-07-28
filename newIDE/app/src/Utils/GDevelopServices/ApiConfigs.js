@@ -2,12 +2,12 @@
 const isDev = process.env.NODE_ENV === 'development';
 
 export const GDevelopGamePreviews = {
-  baseUrl: `http://game-previews.gdevelop-app.com/`,
+  baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
 export const GDevelopBuildApi = {
   baseUrl: isDev
-    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
+    ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/build',
 };
 

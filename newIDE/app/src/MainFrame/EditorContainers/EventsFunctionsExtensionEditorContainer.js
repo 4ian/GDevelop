@@ -79,7 +79,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
-    if (!project) return null;
+    if (!project || !projectItemName) return null;
 
     if (!project.hasEventsFunctionsExtensionNamed(projectItemName)) {
       return null;

@@ -1,12 +1,12 @@
 // @flow
 import { type ExpressionAutocompletion } from '../ExpressionAutocompletion';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { mapVector } from '../Utils/MapFor';
 
 const makeFakeEnumeratedExpressionMetadata = (
   name: string,
   expressionMetadata: gdExpressionMetadata
-): EnumeratedInstructionOrExpressionMetadata => ({
+): EnumeratedExpressionMetadata => ({
   type: name,
   name: name,
   displayedName: expressionMetadata.getFullName(),
@@ -22,7 +22,7 @@ const makeFakeEnumeratedExpressionMetadata = (
 });
 
 export const makeFakeExactExpressionAutocompletion = () => {
-  const gd = global.gd;
+  const gd: libGDevelop = global.gd;
   const expressionMetadata = new gd.ExpressionMetadata(
     'SomeExtension',
     'MyFunction',
@@ -51,7 +51,7 @@ export const makeFakeExactExpressionAutocompletion = () => {
 };
 
 export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocompletion> => {
-  const gd = global.gd;
+  const gd: libGDevelop = global.gd;
 
   const expressionMetadata = new gd.ExpressionMetadata(
     'SomeExtension',

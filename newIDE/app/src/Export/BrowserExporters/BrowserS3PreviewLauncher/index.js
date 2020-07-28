@@ -8,7 +8,7 @@ import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
 import { makeTimestampedId } from '../../../Utils/TimestampedId';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type State = {|
   showPreviewLinkDialog: boolean,
@@ -17,6 +17,7 @@ type State = {|
 |};
 
 type Props = {|
+  getIncludeFileHashs: () => { [string]: number },
   onExport?: () => void,
   onChangeSubscription?: () => void,
 |};
@@ -26,6 +27,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => false;
+  canDoHotReload = () => false;
 
   state = {
     showPreviewLinkDialog: false,
@@ -58,7 +60,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         browserS3FileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
+      exporter.setCodeOutputDirectory(outputDir);
 
       return {
         exporter,
@@ -76,16 +78,17 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
     return this._prepareExporter()
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
+        const previewExportOptions = new gd.PreviewExportOptions(
+          project,
+          outputDir
+        );
+        previewExportOptions.setLayoutName(layout.getName());
         if (externalLayout) {
-          exporter.exportExternalLayoutForPixiPreview(
-            project,
-            layout,
-            externalLayout,
-            outputDir
-          );
-        } else {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+          previewExportOptions.setExternalLayoutName(externalLayout.getName());
         }
+
+        exporter.exportProjectForPixiPreview(previewExportOptions);
+        previewExportOptions.delete();
         exporter.delete();
         return browserS3FileSystem
           .uploadPendingObjects()

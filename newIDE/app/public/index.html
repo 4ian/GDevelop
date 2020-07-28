@@ -40,48 +40,17 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
   </head>
   <body>
-    <!-- Root div used for React `App` component rendering-->
+    <!-- Root div used for React `Bootstrapper` component rendering-->
     <div id="root"></div>
 
     <script>
       window["GD_STARTUP_TIMES"] = [["indexHtmlFirstScriptStarted", performance.now()]];
     </script>
 
-    <!-- Monaco Editor support -->
-    <script>
-      // Monaco editor is using amd require. Save the Node.js require if it exists (Electron)
-      nodeRequire = typeof require !== "undefined" ? require : undefined;
-    </script>
-    <script src="%PUBLIC_URL%/external/monaco-editor-min/vs/loader.js"></script>
-    <script>
-      // Restore back the Node.js require (Electron) and delete "define" which can
-      // trick some libraries into thinking they are in an AMD (RequireJS) environment.
-      amdRequire = require;
-      require = nodeRequire;
-      define = undefined;
-
-      // Set up Monaco Editor workers support
-      amdRequire.config({
-        paths: {
-          "vs": "vs"
-        }
-      });
-      window.MonacoEnvironment = {
-        getWorkerUrl: function (workerId, label) {
-          return "external/monaco-editor-min/vs/base/worker/workerMain.js";
-        }
-      };
-    </script>
-
-    <script>
-      window["GD_STARTUP_TIMES"] = window["GD_STARTUP_TIMES"] || [];
-      window["GD_STARTUP_TIMES"].push(["monacoEditorLoaderLoaded", performance.now()]);
-    </script>
-
     <noscript>
       <div style="font-family: sans-serif; padding: 15px;">
         <p>
-          GDevelop 5 is a open-source, cross-platform game engine designed for
+          GDevelop 5 is an open-source, cross-platform game engine designed for
           everyone - it's extensible, fast and easy to learn.
         </p>
 

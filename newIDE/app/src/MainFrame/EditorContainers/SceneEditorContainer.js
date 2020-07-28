@@ -53,7 +53,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
-    if (!project || !project.hasLayoutNamed(projectItemName)) return null;
+    if (
+      !project ||
+      !projectItemName ||
+      !project.hasLayoutNamed(projectItemName)
+    )
+      return null;
 
     return project.getLayout(projectItemName);
   }
@@ -91,6 +96,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         isActive={isActive}
+        hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />
     );
   }

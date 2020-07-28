@@ -9,6 +9,11 @@
       "GDJS_DEPENDENCY": "0"
     },
     "devDependencies": {
-      "electron": "3.0.9"
+      "electron": "8.2.5"
+    },
+    "build": {
+        "directories": {
+            "buildResources": "buildResources"
+        }
     }
-  }
+}

@@ -51,7 +51,10 @@ export type StorageProviderOperations = {|
   |}>,
 
   // Project auto saving:
-  onAutoSaveProject?: (project: gdProject, fileMetadata: FileMetadata) => void,
+  onAutoSaveProject?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
   hasAutoSave?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean

@@ -7,7 +7,7 @@ import GDevelopJsInitializerDecorator, {
 } from './GDevelopJsInitializerDecorator';
 
 import { storiesOf, addDecorator } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { action, configureActions } from '@storybook/addon-actions';
 
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -191,6 +191,20 @@ import {
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
 import LayersList from '../LayersList';
+import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
+import {
+  type NamedCommand,
+  type CommandOption,
+} from '../CommandPalette/CommandManager';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+
+configureActions({
+  depth: 2,
+  limit: 20,
+});
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -209,6 +223,11 @@ const buildFakeMenuTemplate = () => [
     click: action('click option 2'),
   },
 ];
+
+const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
+  hasPreviewsRunning: false,
+  launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+};
 
 storiesOf('Welcome', module)
   .addDecorator(muiDecorator)
@@ -1088,6 +1107,30 @@ storiesOf('UI Building Blocks/AlertMessage', module)
       inimicus.
     </AlertMessage>
   ))
+  .add('long text with icon', () => (
+    <AlertMessage
+      kind="info"
+      renderLeftIcon={() => (
+        <img
+          src="res/tutorial_icons/tween-behavior.jpg"
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            maxWidth: 128,
+            maxHeight: 128,
+          }}
+        />
+      )}
+      onHide={() => {}}
+    >
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
   .add('warning', () => (
     <AlertMessage kind="warning">
       Hello World, this is an alert text
@@ -1555,6 +1598,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     }
                     onObjectCreated={() => {}}
                     onObjectSelected={() => {}}
+                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   />
                 </TabContentContainer>
               }
@@ -2673,6 +2717,44 @@ storiesOf('EventsTree', module)
         </FixedHeightFlexContainer>
       </div>
     </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (no scope)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.emptyEventsList}
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'small'}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet', module)
@@ -3164,6 +3246,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3194,6 +3277,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3293,6 +3377,10 @@ storiesOf('BehaviorsEditor', module)
       <BehaviorsEditor
         project={testProject.project}
         object={testProject.spriteObjectWithBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
   ));
@@ -3774,20 +3862,24 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div style={{ height: 200 }}>
-      <ValueStateHolder
-        initialValue={null}
-        render={(value, onChange) => (
-          <ResourcesList
-            onSelectResource={onChange}
-            selectedResource={value}
-            onDeleteResource={() => {}}
-            onRenameResource={() => {}}
-            project={testProject.project}
-          />
-        )}
-      />
-    </div>
+    <DragAndDropContextProvider>
+      <div style={{ height: 200 }}>
+        <ValueStateHolder
+          initialValue={null}
+          render={(value, onChange) => (
+            <ResourcesList
+              onSelectResource={onChange}
+              selectedResource={value}
+              onDeleteResource={() => {}}
+              onRenameResource={() => {}}
+              project={testProject.project}
+              onRemoveUnusedResources={() => {}}
+              onRemoveAllResourcesWithInvalidPath={() => {}}
+            />
+          )}
+        />
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsFunctionConfigurationEditor', module)
@@ -3905,7 +3997,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4004,6 +4096,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('Error in functions', () => (
@@ -4045,24 +4138,35 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ));
 
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={''}
       onChange={action('change')}
+      objectType=""
     />
   ))
-  .add('with a non existing behavior selected', () => (
+  .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
+      objectType=""
+    />
+  ))
+  .add('default, for a text object', () => (
+    <BehaviorTypeSelector
+      project={testProject.project}
+      value={''}
+      onChange={action('change')}
+      objectType="TextObject::Text"
     />
   ));
 
@@ -4104,7 +4208,7 @@ storiesOf('ExtensionsSearchDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4128,6 +4232,7 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      onEditLayerEffects={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4135,6 +4240,7 @@ storiesOf('LayersList', module)
         cb(true);
       }}
       layersContainer={testProject.testLayout}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('small width and height', () => (
@@ -4147,6 +4253,7 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
+        onEditLayerEffects={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4154,6 +4261,7 @@ storiesOf('LayersList', module)
           cb(true);
         }}
         layersContainer={testProject.testLayout}
+        hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       />
     </div>
   ));
@@ -4209,5 +4317,112 @@ storiesOf('NewObjectDialog', module)
       project={testProject.project}
       onClose={action('close')}
       onChoose={action('choose')}
+    />
+  ));
+
+storiesOf('CommandPalette', module)
+  .addDecorator(muiDecorator)
+  .add('commands', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                name: 'OPEN_PROJECT',
+                displayText: t`Open project`,
+                handler: () => {},
+              },
+              {
+                name: 'SAVE_PROJECT',
+                displayText: t`Save project`,
+                handler: () => {},
+              },
+              {
+                name: 'EDIT_OBJECT',
+                displayText: t`Edit object...`,
+                handler: () => {},
+              },
+            ]: Array<NamedCommand>)
+          }
+          onClose={() => {}}
+          onSelect={action('Open command')}
+          placeholder="Start typing a command..."
+        />
+      )}
+    </I18n>
+  ))
+  .add('command options', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                text: 'Player',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Platform',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Enemy',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+            ]: Array<CommandOption>)
+          }
+          onClose={() => {}}
+          onSelect={action('Select command option')}
+          placeholder="Edit object..."
+        />
+      )}
+    </I18n>
+  ));
+
+storiesOf('HotReloadPreviewButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={false}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ))
+  .add('with preview(s) running', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={true}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ));
+
+storiesOf('HotReloadLogsDialog', module)
+  .addDecorator(muiDecorator)
+  .add('with an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'error',
+          message: 'Oops, something could not be hot-reloaded.',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ))
+  .add('without an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'info',
+          message: 'Everything is fine',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
     />
   ));

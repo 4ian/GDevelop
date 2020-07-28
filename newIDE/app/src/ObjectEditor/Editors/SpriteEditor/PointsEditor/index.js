@@ -14,7 +14,7 @@ import {
 import SpriteSelector from '../Utils/SpriteSelector';
 import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
-const gd = global.gd;
+const gd /*TODO: add flow in this file */ = global.gd;
 
 export default class PointsEditor extends Component {
   state = {

@@ -57,6 +57,28 @@ gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
+ * @param {VideoObjectData} oldObjectData
+ * @param {VideoObjectData} newObjectData
+ */
+gdjs.VideoRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.loop !== newObjectData.content.loop) {
+    this.setLoop(newObjectData.content.loop);
+  }
+  if (oldObjectData.content.volume !== newObjectData.content.volume) {
+    this.setVolume(newObjectData.content.volume);
+  }
+
+  if (oldObjectData.content.videoResource !== newObjectData.content.videoResource) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @private
  * @param {{customSize: {width: number, height: number}}} initialInstanceData The initial instance data

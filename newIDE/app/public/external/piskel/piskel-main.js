@@ -25,7 +25,7 @@ const closeWindow = () => {
 };
 
 // Repeatedly try to gain access to piskel's control element and its methods
-// When succeeding, stop trying.
+// When succeeded, stop trying.
 const editorFrameEl = document.getElementById('piskel-frame');
 let pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
 editorFrameEl.onload = () => {

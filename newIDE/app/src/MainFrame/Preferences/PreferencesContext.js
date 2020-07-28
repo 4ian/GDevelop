@@ -121,6 +121,7 @@ export type PreferencesValues = {|
   themeName: string,
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
+  hiddenTutorialHints: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -132,6 +133,9 @@ export type PreferencesValues = {|
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  autoOpenMostRecentProject: boolean,
+  hasProjectOpened: boolean,
+  useCommandPalette: boolean,
 |};
 
 /**
@@ -146,6 +150,7 @@ export type Preferences = {|
   checkUpdates: (forceDownload?: boolean) => void,
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
+  showTutorialHint: (identifier: string, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -168,6 +173,14 @@ export type Preferences = {|
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  getAutoOpenMostRecentProject: () => boolean,
+  setAutoOpenMostRecentProject: (enabled: boolean) => void,
+  hadProjectOpenedDuringLastSession: () => boolean,
+  setHasProjectOpened: (enabled: boolean) => void,
+  setUseCommandPalette: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -177,6 +190,7 @@ export const initialPreferences = {
     themeName: 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
+    hiddenTutorialHints: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -188,6 +202,9 @@ export const initialPreferences = {
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
     recentProjectFiles: [],
+    autoOpenMostRecentProject: true,
+    hasProjectOpened: false,
+    useCommandPalette: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -196,6 +213,7 @@ export const initialPreferences = {
   checkUpdates: () => {},
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
+  showTutorialHint: (identifier: string, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
@@ -214,6 +232,14 @@ export const initialPreferences = {
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => {},
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  getAutoOpenMostRecentProject: () => true,
+  setAutoOpenMostRecentProject: () => {},
+  hadProjectOpenedDuringLastSession: () => false,
+  setHasProjectOpened: () => {},
+  setUseCommandPalette: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

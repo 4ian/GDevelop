@@ -10,14 +10,11 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { findEmptyPath } from './LocalPathFinder';
 import ExamplesList from './ExamplesList';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 
 // To add a new example, add it first in resources/examples (at which point you can see it
@@ -31,11 +28,12 @@ type Props = {|
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
   ) => void,
+  onChangeOutputPath: (outputPath: string) => void,
   onExamplesLoaded: () => void,
+  outputPath: string,
 |};
 
 type State = {|
-  outputPath: string,
   exampleNames: ?Array<string>,
 |};
 
@@ -54,11 +52,6 @@ export const showGameFileCreationError = (
 
 export default class LocalExamples extends Component<Props, State> {
   state = {
-    outputPath: findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ),
     exampleNames: null,
   };
 
@@ -80,13 +73,8 @@ export default class LocalExamples extends Component<Props, State> {
     });
   }
 
-  _handleChangePath = (outputPath: string) =>
-    this.setState({
-      outputPath,
-    });
-
   createFromExample = (i18n: I18nType, exampleName: string) => {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     findExamples(examplesPath => {
@@ -114,8 +102,8 @@ export default class LocalExamples extends Component<Props, State> {
               <Column expand>
                 <LocalFolderPicker
                   fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
+                  value={this.props.outputPath}
+                  onChange={this.props.onChangeOutputPath}
                   type="create-game"
                 />
               </Column>

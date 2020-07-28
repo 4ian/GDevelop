@@ -7,10 +7,12 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
+import { VideoTutorials } from './VideoTutorials';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials',
+  currentTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials',
+  outputPath: string,
 |};
 
 export type CreateProjectDialogWithComponentsProps = {|
@@ -36,9 +38,12 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: 'starters',
+    outputPath: '',
   };
 
-  _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
+  _onChangeTab = (
+    newTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials'
+  ) => {
     this.setState({
       currentTab: newTab,
     });
@@ -79,22 +84,28 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <Tab label={<Trans>Starters</Trans>} value="starters" />
             <Tab label={<Trans>Examples</Trans>} value="examples" />
             <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
+            <Tab label={<Trans>Videos</Trans>} value="video-tutorials" />
           </Tabs>
           {this.state.currentTab === 'starters' && (
             <StartersComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onShowExamples={this._showExamples}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'examples' && (
             <ExamplesComponent
               onOpen={onOpen}
               onCreate={onCreate}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
               onExamplesLoaded={this._onExamplesLoaded}
+              outputPath={this.state.outputPath}
             />
           )}
           {this.state.currentTab === 'tutorials' && <Tutorials />}
+          {this.state.currentTab === 'video-tutorials' && <VideoTutorials />}
         </Column>
       </Dialog>
     );

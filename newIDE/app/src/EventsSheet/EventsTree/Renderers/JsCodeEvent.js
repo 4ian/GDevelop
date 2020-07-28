@@ -13,7 +13,7 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
 
@@ -134,12 +134,16 @@ export default class JsCodeEvent extends React.Component<
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
+
+    const textStyle = this.props.disabled ? styles.comment : undefined;
+
     const objects = (
       <span
         className={classNames({
           [selectableArea]: true,
         })}
         onClick={this.editObject}
+        style={textStyle}
       >
         {parameterObjects
           ? `, objects /*${parameterObjects}*/`
@@ -148,23 +152,29 @@ export default class JsCodeEvent extends React.Component<
     );
 
     const eventsFunctionContext = this.props.scope.eventsFunction ? (
-      <span>, eventsFunctionContext</span>
+      <span style={textStyle}>, eventsFunctionContext</span>
     ) : null;
 
     const functionStart = (
       <p style={styles.wrappingText}>
-        <span>{'(function(runtimeScene'}</span>
+        <span style={textStyle}>
+          {this.props.disabled ? '/*' : ''}
+          {'(function(runtimeScene'}
+        </span>
         {objects}
         {eventsFunctionContext}
-        <span>{') {'}</span>
+        <span style={textStyle}>{') {'}</span>
       </p>
     );
     const functionEnd = (
       <p style={styles.wrappingText}>
-        <span>{'})(runtimeScene'}</span>
+        <span style={textStyle}>{'})(runtimeScene'}</span>
         {objects}
         {eventsFunctionContext}
-        <span>{');'}</span>
+        <span style={textStyle}>
+          {');'}
+          {this.props.disabled ? '*/' : ''}
+        </span>
         <span style={styles.comment}>
           {' // '}
           <a

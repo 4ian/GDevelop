@@ -52,7 +52,7 @@ module.exports = {
     extension
       .addDependency()
       .setName("Thirteen Checker")
-      .setDependencyType(gd.DependencyTypes.npm)
+      .setDependencyType("npm")
       .setExportName("is-thirteen")
       .setVersion("2.0.0");
 

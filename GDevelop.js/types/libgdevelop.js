@@ -99,7 +99,6 @@ declare class libGDevelop {
   ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
-  DependencyTypes: Class<DependencyTypes>;
   DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;

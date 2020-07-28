@@ -8,18 +8,9 @@
 #include <map>
 #include "GDCore/String.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
-    /**
-     * \brief Types of dependencies supported.
-     */
-    enum DependencyTypes {
-        invalid, // This one is the default one: a dependency with that type won't get exported.
-        cordova,
-        npm
-    };
-
-
     /**
      * \brief Contains a information about a Dependency (library) of an extension.
      * \note Is subject to changes.
@@ -58,9 +49,17 @@ namespace gd {
 
             /**
              * \brief Sets the type of dependecy (What will be used to install it)
+             * 
+             * Types can be either "npm", "cordova"
              */
-            DependencyMetadata& SetDependencyType(DependencyTypes dependencyType_) {
+            DependencyMetadata& SetDependencyType(const gd::String& dependencyType_) {
                 dependencyType = dependencyType_;
+                if(
+                    dependencyType != "npm" &&
+                    dependencyType != "cordova"
+                ) {
+                    gd::LogWarning("Invalid dependency type: " + dependencyType);
+                }
                 return *this;
             };
 
@@ -75,7 +74,7 @@ namespace gd {
             const gd::String& GetName() const { return name; };
             const gd::String& GetExportName() const { return exportName; };
             const gd::String& GetVersion() const { return version; };
-            DependencyTypes GetDependencyType() const { return dependencyType; };
+            const gd::String& GetDependencyType() const { return dependencyType; };
             gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) { return extraData[settingName]; };
             std::map<gd::String, gd::PropertyDescriptor>& GetAllExtraSettings() { return extraData; }
 
@@ -83,7 +82,7 @@ namespace gd {
             gd::String name = ""; ///< The name of the dependency.
             gd::String exportName = ""; ///< The name used to install the package (example: npm package name for npm dependency type).
             gd::String version = "-1"; ///< The version of the dependency
-            DependencyTypes dependencyType = DependencyTypes::invalid; ///< The tool used to install the dependency.
+            gd::String dependencyType = "npm"; ///< The tool used to install the dependency.
             std::map<gd::String, gd::PropertyDescriptor> extraData; ///< Contains dependency type specific additional parameters for the dependency.
     };
 } // namespace gd

@@ -7,8 +7,8 @@ declare class gdDependencyMetadata {
   setExportName(exportName_: string): gdDependencyMetadata;
   getVersion(): string;
   setVersion(version_: string): gdDependencyMetadata;
-  getDependencyType(): DependencyTypes;
-  setDependencyType(dependencyType_: DependencyTypes): gdDependencyMetadata;
+  getDependencyType(): string;
+  setDependencyType(dependencyType_: string): gdDependencyMetadata;
   getExtraSetting(settingName: string): gdPropertyDescriptor;
   setExtraSetting(settingName: string, settingValue: gdPropertyDescriptor): gdDependencyMetadata;
   getAllExtraSettings(): gdMapStringPropertyDescriptor;

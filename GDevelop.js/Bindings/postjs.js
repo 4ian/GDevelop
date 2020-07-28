@@ -156,13 +156,6 @@ var adaptNamingConventions = function(gd) {
         this.insert(e, this.size() - 1);
     };
 
-    //Create enums
-    gd.DependencyTypes = {
-        invalid: 0,
-        cordova: 1,
-        npm: 2
-    }
-
     return gd;
 };
 

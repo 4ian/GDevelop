@@ -1035,8 +1035,6 @@ interface ExpressionMetadata {
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
 
-enum DependencyTypes { "invalid", "cordova", "npm" };
-
 interface DependencyMetadata {
     void DependencyMetadata();
 
@@ -1046,8 +1044,8 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetExportName([Const] DOMString exportName_);
     [Const, Ref] DOMString GetVersion();
     [Ref] DependencyMetadata SetVersion([Const] DOMString version_);
-    DependencyTypes GetDependencyType();
-    [Ref] DependencyMetadata SetDependencyType([Const] DependencyTypes dependencyType_);
+    [Const, Ref] DOMString GetDependencyType();
+    [Ref] DependencyMetadata SetDependencyType([Const] DOMString dependencyType_);
     [Ref] PropertyDescriptor GetExtraSetting([Const] DOMString settingName);
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
     [Ref] MapStringPropertyDescriptor GetAllExtraSettings();

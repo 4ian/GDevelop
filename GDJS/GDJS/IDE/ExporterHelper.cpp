@@ -269,7 +269,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
     for (gd::DependencyMetadata dependencies: extension->GetAllDependencies()) {
-      if (dependencies.GetDependencyType() == gd::DependencyTypes::cordova) {
+      if (dependencies.GetDependencyType() == "cordova") {
 
         plugins += "<plugin name=\"" + dependencies.GetExportName();
         if(dependencies.GetVersion() != "-1") {
@@ -450,13 +450,13 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
     for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
       for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
-        if (dependency.GetDependencyType() == gd::DependencyTypes::npm) {
+        if (dependency.GetDependencyType() == "npm") {
           if(dependency.GetVersion() == "-1") {
             gd::LogError("Latest Version (-1) not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported.");
             continue;
           }
           packages += "     \"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",\n";
-          // In npm extra settings are ignored
+          // For node extra settings are ignored
         }
       }
     }

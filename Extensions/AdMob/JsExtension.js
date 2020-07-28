@@ -39,7 +39,7 @@ module.exports = {
 
     extension.addDependency()
       .setName("AdMob Cordova Extension")
-      .setDependencyType(gd.DependencyTypes.cordova)
+      .setDependencyType("cordova")
       .setExportName("cordova-plugin-admob-free")
       .setVersion("~0.21.0")
       .setExtraSetting(

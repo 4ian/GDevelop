@@ -11,8 +11,6 @@ declare class gdProject extends gdObjectsContainer {
   getPackageName(): string;
   setOrientation(orientation: string): void;
   getOrientation(): string;
-  setAdMobAppId(adMobAppId: string): void;
-  getAdMobAppId(): string;
   setProjectFile(file: string): void;
   getProjectFile(): string;
   setGameResolutionSize(width: number, height: number): void;

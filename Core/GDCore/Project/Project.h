@@ -116,20 +116,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   const gd::String& GetOrientation() const { return orientation; }
 
   /**
-   * \brief Change the project AdMob application ID (needed
-   * to use the AdMob extension). This has no effect on desktop
-   * and web browsers.
-   */
-  void SetAdMobAppId(const gd::String& adMobAppId_) {
-    adMobAppId = adMobAppId_;
-  };
-
-  /**
-   * \brief Get the project AdMob application ID.
-   */
-  const gd::String& GetAdMobAppId() const { return adMobAppId; }
-
-  /**
    * Called when project file has changed.
    */
   void SetProjectFile(const gd::String& file) { gameFile = file; }
@@ -979,7 +965,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String packageName;   ///< Game package name
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
-  gd::String adMobAppId;    ///< AdMob application ID.
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String gameFile;                    ///< File of the game

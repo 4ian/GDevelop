@@ -37,7 +37,6 @@ type State = {|
   version: string,
   packageName: string,
   orientation: string,
-  adMobAppId: string,
   scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
@@ -64,7 +63,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       version: project.getVersion(),
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
-      adMobAppId: project.getAdMobAppId(),
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
@@ -95,7 +93,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       version,
       packageName,
       orientation,
-      adMobAppId,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -110,7 +107,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setVersion(version);
     project.setPackageName(packageName);
     project.setOrientation(orientation);
-    project.setAdMobAppId(adMobAppId);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.setMinimumFPS(minFPS);
@@ -133,7 +129,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       version,
       packageName,
       orientation,
-      adMobAppId,
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
@@ -143,7 +138,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     } = this.state;
 
     const defaultPackageName = 'com.example.mygame';
-    const admobHint = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
     const defaultVersion = '1.0.0';
 
     return (
@@ -407,19 +401,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 </Trans>
               </DismissableAlertMessage>
             )}
-            <Text size="title">
-              <Trans>AdMob</Trans>
-            </Text>
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>AdMob application ID (for iOS and Android)</Trans>
-              }
-              fullWidth
-              hintText={admobHint}
-              type="text"
-              value={adMobAppId}
-              onChange={value => this.setState({ adMobAppId: value })}
-            />
             <Text size="title">
               <Trans>Project files</Trans>
             </Text>

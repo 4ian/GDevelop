@@ -16,8 +16,12 @@ namespace gd{
 
 namespace gd{
   class GD_CORE_API ExtensionPropertiesManager {
+    static const gd::String defaultValue;
     public:
       const gd::String& GetValue(const gd::String& extension, const gd::String& property) const {
+        if(properties.count(extension) == 0 || properties.at(extension).count(property) == 0) {
+          return ExtensionPropertiesManager::defaultValue;
+        }
         return properties.at(extension).at(property);
       };
 

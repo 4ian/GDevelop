@@ -5,6 +5,7 @@
 #include "GDCore/Project/Project.h"
 
 namespace gd {
+    const gd::String ExtensionPropertiesManager::defaultValue = "";
 
 std::map<gd::String, gd::PropertyDescriptor> ExtensionPropertiesManager::GetAllExtensionProperties(const gd::String& extensionName, gd::Project& project) {
     // Create a copy
@@ -22,7 +23,7 @@ void ExtensionPropertiesManager::SerializeTo(SerializerElement& element) const {
     element.ConsiderAsArrayOf("extensionProperties");
     for(const std::pair<gd::String, std::map<gd::String, gd::String>> extension : properties) {
         for(const std::pair<gd::String, gd::String> property : extension.second) {
-            SerializerElement& propertyElement = element.AddChild("extensionProperty");
+            SerializerElement& propertyElement = element.AddChild("extensionProperties");
             propertyElement.AddChild("extension").SetStringValue(extension.first);
             propertyElement.AddChild("property").SetStringValue(property.first);
             propertyElement.AddChild("value").SetStringValue(property.second);

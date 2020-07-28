@@ -300,8 +300,6 @@ interface Project {
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
-    void SetAdMobAppId([Const] DOMString adMobAppId);
-    [Const, Ref] DOMString GetAdMobAppId();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
     void SetGameResolutionSize(long width, long height);

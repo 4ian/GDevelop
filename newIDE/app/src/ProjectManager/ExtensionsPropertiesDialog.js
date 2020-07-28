@@ -31,16 +31,16 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
     const propertyList = [];
     for (let i = 0; i < allExtensions.size(); i++) {
       const extension = allExtensions.at(i);
-      const properties = project.getExtensionPropertiesManager().getAllExtensionProperties(extension.getName(), project);
-      if (
-        properties
-          .keys()
-          .size() === 0
-      )
-        continue;
+      const properties = project
+        .getExtensionPropertiesManager()
+        .getAllExtensionProperties(extension.getName(), project);
+      if (properties.keys().size() === 0) continue;
       const propertiesSchema = propertiesMapToSchema(
         properties,
-        instance => project.getExtensionPropertiesManager().getAllExtensionProperties(extension.getName(), project),
+        instance =>
+          project
+            .getExtensionPropertiesManager()
+            .getAllExtensionProperties(extension.getName(), project),
         (instance, propertyName, newValue) =>
           project
             .getExtensionPropertiesManager()
@@ -71,7 +71,11 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
               key="apply"
             />,
           ]}
-          title={<Text size="title"><Trans>Extension properties</Trans></Text>}
+          title={
+            <Text size="title">
+              <Trans>Extension properties</Trans>
+            </Text>
+          }
           cannotBeDismissed={true}
           open={this.props.open}
           onRequestClose={this.props.onApply}

@@ -10,12 +10,13 @@
 #include "GDCore/String.h"
 
 namespace gd{
+  class Project;
+  class PropertyDescriptor;
+}
+
+namespace gd{
   class GD_CORE_API ExtensionPropertiesManager {
     public:
-  	  gd::String& GetValue(const gd::String& extension, const gd::String& property) {
-        return properties[extension][property];
-      };
-
       const gd::String& GetValue(const gd::String& extension, const gd::String& property) const {
         return properties.at(extension).at(property);
       };
@@ -32,6 +33,8 @@ namespace gd{
         }
         return false;
       }
+
+      std::map<gd::String, gd::PropertyDescriptor> GetAllExtensionProperties(const gd::String& extensionName, gd::Project& project);
 
       ///@{
       /**

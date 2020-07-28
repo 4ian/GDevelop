@@ -44,7 +44,7 @@ module.exports = {
       .setType("number")
       .setLabel("Only numbers here ;)");
     
-      extension.registerProperty("DummyPropertyBoolean")
+    extension.registerProperty("DummyPropertyBoolean")
       .setDescription(_("A boolean property"))
       .setType("boolean");
 

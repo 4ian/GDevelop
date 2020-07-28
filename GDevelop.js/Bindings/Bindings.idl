@@ -401,6 +401,7 @@ interface ExtensionPropertiesManager {
     [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
     void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
     boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
+    [Value] MapStringPropertyDescriptor GetAllExtensionProperties([Const] DOMString extension, [Ref] Project project);
 };
 
 interface Behavior {

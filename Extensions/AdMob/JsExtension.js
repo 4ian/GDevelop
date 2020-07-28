@@ -44,9 +44,8 @@ module.exports = {
       .setVersion("~0.21.0")
       .setExtraSetting(
         "ADMOB_APP_ID", 
-        new gd.PropertyDescriptor()
+        new gd.PropertyDescriptor("AdMobAppID")
          .setType("ExtensionProperty")
-         .setValue("AdMobAppID")
       );
 
     // Banner

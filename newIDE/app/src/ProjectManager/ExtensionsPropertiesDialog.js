@@ -22,61 +22,42 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
     this.props.onApply();
   };
 
-  _mapExtensionValueToPropertyDescriptors(
-    properties: gdMapStringPropertyDescriptor,
-    extensionName: string,
-    project: gdProject
-  ) {
-    const keys = properties.keys().toJSArray();
-    const propertiesManager = project.getExtensionPropertiesManager();
-    for (let key of keys) {
-      if (propertiesManager.hasProperty(extensionName, key))
-        // Leave default value if none has been set yet
-        properties
-          .get(key)
-          .setValue(propertiesManager.getValue(extensionName, key));
-    }
-    return properties;
-  }
-
   render() {
     const { project } = this.props;
+    global.project = project;
     const allExtensions = project
       .getCurrentPlatform()
       .getAllPlatformExtensions();
-    const properties = [];
+    const propertyList = [];
     for (let i = 0; i < allExtensions.size(); i++) {
       const extension = allExtensions.at(i);
+      const properties = project.getExtensionPropertiesManager().getAllExtensionProperties(extension.getName(), project);
+      if (
+        properties
+          .keys()
+          .size() === 0
+      )
+        continue;
       const propertiesSchema = propertiesMapToSchema(
-        extension.getAllProperties(),
-        instance =>
-          this._mapExtensionValueToPropertyDescriptors(
-            extension.getAllProperties(),
-            extension.getName(),
-            project
-          ),
+        properties,
+        instance => project.getExtensionPropertiesManager().getAllExtensionProperties(extension.getName(), project),
         (instance, propertyName, newValue) =>
           project
             .getExtensionPropertiesManager()
             .setValue(extension.getName(), propertyName, newValue)
       );
-      if (
-        extension
-          .getAllProperties()
-          .keys()
-          .size() !== 0
-      )
-        properties.push(
-          <ColumnStackLayout key={extension.getName()}>
-            <Text size="title">
-              <Trans>{extension.getFullName()}</Trans>
-            </Text>
-            <PropertiesEditor
-              schema={propertiesSchema}
-              instances={[extension.getAllProperties()]}
-            />
-          </ColumnStackLayout>
-        );
+
+      propertyList.push(
+        <ColumnStackLayout key={extension.getName()}>
+          <Text size="title">
+            <Trans>{extension.getFullName()}</Trans>
+          </Text>
+          <PropertiesEditor
+            schema={propertiesSchema}
+            instances={[extension.getAllProperties()]}
+          />
+        </ColumnStackLayout>
+      );
     }
 
     return (
@@ -90,13 +71,13 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
               key="apply"
             />,
           ]}
-          title={<Trans>Extension properties</Trans>}
+          title={<Text size="title"><Trans>Extension properties</Trans></Text>}
           cannotBeDismissed={true}
           open={this.props.open}
           onRequestClose={this.props.onApply}
         >
-          {properties.length ? (
-            <List>{properties}</List>
+          {propertyList.length ? (
+            <List>{propertyList}</List>
           ) : (
             <EmptyMessage>
               <Trans>No Extension Properties Available.</Trans>

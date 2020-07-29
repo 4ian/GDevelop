@@ -230,6 +230,7 @@ class GD_CORE_API PlatformExtension {
                               const gd::String& smallicon_,
                               std::shared_ptr<gd::BaseEvent> instance);
 
+#if defined(GD_IDE_ONLY)
   /**
    * \brief Adds a property to the Extension.
    * \param name The internal name of the property (to get it later).
@@ -249,6 +250,7 @@ class GD_CORE_API PlatformExtension {
       .SetLabel(hint);
     return extensionProperties[name];
   };
+#endif
 
   /**
    * \brief Adds a property to the Extension.

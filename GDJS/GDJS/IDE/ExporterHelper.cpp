@@ -455,15 +455,16 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             gd::LogError("Latest Version (-1) not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported.");
             continue;
           }
-          packages += "     \"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",\n";
+          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",";
           // For node extra settings are ignored
         }
       }
     }
 
-    packages = packages.substr(0, str.size()-2); // Remove the ,\n at the end as last item cannot have , in JSON.
+    packages = packages.substr(1, packages.size()); // Remove first line break for esthetic.
+    packages = packages.substr(0, packages.size()-1); // Remove the , at the end as last item cannot have , in JSON.
 
-    str.FindAndReplace("\"GDJS_DEPENDENCY\": \"0\"", packages);
+    str = str.FindAndReplace("\"GDJS_DEPENDENCY\": \"0\"", packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";

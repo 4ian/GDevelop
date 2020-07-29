@@ -13,6 +13,7 @@ gdjs.CameraViewportObject = function(runtimeScene, objectData) {
 
   this.width  = 250;
   this.height = 150;
+  this.hidden = false;
 
   this.camera = objectData.content.cameraId;
   this._scene = runtimeScene;
@@ -77,6 +78,16 @@ gdjs.CameraViewportObject.prototype.getHeight = function() {
 gdjs.CameraViewportObject.prototype.getWidth = function() {
   return this.width;
 }
+
+/**
+ * Hide (or show) the object
+ * @param {boolean} hidden true to hide the object, false to show it again.
+ */
+gdjs.CameraViewportObject.prototype.hide = function(hidden) {
+  if ( hidden === undefined ) hidden = true;
+  this.hidden = hidden;
+  this._renderer.changeVisible();
+};
 
 /**
  * Get the camera being rendered.

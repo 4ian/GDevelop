@@ -22,8 +22,10 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
+    if(!this._sprite.visible) return;
+
     /* 
-     * Remove all cameras: cameras can't render themselves as it could result in an endless loop.
+     * Remove all viewports: viewports can't render themselves as it could result in an endless loop.
      * We could theoretically count the renders and replace the camera with a blank texture after too many renders,
      * But chrome web gl automatically blocks textures that are made from a texture to be applied to the texture it is made from.
      */
@@ -37,7 +39,7 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
     // Camera magic
     this._renderer.render(this._scene.getRenderer().getPIXIContainer(), this._renderTexture);
 
-    // Add the cameras back
+    // Add the viewports back
     for(var objectId in this._scene._allInstancesList) {
         var object = this._scene._allInstancesList[objectId];
         if(object.type !== "CameraViewport::CameraViewport") continue;
@@ -49,4 +51,8 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
 
 gdjs.CameraViewportObjectPixiRenderer.prototype.changeSize = function() {
     this._renderTexture.resize(this._object.getWidth(), this._object.getHeight());
+};
+
+gdjs.CameraViewportObjectPixiRenderer.prototype.changeVisible = function() {
+    this._sprite.visible = !this._object.hidden;
 };

@@ -117,6 +117,16 @@ gdjs.Layer.prototype._createCamera = function(cameraId) {
 };
 
 /**
+ * @param {Camera} camera 
+ */
+gdjs.Layer.prototype._applyCamera = function(camera) {
+  this.setCameraX(camera.cameraX);
+  this.setCameraY(camera.cameraY);
+  this.setCameraZoom(camera.zoomFactor);
+  this.setCameraRotation(camera.cameraRotation);
+}
+
+/**
  * Returns the requested camera. Creates it if not existing.
  * @param {number} cameraId The camera number.
  * @returns {Camera}

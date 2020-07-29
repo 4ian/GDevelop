@@ -24,12 +24,32 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.getRendererObject = function() {
 gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
     if(!this._sprite.visible) return;
 
+    var layerBackups = {};
+
+    // If not main camera, set layer the current camera's data
+    if(this._object.camera > 0) {
+        var allLayers = [];
+        this._scene.getAllLayerNames(allLayers);
+        for(var layerId in allLayers) {
+            /** @type {gdjs.Layer} */
+            var layer = this._scene.getLayer(allLayers[layerId]);
+            layerBackups[allLayers[layerId]] = {
+                cameraX: layer.getCameraX(),
+                cameraY: layer.getCameraY(),
+                zoomFactor: layer.getCameraZoom(),
+                cameraRotation: layer.getCameraRotation(),
+            }
+            layer._applyCamera(layer.getCamera(this._object.camera));
+        }
+    }
+
+    this._scene._constructListOfAllInstances();
+
     /* 
      * Remove all viewports: viewports can't render themselves as it could result in an endless loop.
      * We could theoretically count the renders and replace the camera with a blank texture after too many renders,
      * But chrome web gl automatically blocks textures that are made from a texture to be applied to the texture it is made from.
      */
-     this._scene._constructListOfAllInstances();
     for(var objectId in this._scene._allInstancesList) {
         var object = this._scene._allInstancesList[objectId];
         if(object.type !== "CameraViewport::CameraViewport") continue;
@@ -45,6 +65,17 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
         if(object.type !== "CameraViewport::CameraViewport") continue;
         object.getRendererObject().visible = true;
     }
+
+    // Restore layer camera positions
+    if(this._object.camera > 0) {
+        var allLayers = [];
+        this._scene.getAllLayerNames(allLayers);
+        for(var layerId in allLayers) {
+            var layer = this._scene.getLayer(allLayers[layerId]);
+            layer._applyCamera(layerBackups[allLayers[layerId]]);
+        }
+    }
+
     this._sprite.x = this._object.getX();
     this._sprite.y = this._object.getY();
 };

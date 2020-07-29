@@ -53,6 +53,6 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.changeSize = function() {
     this._renderTexture.resize(this._object.getWidth(), this._object.getHeight());
 };
 
-gdjs.CameraViewportObjectPixiRenderer.prototype.changeVisible = function() {
-    this._sprite.visible = !this._object.hidden;
+gdjs.CameraViewportObjectPixiRenderer.prototype.changeVisible = function(hidden) {
+    this._sprite.visible = hidden;
 };

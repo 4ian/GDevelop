@@ -31,10 +31,7 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
     for(var objectId in this._scene._allInstancesList) {
         var object = this._scene._allInstancesList[objectId];
         if(object.type !== "CameraViewport::CameraViewport") continue;
-        this._scene
-            .getLayer(object.layer)
-            .getRenderer()
-            .removeRendererObject(object.getRendererObject());
+        object.getRendererObject().visible = false;
     }
 
     // Camera magic
@@ -44,10 +41,7 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
     for(var objectId in this._scene._allInstancesList) {
         var object = this._scene._allInstancesList[objectId];
         if(object.type !== "CameraViewport::CameraViewport") continue;
-        this._scene
-            .getLayer(object.layer)
-            .getRenderer()
-            .addRendererObject(object.getRendererObject());
+        object.getRendererObject().visible = true;
     }
     this._sprite.x = this._object.getX();
     this._sprite.y = this._object.getY();

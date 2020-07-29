@@ -465,13 +465,33 @@ module.exports = {
       style.fontSize = 24;
       style.wordWrap = true;
       style.wordWrapWidth = 250;
-      PIXI.BitmapFont.from('basicBitmap', this.style);
+      style.fill = '#000000';
 
+      const slugFontName =
+        style.fontFamily +
+        '-' +
+        style.fontSize +
+        '-' +
+        style.fill +
+        '-bitmapFont';
+
+      if (!PIXI.BitmapFont.available[slugFontName]) {
+        PIXI.BitmapFont.from(slugFontName, style);
+        console.log('1');
+      }
+
+      console.log('2');
       this._pixiObject = new PIXI.BitmapText('BitmapText object', {
-        fontName: 'basicBitmap',
+        fontName: slugFontName,
       });
 
-      this._pixiObject.style = style;
+      const properties = this._associatedObject.getProperties();
+      const color = properties.get('color').getValue();
+
+      style.fill = color;
+
+      this.style = style;
+      this.constructorSlugFontName = slugFontName;
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -506,14 +526,20 @@ module.exports = {
       this._pixiObject.alpha = opacity / 255;
 
       const color = properties.get('color').getValue();
-      if (color !== this._pixiObject.style.fill) {
+      if (color !== this.style.fill) {
+        this.style.fill = color;
         this._pixiObject.dirty = true;
-        this._pixiObject.style.fill = color;
       }
 
       const fontSize = Number(properties.get('fontSize').getValue());
-      this._pixiObject.fontSize = fontSize; // size of the text
-      this._pixiObject.style.fontSize = fontSize; //size of the bitmap font texture
+      if (
+        fontSize !== this._pixiObject.fontSize ||
+        fontSize !== this.style.fontSize
+      ) {
+        this._pixiObject.fontSize = fontSize; // size of the text
+        this.style.fontSize = fontSize; //size of the bitmap font texture
+        this._pixiObject.dirty = true;
+      }
 
       const fontResourceName = properties.get('fontFamily').getValue();
       if (this._fontResourceName !== fontResourceName) {
@@ -523,7 +549,7 @@ module.exports = {
           .loadFontFamily(this._project, fontResourceName)
           .then(fontFamily => {
             // Once the font is loaded, we can use the given fontFamily.
-            this._pixiObject.style.fontFamily = fontFamily;
+            this.style.fontFamily = fontFamily;
             this._pixiObject.dirty = true;
           })
           .catch(err => {
@@ -536,8 +562,8 @@ module.exports = {
       }
 
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
-      if (wordWrap !== this._pixiObject.style.wordWrap) {
-        this._pixiObject.style.wordWrap = wordWrap;
+      if (wordWrap !== this.style.wordWrap) {
+        this.style.wordWrap = wordWrap;
         this._pixiObject.dirty = true;
       }
 
@@ -562,7 +588,24 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
       }
-      PIXI.BitmapFont.from('basicBitmap', this._pixiObject.style);
+
+      const slugFontName =
+        this.style.fontFamily +
+        '-' +
+        this.style.fontSize +
+        '-' +
+        this.style.fill +
+        '-bitmapFont';
+
+      if (!PIXI.BitmapFont.available[slugFontName] || this._pixiObject.dirty) {
+        PIXI.BitmapFont.from(slugFontName, this.style);
+      }
+
+      this._pixiObject.fontName = slugFontName;
+      if (this.constructorSlugFontName !== slugFontName) {
+        console.log('slug different');
+      }
+
       this._pixiObject.updateText();
     };
 

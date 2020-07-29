@@ -95,7 +95,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function()
 };
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
   this.style.fontSize = this._object._fontSize;
-  debugger;
   this._pixiObject.fontSize = this._object._fontSize;
   this._pixiObject.dirty = true;
 };

@@ -41,26 +41,29 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
             .getExtensionPropertiesManager()
             .getAllExtensionProperties(extension.getName(), project),
         (instance, propertyName, newValue) => {
-          if(project
-            .getExtensionPropertiesManager()
-            .getAllExtensionProperties(extension.getName(), project)
-            .get(propertyName)
-            .getType() === "boolean") {
-              if(newValue === '1') {
-                project
-                  .getExtensionPropertiesManager()
-                  .setValue(extension.getName(), propertyName, 'true');
-              } else {
-                project
-                  .getExtensionPropertiesManager()
-                  .setValue(extension.getName(), propertyName, 'false');
-              }
+          if (
+            project
+              .getExtensionPropertiesManager()
+              .getAllExtensionProperties(extension.getName(), project)
+              .get(propertyName)
+              .getType() === 'boolean'
+          ) {
+            if (newValue === '1') {
+              project
+                .getExtensionPropertiesManager()
+                .setValue(extension.getName(), propertyName, 'true');
+            } else {
+              project
+                .getExtensionPropertiesManager()
+                .setValue(extension.getName(), propertyName, 'false');
+            }
           } else {
             project
               .getExtensionPropertiesManager()
-              .setValue(extension.getName(), propertyName, newValue)
+              .setValue(extension.getName(), propertyName, newValue);
           }
-        });
+        }
+      );
 
       propertyList.push(
         <ColumnStackLayout key={extension.getName()}>

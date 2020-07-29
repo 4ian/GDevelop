@@ -572,11 +572,14 @@ module.exports = {
         this._pixiObject.align = align;
         this._pixiObject.dirty = true;
       }
-
+      
+      const width = this._instance.hasCustomSize() ? this._instance.getCustomWidth() : this.getDefaultWidth();
+      const height = this._instance.hasCustomSize() ? this._instance.getCustomHeight() : this.getDefaultHeight();
+      
       this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
+        this._instance.getX() + width / 2;
       this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
+        this._instance.getY() + height / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );

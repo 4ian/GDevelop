@@ -620,7 +620,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   extensionProperties.UnserializeFrom(propElement.GetChild("extensionProperties"));
 
   // Compatibility: Move AdMob App ID from project property to extension property.
-  if(propElement.HasAttribute("adMobAppId")) {
+  if(propElement.GetStringAttribute("adMobAppId", "") != "") {
     extensionProperties.SetValue("AdMob", "AdMobAppID", propElement.GetStringAttribute("adMobAppId", ""));
   }
 
@@ -1084,6 +1084,8 @@ void Project::Init(const gd::Project& game) {
   loadingScreen = game.loadingScreen;
   objectGroups = game.objectGroups;
 
+  extensionProperties = game.extensionProperties;
+
   gdMajorVersion = game.gdMajorVersion;
   gdMinorVersion = game.gdMinorVersion;
   gdBuildVersion = game.gdBuildVersion;
@@ -1091,7 +1093,6 @@ void Project::Init(const gd::Project& game) {
   currentPlatform = game.currentPlatform;
 #endif
   extensionsUsed = game.extensionsUsed;
-  extensionProperties = game.extensionProperties;
   platforms = game.platforms;
 
   // Resources

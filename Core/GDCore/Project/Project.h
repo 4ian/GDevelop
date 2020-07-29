@@ -291,6 +291,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   std::vector<gd::String>& GetUsedExtensions() { return extensionsUsed; };
 
+#if defined(GD_IDE_ONLY)
   /**
    * \brief Get all extension properties
    */
@@ -301,7 +302,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::ExtensionPropertiesManager& GetExtensionPropertiesManager() const { return extensionProperties; };
 
-#if defined(GD_IDE_ONLY)
   /**
    * Return the list of platforms used by the project.
    */

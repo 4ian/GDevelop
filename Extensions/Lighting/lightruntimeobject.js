@@ -120,24 +120,8 @@ gdjs.LightRuntimeObject.prototype.getColor = function () {
 };
 
 /**
- * Set the position of x co-ordinate of light object.
- * @param {number} x
- */
-gdjs.LightRuntimeObject.prototype.setX = function (x) {
-  gdjs.RuntimeObject.prototype.setX.call(this, x);
-};
-
-/**
- * Set the position of y co-ordinate of the light object.
- * @param {number} y
- */
-gdjs.LightRuntimeObject.prototype.setY = function (y) {
-  gdjs.RuntimeObject.prototype.setY.call(this, y);
-};
-
-/**
  * Get the light obstacles manager if objects with the behavior exist, null otherwise.
- * @returns {?gdjs.LightObstaclesManager} gdjs.LightObstaclesMager if it exists, otherwise null.
+ * @returns {?gdjs.LightObstaclesManager} gdjs.LightObstaclesManager if it exists, otherwise null.
  */
 gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
   return this._obstaclesManager;
@@ -145,15 +129,15 @@ gdjs.LightRuntimeObject.prototype.getObstaclesManager = function () {
 
 /**
  * Returns true if the light shows debug graphics, false otherwise.
- * @returns {boolean} debug mode.
+ * @returns {boolean} true if debug mode is activated.
  */
 gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
   return this._debugMode;
 };
 
 /**
- * Returns PIXI.Texture if it exists, otherwise null.
- * @returns {?PIXI.Texture} name of texture.
+ * Returns PIXI.Texture if it exists, null otherwise.
+ * @returns {?PIXI.Texture} the texture, if any, null otherwise.
  */
 gdjs.LightRuntimeObject.prototype.getPIXITexture = function () {
   return this._texture;

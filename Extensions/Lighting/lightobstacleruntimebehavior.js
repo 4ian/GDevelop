@@ -2,9 +2,8 @@
  * @memberof gdjs
  * @class LightObstaclesManager
  * @param {gdjs.RuntimeScene} runtimeScene
- * @param {*} sharedData
  */
-gdjs.LightObstaclesManager = function (runtimeScene, sharedData) {
+gdjs.LightObstaclesManager = function (runtimeScene) {
   this._obstacleRBush = new rbush(9, [
     '.owner.getAABB().min[0]',
     '.owner.getAABB().min[1]',
@@ -15,7 +14,7 @@ gdjs.LightObstaclesManager = function (runtimeScene, sharedData) {
 
 gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
   if (!runtimeScene.lightObstaclesManager) {
-    //Create the shared manager if necessary.
+    // Create the shared manager if necessary.
     runtimeScene.lightObstaclesManager = new gdjs.LightObstaclesManager(
       runtimeScene
     );

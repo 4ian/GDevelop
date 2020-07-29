@@ -17,6 +17,8 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
   this._debugMode = runtimeObject.getDebugMode();
+
+  /** @type {?PIXI.Texture} */
   this._texture = runtimeObject.getPIXITexture();
   this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
 
@@ -50,12 +52,12 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     shaderUniforms
   );
   var geometry = new PIXI.Geometry();
-  if (this._light === undefined) {
-    geometry
-      .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-      .addIndex(this._indexBuffer);
-    this._light = new PIXI.Mesh(geometry, shader);
-  }
+  geometry
+    .addAttribute('aVertexPosition', this._vertexBuffer, 2)
+    .addIndex(this._indexBuffer);
+
+  /** @type {PIXI.Mesh} */
+  this._light = new PIXI.Mesh(geometry, shader);
   this._light.blendMode = PIXI.BLEND_MODES.ADD;
   this._debugLight = null;
   this._debugGraphics = null;
@@ -172,8 +174,10 @@ gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function 
   return null;
 };
 
+/**
+ * @returns {PIXI.Mesh | PIXI.Container}
+ */
 gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
-  // Mandatory, return the internal PIXI object used for your object:
   if (this._debugMode) {
     return this._debugLight;
   }
@@ -181,19 +185,19 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
-  if (this._debugMode) this.updateDebugGraphics();
-  this.updateBuffers();
+  if (this._debugMode) this._updateDebugGraphics();
+  this._updateBuffers();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugGraphics = function () {
-  var raycastResult = this._computeLightVertices();
-  var vertices = new Array(2 * raycastResult.length + 2);
+gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function () {
+  var computedVertices = this._computeLightVertices();
+  var vertices = new Array(2 * computedVertices.length + 2);
   vertices[0] = this._object.x;
   vertices[1] = this._object.y;
 
-  for (var i = 2; i < 2 * raycastResult.length + 2; i += 2) {
-    vertices[i] = raycastResult[i / 2 - 1][0];
-    vertices[i + 1] = raycastResult[i / 2 - 1][1];
+  for (var i = 2; i < 2 * computedVertices.length + 2; i += 2) {
+    vertices[i] = computedVertices[i / 2 - 1][0];
+    vertices[i + 1] = computedVertices[i / 2 - 1][1];
   }
 
   this._graphics.clear();
@@ -211,14 +215,14 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugGraphics = function () 
   }
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
 
-  var raycastResult = this._computeLightVertices();
+  var vertices = this._computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.
-  if (raycastResult.length === 0) {
+  if (vertices.length === 0) {
     this._defaultVertexBuffer[0] = this._object.x - this._radius;
     this._defaultVertexBuffer[1] = this._object.y + this._radius;
     this._defaultVertexBuffer[2] = this._object.x + this._radius;
@@ -237,7 +241,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
     return;
   }
 
-  var raycastResultLength = raycastResult.length;
+  var verticesCount = vertices.length;
 
   // If the array buffer which is already allocated is atmost
   // twice the size of memory required, we could avoid re-allocation
@@ -247,42 +251,39 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   var vertexBufferSubArray = null;
   var indexBufferSubArray = null;
 
-  if (this._vertexBuffer.length > 2 * raycastResultLength + 2) {
-    if (this._vertexBuffer.length < 4 * raycastResultLength + 4) {
+  if (this._vertexBuffer.length > 2 * verticesCount + 2) {
+    if (this._vertexBuffer.length < 4 * verticesCount + 4) {
       isSubArrayUsed = true;
       vertexBufferSubArray = this._vertexBuffer.subarray(
         0,
-        2 * raycastResultLength + 2
+        2 * verticesCount + 2
       );
-      indexBufferSubArray = this._indexBuffer.subarray(
-        0,
-        3 * raycastResultLength
-      );
+      indexBufferSubArray = this._indexBuffer.subarray(0, 3 * verticesCount);
     } else {
-      this._vertexBuffer = new Float32Array(2 * raycastResultLength + 2);
-      this._indexBuffer = new Uint16Array(3 * raycastResultLength);
+      this._vertexBuffer = new Float32Array(2 * verticesCount + 2);
+      this._indexBuffer = new Uint16Array(3 * verticesCount);
     }
   }
 
   // When the allocated array buffer has less memory than
   // required, we'll have to allocated new array buffers.
-  if (this._vertexBuffer.length < 2 * raycastResultLength + 2) {
-    this._vertexBuffer = new Float32Array(2 * raycastResultLength + 2);
-    this._indexBuffer = new Uint16Array(3 * raycastResultLength);
+  if (this._vertexBuffer.length < 2 * verticesCount + 2) {
+    this._vertexBuffer = new Float32Array(2 * verticesCount + 2);
+    this._indexBuffer = new Uint16Array(3 * verticesCount);
   }
 
   this._vertexBuffer[0] = this._object.x;
   this._vertexBuffer[1] = this._object.y;
 
-  for (var i = 2; i < 2 * raycastResultLength + 2; i += 2) {
-    this._vertexBuffer[i] = raycastResult[i / 2 - 1][0];
-    this._vertexBuffer[i + 1] = raycastResult[i / 2 - 1][1];
+  for (var i = 2; i < 2 * verticesCount + 2; i += 2) {
+    this._vertexBuffer[i] = vertices[i / 2 - 1][0];
+    this._vertexBuffer[i + 1] = vertices[i / 2 - 1][1];
   }
 
-  for (var i = 0; i < 3 * raycastResultLength; i += 3) {
+  for (var i = 0; i < 3 * verticesCount; i += 3) {
     this._indexBuffer[i] = 0;
     this._indexBuffer[i + 1] = i / 3 + 1;
-    if (i / 3 + 1 !== raycastResultLength) this._indexBuffer[i + 2] = i / 3 + 2;
+    if (i / 3 + 1 !== verticesCount) this._indexBuffer[i + 2] = i / 3 + 2;
     else this._indexBuffer[i + 2] = 1;
   }
 
@@ -299,6 +300,10 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateBuffers = function () {
   }
 };
 
+/**
+ * Computes the vertices of mesh using raycasting.
+ * @returns {number[][]} the vertices of mesh.
+ */
 gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function () {
   var lightObstacles = [];
   if (this._manager)

@@ -24,10 +24,10 @@ export const onObjectAdded = (
   layout: gdLayout,
   project: gdProject
 ): ?InfoBarDetails => {
-  const services = objectType[object.getType()];
-  if (services) {
-    services.onObjectAdded(object, layout, project);
-    return services.getInfoBarDetails('onObjectAdded');
+  const additionalWork = objectType[object.getType()];
+  if (additionalWork) {
+    additionalWork.onObjectAdded(object, layout, project);
+    return additionalWork.getInfoBarDetails('onObjectAdded');
   }
 
   return null;
@@ -38,11 +38,11 @@ export const onInstanceAdded = (
   layout: gdLayout,
   project: gdProject
 ): ?InfoBarDetails => {
-  const services =
+  const additionalWork =
     objectType[layout.getObject(instance.getObjectName()).getType()];
-  if (services) {
-    services.onInstanceAdded(instance, layout, project);
-    return services.getInfoBarDetails('onInstanceAdded');
+  if (additionalWork) {
+    additionalWork.onInstanceAdded(instance, layout, project);
+    return additionalWork.getInfoBarDetails('onInstanceAdded');
   }
 
   return null;
@@ -88,16 +88,16 @@ const objectType = {
       if (infoBarEvent === 'onObjectAdded') {
         return {
           identifier: 'automatic-lighting-layer',
-          message: t`Lighting Layer created!`,
-          touchScreenMessage: t`Lighting Layer created!`,
+          message: t`A lighting layer was created. Lights will be placed on it automatically. You can change the ambient light color in the properties of this layer`,
+          touchScreenMessage: t`A lighting layer was created. Lights will be placed on it automatically. You can change the ambient light color in the properties of this layer`,
         };
       }
 
       if (infoBarEvent === 'onInstanceAdded') {
         return {
           identifier: 'object-moved-in-lighting-layer',
-          message: t`Light Object is added in lighting layer!`,
-          touchScreenMessage: t`Light Object is added in lighting layer!`,
+          message: t`The light object was automatically placed on the Lighting layer.`,
+          touchScreenMessage: t`The light object was automatically placed on the Lighting layer.`,
         };
       }
 

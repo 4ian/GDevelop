@@ -276,7 +276,6 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
 /**
  * Updates the render texture, if it exists.
  * Also, render texture is cleared with a specified clear color.
- * not to be called outside the update method in most cases.
  */
 gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
   if (!this._pixiRenderer) return;
@@ -312,7 +311,6 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
   var oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
 
   this._pixiRenderer.renderTexture.bind(this._renderTexture);
-  //TODO: Pass data for clear color.
   this._pixiRenderer.renderTexture.clear(this._clearColor);
 
   this._pixiRenderer.render(this._pixiContainer, this._renderTexture, false);
@@ -324,7 +322,7 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
 };
 
 /**
- * Creates the render texture of pixi container and returns it.
+ * Get the render texture used to display this layer. If render texture is not used, it is created.
  * @returns {?PIXI.RenderTexture} RenderTexture of the container.
  */
 gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
@@ -333,8 +331,9 @@ gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
 };
 
 /**
- * Creates a sprite with the render texture of pixi container,
- * and replaces the container with sprite in runtimeScene's pixi container.
+ * Enable the user of a PIXI.RenderTexture to render the PIXI.Container 
+ * of the layer and, in the scene PIXI container, replace the container 
+ * of the layer by a sprite showing this texture.
  * @private used only in lighting for now as the sprite could have MULTIPLY blend mode.
  */
 gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {

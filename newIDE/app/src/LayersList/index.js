@@ -216,16 +216,17 @@ export default class LayersList extends Component<Props, State> {
           <Column>
             <Line justifyContent="flex-end" expand>
               <RaisedButton
-                label={<Trans>Add lighting layer</Trans>}
-                disabled={isLightingLayerPresent}
-                onClick={this._addLightingLayer}
-                icon={<Add />}
-              />
-              <Spacer />
-              <RaisedButton
                 label={<Trans>Add a layer</Trans>}
                 primary
                 onClick={this._addLayer}
+                icon={<Add />}
+              />
+            </Line>
+            <Line justifyContent="flex-end" expand>
+              <RaisedButton
+                label={<Trans>Add lighting layer</Trans>}
+                disabled={isLightingLayerPresent}
+                onClick={this._addLightingLayer}
                 icon={<Add />}
               />
             </Line>

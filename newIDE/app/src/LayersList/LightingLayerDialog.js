@@ -52,10 +52,10 @@ const LightingLayerDialog = (props: Props) => {
       <ColumnStackLayout>
         <DismissableAlertMessage kind="info" identifier="lighting-layer-usage">
           <Trans>
-            Lighting layer introduces ambient light in the scene. There should
-            be only one lighting layer per scene. Ideally all the lights should
-            be in the lighting layer and in most of the cases lighting layer
-            should follow the base layer.
+            The lighting layer renders an ambient light on the scene. All lights
+            should be placed on this layer so that shadows are properly
+            rendered. By default, the layer follows the base layer camera.
+            Uncheck this if you want to manually move the camera using events.
           </Trans>
         </DismissableAlertMessage>
         <InlineCheckbox

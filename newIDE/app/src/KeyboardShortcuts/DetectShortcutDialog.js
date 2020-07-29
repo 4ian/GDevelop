@@ -35,10 +35,15 @@ const DetectShortcutDialog = (props: Props) => {
       cannotBeDismissed={false}
       maxWidth="xs"
       actions={[
-        <FlatButton label={<Trans>Cancel</Trans>} onClick={props.onClose} />,
+        <FlatButton
+          key="Cancel"
+          label={<Trans>Cancel</Trans>}
+          onClick={props.onClose}
+        />,
         <FlatButton
           label={<Trans>Set shortcut</Trans>}
           primary
+          key="Set"
           onClick={() => {
             shortcutString && props.onSet(shortcutString);
             props.onClose();

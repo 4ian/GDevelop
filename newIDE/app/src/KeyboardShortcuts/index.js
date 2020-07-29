@@ -26,7 +26,7 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
     e.code === 'Tab'
   )
     isValidActionKey = true;
-  if (!isValidActionKey) return console.log('Invalid shortcut');
+  if (!isValidActionKey) return;
 
   const shortcutStringPieces = [];
   if (e.ctrlKey || e.metaKey) shortcutStringPieces.push('CmdOrCtrl');
@@ -73,7 +73,6 @@ export const useKeyboardShortcuts = (onRunCommand: string => void) => {
  * For example, "KeyA" -> "A", "NumpadAdd" -> "Plus"
  */
 const getKeyDisplayName = (code: string) => {
-  console.log(code);
   // Alphabet key ("KeyA"..."KeyZ")
   if (code.includes('Key')) return code.slice(3);
   // Numeric key ("0"..."9")

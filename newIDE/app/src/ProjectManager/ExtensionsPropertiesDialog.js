@@ -24,7 +24,6 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
 
   render() {
     const { project } = this.props;
-    global.project = project;
     const allExtensions = project
       .getCurrentPlatform()
       .getAllPlatformExtensions();
@@ -41,11 +40,27 @@ class ExtensionsPropertiesDialog extends React.Component<Props> {
           project
             .getExtensionPropertiesManager()
             .getAllExtensionProperties(extension.getName(), project),
-        (instance, propertyName, newValue) =>
-          project
+        (instance, propertyName, newValue) => {
+          if(project
             .getExtensionPropertiesManager()
-            .setValue(extension.getName(), propertyName, newValue)
-      );
+            .getAllExtensionProperties(extension.getName(), project)
+            .get(propertyName)
+            .getType() === "boolean") {
+              if(newValue === '1') {
+                project
+                  .getExtensionPropertiesManager()
+                  .setValue(extension.getName(), propertyName, 'true');
+              } else {
+                project
+                  .getExtensionPropertiesManager()
+                  .setValue(extension.getName(), propertyName, 'false');
+              }
+          } else {
+            project
+              .getExtensionPropertiesManager()
+              .setValue(extension.getName(), propertyName, newValue)
+          }
+        });
 
       propertyList.push(
         <ColumnStackLayout key={extension.getName()}>

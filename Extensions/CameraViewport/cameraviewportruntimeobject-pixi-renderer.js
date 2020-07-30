@@ -56,6 +56,9 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
         object.getRendererObject().visible = false;
     }
 
+    // Recalculate culling for new camera parameters before rendering
+    this._scene._updateObjectsVisibility();
+
     // Camera magic
     this._renderer.render(this._scene.getRenderer().getPIXIContainer(), this._renderTexture);
 

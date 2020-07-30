@@ -477,10 +477,8 @@ module.exports = {
 
       if (!PIXI.BitmapFont.available[slugFontName]) {
         PIXI.BitmapFont.from(slugFontName, style);
-        console.log('1');
       }
 
-      console.log('2');
       this._pixiObject = new PIXI.BitmapText('BitmapText object', {
         fontName: slugFontName,
       });

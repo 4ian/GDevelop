@@ -12,31 +12,47 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
 ) {
   this._object = runtimeObject;
 
+  const style = new PIXI.TextStyle();
+  style.fontFamily = runtimeScene
+    .getGame()
+    .getFontManager()
+    .getFontFamily(runtimeObject._fontFamily);
+  style.padding = 4;
+  style.fontSize = runtimeObject._fontSize;
+  style.wordWrap = runtimeObject._wordWrap;
+  style.wordWrapWidth = runtimeObject._wrappingWidth;
+  style.align = runtimeObject._align;
+  style.fill = runtimeObject._color;
+
+  const slugFontName =
+    style.fontFamily + '-' + style.fontSize + '-' + style.fill + '-bitmapFont';
+
+  if (!PIXI.BitmapFont.available[slugFontName]) {
+    PIXI.BitmapFont.from(slugFontName, style);
+  }
+
   // Load (or reset) the text
   if (this._pixiObject === undefined) {
-    this.style = new PIXI.TextStyle();
-
-    this.style.fontFamily = runtimeScene
-      .getGame()
-      .getFontManager()
-      .getFontFamily(runtimeObject._fontFamily);
-    this.style.fill = runtimeObject._color;
-    this.style.fontSize = runtimeObject._fontSize;
-    this._pixiObject.fontSize = runtimeObject._fontSize;
-//  this.style.size = runtimeObject._fontSize + 'px';
-    this.style.align = runtimeObject._align;
-
-    PIXI.BitmapFont.from('basicBitmap', this.style);
-
-    this._pixiObject = new PIXI.BitmapText('BitmapText pixi renderer', {
-      fontName: 'basicBitmap'
+    this._pixiObject = new PIXI.BitmapText('BitmapText object', {
+      fontName: slugFontName,
     });
+
+    this.style = style;
+    this.constructorSlugFontName = slugFontName;
+
+    this._pixiObject.fontName = slugFontName;
+    if (this.constructorSlugFontName !== slugFontName) {
+      console.log('slug different renderer');
+    }
   } else {
+    this.updateTextContent();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
     this.updateFontSize();
   }
+
+  this._pixiObject.updateText(); // update BitmapText with new styles
 
   runtimeScene
     .getLayer('')
@@ -48,7 +64,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
 
-  this.updateText();
+  this.updateTextContent();
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
@@ -72,7 +88,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = functio
   this.updatePosition();
 };
 
-gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateText = function() {
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTextContent = function() {
   this._pixiObject.text = this._object._text;
   this.updatePosition();
 };

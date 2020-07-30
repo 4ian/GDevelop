@@ -35,8 +35,9 @@ gdjs.LayerPixiRenderer.prototype.getRendererObject = function() {
  * @private
  */
 gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
-  var angle = -gdjs.toRad(this._layer.getCameraRotation());
-  var zoomFactor = this._layer.getCameraZoom();
+  var camera = this._layer.getCamera(this._layer.getCurrentCamera());
+  var angle = -gdjs.toRad(camera.cameraRotation);
+  var zoomFactor = camera.zoomFactor;
 
   this._pixiContainer.rotation = angle;
   this._pixiContainer.scale.x = zoomFactor;
@@ -45,11 +46,11 @@ gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
   var cosValue = Math.cos(angle);
   var sinValue = Math.sin(angle);
   var centerX =
-    this._layer.getCameraX() * zoomFactor * cosValue -
-    this._layer.getCameraY() * zoomFactor * sinValue;
+    camera.cameraX * zoomFactor * cosValue -
+    camera.cameraY * zoomFactor * sinValue;
   var centerY =
-    this._layer.getCameraX() * zoomFactor * sinValue +
-    this._layer.getCameraY() * zoomFactor * cosValue;
+  camera.cameraX * zoomFactor * sinValue +
+  camera.cameraY * zoomFactor * cosValue;
 
   this._pixiContainer.position.x = -centerX;
   this._pixiContainer.position.y = -centerY;

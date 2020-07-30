@@ -25,14 +25,11 @@
  */
 gdjs.Layer = function(layerData, runtimeScene) {
   this._name = layerData.name;
-  this._additionalCameras = [];
-  this._cameraRotation = 0;
-  this._zoomFactor = 1;
+  this._cameras = [];
+  this._currentCamera = 0;
   this._timeScale = 1;
   this._hidden = !layerData.visibility;
   this._initialEffectsData = layerData.effects || [];
-  this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
-  this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
   this._cachedGameResolutionWidth = runtimeScene
     .getGame()
     .getGameResolutionWidth();
@@ -108,22 +105,21 @@ gdjs.Layer.prototype.getName = function() {
 
 gdjs.Layer.prototype._createCamera = function(cameraId) {
   var camera = {
-    cameraX: 0,
-    cameraY: 0,
+    cameraX: this._runtimeScene.getGame().getGameResolutionHeight() / 2,
+    cameraY: this._runtimeScene.getGame().getGameResolutionHeight() / 2,
     zoomFactor: 1,
     cameraRotation: 0,
   }
-  this._additionalCameras[cameraId] = camera;
+  this._cameras[cameraId] = camera;
 };
 
-/**
- * @param {Camera} camera 
- */
-gdjs.Layer.prototype._applyCamera = function(camera) {
-  this.setCameraX(camera.cameraX);
-  this.setCameraY(camera.cameraY);
-  this.setCameraZoom(camera.zoomFactor);
-  this.setCameraRotation(camera.cameraRotation);
+gdjs.Layer.prototype.setCurrentCamera = function(cameraId) {
+  this._currentCamera = cameraId;
+  this._renderer.updatePosition();
+}
+
+gdjs.Layer.prototype.getCurrentCamera = function() {
+  return this._currentCamera;
 }
 
 /**
@@ -132,10 +128,10 @@ gdjs.Layer.prototype._applyCamera = function(camera) {
  * @returns {Camera}
  */
 gdjs.Layer.prototype.getCamera = function(cameraId) {
-  if(this._additionalCameras.length <= cameraId || this._additionalCameras[cameraId] == undefined) {
+  if(this._cameras.length <= cameraId || this._cameras[cameraId] == undefined) {
     this._createCamera(cameraId);
   }
-  return this._additionalCameras[cameraId];
+  return this._cameras[cameraId];
 };
 
 /**
@@ -146,10 +142,7 @@ gdjs.Layer.prototype.getCamera = function(cameraId) {
  */
 gdjs.Layer.prototype.getCameraX = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId >= 1) {
-    return this.getCamera(cameraId).cameraX;
-  }
-  return this._cameraX;
+  return this.getCamera(cameraId).cameraX;
 };
 
 /**
@@ -160,10 +153,7 @@ gdjs.Layer.prototype.getCameraX = function(cameraId) {
  */
 gdjs.Layer.prototype.getCameraY = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId >= 1) {
-    return this.getCamera(cameraId).cameraY;
-  }
-  return this._cameraY;
+  return this.getCamera(cameraId).cameraY;
 };
 
 /**
@@ -174,13 +164,9 @@ gdjs.Layer.prototype.getCameraY = function(cameraId) {
  */
 gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    this._cameraX = x;
+  this.getCamera(cameraId).cameraX = x;
+  if(cameraId === this._currentCamera) {
     this._renderer.updatePosition();
-  } else {
-    if(cameraId >= 1) {
-      this.getCamera(cameraId).cameraX = x;
-    }
   }
 };
 
@@ -192,13 +178,9 @@ gdjs.Layer.prototype.setCameraX = function(x, cameraId) {
  */
 gdjs.Layer.prototype.setCameraY = function(y, cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    this._cameraY = y;
+  this.getCamera(cameraId).cameraY = y;
+  if(cameraId === this._currentCamera) {
     this._renderer.updatePosition();
-  } else {
-    if(cameraId >= 1) {
-      this.getCamera(cameraId).cameraY = y;
-    }
   }
 };
 
@@ -211,11 +193,7 @@ gdjs.Layer.prototype.setCameraY = function(y, cameraId) {
  */
 gdjs.Layer.prototype.getCameraWidth = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    return (+this._cachedGameResolutionWidth * 1) / this._zoomFactor;
-  } else {
-    return (+this._cachedGameResolutionWidth * 1) / this.getCamera(cameraId).zoomFactor;
-  }
+  return (+this._cachedGameResolutionWidth * 1) / this.getCamera(cameraId).zoomFactor;
 };
 
 /**
@@ -227,11 +205,7 @@ gdjs.Layer.prototype.getCameraWidth = function(cameraId) {
  */
 gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    return (+this._cachedGameResolutionHeight * 1) / this._zoomFactor;
-  } else {
-    return (+this._cachedGameResolutionWidth * 1) / this.getCamera(cameraId).zoomFactor;
-  }
+  return (+this._cachedGameResolutionWidth * 1) / this.getCamera(cameraId).zoomFactor;
 };
 
 /**
@@ -260,11 +234,9 @@ gdjs.Layer.prototype.isVisible = function() {
  */
 gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    this._zoomFactor = newZoom;
+  this.getCamera(cameraId).zoomFactor = newZoom;
+  if(cameraId === this._currentCamera) {
     this._renderer.updatePosition();
-  } else {
-    this.getCamera(cameraId).zoomFactor = newZoom;
   }
 };
 
@@ -276,11 +248,7 @@ gdjs.Layer.prototype.setCameraZoom = function(newZoom, cameraId) {
  */
 gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    return this._zoomFactor;
-  } else {
-    return this.getCamera(cameraId).zoomFactor;
-  }
+  return this.getCamera(cameraId).zoomFactor;
 };
 
 /**
@@ -291,11 +259,7 @@ gdjs.Layer.prototype.getCameraZoom = function(cameraId) {
  */
 gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    return this._cameraRotation;
-  } else {
-    return this.getCamera(cameraId).cameraRotation;
-  }
+  return this.getCamera(cameraId).cameraRotation;
 };
 
 /**
@@ -307,11 +271,9 @@ gdjs.Layer.prototype.getCameraRotation = function(cameraId) {
  */
 gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
   cameraId = cameraId || 0;
-  if(cameraId === 0) {
-    this._cameraRotation = rotation;
+  this.getCamera(cameraId).cameraRotation = rotation;
+  if(cameraId === this._currentCamera) {
     this._renderer.updatePosition();
-  } else {
-    this.getCamera(cameraId).cameraRotation = rotation;
   }
 };
 
@@ -323,39 +285,45 @@ gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
  *
  * @param {number} x The x position, in canvas coordinates.
  * @param {number} y The y position, in canvas coordinates.
- * @param {number} [cameraId] The camera number. Currently ignored.
+ * @param {number} [cameraId] The camera number.
  */
 gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
+  cameraId = cameraId || 0;
+  var camera = this.getCamera(cameraId);
+
   x -= this._cachedGameResolutionWidth / 2;
   y -= this._cachedGameResolutionHeight / 2;
-  x /= Math.abs(this._zoomFactor);
-  y /= Math.abs(this._zoomFactor);
+  x /= Math.abs(camera.zoomFactor);
+  y /= Math.abs(camera.zoomFactor);
 
   // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
-  var angleInRadians = (this._cameraRotation / 180) * Math.PI;
+  var angleInRadians = (camera.cameraRotation / 180) * Math.PI;
   var tmp = x;
   var cosValue = Math.cos(angleInRadians);
   var sinValue = Math.sin(angleInRadians);
   x = cosValue * x - sinValue * y;
   y = sinValue * tmp + cosValue * y;
 
-  return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
+  return [x + camera.cameraX, y + camera.cameraY];
 };
 
 gdjs.Layer.prototype.convertInverseCoords = function(x, y, cameraId) {
-  x -= this.getCameraX(cameraId);
-  y -= this.getCameraY(cameraId);
+  cameraId = cameraId || 0;
+  var camera = this.getCamera(cameraId);
+
+  x -= camera.cameraX;
+  y -= camera.cameraY;
 
   // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
-  var angleInRadians = (this._cameraRotation / 180) * Math.PI;
+  var angleInRadians = (camera.cameraRotation / 180) * Math.PI;
   var tmp = x;
   var cosValue = Math.cos(-angleInRadians);
   var sinValue = Math.sin(-angleInRadians);
   x = cosValue * x - sinValue * y;
   y = sinValue * tmp + cosValue * y;
 
-  x *= Math.abs(this._zoomFactor);
-  y *= Math.abs(this._zoomFactor);
+  x *= Math.abs(camera.zoomFactor);
+  y *= Math.abs(camera.zoomFactor);
 
   return [
     x + this._cachedGameResolutionWidth / 2,

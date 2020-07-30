@@ -47,6 +47,11 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'Render Camera Viewports') {
+        objectContent.showOtherCameras = newValue === '1' ? true : false;
+        return true;
+      }
+
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -57,6 +62,12 @@ module.exports = {
         .getOrCreate('Camera Number')
         .setValue(objectContent.cameraId)
         .setType("number");
+      
+      objectProperties
+        .getOrCreate('Render Camera Viewports')
+        .setValue(objectContent.showOtherCameras ? 'true' : 'false')
+        .setLabel("Should the camera render also cameras? Turning this on might cause a loose of performance.")
+        .setType("boolean");
 
       return objectProperties;
     };
@@ -64,6 +75,7 @@ module.exports = {
     cameraViewport.setRawJSONContent(
       JSON.stringify({
         cameraId: '0',
+        showOtherCameras: false,
       })
     );
 

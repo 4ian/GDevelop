@@ -36,43 +36,44 @@ gdjs.CameraViewportObjectPixiRenderer.prototype.update = function() {
             var layer = this._scene.getLayer(allLayers[layerId]);
             layer.setCurrentCamera(this._object.camera);
         }
+        // Recalculate culling for new camera parameters before rendering
+        this._scene._updateObjectsVisibility();
     }
 
     this._scene._constructListOfAllInstances();
-
-    /* 
-     * Remove all viewports: viewports can't render themselves as it could result in an endless loop.
-     * We could theoretically count the renders and replace the camera with a blank texture after too many renders,
-     * But chrome web gl automatically blocks textures that are made from a texture to be applied to the texture it is made from.
-     */
-    for(var objectId in this._scene._allInstancesList) {
-        var object = this._scene._allInstancesList[objectId];
-        if(object.type !== "CameraViewport::CameraViewport") continue;
-        object.getRendererObject().visible = false;
+    var invisibleObjects = [];
+    if(!this._object.showOtherCameras) {
+        for(var objectId in this._scene._allInstancesList) {
+            var object = this._scene._allInstancesList[objectId];
+            if(object.type !== "CameraViewport::CameraViewport" || object.getRendererObject().visible === false) continue;
+            object.getRendererObject().visible = false;
+            invisibleObjects.push(object);
+        }
     }
-
-    // Recalculate culling for new camera parameters before rendering
-    this._scene._updateObjectsVisibility();
 
     /**
      * We can't directly render to the render texture as 
      * the render texture is part of what is being rendered, 
      * and webgl is blocking that (it could make an infinite loop).
      * So we need to render to an intermediate outside of the main container
-     * and then render it to the real render texture
+     * and then render it to the real render texture.
+     * This is only needed if you want to render a container with rendered cameras.
      * 
      * @TODO
      * There is probably a better method for rerendering from a render texture
      * than just rendering a sprite using it as texture.
      * Possible hint: https://www.html5gamedevs.com/topic/45423-why-is-this-not-allowed/?do=findComment&comment=251116
      */
-    gdjs.CameraViewportObjectPixiRenderer.tempTexture.resize(this._renderTexture.width, this._renderTexture.height);
-    this._renderer.render(this._scene.getRenderer().getPIXIContainer(), gdjs.CameraViewportObjectPixiRenderer.tempTexture);
-    this._renderer.render(new PIXI.Sprite(gdjs.CameraViewportObjectPixiRenderer.tempTexture), this._renderTexture);
+    if(this._object.showOtherCameras) {
+        gdjs.CameraViewportObjectPixiRenderer.tempTexture.resize(this._renderTexture.width, this._renderTexture.height);
+        this._renderer.render(this._scene.getRenderer().getPIXIContainer(), gdjs.CameraViewportObjectPixiRenderer.tempTexture);
+        this._renderer.render(new PIXI.Sprite(gdjs.CameraViewportObjectPixiRenderer.tempTexture), this._renderTexture);
+    } else {
+        this._renderer.render(this._scene.getRenderer().getPIXIContainer(), this._renderTexture);
+    }
 
-    // Add the viewports back
-    for(var objectId in this._scene._allInstancesList) {
-        var object = this._scene._allInstancesList[objectId];
+    for(var objectId in invisibleObjects) {
+        var object = invisibleObjects[objectId];
         if(object.type !== "CameraViewport::CameraViewport") continue;
         object.getRendererObject().visible = true;
     }

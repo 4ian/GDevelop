@@ -8,11 +8,12 @@
 gdjs.CameraViewportObject = function(runtimeScene, objectData) {
   // *ALWAYS* call the base gdjs.RuntimeObject constructor.
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+  console.log(objectData)
 
   this.width  = 250;
   this.height = 150;
-
   this.camera = objectData.content.cameraId;
+  this.showOtherCameras = objectData.content.showOtherCameras;
   this._scene = runtimeScene;
 
   if (this._renderer)
@@ -39,6 +40,10 @@ gdjs.CameraViewportObject.prototype.updateFromObjectData = function(oldObjectDat
   // This is useful for "hot-reloading".
   if (oldObjectData.content.cameraId !== newObjectData.content.cameraId) {
     this.camera = newObjectData.content.cameraId;
+  }
+
+  if (oldObjectData.content.showOtherCameras !== newObjectData.content.showOtherCameras) {
+    this.showOtherCameras = newObjectData.content.showOtherCameras;
   }
 
   return true;

@@ -73,6 +73,11 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'CameraViewport',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/CameraViewport/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

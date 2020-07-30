@@ -94,7 +94,7 @@ module.exports = {
         'CameraViewport',
         _('Camera viewport'),
         _('Renders a camera'),
-        'CppPlatform/Extensions/topdownmovementicon.png',
+        'res/conditions/camera.png',
         cameraViewport
       )
       .setIncludeFile('Extensions/CameraViewport/cameraviewportruntimeobject.js')
@@ -118,7 +118,7 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return true;
+    return [];
   },
   /**
    * Register editors for objects.

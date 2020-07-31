@@ -7,8 +7,8 @@ const gd: libGDevelop = global.gd;
 
 const loadedFontFamilies = {};
 const loadedTextures = {};
+const loadedTileSets = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
-const loadedTilesets = {};
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of

@@ -77,7 +77,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
     this._debugLight = new PIXI.Container();
     this._debugLight.addChild(this._light);
-    this._debugLight.addChild(this._graphics);
+    this._debugLight.addChild(this._debugGraphics);
   }
 };
 
@@ -185,6 +185,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
+  if(this._object.isHidden()) return;
+
   if (this._debugMode) this._updateDebugGraphics();
   this._updateBuffers();
 };
@@ -200,17 +202,17 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
     vertices[i + 1] = computedVertices[i / 2 - 1][1];
   }
 
-  this._graphics.clear();
+  this._debugGraphics.clear();
   for (var i = 0; i < vertices.length; i += 2) {
     var lineColor = i % 4 === 0 ? 0xff0000 : 0x00ff00;
-    this._graphics
+    this._debugGraphics
       .lineStyle(1, lineColor, 1)
       .moveTo(vertices[0], vertices[1])
       .lineTo(vertices[i], vertices[i + 1]);
     if (i !== vertices.length - 2) {
-      this._graphics.lineTo(vertices[i + 2], vertices[i + 3]);
+      this._debugGraphics.lineTo(vertices[i + 2], vertices[i + 3]);
     } else {
-      this._graphics.lineTo(vertices[2], vertices[3]);
+      this._debugGraphics.lineTo(vertices[2], vertices[3]);
     }
   }
 };

@@ -91,11 +91,9 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function(oldObject
     this.setFontSize(newObjectData.content.fontSize);
   }
   
-  /*
   if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
     this.setWordWrap(newObjectData.content.wordWrap);
   }
-  */
   if (oldObjectData.content.align !== newObjectData.content.align) {
     this.setAlignment(newObjectData.content.align);
   }

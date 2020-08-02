@@ -17,18 +17,16 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     .getGame()
     .getFontManager()
     .getFontFamily(runtimeObject._fontFamily);
-  style.padding = 4;
   style.fontSize = runtimeObject._fontSize;
   style.wordWrap = runtimeObject._wordWrap;
   style.wordWrapWidth = runtimeObject._wrappingWidth;
-  style.align = runtimeObject._align;
   style.fill = runtimeObject._color;
 
   const slugFontName =
     style.fontFamily + '-' + style.fontSize + '-' + style.fill + '-bitmapFont';
 
   if (!PIXI.BitmapFont.available[slugFontName]) {
-    PIXI.BitmapFont.from(slugFontName, style);
+    PIXI.BitmapFont.from(slugFontName, style, {chars: PIXI.BitmapFont.ASCII});
   }
 
   // Load (or reset) the text
@@ -37,13 +35,9 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
       fontName: slugFontName,
     });
 
+    this._pixiObject.align = runtimeObject._align;
     this.style = style;
     this.constructorSlugFontName = slugFontName;
-
-    this._pixiObject.fontName = slugFontName;
-    if (this.constructorSlugFontName !== slugFontName) {
-      console.log('slug different renderer');
-    }
   } else {
     this.updateTextContent();
     this.updateColor();
@@ -77,13 +71,13 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function(
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWordWrap = function() {
-  this._pixiObject._style.wordWrap = this._object._wordWrap;
+  this._pixiObject.style.wordWrap = this._object._wordWrap;
   this._pixiObject.dirty = true;
   this.updatePosition();
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function() {
-  this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
+  this._pixiObject.maxWidth = this._object._wrappingWidth;
   this._pixiObject.dirty = true;
   this.updatePosition();
 };
@@ -99,7 +93,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateColor = function() {
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
-  this.style.align = this._object._align;
+  this._pixiObject.align = this._object._align;
   this._pixiObject.dirty = true;
 };
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {

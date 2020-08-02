@@ -61,7 +61,7 @@ module.exports = {
         .getOrCreate('text')
         .setValue(objectContent.text)
         .setType('textarea')
-        .setLabel(_('Bitmap text'));
+        .setLabel(_('Text'));
 
       objectProperties
         .getOrCreate('color')
@@ -460,12 +460,17 @@ module.exports = {
       );
 
       const style = new PIXI.TextStyle();
+
+      //classic font in GDevelop
       style.fontFamily = 'Arial';
+      style.fontSize = 20;
       style.padding = 4;
-      style.fontSize = 24;
-      style.wordWrap = true;
-      style.wordWrapWidth = 250;
-      style.fill = '#000000';
+      style.wordWrap = false;
+      style.fill = '#ffffff'; // baked color in font, not doing for be dynamic so it's white here, and real color is handle dynamicaly on bitmapText.
+
+      /*
+      style.wordWrapWidth = 1; // ??
+      */
 
       const slugFontName =
         style.fontFamily +
@@ -476,17 +481,14 @@ module.exports = {
         '-bitmapFont';
 
       if (!PIXI.BitmapFont.available[slugFontName]) {
-        PIXI.BitmapFont.from(slugFontName, style);
+        PIXI.BitmapFont.from(slugFontName, style, {
+          chars: PIXI.BitmapFont.ASCII,
+        });
       }
 
-      this._pixiObject = new PIXI.BitmapText('BitmapText object', {
+      this._pixiObject = new PIXI.BitmapText('', {
         fontName: slugFontName,
       });
-
-      const properties = this._associatedObject.getProperties();
-      const color = properties.get('color').getValue();
-
-      style.fill = color;
 
       this.style = style;
       this.constructorSlugFontName = slugFontName;
@@ -516,13 +518,19 @@ module.exports = {
     RenderedBitmapTextInstance.prototype.update = function() {
       const properties = this._associatedObject.getProperties();
 
+      //NOTE text - bitmapText
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {
         this._pixiObject.text = rawText;
       }
-      const opacity = properties.get('opacity').getValue();
-      this._pixiObject.alpha = opacity / 255;
 
+      //NOTE opacity - bitmapText
+      const opacity = properties.get('opacity').getValue();
+      if (opacity !== this._pixiObject.opacity) {
+        this._pixiObject.alpha = opacity / 255;
+      }
+
+      //NOTE color - bitmapFont
       const color = properties.get('color').getValue();
       if (color !== this.style.fill) {
         this.style.fill = color;
@@ -530,15 +538,13 @@ module.exports = {
       }
 
       const fontSize = Number(properties.get('fontSize').getValue());
-      if (
-        fontSize !== this._pixiObject.fontSize ||
-        fontSize !== this.style.fontSize
-      ) {
-        this._pixiObject.fontSize = fontSize; // size of the text
-        this.style.fontSize = fontSize; //size of the bitmap font texture
+      if (fontSize !== this.style.fontSize) {
+        this.style.fontSize = fontSize; //size of the bitmapFont, generate a texture
+        this._pixiObject.fontSize = fontSize; // size of the bitmapText
         this._pixiObject.dirty = true;
       }
 
+      //NOTE fontFamily - bitmapFont
       const fontResourceName = properties.get('fontFamily').getValue();
       if (this._fontResourceName !== fontResourceName) {
         this._fontResourceName = fontResourceName;
@@ -559,36 +565,32 @@ module.exports = {
           });
       }
 
+      const width = this._instance.hasCustomSize()
+        ? this._instance.getCustomWidth()
+        : this.getDefaultWidth();
+      const height = this._instance.hasCustomSize()
+        ? this._instance.getCustomHeight()
+        : this.getDefaultHeight();
+
+      //NOTE wordWrap to maxWidth - bitmapText
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
-      if (wordWrap !== this.style.wordWrap) {
-        this.style.wordWrap = wordWrap;
-        this._pixiObject.dirty = true;
+      if (wordWrap) {
+        this._pixiObject.maxWidth = width;
+      } else {
+        this._pixiObject.maxWidth = 0;
       }
 
+      // NOTE align - bitmapText
       const align = properties.get('align').getValue();
       if (align !== this._pixiObject.align) {
         this._pixiObject.align = align;
-        this._pixiObject.dirty = true;
       }
-      
-      const width = this._instance.hasCustomSize() ? this._instance.getCustomWidth() : this.getDefaultWidth();
-      const height = this._instance.hasCustomSize() ? this._instance.getCustomHeight() : this.getDefaultHeight();
-      
-      this._pixiObject.position.x =
-        this._instance.getX() + width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + height / 2;
+
+      this._pixiObject.position.x = this._instance.getX() + width / 2;
+      this._pixiObject.position.y = this._instance.getY() + height / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-
-      if (this._instance.hasCustomSize() && this._pixiObject) {
-        const customWidth = this._instance.getCustomWidth();
-        if (this._pixiObject && this._pixiObject.maxWidth !== customWidth) {
-          this._pixiObject.maxWidth = customWidth;
-          this._pixiObject.dirty = true;
-        }
-      }
 
       const slugFontName =
         this.style.fontFamily +
@@ -599,14 +601,11 @@ module.exports = {
         '-bitmapFont';
 
       if (!PIXI.BitmapFont.available[slugFontName] || this._pixiObject.dirty) {
-        PIXI.BitmapFont.from(slugFontName, this.style);
+        PIXI.BitmapFont.from(slugFontName, this.style, {
+          chars: PIXI.BitmapFont.ASCII,
+        });
       }
-
       this._pixiObject.fontName = slugFontName;
-      if (this.constructorSlugFontName !== slugFontName) {
-        console.log('slug different');
-      }
-
       this._pixiObject.updateText();
     };
 

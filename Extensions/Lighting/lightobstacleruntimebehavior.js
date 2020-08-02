@@ -13,14 +13,14 @@ gdjs.LightObstaclesManager = function (runtimeScene) {
 };
 
 gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
-  if (!runtimeScene.lightObstaclesManager) {
+  if (!runtimeScene._lightObstaclesManager) {
     // Create the shared manager if necessary.
-    runtimeScene.lightObstaclesManager = new gdjs.LightObstaclesManager(
+    runtimeScene._lightObstaclesManager = new gdjs.LightObstaclesManager(
       runtimeScene
     );
   }
 
-  return runtimeScene.lightObstaclesManager;
+  return runtimeScene._lightObstaclesManager;
 };
 
 gdjs.LightObstaclesManager.prototype.addObstacle = function (obstacle) {
@@ -57,7 +57,7 @@ gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
  * @memberof gdjs
  * @class LightObstacleRuntimeBehavior
  * @param {gdjs.RuntimeScene} runtimeScene
- * @param {*} behaviorData
+ * @param {BehaviorData} behaviorData
  * @param {gdjs.RuntimeObject} owner
  */
 gdjs.LightObstacleRuntimeBehavior = function (

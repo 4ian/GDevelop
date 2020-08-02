@@ -130,7 +130,7 @@ type State = {|
   onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
   layerRemoved: ?string,
   effectsEditedLayer: ?gdLayer,
-  lightingEditLayer: ?gdLayer,
+  lightingEditedLayer: ?gdLayer,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
@@ -182,7 +182,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       effectsEditedLayer: null,
-      lightingEditLayer: null,
+      lightingEditedLayer: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
       variablesEditedObject: null,
@@ -350,7 +350,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editLightingLayer = (layer: ?gdLayer) => {
-    this.setState({ lightingEditLayer: layer });
+    this.setState({ lightingEditedLayer: layer });
   };
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
@@ -475,27 +475,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!objectName || !this.editor) return;
 
     const instances = this.editor.addInstances(pos, [objectName]);
-    instances.forEach(instance => {
-      const infoBarDetails = onInstanceAdded(
-        instance,
-        this.props.layout,
-        this.props.project
-      );
-      if (infoBarDetails) {
-        this.setState({
-          additionalWorkInfoBar: infoBarDetails,
-          showAdditionalWorkInfoBar: true,
-        });
-      }
-    });
-
-    this.setState(
-      {
-        selectedObjectNames: [],
-        history: saveToHistory(this.state.history, this.props.initialInstances),
-      },
-      () => this.updateToolbar()
-    );
+    this._onInstancesAdded(instances);
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
@@ -1346,12 +1326,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
-        {!!this.state.lightingEditLayer && (
+        {!!this.state.lightingEditedLayer && (
           <LightingLayerDialog
-            layer={this.state.lightingEditLayer}
+            layer={this.state.lightingEditedLayer}
             onClose={() =>
               this.setState({
-                lightingEditLayer: null,
+                lightingEditedLayer: null,
               })
             }
           />

@@ -322,15 +322,6 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
 };
 
 /**
- * Get the render texture used to display this layer. If render texture is not used, it is created.
- * @returns {?PIXI.RenderTexture} RenderTexture of the container.
- */
-gdjs.LayerPixiRenderer.prototype.getRenderTexture = function () {
-  if (!this._renderTexture) this._updateRenderTexture();
-  return this._renderTexture;
-};
-
-/**
  * Enable the user of a PIXI.RenderTexture to render the PIXI.Container 
  * of the layer and, in the scene PIXI container, replace the container 
  * of the layer by a sprite showing this texture.
@@ -348,8 +339,4 @@ gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
   var index = sceneContainer.getChildIndex(this._pixiContainer);
   sceneContainer.addChildAt(this._lightingSprite, index);
   sceneContainer.removeChild(this._pixiContainer);
-};
-
-gdjs.LayerPixiRenderer.prototype.getPIXIContainer = function () {
-  return this._pixiContainer;
 };

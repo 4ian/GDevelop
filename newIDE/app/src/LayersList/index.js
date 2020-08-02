@@ -6,7 +6,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
 import {

@@ -8,7 +8,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
  * Define additional logic which executes after an object/instance has been created.
  * Also, InfoBar can be used which could notify users of the additional changes.
  * Declare new identifier for infoBar in Mainframe/Preferences/PreferenceContext
- * and add it in hints/explaination list.
+ * and add it in hints/explanation list.
  */
 
 export type InfoBarDetails = {|

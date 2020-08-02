@@ -5,8 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "cd ./node_modules/karma/bin && karma start ../../../karma.conf.js --browsers ChromeHeadless --single-run",
-    "test:firefox": "./node_modules/karma/bin/karma start --browsers Firefox --single-run"
+    "test": "karma start --browsers ChromeHeadless --single-run",
+    "test:firefox": "karma start --browsers Firefox --single-run"
   },
   "keywords": [
     "HTML5",

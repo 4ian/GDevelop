@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -177,7 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "a2dd52ec-0278-4199-bf75-fc11c08ef355",
+          "persistentUuid": "658aa6f4-5ada-455d-bca2-2efcdd5cb79e",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -198,7 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "237420ea-605c-4ec9-90ec-a1eb83a37209",
+          "persistentUuid": "3253ee07-53ae-49cf-802d-19d979a451d0",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -577,7 +577,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "4b5e564b-0074-48b0-b0b9-ce55f25ad376",
+          "persistentUuid": "8ceb6ab2-b269-4d4a-bdf2-258761f19cdb",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -598,7 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "fb92fd12-b526-4ce2-86c0-f900bf03f982",
+          "persistentUuid": "73d93e1e-c975-4573-87ad-64a482fa21c2",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -619,7 +619,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "0cc85b8c-2de0-4096-81ce-99b3701f63bb",
+          "persistentUuid": "9bbd190d-0405-4d59-bbea-4d464c758a43",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -640,7 +640,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "70aaefe7-8f01-461a-9028-ea07b1b1e90b",
+          "persistentUuid": "5e3f389f-bddc-41f7-8c38-5b5802d0f24a",
           "width": 0,
           "x": 608.5,
           "y": 178.5,

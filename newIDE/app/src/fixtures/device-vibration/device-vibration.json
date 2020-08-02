@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateOnce",
-          "persistentUuid": "ebf29bbb-a3d7-44bc-97d9-bb6b158d0f65",
+          "persistentUuid": "f03bf171-94c1-41f0-ba73-eedce7b12014",
           "width": 0,
           "x": 224,
           "y": 256,
@@ -169,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateMulti",
-          "persistentUuid": "1b659d37-f9c6-4179-b41a-0745bbe84de9",
+          "persistentUuid": "3e2d50e7-fc7d-4bf4-a250-d1b24767c86f",
           "width": 0,
           "x": 224,
           "y": 416,
@@ -185,7 +185,7 @@
           "layer": "",
           "locked": false,
           "name": "StopVibration",
-          "persistentUuid": "f8815dc5-f3f4-4f02-b3c9-a7d6e21ca70f",
+          "persistentUuid": "68ee1b12-f61c-43ac-af37-8fc9ba914d55",
           "width": 0,
           "x": 224,
           "y": 576,
@@ -201,7 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "ae746b30-eb7c-49b7-9b57-4f9f1948f720",
+          "persistentUuid": "2dc5b2ab-01ce-4ec3-8439-a2fc43dd3cad",
           "width": 416,
           "x": 192,
           "y": 544,
@@ -217,7 +217,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "06fd9390-285c-4674-99f5-297677eee770",
+          "persistentUuid": "b5589169-4d09-4fd9-9ec4-38bad2509b37",
           "width": 416,
           "x": 192,
           "y": 224,
@@ -233,7 +233,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "c73bb5ba-1fc5-4cc4-9f72-640e3415f7e1",
+          "persistentUuid": "8131c3cd-64d2-473b-b817-1acc5424055f",
           "width": 416,
           "x": 192,
           "y": 384,
@@ -249,7 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
-          "persistentUuid": "610679df-83c8-40c2-b8fc-dab3746ef8b1",
+          "persistentUuid": "241867ce-bade-4bc3-8ec5-1dce7ecb58b6",
           "width": 0,
           "x": 32,
           "y": 64,

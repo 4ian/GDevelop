@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -209,7 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
-          "persistentUuid": "8ded9135-6af1-4950-a7ff-b6cf6b2ac1ef",
+          "persistentUuid": "347c4c54-9164-4191-91ca-54ea4a20c990",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -225,7 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
-          "persistentUuid": "83232e70-0860-4f33-8b0d-e077e58ef8bd",
+          "persistentUuid": "ad88b45d-7639-4b50-bad3-168cd1430279",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -241,7 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "ba42c8b8-69bf-4c2c-a5e0-554faf204685",
+          "persistentUuid": "4c954b3f-7fdb-415b-a760-0839175c576e",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -257,7 +257,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
-          "persistentUuid": "40d421b6-bd32-4624-8a79-dbcc51411288",
+          "persistentUuid": "5336a4e2-134c-42b6-8cb0-9d705384810d",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -273,7 +273,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
-          "persistentUuid": "e8d9c3fb-48a7-43b5-b8e9-ca283bb43b44",
+          "persistentUuid": "669299f8-7bd2-4b44-bbd8-dc98620e181e",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -289,7 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
-          "persistentUuid": "d2d4772f-10d4-4470-9cbd-58bcebbb7f6f",
+          "persistentUuid": "508ebb53-5e7d-41b0-bb5c-3d3392fd2b4f",
           "width": 0,
           "x": 620,
           "y": 427,

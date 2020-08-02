@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -168,7 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "1736aad8-1ae9-4fe2-9946-46d76a863409",
+          "persistentUuid": "77fe4982-6fb9-4278-8b79-ce3ffd23687c",
           "width": 0,
           "x": 10,
           "y": 12.5,
@@ -184,7 +184,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "8b50f1f3-01cc-468d-a6ed-65962e1944bf",
+          "persistentUuid": "ca2dd0c2-4540-4c1b-af19-8b9eede5ad4f",
           "width": 0,
           "x": 406,
           "y": 343,
@@ -200,7 +200,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "427f491f-8f6b-456d-b2f4-e18f4bc8f3f6",
+          "persistentUuid": "32b4d60e-1a78-44ee-a500-fbfd35fc5f8b",
           "width": 54.7414,
           "x": 516,
           "y": 215,
@@ -216,7 +216,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "5f1e7f9d-a472-456a-b99a-88e0edca50a1",
+          "persistentUuid": "d8fd5584-864f-44e2-983b-32a5a73de7e7",
           "width": 215.06,
           "x": 373,
           "y": 198,
@@ -232,7 +232,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "bfcb7dbf-b256-44db-84b6-347520e85c3b",
+          "persistentUuid": "7ea54f51-1786-4bce-8eae-04a1efb737a9",
           "width": 160.345,
           "x": 566,
           "y": 455,
@@ -248,7 +248,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "e58a982d-6d4d-47b8-bc95-ff73ab0b118e",
+          "persistentUuid": "7bbb4096-541a-42e3-bb52-40fca915c081",
           "width": 100,
           "x": 233.433,
           "y": 453.542,
@@ -264,7 +264,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "1311e9af-c354-43e9-bcca-8f8a6005639c",
+          "persistentUuid": "2513f6cd-2205-43d6-9391-172eb7f20a22",
           "width": 73.0603,
           "x": 216,
           "y": 221,

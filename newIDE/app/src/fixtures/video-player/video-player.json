@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -320,7 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Video",
-          "persistentUuid": "947cf900-dbfc-43dd-b741-6975120067f4",
+          "persistentUuid": "236acd63-761b-451d-a5df-203bd3109d73",
           "width": 625,
           "x": 89,
           "y": 98,
@@ -345,7 +345,7 @@
           "layer": "",
           "locked": false,
           "name": "DEBUG_VIDEO",
-          "persistentUuid": "92cf525a-72db-414e-9295-78e7f219293e",
+          "persistentUuid": "9ffa53a4-ec69-4be7-8e5e-3c42502c5f4d",
           "width": 0,
           "x": 325,
           "y": 648,
@@ -361,7 +361,7 @@
           "layer": "",
           "locked": false,
           "name": "Explain",
-          "persistentUuid": "5a444e49-aa33-4f23-a551-3a4a52111514",
+          "persistentUuid": "ea64bb71-ed37-433d-89fb-495b98f8abea",
           "width": 0,
           "x": 83,
           "y": 467,
@@ -377,7 +377,7 @@
           "layer": "",
           "locked": false,
           "name": "Credit",
-          "persistentUuid": "df840d31-1ddb-4b33-9d02-ca6028acf1c4",
+          "persistentUuid": "4ad4379c-f89f-4665-bfd1-b2b343b5b624",
           "width": 0,
           "x": 306,
           "y": 570,
@@ -393,7 +393,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
-          "persistentUuid": "d31b41cc-4fe6-49ff-a1dd-6db94acf7a1b",
+          "persistentUuid": "c91856b6-0d2c-46c9-8156-752afcf9aeb6",
           "width": 344,
           "x": 260,
           "y": 32,

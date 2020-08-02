@@ -209,7 +209,7 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    useCommandPalette: false,
+    useCommandPalette: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},

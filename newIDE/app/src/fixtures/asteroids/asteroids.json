@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -374,7 +374,7 @@
           "layer": "",
           "locked": false,
           "name": "button",
-          "persistentUuid": "d042a79b-cb28-4d90-947f-7159de44e78d",
+          "persistentUuid": "959440d3-e711-440b-92a9-f3754b612d53",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -390,7 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
-          "persistentUuid": "decff4fa-cd64-47aa-b3b7-69855c88a02d",
+          "persistentUuid": "fa2cad5c-e298-476d-9e1f-17b24093631a",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -744,7 +744,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_left",
-          "persistentUuid": "88080ac2-d2a9-464a-a037-0932031facf7",
+          "persistentUuid": "f06a98d0-25a7-4951-885a-9df227ef4094",
           "width": 0,
           "x": 64,
           "y": 480,
@@ -760,7 +760,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_right",
-          "persistentUuid": "db2cf9af-ac2f-4e08-837d-b5b81ac4410e",
+          "persistentUuid": "3d9aa7bb-bc58-435e-9ba1-3987e91cf2f3",
           "width": 0,
           "x": 160,
           "y": 480,
@@ -776,7 +776,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_fire",
-          "persistentUuid": "a1d2807c-2a9a-449a-a527-65e498ae0a30",
+          "persistentUuid": "b5c7ddc4-4dcd-4be7-b52c-db25ee6d574a",
           "width": 0,
           "x": 608,
           "y": 480,
@@ -792,7 +792,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_thruster",
-          "persistentUuid": "68fd70ea-4d93-4006-a7fb-41e1aba06011",
+          "persistentUuid": "c387382a-aed6-4b4a-950e-b12492787e88",
           "width": 0,
           "x": 672,
           "y": 416,
@@ -7744,7 +7744,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
-          "persistentUuid": "3dea9b42-88da-46d2-a4b2-752c3534a80d",
+          "persistentUuid": "0c525ec6-1ede-4ad9-9bed-39b4643e3b24",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -7760,7 +7760,7 @@
           "layer": "",
           "locked": false,
           "name": "restart",
-          "persistentUuid": "e804cd51-fa03-4590-94c7-633f66ef0421",
+          "persistentUuid": "cc4f03ee-7b42-4e45-8d1d-3a4e0128a7da",
           "width": 0,
           "x": 311,
           "y": 262,

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -161,7 +161,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyPressed",
-          "persistentUuid": "92fdcc38-a7c7-424e-9b09-f856b5d4dc6b",
+          "persistentUuid": "b75dac7e-5bf4-4ab1-b4d5-d30eaffb0223",
           "width": 0,
           "x": 64,
           "y": 192,
@@ -177,7 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyText",
-          "persistentUuid": "8830783c-edcc-40e5-a704-da772a4f7ac4",
+          "persistentUuid": "7a1b58d2-5ed3-4d47-aeae-466eb1a3c23c",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -193,7 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
-          "persistentUuid": "5f2b5fde-a5a7-402c-8c05-a097a816b6aa",
+          "persistentUuid": "3c3f5924-7d02-487c-87a9-094d03219364",
           "width": 0,
           "x": 356.5,
           "y": 439.5,
@@ -209,7 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
-          "persistentUuid": "5e8cb97a-0501-4b73-b800-d85866d31299",
+          "persistentUuid": "129886ac-c919-46f1-898a-b0083a0b74da",
           "width": 0,
           "x": 113,
           "y": 323,
@@ -225,7 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyUsed",
-          "persistentUuid": "ec6dd212-feb1-4a98-bff1-0a4365c296a8",
+          "persistentUuid": "6b3b9aa2-0a94-4e36-93ab-14763786a365",
           "width": 0,
           "x": 64,
           "y": 224,
@@ -241,7 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyText",
-          "persistentUuid": "9cc34855-24fb-47f8-89de-a4d086db6ebb",
+          "persistentUuid": "f32f08d2-84a3-4078-9222-79728dd83a2e",
           "width": 0,
           "x": 256,
           "y": 224,

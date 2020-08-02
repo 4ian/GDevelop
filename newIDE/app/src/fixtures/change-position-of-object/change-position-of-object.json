@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "439a1f42-8f49-4b91-8b3c-b87b48db3ad9",
+          "persistentUuid": "0e91b1c9-d256-492d-a674-06ff783cecd0",
           "width": 0,
           "x": 336.849,
           "y": 241.534,
@@ -169,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "6de82ffc-35a5-4f1a-9fdd-64321feccc29",
+          "persistentUuid": "4617eb01-1e3b-4e42-bf29-960a6180cf9a",
           "width": 0,
           "x": 117.085,
           "y": 1.20455,

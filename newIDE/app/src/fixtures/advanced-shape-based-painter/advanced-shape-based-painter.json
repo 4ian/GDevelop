@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -322,7 +322,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "f718226c-dddc-4eca-86bd-966a9421d633",
+          "persistentUuid": "2834a434-2636-4222-ade4-5d2fd8e59a6f",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -343,7 +343,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "3cb8d6e4-c2b7-4061-ba01-81c92fd14570",
+          "persistentUuid": "d125f5c3-6219-4026-94ab-17559212ae74",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -364,7 +364,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "0166fc6b-f8c3-4920-967f-1e96ba97807a",
+          "persistentUuid": "d8c0c63b-5ca4-4a59-b60a-fa8306257388",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -385,7 +385,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "580fd1e9-b710-4fc0-a688-0340382e4061",
+          "persistentUuid": "28a0be97-2da9-47d2-8ded-fcccefc458a3",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -406,7 +406,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "5d6eebe0-c63e-4ca9-bfc0-04d859fdf0b5",
+          "persistentUuid": "68c21742-5e50-44f4-be67-735026fa2d92",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -427,7 +427,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "506cd7ed-e313-41eb-9bc0-f855c63ca786",
+          "persistentUuid": "ff25f53c-ba79-4339-9e1d-b729d2ff367d",
           "width": 0,
           "x": 18,
           "y": 523,

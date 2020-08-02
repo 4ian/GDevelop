@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -207,7 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "6f89ae38-ae7c-4979-8eeb-64a9befcc9d0",
+          "persistentUuid": "f3887e4c-dbf9-4b49-afef-e7b6337e2587",
           "width": 0,
           "x": 331,
           "y": 298,
@@ -223,7 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "7831c6b1-c2d0-4495-8785-64d086003601",
+          "persistentUuid": "8df84059-cd04-4fd4-8565-e819e238e7cd",
           "width": 0,
           "x": 113,
           "y": 33,
@@ -239,7 +239,7 @@
           "layer": "",
           "locked": false,
           "name": "pause_message",
-          "persistentUuid": "c448e989-b771-4e14-be2c-cb86893b2474",
+          "persistentUuid": "16f1c809-d294-4cbc-8e6f-2cad2ed96cb0",
           "width": 0,
           "x": 192,
           "y": 432,
@@ -255,7 +255,7 @@
           "layer": "",
           "locked": false,
           "name": "animation_message",
-          "persistentUuid": "519f1626-4c34-49b4-9a4e-ad0776bb0eac",
+          "persistentUuid": "82a4ddc5-63ff-4f6c-a849-1fd85d39ed76",
           "width": 0,
           "x": 341,
           "y": 250,

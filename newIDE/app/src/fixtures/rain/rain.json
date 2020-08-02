@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -201,7 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_1",
-          "persistentUuid": "0da53fc4-ac3e-45d0-8604-5e48ac4850f9",
+          "persistentUuid": "37900e34-f6b2-4094-9382-cd5ef061eca7",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -222,7 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_2",
-          "persistentUuid": "974074f9-acf1-45ae-bfb8-f73f88fb685d",
+          "persistentUuid": "266681c3-c7f7-401e-a020-c8b577efada8",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -243,7 +243,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_3",
-          "persistentUuid": "dc6e3fcc-72ef-480f-affd-fb508c7ac9f9",
+          "persistentUuid": "95567d7f-a1ab-4612-a561-4509822eecd7",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -264,7 +264,7 @@
           "layer": "",
           "locked": false,
           "name": "logo_inrain",
-          "persistentUuid": "182964a7-6085-4882-8327-42518eadce3e",
+          "persistentUuid": "a3252ac4-7679-4005-8728-9188c6637bb0",
           "width": 0,
           "x": 906,
           "y": 666,

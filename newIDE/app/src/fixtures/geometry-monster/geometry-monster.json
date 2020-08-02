@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -464,7 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
-          "persistentUuid": "b6d086f5-f3f4-480e-bb9a-df6c03ae36f0",
+          "persistentUuid": "1e27dd7c-c0c8-4e60-92e7-0e6e2b72a675",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -480,7 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
-          "persistentUuid": "1e536c96-ac97-4f68-b3fd-d7897fe7a90b",
+          "persistentUuid": "dc0f9600-1ec9-4b59-a667-f592bc2989d9",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -860,7 +860,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
-          "persistentUuid": "69e801ca-f838-44a7-a1dc-9f88096c6f97",
+          "persistentUuid": "0d732576-5dab-4f4c-b9b3-cb0069b6c743",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -876,7 +876,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
-          "persistentUuid": "16945b68-42d6-4256-8461-d73ca2c61351",
+          "persistentUuid": "45ce24d5-85d3-4f04-b0d9-15a4d2f5b0dd",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -892,7 +892,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
-          "persistentUuid": "954d4e53-59d4-4e04-80b6-4fb0e0593563",
+          "persistentUuid": "231f2d88-0933-4d09-b832-41ab5903af6f",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -908,7 +908,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
-          "persistentUuid": "56ec9b82-d992-4eca-82b1-e1890e05b171",
+          "persistentUuid": "f790301e-c5d4-48db-bcd3-0864f1c943ef",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -924,7 +924,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
-          "persistentUuid": "dd83aa0d-1c63-4446-a55b-2462befa17ef",
+          "persistentUuid": "af85eb6d-d763-4016-a59a-59da0c006043",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -940,7 +940,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
-          "persistentUuid": "4ab5af0f-a31b-4947-a8c5-91b041516236",
+          "persistentUuid": "69557889-59fd-4df5-87fe-602a4a46b75f",
           "width": 0,
           "x": 110,
           "y": 406,

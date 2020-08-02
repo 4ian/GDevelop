@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -146,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
-          "persistentUuid": "ca987986-fb6f-4f0f-8179-8fab1916fbf5",
+          "persistentUuid": "6a91ed23-4442-4281-bff4-e80dbfc4d8f3",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -329,7 +329,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
-          "persistentUuid": "f1bdc73a-27cc-4f06-bd90-928133c10f16",
+          "persistentUuid": "239b7c59-1ced-4a8b-8905-6e640f5d03f3",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -512,7 +512,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
-          "persistentUuid": "fb2f9dd8-64bc-4a22-87e9-d26c1e093a73",
+          "persistentUuid": "b05550ba-6f3c-4412-bc6b-409ec6184dcd",
           "width": 0,
           "x": 230,
           "y": 264,

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -174,7 +174,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "0b3d8344-5c6b-47d2-ae3a-74fcf3577d12",
+          "persistentUuid": "4d6bd753-4a1c-4e91-adbe-e7ec2293ed5e",
           "width": 0,
           "x": 186,
           "y": 274.5,
@@ -190,7 +190,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "ad49b4de-78d2-46ad-99ce-22b7fd7e03c0",
+          "persistentUuid": "a87799e6-4c98-456c-af1a-71f73108b603",
           "width": 0,
           "x": 171,
           "y": 369.5,
@@ -643,7 +643,7 @@
           "layer": "",
           "locked": false,
           "name": "Button1",
-          "persistentUuid": "00ec43a9-3c23-4178-ad4f-4b60a8fc5495",
+          "persistentUuid": "1565d4ee-2a2a-438f-b296-c199db48af65",
           "width": 0,
           "x": 186,
           "y": 135.5,
@@ -659,7 +659,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "a4d6025b-fc82-4026-b5e4-d12eb51e8d1f",
+          "persistentUuid": "c10e8f41-8b1e-4d50-9c8d-ecff5f1d1efc",
           "width": 0,
           "x": 172,
           "y": 383.5,
@@ -675,7 +675,7 @@
           "layer": "",
           "locked": false,
           "name": "Button2",
-          "persistentUuid": "63cb64d1-94a4-4847-9c5f-381e70593909",
+          "persistentUuid": "4e00534c-66c8-433f-b429-c7227242fefb",
           "width": 0,
           "x": 184,
           "y": 199.5,
@@ -691,7 +691,7 @@
           "layer": "",
           "locked": false,
           "name": "Button3",
-          "persistentUuid": "3270bd2b-a402-4163-ae1e-8cd7b6d48ca4",
+          "persistentUuid": "08f55fb9-72d2-4986-b1e8-7131bae520c7",
           "width": 0,
           "x": 187,
           "y": 265.5,

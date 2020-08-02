@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -270,7 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "74662c7d-f521-449f-9962-480e70b44ca6",
+          "persistentUuid": "441befd3-28f5-4ccf-8dfe-964b1fbba22b",
           "width": 0,
           "x": 173,
           "y": 42,

@@ -699,7 +699,7 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
         var allInstances = this._instances.get(obj.getName());
         for(var i = 0, len = allInstances.length;i<len;++i) {
             if (allInstances[i].id == objId) {
-                allInstances.remove(i);
+                allInstances.splice(i, 1);
                 break;
             }
         }

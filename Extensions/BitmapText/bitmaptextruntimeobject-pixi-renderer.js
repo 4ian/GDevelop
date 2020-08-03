@@ -48,13 +48,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     this.updateFontSize();
     this.updateWordWrap();
     this.updateWrappingWidth();
-    /* 
-    NOTE 
-    Ajoute:
-      updateWordWrap
-      updateWrappingWidth
-
-    */
   }
 
   // update BitmapText with new styles
@@ -74,8 +67,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
-
-  this._pixiObject.dirty = true;
 };
 
 gdjs.BitmapTextRuntimeObjectRenderer = gdjs.BitmapTextRuntimeObjectPixiRenderer;
@@ -88,26 +79,16 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function(
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWordWrap = function() {
   this._pixiObject.style.wordWrap = this._object._wordWrap;
   this._pixiObject.dirty = true;
-  this.updatePosition();
 };
 
 // REVIEW comparé le wrap avec celui de l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function() {
-  if (this._object.wordWrap) {
-    this._pixiObject.maxWidth = width;
+  if (this._object._wordWrap) {
+    this._pixiObject.maxWidth = this._object._wrappingWidth;
   } else {
     this._pixiObject.maxWidth = 0;
   }
-
-    
-
-
   this._pixiObject.dirty = true;
-
- 
-  this._pixiObject.maxWidth = this._object._wrappingWidth;
-  this.updatePosition();
- 
 };
 
 // REVIEW  text - seem OK
@@ -144,6 +125,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
 
 // FIXME position et placement correspondent pas à l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
+  //debugger;
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };

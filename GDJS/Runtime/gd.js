@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -8,26 +9,29 @@
  * The `gdjs` namespace contains all classes and objects of the game engine.
  * @namespace
  */
-window.gdjs = {
-  objectsTypes: new Hashtable(),
-  behaviorsTypes: new Hashtable(),
-  /**
-   * Contains functions used by events (this is a convention only, functions can actually
-   * be anywhere).
-   * @namespace
-   * @memberOf gdjs
-   */
-  evtTools: {},
-  callbacksFirstRuntimeSceneLoaded: [],
-  callbacksRuntimeSceneLoaded: [],
-  callbacksRuntimeScenePreEvents: [],
-  callbacksRuntimeScenePostEvents: [],
-  callbacksRuntimeScenePaused: [],
-  callbacksRuntimeSceneResumed: [],
-  callbacksRuntimeSceneUnloading: [],
-  callbacksRuntimeSceneUnloaded: [],
-  callbacksObjectDeletedFromScene: [],
-};
+// @ts-ignore - creating the global object acting as a namespace
+window.gdjs = {};
+
+/**
+ * Contains functions used by events (this is a convention only, functions can actually
+ * be anywhere).
+ * @namespace
+ * @memberOf gdjs
+ */
+gdjs.evtTools = {};
+
+gdjs.objectsTypes = new Hashtable();
+gdjs.behaviorsTypes = new Hashtable();
+
+/** @type {Function[]} */ gdjs.callbacksFirstRuntimeSceneLoaded = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneLoaded = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePreEvents = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePostEvents = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePaused = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneResumed = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneUnloading = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneUnloaded = [];
+/** @type {Function[]} */ gdjs.callbacksObjectDeletedFromScene = [];
 
 /**
  * Convert a rgb color value to a hex string.
@@ -124,14 +128,6 @@ gdjs.toDegrees = function (angleInRadians) {
 };
 
 /**
- * A Constructor for a {@link gdjs.RuntimeObject}.
- * @name RuntimeObjectConstructor
- * @function
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
- * @param {ObjectData} objectData The initial properties of the object.
- */
-
-/**
  * Register a runtime object (class extending {@link gdjs.RuntimeObject}) that can be used in a scene.
  *
  * The name of the type of the object must be complete, with the namespace if any. For
@@ -139,20 +135,11 @@ gdjs.toDegrees = function (angleInRadians) {
  * of the type of the object is "TextObject::Text".
  *
  * @param {string} objectTypeName The name of the type of the Object.
- * @param {RuntimeObjectConstructor} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeObject} Ctor The constructor of the Object.
  */
 gdjs.registerObject = function (objectTypeName, Ctor) {
   gdjs.objectsTypes.put(objectTypeName, Ctor);
 };
-
-/**
- * A Constructor for a {@link gdjs.RuntimeBehavior}.
- * @name RuntimeBehaviorConstructor
- * @function
- * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
- * @param {BehaviorData} behaviorData The properties used to setup the behavior
- * @param {gdjs.RuntimeObject} owner The object owning the behavior
- */
 
 /**
  * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a
@@ -163,7 +150,7 @@ gdjs.registerObject = function (objectTypeName, Ctor) {
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
  * @param {string} behaviorTypeName The name of the type of the behavior.
- * @param {RuntimeBehaviorConstructor} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeBehavior} Ctor The constructor of the Object.
  */
 gdjs.registerBehavior = function (behaviorTypeName, Ctor) {
   gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
@@ -258,7 +245,7 @@ gdjs.registerObjectDeletedFromSceneCallback = function (callback) {
  * @private
  */
 gdjs.registerGlobalCallbacks = function () {
-  console.warning(
+  console.warn(
     "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
   );
 };
@@ -284,7 +271,7 @@ gdjs.clearGlobalCallbacks = function () {
  * Get the constructor of an object.
  *
  * @param {string} name The name of the type of the object.
- * @returns {ObjectCtor}
+ * @returns {typeof gdjs.RuntimeObject}
  */
 gdjs.getObjectConstructor = function (name) {
   if (name !== undefined && gdjs.objectsTypes.containsKey(name))
@@ -298,7 +285,7 @@ gdjs.getObjectConstructor = function (name) {
  * Get the constructor of a behavior.
  *
  * @param {string} name The name of the type of the behavior.
- * @returns {BehaviorCtor}
+ * @returns {typeof gdjs.RuntimeBehavior}
  */
 gdjs.getBehaviorConstructor = function (name) {
   if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
@@ -383,13 +370,13 @@ gdjs.filterPickedObjectsList = function (arr) {
  * @param {Array<any>} src The source array
  * @param {Array<any>} dst The destination array
  */
-gdjs.copyArray = function(src, dst) {
+gdjs.copyArray = function (src, dst) {
   var len = src.length;
   for (var i = 0; i < len; ++i) {
     dst[i] = src[i];
   }
   dst.length = len;
-}
+};
 
 //Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;

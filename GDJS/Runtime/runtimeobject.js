@@ -92,7 +92,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this._livingOnScene = true;
     /**
      * @type {number}
-     * @protected
+     * @readonly
      */
     this.id = runtimeScene.createNewUniqueId();
     /**
@@ -105,6 +105,13 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
      * @type {?string}
      */
     this.persistentUuid = null;
+
+    /**
+     * A property to be used by external algorithms to indicate if the
+     * object is picked or not in an object selection. By construction, this is
+     * not "thread safe" or "re-entrant algorithm" safe.
+     */
+    this.pick = false;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {

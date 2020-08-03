@@ -187,3 +187,14 @@ gdjs.RuntimeSceneCocosRenderer.prototype.showCursor = function() {
 gdjs.RuntimeSceneCocosRenderer.prototype.getCocosScene = function() {
     return this._cocosScene;
 }
+
+/**
+ * @param {gdjs.Layer} layer
+ * @param {number} index
+ */
+gdjs.RuntimeSceneCocosRenderer.prototype.setLayerIndex = function (
+    layer,
+    index
+) {
+    // Not implemented
+}

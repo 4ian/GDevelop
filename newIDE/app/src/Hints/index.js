@@ -162,6 +162,14 @@ const tutorialHints = {
     link: 'https://www.youtube.com/watch?v=1qsCgwFtYfg',
     identifier: 'opening-chest',
   },
+  'health-bar-and-health-potion': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/health-bar-and-health-potion.jpg',
+    name: 'Create a Health Bar and Health Potion',
+    message: t`How to show a health bar on screen and a potion to give back health to the player.`,
+    link: 'https://www.youtube.com/watch?v=P-scQW7PeVg',
+    identifier: 'health-bar-and-health-potion',
+  },
 };
 
 const allTutorialHints = Object.keys(tutorialHints).map(

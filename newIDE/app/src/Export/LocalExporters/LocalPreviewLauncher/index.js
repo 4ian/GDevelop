@@ -23,11 +23,12 @@ type Props = {|
   onChangeSubscription?: () => void,
 |};
 
-type State = {
+type State = {|
   networkPreviewDialogOpen: boolean,
   networkPreviewHost: ?string,
   networkPreviewPort: ?number,
   networkPreviewError: ?any,
+  hotReloadsCount: number,
   previewGamePath: ?string,
   devToolsOpen: boolean,
   previewBrowserWindowConfig: ?{
@@ -37,7 +38,7 @@ type State = {
     title: string,
     backgroundColor: string,
   },
-};
+|};
 
 export default class LocalPreviewLauncher extends React.Component<
   Props,
@@ -54,8 +55,10 @@ export default class LocalPreviewLauncher extends React.Component<
     previewGamePath: null,
     devToolsOpen: false,
     previewBrowserWindowConfig: null,
+    hotReloadsCount: 0,
   };
-  _subscriptionChecker: ?SubscriptionChecker = null;
+  _networkPreviewSubscriptionChecker: ?SubscriptionChecker = null;
+  _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
     if (
@@ -118,7 +121,7 @@ export default class LocalPreviewLauncher extends React.Component<
               });
             }
 
-            setTimeout(() => this._checkSubscription());
+            setTimeout(() => this._checkSubscriptionForNetworkPreview());
           });
           ipcRenderer.on('local-network-ip', (event, ipAddress) => {
             this.setState({
@@ -216,6 +219,16 @@ export default class LocalPreviewLauncher extends React.Component<
                   command: 'hotReload',
                 });
               });
+
+              if (
+                this.state.hotReloadsCount % 16 === 0 &&
+                this._hotReloadSubscriptionChecker
+              ) {
+                this._hotReloadSubscriptionChecker.checkHasSubscription();
+              }
+              this.setState(state => ({
+                hotReloadsCount: state.hotReloadsCount + 1,
+              }));
             } else {
               this._openPreviewWindow(project, outputDir, previewOptions);
             }
@@ -229,10 +242,10 @@ export default class LocalPreviewLauncher extends React.Component<
     return LocalPreviewDebuggerServer;
   }
 
-  _checkSubscription = () => {
-    if (!this._subscriptionChecker) return true;
+  _checkSubscriptionForNetworkPreview = () => {
+    if (!this._networkPreviewSubscriptionChecker) return true;
 
-    return this._subscriptionChecker.checkHasSubscription();
+    return this._networkPreviewSubscriptionChecker.checkHasSubscription();
   };
 
   render() {
@@ -242,11 +255,12 @@ export default class LocalPreviewLauncher extends React.Component<
       networkPreviewPort,
       networkPreviewError,
     } = this.state;
+
     return (
       <React.Fragment>
         <SubscriptionChecker
           ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)
+            (this._networkPreviewSubscriptionChecker = subscriptionChecker)
           }
           onChangeSubscription={() => {
             this.setState({ networkPreviewDialogOpen: false });
@@ -255,6 +269,20 @@ export default class LocalPreviewLauncher extends React.Component<
           }}
           id="Preview over wifi"
           title={<Trans>Preview over wifi</Trans>}
+          mode="try"
+        />
+        <SubscriptionChecker
+          ref={subscriptionChecker =>
+            (this._hotReloadSubscriptionChecker = subscriptionChecker)
+          }
+          onChangeSubscription={() => {
+            if (this.props.onChangeSubscription)
+              this.props.onChangeSubscription();
+          }}
+          id="Hot reloading"
+          title={
+            <Trans>Live preview (apply changes to the running preview)</Trans>
+          }
           mode="try"
         />
         <LocalNetworkPreviewDialog

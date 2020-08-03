@@ -58,10 +58,10 @@ gdjs.PhysicsSharedData = function(runtimeScene, sharedData)
         behaviorB = contact.GetFixtureB().GetBody().gdjsAssociatedBehavior;
 
         var i = behaviorA.currentContacts.indexOf(behaviorB);
-        if ( i !== -1 ) behaviorA.currentContacts.remove(i);
+        if ( i !== -1 ) behaviorA.currentContacts.splice(i, 1);
 
         i = behaviorB.currentContacts.indexOf(behaviorA);
-        if ( i !== -1 ) behaviorB.currentContacts.remove(i);
+        if ( i !== -1 ) behaviorB.currentContacts.splice(i, 1);
     };
 
 	this.contactListener.PreSolve = function() {};

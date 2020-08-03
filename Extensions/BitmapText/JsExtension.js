@@ -570,10 +570,12 @@ module.exports = {
 
       //NOTE wordWrap to maxWidth - bitmapText
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
-      if (wordWrap) {
+      if (wordWrap && this._instance.hasCustomSize()) {
         this._pixiObject.maxWidth = width;
+        this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;
+        this._pixiObject.dirty = true;
       }
 
       // NOTE align - bitmapText
@@ -601,6 +603,7 @@ module.exports = {
           chars: PIXI.BitmapFont.ASCII,
           textureWidth: 1024,
         });
+        this._pixiObject.dirty = true;
       }
       this._pixiObject.fontName = slugFontName;
       this._pixiObject.updateText();

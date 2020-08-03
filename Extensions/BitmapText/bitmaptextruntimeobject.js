@@ -44,9 +44,16 @@ gdjs.BitmapTextRuntimeObject = function(runtimeScene, objectData) {
   this._align = objectData.content.align;
 
   if (this._renderer)
-    gdjs.BitmapTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
+    gdjs.BitmapTextRuntimeObjectRenderer.call(
+      this._renderer,
+      this,
+      runtimeScene
+    );
   else
-    this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(this, runtimeScene);
+    this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
+      this,
+      runtimeScene
+    );
 
   // While this should rather be exposed as a property for all objects, honor the "visible"
   // property that is specific to this object.
@@ -69,7 +76,10 @@ gdjs.BitmapTextRuntimeObject.prototype.getRendererObject = function() {
  * @param {BitmapTextObjectDataType} oldObjectData
  * @param {BitmapTextObjectDataType} newObjectData
  */
-gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function(
+  oldObjectData,
+  newObjectData
+) {
   if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
     this.setOpacity(newObjectData.content.opacity);
   }
@@ -83,14 +93,14 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function(oldObject
     this._color = newObjectData.content.color;
     this._renderer.updateColor();
   }
-  
+
   if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
     this.setFontFamily(newObjectData.content.fontFamily);
   }
   if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
     this.setFontSize(newObjectData.content.fontSize);
   }
-  
+
   if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
     this.setWordWrap(newObjectData.content.wordWrap);
   }
@@ -105,14 +115,21 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function(oldObject
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
-gdjs.BitmapTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-  if (initialInstanceData.customSize)
+gdjs.BitmapTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
+  initialInstanceData
+) {
+  if (initialInstanceData.customSize) {
     this.setWrappingWidth(initialInstanceData.width);
-  else
+  } else {
     this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
+  }
+  this.setX(initialInstanceData.x);
+  this.setY(initialInstanceData.y);
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+gdjs.BitmapTextRuntimeObject.prototype.onDestroyFromScene = function(
+  runtimeScene
+) {
   gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 };
 

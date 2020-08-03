@@ -19,6 +19,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     .getFontFamily(runtimeObject._fontFamily);
   style.fontSize = runtimeObject._fontSize;
   style.wordWrap = runtimeObject._wordWrap;
+  style.wordWrapWidth= runtimeObject._wrappingWidth;
   style.fill = runtimeObject._color;
 
   const slugFontName =
@@ -114,7 +115,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function()
     .getGame()
     .getFontManager()
     .getFontFamily(this._object._fontFamily);
-  //update bitmapFont
   this._pixiObject.dirty = true;
 };
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
@@ -125,7 +125,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
 
 // FIXME position et placement correspondent pas à l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
-  //debugger;
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };

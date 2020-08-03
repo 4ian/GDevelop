@@ -26,7 +26,10 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     style.fontFamily + '-' + style.fontSize + '-' + style.fill + '-bitmapFont';
 
   if (!PIXI.BitmapFont.available[slugFontName]) {
-    PIXI.BitmapFont.from(slugFontName, style, {chars: PIXI.BitmapFont.ASCII});
+    PIXI.BitmapFont.from(slugFontName, style, {
+      chars: PIXI.BitmapFont.ASCII,
+      textureWidth: 1024,
+    });
   }
 
   // Load (or reset) the text

@@ -483,6 +483,7 @@ module.exports = {
       if (!PIXI.BitmapFont.available[slugFontName]) {
         PIXI.BitmapFont.from(slugFontName, style, {
           chars: PIXI.BitmapFont.ASCII,
+          textureWidth: 1024,
         });
       }
 
@@ -603,6 +604,7 @@ module.exports = {
       if (!PIXI.BitmapFont.available[slugFontName] || this._pixiObject.dirty) {
         PIXI.BitmapFont.from(slugFontName, this.style, {
           chars: PIXI.BitmapFont.ASCII,
+          textureWidth: 1024,
         });
       }
       this._pixiObject.fontName = slugFontName;

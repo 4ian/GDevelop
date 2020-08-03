@@ -19,7 +19,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     .getFontFamily(runtimeObject._fontFamily);
   style.fontSize = runtimeObject._fontSize;
   style.wordWrap = runtimeObject._wordWrap;
-  style.wordWrapWidth = runtimeObject._wrappingWidth;
   style.fill = runtimeObject._color;
 
   const slugFontName =
@@ -39,17 +38,27 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
     });
 
     this._pixiObject.align = runtimeObject._align;
+
     this.style = style;
     this.constructorSlugFontName = slugFontName;
   } else {
-    this.updateTextContent();
     this.updateColor();
     this.updateAlignment();
     this.updateFontFamily();
     this.updateFontSize();
+    this.updateWordWrap();
+    this.updateWrappingWidth();
+    /* 
+    NOTE 
+    Ajoute:
+      updateWordWrap
+      updateWrappingWidth
+
+    */
   }
 
-  this._pixiObject.updateText(); // update BitmapText with new styles
+  // update BitmapText with new styles
+  this._pixiObject.updateText();
 
   runtimeScene
     .getLayer('')
@@ -65,6 +74,8 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function(
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
+
+  this._pixiObject.dirty = true;
 };
 
 gdjs.BitmapTextRuntimeObjectRenderer = gdjs.BitmapTextRuntimeObjectPixiRenderer;
@@ -73,37 +84,56 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function(
   return this._pixiObject;
 };
 
+// REVIEW comparé le wrap avec celui de l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWordWrap = function() {
   this._pixiObject.style.wordWrap = this._object._wordWrap;
   this._pixiObject.dirty = true;
   this.updatePosition();
 };
 
+// REVIEW comparé le wrap avec celui de l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function() {
-  this._pixiObject.maxWidth = this._object._wrappingWidth;
+  if (this._object.wordWrap) {
+    this._pixiObject.maxWidth = width;
+  } else {
+    this._pixiObject.maxWidth = 0;
+  }
+
+    
+
+
   this._pixiObject.dirty = true;
+
+ 
+  this._pixiObject.maxWidth = this._object._wrappingWidth;
   this.updatePosition();
+ 
 };
 
+// REVIEW  text - seem OK
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTextContent = function() {
   this._pixiObject.text = this._object._text;
   this.updatePosition();
 };
 
+// REVIEW fill - seem OK
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateColor = function() {
   this.style.fill = this._object._color;
   this._pixiObject.dirty = true;
 };
 
+// REVIEW align - seem OK
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function() {
   this._pixiObject.align = this._object._align;
-  this._pixiObject.dirty = true;
 };
+
+// REVIEW fontFamily - seem OK
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontFamily = function() {
   this.style.fontFamily = this._object._runtimeScene
     .getGame()
     .getFontManager()
     .getFontFamily(this._object._fontFamily);
+  //update bitmapFont
   this._pixiObject.dirty = true;
 };
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
@@ -112,11 +142,13 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function() {
   this._pixiObject.dirty = true;
 };
 
+// FIXME position et placement correspondent pas à l'IDE
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };
 
+// REVIEW angle
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
   this._pixiObject.rotation = gdjs.toRad(this._object.angle);
 };

@@ -464,13 +464,8 @@ module.exports = {
       //classic font in GDevelop
       style.fontFamily = 'Arial';
       style.fontSize = 20;
-      style.padding = 4;
       style.wordWrap = false;
       style.fill = '#ffffff'; // baked color in font, not doing for be dynamic so it's white here, and real color is handle dynamicaly on bitmapText.
-
-      /*
-      style.wordWrapWidth = 1; // ??
-      */
 
       const slugFontName =
         style.fontFamily +

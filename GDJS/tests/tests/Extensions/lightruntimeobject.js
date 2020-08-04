@@ -2,22 +2,60 @@
  * Tests for Light Object
  */
 
-describe('gdjs.LightRuntimeObject', function () {
-  const runtimeScene = new gdjs.RuntimeScene(null);
+/**
+ * Utility function for adding light object for tests.
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {number} radius
+ * @returns {gdjs.LightRuntimeObject}
+ */
+const addLightObject = (runtimeScene, radius) => {
   const lightObj = new gdjs.LightRuntimeObject(runtimeScene, {
-    name: 'obj1',
+    name: 'lightObject',
     type: 'Lighting::LightObject',
     variables: [],
     behaviors: [],
     content: {
-      radius: 100,
+      radius: radius,
       color: '#b4b4b4',
       texture: '',
       debugMode: false,
     },
   });
-  lightObj.setX(200);
-  lightObj.setY(200);
+  runtimeScene.addObject(lightObj);
+  return lightObj;
+};
+
+/**
+ * Utility function for adding light obstacle for tests.
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {number} width
+ * @param {number} height
+ * @returns {gdjs.RuntimeObject}
+ */
+const addLightObstacle = (runtimeScene, width, height) => {
+  const obstacle = new gdjs.RuntimeObject(runtimeScene, {
+    name: 'lightObstacle',
+    type: '',
+    behaviors: [
+      {
+        type: 'Lighting::LightObstacleBehavior',
+      },
+    ],
+  });
+  obstacle.getWidth = function () {
+    return width;
+  };
+  obstacle.getHeight = function () {
+    return height;
+  };
+  runtimeScene.addObject(obstacle);
+  return obstacle;
+};
+
+describe('gdjs.LightRuntimeObject', function () {
+  const runtimeScene = new gdjs.RuntimeScene(null);
+  const lightObj = addLightObject(runtimeScene, 100);
+  lightObj.setPosition(200, 200);
 
   it('check object properties', function () {
     expect(lightObj.getRadius()).to.be(100);
@@ -36,5 +74,143 @@ describe('gdjs.LightRuntimeObject', function () {
     expect(gdjs.LightRuntimeObjectPixiRenderer._defaultIndexBuffer).to.eql(
       new Float32Array([0, 1, 2, 0, 2, 3])
     );
+  });
+});
+
+describe('Light with obstacles around it', function () {
+  const runtimeGame = new gdjs.RuntimeGame({
+    variables: [],
+    resources: {
+      resources: [],
+    },
+    properties: { windowWidth: 800, windowHeight: 600 },
+  });
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
+  runtimeScene._timeManager.getElapsedTime = function () {
+    return (1 / 60) * 1000;
+  };
+  const light = addLightObject(runtimeScene, 100);
+  const obstacle = addLightObstacle(runtimeScene, 50, 50);
+  light.setPosition(200, 200);
+  obstacle.setPosition(250, 250);
+
+  runtimeScene.renderAndStep();
+  light.update();
+
+  it('Vertex and index buffers when light obstacle is present', function () {
+    const vertexBuffer = light._renderer._vertexBuffer;
+    const indexBuffer = light._renderer._indexBuffer;
+    const vertexData = [
+      200, 200,
+      100, 100.0199966430664,
+      100, 100,
+      100.0199966430664, 100,
+      299.9800109863281, 100,
+      300, 100,
+      300, 100.0199966430664,
+      300, 299.9800109863281,
+      300, 300,
+      299.9800109863281, 300,
+      200.00999450683594, 300,
+      200, 250,
+      199.9949951171875, 250,
+      175.00625610351562, 250,
+      175, 250,
+      174.99374389648438, 250,
+      150.00999450683594, 250,
+      150, 250,
+      100, 299.9800109863281
+    ];
+    const indexData = [
+      0, 1, 2,
+      0, 2, 3,
+      0, 3, 4,
+      0, 4, 5,
+      0, 5, 6,
+      0, 6, 7,
+      0, 7, 8,
+      0, 8, 9,
+      0, 9, 10,
+      0, 10, 11,
+      0, 11, 12,
+      0, 12, 13,
+      0, 13, 14,
+      0, 14, 15,
+      0, 15, 16,
+      0, 16, 17,
+      0, 17, 18,
+      0, 18, 1
+    ];
+
+    vertexData.forEach((val, index) => {
+      expect(vertexBuffer[index]).to.be(val);
+    }); 
+    indexData.forEach((val, index) => {
+      expect(indexBuffer[index]).to.be(val);
+    });
+  });
+
+  obstacle.setPosition(150, 250);
+  runtimeScene.renderAndStep();
+  light.update();
+
+  it('Vertex and index buffers after obstacle is moved', function () {
+    const vertexBuffer = light._renderer._vertexBuffer;
+    const indexBuffer = light._renderer._indexBuffer;
+    const vertexData = [
+      200, 200,
+      100, 100.0199966430664,
+      100, 100,
+      100.0199966430664, 100,
+      299.9800109863281, 100,
+      300, 100,
+      300, 100.0199966430664,
+      300, 299.9800109863281,
+      300, 300,
+      299.9800109863281, 300,
+      200.00999450683594, 300, 
+      200, 250, 
+      199.9949951171875, 250,
+      175.00625610351562, 250,
+      175, 250,
+      174.99374389648438, 250,
+      150.00999450683594, 250,
+      150, 250,
+      100, 299.9800109863281,
+    ];
+    const indexData = [
+      0, 1, 2,
+      0, 2, 3,
+      0, 3, 4,
+      0, 4, 5,
+      0, 5, 6,
+      0, 6, 7,
+      0, 7, 8,
+      0, 8, 9,
+      0, 9, 10,
+      0, 10, 11,
+      0, 11, 12,
+      0, 12, 13,
+      0, 13, 14,
+      0, 14, 15,
+      0, 15, 16,
+      0, 16, 17,
+      0, 17, 18,
+      0, 18, 1
+    ];
+
+    vertexData.forEach((val, index) => {
+      expect(vertexBuffer[index]).to.be(val);
+    }); 
+    indexData.forEach((val, index) => {
+      expect(indexBuffer[index]).to.be(val);
+    });
   });
 });

@@ -93,6 +93,6 @@ export const parseShortcutIntoKeys = (shortcutString: string) => {
   return shortcutString.split('+').map<string>(keyCode => {
     if (keyCode === 'CmdOrCtrl') return isMacLike() ? 'Cmd' : 'Ctrl';
     if (keyCode === 'Shift' || keyCode === 'Alt') return keyCode;
-    return getKeyDisplayName(keyCode); // Action key: to be implemented
+    return getKeyDisplayName(keyCode);
   });
 };

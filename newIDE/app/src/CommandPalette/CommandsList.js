@@ -1,71 +1,226 @@
 // @flow
 import { t } from '@lingui/macro';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
-const CommandsList = {
-  // General commands
-  QUIT_APP: t`Close GDevelop`,
-  OPEN_PROJECT_MANAGER: t`Open project manager`,
-  LAUNCH_PREVIEW: t`Launch preview`,
-  LAUNCH_DEBUG_PREVIEW: t`Launch preview with debugger and profiler`,
-  OPEN_START_PAGE: t`Open start page`,
-  CREATE_NEW_PROJECT: t`Create a new project`,
-  OPEN_PROJECT: t`Open project`,
-  SAVE_PROJECT: t`Save project`,
-  SAVE_PROJECT_AS: t`Save project as...`,
-  CLOSE_PROJECT: t`Close project`,
-  EXPORT_GAME: t`Export game`,
-  OPEN_RECENT_PROJECT: t`Open recent project...`,
+export type CommandName =
+  | 'QUIT_APP'
+  | 'OPEN_PROJECT_MANAGER'
+  | 'LAUNCH_PREVIEW'
+  | 'LAUNCH_DEBUG_PREVIEW'
+  | 'OPEN_START_PAGE'
+  | 'CREATE_NEW_PROJECT'
+  | 'OPEN_PROJECT'
+  | 'SAVE_PROJECT'
+  | 'SAVE_PROJECT_AS'
+  | 'CLOSE_PROJECT'
+  | 'EXPORT_GAME'
+  | 'OPEN_RECENT_PROJECT'
+  | 'OPEN_PROJECT_PROPERTIES'
+  | 'OPEN_PROJECT_VARIABLES'
+  | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
+  | 'OPEN_PROJECT_RESOURCES'
+  | 'OPEN_LAYOUT'
+  | 'OPEN_EXTERNAL_EVENTS'
+  | 'OPEN_EXTERNAL_LAYOUT'
+  | 'OPEN_EXTENSION'
+  | 'OPEN_SCENE_PROPERTIES'
+  | 'OPEN_SCENE_VARIABLES'
+  | 'OPEN_OBJECTS_PANEL'
+  | 'OPEN_OBJECT_GROUPS_PANEL'
+  | 'OPEN_PROPERTIES_PANEL'
+  | 'TOGGLE_INSTANCES_PANEL'
+  | 'TOGGLE_LAYERS_PANEL'
+  | 'SCENE_EDITOR_UNDO'
+  | 'SCENE_EDITOR_REDO'
+  | 'DELETE_INSTANCES'
+  | 'TOGGLE_WINDOW_MASK'
+  | 'TOGGLE_GRID'
+  | 'OPEN_SETUP_GRID'
+  | 'EDIT_LAYER_EFFECTS'
+  | 'EDIT_OBJECT'
+  | 'EDIT_OBJECT_VARIABLES'
+  | 'EDIT_OBJECT_GROUP'
+  | 'ADD_STANDARD_EVENT'
+  | 'ADD_SUBEVENT'
+  | 'ADD_COMMENT_EVENT'
+  | 'CHOOSE_AND_ADD_EVENT'
+  | 'EVENTS_EDITOR_UNDO'
+  | 'EVENTS_EDITOR_REDO'
+  | 'DELETE_SELECTION'
+  | 'SEARCH_EVENTS'
+  | 'OPEN_SETTINGS';
 
-  // Project manager commands
-  OPEN_PROJECT_PROPERTIES: t`Open project properties`,
-  OPEN_PROJECT_VARIABLES: t`Edit global variables`,
-  OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG: t`Open project icons`,
-  OPEN_PROJECT_RESOURCES: t`Open project resources`,
-
-  // Tab-opening commands
-  OPEN_LAYOUT: t`Open scene...`,
-  OPEN_EXTERNAL_EVENTS: t`Open external events...`,
-  OPEN_EXTERNAL_LAYOUT: t`Open external layout...`,
-  OPEN_EXTENSION: t`Open extension...`,
-
-  // Scene editor commands
-  OPEN_SCENE_PROPERTIES: t`Open scene properties`,
-  OPEN_SCENE_VARIABLES: t`Open scene variables`,
-
-  // Scene editor toolbar commands
-  OPEN_OBJECTS_PANEL: t`Open the objects editor`,
-  OPEN_OBJECT_GROUPS_PANEL: t`Open the object groups editor`,
-  OPEN_PROPERTIES_PANEL: t`Open the properties panel`,
-  TOGGLE_INSTANCES_PANEL: t`Open the list of instances`,
-  TOGGLE_LAYERS_PANEL: t`Open the layers editor`,
-  SCENE_EDITOR_UNDO: t`Undo the last changes`,
-  SCENE_EDITOR_REDO: t`Redo the last changes`,
-  DELETE_INSTANCES: t`Delete the selected instances from the scene`,
-  TOGGLE_WINDOW_MASK: t`Toggle mask`,
-  TOGGLE_GRID: t`Toggle grid`,
-  OPEN_SETUP_GRID: t`Setup grid`,
-
-  // Layers list commands
-  EDIT_LAYER_EFFECTS: t`Edit layer effects...`,
-
-  // Objects list commands
-  EDIT_OBJECT: t`Edit object...`,
-  EDIT_OBJECT_VARIABLES: t`Edit object variables...`,
-
-  // Object groups list commands
-  EDIT_OBJECT_GROUP: t`Edit object group...`,
-
-  // Events editor toolbar commands
-  ADD_STANDARD_EVENT: t`Add a new empty event`,
-  ADD_SUBEVENT: t`Add a sub-event to the selected event`,
-  ADD_COMMENT_EVENT: t`Add a comment`,
-  CHOOSE_AND_ADD_EVENT: t`Choose and add an event...`,
-  EVENTS_EDITOR_UNDO: t`Undo the last changes`,
-  EVENTS_EDITOR_REDO: t`Redo the last changes`,
-  DELETE_SELECTION: t`Delete the selected event(s)`,
-  SEARCH_EVENTS: t`Search in events`,
-  OPEN_SETTINGS: t`Open settings`,
+export const commandAreas = {
+  GENERAL: t`General`,
+  IDE: t`IDE`,
+  PROJECT: t`Project`,
+  SCENE: t`Scene`,
+  EVENTS: t`Events`,
 };
 
-export default CommandsList;
-export type CommandName = $Keys<typeof CommandsList>;
+type CommandArea = $Keys<typeof commandAreas>;
+
+type CommandMetadata = {|
+  area: CommandArea,
+  displayText: MessageDescriptor,
+  noShortcut?: boolean,
+|};
+
+const commandsList: { [CommandName]: CommandMetadata } = {
+  // General commands
+  QUIT_APP: { area: 'GENERAL', displayText: t`Close GDevelop` },
+  OPEN_PROJECT_MANAGER: {
+    area: 'IDE',
+    displayText: t`Open project manager`,
+  },
+  LAUNCH_PREVIEW: { area: 'PROJECT', displayText: t`Launch preview` },
+  LAUNCH_DEBUG_PREVIEW: {
+    area: 'PROJECT',
+    displayText: t`Launch preview with debugger and profiler`,
+  },
+  OPEN_START_PAGE: { area: 'IDE', displayText: t`Open start page` },
+  CREATE_NEW_PROJECT: { area: 'GENERAL', displayText: t`Create a new project` },
+  OPEN_PROJECT: { area: 'GENERAL', displayText: t`Open project` },
+  SAVE_PROJECT: { area: 'GENERAL', displayText: t`Save project` },
+  SAVE_PROJECT_AS: { area: 'GENERAL', displayText: t`Save project as...` },
+  CLOSE_PROJECT: { area: 'GENERAL', displayText: t`Close project` },
+  EXPORT_GAME: { area: 'PROJECT', displayText: t`Export game` },
+  OPEN_RECENT_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Open recent project...`,
+  },
+
+  // Project manager commands
+  OPEN_PROJECT_PROPERTIES: {
+    area: 'PROJECT',
+    displayText: t`Open project properties`,
+  },
+  OPEN_PROJECT_VARIABLES: {
+    area: 'PROJECT',
+    displayText: t`Edit global variables`,
+  },
+  OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG: {
+    area: 'PROJECT',
+    displayText: t`Open project icons`,
+  },
+  OPEN_PROJECT_RESOURCES: {
+    area: 'PROJECT',
+    displayText: t`Open project resources`,
+  },
+
+  // Tab-opening commands
+  OPEN_LAYOUT: { area: 'IDE', displayText: t`Open scene...` },
+  OPEN_EXTERNAL_EVENTS: {
+    area: 'IDE',
+    displayText: t`Open external events...`,
+  },
+  OPEN_EXTERNAL_LAYOUT: {
+    area: 'IDE',
+    displayText: t`Open external layout...`,
+  },
+  OPEN_EXTENSION: { area: 'IDE', displayText: t`Open extension...` },
+
+  // Scene editor commands
+  OPEN_SCENE_PROPERTIES: {
+    area: 'SCENE',
+    displayText: t`Open scene properties`,
+  },
+  OPEN_SCENE_VARIABLES: {
+    area: 'SCENE',
+    displayText: t`Open scene variables`,
+  },
+
+  // Scene editor toolbar commands
+  OPEN_OBJECTS_PANEL: {
+    area: 'SCENE',
+    displayText: t`Open the objects editor`,
+  },
+  OPEN_OBJECT_GROUPS_PANEL: {
+    area: 'SCENE',
+    displayText: t`Open the object groups editor`,
+  },
+  OPEN_PROPERTIES_PANEL: {
+    area: 'SCENE',
+    displayText: t`Open the properties panel`,
+  },
+  TOGGLE_INSTANCES_PANEL: {
+    area: 'SCENE',
+    displayText: t`Open the list of instances`,
+  },
+  TOGGLE_LAYERS_PANEL: {
+    area: 'SCENE',
+    displayText: t`Open the layers editor`,
+  },
+  SCENE_EDITOR_UNDO: {
+    area: 'SCENE',
+    displayText: t`Undo the last changes`,
+    noShortcut: true,
+  },
+  SCENE_EDITOR_REDO: {
+    area: 'SCENE',
+    displayText: t`Redo the last changes`,
+    noShortcut: true,
+  },
+  DELETE_INSTANCES: {
+    area: 'SCENE',
+    displayText: t`Delete the selected instances from the scene`,
+    noShortcut: true,
+  },
+  TOGGLE_WINDOW_MASK: { area: 'SCENE', displayText: t`Toggle mask` },
+  TOGGLE_GRID: { area: 'SCENE', displayText: t`Toggle grid` },
+  OPEN_SETUP_GRID: { area: 'SCENE', displayText: t`Setup grid` },
+
+  // Layers list commands
+  EDIT_LAYER_EFFECTS: {
+    area: 'SCENE',
+    displayText: t`Edit layer effects...`,
+  },
+
+  // Objects list commands
+  EDIT_OBJECT: { area: 'SCENE', displayText: t`Edit object...` },
+  EDIT_OBJECT_VARIABLES: {
+    area: 'SCENE',
+    displayText: t`Edit object variables...`,
+  },
+
+  // Object groups list commands
+  EDIT_OBJECT_GROUP: { area: 'SCENE', displayText: t`Edit object group...` },
+
+  // Events editor toolbar commands
+  ADD_STANDARD_EVENT: {
+    area: 'EVENTS',
+    displayText: t`Add a new empty event`,
+  },
+  ADD_SUBEVENT: {
+    area: 'EVENTS',
+    displayText: t`Add a sub-event to the selected event`,
+  },
+  ADD_COMMENT_EVENT: { area: 'EVENTS', displayText: t`Add a comment` },
+  CHOOSE_AND_ADD_EVENT: {
+    area: 'EVENTS',
+    displayText: t`Choose and add an event...`,
+  },
+  EVENTS_EDITOR_UNDO: {
+    area: 'EVENTS',
+    displayText: t`Undo the last changes`,
+    noShortcut: true,
+  },
+  EVENTS_EDITOR_REDO: {
+    area: 'EVENTS',
+    displayText: t`Redo the last changes`,
+    noShortcut: true,
+  },
+  DELETE_SELECTION: {
+    area: 'EVENTS',
+    displayText: t`Delete the selected event(s)`,
+    noShortcut: true,
+  },
+  SEARCH_EVENTS: {
+    area: 'EVENTS',
+    displayText: t`Search in events`,
+    noShortcut: true,
+  },
+  OPEN_SETTINGS: { area: 'EVENTS', displayText: t`Open settings` },
+};
+
+export default commandsList;

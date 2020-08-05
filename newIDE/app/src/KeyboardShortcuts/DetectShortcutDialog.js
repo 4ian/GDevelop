@@ -5,7 +5,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import { parseShortcutIntoKeys, getShortcutStringFromEvent } from './index';
+import { getShortcutDisplay, getShortcutStringFromEvent } from './index';
 
 type Props = {|
   commandText: ?string,
@@ -56,7 +56,7 @@ const DetectShortcutDialog = (props: Props) => {
       <Paper variant="outlined" style={{ padding: 15, textAlign: 'center' }}>
         <Typography>
           {shortcutString ? (
-            parseShortcutIntoKeys(shortcutString).join(' + ')
+            getShortcutDisplay(shortcutString)
           ) : (
             <Trans>Press a shortcut combination...</Trans>
           )}

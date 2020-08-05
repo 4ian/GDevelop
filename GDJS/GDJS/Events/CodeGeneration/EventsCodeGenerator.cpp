@@ -514,21 +514,18 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
 
   // Generate whole condition code
   conditionCode +=
-      "for(var i = 0, l = " + GetObjectListName(objectName, context) +
+      "for(var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
       ".length;i<l;++i) {\n";
   conditionCode += "    if ( " + predicat + " ) {\n";
   conditionCode += "        " +
                    GenerateBooleanFullName(returnBoolean, context) +
                    ".val = true;\n";
-  conditionCode +=
-      "    " + GetObjectListName(objectName, context) + "[i].pick = true";
-  conditionCode += "    } else {";
-  conditionCode +=
-      "    " + GetObjectListName(objectName, context) + "[i].pick = false";
-  conditionCode += "    }";
+  conditionCode += "        " + GetObjectListName(objectName, context) +
+                   "[k] = " + GetObjectListName(objectName, context) + "[i];\n";
+  conditionCode += "        ++k;\n";
+  conditionCode += "    }\n";
   conditionCode += "}\n";
-  conditionCode += "gdjs.filterPickedObjectsList(" +
-                   GetObjectListName(objectName, context) + ");\n";
+  conditionCode += GetObjectListName(objectName, context) + ".length = k;";
 
   return conditionCode;
 }

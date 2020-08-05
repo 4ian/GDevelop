@@ -346,25 +346,6 @@ gdjs.objectsListsToArray = function (objectsLists) {
 };
 
 /**
- * Filter in-place the specified array to remove objects for which
- * `pick` property is set to false.
- * @param {gdjs.RuntimeObject[]} arr
- */
-gdjs.filterPickedObjectsList = function (arr) {
-  var finalSize = 0;
-
-  for (var k = 0, lenk = arr.length; k < lenk; ++k) {
-    var obj = arr[k];
-    if (arr[k].pick) {
-      arr[finalSize] = obj;
-      finalSize++;
-    }
-  }
-
-  arr.length = finalSize;
-};
-
-/**
  * Copy the element for the first array into the second array, so that
  * both array contains the same elements.
  * @param {Array<any>} src The source array

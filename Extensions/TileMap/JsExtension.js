@@ -1,19 +1,20 @@
 /**
-  * This is a declaration of an extension for GDevelop 5.
-  *
-  * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
-  * to this extension file or to any other *.js file that you reference inside.
-  *
-  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
-  * ⚠️ If you make a change and the extension is not loaded, open the developer console
-  * and search for any errors.
-  *
-  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
-  */
+ * This is a declaration of an extension for GDevelop 5.
+ *
+ * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
+ * to this extension file or to any other *.js file that you reference inside.
+ *
+ * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
+ * ⚠️ If you make a change and the extension is not loaded, open the developer console
+ * and search for any errors.
+ *
+ * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
+ */
+//
 
 
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -26,7 +27,7 @@ module.exports = {
       .setExtensionHelpPath('/objects/tile_map');
 
     var objectTileMap = new gd.ObjectJsImplementation();
-    objectTileMap.updateProperty = function (
+    objectTileMap.updateProperty = function(
       objectContent,
       propertyName,
       newValue
@@ -40,7 +41,7 @@ module.exports = {
 
       return false;
     };
-    objectTileMap.getProperties = function (objectContent) {
+    objectTileMap.getProperties = function(objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
@@ -91,7 +92,7 @@ module.exports = {
       })
     );
 
-    objectTileMap.updateInitialInstanceProperty = function (
+    objectTileMap.updateInitialInstanceProperty = function(
       objectContent,
       instance,
       propertyName,
@@ -101,7 +102,7 @@ module.exports = {
     ) {
       return false;
     };
-    objectTileMap.getInitialInstanceProperties = function (
+    objectTileMap.getInitialInstanceProperties = function(
       content,
       instance,
       project,
@@ -295,25 +296,25 @@ module.exports = {
   },
 
   /**
-    * You can optionally add sanity tests that will check the basic working
-    * of your extension behaviors/objects by instanciating behaviors/objects
-    * and setting the property to a given value.
-    *
-    * If you don't have any tests, you can simply return an empty array like this:
-    * `runExtensionSanityTests: function(gd, extension) { return []; }`
-    *
-    * But it is recommended to create tests for the behaviors/objects properties you created
-    * to avoid mistakes.
-    */
-  runExtensionSanityTests: function (gd, extension) {
+   * You can optionally add sanity tests that will check the basic working
+   * of your extension behaviors/objects by instanciating behaviors/objects
+   * and setting the property to a given value.
+   *
+   * If you don't have any tests, you can simply return an empty array like this:
+   * `runExtensionSanityTests: function(gd, extension) { return []; }`
+   *
+   * But it is recommended to create tests for the behaviors/objects properties you created
+   * to avoid mistakes.
+   */
+  runExtensionSanityTests: function(gd, extension) {
     return [];
   },
   /**
-    * Register editors for objects.
-    *
-    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
-    */
-  registerEditorConfigurations: function (objectsEditorService) {
+   * Register editors for objects.
+   *
+   * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
+   */
+  registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -322,11 +323,11 @@ module.exports = {
     );
   },
   /**
-    * Register renderers for instance of objects on the scene editor.
-    *
-    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
-    */
-  registerInstanceRenderers: function (objectsRenderingService) {
+   * Register renderers for instance of objects on the scene editor.
+   *
+   * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
+   */
+  registerInstanceRenderers: function(objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -336,12 +337,12 @@ module.exports = {
     );
 
     /**
-      * Renderer for instances of TileMap inside the IDE.
-      *
-      * @extends RenderedTileMapInstance
-      * @class RenderedTileMapInstance
-      * @constructor
-      */
+     * Renderer for instances of TileMap inside the IDE.
+     *
+     * @extends RenderedTileMapInstance
+     * @class RenderedTileMapInstance
+     * @constructor
+     */
     function RenderedTileMapInstance(
       project,
       layout,
@@ -382,9 +383,9 @@ module.exports = {
     );
 
     /**
-      * Return the path to the thumbnail of the specified object.
-      */
-    RenderedTileMapInstance.getThumbnail = function (
+     * Return the path to the thumbnail of the specified object.
+     */
+    RenderedTileMapInstance.getThumbnail = function(
       project,
       resourcesLoader,
       object
@@ -434,9 +435,9 @@ module.exports = {
       );
     };
     /**
-      * This is called to update the PIXI object on the scene editor
-      */
-    RenderedTileMapInstance.prototype.update = function () {
+     * This is called to update the PIXI object on the scene editor
+     */
+    RenderedTileMapInstance.prototype.update = function() {
       const tiledFile = this._associatedObject
         .getProperties(this.project)
         .get('tiledFile')
@@ -486,16 +487,16 @@ module.exports = {
     };
 
     /**
-      * Return the width of the instance, when it's not resized.
-      */
-    RenderedTileMapInstance.prototype.getDefaultWidth = function () {
+     * Return the width of the instance, when it's not resized.
+     */
+    RenderedTileMapInstance.prototype.getDefaultWidth = function() {
       return this._pixiObject.width;
     };
 
     /**
-      * Return the height of the instance, when it's not resized.
-      */
-    RenderedTileMapInstance.prototype.getDefaultHeight = function () {
+     * Return the height of the instance, when it's not resized.
+     */
+    RenderedTileMapInstance.prototype.getDefaultHeight = function() {
       return this._pixiObject.height;
     };
 

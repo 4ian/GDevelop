@@ -4,17 +4,17 @@ import { type CommandName } from '../CommandPalette/CommandsList';
 export type ShortcutMap = { [CommandName]: string };
 
 const defaultShortcuts: ShortcutMap = {
-  QUIT_APP: 'CmdOrCtrl+Shift+Q',
-  OPEN_PROJECT_MANAGER: 'CmdOrCtrl+Shift+B',
+  QUIT_APP: 'CmdOrCtrl+Shift+KeyQ',
+  OPEN_PROJECT_MANAGER: 'CmdOrCtrl+Shift+KeyB',
   LAUNCH_PREVIEW: 'F5',
   LAUNCH_DEBUG_PREVIEW: 'F6',
-  OPEN_START_PAGE: 'CmdOrCtrl+Shift+M',
-  CREATE_NEW_PROJECT: 'CmdOrCtrl+Shift+N',
-  OPEN_PROJECT: 'CmdOrCtrl+O',
-  SAVE_PROJECT: 'CmdOrCtrl+S',
-  SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+S',
-  CLOSE_PROJECT: 'CmdOrCtrl+Q',
-  EXPORT_GAME: 'CmdOrCtrl+Shift+E',
+  OPEN_START_PAGE: 'CmdOrCtrl+Shift+KeyM',
+  CREATE_NEW_PROJECT: 'CmdOrCtrl+Shift+KeyN',
+  OPEN_PROJECT: 'CmdOrCtrl+KeyO',
+  SAVE_PROJECT: 'CmdOrCtrl+KeyS',
+  SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
+  CLOSE_PROJECT: 'CmdOrCtrl+KeyQ',
+  EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   OPEN_RECENT_PROJECT: '',
 
   OPEN_PROJECT_PROPERTIES: '',
@@ -22,10 +22,10 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG: '',
   OPEN_PROJECT_RESOURCES: '',
 
-  OPEN_LAYOUT: 'CmdOrCtrl+Alt+L',
-  OPEN_EXTERNAL_EVENTS: 'CmdOrCtrl+Alt+E',
-  OPEN_EXTERNAL_LAYOUT: 'CmdOrCtrl+Alt+F',
-  OPEN_EXTENSION: 'CmdOrCtrl+Alt+G',
+  OPEN_LAYOUT: 'CmdOrCtrl+Alt+KeyL',
+  OPEN_EXTERNAL_EVENTS: 'CmdOrCtrl+Alt+KeyE',
+  OPEN_EXTERNAL_LAYOUT: 'CmdOrCtrl+Alt+KeyF',
+  OPEN_EXTENSION: 'CmdOrCtrl+Alt+KeyG',
 
   OPEN_SCENE_PROPERTIES: '',
   OPEN_SCENE_VARIABLES: '',
@@ -40,14 +40,14 @@ const defaultShortcuts: ShortcutMap = {
   TOGGLE_GRID: '',
   OPEN_SETUP_GRID: '',
   EDIT_LAYER_EFFECTS: '',
-  EDIT_OBJECT: 'CmdOrCtrl+Shift+O',
-  EDIT_OBJECT_VARIABLES: 'CmdOrCtrl+Shift+V',
-  EDIT_OBJECT_GROUP: 'CmdOrCtrl+Shift+G',
+  EDIT_OBJECT: 'CmdOrCtrl+Shift+KeyO',
+  EDIT_OBJECT_VARIABLES: 'CmdOrCtrl+Shift+KeyV',
+  EDIT_OBJECT_GROUP: 'CmdOrCtrl+Shift+KeyG',
 
-  ADD_STANDARD_EVENT: 'CmdOrCtrl+Shift+A',
-  ADD_SUBEVENT: 'CmdOrCtrl+Shift+Z',
+  ADD_STANDARD_EVENT: 'CmdOrCtrl+Shift+KeyA',
+  ADD_SUBEVENT: 'CmdOrCtrl+Shift+KeyZ',
   ADD_COMMENT_EVENT: '',
-  CHOOSE_AND_ADD_EVENT: 'CmdOrCtrl+Shift+W',
+  CHOOSE_AND_ADD_EVENT: 'CmdOrCtrl+Shift+KeyW',
   OPEN_SETTINGS: '',
 };
 

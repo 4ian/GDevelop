@@ -3,6 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { type I18n } from '@lingui/core';
 import List from '@material-ui/core/List';
+import Text from '../UI/Text';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -17,7 +18,45 @@ import { type ShortcutMap } from './DefaultShortcuts';
 import { getShortcutDisplay } from './index';
 import Window from '../Utils/Window';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
-import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
+import commandsList, {
+  type CommandName,
+  commandAreas,
+} from '../CommandPalette/CommandsList';
+
+type ShortcutRowProps = {|
+  i18n: I18n,
+  commandName: CommandName,
+  isDefault: boolean,
+  shortcutString: string,
+  onEditShortcut: () => void,
+  onResetShortcut: () => void,
+|};
+const ShortcutRow = (props: ShortcutRowProps) => {
+  return (
+    <ListItem>
+      <ListItemText
+        primary={props.i18n._(commandsList[props.commandName].displayText)}
+      />
+      <ListItemSecondaryAction>
+        <Chip
+          style={{ borderRadius: 3 }}
+          label={props.shortcutString || 'No shortcut'}
+        />
+        <IconButton onClick={props.onEditShortcut} tooltip={t`Edit shortcut`}>
+          <EditIcon />
+        </IconButton>
+        {!props.isDefault && (
+          <IconButton
+            onClick={props.onResetShortcut}
+            tooltip={t`Reset to default`}
+          >
+            <RotateLeftIcon />
+          </IconButton>
+        )}
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+};
 
 type Props = {|
   i18n: I18n,
@@ -44,6 +83,16 @@ const ShortcutsList = (props: Props) => {
     props.onEdit(commandName, defaultShortcuts[commandName]);
   };
 
+  const areaWiseCommands = {};
+  Object.keys(commandsList)
+    .filter(name => !commandsList[name].noShortcut)
+    .forEach(name => {
+      // Implement this
+      const areaName = commandsList[name].area;
+      if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
+      areaWiseCommands[areaName].push(name);
+    });
+
   return (
     <>
       <Line>
@@ -53,42 +102,28 @@ const ShortcutsList = (props: Props) => {
         />
       </Line>
       <List>
-        {Object.keys(commandsList)
-          .filter(commandName => !commandsList[commandName].noShortcut)
-          .map(commandName => {
-            const userShortcut = props.shortcutMap[commandName] || '';
-            const defaultShortcut = defaultShortcuts[commandName] || '';
-            const isDefault = userShortcut === defaultShortcut;
-            const shortcutString = getShortcutDisplay(userShortcut);
-
-            return (
-              <ListItem key={commandName}>
-                <ListItemText
-                  primary={props.i18n._(commandsList[commandName].displayText)}
+        {Object.keys(areaWiseCommands).map(areaName => (
+          <React.Fragment key={areaName}>
+            <Text size="title">{props.i18n._(commandAreas[areaName])}</Text>
+            {areaWiseCommands[areaName].map(commandName => {
+              const userShortcut = props.shortcutMap[commandName] || '';
+              const defaultShortcut = defaultShortcuts[commandName] || '';
+              const isDefault = userShortcut === defaultShortcut;
+              const shortcutString = getShortcutDisplay(userShortcut);
+              return (
+                <ShortcutRow
+                  i18n={props.i18n}
+                  key={commandName}
+                  shortcutString={shortcutString}
+                  commandName={commandName}
+                  isDefault={isDefault}
+                  onEditShortcut={() => setEditedShortcut(commandName)}
+                  onResetShortcut={() => resetShortcut(commandName)}
                 />
-                <ListItemSecondaryAction>
-                  <Chip
-                    style={{ borderRadius: 3 }}
-                    label={shortcutString || 'No shortcut'}
-                  />
-                  <IconButton
-                    onClick={() => setEditedShortcut(commandName)}
-                    tooltip={t`Edit shortcut`}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  {!isDefault && (
-                    <IconButton
-                      onClick={() => resetShortcut(commandName)}
-                      tooltip={t`Reset to default`}
-                    >
-                      <RotateLeftIcon />
-                    </IconButton>
-                  )}
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
+              );
+            })}
+          </React.Fragment>
+        ))}
       </List>
       {editedShortcut && (
         <DetectShortcutDialog

@@ -49,7 +49,9 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('fix warning') ||
           lowerCaseMessage.includes('fix typo') ||
           lowerCaseMessage === 'update translations' ||
-          lowerCaseMessage.includes('package-lock.json');
+          lowerCaseMessage.includes('package-lock.json') ||
+          lowerCaseMessage.indexOf('merge branch') === 0 ||
+          lowerCaseMessage.indexOf('merge pull request #') === 0;
         const forceHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
           lowerCaseMessage.includes("pull request") ||
@@ -145,7 +147,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in|in the|developer) changelog/i;
+  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in the |in |the )?(changelog|developer)/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0

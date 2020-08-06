@@ -14,8 +14,15 @@ describe('gdjs.RuntimeScene integration tests', function () {
       });
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
-        layers: [{ name: '', visibility: true, effects: [] }],
+        layers: [{ name: '', visibility: true, cameras: [], effects: [] }],
         variables: [],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
         behaviorsSharedData: [],
         objects: [
           {
@@ -24,14 +31,19 @@ describe('gdjs.RuntimeScene integration tests', function () {
             behaviors: [
               {
                 type: 'TestBehavior::TestBehavior',
+                name: "SomeBehavior"
               },
             ],
+            variables: [],
           },
         ],
         instances: [],
       });
 
       const object = runtimeScene.createObject('Object1');
+      if (!object) {
+        throw new Error("object should have been created");
+      }
 
       // Check that the behavior was properly created
       expect(object.getVariables().get('lastState').getAsString()).to.eql(
@@ -45,6 +57,9 @@ describe('gdjs.RuntimeScene integration tests', function () {
       );
 
       const object2 = runtimeScene.createObject('Object1');
+      if (!object2) {
+        throw new Error("object should have been created");
+      }
 
       // Check that the behaviors are properly destroyed
       runtimeScene.unloadScene();
@@ -64,16 +79,24 @@ describe('gdjs.RuntimeScene integration tests', function () {
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [
-        { name: '', visibility: true, effects: [] },
-        { name: 'MyLayer', visibility: true, effects: [] },
+        { name: '', visibility: true, cameras: [], effects: [] },
+        { name: 'MyLayer', visibility: true, cameras: [], effects: [] },
       ],
       variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
       behaviorsSharedData: [],
       objects: [
         {
           type: 'Sprite',
           name: 'MyObject',
           behaviors: [],
+          // @ts-ignore
           animations: [],
           updateIfNotVisible: false,
         },
@@ -88,6 +111,9 @@ describe('gdjs.RuntimeScene integration tests', function () {
     const object1 = runtimeScene.createObject('MyObject');
     const object2 = runtimeScene.createObject('MyObject');
     const object3 = runtimeScene.createObject('MyObject');
+    if (!object1 || !object2 || !object3) {
+      throw new Error("object should have been created");
+    }
     object2.setLayer('MyLayer');
 
     runtimeScene.addLayer({

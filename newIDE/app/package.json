@@ -32,7 +32,7 @@
     "@blueprintjs/icons": "file:src/Utils/BlueprintJsPlaceholder",
     "@lingui/react": "git://github.com/4ian/lingui-react.git#master",
     "@material-ui/core": "4.9.10",
-    "@material-ui/icons": "4.2.1",
+    "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.49",
     "algoliasearch": "3.33.0",
     "axios": "^0.18.1",

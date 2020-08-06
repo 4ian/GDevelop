@@ -25,6 +25,10 @@ gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
 
+gdjs.LayerPixiRenderer.prototype.getRendererObject = function() {
+  return this._pixiContainer;
+}
+
 /**
  * Update the position of the PIXI container. To be called after each change
  * made to position, zoom or rotation of the camera.

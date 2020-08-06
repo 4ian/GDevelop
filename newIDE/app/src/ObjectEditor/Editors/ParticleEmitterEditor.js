@@ -11,6 +11,8 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type EditorProps } from './EditorProps.flow';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
+import { getObjectTutorialHints } from '../../Hints';
 const gd = global.gd;
 
 export default class ParticleEmitterEditor extends React.Component<
@@ -26,9 +28,16 @@ export default class ParticleEmitterEditor extends React.Component<
       resourceExternalEditors,
     } = this.props;
     const particleEmitterObject = gd.asParticleEmitterObject(object);
+    const tutorialHints = getObjectTutorialHints(object.getType());
 
     return (
       <ColumnStackLayout>
+        {tutorialHints.map(tutorialHint => (
+          <DismissableTutorialMessage
+            key={tutorialHint.identifier}
+            tutorialHint={tutorialHint}
+          />
+        ))}
         <SelectField
           fullWidth
           floatingLabelText={<Trans>Particles kind</Trans>}

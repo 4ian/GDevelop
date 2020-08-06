@@ -17,6 +17,7 @@
   "dependencies": {},
   "scripts": {
     "check-types": "tsc",
+    "test": "cd tests && npm test",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
   }
 }

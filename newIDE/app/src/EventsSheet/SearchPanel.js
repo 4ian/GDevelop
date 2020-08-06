@@ -118,6 +118,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       hasEventSelected,
       onGoToPreviousSearchResult,
       onGoToNextSearchResult,
+      onCloseSearchPanel,
     } = this.props;
     const { searchText, replaceText, searchInSelection } = this.state;
 
@@ -259,7 +260,9 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 key="close"
                 label={<Trans>Close</Trans>}
                 primary={false}
-                onClick={()=>{this.props.onCloseSearchPanel()}}
+                onClick={() => {
+                  onCloseSearchPanel();
+                }}
               />
             </Line>
           </Line>

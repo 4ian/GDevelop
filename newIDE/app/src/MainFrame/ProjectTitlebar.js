@@ -1,8 +1,9 @@
 // @flow
-import React, { Component } from 'react';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import * as React from 'react';
+import ThemeContext from '../UI/Theme/ThemeContext';
 import Window from '../Utils/Window';
 import { type FileMetadata } from '../ProjectsStorage';
+import UnsavedChangesContext from './UnsavedChangesContext';
 
 type Props = {|
   fileMetadata: ?FileMetadata,
@@ -10,24 +11,28 @@ type Props = {|
 
 /**
  * Update the title bar according to the project and the current theme.
- * Note that this is doing side-effects in the render which is normally not valid in React,
- * but we're actually calling imperative Electron apis or updating some meta tags/document
- * properties so this should be fine.
  */
-export default class ProjectTitlebar extends Component<Props> {
-  render() {
-    const { fileMetadata } = this.props;
-    const titleElements = ['GDevelop 5'];
-    if (fileMetadata) titleElements.push(fileMetadata.fileIdentifier);
+export default function ProjectTitlebar({ fileMetadata }: Props) {
+  const gdevelopTheme = React.useContext(ThemeContext);
+  const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
 
-    Window.setTitle(titleElements.join(' - '));
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          Window.setTitleBarColor(muiTheme.toolbar.backgroundColor);
-          return null;
-        }}
-      </ThemeConsumer>
-    );
-  }
+  React.useEffect(
+    () => {
+      const title = [
+        'GDevelop 5',
+        fileMetadata
+          ? fileMetadata.fileIdentifier + (hasUnsavedChanges ? ' *' : '')
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' - ');
+
+      Window.setTitle(title);
+      Window.setTitleBarColor(gdevelopTheme.toolbar.backgroundColor);
+    },
+    [fileMetadata, hasUnsavedChanges, gdevelopTheme.toolbar.backgroundColor]
+  );
+
+  return null;
 }

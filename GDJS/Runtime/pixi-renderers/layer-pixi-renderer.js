@@ -14,17 +14,20 @@
  * @param {gdjs.RuntimeScenePixiRenderer} runtimeSceneRenderer The scene renderer
  */
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
-  // @ts-ignore
   this._pixiContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
   this._layer = layer;
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
 
-  this._setupFilters();
+  this._pixiContainer.filters = [];
 };
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
+
+gdjs.LayerPixiRenderer.prototype.getRendererObject = function() {
+  return this._pixiContainer;
+}
 
 /**
  * Update the position of the PIXI container. To be called after each change
@@ -65,48 +68,51 @@ gdjs.LayerPixiRenderer.prototype.updateTime = function() {
   }
 };
 
-gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
-  var effects = this._layer.getEffects();
-  if (effects.length === 0) {
+/**
+ * Add a new effect, or replace the one with the same name.
+ * @param {EffectData} effectData The data of the effect to add.
+ */
+gdjs.LayerPixiRenderer.prototype.addEffect = function(effectData) {
+  var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
+    effectData.effectType
+  );
+  if (!filterCreator) {
+    console.log(
+      'Filter "' +
+        effectData.name +
+        '" has an unknown effect type: "' +
+        effectData.effectType +
+        '". Was it registered properly? Is the effect type correct?'
+    );
     return;
   }
 
-  this._filters = {};
+  /** @type gdjsPixiFiltersToolsFilter */
+  var filter = {
+    pixiFilter: filterCreator.makePIXIFilter(this._layer, effectData),
+    updateDoubleParameter: filterCreator.updateDoubleParameter,
+    updateStringParameter: filterCreator.updateStringParameter,
+    updateBooleanParameter: filterCreator.updateBooleanParameter,
+    update: filterCreator.update,
+  };
 
-  // @ts-ignore
-  /** @type PIXI.Filter[] */
-  var pixiFilters = [];
-  for (var i = 0; i < effects.length; ++i) {
-    var effect = effects[i];
-    var filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
-      effect.effectType
-    );
-    if (!filterCreator) {
-      console.log(
-        'Filter "' +
-          effect.name +
-          '" has an unknown effect type: "' +
-          effect.effectType +
-          '". Was it registered properly? Is the effect type correct?'
-      );
-      continue;
-    }
+  this._pixiContainer.filters = (this._pixiContainer.filters || [])
+    .concat(filter.pixiFilter);
+  this._filters[effectData.name] = filter;
+}
 
-    /** @type gdjsPixiFiltersToolsFilter */
-    var filter = {
-      pixiFilter: filterCreator.makePIXIFilter(this._layer, effect),
-      updateDoubleParameter: filterCreator.updateDoubleParameter,
-      updateStringParameter: filterCreator.updateStringParameter,
-      updateBooleanParameter: filterCreator.updateBooleanParameter,
-      update: filterCreator.update,
-    };
+/**
+ * Remove the effect with the specified name
+ * @param {string} effectName The name of the effect.
+ */
+gdjs.LayerPixiRenderer.prototype.removeEffect = function(effectName) {
+  var filter = this._filters[effectName];
+  if (!filter) return;
 
-    pixiFilters.push(filter.pixiFilter);
-    this._filters[effect.name] = filter;
-  }
-
-  this._pixiContainer.filters = pixiFilters;
-};
+  this._pixiContainer.filters = (this._pixiContainer.filters || [])
+    .filter(function(pixiFilter) { return pixiFilter !== filter.pixiFilter; });
+  delete this._filters[effectName];
+}
 
 /**
  * Add a child to the pixi container associated to the layer.
@@ -119,6 +125,7 @@ gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
   child.zOrder = zOrder; //Extend the pixi object with a z order.
 
   for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
+    // @ts-ignore
     if (this._pixiContainer.children[i].zOrder >= zOrder) {
       //TODO : Dichotomic search
       this._pixiContainer.addChildAt(child, i);
@@ -201,6 +208,15 @@ gdjs.LayerPixiRenderer.prototype.setEffectBooleanParameter = function(
   if (!filter) return;
 
   filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
+};
+
+/**
+ * Check if an effect exists.
+ * @param {string} name The effect name
+ * @returns {boolean} True if the effect exists, false otherwise
+ */
+gdjs.LayerPixiRenderer.prototype.hasEffect = function(name) {
+  return !!this._filters[name];
 };
 
 /**

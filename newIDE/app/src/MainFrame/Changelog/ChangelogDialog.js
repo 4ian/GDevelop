@@ -37,7 +37,7 @@ export default class ChangelogDialog extends React.Component<Props, State> {
         actions={actions}
         open={open}
         onRequestClose={onClose}
-        modal
+        cannotBeDismissed={false}
       >
         <Text>
           <Trans>

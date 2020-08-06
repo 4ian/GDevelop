@@ -21,6 +21,12 @@
   display: flex;
 }
 
+/* Make the horizontal split to have the same thickness as the vertical */
+.mosaic-gd-theme .mosaic-split.-column {
+  margin-top: -4px;
+  height: 4px;
+}
+
 /* Mosaic window and tile */
 .mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-window,
 .mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview {

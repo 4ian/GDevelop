@@ -9,7 +9,7 @@ import ListIcon from '../UI/ListIcon';
 import Text from '../UI/Text';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   onOpen: (
@@ -102,6 +102,29 @@ export default class BrowserStarters extends Component<Props> {
                   sendNewGameCreated('geometry-monster');
                   this.props.onOpen(InternalFileStorageProvider, {
                     fileIdentifier: 'example://geometry-monster',
+                  });
+                }}
+              />
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
+                    src="res/starters_icons/particle-effects-demo.png"
+                  />
+                }
+                primaryText={<Trans>Particle Effects Demo</Trans>}
+                secondaryText={
+                  <Trans>
+                    A demo of various high quality particle effects (fire,
+                    magic, snow, rune spell...) that you can try and use in your
+                    game.
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('particle-effects-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://particle-effects-demo',
                   });
                 }}
               />

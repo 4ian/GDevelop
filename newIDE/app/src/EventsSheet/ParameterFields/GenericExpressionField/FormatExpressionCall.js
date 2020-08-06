@@ -1,10 +1,11 @@
 //@flow
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
+import { mapVector } from '../../../Utils/MapFor';
 
 const filterOutCodeOnlyParameters = (
   array: Array<string>,
-  expressionMetadata: Object,
+  expressionMetadata: gdExpressionMetadata | gdInstructionMetadata,
   firstParameterIndex: number
 ) => {
   const parametersCount = expressionMetadata.getParametersCount();
@@ -17,6 +18,35 @@ const filterOutCodeOnlyParameters = (
       !expressionMetadata.getParameter(index).isCodeOnly()
     );
   });
+};
+
+export const getVisibleParameterTypes = (
+  expressionMetadata: EnumeratedInstructionOrExpressionMetadata
+): Array<string> => {
+  const parameterTypes: Array<string> = mapVector(
+    expressionMetadata.metadata.getParameters(),
+    parameterMetadata => parameterMetadata.getType()
+  );
+
+  if (expressionMetadata.scope.objectMetadata) {
+    return filterOutCodeOnlyParameters(
+      parameterTypes,
+      expressionMetadata.metadata,
+      1
+    );
+  } else if (expressionMetadata.scope.behaviorMetadata) {
+    return filterOutCodeOnlyParameters(
+      parameterTypes,
+      expressionMetadata.metadata,
+      2
+    );
+  } else {
+    return filterOutCodeOnlyParameters(
+      parameterTypes,
+      expressionMetadata.metadata,
+      0
+    );
+  }
 };
 
 export const formatExpressionCall = (

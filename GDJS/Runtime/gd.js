@@ -13,7 +13,7 @@ window.gdjs = {
   behaviorsTypes: new Hashtable(),
   /**
    * Contains functions used by events (this is a convention only, functions can actually
-   * by anywhere).
+   * be anywhere).
    * @namespace
    * @memberOf gdjs
    */

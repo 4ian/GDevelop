@@ -29,7 +29,7 @@ void PlatformBehavior::InitializeContent(
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   gd::String platformType = behaviorContent.GetStringAttribute("platformType");
@@ -58,8 +58,7 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(
 
 bool PlatformBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                       const gd::String& name,
-                                      const gd::String& value,
-                                      gd::Project& project) {
+                                      const gd::String& value) {
   if (name == _("Ledges can be grabbed"))
     behaviorContent.SetAttribute("canBeGrabbed", (value == "1"));
   else if (name == _("Type")) {

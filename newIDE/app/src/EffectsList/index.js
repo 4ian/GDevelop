@@ -201,7 +201,7 @@ export default function EffectsList(props: Props) {
                         { type: 'separator' },
                         {
                           type: 'checkbox',
-                          label: 'Show Parameter Names',
+                          label: i18n._(t`Show Parameter Names`),
                           checked: showEffectParameterNames,
                           click: () =>
                             setShowEffectParameterNames(
@@ -258,7 +258,6 @@ export default function EffectsList(props: Props) {
                   primary
                   label={<Trans>Add an effect</Trans>}
                   onClick={addEffect}
-                  labelPosition="before"
                   icon={<Add />}
                 />
               </Line>

@@ -98,6 +98,23 @@ gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
 };
 
 /**
+ * Get the path to the user's home folder (on Windows `C:\Users\<USERNAME>\` for example).
+ * @return {string} The path to user's "home" folder
+ */
+gdjs.fileSystem.getUserHomePath = function() {
+  const electron = runtimeScene
+    .getGame()
+    .getRenderer()
+    .getElectron();
+
+  if (electron) {
+    return electron.remote.app.getPath('home') || '';
+  } else {
+    return '';
+  }
+};
+
+/**
  * Get the path to 'Temp' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder

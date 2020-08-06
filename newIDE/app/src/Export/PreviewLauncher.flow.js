@@ -1,32 +1,26 @@
 // @flow
 import * as React from 'react';
 
-export type PreviewOptions =
-  | {|
-      networkPreview?: boolean,
-    |}
-  | {||};
+export type PreviewOptions = {|
+  project: gdProject,
+  layout: gdLayout,
+  externalLayout: ?gdExternalLayout,
+  networkPreview: boolean,
+  hotReload: boolean,
+  projectDataOnlyExport: boolean,
+|};
 
 /** The functions that PreviewLauncher must expose on their class */
 export type PreviewLauncherInterface = {
-  launchLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    options: PreviewOptions
-  ) => Promise<any>,
-
-  launchExternalLayoutPreview: (
-    project: gdProject,
-    layout: gdLayout,
-    externalLayout: gdExternalLayout,
-    options: PreviewOptions
-  ) => Promise<any>,
-
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
+  canDoHotReload: () => boolean,
+  +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
+  getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
   onChangeSubscription: () => void,
 |};
@@ -39,3 +33,43 @@ export type PreviewLauncherComponent = React.AbstractComponent<
   PreviewLauncherProps,
   PreviewLauncherInterface
 >;
+
+/** Each game connected to the debugger server is identified by a unique number. */
+export type DebuggerId = number;
+
+/** The callbacks for a debugger server used for previews. */
+export type PreviewDebuggerServerCallbacks = {|
+  onErrorReceived: (err: Error) => void,
+  onServerStateChanged: () => void,
+  onConnectionClosed: ({|
+    id: DebuggerId,
+    debuggerIds: Array<DebuggerId>,
+  |}) => void,
+  onConnectionOpened: ({|
+    id: DebuggerId,
+    debuggerIds: Array<DebuggerId>,
+  |}) => void,
+  onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
+|};
+
+/** The address to be used to communicate with the debugger server using WebSockets. */
+export type ServerAddress = {
+  address: string,
+  port: number,
+};
+
+/** Interface to run a debugger server for previews. */
+export type PreviewDebuggerServer = {|
+  startServer: () => Promise<void>,
+  getServerState: () => 'started' | 'stopped',
+  getServerAddress: () => ?ServerAddress,
+  getExistingDebuggerIds: () => Array<DebuggerId>,
+  sendMessage: (id: DebuggerId, message: Object) => void,
+  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,
+|};
+
+/** The logs returned by the game hot-reloader. */
+export type HotReloaderLog = {|
+  kind: 'fatal' | 'error' | 'warning' | 'info',
+  message: string,
+|};

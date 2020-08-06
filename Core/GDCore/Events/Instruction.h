@@ -5,7 +5,9 @@
  */
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
+#include <memory>
 #include <vector>
+
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/String.h"
@@ -131,6 +133,17 @@ class GD_CORE_API Instruction {
    */
   inline gd::InstructionsList& GetSubInstructions() { return subInstructions; };
 
+  /**
+   * \brief Return the original instruction this instruction was copied from.
+   *
+   * Useful to get reference to the original instruction in memory during code
+   * generation, to ensure stable unique identifiers.
+   */
+  std::weak_ptr<Instruction> GetOriginalInstruction() { return originalInstruction; };
+
+  friend std::shared_ptr<Instruction> CloneRememberingOriginalElement(
+      std::shared_ptr<Instruction> instruction);
+
  private:
   gd::String type;  ///< Instruction type
   bool inverted;  ///< True if the instruction if inverted. Only applicable for
@@ -139,8 +152,22 @@ class GD_CORE_API Instruction {
       parameters;                        ///< Vector containing the parameters
   gd::InstructionsList subInstructions;  ///< Sub instructions, if applicable.
 
+  std::weak_ptr<Instruction>
+      originalInstruction;  ///< Pointer used to remember which gd::Instruction
+                            ///< this instruction was copied from. Useful to
+                            ///< ensure the stability of code generation (as
+                            ///< some part of code generation uses the pointer
+                            ///< to the instruction as a unique identifier).
+
   static gd::Expression badExpression;
 };
+
+/**
+ * Clone the given instruction, returning an instruction for which
+ * `GetOriginalInstruction()` returns the originally copied instruction.
+ */
+std::shared_ptr<Instruction> GD_CORE_API
+CloneRememberingOriginalElement(std::shared_ptr<Instruction> instruction);
 
 }  // namespace gd
 

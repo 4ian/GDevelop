@@ -30,6 +30,25 @@ describe('gdjs.InputManager', function() {
     inputManager.onKeyReleased(33);
     expect(inputManager.wasKeyReleased(33)).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(false);
+
+    // Pressed Right shift
+    inputManager.onKeyPressed(16, 2);
+    expect(inputManager.anyKeyPressed()).to.be(true);
+    expect(inputManager.getLastPressedKey()).to.be(2016);
+    expect(inputManager.isKeyPressed(2016)).to.be(true);
+    expect(inputManager.isKeyPressed(1016)).to.be(false);
+
+    // Pressed Control with no location - expect to default to left.
+    inputManager.onKeyPressed(17);
+    expect(inputManager.getLastPressedKey()).to.be(1017);
+    expect(inputManager.isKeyPressed(1017)).to.be(true);
+    expect(inputManager.isKeyPressed(2017)).to.be(false);
+
+    inputManager.onKeyReleased(16, 2);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.getLastPressedKey()).to.be(1017);
+    expect(inputManager.wasKeyReleased(2016)).to.be(true);
+    expect(inputManager.wasKeyReleased(1016)).to.be(false);
   });
 
   it('should handle mouse events', function() {
@@ -117,10 +136,11 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     properties: { windowWidth: 800, windowHeight: 600 },
+    resources: { resources: [] }
   });
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true }],
+    layers: [{ name: '', visibility: true, effects: [] }],
     variables: [],
     behaviorsSharedData: [],
     objects: [],

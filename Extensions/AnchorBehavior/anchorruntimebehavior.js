@@ -40,6 +40,26 @@ gdjs.AnchorRuntimeBehavior.VerticalAnchor = {
    PROPORTIONAL: 3
 };
 
+gdjs.AnchorRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.leftEdgeAnchor !== newBehaviorData.leftEdgeAnchor) {
+        this._leftEdgeAnchor = newBehaviorData.leftEdgeAnchor;
+    }
+    if (oldBehaviorData.rightEdgeAnchor !== newBehaviorData.rightEdgeAnchor) {
+        this._rightEdgeAnchor = newBehaviorData.rightEdgeAnchor;
+    }
+    if (oldBehaviorData.topEdgeAnchor !== newBehaviorData.topEdgeAnchor) {
+        this._topEdgeAnchor = newBehaviorData.topEdgeAnchor;
+    }
+    if (oldBehaviorData.bottomEdgeAnchor !== newBehaviorData.bottomEdgeAnchor) {
+        this._bottomEdgeAnchor = newBehaviorData.bottomEdgeAnchor;
+    }
+    if (oldBehaviorData.relativeToOriginalWindowSize !== newBehaviorData.relativeToOriginalWindowSize) {
+        return false;
+    }
+
+    return true;
+}
+
 gdjs.AnchorRuntimeBehavior.prototype.onActivate = function() {
     this._invalidDistances = true;
 };

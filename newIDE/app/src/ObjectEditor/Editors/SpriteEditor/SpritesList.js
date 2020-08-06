@@ -25,7 +25,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 const path = require('path');
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -273,7 +273,10 @@ export default class SpritesList extends Component<Props, void> {
           const sprite = new gd.Sprite();
           sprite.setImageName(resource.name);
           // Restore collision masks and points
-          if (resource.originalIndex !== undefined) {
+          if (
+            resource.originalIndex !== undefined &&
+            resource.originalIndex !== null
+          ) {
             const originalSprite = direction.getSprite(resource.originalIndex);
             copySpritePoints(originalSprite, sprite);
             copySpritePolygons(originalSprite, sprite);

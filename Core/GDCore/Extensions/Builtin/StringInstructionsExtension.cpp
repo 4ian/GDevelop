@@ -120,6 +120,18 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      "res/conditions/toujours24.png")
 
       .AddParameter("string", _("Text"))
+      .AddParameter("string", _("Text to search for"))
+      .SetHidden(); // Deprecated, see StrFindLast instead.
+
+  extension
+      .AddExpression("StrFindLast",
+                     _("Search the last occurence in a text"),
+                     _("Search the last occurence in a string (return the position of "
+                       "the result, from the beginning of the string, or -1 if not found)"),
+                     _("Manipulation of text"),
+                     "res/conditions/toujours24.png")
+
+      .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
 
   extension
@@ -142,6 +154,22 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           _("Search in a text from the end, starting from a position"),
           _("Search in a text from the end, starting from a position (return "
             "the position of the result or -1 if not found)"),
+          _("Manipulation of text"),
+          "res/conditions/toujours24.png")
+
+      .AddParameter("string", _("Text"))
+      .AddParameter("string", _("Text to search for"))
+      .AddParameter("expression",
+                    _("Position of the last character in the string to be "
+                      "considered in the search"))
+      .SetHidden(); // Deprecated, see StrFindLastFrom instead.
+
+  extension
+      .AddExpression(
+          "StrFindLastFrom",
+          _("Search the last occurence in a text, starting from a position"),
+          _("Search in a text the last occurence, starting from a position (return "
+            " the position of the result, from the beginning of the string, or -1 if not found)"),
           _("Manipulation of text"),
           "res/conditions/toujours24.png")
 

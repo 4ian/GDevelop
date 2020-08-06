@@ -20,7 +20,7 @@ export const enumerateExternalLayouts = (
 
 export const enumerateEventsFunctionsExtensions = (
   project: gdProject
-): Array<gdEventsFunction> =>
+): Array<gdEventsFunctionsExtension> =>
   mapFor(0, project.getEventsFunctionsExtensionsCount(), i =>
     project.getEventsFunctionsExtensionAt(i)
   );

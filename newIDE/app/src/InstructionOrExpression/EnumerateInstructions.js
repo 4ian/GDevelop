@@ -1,9 +1,10 @@
 // @flow
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
+  type EnumeratedInstructionOrExpressionMetadata,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
@@ -33,6 +34,7 @@ const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
       'Distance',
       'SeDirige',
       'EstTourne',
+      'SourisSurObjet',
     ],
   },
 };
@@ -59,7 +61,7 @@ const freeInstructionsToRemove = {
 };
 
 const filterInstructionsToRemove = (
-  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+  list: Array<EnumeratedInstructionMetadata>,
   typesToRemove: ?$ReadOnlyArray<string>
 ) => {
   const types = typesToRemove; // Make Flow happy
@@ -133,7 +135,7 @@ const enumerateInstruction = (
   type: string,
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope
-): EnumeratedInstructionOrExpressionMetadata => {
+): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
@@ -154,14 +156,14 @@ const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
   scope: InstructionOrExpressionScope
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
   const allInstructions = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
-    const type = instructionsTypes.get(j);
+    const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
     if (instrMetadata.isHidden()) continue;
 
@@ -176,16 +178,16 @@ const enumerateExtensionInstructions = (
 /**
  * List all the instructions available.
  */
-export const enumerateInstructions = (
+export const enumerateAllInstructions = (
   isCondition: boolean
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedInstructionMetadata> => {
   let allInstructions = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
-    const extension = allExtensions.get(i);
+    const extension = allExtensions.at(i);
     const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
@@ -220,7 +222,7 @@ export const enumerateInstructions = (
 
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
-      const objectType = allObjectsTypes.get(j);
+      const objectType = allObjectsTypes.at(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
       const scope = { objectMetadata };
       allInstructions = [
@@ -244,7 +246,7 @@ export const enumerateInstructions = (
 
     //Behaviors instructions:
     for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
-      const behaviorType = allBehaviorsTypes.get(j);
+      const behaviorType = allBehaviorsTypes.at(j);
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { behaviorMetadata };
 
@@ -272,7 +274,7 @@ export const enumerateInstructions = (
 };
 
 const orderFirstInstructionsWithoutGroup = (
-  allInstructions: Array<EnumeratedInstructionOrExpressionMetadata>
+  allInstructions: Array<EnumeratedInstructionMetadata>
 ) => {
   const noGroupInstructions = allInstructions.filter(
     instructionMetadata => instructionMetadata.fullGroupName.length === 0
@@ -294,7 +296,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedInstructionMetadata> => {
   let allInstructions = [];
 
   const objectType: string = gd.getTypeOfObject(
@@ -316,7 +318,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
       gd.getTypeOfBehavior(
         globalObjectsContainer,
         objectsContainer,
-        behaviorName
+        behaviorName,
+        false
       )
     )
   );
@@ -326,7 +329,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
-    const extension = allExtensions.get(i);
+    const extension = allExtensions.at(i);
     const hasObjectType =
       extension
         .getExtensionObjectsTypes()
@@ -430,14 +433,14 @@ export const enumerateObjectAndBehaviorsInstructions = (
  */
 export const enumerateFreeInstructions = (
   isCondition: boolean
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedInstructionMetadata> => {
   let allFreeInstructions = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
-    const extension = allExtensions.get(i);
+    const extension = allExtensions.at(i);
     const extensionName: string = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
@@ -473,19 +476,19 @@ export type InstructionFilteringOptions = {|
   searchText: string,
 |};
 
-export const filterInstructionsList = (
-  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+export const filterInstructionsList = <
+  T: EnumeratedInstructionOrExpressionMetadata
+>(
+  list: Array<T>,
   { searchText }: InstructionFilteringOptions
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<T> => {
   if (!searchText === '') {
     return list;
   }
 
   const lowercaseSearch = searchText.toLowerCase();
 
-  const matchCritera = (
-    enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata
-  ) => {
+  const matchCritera = (enumeratedInstructionOrExpressionMetadata: T) => {
     const {
       displayedName,
       fullGroupName,
@@ -496,9 +499,7 @@ export const filterInstructionsList = (
     );
   };
 
-  const favorExactMatch = (
-    list: Array<EnumeratedInstructionOrExpressionMetadata>
-  ): Array<EnumeratedInstructionOrExpressionMetadata> => {
+  const favorExactMatch = (list: Array<T>): Array<T> => {
     if (!searchText) {
       return list;
     }
@@ -514,6 +515,7 @@ export const filterInstructionsList = (
     return list;
   };
 
+  // See EnumerateExpressions for a similar logic for expressions
   return favorExactMatch(list.filter(matchCritera));
 };
 

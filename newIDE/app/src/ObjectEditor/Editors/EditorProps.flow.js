@@ -3,6 +3,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 
 /**
  * The props given to any object editor
@@ -15,4 +16,5 @@ export type EditorProps = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onSizeUpdated: () => void,
   objectName: string,
+  unsavedChanges?: UnsavedChanges,
 |};

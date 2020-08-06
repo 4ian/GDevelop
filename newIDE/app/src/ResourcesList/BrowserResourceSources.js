@@ -228,6 +228,7 @@ class GenericResourcesChooser extends Component {
       <Dialog
         title={this.props.title}
         actions={actions}
+        cannotBeDismissed={false}
         open={this.state.open}
         noMargin
       >

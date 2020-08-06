@@ -8,6 +8,12 @@ export type ResourceKind = 'image' | 'audio' | 'font' | 'video' | 'json';
 
 export type ResourceSourceComponentProps = {|
   i18n: I18nType,
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
+    project: gdProject,
+    kind: ResourceKind,
+    path: string
+  ) => void,
 |};
 
 export type ResourceSource = {

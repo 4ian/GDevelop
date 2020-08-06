@@ -12,7 +12,6 @@ import PreferencesContext from './PreferencesContext';
 import AlertMessage from '../../UI/AlertMessage';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
-import Divider from '@material-ui/core/Divider';
 
 type Props = {|
   open: boolean,
@@ -107,10 +106,11 @@ export default class LanguageDialog extends Component<Props, State> {
                     />,
                   ]}
                   onRequestClose={() => onClose(this.state.languageDidChange)}
+                  cannotBeDismissed={false}
                   open={open}
                   title={<Trans>Language</Trans>}
                 >
-                  <Column>
+                  <Column noMargin>
                     <Line>
                       <AlertMessage kind="info">
                         <Trans>
@@ -141,7 +141,6 @@ export default class LanguageDialog extends Component<Props, State> {
                         {goodProgressLocales.map(localeMetadata =>
                           renderLanguageSelectOption(localeMetadata)
                         )}
-                        <Divider />
                         {startedLocales.map(localeMetadata =>
                           renderLanguageSelectOption(localeMetadata)
                         )}

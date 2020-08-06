@@ -1,6 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
@@ -16,9 +19,18 @@ export type AlertMessageIdentifier =
   | 'instance-drag-n-drop-explanation'
   | 'objects-panel-explanation'
   | 'instance-properties-panel-explanation'
+  | 'layers-panel-explanation'
+  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used';
+
+export type EditorMosaicName =
+  | 'scene-editor'
+  | 'scene-editor-small'
+  | 'debugger'
+  | 'resources-editor'
+  | 'events-functions-extension-editor';
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -77,6 +89,14 @@ export const allAlertMessages: Array<{
     label: <Trans>Using the instance properties panel</Trans>,
   },
   {
+    key: 'layers-panel-explanation',
+    label: <Trans>Using the layers panel</Trans>,
+  },
+  {
+    key: 'instances-panel-explanation',
+    label: <Trans>Using the instances panel</Trans>,
+  },
+  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
   },
@@ -101,6 +121,7 @@ export type PreferencesValues = {|
   themeName: string,
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
+  hiddenTutorialHints: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -109,6 +130,12 @@ export type PreferencesValues = {|
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
+  projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  autoOpenMostRecentProject: boolean,
+  hasProjectOpened: boolean,
+  useCommandPalette: boolean,
 |};
 
 /**
@@ -123,6 +150,7 @@ export type Preferences = {|
   checkUpdates: (forceDownload?: boolean) => void,
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
+  showTutorialHint: (identifier: string, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -130,6 +158,29 @@ export type Preferences = {|
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
+    project: gdProject,
+    kind: ResourceKind,
+    path: string
+  ) => void,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => ?EditorMosaicNode,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => void,
+  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  getAutoOpenMostRecentProject: () => boolean,
+  setAutoOpenMostRecentProject: (enabled: boolean) => void,
+  hadProjectOpenedDuringLastSession: () => boolean,
+  setHasProjectOpened: (enabled: boolean) => void,
+  setUseCommandPalette: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -139,14 +190,21 @@ export const initialPreferences = {
     themeName: 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
+    hiddenTutorialHints: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useNewInstructionEditorDialog: false,
+    useNewInstructionEditorDialog: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
+    projectLastUsedPaths: {},
+    defaultEditorMosaicNodes: {},
+    recentProjectFiles: [],
+    autoOpenMostRecentProject: true,
+    hasProjectOpened: false,
+    useCommandPalette: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -155,6 +213,7 @@ export const initialPreferences = {
   checkUpdates: () => {},
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
+  showTutorialHint: (identifier: string, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
@@ -162,6 +221,25 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => {},
+  getRecentProjectFiles: () => [],
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  getAutoOpenMostRecentProject: () => true,
+  setAutoOpenMostRecentProject: () => {},
+  hadProjectOpenedDuringLastSession: () => false,
+  setHasProjectOpened: () => {},
+  setUseCommandPalette: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -74,7 +74,7 @@ gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
 };
 
 /**
- * Hashmap associated each name of a key to its keyCode.
+ * Hashmap associated each name of a key to its location-aware keyCode.
  * @memberof gdjs.evtTools
  */
 gdjs.evtTools.input.keysNameToCode = {
@@ -127,14 +127,17 @@ gdjs.evtTools.input.keysNameToCode = {
   Numpad8: 104,
   Numpad9: 105,
 
-  RControl: 17,
-  RShift: 16,
-  RAlt: 18,
-  LControl: 17,
-  LShift: 16,
-  LAlt: 18,
-  LSystem: 91,
-  RSystem: 91,
+  LShift: 1016,
+  RShift: 2016,
+
+  LControl: 1017,
+  RControl: 2017,
+
+  LAlt: 1018,
+  RAlt: 2018,
+
+  LSystem: 1091,
+  RSystem: 2091,
   /*"Menu": sf::Keyboard::Menu ,
     "LBracket": sf::Keyboard::LBracket ,
     "RBracket": sf::Keyboard::RBracket ,
@@ -148,26 +151,40 @@ gdjs.evtTools.input.keysNameToCode = {
     "Equal": sf::Keyboard::Equal ,
     "Dash": sf::Keyboard::Dash,*/
   Space: 32,
-  Return: 13,
   Back: 8,
   Tab: 9,
+  Delete: 46,
+  Insert: 45,
+  Escape: 27,
+
   PageUp: 33,
   PageDown: 34,
   End: 35,
   Home: 36,
-  Delete: 46,
-  Insert: 45,
-  Escape: 27,
+  Return: 13,
+  NumpadPageUp: 3033,
+  NumpadPageDown: 3034,
+  NumpadEnd: 3035,
+  NumpadHome: 3036,
+  NumpadReturn: 3013,
 
   Add: 107,
   Subtract: 109,
   Multiply: 106,
   Divide: 111,
+  NumpadAdd: 3107,
+  NumpadSubtract: 3109,
+  NumpadMultiply: 3106,
+  NumpadDivide: 3111,
 
   Left: 37,
   Up: 38,
   Right: 39,
   Down: 40,
+  NumpadLeft: 3037,
+  NumpadUp: 3038,
+  NumpadRight: 3039,
+  NumpadDown: 3040,
 
   F1: 112,
   F2: 113,

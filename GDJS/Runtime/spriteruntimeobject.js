@@ -19,6 +19,7 @@
 
 /**
  * @typedef {Object} SpriteCenterPointData Represents the center point in a frame.
+ * @property {string} name Name of the point.
  * @property {boolean} automatic Is the center automatically computed?
  * @property {number} x X position of the point.
  * @property {number} y Y position of the point.
@@ -28,7 +29,7 @@
  * @typedef {Object} SpriteFrameData Represents a {@link gdjs.SpriteAnimationFrame}.
  * @property {string} [image] The resource name of the image used in this frame.
  * @property {Array<SpriteCustomPointData>} [points] The points of the frame.
- * @property {SpritePoint} originPoint The origin point.
+ * @property {SpriteCustomPointData} originPoint The origin point.
  * @property {SpriteCenterPointData} centerPoint The center of the frame.
  * @property {boolean} hasCustomCollisionMask Is The collision mask custom?
  * @property {Array<Array<SpritePoint>>} [customCollisionMask] The collision mask if it is custom.
@@ -52,7 +53,7 @@
  * @typedef {Object} SpriteObjectDataType Represents the data of a {@link gdjs.SpriteRuntimeObject}.
  * @property {boolean} updateIfNotVisible Update the object even if he is not visible?.
  * @property {Array<SpriteAnimationData>} animations The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances.
- * 
+ *
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
 
@@ -264,7 +265,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
     this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
 
     //Animations:
-    
+
     if ( this._animations === undefined ) {
         /** @type {Array<gdjs.SpriteAnimation>} */
         this._animations = [];
@@ -306,6 +307,30 @@ gdjs.SpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype
 gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the object existence.
 
 //Others initialization and internal state management :
+
+/**
+ * @param {SpriteObjectData} oldObjectData
+ * @param {SpriteObjectData} newObjectData
+ */
+gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    var runtimeScene = this._runtimeScene;
+    for(var i = 0, len = newObjectData.animations.length;i<len;++i) {
+        var animData = newObjectData.animations[i];
+
+        if ( i < this._animations.length )
+            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
+        else
+            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+    }
+    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
+
+    this._updateAnimationFrame();
+    if (!this._animationFrame) {
+        this.setAnimation(0);
+    }
+    this.hitBoxesDirty = true;
+    return true;
+};
 
 /**
  * Initialize the extra parameters that could be set for an instance.

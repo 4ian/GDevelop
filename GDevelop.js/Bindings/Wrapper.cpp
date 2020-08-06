@@ -78,6 +78,7 @@
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
+#include <GDJS/IDE/ExporterHelper.h>
 
 #include <emscripten.h>
 #include "ProjectHelper.h"
@@ -445,13 +446,14 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define WRAPPED_at(a) at(a).get()
 
-#define MAP_get(a) find(a)->second
+#define MAP_getOrCreate(key) operator[](key)
+#define MAP_get(key) find(key)->second
 #define MAP_set(key, value) [key] = value
 #define MAP_has(key) find(key) != self->end()
 
 #define STATIC_CreateNewGDJSProject CreateNewGDJSProject
 #define STATIC_InitializePlatforms InitializePlatforms
-#define STATIC_ValidateObjectName ValidateObjectName
+#define STATIC_ValidateName ValidateName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(gd::String(x))
 #define STATIC_IsObject IsObject

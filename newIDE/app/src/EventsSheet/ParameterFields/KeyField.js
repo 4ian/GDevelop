@@ -70,10 +70,18 @@ const keyNames = [
   'Subtract',
   'Multiply',
   'Divide',
+  'NumpadAdd',
+  'NumpadSubtract',
+  'NumpadMultiply',
+  'NumpadDivide',
   'Left',
   'Right',
   'Up',
   'Down',
+  'NumpadLeft',
+  'NumpadRight',
+  'NumpadUp',
+  'NumpadDown',
   'F1',
   'F2',
   'F3',
@@ -105,7 +113,13 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
   }
 
   render() {
-    const { value, onChange, isInline, parameterMetadata } = this.props;
+    const {
+      value,
+      onChange,
+      isInline,
+      parameterMetadata,
+      onRequestClose,
+    } = this.props;
 
     return (
       <SemiControlledAutoComplete
@@ -124,6 +138,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
           value: keyName,
         }))}
         openOnFocus={!isInline}
+        onRequestClose={onRequestClose}
         ref={field => (this._field = field)}
         errorText={
           !value ? (

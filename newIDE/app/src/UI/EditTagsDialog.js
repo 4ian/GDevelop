@@ -64,6 +64,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             disabled={!this.props.tagsString && !tags.length}
           />,
         ]}
+        cannotBeDismissed={true}
         open
         onRequestClose={onCancel}
       >

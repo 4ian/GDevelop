@@ -12,6 +12,8 @@
     "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install",
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
+    "format": "prettier --write --ignore-path .gitignore \"**/*.js\"",
+    "check-format": "prettier --list-different --ignore-path .gitignore \"**/*.js\"",
     "electron-win": "node node_modules/electron/cli.js app",
     "electron-linux": "./node_modules/electron/dist/electron app",
     "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
@@ -44,10 +46,11 @@
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
-    "electron": "3.0.9",
-    "electron-builder": "20.44.4",
+    "electron": "8.2.5",
+    "electron-builder": "21.2.0",
     "electron-notarize": "^0.2.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
+    "prettier": "1.15.3",
     "shelljs": "^0.7.7",
     "unzipper": "^0.9.11"
   },

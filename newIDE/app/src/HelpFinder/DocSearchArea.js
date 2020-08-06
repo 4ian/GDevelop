@@ -44,6 +44,15 @@ type State = {|
   error: ?Error,
 |};
 
+const fixSomeHtmlCharacters = (str: string) => {
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#x27;/g, "'");
+};
+
 const indexName = 'gdevelop';
 const appId = 'BH4D9OD16A';
 const apiKey = '69c73fc1a710bb79543d4b91f6b81c08';
@@ -105,7 +114,8 @@ export default class DocSearchArea extends React.Component<Props, State> {
       result.hierarchy.lvl3 ||
       result.hierarchy.lvl4 ||
       result.hierarchy.lvl5 ||
-      result.hierarchy.lvl6;
+      result.hierarchy.lvl6 ||
+      '';
 
     const secondaryText = [
       result.hierarchy.lvl0,
@@ -118,14 +128,13 @@ export default class DocSearchArea extends React.Component<Props, State> {
     ]
       .filter(text => !!text)
       .filter(text => text !== primaryText)
-      .join(' - ')
-      .replace(/&quot;/g, '"');
+      .join(' - ');
 
     return (
       <ListItem
         key={result.objectID}
-        primaryText={primaryText}
-        secondaryText={result.content || secondaryText}
+        primaryText={fixSomeHtmlCharacters(primaryText)}
+        secondaryText={fixSomeHtmlCharacters(result.content || secondaryText)}
         secondaryTextLines={2}
         onClick={() => {
           Window.openExternalURL(result.url);

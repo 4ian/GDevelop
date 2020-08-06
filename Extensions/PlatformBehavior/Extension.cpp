@@ -181,6 +181,39 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetMaxFallingSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+     aut.AddCondition(
+           "LadderClimbingSpeed",
+           _("Ladder climbing speed"),
+           _("Compare the ladder climbing speed (in pixels per "
+             "second)."),
+           _("the ladder climbing speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetLadderClimbingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddAction(
+           "LadderClimbingSpeed",
+           _("Ladder climbing speed"),
+           _("Change the ladder climbing speed (in pixels per "
+             "second)."),
+           _("the ladder climbing speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("SetLadderClimbingSpeed")
+        .SetGetter("GetLadderClimbingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
                      _("Compare the acceleration of the object (in pixels per "
@@ -303,9 +336,34 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddCondition(
+           "JumpSustainTime",
+           _("Jump sustain time"),
+           _("Compare the jump sustain time of the object (in seconds)."),
+           _("the jump sustain time"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced();
+
+    aut.AddAction(
+           "JumpSustainTime",
+           _("Jump sustain time"),
+           _("Change the jump sustain time of an object (in seconds)."),
+           _("the jump sustain time"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number");
+
     aut.AddAction(
            "SetCanJump",
-           _("Allow again jumping"),
+           _("Allow jumping again"),
            _("When this action is executed, the object is able to jump again, "
              "even if it is in the air: this can be useful to allow a double "
              "jump for example. This is not a permanent effect: you must call "
@@ -319,6 +377,19 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("SetCanJump")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddCondition("CanJump",
+                     _("Can jump"),
+                     _("Check if the object can jump."),
+                     _("_PARAM0_ can jump"),
+                     "",
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsSimple()
+        .SetFunctionName("canJump")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddAction("SimulateLeftKey",
@@ -443,6 +514,79 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("IgnoreDefaultControls")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddAction("CanGrabPlatforms",
+                  _("Platform grabbing"),
+                  _("Enable (or disable) the ability of the object to grab platforms when falling near to one."),
+                  _("Allow _PARAM0_ to grab platforms: _PARAM2_"),
+                  _("Controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .AddParameter("yesorno", _("Can grab platforms"))
+        .MarkAsAdvanced();
+
+    aut.AddCondition("CanGrabPlatforms",
+                     _("Can grab platforms"),
+                     _("Check if the object can grab the platforms."),
+                     _("_PARAM0_ can grab the platforms"),
+                     "",
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsSimple()
+        .SetFunctionName("canGrabPlatforms")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddCondition(
+           "CurrentFallSpeed",
+           _("Current falling speed"),
+           _("Compare the current falling speed of the object (in pixels per "
+             "second)."),
+           _("the current falling speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetCurrentFallSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddCondition(
+           "CurrentJumpSpeed",
+           _("Current jump speed"),
+           _("Compare the current jump speed of the object (in pixels per "
+             "second)."),
+           _("the current jump speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetCurrentJumpSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddCondition(
+           "CurrentSpeed",
+           _("Current speed"),
+           _("Compare the current speed of the object (in pixels per "
+             "second)."),
+           _("the current speed"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardRelationalOperatorParameters("number")
+        .MarkAsAdvanced()
+        .SetFunctionName("GetCurrentSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddExpression("Gravity",
                       _("Gravity"),
                       _("Get the gravity applied on the object"),
@@ -461,6 +605,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetMaxFallingSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("LadderClimbingSpeed",
+                      _("Ladder climbing speed"),
+                      _("Get the ladder climbing speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetLadderClimbingSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
     aut.AddExpression("Acceleration",
@@ -501,6 +655,44 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetJumpSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    aut.AddExpression("JumpSustainTime",
+                      _("Jump sustain time"),
+                      _("The time during which keeping the jump button held allow the initial jump speed to be maintained."),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
+    
+    aut.AddExpression("CurrentFallSpeed",
+                      _("Current fall speed"),
+                      _("Current fall speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetCurrentFallSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+    
+    aut.AddExpression("CurrentSpeed",
+                      _("Current speed"),
+                      _("Current speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetCurrentSpeed")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+    
+    aut.AddExpression("CurrentJumpSpeed",
+                      _("Current jump speed"),
+                      _("Current jump speed"),
+                      _("Options"),
+                      "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetFunctionName("GetCurrentJumpSpeed")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 #endif
   }

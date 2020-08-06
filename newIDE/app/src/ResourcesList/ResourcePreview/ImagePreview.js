@@ -53,7 +53,6 @@ type Props = {|
     imageHeight: number,
     imageZoomFactor: number,
   |}) => React.Node,
-  style?: Object,
   onSize?: (number, number) => void,
 |};
 
@@ -69,8 +68,6 @@ type State = {|
  * Display the preview for a resource of a project with kind "image".
  */
 export default class ImagePreview extends React.Component<Props, State> {
-  _container: ?HTMLDivElement = null;
-
   state = {
     errored: false,
     imageWidth: null,
@@ -135,10 +132,10 @@ export default class ImagePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <Measure>
-        {dimensions => {
-          const containerWidth = dimensions.width;
-          const { resourceName, style, renderOverlay } = this.props;
+      <Measure bounds>
+        {({ contentRect, measureRef }) => {
+          const containerWidth = contentRect.bounds.width;
+          const { resourceName, renderOverlay } = this.props;
           const {
             imageHeight,
             imageWidth,
@@ -198,8 +195,8 @@ export default class ImagePreview extends React.Component<Props, State> {
                 </IconButton>
               </MiniToolbar>
               <div
-                style={{ ...styles.imagePreviewContainer, ...style }}
-                ref={container => (this._container = container)}
+                style={styles.imagePreviewContainer}
+                ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts

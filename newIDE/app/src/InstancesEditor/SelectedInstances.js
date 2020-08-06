@@ -1,9 +1,9 @@
 // @flow
 import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import InstancesSelection from '../SceneEditor/InstancesSelection';
+import InstancesSelection from './InstancesSelection';
 
 type Props = {|
   instancesSelection: InstancesSelection,
@@ -35,6 +35,9 @@ const getButtonSizes = (screenType: ScreenType) => {
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
+/**
+ * Render selection rectangle for selected instances.
+ */
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
@@ -49,7 +52,7 @@ export default class SelectedInstances {
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
   resizeButton = new PIXI.Graphics();
-  resizeIcon = new PIXI.Sprite.fromImage('res/actions/direction.png');
+  resizeIcon = new PIXI.Sprite.from('res/actions/direction.png');
   rightResizeButton = new PIXI.Graphics();
   bottomResizeButton = new PIXI.Graphics();
   rotateButton = new PIXI.Graphics();
@@ -155,7 +158,7 @@ export default class SelectedInstances {
 
     buttonObject.beginFill(0xffffff);
     buttonObject.lineStyle(1, 0x6868e8, 1);
-    buttonObject.fillAlpha = 0.9;
+    buttonObject.fill.alpha = 0.9;
     if (shape === RECTANGLE_BUTTON_SHAPE) {
       buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
     } else if (shape === CIRCLE_BUTTON_SHAPE) {
@@ -204,7 +207,7 @@ export default class SelectedInstances {
       this.selectedRectangles[i].clear();
       this.selectedRectangles[i].beginFill(0x6868e8);
       this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);
-      this.selectedRectangles[i].fillAlpha = 0.3;
+      this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
       this.selectedRectangles[i].drawRect(
         selectionRectangle.x,

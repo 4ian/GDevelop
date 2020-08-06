@@ -31,6 +31,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._roundCoordinates = behaviorData.roundCoordinates;
   this._gravity = behaviorData.gravity;
   this._maxFallingSpeed = behaviorData.maxFallingSpeed;
+  this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
   this._acceleration = behaviorData.acceleration;
   this._deceleration = behaviorData.deceleration;
   this._maxSpeed = behaviorData.maxSpeed;
@@ -38,6 +39,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._canGrabPlatforms = behaviorData.canGrabPlatforms || false;
   this._yGrabOffset = behaviorData.yGrabOffset || 0;
   this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
+  this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
   this._isOnFloor = false;
   this._isOnLadder = false;
   this._floorPlatform = null;
@@ -45,6 +47,8 @@ gdjs.PlatformerObjectRuntimeBehavior = function(
   this._currentSpeed = 0;
   this._jumping = false;
   this._currentJumpSpeed = 0;
+  this._timeSinceCurrentJumpStart = 0;
+  this._jumpKeyHeldSinceJumpStart = false;
   this._canJump = false;
   this._isGrabbingPlatform = false;
   this._grabbedPlatform = null;
@@ -73,6 +77,44 @@ gdjs.registerBehavior(
   gdjs.PlatformerObjectRuntimeBehavior
 );
 
+gdjs.PlatformerObjectRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  if (oldBehaviorData.roundCoordinates !== newBehaviorData.roundCoordinates) {
+    this._roundCoordinates = newBehaviorData.roundCoordinates;
+  }
+  if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
+    this.setGravity(newBehaviorData.gravity);
+  }
+  if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
+    this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
+  }
+  if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
+    this.setAcceleration(newBehaviorData.acceleration);
+  }
+  if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
+    this.setDeceleration(newBehaviorData.deceleration);
+  }
+  if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
+    this.setMaxSpeed(newBehaviorData.maxSpeed);
+  }
+  if (oldBehaviorData.jumpSpeed !== newBehaviorData.jumpSpeed) {
+    this.setJumpSpeed(newBehaviorData.jumpSpeed);
+  }
+  if (oldBehaviorData.canGrabPlatforms !== newBehaviorData.canGrabPlatforms) {
+    this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
+  }
+  if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
+    this._yGrabOffset = newBehaviorData.yGrabOffset;
+  }
+  if (oldBehaviorData.xGrabTolerance !== newBehaviorData.xGrabTolerance) {
+    this._xGrabTolerance = newBehaviorData.xGrabTolerance;
+  }
+  if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
+    this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+  }
+
+  return true;
+};
+
 gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   runtimeScene
 ) {
@@ -80,7 +122,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   var UPKEY = 38;
   var RIGHTKEY = 39;
   var DOWNKEY = 40;
-  var SHIFTKEY = 16;
+  var LSHIFTKEY = 1016;
+  var RSHIFTKEY = 2016;
   var SPACEKEY = 32;
   var object = this.owner;
   var timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
@@ -262,8 +305,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
         .getGame()
         .getInputManager()
         .isKeyPressed(DOWNKEY);
-    if (this._upKey) requestedDeltaY -= 150 * timeDelta;
-    if (this._downKey) requestedDeltaY += 150 * timeDelta;
+    if (this._upKey) requestedDeltaY -= this._ladderClimbingSpeed * timeDelta;
+    if (this._downKey) requestedDeltaY += this._ladderClimbingSpeed * timeDelta;
 
     //Coming to an extremity of a ladder
     if (!this._isOverlappingLadder()) {
@@ -354,7 +397,11 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     (runtimeScene
       .getGame()
       .getInputManager()
-      .isKeyPressed(SHIFTKEY) ||
+      .isKeyPressed(LSHIFTKEY) ||
+      runtimeScene
+        .getGame()
+        .getInputManager()
+        .isKeyPressed(RSHIFTKEY) ||
       runtimeScene
         .getGame()
         .getInputManager()
@@ -362,6 +409,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   if (this._canJump && this._jumpKey) {
     this._jumping = true;
     this._canJump = false;
+    this._timeSinceCurrentJumpStart = 0;
+    this._jumpKeyHeldSinceJumpStart = true;
     //this._isOnFloor = false; If floor is a very steep slope, the object could go into it.
     this._isOnLadder = false;
     this._currentJumpSpeed = this._jumpSpeed;
@@ -370,9 +419,22 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
     //object.setY(object.getY()-1); //Useless and dangerous
   }
 
+  // Check if the jump key is continuously held since
+  // the beginning of the jump.
+  if (!this._jumpKey) this._jumpKeyHeldSinceJumpStart = false;
+
   if (this._jumping) {
+    this._timeSinceCurrentJumpStart += timeDelta;
     requestedDeltaY -= this._currentJumpSpeed * timeDelta;
-    this._currentJumpSpeed -= this._gravity * timeDelta;
+
+    // Decrease jump speed after the (optional) jump sustain time is over.
+    var sustainJumpSpeed =
+      this._jumpKeyHeldSinceJumpStart &&
+      this._timeSinceCurrentJumpStart < this._jumpSustainTime;
+    if (!sustainJumpSpeed) {
+      this._currentJumpSpeed -= this._gravity * timeDelta;
+    }
+
     if (this._currentJumpSpeed < 0) {
       this._currentJumpSpeed = 0;
       this._jumping = false;
@@ -862,6 +924,14 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getMaxFallingSpeed = function() {
 };
 
 /**
+ * Get the speed used to move on Y axis when climbing a ladder.
+ * @returns {number} The speed of ladder climbing.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getLadderClimbingSpeed = function() {
+  return this._ladderClimbingSpeed;
+};
+
+/**
  * Get the acceleration value of the Platformer Object.
  * @returns {number} The current acceleration.
  */
@@ -894,6 +964,54 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSpeed = function() {
 };
 
 /**
+ * Get the jump sustain time of the Platformer Object.
+ * @returns {number} The jump sustain time.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getJumpSustainTime = function() {
+  return this._jumpSustainTime;
+};
+
+/**
+ * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
+ * @returns {number} The current fall speed.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentFallSpeed = function() {
+  return this._currentFallSpeed;
+};
+
+/**
+ * Get the current speed of the Platformer Object.
+ * @returns {number} The current speed.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentSpeed = function() {
+  return this._currentSpeed;
+};
+
+/**
+ * Get the current jump speed of the Platformer Object.
+ * @returns {number} The current jump speed.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.getCurrentJumpSpeed = function() {
+  return this._currentJumpSpeed;
+};
+
+/**
+ * Check if the Platformer Object can grab the platforms.
+ * @returns {boolean} Returns true if the object can grab the platforms.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.canGrabPlatforms = function() {
+  return this._canGrabPlatforms;
+};
+
+/**
+ * Check if the Platformer Object can jump.
+ * @returns {boolean} Returns true if the object can jump.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.canJump = function() {
+  return this._canJump;
+};
+
+/**
  * Set the gravity of the Platformer Object.
  * @param {number} gravity The new gravity.
  */
@@ -909,6 +1027,16 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setMaxFallingSpeed = function(
   maxFallingSpeed
 ) {
   this._maxFallingSpeed = maxFallingSpeed;
+};
+
+/**
+* Set the speed used to move on Y axis when climbing a ladder.
+* @param {number} ladderClimbingSpeed The speed of ladder climbing.
+*/
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setLadderClimbingSpeed = function (
+  ladderClimbingSpeed
+) {
+  this._ladderClimbingSpeed = ladderClimbingSpeed;
 };
 
 /**
@@ -949,6 +1077,16 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSpeed = function(
   jumpSpeed
 ) {
   this._jumpSpeed = jumpSpeed;
+};
+
+/**
+ * Set the jump sustain time of the Platformer Object.
+ * @param {number} jumpSpeed The new jump sustain time.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setJumpSustainTime = function(
+  jumpSustainTime
+) {
+  this._jumpSustainTime = jumpSustainTime;
 };
 
 /**

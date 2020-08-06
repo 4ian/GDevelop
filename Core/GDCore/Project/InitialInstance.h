@@ -200,7 +200,7 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Get the value of a float property stored in the instance.
    * \note Only use this when \a GetCustomProperties is too slow (when rendering
-   * instances for example). 
+   * instances for example).
    * \return the value of the property, or 0 if it does
    * not exists.
    */
@@ -209,7 +209,7 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Get the value of a string property stored in the instance.
    * \note Only use this when \a GetCustomProperties is too slow (when rendering
-   * instances for example). 
+   * instances for example).
    * \return the value of the propety, or an empty
    * string if it does not exists.
    */
@@ -240,6 +240,12 @@ class GD_CORE_API InitialInstance {
    * \brief Unserialize the instances container.
    */
   virtual void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Reset the persistent UUID used to recognize
+   * the same initial instance between serialization.
+   */
+  InitialInstance& ResetPersistentUuid();
   ///@}
 
   // More properties can be stored in floatInfos and stringInfos.
@@ -260,6 +266,7 @@ class GD_CORE_API InitialInstance {
   float height;           ///< Object custom height
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
+  mutable gd::String persistentUuid; ///< A persistent random version 4 UUID, useful for hot reloading.
 
   static gd::String*
       badStringProperyValue;  ///< Empty string returned by GetRawStringProperty

@@ -10,6 +10,7 @@ import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -34,6 +35,8 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const styles = {
   listContainer: {
@@ -96,6 +99,8 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
 
   getThumbnail: (project: gdProject, object: Object) => string,
+  unsavedChanges?: ?UnsavedChanges,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -187,8 +192,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this object? This can't be undone."
     );
     if (!answer) return;
@@ -207,7 +211,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         objectsContainer.removeObject(object.getName());
       }
 
-      this.forceUpdate();
+      this._onObjectModified(false);
     });
   };
 
@@ -270,7 +274,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
     newObject.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObject);
 
     return { object: newObject, global };
@@ -306,7 +310,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         if (!doRename) return;
 
         object.setName(newName);
-        this.forceUpdate();
+        this._onObjectModified(false);
       });
     }
   };
@@ -357,8 +361,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         )
       );
     });
-
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -375,8 +378,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       return;
     }
 
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
     );
     if (!answer) return;
@@ -389,8 +391,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       project,
       project.getObjectsCount()
     );
-
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   forceUpdateList = () => {
@@ -409,7 +410,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     // Force update the list as it's possible that user removed a tag
     // from an object, that should then not be shown anymore in the list.
-    this.forceUpdateList();
+    this._onObjectModified(true);
   };
 
   _selectObject = (objectWithContext: ?ObjectWithContext) => {
@@ -485,6 +486,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this._duplicateObject(objectWithContext),
       },
     ];
+  };
+
+  _onObjectModified = (shouldForceUpdateList: boolean) => {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+
+    if (shouldForceUpdateList) this.forceUpdateList();
+    else this.forceUpdate();
   };
 
   render() {
@@ -593,6 +602,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                 the health of the object.
               </Trans>
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {tagEditedObject && (

@@ -7,6 +7,7 @@ import {
   enumerateAllExpressions,
 } from './EnumerateExpressions';
 import { createTree } from './CreateTree';
+import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions', () => {
@@ -46,14 +47,22 @@ describe('EnumerateExpressions', () => {
       'PlatformBehavior::PlatformerObjectBehavior'
     );
 
+    const jumpSpeedExpressions = filterExpressions(
+      platformerObjectBehaviorExpressions,
+      'JumpSpeed'
+    );
+
     expect(
       filterExpressions(platformerObjectBehaviorExpressions, 'JumpSpeed')
-    ).toHaveLength(1);
-    expect(
-      filterExpressions(platformerObjectBehaviorExpressions, 'JumpSpeed')
-    ).toContainEqual(
+    ).toHaveLength(2);
+    expect(jumpSpeedExpressions).toContainEqual(
       expect.objectContaining({
         type: 'JumpSpeed',
+      })
+    );
+    expect(jumpSpeedExpressions).toContainEqual(
+      expect.objectContaining({
+        type: 'CurrentJumpSpeed',
       })
     );
   });
@@ -81,7 +90,9 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can create the tree of all expressions', () => {
-    const allExpressions = enumerateAllExpressions('number');
+    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
+      'number'
+    );
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there

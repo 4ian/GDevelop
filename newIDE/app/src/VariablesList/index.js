@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Table, TableHeader, TableHeaderColumn, TableRow } from '../UI/Table';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
@@ -23,7 +22,7 @@ import {
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
@@ -45,6 +44,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
+  commitVariableValueOnBlur?: boolean,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -203,7 +203,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const isStructure = variable.isStructure();
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
@@ -217,8 +217,9 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        commitVariableValueOnBlur={commitVariableValueOnBlur}
         errorText={
-          this.state.nameErrors[variable.ptr]
+          this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'
             : undefined
         }
@@ -373,33 +374,22 @@ export default class VariablesList extends React.Component<Props, State> {
     );
 
     return (
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableHeaderColumn style={styles.toolColumnHeader} />
-            </TableRow>
-          </TableHeader>
-        </Table>
-        <SortableVariablesListBody
-          variablesContainer={this.props.variablesContainer}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            this.props.variablesContainer.move(oldIndex, newIndex);
-            this.forceUpdate();
-          }}
-          helperClass="sortable-helper"
-          useDragHandle
-          lockToContainerEdges
-        >
-          {!!containerInheritedVariablesTree.length &&
-            containerInheritedVariablesTree}
-          {!containerVariablesTree.length && this._renderEmpty()}
-          {!!containerVariablesTree.length && containerVariablesTree}
-          {editRow}
-        </SortableVariablesListBody>
-      </div>
+      <SortableVariablesListBody
+        variablesContainer={this.props.variablesContainer}
+        onSortEnd={({ oldIndex, newIndex }) => {
+          this.props.variablesContainer.move(oldIndex, newIndex);
+          this.forceUpdate();
+        }}
+        helperClass="sortable-helper"
+        useDragHandle
+        lockToContainerEdges
+      >
+        {!!containerInheritedVariablesTree.length &&
+          containerInheritedVariablesTree}
+        {!containerVariablesTree.length && this._renderEmpty()}
+        {!!containerVariablesTree.length && containerVariablesTree}
+        {editRow}
+      </SortableVariablesListBody>
     );
   }
 }

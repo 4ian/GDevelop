@@ -1,7 +1,7 @@
 // @flow
 
 /*::
-type TestProject = {|
+export type TestProject = {|
   project: gdProject,
   shapePainterObject: any,
   textObject: any,
@@ -17,6 +17,7 @@ type TestProject = {|
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
   emptyLayout: gdLayout,
+  emptyEventsList: gdEventsList,
   testEventsFunction: gdEventsFunction,
   testEventsFunctionsExtension: gdEventsFunctionsExtension,
   testSerializedEvents: Object,
@@ -194,22 +195,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evt = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-  var evt2 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
-  var evt3 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 2);
-  var evt4 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::While', 3);
-  var evt5 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 4);
   var evt6 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Group', 5);
-  var evt7 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 6);
   var evt8 = testLayout
@@ -347,6 +348,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
+
+  // Empty events list
+  const emptyEventsList = new gd.EventsList();
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -490,7 +494,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   effect2.setDoubleParameter('opacity', 0.2);
   effect3.setEffectType('FakeEffectWithVariousParameters');
   effect3.setDoubleParameter('intensity', 0.1);
-  effect3.setDoubleParameter('image', 'my-image');
+  effect3.setStringParameter('image', 'my-image');
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType.insertNewEffect(
@@ -516,6 +520,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
+    emptyEventsList,
     testEventsFunction,
     testEventsFunctionsExtension,
     testSerializedEvents,

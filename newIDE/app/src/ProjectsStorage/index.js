@@ -12,6 +12,11 @@ export type FileMetadata = {|
   fileIdentifier: string,
 |};
 
+export type FileMetadataAndStorageProviderName = {
+  fileMetadata: FileMetadata,
+  storageProviderName: string,
+};
+
 /**
  * Interface returned by a storage provider to manipulate files.
  */
@@ -46,7 +51,10 @@ export type StorageProviderOperations = {|
   |}>,
 
   // Project auto saving:
-  onAutoSaveProject?: (project: gdProject, fileMetadata: FileMetadata) => void,
+  onAutoSaveProject?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
   hasAutoSave?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean

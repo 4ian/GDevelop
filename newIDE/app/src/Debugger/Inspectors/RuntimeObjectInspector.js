@@ -17,13 +17,6 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
-
 const transform = runtimeObject => {
   if (!runtimeObject) return null;
   return {
@@ -55,7 +48,7 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
 };
 
 export default (props: Props) => (
-  <div style={styles.container}>
+  <React.Fragment>
     <Text>
       <Trans>General:</Trans>
     </Text>
@@ -84,5 +77,5 @@ export default (props: Props) => (
       }
       onCall={(path, args) => props.onCall(['_variables'].concat(path), args)}
     />
-  </div>
+  </React.Fragment>
 );

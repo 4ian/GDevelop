@@ -7,7 +7,7 @@ const isGitClean = require('is-git-clean');
 const git = require('git-rev');
 
 isGitClean()
-  .then(clean => {
+  .then((clean) => {
     if (args['skip-git-check']) return;
 
     if (!clean) {
@@ -20,8 +20,8 @@ isGitClean()
   .then(() => {
     if (args['skip-git-check']) return;
 
-    return new Promise(resolve => {
-      git.branch(function(branch) {
+    return new Promise((resolve) => {
+      git.branch(function (branch) {
         if (branch !== 'master') {
           shell.echo('⚠️ Please run deployment only from master branch');
           shell.exit(1);
@@ -32,8 +32,9 @@ isGitClean()
     });
   })
   .then(() => {
-    return new Promise(resolve => {
-      fs.stat(path.join('../../app/public/libGD.js'), (err, stats) => {
+    const appPublicPath = path.join(__dirname, '../../app/public/');
+    return new Promise((resolve) => {
+      fs.stat(path.join(appPublicPath, 'libGD.js'), (err, stats) => {
         if (err) {
           shell.echo(
             `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
@@ -54,6 +55,16 @@ isGitClean()
         shell.echo(
           `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
         );
+
+        if (
+          !fs.existsSync(path.join(appPublicPath, 'libGD.js.mem')) ||
+          fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))
+        ) {
+          shell.echo(
+            `❌ Found libGD.wasm or missing libGD.js.mem - are you sure you're not trying to deploy the development version?`
+          );
+          shell.exit(1);
+        }
         resolve();
       });
     });
@@ -82,7 +93,7 @@ isGitClean()
 
     if (!args['skip-deploy']) {
       shell.echo('🚄 Uploading the built app to gh-pages...');
-      ghpages.publish('dist', {}, err => {
+      ghpages.publish('dist', {}, (err) => {
         if (err) {
           shell.echo('❌ Finished with error:');
           shell.echo(err);

@@ -58,6 +58,16 @@ const DetectShortcutDialog = (props: Props) => {
           disabled={!shortcutString}
         />,
       ]}
+      secondaryActions={[
+        <FlatButton
+          key="Remove"
+          label={<Trans>Remove shortcut</Trans>}
+          onClick={() => {
+            props.onSet('');
+            props.onClose();
+          }}
+        />,
+      ]}
     >
       <Typography>{props.commandText}</Typography>
       <Paper variant="outlined" style={styles.shortcutBox}>

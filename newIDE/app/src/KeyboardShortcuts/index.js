@@ -14,8 +14,8 @@ type KeyType =
   | 'other'; // Tab, Space
 
 /**
- * Gets action key type from key code
- * Returns null if invalid action key
+ * Given a key code, gives the associated KeyType.
+ * Returns null if the key code can't be categorised.
  */
 const getKeyTypeFromCode = (code: string): KeyType | null => {
   if (code.indexOf('Key') === 0) return 'alphabet';
@@ -32,7 +32,7 @@ const getKeyTypeFromCode = (code: string): KeyType | null => {
  * Returns null if event does not correspond to valid shortcut press
  */
 export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
-  // Check if action key is valid
+  // Check if action key is a shortcut supported key
   const keyType = getKeyTypeFromCode(e.code);
   if (!keyType) return;
 
@@ -83,7 +83,6 @@ export const useKeyboardShortcuts = (onRunCommand: string => void) => {
         );
         if (!commandName) return;
         e.preventDefault();
-        console.log('Detected shortcut for', commandName);
         onRunCommand(commandName);
       };
 
@@ -111,7 +110,7 @@ const getKeyDisplayName = (code: string) => {
 /**
  * Parses shortcut string into array of platform-specific key strings
  */
-export const getShortcutDisplay = (shortcutString: string) => {
+export const getShortcutDisplayName = (shortcutString: string) => {
   return shortcutString
     .split('+')
     .map<string>(keyCode => {

@@ -4,59 +4,18 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n } from '@lingui/core';
 import List from '@material-ui/core/List';
 import Text from '../UI/Text';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import DetectShortcutDialog from './DetectShortcutDialog';
-import Chip from '@material-ui/core/Chip';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import IconButton from '../UI/IconButton';
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-import EditIcon from '@material-ui/icons/Edit';
 import { type ShortcutMap } from './DefaultShortcuts';
-import { getShortcutDisplay } from './index';
+import { getShortcutDisplayName } from './index';
 import Window from '../Utils/Window';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
+import ShortcutsListRow from './ShortcutsListRow';
 import commandsList, {
   type CommandName,
   commandAreas,
 } from '../CommandPalette/CommandsList';
-
-type ShortcutRowProps = {|
-  i18n: I18n,
-  commandName: CommandName,
-  isDefault: boolean,
-  shortcutString: string,
-  onEditShortcut: () => void,
-  onResetShortcut: () => void,
-|};
-const ShortcutRow = (props: ShortcutRowProps) => {
-  return (
-    <ListItem>
-      <ListItemText
-        primary={props.i18n._(commandsList[props.commandName].displayText)}
-      />
-      <ListItemSecondaryAction>
-        <Chip
-          style={{ borderRadius: 3 }}
-          label={props.shortcutString || 'No shortcut'}
-        />
-        <IconButton onClick={props.onEditShortcut} tooltip={t`Edit shortcut`}>
-          <EditIcon />
-        </IconButton>
-        {!props.isDefault && (
-          <IconButton
-            onClick={props.onResetShortcut}
-            tooltip={t`Reset to default`}
-          >
-            <RotateLeftIcon />
-          </IconButton>
-        )}
-      </ListItemSecondaryAction>
-    </ListItem>
-  );
-};
 
 type Props = {|
   i18n: I18n,
@@ -73,7 +32,9 @@ const ShortcutsList = (props: Props) => {
 
   const resetAllShortcutsToDefault = () => {
     const answer = Window.showConfirmDialog(
-      props.i18n._(t`Are you sure you want to reset all shortcuts to default?`),
+      props.i18n._(
+        t`Are you sure you want to reset all shortcuts to their default values?`
+      ),
       'question'
     );
     if (answer) props.onReset();
@@ -109,12 +70,12 @@ const ShortcutsList = (props: Props) => {
               const userShortcut = props.shortcutMap[commandName] || '';
               const defaultShortcut = defaultShortcuts[commandName] || '';
               const isDefault = userShortcut === defaultShortcut;
-              const shortcutString = getShortcutDisplay(userShortcut);
+              const shortcutDisplayName = getShortcutDisplayName(userShortcut);
               return (
-                <ShortcutRow
+                <ShortcutsListRow
                   i18n={props.i18n}
                   key={commandName}
-                  shortcutString={shortcutString}
+                  shortcutString={shortcutDisplayName}
                   commandName={commandName}
                   isDefault={isDefault}
                   onEditShortcut={() => setEditedShortcut(commandName)}

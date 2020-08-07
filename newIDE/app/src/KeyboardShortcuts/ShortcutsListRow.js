@@ -9,6 +9,7 @@ import Chip from '@material-ui/core/Chip';
 import IconButton from '../UI/IconButton';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import EditIcon from '@material-ui/icons/Edit';
+import WarningIcon from '@material-ui/icons/Warning';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 
 const styles = {
@@ -22,6 +23,7 @@ type Props = {|
   commandName: CommandName,
   isDefault: boolean,
   shortcutString: string,
+  clashingCommand: ?CommandName,
   onEditShortcut: () => void,
   onResetShortcut: () => void,
 |};
@@ -33,6 +35,11 @@ const ShortcutsListRow = (props: Props) => {
         primary={props.i18n._(commandsList[props.commandName].displayText)}
       />
       <ListItemSecondaryAction>
+        {props.clashingCommand && (
+          <IconButton tooltip={t`This shortcut clashes with another action.`}>
+            <WarningIcon />
+          </IconButton>
+        )}
         <Chip
           style={styles.shortcutChip}
           label={props.shortcutString || <Trans>No shortcut</Trans>}

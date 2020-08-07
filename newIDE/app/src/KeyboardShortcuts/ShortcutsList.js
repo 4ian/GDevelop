@@ -67,10 +67,23 @@ const ShortcutsList = (props: Props) => {
           <React.Fragment key={areaName}>
             <Text size="title">{props.i18n._(commandAreas[areaName])}</Text>
             {areaWiseCommands[areaName].map(commandName => {
+              // Get default and user-set shortcuts
               const userShortcut = props.shortcutMap[commandName] || '';
               const defaultShortcut = defaultShortcuts[commandName] || '';
               const isDefault = userShortcut === defaultShortcut;
               const shortcutDisplayName = getShortcutDisplayName(userShortcut);
+              // Check if shortcut clashes with another command
+              const clashingCommandName = Object.keys(props.shortcutMap).find(
+                otherCommandName => {
+                  if (otherCommandName === commandName) return false;
+                  const commandShortcut =
+                    props.shortcutMap[otherCommandName] || '';
+                  if (commandShortcut !== userShortcut) return false;
+                  if (commandShortcut === '') return false;
+                  return true;
+                }
+              );
+
               return (
                 <ShortcutsListRow
                   i18n={props.i18n}
@@ -78,6 +91,7 @@ const ShortcutsList = (props: Props) => {
                   shortcutString={shortcutDisplayName}
                   commandName={commandName}
                   isDefault={isDefault}
+                  clashingCommand={clashingCommandName}
                   onEditShortcut={() => setEditedShortcut(commandName)}
                   onResetShortcut={() => resetShortcut(commandName)}
                 />

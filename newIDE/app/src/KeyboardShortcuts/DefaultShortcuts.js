@@ -16,7 +16,7 @@ const defaultShortcuts: ShortcutMap = {
   CLOSE_PROJECT: 'CmdOrCtrl+KeyQ',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   OPEN_RECENT_PROJECT: '',
-  OPEN_COMMAND_PALETTE: 'CmdOrCtrl+P',
+  OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',
 
   OPEN_PROJECT_PROPERTIES: '',
   OPEN_PROJECT_VARIABLES: '',

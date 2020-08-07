@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { type CommandWithOptions, type SimpleCommand } from './CommandManager';
 import CommandsContext from './CommandsContext';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import isDialogOpen from '../UI/OpenedDialogChecker';
 import { type CommandName } from './CommandsList';
 
 /**
@@ -43,29 +41,6 @@ export const useCommandWithOptions = (
       return () => commandManager.deregisterCommand(commandName);
     },
     [commandManager, commandName, enabled, generateOptions]
-  );
-};
-
-/**
- * Binds Ctrl+P(or Cmd+P) to opening the command palette
- * only if there's no dialog or overlay open on screen
- */
-export const useKeyboardShortcutForCommandPalette = (onOpen: () => void) => {
-  const { values } = React.useContext(PreferencesContext);
-  React.useEffect(
-    () => {
-      const handler = (e: KeyboardEvent) => {
-        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyP') {
-          if (!values.useCommandPalette) return;
-          // Don't open browser's print dialog if palette is enabled
-          e.preventDefault();
-          if (!isDialogOpen()) onOpen();
-        }
-      };
-      document.addEventListener('keydown', handler);
-      return () => document.removeEventListener('keydown', handler);
-    },
-    [onOpen, values.useCommandPalette]
   );
 };
 

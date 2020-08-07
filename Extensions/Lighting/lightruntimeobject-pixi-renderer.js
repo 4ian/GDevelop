@@ -34,34 +34,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     runtimeObject.y - this._radius,
   ]);
   this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
-  var fragmentShader =
-    this._texture === null
-      ? gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader
-      : gdjs.LightRuntimeObjectPixiRenderer.texturedFragmentShader;
-  var shaderUniforms = {
-    center: this._center,
-    radius: this._radius,
-    color: this._color,
-  };
-  if (this._texture) {
-    shaderUniforms.uSampler = this._texture;
-  }
-  var shader = PIXI.Shader.from(
-    gdjs.LightRuntimeObjectPixiRenderer.defaultVertexShader,
-    fragmentShader,
-    shaderUniforms
-  );
-  var geometry = new PIXI.Geometry();
-  geometry
-    .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-    .addIndex(this._indexBuffer);
 
-  /** @type {PIXI.Mesh} */
-  this._light = new PIXI.Mesh(geometry, shader);
-  this._light.blendMode = PIXI.BLEND_MODES.ADD;
+  /** @type {?PIXI.Mesh} */
+  this._light = null;
+  this._updateMesh();
+  
   this._debugLight = null;
   this._debugGraphics = null;
-
   if (this._debugMode) {
     this._debugGraphics = new PIXI.Graphics();
     this._debugGraphics
@@ -175,10 +154,10 @@ gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function 
 };
 
 /**
- * @returns {PIXI.Mesh | PIXI.Container}
+ * @returns {?PIXI.Mesh | PIXI.Container}
  */
 gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
-  if (this._debugMode) {
+  if (this._debugLight) {
     return this._debugLight;
   }
   return this._light;
@@ -187,21 +166,60 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
   if (this._object.isHidden()) return;
 
-  if (this._debugMode) this._updateDebugGraphics();
+  if (this._debugGraphics) this._updateDebugGraphics();
   this._updateBuffers();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype.updateProperties = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype._updateMesh = function () {
+  var fragmentShader =
+    this._texture === null
+      ? gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader
+      : gdjs.LightRuntimeObjectPixiRenderer.texturedFragmentShader;
+  var shaderUniforms = {
+    center: this._center,
+    radius: this._radius,
+    color: this._color,
+  };
+  if (this._texture) {
+    shaderUniforms.uSampler = this._texture;
+  }
+  var shader = PIXI.Shader.from(
+    gdjs.LightRuntimeObjectPixiRenderer.defaultVertexShader,
+    fragmentShader,
+    shaderUniforms
+  );
+  var geometry = new PIXI.Geometry();
+  geometry
+    .addAttribute('aVertexPosition', this._vertexBuffer, 2)
+    .addIndex(this._indexBuffer);
+  if(!this._light) {
+    this._light = new PIXI.Mesh(geometry, shader);
+    this._light.blendMode = PIXI.BLEND_MODES.ADD;
+  } else {
+    this._light.shader = shader;
+    this._light.geometry = geometry;
+  }
+}
+
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateRadius = function () {
   this._radius = this._object.getRadius();
+  this._light.shader.uniforms.radius = this._radius;
+};
+
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
   var objectColor = this._object.getColor();
   this._color = [
     objectColor[0] / 255,
     objectColor[1] / 255,
     objectColor[2] / 255,
   ];
-  this._light.shader.uniforms.radius = this._radius;
   this._light.shader.uniforms.color = this._color;
-};
+}
+
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
+  this._texture = this._object.getPIXITexture();
+  this._updateMesh();
+}
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function () {
   var computedVertices = this._computeLightVertices();
@@ -233,7 +251,6 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
-  console.log(this._radius);
 
   var vertices = this._computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.

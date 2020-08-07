@@ -51,6 +51,9 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
 
+  /** @type {gdjs.RuntimeScene} */
+  this._runtimeScene = runtimeScene;
+
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
 };
@@ -65,6 +68,43 @@ gdjs.LightRuntimeObject.hexToRGBColor = function (hex) {
 
 gdjs.LightRuntimeObject.prototype.getRendererObject = function () {
   return this._renderer.getRendererObject();
+};
+
+/**
+ *
+ * @param {LightObjectData} oldObjectData
+ * @param {LightObjectData} newObjectData
+ */
+gdjs.LightRuntimeObject.prototype.updateFromObjectData = function (
+  oldObjectData,
+  newObjectData
+) {
+  if (oldObjectData.content.radius !== newObjectData.content.radius)
+    this.setRadius(newObjectData.content.radius);
+
+  if (oldObjectData.content.color !== newObjectData.content.radius) {
+    this._color = gdjs.LightRuntimeObject.hexToRGBColor(
+      newObjectData.content.color
+    );
+    this._renderer.updateColor();
+  }
+
+  if (oldObjectData.content.texture !== newObjectData.content.texture) {
+    this._texture =
+      newObjectData.content.texture === ''
+        ? null
+        : this._runtimeScene
+            .getGame()
+            .getImageManager()
+            .getPIXITexture(newObjectData.content.texture);
+    this._renderer.updateTexture();
+  }
+
+  if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
+    return false;
+  }
+
+  return true;
 };
 
 gdjs.LightRuntimeObject.prototype.update = function () {
@@ -84,8 +124,8 @@ gdjs.LightRuntimeObject.prototype.getRadius = function () {
  * @param {number} radius
  */
 gdjs.LightRuntimeObject.prototype.setRadius = function (radius) {
-  this._radius = radius;
-  this._renderer.updateProperties();
+  this._radius = radius > 0 ? radius : 1;
+  this._renderer.updateRadius();
 };
 
 /**
@@ -139,7 +179,7 @@ gdjs.LightRuntimeObject.prototype.setColor = function (color) {
     parseInt(rgbColor[1]),
     parseInt(rgbColor[2]),
   ];
-  this._renderer.updateProperties();
+  this._renderer.updateColor();
 };
 
 /**

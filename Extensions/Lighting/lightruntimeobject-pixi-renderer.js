@@ -38,7 +38,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   /** @type {?PIXI.Mesh} */
   this._light = null;
   this._updateMesh();
-  
+
   this._debugLight = null;
   this._debugGraphics = null;
   if (this._debugMode) {
@@ -192,14 +192,14 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateMesh = function () {
   geometry
     .addAttribute('aVertexPosition', this._vertexBuffer, 2)
     .addIndex(this._indexBuffer);
-  if(!this._light) {
+  if (!this._light) {
     this._light = new PIXI.Mesh(geometry, shader);
     this._light.blendMode = PIXI.BLEND_MODES.ADD;
   } else {
     this._light.shader = shader;
     this._light.geometry = geometry;
   }
-}
+};
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateRadius = function () {
   this._radius = this._object.getRadius();
@@ -214,12 +214,12 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
     objectColor[2] / 255,
   ];
   this._light.shader.uniforms.color = this._color;
-}
+};
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
   this._texture = this._object.getPIXITexture();
   this._updateMesh();
-}
+};
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function () {
   var computedVertices = this._computeLightVertices();

@@ -11,6 +11,7 @@ import {
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
 } from '../ProjectManager/EnumerateProjectItems';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 type Item =
   | gdLayout
@@ -53,9 +54,12 @@ type CommandHandlers = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
+  onOpenCommandPalette: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
+  const preferences = React.useContext(PreferencesContext);
+
   useCommand('QUIT_APP', true, {
     handler: handlers.onCloseApp,
   });
@@ -98,6 +102,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('EXPORT_GAME', !!handlers.project, {
     handler: handlers.onExportGame,
+  });
+
+  useCommand('OPEN_COMMAND_PALETTE', preferences.values.useCommandPalette, {
+    handler: handlers.onOpenCommandPalette,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

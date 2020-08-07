@@ -15,6 +15,7 @@ export type CommandName =
   | 'CLOSE_PROJECT'
   | 'EXPORT_GAME'
   | 'OPEN_RECENT_PROJECT'
+  | 'OPEN_COMMAND_PALETTE'
   | 'OPEN_PROJECT_PROPERTIES'
   | 'OPEN_PROJECT_VARIABLES'
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
@@ -89,6 +90,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'GENERAL',
     displayText: t`Open recent project...`,
   },
+  OPEN_COMMAND_PALETTE: { area: 'IDE', displayText: t`Open command palette` },
 
   // Project manager commands
   OPEN_PROJECT_PROPERTIES: {

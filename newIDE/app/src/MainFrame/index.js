@@ -1739,6 +1739,9 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
+    onOpenCommandPalette: commandPaletteRef.current
+      ? commandPaletteRef.current.open
+      : () => {},
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;

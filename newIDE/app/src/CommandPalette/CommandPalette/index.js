@@ -44,7 +44,10 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
         if (command.handler) {
           // Simple command
           command.handler();
-          setMode('closed');
+          if (command.name !== 'OPEN_COMMAND_PALETTE') {
+            // Don't close palette if the command is for opening it
+            setMode('closed');
+          }
         } else {
           // Command with options
           selectCommand(command);

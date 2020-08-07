@@ -183,6 +183,36 @@ module.exports = {
         'Extensions/Lighting/lightruntimeobject-pixi-renderer.js'
       );
 
+    object
+      .addAction(
+        'SetRadius',
+        _('Set the radius of light object'),
+        _('Set the radius of light object'),
+        _('Set the radius of _PARAM0_ to: _PARAM1_'),
+        '',
+        'CppPlatform/Extensions/lightIcon24.png',
+        'CppPlatform/Extensions/lightIcon16.png'
+      )
+      .addParameter('object', _('Object'), 'LightObject', false)
+      .addParameter('expression', _('Radius'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setRadius');
+
+    object
+      .addAction(
+        'SetColor',
+        _('Set the color of light object'),
+        _('Set the color of light object in format "R;G;B" string.'),
+        _('Set the color of _PARAM0_ to: _PARAM1_'),
+        '',
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('Object'), 'LightObject', false)
+      .addParameter('string', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
+
     return extension;
   },
 

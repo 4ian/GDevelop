@@ -80,6 +80,15 @@ gdjs.LightRuntimeObject.prototype.getRadius = function () {
 };
 
 /**
+ * Set the radius of the light object.
+ * @param {number} radius
+ */
+gdjs.LightRuntimeObject.prototype.setRadius = function (radius) {
+  this._radius = radius;
+  this._renderer.updateProperties();
+};
+
+/**
  * Get the height of the light object.
  * @returns {number} height of light object.
  */
@@ -117,6 +126,20 @@ gdjs.LightRuntimeObject.prototype.getDrawableY = function () {
  */
 gdjs.LightRuntimeObject.prototype.getColor = function () {
   return this._color;
+};
+
+/**
+ * Set the color of the light object in format "R;G;B" string, with components in the range of [0-255].
+ * @param {string} color
+ */
+gdjs.LightRuntimeObject.prototype.setColor = function (color) {
+  var rgbColor = color.split(';');
+  this._color = [
+    parseInt(rgbColor[0]),
+    parseInt(rgbColor[1]),
+    parseInt(rgbColor[2]),
+  ];
+  this._renderer.updateProperties();
 };
 
 /**

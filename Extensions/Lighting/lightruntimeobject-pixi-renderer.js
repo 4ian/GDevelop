@@ -185,10 +185,22 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.getRendererObject = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
-  if(this._object.isHidden()) return;
+  if (this._object.isHidden()) return;
 
   if (this._debugMode) this._updateDebugGraphics();
   this._updateBuffers();
+};
+
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateProperties = function () {
+  this._radius = this._object.getRadius();
+  var objectColor = this._object.getColor();
+  this._color = [
+    objectColor[0] / 255,
+    objectColor[1] / 255,
+    objectColor[2] / 255,
+  ];
+  this._light.shader.uniforms.radius = this._radius;
+  this._light.shader.uniforms.color = this._color;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function () {
@@ -221,6 +233,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
   this._light.shader.uniforms.center = this._center;
+  console.log(this._radius);
 
   var vertices = this._computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.

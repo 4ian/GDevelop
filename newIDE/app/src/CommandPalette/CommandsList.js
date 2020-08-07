@@ -64,7 +64,8 @@ type CommandArea = $Keys<typeof commandAreas>;
 type CommandMetadata = {|
   area: CommandArea,
   displayText: MessageDescriptor,
-  noShortcut?: boolean,
+  noShortcut?: boolean, // If true, command won't show up in shortcuts list
+  ghost?: boolean, // If true, command won't show up in palette
 |};
 
 const commandsList: { [CommandName]: CommandMetadata } = {
@@ -90,7 +91,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'GENERAL',
     displayText: t`Open recent project...`,
   },
-  OPEN_COMMAND_PALETTE: { area: 'IDE', displayText: t`Open command palette` },
+  OPEN_COMMAND_PALETTE: {
+    area: 'IDE',
+    displayText: t`Open command palette`,
+    ghost: true,
+  },
 
   // Project manager commands
   OPEN_PROJECT_PROPERTIES: {

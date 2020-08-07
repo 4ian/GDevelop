@@ -103,7 +103,11 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               <AutocompletePicker
                 i18n={i18n}
                 items={
-                  (commandManager.getAllNamedCommands(): Array<NamedCommand>)
+                  (commandManager
+                    .getAllNamedCommands()
+                    .filter(
+                      command => !commandsList[command.name].ghost
+                    ): Array<NamedCommand>)
                 }
                 placeholder={t`Start typing a command...`}
                 onClose={() => setMode('closed')}

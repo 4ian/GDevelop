@@ -26,6 +26,7 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
+import updateDiscordRichPresence from './Utils/UpdateDiscordRichPresence';
 
 const gd: libGDevelop = global.gd;
 
@@ -34,6 +35,8 @@ export const create = (authentification: Authentification) => {
 
   const appArguments = Window.getArguments();
   const isDev = Window.isDev();
+
+  updateDiscordRichPresence();
 
   return (
     <Providers

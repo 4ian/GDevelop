@@ -18,6 +18,7 @@ const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
+const updateDiscordRichPresence = require('discord-rich-presence')('718194112775454720').updatePresence;
 
 log.info('GDevelop Electron app starting...');
 
@@ -188,6 +189,8 @@ app.on('ready', function() {
       },
     });
   });
+
+  ipcMain.on('update-discord-rp', (event, config) => updateDiscordRichPresence(config));
 
   ipcMain.on('jfxr-changes-saved', (event, newFilePath, externalEditorData) => {
     mainWindow.webContents.send(

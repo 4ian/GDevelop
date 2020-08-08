@@ -113,6 +113,7 @@ import {
 } from './PreviewState';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import updateDiscordRichPresence from '../Utils/UpdateDiscordRichPresence';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -478,7 +479,9 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: null,
           editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         };
-      }).then(() => {});
+      }).then(() => {
+        updateDiscordRichPresence();
+      });
     },
     [currentProject, eventsFunctionsExtensionsState, preferences, setState]
   );
@@ -505,6 +508,8 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: fileMetadata,
           createDialogOpen: false,
         })).then(state => {
+          updateDiscordRichPresence({project: project, resetDate: true});
+
           // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
           // their editor will take care of reloading them.
           eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(

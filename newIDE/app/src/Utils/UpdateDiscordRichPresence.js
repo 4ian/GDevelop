@@ -16,13 +16,13 @@ const updatePresence = (params /*: ?Params */) => {
   params = params || {};
   const { project, resetDate } = params;
 
-  if (resetDate === true) updatePrsence.date = Date.now();
-  updatePrsence.date = updatePrsence.date || Date.now();
+  if (resetDate === true) updatePresence.date = Date.now();
+  updatePresence.date = updatePresence.date || Date.now();
 
   let state = {
     details: 'Making a game with GDevelop.',
     state: 'Not working on any game.',
-    startTimestamp: updatePrsence.date,
+    startTimestamp: updatePresence.date,
     largeImageKey: 'gdicon',
     largeImageText: 'GDevelop',
   };

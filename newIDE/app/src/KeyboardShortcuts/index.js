@@ -2,6 +2,7 @@
 import * as React from 'react';
 import isDialogOpen from '../UI/OpenedDialogChecker';
 import { isMacLike } from '../Utils/Platform';
+import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 // Valid action keys
@@ -59,7 +60,12 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
   if (shiftPressed) shortcutStringPieces.push('Shift');
   if (altPressed) shortcutStringPieces.push('Alt');
   shortcutStringPieces.push(e.code);
-  return shortcutStringPieces.join('+');
+  const shortcutString = shortcutStringPieces.join('+');
+
+  // Check if shortcut string is reserved
+  if (reservedShortcuts.includes(shortcutString)) return;
+
+  return shortcutString;
 };
 
 /**

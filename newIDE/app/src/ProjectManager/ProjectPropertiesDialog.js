@@ -119,7 +119,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
     project.setFolderProject(isFolderProject);
 
-    updateDiscordRichPresence({project: project});
+    updateDiscordRichPresence({ project: project });
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 

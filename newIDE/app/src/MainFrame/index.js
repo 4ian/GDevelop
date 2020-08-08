@@ -508,7 +508,7 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: fileMetadata,
           createDialogOpen: false,
         })).then(state => {
-          updateDiscordRichPresence({project: project, resetDate: true});
+          updateDiscordRichPresence({ project: project, resetDate: true });
 
           // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
           // their editor will take care of reloading them.

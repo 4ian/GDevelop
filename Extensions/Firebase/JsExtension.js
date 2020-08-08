@@ -60,7 +60,7 @@ module.exports = {
           'Triggers an Event/Conversion for the current user on the Analytics.' +
             'Can also pass additional data to the Analytics'
         ),
-        _('Trigger Event _PARAM1_ with argument _PARAM2_'),
+        _('Trigger Event _PARAM0_ with argument _PARAM1_'),
         _('Firebase/Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -86,7 +86,7 @@ module.exports = {
             'so it should always be unique for each user. ' +
             'For advanced usage only.'
         ),
-        _("Set current user's ID to _PARAM1_"),
+        _("Set current user's ID to _PARAM0_"),
         _('Firebase/Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -110,7 +110,7 @@ module.exports = {
           "Sets an user's properties." +
             'Can be used to classify user in Analytics.'
         ),
-        _('Set property _PARAM1_ of the current user to _PARAM2_'),
+        _('Set property _PARAM0_ of the current user to _PARAM1_'),
         _('Firebase/Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'

@@ -5,8 +5,8 @@ const ipc = electron ? electron.ipcRenderer : null;
 
 /*::
 type Params = {
-  project : ?gdProject,
-  resetDate: ?boolean,
+  project?: gdProject,
+  resetDate?: boolean,
 };
 */
 

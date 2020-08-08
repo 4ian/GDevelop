@@ -2533,7 +2533,7 @@ module.exports = {
     ]
   },
   "online-multiplayer": {
-    "description": "An showcase of some multiplayer possibilities using the P2P extension.",
+    "description": "A showcase of some multiplayer possibilities using the P2P extension.",
     "usedExtensions": [
       {
         "fullName": "Text object",

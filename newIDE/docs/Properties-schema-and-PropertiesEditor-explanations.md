@@ -42,8 +42,7 @@ That's why object and behaviors can have "properties". A property is defined by 
 * Their usage is mostly the same in C++. For example, in the case of a Skeleton Object:
 
     ```c++
-    std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(
-        gd::Project& project) const {
+    std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties() const {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Skeletal data filename")]
         .SetValue(skeletalDataFilename)

@@ -7,8 +7,8 @@ declare class gdSkeletonObject {
   getType(): string;
   setTags(tags: string): void;
   getTags(): string;
-  getProperties(project: gdProject): gdMapStringPropertyDescriptor;
-  updateProperty(name: string, value: string, project: gdProject): boolean;
+  getProperties(): gdMapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance, project: gdProject, scene: gdLayout): gdMapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string, project: gdProject, scene: gdLayout): boolean;
   exposeResources(worker: gdArbitraryResourceWorker): void;

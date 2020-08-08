@@ -14,17 +14,20 @@
  * @param {gdjs.RuntimeScenePixiRenderer} runtimeSceneRenderer The scene renderer
  */
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer) {
-  // @ts-ignore
   this._pixiContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
   this._layer = layer;
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
 
-  this._setupFilters();
+  this._pixiContainer.filters = [];
 };
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
+
+gdjs.LayerPixiRenderer.prototype.getRendererObject = function() {
+  return this._pixiContainer;
+}
 
 /**
  * Update the position of the PIXI container. To be called after each change
@@ -62,18 +65,6 @@ gdjs.LayerPixiRenderer.prototype.updateTime = function() {
   for(var filterName in this._filters) {
     var filter = this._filters[filterName];
     filter.update(filter.pixiFilter, this._layer);
-  }
-};
-
-gdjs.LayerPixiRenderer.prototype._setupFilters = function() {
-  var effectsData = this._layer.getEffectsData();
-  if (effectsData.length === 0) {
-    return;
-  }
-
-  this._pixiContainer.filters = [];
-  for (var i = 0; i < effectsData.length; ++i) {
-    this.addEffect(effectsData[i])
   }
 };
 
@@ -134,6 +125,7 @@ gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
   child.zOrder = zOrder; //Extend the pixi object with a z order.
 
   for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
+    // @ts-ignore
     if (this._pixiContainer.children[i].zOrder >= zOrder) {
       //TODO : Dichotomic search
       this._pixiContainer.addChildAt(child, i);

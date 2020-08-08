@@ -6,8 +6,11 @@ import EventsFunctionsExtensionsContext, {
 } from './EventsFunctionsExtensionsContext';
 import {
   loadProjectEventsFunctionsExtensions,
+  type IncludeFileContent,
+  type EventsFunctionCodeWriterCallbacks,
   type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
+  unloadProjectEventsFunctionsExtension,
 } from '.';
 import {
   type EventsFunctionsExtensionWriter,
@@ -16,11 +19,12 @@ import {
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+import xxhashjs from 'xxhashjs';
 
 type Props = {|
   children: React.Node,
   i18n: I18nType,
-  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
@@ -37,6 +41,12 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
   State
 > {
+  _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
+    {
+      onWriteFile: this._onWriteFile.bind(this),
+    }
+  );
+  _includeFileHashs: { [string]: number } = {};
   _lastLoadPromise: ?Promise<void> = null;
   state = {
     eventsFunctionsExtensionsError: null,
@@ -44,6 +54,9 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       this
     ),
     unloadProjectEventsFunctionsExtensions: this._unloadProjectEventsFunctionsExtensions.bind(
+      this
+    ),
+    unloadProjectEventsFunctionsExtension: this._unloadProjectEventsFunctionsExtension.bind(
       this
     ),
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
@@ -54,7 +67,14 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       this.props.eventsFunctionsExtensionWriter,
     getEventsFunctionsExtensionOpener: () =>
       this.props.eventsFunctionsExtensionOpener,
+    getIncludeFileHashs: () => this._includeFileHashs,
   };
+
+  _onWriteFile({ includeFile, content }: IncludeFileContent) {
+    this._includeFileHashs[includeFile] = xxhashjs
+      .h32(content, 0xabcd)
+      .toNumber();
+  }
 
   _ensureLoadFinished(): Promise<void> {
     if (this._lastLoadPromise) {
@@ -73,7 +93,8 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   }
 
   _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
-    const { i18n, eventsFunctionCodeWriter } = this.props;
+    const { i18n } = this.props;
+    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
     if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
     const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
@@ -111,6 +132,13 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {
     unloadProjectEventsFunctionsExtensions(project);
+  }
+
+  _unloadProjectEventsFunctionsExtension(
+    project: gdProject,
+    extensionName: string
+  ) {
+    unloadProjectEventsFunctionsExtension(project, extensionName);
   }
 
   _reloadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {

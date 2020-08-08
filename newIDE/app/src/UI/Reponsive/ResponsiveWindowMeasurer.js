@@ -18,7 +18,7 @@ export const ResponsiveWindowMeasurer = ({ children }: Props) => {
   }
 
   return children(
-    window.innerWidth < 750 || window.innerHeight < 475
+    window.innerWidth < 750 || window.innerHeight < 350
       ? 'small'
       : window.innerWidth < 1150
       ? 'medium'

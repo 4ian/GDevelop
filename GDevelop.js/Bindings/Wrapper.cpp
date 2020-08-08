@@ -78,6 +78,7 @@
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
+#include <GDJS/IDE/ExporterHelper.h>
 
 #include <emscripten.h>
 #include "ProjectHelper.h"

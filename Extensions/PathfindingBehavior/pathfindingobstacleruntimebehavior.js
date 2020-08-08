@@ -104,6 +104,17 @@ gdjs.PathfindingObstacleRuntimeBehavior = function(runtimeScene, behaviorData, o
 gdjs.PathfindingObstacleRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.registerBehavior("PathfindingBehavior::PathfindingObstacleBehavior", gdjs.PathfindingObstacleRuntimeBehavior);
 
+gdjs.PathfindingObstacleRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.impassable !== newBehaviorData.impassable) {
+        this.setImpassable(newBehaviorData.impassable);
+    }
+    if (oldBehaviorData.cost !== newBehaviorData.cost) {
+        this.setCost(newBehaviorData.cost);
+    }
+
+    return true;
+};
+
 gdjs.PathfindingObstacleRuntimeBehavior.prototype.onDestroy = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removeObstacle(this);
 };

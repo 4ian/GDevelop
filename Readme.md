@@ -4,7 +4,7 @@ GDevelop is a full-featured, open-source game development software, allowing to 
 
 ![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
-Getting started [![Test status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master)
+Getting started [![Test status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 ---------------
 
 | ❔ I want to... | 🚀 What to do |

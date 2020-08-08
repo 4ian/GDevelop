@@ -566,7 +566,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
       const videoResource = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('videoResource')
         .getValue();
 
@@ -583,20 +583,19 @@ module.exports = {
     RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
       const videoResource = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('videoResource')
         .getValue();
       if (videoResource !== this._videoResource) {
         this._videoResource = videoResource;
         this._pixiObject.texture = this._getVideoTexture();
 
-        if (this._pixiObject.texture.noFrame) {
+        if (!this._pixiObject.texture.baseTexture.valid) {
           var that = this;
 
-          // Try to display an error texture in case of error, though
-          // for some reason "error" is never called.
           that._pixiObject.texture.on('error', function () {
             that._pixiObject.texture.off('error', this);
+
             that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
           });
         }
@@ -604,7 +603,7 @@ module.exports = {
 
       // Update opacity
       const opacity = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('Opacity')
         .getValue();
       this._pixiObject.alpha = opacity / 255;

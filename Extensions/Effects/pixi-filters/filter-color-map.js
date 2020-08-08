@@ -1,6 +1,6 @@
 /*!
- * @pixi/filter-color-map - v3.0.3
- * Compiled Wed, 29 May 2019 03:04:05 UTC
+ * @pixi/filter-color-map - v3.1.1
+ * Compiled Wed, 08 Apr 2020 11:09:37 UTC
  *
  * @pixi/filter-color-map is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license

@@ -48,6 +48,38 @@ gdjs.PathfindingRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 gdjs.PathfindingRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.registerBehavior("PathfindingBehavior::PathfindingBehavior", gdjs.PathfindingRuntimeBehavior);
 
+gdjs.PathfindingRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
+        this.allowDiagonals(newBehaviorData.allowDiagonals);
+    }
+    if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
+        this.setAcceleration(newBehaviorData.acceleration);
+    }
+    if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
+        this.setMaxSpeed(newBehaviorData.maxSpeed);
+    }
+    if (oldBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
+        this.setAngularMaxSpeed(newBehaviorData.angularMaxSpeed);
+    }
+    if (oldBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
+        this.setRotateObject(newBehaviorData.rotateObject);
+    }
+    if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
+        this.setAngleOffset(newBehaviorData.angleOffset);
+    }
+    if (oldBehaviorData.cellWidth !== newBehaviorData.cellWidth) {
+        this.setCellWidth(newBehaviorData.cellWidth);
+    }
+    if (oldBehaviorData.cellHeight !== newBehaviorData.cellHeight) {
+        this.setCellHeight(newBehaviorData.cellHeight);
+    }
+    if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
+        this.setExtraBorder(newBehaviorData.extraBorder);
+    }
+
+    return true;
+}
+
 gdjs.PathfindingRuntimeBehavior.prototype.setCellWidth = function(width) {
     this._cellWidth = width;
 };

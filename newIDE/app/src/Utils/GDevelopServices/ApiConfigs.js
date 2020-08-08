@@ -7,7 +7,7 @@ export const GDevelopGamePreviews = {
 
 export const GDevelopBuildApi = {
   baseUrl: isDev
-    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
+    ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/build',
 };
 

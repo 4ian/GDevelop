@@ -53,9 +53,9 @@ gdjs.Physics2SharedData = function(runtimeScene, sharedData) {
     var behaviorB = contact.GetFixtureB().GetBody().gdjsAssociatedBehavior;
     // Remove each other contact
     var i = behaviorA.currentContacts.indexOf(behaviorB);
-    if (i !== -1) behaviorA.currentContacts.remove(i);
+    if (i !== -1) behaviorA.currentContacts.splice(i, 1);
     i = behaviorB.currentContacts.indexOf(behaviorA);
-    if (i !== -1) behaviorB.currentContacts.remove(i);
+    if (i !== -1) behaviorB.currentContacts.splice(i, 1);
   };
 
   this.contactListener.PreSolve = function() {};
@@ -250,6 +250,75 @@ gdjs.Physics2RuntimeBehavior.prototype.b2Vec2Sec = function(x, y) {
   this._tempb2Vec2Sec.set_x(x);
   this._tempb2Vec2Sec.set_y(y);
   return this._tempb2Vec2Sec;
+};
+
+gdjs.Physics2RuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  if (oldBehaviorData.bullet !== newBehaviorData.bullet) {
+    this.setBullet(newBehaviorData.bullet);
+  }
+  if (oldBehaviorData.fixedRotation !== newBehaviorData.fixedRotation) {
+    this.setFixedRotation(newBehaviorData.fixedRotation);
+  }
+  if (oldBehaviorData.canSleep !== newBehaviorData.canSleep) {
+    this.setSleepingAllowed(newBehaviorData.canSleep);
+  }
+  if (oldBehaviorData.shapeDimensionA !== newBehaviorData.shapeDimensionA) {
+    this.shapeDimensionA = newBehaviorData.shapeDimensionA;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
+    this.shapeDimensionB = newBehaviorData.shapeDimensionB;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeOffsetX !== newBehaviorData.shapeOffsetX) {
+    this.shapeOffsetX = newBehaviorData.shapeOffsetX;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.shapeOffsetY !== newBehaviorData.shapeOffsetY) {
+    this.shapeOffsetY = newBehaviorData.shapeOffsetY;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.polygonOrigin !== newBehaviorData.polygonOrigin) {
+    this.polygonOrigin = newBehaviorData.polygonOrigin;
+    this.recreateShape();
+  }
+  if (oldBehaviorData.density !== newBehaviorData.density) {
+    this.setDensity(newBehaviorData.density);
+  }
+  if (oldBehaviorData.friction !== newBehaviorData.friction) {
+    this.setFriction(newBehaviorData.friction);
+  }
+  if (oldBehaviorData.restitution !== newBehaviorData.restitution) {
+    this.setRestitution(newBehaviorData.restitution);
+  }
+  if (oldBehaviorData.linearDamping !== newBehaviorData.linearDamping) {
+    this.setLinearDamping(newBehaviorData.linearDamping);
+  }
+  if (oldBehaviorData.angularDamping !== newBehaviorData.angularDamping) {
+    this.setAngularDamping(newBehaviorData.angularDamping);
+  }
+  if (oldBehaviorData.gravityScale !== newBehaviorData.gravityScale) {
+    this.setGravityScale(newBehaviorData.gravityScale);
+  }
+
+  // TODO: make these properties updatable.
+  if (oldBehaviorData.layers !== newBehaviorData.layers) {
+    return false;
+  }
+  if (oldBehaviorData.masks !== newBehaviorData.masks) {
+    return false;
+  }
+  if (oldBehaviorData.vertices !== newBehaviorData.vertices) {
+    return false;
+  }
+  if (oldBehaviorData.bodyType !== newBehaviorData.bodyType) {
+    return false;
+  }
+  if (oldBehaviorData.shape !== newBehaviorData.shape) {
+    return false;
+  }
+
+  return true;
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
@@ -573,10 +642,21 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPreEvents = function(
 gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
   runtimeScene
 ) {
+  this._updateBodyFromObject();
+
+  // Reset world step to update next frame
+  this._sharedData.stepped = false;
+};
+
+gdjs.Physics2RuntimeBehavior.prototype.onObjectHotReloaded = function() {
+  this._updateBodyFromObject();
+}
+
+gdjs.Physics2RuntimeBehavior.prototype._updateBodyFromObject = function() {
   // If there is no body, set a new one
   if (this._body === null) this.createBody();
 
-  // GD object size has changed, recreate shape
+  // The object size has changed, recreate the shape.
   // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
   // The height has changed, the shape is not an edge (edges doesn't have height),
   // it isn't a box with custom height or a circle with custom radius
@@ -591,7 +671,7 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
     this.recreateShape();
   }
 
-  // GD object transform has changed, update body transform
+  // The object object transform has changed, update body transform:
   if (
     this._objectOldX !== this.owner.getX() ||
     this._objectOldY !== this.owner.getY() ||
@@ -606,10 +686,7 @@ gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(
     this._body.SetTransform(pos, gdjs.toRad(this.owner.getAngle()));
     this._body.SetAwake(true);
   }
-
-  // Reset world step to update next frame
-  this._sharedData.stepped = false;
-};
+}
 
 gdjs.Physics2RuntimeBehavior.prototype.getGravityX = function() {
   return this._sharedData.gravityX;

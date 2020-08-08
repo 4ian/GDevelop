@@ -36,6 +36,7 @@ import {
   getTagsFromString,
 } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const styles = {
   listContainer: {
@@ -99,6 +100,7 @@ type Props = {|
 
   getThumbnail: (project: gdProject, object: Object) => string,
   unsavedChanges?: ?UnsavedChanges,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -600,6 +602,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                 the health of the object.
               </Trans>
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {tagEditedObject && (

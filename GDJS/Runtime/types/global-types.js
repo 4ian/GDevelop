@@ -7,6 +7,7 @@
 // Import all the types as global typedefs so that they can be used
 // in any JS file of the game engine/extensions/tests. This file is not read by JSDoc
 // because it's not compatible with these TypeScript definitions and import.
+
 /**
  * @typedef { import("./project-data").ProjectData } ProjectData
  * @typedef { import("./project-data").ProjectPropertiesData } ProjectPropertiesData
@@ -19,4 +20,9 @@
  * @typedef { import("./project-data").EffectData } EffectData
  * @typedef { import("./project-data").ResourceData } ResourceData
  * @typedef { import("./project-data").ResourcesData } ResourcesData
+ * @typedef { import("./project-data").BehaviorSharedData } BehaviorSharedData
+ */
+
+/**
+ * @typedef { import("pixi.js") } PIXI
  */

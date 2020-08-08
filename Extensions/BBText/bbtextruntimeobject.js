@@ -2,7 +2,7 @@
  * @typedef {Object} BBTextObjectDataType Base parameters for {@link gdjs.BBTextRuntimeObject}
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
- * @property {boolean} content.visible Is the text visible?
+ * @property {boolean} content.visible Deprecated - Is the text visible?
  * @property {string} content.text Content of the text
  * @property {string} content.color The color of the text
  * @property {string} content.fontFamily The font of the text
@@ -27,8 +27,6 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type {number} */
   this._opacity = parseFloat(objectData.content.opacity);
   // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
-  /** @type {boolean} */
-  this._visible = objectData.content.visible;
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {string} */
@@ -48,8 +46,11 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
-    /** @type {gdjs.BBTextRuntimeObjectRenderer} */
     this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
+
+  // While this should rather be exposed as a property for all objects, honor the "visible"
+  // property that is specific to this object.
+  this.hidden = !objectData.content.visible;
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
@@ -65,13 +66,48 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
+ * @param {BBTextObjectDataType} oldObjectData
+ * @param {BBTextObjectDataType} newObjectData
+ */
+gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.visible !== newObjectData.content.visible) {
+    this.hide(!newObjectData.content.visible);
+  }
+  if (oldObjectData.content.text !== newObjectData.content.text) {
+    this.setBBText(newObjectData.content.text);
+  }
+  if (oldObjectData.content.color !== newObjectData.content.color) {
+    this._color = newObjectData.content.color;
+    this._renderer.updateColor();
+  }
+  if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
+    this.setFontFamily(newObjectData.content.fontFamily);
+  }
+  if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
+    this.setFontSize(newObjectData.content.fontSize);
+  }
+  if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
+    this.setWordWrap(newObjectData.content.wordWrap);
+  }
+  if (oldObjectData.content.align !== newObjectData.content.align) {
+    this.setAlignment(newObjectData.content.align);
+  }
+
+  return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);
+  else
+    this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
@@ -79,13 +115,16 @@ gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
 };
 
 /**
- * Set/Get BBText base style properties
+ * Set the markup text to display.
  */
 gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
   this._text = text;
   this._renderer.updateText();
 };
 
+/**
+ * Get the markup text displayed by the object.
+ */
 gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
   return this._text;
 };

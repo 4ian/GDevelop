@@ -10,7 +10,7 @@ type Params = {
 };
 */
 
-const updatePrsence = (params /*: ?Params */) => {
+const updatePresence = (params /*: ?Params */) => {
   if (ipc === null) return;
 
   params = params || {};
@@ -32,4 +32,4 @@ const updatePrsence = (params /*: ?Params */) => {
   ipc.send('update-discord-rp', state);
 };
 
-export default updatePrsence;
+export default updatePresence;

@@ -32,7 +32,7 @@ gdjs.evtTools.firebase.functions = {
     firebase
       .functions()
       .httpsCallable(httpFunctionName)
-      .__call(param)
+      (param)
       .then((response) => response.data)
       .then((data) => {
         if (callbackValueVariable)

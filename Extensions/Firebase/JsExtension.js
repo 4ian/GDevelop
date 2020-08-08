@@ -851,7 +851,7 @@ module.exports = {
         'StopTracer',
         _('Stop a tracer'),
         _('Stop measuring performance for that tracer'),
-        _('Stop Performance Measuring on tracer _PARAM0_'),
+        _('Stop performance measuring on tracer _PARAM0_'),
         _('Firebase/Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -873,7 +873,7 @@ module.exports = {
         'RecordTracer',
         _('Record performance'),
         _(
-          'Record performance from a fixed start to end time. ' +
+          'Record performance for a delimited period of time. ' +
             'Use this if you want to measure the performance for a specified duration.'
         ),
         _(
@@ -908,7 +908,7 @@ module.exports = {
       .addAction(
         'CallHttpFunction',
         _('Call a HTTP function'),
-        _('Calls a HTTP function by name, and put the result in.'),
+        _('Calls a HTTP function by name, and store the result in a variable.'),
         _(
           'Call HTTP Function _PARAM0_ with parameter(s) _PARAM1_ ' +
             '(Callback variables: Value: _PARAM2_ State: _PARAM3_)'
@@ -1165,7 +1165,7 @@ module.exports = {
         _('Get a document from firestore'),
         _('Gets a firestore document and store it in a variable.'),
         _(
-          'Load firestore document _PARAM1_ in collection _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'
+          'Load firestore document _PARAM1_ from collection _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',

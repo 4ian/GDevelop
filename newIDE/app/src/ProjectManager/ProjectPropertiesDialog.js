@@ -453,10 +453,10 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 ) : (
                   <Trans>
                     {`
-                    The Firebase Configuration is not valid JSON. Make sure that
+                    The Firebase configuration is not valid JSON. Make sure that
                     you only include what is between the {} and include the {}.
                     Make sure the text before the : is also wrapped in "". Make
-                    sure that tere is a , after every configuration string
+                    sure that there is a , after every configuration string
                     except the latest.
                     `}
                   </Trans>

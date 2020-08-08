@@ -53,7 +53,14 @@ const addLightObstacle = (runtimeScene, width, height) => {
 };
 
 describe('gdjs.LightRuntimeObject', function () {
-  const runtimeScene = new gdjs.RuntimeScene(null);
+  const runtimeGame = new gdjs.RuntimeGame({
+    variables: [],
+    resources: {
+      resources: [],
+    },
+    properties: { windowWidth: 800, windowHeight: 600 },
+  });
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   const lightObj = addLightObject(runtimeScene, 100);
   lightObj.setPosition(200, 200);
 
@@ -109,50 +116,105 @@ describe('Light with obstacles around it', function () {
     const vertexBuffer = light._renderer._vertexBuffer;
     const indexBuffer = light._renderer._indexBuffer;
     const vertexData = [
-      200, 200,
-      100, 100.0199966430664,
-      100, 100,
-      100.0199966430664, 100,
-      299.9800109863281, 100,
-      300, 100,
-      300, 100.0199966430664,
-      300, 249.9875030517578,
-      300, 250,
-      299.9750061035156, 250,
-      250.00999450683594, 250,
-      250, 250,
-      250, 250.00999450683594,
-      250, 299.9750061035156,
-      250, 300,
-      249.9875030517578, 300,
-      100.0199966430664, 300,
-      100, 300,
-      100, 299.9800109863281
+      200,
+      200,
+      100,
+      100.0199966430664,
+      100,
+      100,
+      100.0199966430664,
+      100,
+      299.9800109863281,
+      100,
+      300,
+      100,
+      300,
+      100.0199966430664,
+      300,
+      249.9875030517578,
+      300,
+      250,
+      299.9750061035156,
+      250,
+      250.00999450683594,
+      250,
+      250,
+      250,
+      250,
+      250.00999450683594,
+      250,
+      299.9750061035156,
+      250,
+      300,
+      249.9875030517578,
+      300,
+      100.0199966430664,
+      300,
+      100,
+      300,
+      100,
+      299.9800109863281,
     ];
     const indexData = [
-      0, 1, 2,
-      0, 2, 3,
-      0, 3, 4,
-      0, 4, 5,
-      0, 5, 6,
-      0, 6, 7,
-      0, 7, 8,
-      0, 8, 9,
-      0, 9, 10,
-      0, 10, 11,
-      0, 11, 12,
-      0, 12, 13,
-      0, 13, 14,
-      0, 14, 15,
-      0, 15, 16,
-      0, 16, 17,
-      0, 17, 18,
-      0, 18, 1
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
+      0,
+      3,
+      4,
+      0,
+      4,
+      5,
+      0,
+      5,
+      6,
+      0,
+      6,
+      7,
+      0,
+      7,
+      8,
+      0,
+      8,
+      9,
+      0,
+      9,
+      10,
+      0,
+      10,
+      11,
+      0,
+      11,
+      12,
+      0,
+      12,
+      13,
+      0,
+      13,
+      14,
+      0,
+      14,
+      15,
+      0,
+      15,
+      16,
+      0,
+      16,
+      17,
+      0,
+      17,
+      18,
+      0,
+      18,
+      1,
     ];
 
     vertexData.forEach((val, index) => {
       expect(vertexBuffer[index]).to.be(val);
-    }); 
+    });
     indexData.forEach((val, index) => {
       expect(indexBuffer[index]).to.be(val);
     });
@@ -166,56 +228,111 @@ describe('Light with obstacles around it', function () {
     const vertexBuffer = light._renderer._vertexBuffer;
     const indexBuffer = light._renderer._indexBuffer;
     const vertexData = [
-      200, 200,
-      100, 100.0199966430664,
-      100, 100,
-      100.0199966430664, 100,
-      299.9800109863281, 100,
-      300, 100,
-      300, 100.0199966430664,
-      300, 299.9800109863281,
-      300, 300,
-      299.9800109863281, 300,
-      200.00999450683594, 300, 
-      200, 250, 
-      199.9949951171875, 250,
-      175.00625610351562, 250,
-      175, 250,
-      174.99374389648438, 250,
-      150.00999450683594, 250,
-      150, 250,
-      100, 299.9800109863281,
+      200,
+      200,
+      100,
+      100.0199966430664,
+      100,
+      100,
+      100.0199966430664,
+      100,
+      299.9800109863281,
+      100,
+      300,
+      100,
+      300,
+      100.0199966430664,
+      300,
+      299.9800109863281,
+      300,
+      300,
+      299.9800109863281,
+      300,
+      200.00999450683594,
+      300,
+      200,
+      250,
+      199.9949951171875,
+      250,
+      175.00625610351562,
+      250,
+      175,
+      250,
+      174.99374389648438,
+      250,
+      150.00999450683594,
+      250,
+      150,
+      250,
+      100,
+      299.9800109863281,
     ];
     const indexData = [
-      0, 1, 2,
-      0, 2, 3,
-      0, 3, 4,
-      0, 4, 5,
-      0, 5, 6,
-      0, 6, 7,
-      0, 7, 8,
-      0, 8, 9,
-      0, 9, 10,
-      0, 10, 11,
-      0, 11, 12,
-      0, 12, 13,
-      0, 13, 14,
-      0, 14, 15,
-      0, 15, 16,
-      0, 16, 17,
-      0, 17, 18,
-      0, 18, 1
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
+      0,
+      3,
+      4,
+      0,
+      4,
+      5,
+      0,
+      5,
+      6,
+      0,
+      6,
+      7,
+      0,
+      7,
+      8,
+      0,
+      8,
+      9,
+      0,
+      9,
+      10,
+      0,
+      10,
+      11,
+      0,
+      11,
+      12,
+      0,
+      12,
+      13,
+      0,
+      13,
+      14,
+      0,
+      14,
+      15,
+      0,
+      15,
+      16,
+      0,
+      16,
+      17,
+      0,
+      17,
+      18,
+      0,
+      18,
+      1,
     ];
 
     vertexData.forEach((val, index) => {
       expect(vertexBuffer[index]).to.be(val);
-    }); 
+    });
     indexData.forEach((val, index) => {
       expect(indexBuffer[index]).to.be(val);
     });
   });
 
-  it("Obstacle moved outside light's radius.", function() {
+  it("Obstacle moved outside light's radius.", function () {
     obstacle.setPosition(400, 400);
     runtimeScene.renderAndStep();
     light.update();
@@ -225,20 +342,12 @@ describe('Light with obstacles around it', function () {
 
     const vertexBuffer = light._renderer._defaultVertexBuffer;
     const indexBuffer = gdjs.LightRuntimeObjectPixiRenderer._defaultIndexBuffer;
-    const vertexData = [
-      100, 300,
-      300, 300,
-      300, 100,
-      100, 100,
-    ];
-    const indexData = [
-     0, 1, 2,
-     0, 2, 3,
-    ];
+    const vertexData = [100, 300, 300, 300, 300, 100, 100, 100];
+    const indexData = [0, 1, 2, 0, 2, 3];
 
     vertexData.forEach((val, index) => {
       expect(vertexBuffer[index]).to.be(val);
-    }); 
+    });
     indexData.forEach((val, index) => {
       expect(indexBuffer[index]).to.be(val);
     });

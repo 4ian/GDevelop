@@ -16,7 +16,6 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[1] / 255,
     objectColor[2] / 255,
   ];
-  this._debugMode = runtimeObject.getDebugMode();
 
   /** @type {?PIXI.Texture} */
   this._texture = runtimeObject.getPIXITexture();
@@ -39,25 +38,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._light = null;
   this._updateMesh();
 
+  this._isPreview = runtimeScene.getGame().isPreview();
+  this._debugMode = null;
+  /** @type {?PIXI.Container} */
   this._debugLight = null;
+  /** @type {?PIXI.Graphics} */
   this._debugGraphics = null;
-  if (this._debugMode) {
-    this._debugGraphics = new PIXI.Graphics();
-    this._debugGraphics
-      .lineStyle(1, 0xff0000, 1)
-      .moveTo(this._object.x, this._object.y)
-      .lineTo(this._object.x - this._radius, this._object.y + this._radius)
-      .moveTo(this._object.x, this._object.y)
-      .lineTo(this._object.x + this._radius, this._object.y + this._radius)
-      .moveTo(this._object.x, this._object.y)
-      .lineTo(this._object.x + this._radius, this._object.y - this._radius)
-      .moveTo(this._object.x, this._object.y)
-      .lineTo(this._object.x - this._radius, this._object.y - this._radius);
-
-    this._debugLight = new PIXI.Container();
-    this._debugLight.addChild(this._light);
-    this._debugLight.addChild(this._debugGraphics);
-  }
+  this.updateDebugMode();
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
@@ -221,8 +208,49 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
   this._updateMesh();
 };
 
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugMode = function () {
+  this._debugMode = this._object.getDebugMode();
+  if (!this._debugLight && (this._isPreview || this._debugMode)) {
+    this._debugLight = new PIXI.Container();
+    this._debugLight.addChild(this._light);
+  }
+
+  if (this._debugMode && !this._debugGraphics) {
+    this._debugGraphics = new PIXI.Graphics();
+    this._debugLight.addChild(this._debugGraphics);
+  }
+
+  if (!this._debugMode && this._debugGraphics) {
+    this._debugLight.removeChild(this._debugGraphics);
+    this._debugGraphics.destroy();
+    this._debugGraphics = null;
+  }
+
+  this.ensureUpToDate();
+};
+
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function () {
   var computedVertices = this._computeLightVertices();
+
+  if (!computedVertices.length) {
+    this._debugGraphics.clear();
+    this._debugGraphics
+      .lineStyle(1, 0xff0000, 1)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x - this._radius, this._object.y + this._radius)
+      .lineTo(this._object.x + this._radius, this._object.y + this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x + this._radius, this._object.y + this._radius)
+      .lineTo(this._object.x + this._radius, this._object.y - this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x + this._radius, this._object.y - this._radius)
+      .lineTo(this._object.x - this._radius, this._object.y - this._radius)
+      .moveTo(this._object.x, this._object.y)
+      .lineTo(this._object.x - this._radius, this._object.y - this._radius)
+      .lineTo(this._object.x - this._radius, this._object.y + this._radius);
+    return;
+  }
+
   var vertices = new Array(2 * computedVertices.length + 2);
   vertices[0] = this._object.x;
   vertices[1] = this._object.y;

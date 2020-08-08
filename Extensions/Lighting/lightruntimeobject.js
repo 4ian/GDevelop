@@ -101,7 +101,8 @@ gdjs.LightRuntimeObject.prototype.updateFromObjectData = function (
   }
 
   if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
-    return false;
+    this._debugMode = newObjectData.content.debugMode;
+    this._renderer.updateDebugMode();
   }
 
   return true;

@@ -202,7 +202,7 @@ module.exports = {
         'SetRender',
         _('Render'),
         _('Set Render'),
-        _('Set the render of _PARAM0_ to _PARAM1_'),
+        _('Set render of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/skeletonicon.png',
         'JsPlatform/Extensions/skeletonicon.png'
@@ -223,6 +223,7 @@ module.exports = {
         'IsLayerIndex',
         _('Layer index'),
         _('Compare the value of the layer index.'),
+        _('the layer index'),
         '',
         'JsPlatform/Extensions/skeletonicon.png',
         'JsPlatform/Extensions/skeletonicon.png'
@@ -237,7 +238,7 @@ module.exports = {
         'SetLayerIndex',
         _('Layer index'),
         _('Set Layer index'),
-        _('Do _PARAM1__PARAM2_ to the layer index of _PARAM0_'),
+        _('the layer index'),
         '',
         'JsPlatform/Extensions/skeletonicon.png',
         'JsPlatform/Extensions/skeletonicon.png'

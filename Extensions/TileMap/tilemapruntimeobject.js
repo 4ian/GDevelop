@@ -19,8 +19,6 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   this._render = objectData.content.render;
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
-  /** @type {boolean} */
-  this._visible = objectData.content.visible;
 
   if (this._renderer)
     gdjs.TileMapRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -53,6 +51,21 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   }
   if (oldObjectData.content.visible !== newObjectData.content.visible) {
     this.hide(!newObjectData.content.visible);
+  }
+  if (oldObjectData.content.tiledFile !== newObjectData.content.tiledFile) {
+    this.setTiledFile(newObjectData.content.tiledFile);
+  }
+  if (
+    oldObjectData.content.tilemapAtlasImage !==
+    newObjectData.content.tilemapAtlasImage
+  ) {
+    this.setTilemapAtlasImage(newObjectData.content.tilemapAtlasImage);
+  }
+  if (oldObjectData.content.render !== newObjectData.content.render) {
+    this.setRender(newObjectData.content.render);
+  }
+  if (oldObjectData.content.layerIndex !== newObjectData.content.layerIndex) {
+    this.setLayerIndex(newObjectData.content.layerIndex);
   }
 
   return true;
@@ -113,12 +126,12 @@ gdjs.RuntimeObject.prototype.setLayerIndex = function(layerIndex) {
 gdjs.RuntimeObject.prototype.getLayerIndex = function() {
   return this._layerIndex;
 };
-gdjs.RuntimeObject.prototype.setVisible = function(visible) {
+gdjs.TileMapRuntimeObject.prototype.setVisible = function(visible) {
   this._visible = visible;
   this._renderer.updateVisible();
 };
 
-gdjs.RuntimeObject.prototype.getVisible = function() {
+gdjs.TileMapRuntimeObject.prototype.getVisible = function() {
   return this._visible;
 };
 

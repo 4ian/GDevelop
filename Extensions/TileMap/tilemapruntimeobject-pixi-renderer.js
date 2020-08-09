@@ -83,11 +83,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
   //this._pixiObject.dirty = true;
   this.updatePosition();
 };
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateVisible = function() {
-  this._pixiObject._visible = this._object._visible;
-  //this._pixiObject.dirty = true;
-  this.updatePosition();
-};
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;

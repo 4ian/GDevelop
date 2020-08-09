@@ -34,7 +34,7 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
 gdjs.TileMapRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.TileMapRuntimeObject.thisIsARuntimeObjectConstructor = 'TileMap::TileMap';
+gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);
 
 gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();

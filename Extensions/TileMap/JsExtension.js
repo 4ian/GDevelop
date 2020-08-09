@@ -10,8 +10,6 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
-//
-
 
 module.exports = {
   createExtension: function(_, gd) {
@@ -124,7 +122,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
       )
-      .addIncludeFile('Extensions/TileMap/pixi-tilemap.js');
+    //   .addIncludeFile('Extensions/TileMap/pixi-tilemap.js');
 
     object
       .addCondition(
@@ -213,7 +211,7 @@ module.exports = {
       .addParameter(
         'stringWithSelector',
         _('Render'),
-        '[ "visible", "all", "index"]',
+        '["visible", "all", "index"]',
         false
       )
       .getCodeExtraInformation()
@@ -331,10 +329,10 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    const ImportedExtLib = objectsRenderingService.requireModule(
-      __dirname,
-      'pixi-tilemap'
-    );
+    // const ImportedExtLib = objectsRenderingService.requireModule(
+    //   __dirname,
+    //   'pixi-tilemap'
+    // );
 
     /**
      * Renderer for instances of TileMap inside the IDE.
@@ -361,7 +359,7 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
+      this._pixiObject = new PIXI.Container();//new PIXI.tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
       //this._pixiObject.anchor.x = 0.5;
       //this._pixiObject.anchor.y = 0.5;
@@ -376,7 +374,7 @@ module.exports = {
         pixiResourcesLoader
       );
       this.update();
-      this.updateTileMap();
+    //   this.updateTileMap();
     }
     RenderedTileMapInstance.prototype = Object.create(
       RenderedInstance.prototype
@@ -393,9 +391,9 @@ module.exports = {
       return 'JsPlatform/Extensions/skeletonicon.png';
     };
     /**
-      * This is called to update the Tilemap
-      */
-    RenderedTileMapInstance.prototype.updateTileMap = function () {
+     * This is called to update the TileMap
+     */
+    RenderedTileMapInstance.prototype.updateTileMap = function() {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)

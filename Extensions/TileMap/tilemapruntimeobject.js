@@ -7,19 +7,19 @@
 gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  /** @type number */
+  /** @type {number} */
   this._opacity = objectData.content.opacity;
-  /** @type boolean */
+  /** @type {boolean} */
   this._visible = objectData.content.visible;
-  /** @type string */
+  /** @type {string} */
   this._tiledFile = objectData.content.tiledFile;
-  /** @type string */
+  /** @type {string} */
   this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
-  /** @type string */
+  /** @type {string} */
   this._render = objectData.content.render;
-  /** @type number */
+  /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
-  /** @type boolean */
+  /** @type {boolean} */
   this._visible = objectData.content.visible;
 
   if (this._renderer)
@@ -41,15 +41,32 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
+ * @param { TileMapObjectDataType} oldObjectData
+ * @param { TileMapObjectDataType} newObjectData
+ */
+gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
+  oldObjectData,
+  newObjectData
+) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.visible !== newObjectData.content.visible) {
+    this.hide(!newObjectData.content.visible);
+  }
+
+  return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
 gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
-  if (initialInstanceData.customSize)
-    this.setWrappingWidth(initialInstanceData.width);
+  if (initialInstanceData.customSize) {
+  }
 };
 
 gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
@@ -146,22 +163,6 @@ gdjs.TileMapRuntimeObject.prototype.setOpacity = function(opacity) {
  */
 gdjs.TileMapRuntimeObject.prototype.getOpacity = function() {
   return this._opacity;
-};
-
-/**
- * Set the width.
- * @param {number} width The new width in pixels.
- */
-gdjs.TileMapRuntimeObject.prototype.setWrappingWidth = function(width) {
-  this._width = width;
-  this._renderer.updateWidth();
-};
-
-/**
- * Get the width of the object.
- */
-gdjs.TileMapRuntimeObject.prototype.getWrappingWidth = function() {
-  return this._width;
 };
 
 /**

@@ -213,7 +213,7 @@ module.exports = {
       .addParameter(
         'stringWithSelector',
         _('Render'),
-        '[ "visible", "all", "index",]',
+        '[ "visible", "all", "index"]',
         false
       )
       .getCodeExtraInformation()

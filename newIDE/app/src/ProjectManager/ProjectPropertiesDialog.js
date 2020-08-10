@@ -19,7 +19,6 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import updateDiscordRichPresence from '../Utils/UpdateDiscordRichPresence';
 
 type Props = {|
   project: gdProject,
@@ -118,8 +117,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setMaximumFPS(maxFPS);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
     project.setFolderProject(isFolderProject);
-
-    updateDiscordRichPresence({ project: project });
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 

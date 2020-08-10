@@ -18,8 +18,7 @@ const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
-const discordClient = require('discord-rich-presence')('718194112775454720');
-discordClient.on("error", _ => true); // Ignore error: They happen only when discord is not installed
+const setUpDiscordRichPresence = require('./DiscordRichPresence');
 
 log.info('GDevelop Electron app starting...');
 
@@ -220,9 +219,6 @@ app.on('ready', function() {
     mainWindow.webContents.send('yarn-changes-saved', newFilePath);
   });
 
-  // Discord Rich Presence event:
-  ipcMain.on('update-discord-rp', (event, config) => discordClient.updatePresence(config));
-
   // LocalFileUploader events:
   ipcMain.on('local-file-upload', (event, localFilePath, uploadOptions) => {
     log.info(
@@ -361,4 +357,6 @@ app.on('ready', function() {
       info,
     });
   });
+
+  setUpDiscordRichPresence(ipcMain);
 });

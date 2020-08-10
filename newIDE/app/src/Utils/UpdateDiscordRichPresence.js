@@ -20,12 +20,11 @@ const updateDiscordRichPresence = (project: ?gdProject) => {
   ipc.send('update-discord-rich-presence', state);
 };
 
-export const useDiscordRichPresence = (project: ?Project) => {
+export const useDiscordRichPresence = (project: ?gdProject) => {
   const [lastCallTime, setLastCallTime] = useState(0);
   useEffect(() => updateDiscordRichPresence(project));
   useEffect(
     () => {
-      console.log('hello');
       if (performance.now() - lastCallTime > 60000) {
         setLastCallTime(performance.now());
         updateDiscordRichPresence(project);

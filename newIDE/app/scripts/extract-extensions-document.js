@@ -20,11 +20,11 @@ const writeFile = content => {
 (async () => {
   try {
     const response = await axios.get(extensionsRegistoryURL);
-    let texts = '## List of community-made extensions\n\n';
+    let texts = '# List of community-made extensions\n\n';
 
     response.data.extensionShortHeaders
     .forEach(element => {
-      texts += '### ' + element.fullName + '\n' + element.shortDescription + '\n\n';
+      texts += '## ' + element.fullName + '\n' + element.shortDescription + '\n\n';
     });
 
     writeFile(texts)

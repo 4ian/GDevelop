@@ -4,6 +4,7 @@ import isDialogOpen from '../UI/OpenedDialogChecker';
 import { isMacLike } from '../Utils/Platform';
 import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import isUserTyping from './IsUserTyping';
 
 // Valid action keys
 type KeyType =
@@ -42,17 +43,9 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
   const altPressed = e.altKey;
 
   // Check keytype-specific restrictions
-  if (
-    keyType === 'alphabet' ||
-    keyType === 'number' ||
-    keyType === 'numrow-arith' ||
-    keyType === 'other'
-  ) {
-    // Ctrl or Alt modifier is required, otherwise may clash with text entry
+  if (keyType === 'other') {
+    // Tab and Space may clash with keyboard navigation - Ctrl or Alt required
     if (!ctrlOrCmdPressed && !altPressed) return;
-  } else if (keyType === 'numpad-arith') {
-    // A modifier key is required, otherwise clashes with zoom shortcuts
-    if (!ctrlOrCmdPressed && !altPressed && !shiftPressed) return;
   }
 
   const shortcutStringPieces = [];
@@ -79,16 +72,21 @@ export const useKeyboardShortcuts = (onRunCommand: string => void) => {
   React.useEffect(
     () => {
       const handler = (e: KeyboardEvent) => {
-        // Disable shortcuts when a dialog or overlay is open
-        if (isDialogOpen()) return;
-        // Convert event object to shortcut string
+        // Get shortcut string and corresponding command name from event
         const shortcutString = getShortcutStringFromEvent(e);
-        // Get corresponding command name and run callback
         const commandName = Object.keys(shortcutMap).find(
           name => shortcutMap[name] === shortcutString
         );
         if (!commandName) return;
+
+        // e.preventDefault tends to block user from typing,
+        // so do it only if user is not typing.
+        if (isUserTyping()) return;
         e.preventDefault();
+
+        // Discard shortcut presses if a dialog is open
+        if (isDialogOpen()) return;
+
         onRunCommand(commandName);
       };
 

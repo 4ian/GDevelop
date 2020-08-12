@@ -34,7 +34,8 @@
 /TextObject/obj
 /TextObject/TextObject.depend
 /TiledSpriteObject/obj
-/TiledSpriteObject/TiledSpriteObject.depend
+/TiledSpriteObject/obj
+/TileMap/pixi-tilemap/
 /TimedEvent/obj
 /TimedEvent/TimedEvent.depend
 /VideoObject/obj

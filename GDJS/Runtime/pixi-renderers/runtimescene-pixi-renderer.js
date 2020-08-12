@@ -34,6 +34,10 @@ gdjs.RuntimeScenePixiRenderer.prototype.onGameResolutionResized = function () {
     this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 };
 
+gdjs.RuntimeScenePixiRenderer.prototype.onSceneUnloaded = function () {
+  // Nothing to do.
+};
+
 gdjs.RuntimeScenePixiRenderer.prototype.render = function () {
   if (!this._pixiRenderer) return;
 
@@ -45,7 +49,8 @@ gdjs.RuntimeScenePixiRenderer.prototype.render = function () {
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function () {
-  if (!this._runtimeScene.getProfiler()) return;
+  var profiler = this._runtimeScene.getProfiler();
+  if (!profiler) return;
 
   if (!this._profilerText) {
     this._profilerText = new PIXI.Text(' ', {
@@ -57,7 +62,7 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function () {
     this._pixiContainer.addChild(this._profilerText);
   }
 
-  var average = this._runtimeScene.getProfiler().getFramesAverageMeasures();
+  var average = profiler.getFramesAverageMeasures();
   var outputs = [];
   gdjs.Profiler.getProfilerSectionTexts('All', average, outputs);
 

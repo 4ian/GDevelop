@@ -8,8 +8,15 @@ describe('gdjs.DraggableRuntimeBehavior', function() {
 	});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 	runtimeScene.loadFromScene({
-		layers:[{name:"", visibility: true, effects: []}],
+		layers:[{name:"", visibility: true, cameras: [], effects: []}],
 		variables: [],
+		r: 0,
+		v: 0,
+		b: 0,
+		mangledName: 'Scene1',
+		name: 'Scene1',
+		stopSoundsOnStartup: false,
+		title: '',
 		behaviorsSharedData: [],
 		objects: [],
 		instances: []

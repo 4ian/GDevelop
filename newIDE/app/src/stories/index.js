@@ -2841,6 +2841,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('default (no results)', () => (
@@ -2851,6 +2852,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('3 results', () => (
@@ -2861,6 +2863,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ));
 

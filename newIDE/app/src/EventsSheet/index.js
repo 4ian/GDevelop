@@ -1101,6 +1101,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 goToPreviousSearchResult
                               )
                             }
+                            onCloseSearchPanel={this._closeSearchPanel}
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }

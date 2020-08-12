@@ -133,6 +133,10 @@ gdjs.LayerCocosRenderer.prototype.update = function() {
     // Unimplemented
 }
 
+gdjs.LayerCocosRenderer.prototype.updateClearColor = function() {
+    // Unimplemented
+}
+
 gdjs.LayerCocosRenderer.prototype.addRendererObject = function(child, zOrder) {
     this._cocosLayer.addChild(child, zOrder);
 };

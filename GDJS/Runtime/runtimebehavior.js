@@ -156,7 +156,10 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
 /**
  * This method is called when the owner of the behavior
- * is being removed from the scene and is about to be destroyed/reused later,
+ * is being removed from the scene and is about to be destroyed/reused later
+ * or when the behavior is removed from an object (can happen in case of
+ * hot-reloading only. Otherwise, behaviors are just de-activated,
+ * not removed. See `onDeActivate`).
  */
 gdjs.RuntimeBehavior.prototype.onDestroy = function() {
 

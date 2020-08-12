@@ -20,6 +20,9 @@ gdjs.RuntimeScenePixiRenderer = function (runtimeScene, runtimeGameRenderer) {
 
   /** @type {?PIXI.Text} */
   this._profilerText = null;
+
+  /** @type {boolean} */
+  this._isForwardDiffusedActivated = false;
 };
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
@@ -151,3 +154,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.setLayerIndex = function (
   this._pixiContainer.removeChild(layerPixiObject);
   this._pixiContainer.addChildAt(layerPixiObject, index);
 };
+
+gdjs.RuntimeScenePixiRenderer.prototype.activateForwardDiffusedRendering = function () {
+  this._isForwardDiffusedActivated = true;
+}

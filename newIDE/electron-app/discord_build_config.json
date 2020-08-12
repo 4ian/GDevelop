@@ -1,0 +1,44 @@
+{
+  "application": {
+    "id": 718194112775454720,
+    "manifests": [
+	  {
+		"label": "gdevelop-5/windows",
+		"platforms": ["win32", "win64"],
+		"locales": [],
+		"local_root": "./dist/win-unpacked",
+		"file_rules": {
+          "mappings": [
+            {
+              "local_path": ".",
+              "install_path": "."
+            }
+          ]
+		},
+		"storage": {
+          "sync": true,
+          "roots": [
+            {
+              "id": "gdevelop-projects",
+              "paths": [
+                {
+				  "platform": "windows",
+                  "path": "${DOCUMENTS}/GDevelop projects"
+                }
+              ],
+              "patterns": ["**/*"]
+            }
+          ]
+        },
+		"launch_options": [
+          {
+            "name": "GDevelop 5",
+            "executable": "GDevelop 5.exe",
+            "arguments": [],
+            "platforms": ["win32", "win64"]
+          }
+		]
+	  }
+	]
+  }
+}

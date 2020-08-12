@@ -277,7 +277,7 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
 gdjs.LayerPixiRenderer.prototype.updateClearColor = function () {
   this._clearColor = this._layer.getClearColor();
   this._updateRenderTexture();
-}
+};
 
 /**
  * Updates the render texture, if it exists.
@@ -328,8 +328,8 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
 };
 
 /**
- * Enable the use of a PIXI.RenderTexture to render the PIXI.Container 
- * of the layer and, in the scene PIXI container, replace the container 
+ * Enable the use of a PIXI.RenderTexture to render the PIXI.Container
+ * of the layer and, in the scene PIXI container, replace the container
  * of the layer by a sprite showing this texture.
  * @private used only in lighting for now as the sprite could have MULTIPLY blend mode.
  */

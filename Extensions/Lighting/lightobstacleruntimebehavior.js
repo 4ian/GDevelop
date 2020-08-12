@@ -12,6 +12,11 @@ gdjs.LightObstaclesManager = function (runtimeScene) {
   ]);
 };
 
+/**
+ * Get the light obstacles manager of a scene.
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @returns {gdjs.LightObstaclesManager}
+ */
 gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
   if (!runtimeScene._lightObstaclesManager) {
     // Create the shared manager if necessary.
@@ -23,14 +28,29 @@ gdjs.LightObstaclesManager.getManager = function (runtimeScene) {
   return runtimeScene._lightObstaclesManager;
 };
 
+/**
+ * Add a light obstacle to the list of existing obstacles.
+ * @param {gdjs.LightObstacleRuntimeBehavior} obstacle
+ */
 gdjs.LightObstaclesManager.prototype.addObstacle = function (obstacle) {
   this._obstacleRBush.insert(obstacle);
 };
 
+/**
+ * Remove a light obstacle from the list of existing obstacles. Be sure that the obstacle was
+ * added before.
+ * @param {gdjs.LightObstacleRuntimeBehavior} obstacle
+ */
 gdjs.LightObstaclesManager.prototype.removeObstacle = function (obstacle) {
   this._obstacleRBush.remove(obstacle);
 };
 
+/**
+ * Returns all the light obstacles around the specified object.
+ * @param {gdjs.RuntimeObject} object The object
+ * @param {number} radius Radius of the area to be searched.
+ * @param {gdjs.RuntimeObject[]} result An array with all obstacles near the object.
+ */
 gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
   object,
   radius,
@@ -48,9 +68,9 @@ gdjs.LightObstaclesManager.prototype.getAllObstaclesAround = function (
   searchArea.minY = y - radius;
   searchArea.maxX = x + radius;
   searchArea.maxY = y + radius;
-  var nearbyPlatforms = this._obstacleRBush.search(searchArea);
+  var nearbyObstacles = this._obstacleRBush.search(searchArea);
   result.length = 0;
-  result.push.apply(result, nearbyPlatforms);
+  result.push.apply(result, nearbyObstacles);
 };
 
 /**
@@ -111,4 +131,23 @@ gdjs.LightObstacleRuntimeBehavior.prototype.doStepPreEvents = function (
     this._oldWidth = this.owner.getWidth();
     this._oldHeight = this.owner.getHeight();
   }
+};
+
+gdjs.LightObstacleRuntimeBehavior.prototype.onDestroy = function () {
+  if (this._manager && this._registeredInManager)
+    this._manager.removeObstacle(this);
+};
+
+gdjs.LightObstacleRuntimeBehavior.prototype.onActivate = function () {
+  if (this._registeredInManager) return;
+
+  this._manager.addObstacle(this);
+  this._registeredInManager = true;
+};
+
+gdjs.LightObstacleRuntimeBehavior.prototype.onDeActivate = function () {
+  if (!this._registeredInManager) return;
+
+  this._manager.removeObstacle(this);
+  this._registeredInManager = false;
 };

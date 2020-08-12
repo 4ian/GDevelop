@@ -46,7 +46,7 @@ gdjs.Layer = function (layerData, runtimeScene) {
   this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
   this.show(!this._hidden);
 
-  for(var i = 0;i < layerData.effects.length;++i) {
+  for (var i = 0; i < layerData.effects.length; ++i) {
     this.addEffect(layerData.effects[i]);
   }
 };
@@ -293,7 +293,7 @@ gdjs.Layer.prototype.getHeight = function () {
  * Return the initial effects data for the layer. Only to
  * be used by renderers.
  */
-gdjs.Layer.prototype.getInitialEffectsData = function() {
+gdjs.Layer.prototype.getInitialEffectsData = function () {
   return this._initialEffectsData;
 };
 
@@ -325,7 +325,7 @@ gdjs.Layer.prototype.addEffect = function (effectData) {
       effectData.booleanParameters[name]
     );
   }
-}
+};
 
 /**
  * Remove the effect with the specified name
@@ -453,20 +453,20 @@ gdjs.Layer.prototype.getClearColor = function () {
  * @param {?number} g Green color component in the range 0-255.
  * @param {?number} b Blue color component in the range 0-255.
  */
-gdjs.Layer.prototype.setClearColor = function(r, g, b) {
-  if(r) this._clearColor[0] = r/255;
-  if(g) this._clearColor[1] = g/255;
-  if(b) this._clearColor[2] = b/255;
+gdjs.Layer.prototype.setClearColor = function (r, g, b) {
+  if (r) this._clearColor[0] = r / 255;
+  if (g) this._clearColor[1] = g / 255;
+  if (b) this._clearColor[2] = b / 255;
   this._renderer.updateClearColor();
-}
+};
 
 /**
  * Set whether layer's camera follows base layer's camera or not.
- * @param {boolean} follow 
+ * @param {boolean} follow
  */
-gdjs.Layer.prototype.setFollowBaseLayerCamera = function(follow) {
-  this._followBaseLayerCamera = follow
-}
+gdjs.Layer.prototype.setFollowBaseLayerCamera = function (follow) {
+  this._followBaseLayerCamera = follow;
+};
 
 /**
  * Return true if the layer is a lighting layer, false otherwise.

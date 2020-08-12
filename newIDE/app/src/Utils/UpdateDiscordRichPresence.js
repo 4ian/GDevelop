@@ -4,20 +4,20 @@ import optionalRequire from './OptionalRequire';
 const electron = optionalRequire('electron');
 const ipc = electron ? electron.ipcRenderer : null;
 
+const richPresenceStartTimestamp = Date.now();
+
 const updateDiscordRichPresence = (project: ?gdProject) => {
   if (ipc === null) return;
-  if (!updateDiscordRichPresence.date)
-    updateDiscordRichPresence.date = Date.now();
 
-  let state = {
+  const config = {
     details: project ? 'Working on:' : 'Not working on',
     state: project ? project.getName() : 'any game',
-    startTimestamp: updateDiscordRichPresence.date,
+    startTimestamp: richPresenceStartTimestamp,
     largeImageKey: 'gdicon',
     largeImageText: 'GDevelop',
   };
 
-  ipc.send('update-discord-rich-presence', state);
+  ipc.send('update-discord-rich-presence', config);
 };
 
 export const useDiscordRichPresence = (project: ?gdProject) => {
@@ -29,9 +29,7 @@ export const useDiscordRichPresence = (project: ?gdProject) => {
         setLastCallTime(performance.now());
         updateDiscordRichPresence(project);
       }
-      // We don't want lastCallTime as dependency
-      // eslint-disable-next-line
     },
-    [project]
+    [project, lastCallTime]
   );
 };

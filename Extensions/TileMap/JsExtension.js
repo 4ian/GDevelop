@@ -122,7 +122,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
       )
-    //   .addIncludeFile('Extensions/TileMap/pixi-tilemap.js');
+      .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/umd/dist/pixi-tilemap.js');
 
     object
       .addCondition(
@@ -330,10 +330,10 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    // const ImportedExtLib = objectsRenderingService.requireModule(
-    //   __dirname,
-    //   'pixi-tilemap'
-    // );
+    const ImportedExtLib = objectsRenderingService.requireModule(
+      __dirname,
+      'pixi-tilemap/dist/umd/dist/pixi-tilemap'
+    );
 
     /**
      * Renderer for instances of TileMap inside the IDE.
@@ -360,7 +360,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new PIXI.Container();//new PIXI.tilemap.CompositeRectTileLayer(0);
+      console.log(PIXI);
+      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
       //this._pixiObject.anchor.x = 0.5;
       //this._pixiObject.anchor.y = 0.5;
@@ -375,7 +376,7 @@ module.exports = {
         pixiResourcesLoader
       );
       this.update();
-    //   this.updateTileMap();
+      this.updateTileMap();
     }
     RenderedTileMapInstance.prototype = Object.create(
       RenderedInstance.prototype

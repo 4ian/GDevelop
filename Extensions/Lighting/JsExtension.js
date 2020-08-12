@@ -68,7 +68,9 @@ module.exports = {
         lightObstacleBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
+      .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+      .addIncludeFile('Extensions/Lighting/lightruntimeobject.js')
+      .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js');
 
     const lightObject = new gd.ObjectJsImplementation();
 
@@ -179,9 +181,8 @@ module.exports = {
         lightObject
       )
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
-      .addIncludeFile(
-        'Extensions/Lighting/lightruntimeobject-pixi-renderer.js'
-      );
+      .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
+      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
 
     object
       .addAction(

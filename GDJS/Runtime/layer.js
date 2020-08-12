@@ -440,12 +440,33 @@ gdjs.Layer.prototype.followBaseLayer = function () {
 };
 
 /**
- * The clear color is defined in the format [r, g, b, a], with components in the range of [0, 1].
+ * The clear color is defined in the format [r, g, b], with components in the range of 0 to 1.
  * @return {number[]} the clear color of layer in the range of [0, 1].
  */
 gdjs.Layer.prototype.getClearColor = function () {
   return this._clearColor;
 };
+
+/**
+ * Set the clear color in format [r, g, b], with components in the range of 0 to 1.;
+ * @param {?number} r Red color component in the range 0-255.
+ * @param {?number} g Green color component in the range 0-255.
+ * @param {?number} b Blue color component in the range 0-255.
+ */
+gdjs.Layer.prototype.setClearColor = function(r, g, b) {
+  if(r) this._clearColor[0] = r/255;
+  if(g) this._clearColor[1] = g/255;
+  if(b) this._clearColor[2] = b/255;
+  this._renderer.updateClearColor();
+}
+
+/**
+ * Set whether layer's camera follows base layer's camera or not.
+ * @param {boolean} follow 
+ */
+gdjs.Layer.prototype.setFollowBaseLayerCamera = function(follow) {
+  this._followBaseLayerCamera = follow
+}
 
 /**
  * Return true if the layer is a lighting layer, false otherwise.

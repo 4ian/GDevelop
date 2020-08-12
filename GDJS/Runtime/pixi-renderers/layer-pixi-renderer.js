@@ -27,6 +27,7 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
 
   this._runtimeSceneRenderer = runtimeSceneRenderer;
   this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
+  // Width and height are tracked when a render texture is used.
   this._oldWidth = null;
   this._oldHeight = null;
   this._isLightingLayer = layer.isLightingLayer();
@@ -273,6 +274,11 @@ gdjs.LayerPixiRenderer.prototype.isEffectEnabled = function (name) {
   return gdjs.PixiFiltersTools.isEffectEnabled(filter);
 };
 
+gdjs.LayerPixiRenderer.prototype.updateClearColor = function () {
+  this._clearColor = this._layer.getClearColor();
+  this._updateRenderTexture();
+}
+
 /**
  * Updates the render texture, if it exists.
  * Also, render texture is cleared with a specified clear color.
@@ -322,7 +328,7 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
 };
 
 /**
- * Enable the user of a PIXI.RenderTexture to render the PIXI.Container 
+ * Enable the use of a PIXI.RenderTexture to render the PIXI.Container 
  * of the layer and, in the scene PIXI container, replace the container 
  * of the layer by a sprite showing this texture.
  * @private used only in lighting for now as the sprite could have MULTIPLY blend mode.

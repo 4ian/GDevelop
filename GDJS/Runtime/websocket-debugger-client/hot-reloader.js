@@ -1013,6 +1013,24 @@ gdjs.HotReloader.prototype._hotReloadRuntimeLayer = function (
     runtimeLayer.show(newLayer.visibility);
   }
 
+  if(newLayer.isLightingLayer) {
+    if (oldLayer.ambientLightColorR !== newLayer.ambientLightColorR) {
+      runtimeLayer.setClearColor(newLayer.ambientLightColorR, null, null);
+    }
+  
+    if (oldLayer.ambientLightColorG !== newLayer.ambientLightColorG) {
+      runtimeLayer.setClearColor(null, newLayer.ambientLightColorG, null);
+    }
+  
+    if (oldLayer.ambientLightColorB !== newLayer.ambientLightColorB) {
+      runtimeLayer.setClearColor(null, null, newLayer.ambientLightColorB);
+    }
+
+    if (oldLayer.followBaseLayerCamera !== newLayer.followBaseLayerCamera) {
+      runtimeLayer.setFollowBaseLayerCamera(newLayer.followBaseLayerCamera);
+    }
+  }
+
   // TODO: cameras
 
   // Effects

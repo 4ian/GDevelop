@@ -113,6 +113,7 @@ import {
 } from './PreviewState';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -453,6 +454,8 @@ const MainFrame = (props: Props) => {
         }
       });
   };
+
+  useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
     (): Promise<void> => {

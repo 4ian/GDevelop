@@ -122,7 +122,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
       )
-      .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/umd/dist/pixi-tilemap.js');
+      .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js');
 
     object
       .addCondition(
@@ -332,7 +332,7 @@ module.exports = {
 
     const ImportedExtLib = objectsRenderingService.requireModule(
       __dirname,
-      'pixi-tilemap/dist/umd/dist/pixi-tilemap'
+      'pixi-tilemap/dist/pixi-tilemap.umd'
     );
 
     /**
@@ -360,7 +360,7 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      console.log(PIXI);
+      console.log(PIXI.tilemap);
       this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
       //this._pixiObject.anchor.x = 0.5;

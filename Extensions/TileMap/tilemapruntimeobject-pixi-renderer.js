@@ -11,11 +11,11 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
-    // this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(
-    //   0,
-    //   runtimeObject._tilemapAtlasImage.texture
-    // );
-    this._pixiObject = new PIXI.Container();
+    this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(
+      0,
+      runtimeObject._tilemapAtlasImage.texture
+    );
+    // this._pixiObject = new PIXI.Container();
 
     this._object.hidden = !runtimeObject._visible;
   } else {

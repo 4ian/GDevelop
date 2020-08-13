@@ -1,0 +1,140 @@
+:root{
+  --gd-default-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+color: black;
+
+/*defaulttheme*/
+}
+:root {
+  --white: white;
+  --black: black;
+  --table-font-size: 13px;
+  --table-font-border-bottom-default-theme: 1px solid #e0e0e0;
+  --table-odd-row: #fafafa;
+  --table-Selected-Row: #4c92ff;
+  --table-Header-Column-font-weight: 600;
+  --table-Header-Column-font-size: 12px;
+  --table-Header-Column-color: #9e9e9e;
+  --table-Header-Column-text-transform: none;
+  --table-Column-white-space: nowrap;
+  --table-Column-overflow: hidden;
+  --table-Column-text-overflow: ellipsis;
+}
+/*darktheme*/
+:root {
+  --table-font-border-bottom-dark-theme: 1px solid #303030;
+  --table-even-row-dark-theme: #252525;
+  --color-dark-theme: #DDD;
+}
+
+/*nordtheme*/
+:root{
+  --color-nord-theme: #ECEFF4;
+  --table-font-border-bottom-nord-theme: 1px solid #3B4252;
+  --table-even-row-nord-theme: #2E3440;
+  --table-Selected-Row-nord-theme-bg-color:#88C0D0;
+  --table-Header-Column-dark-theme-color: #D8DEE9;
+  
+
+}
+/*default theme*/
+.gd-table-default-theme {
+  font-family: var(--gd-default-font);
+  color: var(--black);
+}
+.gd-table-dark-theme{
+  font-family: var(--gd-default-font);
+  color: var(--color-dark-theme);
+
+}
+.gd-table-nord-theme {
+  font-family: var(--gd-default-font);
+  color: var(--color-nord-theme);
+  
+}
+
+
+.gd-table-default-theme .tableHeaderRow,
+.gd-table-default-theme .tableEvenRow,
+.gd-table-default-theme .tableSelectedRow,
+.gd-table-default-theme .tableOddRow {
+  font-size: var(--table-font-size);
+  border-bottom: var(--table-font-border-bottom-default-theme);
+}
+
+.gd-table-default-theme .tableOddRow {
+  background-color: var(--table-font-border-bottom-default-theme);
+}
+
+.gd-table-default-theme .tableEvenRow {
+  background-color: var(--white);
+}
+
+.gd-table-default-theme .tableSelectedRow,
+.gd-table-dark-theme .tableSelectedRow {
+  background-color: var(--table-Selected-Row); /*OS X selection*/
+  color: var(--white);
+}
+
+.gd-table-default-theme .tableHeaderColumn,
+.gd-table-dark-theme .tableHeaderColumn {
+  text-transform: var(--table-Header-Column-text-transform);
+  font-weight: var(--table-Header-Column-font-weight);
+  font-size: var(--table-Header-Column-font-size);
+  color: var(--table-Header-Column-color);
+}
+
+.gd-table-dark-theme .tableColumn,
+.gd-table-default-theme .tableColumn,
+.gd-table-nord-theme .tableColumn {
+  white-space: var(--table-Column-white-space);
+  overflow: var(--table-Column-overflow);
+  text-overflow: var(--table-Column-text-overflow);
+}
+
+
+/*dark theme*/
+.gd-table-dark-theme .tableHeaderRow,
+.gd-table-dark-theme .tableEvenRow,
+.gd-table-dark-theme .tableSelectedRow,
+.gd-table-dark-theme .tableOddRow {
+  font-size: var(--table-font-size);
+  border-bottom: var(--table-font-border-bottom-dark-theme);
+}
+
+.gd-table-dark-theme .tableOddRow {
+  background-color: var(--table-font-border-bottom-dark-theme);
+}
+
+.gd-table-dark-theme .tableEvenRow {
+  background-color: var(--table-even-row-dark-theme);
+}
+
+/*nord theme*/
+.gd-table-nord-theme .tableHeaderRow,
+.gd-table-nord-theme .tableEvenRow,
+.gd-table-nord-theme .tableSelectedRow,
+.gd-table-nord-theme .tableOddRow {
+  font-size: var(--table-font-size);
+  border-bottom: var(--table-font-border-bottom-nord-theme);
+}
+
+.gd-table-dark-theme .tableOddRow {
+  background-color: var(--table-font-border-bottom-nord-theme);
+}
+
+.gd-table-dark-theme .tableEvenRow {
+  background-color: var(--table-even-row-nord-theme);
+}
+
+.gd-table-nord-theme .tableSelectedRow {
+  background-color: var(--table-Selected-Row-nord-theme-bg-color); 
+  color: var(--table-even-row-nord-theme);
+}
+.gd-table-nord-theme .tableHeaderColumn {
+  text-transform: var(--table-Header-Column-text-transform);
+  font-weight: var(--table-Header-Column-font-weight);
+  font-size: var(--table-Header-Column-font-size);
+  color: var(--table-Header-Column-dark-theme-color)
+}

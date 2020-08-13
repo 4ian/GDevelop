@@ -3,7 +3,7 @@ import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
 import './Mosaic.css';
 import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
-import './Table.css';
+import '../Theme/Table.css';
 import './Markdown.css';
 
 const gdevelopPurple = '#9100ce';

@@ -15,7 +15,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
 import { type NamedCommand, type CommandOption } from '../CommandManager';
-import commandsList, { commandAreas, type CommandName } from '../CommandsList';
+import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 
 const useStyles = makeStyles({

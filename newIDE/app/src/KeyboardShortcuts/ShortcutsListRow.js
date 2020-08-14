@@ -43,6 +43,7 @@ const ShortcutsListRow = (props: Props) => {
         <Chip
           style={styles.shortcutChip}
           label={props.shortcutString || <Trans>No shortcut</Trans>}
+          disabled={!props.shortcutString}
         />
         <IconButton onClick={props.onEditShortcut} tooltip={t`Edit shortcut`}>
           <EditIcon />

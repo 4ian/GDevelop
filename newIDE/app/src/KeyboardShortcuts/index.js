@@ -4,7 +4,10 @@ import isDialogOpen from '../UI/OpenedDialogChecker';
 import { isMacLike } from '../Utils/Platform';
 import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
 
 // Valid action keys
 type KeyType =
@@ -79,6 +82,9 @@ export const useKeyboardShortcuts = (onRunCommand: string => void) => {
         );
         if (!commandName) return;
 
+        // On desktop app, ignore shortcuts that are handled by Electron
+        if (electron && commandsList[commandName].handledByElectron) return;
+
         // e.preventDefault tends to block user from typing,
         // so do it only if user is not typing.
         if (isUserTyping()) return;
@@ -123,4 +129,32 @@ export const getShortcutDisplayName = (shortcutString: string) => {
       return getKeyDisplayName(keyCode);
     })
     .join(' + ');
+};
+
+/**
+ * Takes key code and returns Electron string for the key
+ */
+const getElectronKeyString = (code: string) => {
+  const keyType = getKeyTypeFromCode(code);
+  if (keyType === 'alphabet') return code.slice(3);
+  if (keyType === 'number') return code.slice(5);
+  if (keyType === 'fn-row') return code;
+  if (keyType === 'numpad-arith')
+    return code === 'NumpadAdd' ? 'numadd' : 'numsub';
+  if (keyType === 'numrow-arith') return code === 'Minus' ? '-' : '=';
+  return code; // Tab, Space
+};
+
+/**
+ * Converts given shortcut string into an Electron accelerator string
+ */
+export const getElectronAccelerator = (shortcutString: string) => {
+  return shortcutString
+    .split('+')
+    .map<string>(keyCode => {
+      if (keyCode === 'CmdOrCtrl') return 'CmdOrCtrl';
+      if (keyCode === 'Shift' || keyCode === 'Alt') return keyCode;
+      return getElectronKeyString(keyCode);
+    })
+    .join('+');
 };

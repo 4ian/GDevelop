@@ -66,14 +66,20 @@ type CommandMetadata = {|
   displayText: MessageDescriptor,
   noShortcut?: boolean, // If true, command won't show up in shortcuts list
   ghost?: boolean, // If true, command won't show up in palette
+  handledByElectron?: boolean, // If true, command shortcut is handled by Electron in desktop app
 |};
 
 const commandsList: { [CommandName]: CommandMetadata } = {
   // General commands
-  QUIT_APP: { area: 'GENERAL', displayText: t`Close GDevelop` },
+  QUIT_APP: {
+    area: 'GENERAL',
+    displayText: t`Close GDevelop`,
+    handledByElectron: true,
+  },
   OPEN_PROJECT_MANAGER: {
     area: 'IDE',
     displayText: t`Open project manager`,
+    handledByElectron: true,
   },
   LAUNCH_PREVIEW: { area: 'PROJECT', displayText: t`Launch preview` },
   LAUNCH_DEBUG_PREVIEW: {
@@ -81,12 +87,36 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Launch preview with debugger and profiler`,
   },
   OPEN_START_PAGE: { area: 'IDE', displayText: t`Open start page` },
-  CREATE_NEW_PROJECT: { area: 'GENERAL', displayText: t`Create a new project` },
-  OPEN_PROJECT: { area: 'GENERAL', displayText: t`Open project` },
-  SAVE_PROJECT: { area: 'GENERAL', displayText: t`Save project` },
-  SAVE_PROJECT_AS: { area: 'GENERAL', displayText: t`Save project as...` },
-  CLOSE_PROJECT: { area: 'GENERAL', displayText: t`Close project` },
-  EXPORT_GAME: { area: 'PROJECT', displayText: t`Export game` },
+  CREATE_NEW_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Create a new project`,
+    handledByElectron: true,
+  },
+  OPEN_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Open project`,
+    handledByElectron: true,
+  },
+  SAVE_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Save project`,
+    handledByElectron: true,
+  },
+  SAVE_PROJECT_AS: {
+    area: 'GENERAL',
+    displayText: t`Save project as...`,
+    handledByElectron: true,
+  },
+  CLOSE_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Close project`,
+    handledByElectron: true,
+  },
+  EXPORT_GAME: {
+    area: 'PROJECT',
+    displayText: t`Export game`,
+    handledByElectron: true,
+  },
   OPEN_RECENT_PROJECT: {
     area: 'GENERAL',
     displayText: t`Open recent project...`,

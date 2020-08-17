@@ -53,6 +53,9 @@ module.exports = function(config) {
       '../../Extensions/LinkedObjects/linkedobjects.js',
       '../../Extensions/Inventory/inventory.js',
       '../../Extensions/Inventory/inventorytools.js',
+      '../../Extensions/Lighting/lightruntimeobject.js',
+      '../../Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
+      '../../Extensions/Lighting/lightobstacleruntimebehavior.js',
 
       // Test extensions:
       './tests/Extensions/**.js',

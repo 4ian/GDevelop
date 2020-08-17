@@ -8,28 +8,59 @@ import './Theme.css';
 import '../SharedMosaic.css';
 import '../SharedTable.css';
 
-const background_color = window.getComputedStyle(document.documentElement).getPropertyValue("--background-color");
-const canvas_color = window.getComputedStyle(document.documentElement).getPropertyValue("--canvas-color");
-const alternate_canvas_color = window.getComputedStyle(document.documentElement).getPropertyValue("--alternate-canvas-color");
-const system_selection_color = window.getComputedStyle(document.documentElement).getPropertyValue("--system-selection-color");
-const separator_color = window.getComputedStyle(document.documentElement).getPropertyValue("--separator-color");
-const list_item_separator_color = window.getComputedStyle(document.documentElement).getPropertyValue("--list-item-separator-color");
-const text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--text-color");
-const selected_text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--selected-text-color");
-const group_text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--group-text-color");
-const deprecated_group_text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--deprecated-group-text-color");
-const right_icon_color = window.getComputedStyle(document.documentElement).getPropertyValue("--right-icon-color");
-const selected_right_icon_color = window.getComputedStyle(document.documentElement).getPropertyValue("--selected-right-icon-color");
-const error_text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--error-text-color");
-const warning_text_color = window.getComputedStyle(document.documentElement).getPropertyValue("--warning-text-color");
-const selected_error_background_color = window.getComputedStyle(document.documentElement).getPropertyValue("--selected-error-background-color");
-const selected_warning_background_color = window.getComputedStyle(document.documentElement).getPropertyValue("--selected-warning-background-color");
-
+const background_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--background-color');
+const canvas_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--canvas-color');
+const alternate_canvas_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--alternate-canvas-color');
+const system_selection_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--system-selection-color');
+const separator_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--separator-color');
+const list_item_separator_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--list-item-separator-color');
+const text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--text-color');
+const selected_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-text-color');
+const group_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--group-text-color');
+const deprecated_group_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--deprecated-group-text-color');
+const right_icon_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--right-icon-color');
+const selected_right_icon_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-right-icon-color');
+const error_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--error-text-color');
+const warning_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--warning-text-color');
+const selected_error_background_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-error-background-color');
+const selected_warning_background_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-warning-background-color');
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
 
-const systemSelectionColor = system_selection_color;//OS X selection
+const systemSelectionColor = system_selection_color; //OS X selection
 
 // Use the fonts provided by the operating system(s) as possible.
 // If you update this font list, be sure to do it in all the other places using fonts in the codebase.
@@ -40,7 +71,6 @@ const fontFamily =
  * The background color of the main window
  */
 const backgroundColor = background_color;
-
 
 /**
  * The background color of the "papers", "dialogs", etc...

@@ -70,7 +70,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject.js')
-      .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js');
+      .addIncludeFile(
+        'Extensions/Lighting/lightruntimeobject-pixi-renderer.js'
+      );
 
     const lightObject = new gd.ObjectJsImplementation();
 
@@ -126,6 +128,11 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.debugMode ? 'true' : 'false')
           .setType('boolean')
           .setLabel(_('Debug mode'))
+          .setDescription(
+            _(
+              'When activated, display the lines used to render the light - useful to understand how the light is rendered on screen.'
+            )
+          )
       );
 
       objectProperties
@@ -133,14 +140,19 @@ module.exports = {
         .setValue(objectContent.texture)
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Image resource'));
+        .setLabel(_('Light texture (optional)'))
+        .setDescription(
+          _(
+            "A texture to be used to display the light. If you don't specify a texture, the light is rendered as fading from bright, in its center, to dark."
+          )
+        );
 
       return objectProperties;
     };
     lightObject.setRawJSONContent(
       JSON.stringify({
         radius: 50,
-        color: '#b4b4b4',
+        color: '#ffffff',
         debugMode: false,
         texture: '',
       })

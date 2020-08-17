@@ -92,7 +92,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this._livingOnScene = true;
     /**
      * @type {number}
-     * @protected
+     * @readonly
      */
     this.id = runtimeScene.createNewUniqueId();
     /**
@@ -105,6 +105,13 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
      * @type {?string}
      */
     this.persistentUuid = null;
+
+    /**
+     * A property to be used by external algorithms to indicate if the
+     * object is picked or not in an object selection. By construction, this is
+     * not "thread safe" or "re-entrant algorithm" safe.
+     */
+    this.pick = false;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
@@ -1121,7 +1128,10 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
 };
 
 /**
- * Remove the behavior with the given name.
+ * Remove the behavior with the given name. Usually only used by
+ * hot-reloading, as performance of this operation is not guaranteed
+ * (in the future, this could lead to re-organization of arrays
+ * holding behaviors).
  *
  * @param {string} name The name of the behavior to remove.
  * @returns {boolean} true if the behavior was properly removed, false otherwise.
@@ -1129,6 +1139,8 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
 gdjs.RuntimeObject.prototype.removeBehavior = function(name) {
     var behavior = this._behaviorsTable.get(name);
     if (!behavior) return false;
+
+    behavior.onDestroy();
 
     var behaviorIndex = this._behaviors.indexOf(behavior);
     if (behaviorIndex !== -1) this._behaviors.splice(behaviorIndex, 1);

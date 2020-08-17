@@ -1,5 +1,5 @@
 describe('gdjs.TimeManager', function() {
-	var timeManager = new gdjs.TimeManager(0);
+	var timeManager = new gdjs.TimeManager();
 
 	it('should handle timers', function(){
 		timeManager.addTimer("timer1");

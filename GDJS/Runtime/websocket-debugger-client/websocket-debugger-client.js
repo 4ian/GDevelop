@@ -229,7 +229,6 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function () {
 
     // Exclude some RuntimeScene fields:
     '_allInstancesList',
-    '_initialObjectsData',
 
     // Exclude circular references to parent runtimeGame or runtimeScene:
     '_runtimeGame',

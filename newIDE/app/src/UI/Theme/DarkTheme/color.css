@@ -1,0 +1,23 @@
+:root {
+  --backgroundColor: #f7f7f7;
+  --canvas-Color: #fd3636;
+  --white: #ffffff;
+  --separatorColor: #df4545;
+    
+
+
+}
+
+/*gd-table*/
+:root {
+  --gdtable: black;
+  --tablerow: #e0e0e0;
+  --tableheadercolumn: #9e9e9e;
+  --tableselectedrow: #4c92ff;
+  --tableoddrow: #fafafa;
+}
+
+/*mosaic*/
+:root {
+  --pur: #9100ce;
+}

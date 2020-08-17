@@ -1,0 +1,17 @@
+.mosaic-gd .mosaic-window .mosaic-window-title {
+  font-weight: 400 !important;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px; /* Same as ClosableTabs font size */
+}
+
+.mosaic-gd .mosaic-split.-column .mosaic-split-line {
+  height: 1px;
+  width: 25px;
+  margin: auto;
+  bottom: 1px;
+}
+
+.mosaic-gd .mosaic-split:hover .mosaic-split-line {
+  box-shadow: none !important;
+  cursor: ns-resize;
+}

@@ -1,0 +1,120 @@
+:root {
+    --white: #ffffff;
+    
+    --gdevelop-purple: #9100ce;
+    --canvas-color: #f0f0f0;
+    --background-color: #f7f7f7;
+    --alternate-canvas-color: #ffffff;
+    --system-selection-color: #4c92ff;
+  
+  
+  }
+
+  /*gdevelop theme*/
+:root {
+    /*toolbar*/
+    --separator-color: #cecece;
+    /*closable tabs*/
+    --text-color: #878787;
+    --selected-text-color: #ffffff;
+    /*list items*/
+    --group-text-color: #0000008a;
+    --deprecated-group-text-color: #0000004d;
+    --list-item-separator-color: #e0e0e0;
+    --right-icon-color: #111;
+    --selected-right-icon-color: #111;
+    --error-text-color: #ff2e16;
+    --warning-text-color: #ffb032;
+    --selected-error-background-color: #ff2e16;
+    --selected-warning-background-color: #ffb032;
+
+  }
+  
+  /*gd-table*/
+:root {
+    --gdtable: black;
+    --tablerow: #e0e0e0;
+    --tableheadercolumn: #9e9e9e;
+    --tableselectedrow: #4c92ff;
+    --tableoddrow: #fafafa;
+  }
+  
+  /*mosaic*/
+:root {
+    --mosaic-window: #9100ce;
+    --mosaic-layout: #e0e0e0;
+    --mosaic-split-hover: #2b95d6;
+    --mosaic-split: #bbbbbb;
+  }
+
+  /*markdown*/
+:root {
+    --markdown-a: #4ab0e4;
+}
+
+/*events sheet*/
+:root {
+    --events-tree: #f0f0f2;
+    --rst__moveHandle: #4ab0e4;
+    --rst__moveHandle-hover: #84d2ff;
+    --linehalf: black;
+    --rst__rowContents-bg-color: #f0f0f2;
+    --rst__rowContents-color: black;
+    --selectable-hover: #0000001a;
+    --selectable-selected-bg: #0000001a;
+    --selectable-selected-border: #4ab0e4;
+    /*large selectable area*/
+    --large-selectable: #f0f0f2;
+    --large-selectable-selected: #4ab0e4;
+
+    /*conditions and actions*/
+    --conditions-container-bg: #f1f2f2;
+    --conditions-container-border: #e2e2e2;
+    /*conditions container*/
+    --small-width-container-border-right: #e2e2e2;
+    --small-width-container-border-bottom: #e2e2e2;
+
+    /*actions container*/
+    --actions-container-bg: #ffffff;
+    --sub-instructions-container-border-left: #d3d3d3;
+
+    /*instructions parameters color scheme*/
+    --instruction-parameter: #4e4e4e;
+    --instruction-parameter-expression: #1b8f01;
+    --instruction-parameter-object: #3c4698;
+    --instruction-parameter-behavior: #777777;
+    --instruction-parameter-operator: #3783d3;
+    --instruction-parameter-objectvar: #8337a2;
+    --instruction-parameter-scenevar: #8337a2;
+    --instruction-parameter-globalvar: #8337a2;
+    --instruction-invalid-parameter: #bb0000;
+    --instruction-invalid-parameter-text-decoration: #bb0000;
+    --instruction-missing-parameter-bg: #f3000c26;
+    --instruction-missing-parameter-border-bottom: #bb0000;
+
+    /*search result highlights*/
+    --search-results-rst__moveHandle-bg: #d3d3d3;
+    --rst__moveHandle-border: #d3d3d3;
+    --rst__rowSearchMatch-border-left: #18dcf2;
+    --rst__rowSearchFocus-border-left: #18dcf2;
+
+    /*drag and drop indicator (events)*/
+    --drop-indicator-border-top: black;
+    --cant-drop-indicatorborder-top: #ff5c5c;
+
+    /*Skinning the "Link" event*/
+    --link-container: #f1f2f2;
+
+    --link-container-selectable: #3c4698;
+
+
+
+
+
+
+
+
+
+
+
+}

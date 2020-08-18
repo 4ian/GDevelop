@@ -30,7 +30,7 @@ module.exports = {
         'P2P',
         _('Peer-to-Peer communication (experimental)'),
         _(
-          'Adds possibility to connect multiple game instances together via WebRTC (P2P)'
+          'Allow game instances to communicate remotely using messages sent via WebRTC (P2P)'
         ),
         'Arthur Pacaud (arthuro555)',
         'MIT'
@@ -74,13 +74,13 @@ module.exports = {
     extension
       .addCondition(
         'OnError',
-        _('An error occured'),
+        _('An error occurred'),
         _(
           'Triggers once when an error occurs. ' +
             'Use P2P::GetLastError() expression to get the content of the error ' +
             'if you want to analyse it or display it to the user.'
         ),
-        _('P2P error occured'),
+        _('P2P error occurred'),
         _('P2P (experimental)'),
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'

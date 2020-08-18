@@ -27,7 +27,8 @@ export type AlertMessageIdentifier =
   | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
-  | 'lifecycle-events-function-included-only-if-extension-used';
+  | 'lifecycle-events-function-included-only-if-extension-used'
+  | 'p2p-broker-recommendation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -123,6 +124,10 @@ export const allAlertMessages: Array<{
   {
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
+  },
+  {
+    key: 'p2p-broker-recommendation',
+    label: <Trans>Peer to peer broker server recommendation</Trans>,
   },
 ];
 

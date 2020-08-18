@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -162,7 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "compass",
-          "persistentUuid": "d4c2072a-a764-441e-8236-ec852f435364",
+          "persistentUuid": "a667e2c0-51a3-430e-acf7-85e5c10868e4",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -178,7 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "needle",
-          "persistentUuid": "f40fa3b3-545b-404e-9df5-453a5d71f9e2",
+          "persistentUuid": "dca8b9e9-c36f-4c83-a5cd-83b2becdfb13",
           "width": 0,
           "x": 16,
           "y": 0,

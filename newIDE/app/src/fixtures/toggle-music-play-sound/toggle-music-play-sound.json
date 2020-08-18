@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -240,7 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
-          "persistentUuid": "64ce63ad-2bd7-4676-8293-c8e2b1da6423",
+          "persistentUuid": "b086bb73-4845-423e-b475-9571737b3fa5",
           "width": 0,
           "x": 288,
           "y": 224,
@@ -256,7 +256,7 @@
           "layer": "",
           "locked": false,
           "name": "play",
-          "persistentUuid": "b3d7b68c-9dd6-4b8f-99c0-51f40a2ca0fa",
+          "persistentUuid": "fb6342de-cc00-40f5-874c-52ade5549657",
           "width": 0,
           "x": 384,
           "y": 320,
@@ -272,7 +272,7 @@
           "layer": "",
           "locked": false,
           "name": "pause",
-          "persistentUuid": "a52dc356-500c-4740-8b11-367b5681db4b",
+          "persistentUuid": "0ae70636-7086-4eb4-968f-f5fc4a6c2f16",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -288,7 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "mute",
-          "persistentUuid": "5add142b-1647-4576-8512-09e4ea33a339",
+          "persistentUuid": "5b57e32e-1b5d-49c6-93f9-4436fe751eb7",
           "width": 0,
           "x": 320,
           "y": 320,
@@ -304,7 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "track_info",
-          "persistentUuid": "7679e39f-62a9-453a-a53a-ddd4cd94601b",
+          "persistentUuid": "1f6bd125-da7f-4ae9-8a7b-eccf8ab82daf",
           "width": 0,
           "x": 341.773,
           "y": 224,
@@ -320,7 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_background",
-          "persistentUuid": "726c7212-5433-48e6-b570-b365e549f968",
+          "persistentUuid": "763764e3-637c-4de4-8963-e3e4ff2b2bcc",
           "width": 0,
           "x": 307,
           "y": 293,
@@ -336,7 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_slider",
-          "persistentUuid": "73a39ae4-b783-4c18-84dc-06462a3d2c77",
+          "persistentUuid": "6d4d8005-f5b4-486b-82fa-6f438dd74964",
           "width": 0,
           "x": 307,
           "y": 278,
@@ -352,7 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "slider_button",
-          "persistentUuid": "b6bd393c-0b7d-486d-8ed5-baec35239162",
+          "persistentUuid": "78b65c67-c031-40f1-a7cf-c5052905faa1",
           "width": 0,
           "x": 538,
           "y": 273,

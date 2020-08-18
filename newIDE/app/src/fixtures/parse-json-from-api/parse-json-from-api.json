@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -178,7 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "cc88d7ff-af9f-455a-a9c7-a4f86631ef0d",
+          "persistentUuid": "f775cde1-84aa-4c26-8601-a01ffad52b6c",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -194,7 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
-          "persistentUuid": "9d8af996-fbd4-4d0c-8a7f-b1ff25f70ff5",
+          "persistentUuid": "f5a9640c-4a56-4820-ae4c-887efb891d7a",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -210,7 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "d4b418f5-c7fe-4e3b-aadb-92ffd33b5528",
+          "persistentUuid": "b43e2676-70da-4dd0-bb1c-a43c3362a1dc",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,

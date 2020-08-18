@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -173,7 +173,7 @@
           "layer": "",
           "locked": false,
           "name": "Pea",
-          "persistentUuid": "a94b8cb1-5830-4344-bae0-f7a1bd2298a5",
+          "persistentUuid": "6100f265-63cb-419d-b953-9af253b7e824",
           "width": 32,
           "x": 128,
           "y": 96,
@@ -189,7 +189,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "f4ef25e9-2edd-4d59-91a1-110da5cfbb30",
+          "persistentUuid": "c6610978-6b5f-42ab-a61a-5e0a4f2a82fb",
           "width": 0,
           "x": 288,
           "y": 96,
@@ -205,7 +205,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "5ebb605b-427d-4dff-af3a-78f47108bd67",
+          "persistentUuid": "a31863c3-44ba-4347-8730-50ee7bebccb1",
           "width": 0,
           "x": 0,
           "y": 0,

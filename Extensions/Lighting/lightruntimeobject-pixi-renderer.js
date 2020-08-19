@@ -114,11 +114,12 @@ gdjs.LightRuntimeObjectPixiRenderer._verticesWithAngleComparator = function (
 gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function (
   lightObject,
   angle,
-  polygons
+  polygons,
+  halfOfDiag
 ) {
   var centerX = lightObject.getX();
   var centerY = lightObject.getY();
-  var halfOfDiag = Math.sqrt(2) * lightObject.getRadius();
+  //var halfOfDiag = Math.sqrt(2) * lightObject.getRadius();
   var targetX = centerX + halfOfDiag * Math.cos(angle);
   var targetY = centerY + halfOfDiag * Math.sin(angle);
   var minSqDist = halfOfDiag * halfOfDiag;
@@ -271,14 +272,14 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
   var verticesCount = vertices.length;
   for (var i = 2; i < verticesCount; i += 2) {
     var lineColor = i % 4 === 0 ? 0xff0000 : 0x00ff00;
-    var lastX = i+2 >= verticesCount ? 2 : i+2;
-    var lastY = i+3 >= verticesCount ? 3 : i+3;
+    var lastX = i + 2 >= verticesCount ? 2 : i + 2;
+    var lastY = i + 3 >= verticesCount ? 3 : i + 3;
     this._debugGraphics
       .lineStyle(1, lineColor, 1)
       .lineTo(vertices[i], vertices[i + 1])
       .lineTo(vertices[lastX], vertices[lastY])
       .moveTo(vertices[0], vertices[1])
-      .lineTo(vertices[i], vertices[i+1])
+      .lineTo(vertices[i], vertices[i + 1])
       .moveTo(vertices[0], vertices[1])
       .lineTo(vertices[lastX], vertices[lastY]);
   }
@@ -400,11 +401,43 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
       obstaclePolygons.push(obstacleHitBoxes[i][j]);
   }
 
+  var maxX = this._object.x + this._radius;
+  var minX = this._object.x - this._radius;
+  var maxY = this._object.y + this._radius;
+  var minY = this._object.y - this._radius;
+
   var flattenVertices = [];
-  for (var i = 0; i < obstaclePolygons.length; i++) {
+  for (var i = 1; i < obstaclePolygons.length; i++) {
     var vertices = obstaclePolygons[i].vertices;
     var verticesCount = vertices.length;
-    for (var j = 0; j < verticesCount; j++) flattenVertices.push(vertices[j]);
+    for (var j = 0; j < verticesCount; j++) {
+      flattenVertices.push(vertices[j]);
+
+      if (vertices[j][0] < minX) minX = vertices[j][0];
+      if (vertices[j][0] > maxX) maxX = vertices[j][0];
+      if (vertices[j][1] < minY) minY = vertices[j][1];
+      if (vertices[j][1] > maxY) maxY = vertices[j][1];
+    }
+  }
+
+  obstaclePolygons[0].vertices[0][0] = minX;
+  obstaclePolygons[0].vertices[0][1] = minY;
+  obstaclePolygons[0].vertices[1][0] = maxX;
+  obstaclePolygons[0].vertices[1][1] = minY;
+  obstaclePolygons[0].vertices[2][0] = maxX;
+  obstaclePolygons[0].vertices[2][1] = maxY;
+  obstaclePolygons[0].vertices[3][0] = minX;
+  obstaclePolygons[0].vertices[3][1] = maxY;
+
+  var halfOfDiag = Math.max(
+    Math.hypot(this._object.x - minX, this._object.y - minY),
+    Math.hypot(maxX - this._object.x, this._object.y - minY),
+    Math.hypot(maxX - this._object.x, maxY - this._object.y),
+    Math.hypot(this._object.x - minX, maxY - this._object.y)
+  )
+
+  for(var i = 0; i < 4; i++) {
+    flattenVertices.push(obstaclePolygons[0].vertices[i]);
   }
 
   var closestVertices = [];
@@ -417,7 +450,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertex = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle,
-      obstaclePolygons
+      obstaclePolygons,
+      halfOfDiag
     );
     if (closestVertex) {
       closestVertices.push({
@@ -430,7 +464,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertexOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle + 0.0001,
-      obstaclePolygons
+      obstaclePolygons,
+      halfOfDiag
     );
     if (closestVertexOffsetLeft) {
       closestVertices.push({
@@ -441,7 +476,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertexOffsetRight = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle - 0.0001,
-      obstaclePolygons
+      obstaclePolygons,
+      halfOfDiag
     );
     if (closestVertexOffsetRight) {
       closestVertices.push({

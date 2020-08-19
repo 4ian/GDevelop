@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from '../../UI/ListIcon';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useShortcutMap } from '../../KeyboardShortcuts';
 import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -41,8 +41,7 @@ const AutocompletePicker = (
   props: Props<NamedCommand> | Props<CommandOption>
 ) => {
   const [open, setOpen] = React.useState(true);
-  const preferences = React.useContext(PreferencesContext);
-  const shortcutMap = preferences.values.shortcutMap;
+  const shortcutMap = useShortcutMap();
   const classes = useStyles();
 
   const handleClose = (_, reason) => {

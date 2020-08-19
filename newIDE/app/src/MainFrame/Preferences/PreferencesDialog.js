@@ -312,7 +312,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
         <Column>
           <ShortcutsList
             i18n={i18n}
-            shortcutMap={values.shortcutMap}
+            userShortcutMap={values.userShortcutMap}
             onEdit={setShortcutForCommand}
             onReset={resetShortcutsToDefault}
           />

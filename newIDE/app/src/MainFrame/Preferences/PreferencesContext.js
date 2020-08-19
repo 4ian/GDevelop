@@ -4,9 +4,7 @@ import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
-import defaultShortcuts, {
-  type ShortcutMap,
-} from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 
 export type AlertMessageIdentifier =
@@ -139,7 +137,7 @@ export type PreferencesValues = {|
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
   useCommandPalette: boolean,
-  shortcutMap: ShortcutMap,
+  userShortcutMap: ShortcutMap,
 |};
 
 /**
@@ -209,7 +207,7 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     useCommandPalette: false,
-    shortcutMap: defaultShortcuts,
+    userShortcutMap: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},

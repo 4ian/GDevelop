@@ -441,20 +441,23 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _resetShortcutsToDefault() {
     this.setState(
       state => ({
-        values: { ...state.values, shortcutMap: defaultShortcuts },
+        values: { ...state.values, userShortcutMap: {} },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
   }
 
   _setShortcutForCommand(commandName: CommandName, shortcutString: string) {
-    const updatedShortcutMap = {
-      ...this.state.values.shortcutMap,
-      [(commandName: string)]: shortcutString,
-    };
+    const defaultShortcut = defaultShortcuts[commandName] || '';
+    const setToDefault = defaultShortcut === shortcutString;
+
+    const updatedShortcutMap = { ...this.state.values.userShortcutMap };
+    if (setToDefault) delete updatedShortcutMap[commandName];
+    else updatedShortcutMap[commandName] = shortcutString;
+
     this.setState(
       state => ({
-        values: { ...state.values, shortcutMap: updatedShortcutMap },
+        values: { ...state.values, userShortcutMap: updatedShortcutMap },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

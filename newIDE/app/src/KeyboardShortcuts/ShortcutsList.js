@@ -19,7 +19,7 @@ import commandsList, {
 
 type Props = {|
   i18n: I18n,
-  shortcutMap: ShortcutMap,
+  userShortcutMap: ShortcutMap,
   onEdit: (commandName: CommandName, shortcut: string) => void,
   onReset: () => void,
 |};
@@ -48,7 +48,6 @@ const ShortcutsList = (props: Props) => {
   Object.keys(commandsList)
     .filter(name => !commandsList[name].noShortcut)
     .forEach(name => {
-      // Implement this
       const areaName = commandsList[name].area;
       if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
       areaWiseCommands[areaName].push(name);
@@ -68,21 +67,26 @@ const ShortcutsList = (props: Props) => {
             <Text size="title">{props.i18n._(commandAreas[areaName])}</Text>
             {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
-              const userShortcut = props.shortcutMap[commandName] || '';
+              const userShortcut = props.userShortcutMap[commandName];
               const defaultShortcut = defaultShortcuts[commandName] || '';
-              const isDefault = userShortcut === defaultShortcut;
-              const shortcutDisplayName = getShortcutDisplayName(userShortcut);
-              // Check if shortcut clashes with another command
-              const clashingCommandName = Object.keys(props.shortcutMap).find(
-                otherCommandName => {
-                  if (otherCommandName === commandName) return false;
-                  const commandShortcut =
-                    props.shortcutMap[otherCommandName] || '';
-                  if (commandShortcut !== userShortcut) return false;
-                  if (commandShortcut === '') return false;
-                  return true;
-                }
+              const shortcutString = userShortcut || defaultShortcut;
+              const shortcutDisplayName = getShortcutDisplayName(
+                shortcutString
               );
+              // Check if shortcut clashes with another command
+              const clashingCommandName = Object.keys(commandsList)
+                .filter(commandName => !commandsList[commandName].noShortcut)
+                .find(otherCommandName => {
+                  if (otherCommandName === commandName) return false;
+                  const otherShortcut =
+                    props.userShortcutMap[otherCommandName] ||
+                    defaultShortcuts[otherCommandName] ||
+                    '';
+                  if (shortcutString !== otherShortcut) return false;
+                  if (shortcutString === '') return false;
+                  console.log(otherCommandName);
+                  return true;
+                });
 
               return (
                 <ShortcutsListRow
@@ -90,7 +94,7 @@ const ShortcutsList = (props: Props) => {
                   key={commandName}
                   shortcutString={shortcutDisplayName}
                   commandName={commandName}
-                  isDefault={isDefault}
+                  isDefault={!userShortcut}
                   clashingCommand={clashingCommandName}
                   onEditShortcut={() => setEditedShortcut(commandName)}
                   onResetShortcut={() => resetShortcut(commandName)}

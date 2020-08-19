@@ -3,7 +3,7 @@ import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 import { getElectronAccelerator } from '../KeyboardShortcuts';
-import PreferencesContext from './Preferences/PreferencesContext';
+import { useShortcutMap } from '../KeyboardShortcuts';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
 import { type MainMenuProps } from './MainMenu.flow';
@@ -316,8 +316,7 @@ const buildAndSendMenuTemplate = (
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
-  const preferences = React.useContext(PreferencesContext);
-  const shortcutMap = preferences.values.shortcutMap;
+  const shortcutMap = useShortcutMap();
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);

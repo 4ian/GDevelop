@@ -4,8 +4,9 @@ import isDialogOpen from '../UI/OpenedDialogChecker';
 import { isMacLike } from '../Utils/Platform';
 import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
+import commandsList from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
+import defaultShortcuts, { type ShortcutMap } from './DefaultShortcuts';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 
@@ -65,12 +66,22 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
 };
 
 /**
+ * Patches default shortcuts set with user's custom shortcuts and
+ * returns the full shortcut map obtained.
+ */
+export const useShortcutMap = (): ShortcutMap => {
+  const preferences = React.useContext(PreferencesContext);
+  const userShortcutMap = preferences.values.userShortcutMap;
+  const fullShortcutMap = Object.assign({}, defaultShortcuts, userShortcutMap);
+  return fullShortcutMap;
+};
+
+/**
  * Listens for keyboard shortcuts and launches
  * callback with corresponding command
  */
 export const useKeyboardShortcuts = (onRunCommand: string => void) => {
-  const preferences = React.useContext(PreferencesContext);
-  const shortcutMap = preferences.values.shortcutMap;
+  const shortcutMap = useShortcutMap();
 
   React.useEffect(
     () => {

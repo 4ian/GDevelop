@@ -267,17 +267,20 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
   }
 
   this._debugGraphics.clear();
-  for (var i = 0; i < vertices.length; i += 2) {
+  this._debugGraphics.moveTo(vertices[2], vertices[3]);
+  var verticesCount = vertices.length;
+  for (var i = 2; i < verticesCount; i += 2) {
     var lineColor = i % 4 === 0 ? 0xff0000 : 0x00ff00;
+    var lastX = i+2 >= verticesCount ? 2 : i+2;
+    var lastY = i+3 >= verticesCount ? 3 : i+3;
     this._debugGraphics
       .lineStyle(1, lineColor, 1)
+      .lineTo(vertices[i], vertices[i + 1])
+      .lineTo(vertices[lastX], vertices[lastY])
       .moveTo(vertices[0], vertices[1])
-      .lineTo(vertices[i], vertices[i + 1]);
-    if (i !== vertices.length - 2) {
-      this._debugGraphics.lineTo(vertices[i + 2], vertices[i + 3]);
-    } else {
-      this._debugGraphics.lineTo(vertices[2], vertices[3]);
-    }
+      .lineTo(vertices[i], vertices[i+1])
+      .moveTo(vertices[0], vertices[1])
+      .lineTo(vertices[lastX], vertices[lastY]);
   }
 };
 

@@ -8,6 +8,7 @@
  */
 gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._object = runtimeObject;
+  this._runtimeScene = runtimeScene;
   this._manager = runtimeObject.getObstaclesManager();
   this._radius = runtimeObject.getRadius();
   var objectColor = runtimeObject.getColor();
@@ -17,10 +18,11 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
 
-  /** @type {?PIXI.Texture} */
-  this._texture = runtimeObject.getPIXITexture();
-  this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
+  /** @type {string} */
+  this._texture = null;
+  this.updateTexture();
 
+  this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
   this._defaultVertexBuffer = new Float32Array(8);
   this._vertexBuffer = new Float32Array([
     runtimeObject.x - this._radius,
@@ -36,7 +38,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
   /** @type {?PIXI.Mesh} */
   this._light = null;
-  this._updateMesh();
+  this.updateMesh();
 
   this._isPreview = runtimeScene.getGame().isPreview();
   this._debugMode = null;
@@ -157,7 +159,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
   this._updateBuffers();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype._updateMesh = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateMesh = function () {
+  this.updateTexture();
   var fragmentShader =
     this._texture === null
       ? gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader
@@ -204,8 +207,11 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
-  this._texture = this._object.getPIXITexture();
-  this._updateMesh();
+  var texture = this._object.getTexture();
+  this._texture =
+    texture !== ''
+      ? this._runtimeScene.getGame().getImageManager().getPIXITexture(texture)
+      : null;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugMode = function () {

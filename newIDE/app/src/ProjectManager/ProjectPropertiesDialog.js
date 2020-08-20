@@ -19,6 +19,7 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import ExtensionsProperties from './ExtensionsProperties';
 
 type Props = {|
   project: gdProject,
@@ -136,6 +137,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       maxFPS,
       isFolderProject,
     } = this.state;
+    const { project } = this.props;
 
     const defaultPackageName = 'com.example.mygame';
     const defaultVersion = '1.0.0';
@@ -422,6 +424,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               />
             </SelectField>
           </ColumnStackLayout>
+          <ExtensionsProperties project={project} />
         </Dialog>
         <SubscriptionChecker
           ref={subscriptionChecker =>

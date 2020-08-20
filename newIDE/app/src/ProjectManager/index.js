@@ -13,7 +13,6 @@ import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
-import ExtensionsPropertiesDialog from './ExtensionsPropertiesDialog';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
@@ -31,7 +30,6 @@ import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import Tune from '@material-ui/icons/Tune';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
 import Settings from '@material-ui/icons/Settings';
 import Save from '@material-ui/icons/Save';
@@ -292,7 +290,6 @@ type State = {|
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
-  extensionsPropertiesDialogOpen: boolean,
   projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
   layoutPropertiesDialogOpen: boolean,
@@ -309,7 +306,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
-    extensionsPropertiesDialogOpen: false,
     projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
     layoutPropertiesDialogOpen: false,
@@ -787,14 +783,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                   this.props.onOpenResources();
                 }}
               />,
-              <ListItem
-                key="extension-properties"
-                primaryText={<Trans>Extensions Properties</Trans>}
-                leftIcon={<Tune />}
-                onClick={() =>
-                  this.setState({ extensionsPropertiesDialogOpen: true })
-                }
-              />,
             ]}
           />
           <ProjectStructureItem
@@ -1142,15 +1130,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}
-          />
-        )}
-        {this.state.extensionsPropertiesDialogOpen && (
-          <ExtensionsPropertiesDialog
-            open={this.state.extensionsPropertiesDialogOpen}
-            project={project}
-            onApply={() => {
-              this.setState({ extensionsPropertiesDialogOpen: false });
-            }}
           />
         )}
         {!!this.state.editedPropertiesLayout && (

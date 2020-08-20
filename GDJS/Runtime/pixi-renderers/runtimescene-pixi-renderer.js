@@ -14,7 +14,7 @@ gdjs.RuntimeScenePixiRenderer = function (runtimeScene, runtimeGameRenderer) {
   this._runtimeScene = runtimeScene;
   this._pixiContainer = new PIXI.Container(); // Contains the layers of the scene (and, optionally, debug PIXI objects).
   this._normalMapContainer = new PIXI.Container(); // Contains the normal map layers of the scene.
-  this._forwardDiffuseFilter = new gdjs.ForwardDiffusedRenderFilter(this);
+  // this._forwardDiffuseFilter = new gdjs.ForwardDiffusedRenderFilter(this);
   this._pixiContainer.sortableChildren = true;
 
   /** @type {?PIXI.Graphics} */

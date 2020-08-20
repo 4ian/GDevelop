@@ -4,14 +4,16 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/PlatformExtension.h"
+
 #include <algorithm>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
-#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
@@ -118,12 +120,12 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
 #endif
 }
 
-gd::DependencyMetadata& PlatformExtension::AddDependency() {
 #if defined(GD_IDE_ONLY)
-  extensionDependencies.push_back(DependencyMetadata());
-  return extensionDependencies.back();
-#endif
+gd::DependencyMetadata& PlatformExtension::AddDependency() {
+  extensionDependenciesMetadata.push_back(DependencyMetadata());
+  return extensionDependenciesMetadata.back();
 }
+#endif
 
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
@@ -224,8 +226,7 @@ std::vector<gd::String> PlatformExtension::GetExtensionObjectsTypes() const {
 
 std::vector<gd::String> PlatformExtension::GetExtensionEffectTypes() const {
   std::vector<gd::String> effectNames;
-  for (auto& it : effectsMetadata)
-    effectNames.push_back(it.first);
+  for (auto& it : effectsMetadata) effectNames.push_back(it.first);
 
   return effectNames;
 }
@@ -291,9 +292,8 @@ PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
 }
 
-std::vector<gd::DependencyMetadata>&
-PlatformExtension::GetAllDependencies() {
-  return extensionDependencies;
+std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
+  return extensionDependenciesMetadata;
 }
 
 std::map<gd::String, gd::EventMetadata>& PlatformExtension::GetAllEvents() {
@@ -417,7 +417,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
       name == "BuiltinCommonConversions" ||
       name == "BuiltinStringInstructions" ||
       name == "BuiltinMathematicalTools" ||
-      name == "Effects" || // Well-known effects are not namespaced.
+      name == "Effects" ||      // Well-known effects are not namespaced.
       name == "CommonDialogs")  // New name for BuiltinInterface
   {
     nameSpace = "";

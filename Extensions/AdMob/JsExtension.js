@@ -32,7 +32,7 @@ module.exports = {
       'MIT'
     );
 
-    extension.registerProperty("AdMobAppID")
+    extension.registerProperty("AdMobAppId")
       .setDescription("AdMob App ID")
       .setType("string")
       .setLabel("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY");
@@ -44,7 +44,7 @@ module.exports = {
       .setVersion("~0.21.0")
       .setExtraSetting(
         "ADMOB_APP_ID", 
-        new gd.PropertyDescriptor("AdMobAppID")
+        new gd.PropertyDescriptor("AdMobAppId")
          .setType("ExtensionProperty")
       );
 

@@ -5,13 +5,16 @@
  */
 
 #include "Project.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <cctype>
+
 #include <SFML/System/Utf.hpp>
+#include <cctype>
 #include <fstream>
 #include <map>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -616,12 +619,17 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetStringAttribute("macExecutableFilename");
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
-  
-  extensionProperties.UnserializeFrom(propElement.GetChild("extensionProperties"));
 
-  // Compatibility: Move AdMob App ID from project property to extension property.
-  if(propElement.GetStringAttribute("adMobAppId", "") != "") {
-    extensionProperties.SetValue("AdMob", "AdMobAppID", propElement.GetStringAttribute("adMobAppId", ""));
+  extensionProperties.UnserializeFrom(
+      propElement.GetChild("extensionProperties"));
+
+  // Compatibility: Move AdMob App ID from project property to extension
+  // property.
+  if (propElement.GetStringAttribute("adMobAppId", "") != "") {
+    extensionProperties.SetValue(
+        "AdMob",
+        "AdMobAppId",
+        propElement.GetStringAttribute("adMobAppId", ""));
   }
 
 #endif
@@ -872,7 +880,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
-  propElement.SetAttribute("adaptGameResolutionAtRuntime", adaptGameResolutionAtRuntime);
+  propElement.SetAttribute("adaptGameResolutionAtRuntime",
+                           adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);

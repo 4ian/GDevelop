@@ -6,6 +6,7 @@
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -33,13 +34,6 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Empty constructor creating an empty property to be displayed.
    */
   PropertyDescriptor() : hidden(false){};
-
-  /**
-   * \brief Returns a new PropertyDescriptor with the same data as the current one.
-   */
-  virtual PropertyDescriptor* Clone() const {
-    return new PropertyDescriptor(*this);
-  };
 
   /**
    * \brief Destructor
@@ -129,12 +123,12 @@ class GD_CORE_API PropertyDescriptor {
   virtual void UnserializeFrom(const SerializerElement& element);
 
   /**
-   * \brief Serilaize only the Value and Extra Informations.
+   * \brief Serialize only the value and extra informations.
    */
   virtual void SerializeValuesTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserilaize only the Value and Extra Informations.
+   * \brief Unserialize only the value and extra informations.
    */
   virtual void UnserializeValuesFrom(const SerializerElement& element);
   ///@}
@@ -144,7 +138,7 @@ class GD_CORE_API PropertyDescriptor {
   gd::String
       type;  ///< The type of the property. This is arbitrary and interpreted by
              ///< the class responsible for updating the property grid.
-  gd::String label;  //< The user-friendly property name
+  gd::String label;        //< The user-friendly property name
   gd::String description;  //< The user-friendly property description
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available

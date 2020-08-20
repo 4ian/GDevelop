@@ -30,5 +30,5 @@
     <!-- Cordova/Phonegap version -->
     <preference name="phonegap-version" value="cli-8.0.0" />
 
-    <!-- GDJS_PLUGINS -->
+    <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
 </widget>

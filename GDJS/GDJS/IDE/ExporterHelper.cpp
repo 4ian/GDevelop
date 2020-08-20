@@ -292,7 +292,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   }
 
   str = str.FindAndReplace(
-    "<!-- GDJS_PLUGINS -->",
+    "<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->",
     plugins
   );
 
@@ -464,7 +464,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     packages = packages.substr(1, packages.size()); // Remove first line break for esthetic.
     packages = packages.substr(0, packages.size()-1); // Remove the , at the end as last item cannot have , in JSON.
 
-    str = str.FindAndReplace("\"GDJS_DEPENDENCY\": \"0\"", packages);
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"", packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";

@@ -151,7 +151,6 @@ var adaptNamingConventions = function(gd) {
     //Preserve backward compatibility with some alias for methods:
     gd.VectorString.prototype.get = gd.VectorString.prototype.at;
     gd.VectorPlatformExtension.prototype.get = gd.VectorPlatformExtension.prototype.at;
-    gd.VectorDependencyMetadata.prototype.get = gd.VectorDependencyMetadata.prototype.at;
     gd.InstructionsList.prototype.push_back = function(e) {
         this.insert(e, this.size() - 1);
     };

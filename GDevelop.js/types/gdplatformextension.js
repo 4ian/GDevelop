@@ -40,7 +40,6 @@ declare class gdPlatformExtension {
   getAllConditionsForBehavior(autoType: string): gdMapStringInstructionMetadata;
   getAllExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
   getAllStrExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
-  getProperty(propertyName: string): gdPropertyDescriptor;
   getAllProperties(): gdMapStringPropertyDescriptor;
   getAllDependencies(): gdVectorDependencyMetadata;
   static getNamespaceSeparator(): string;

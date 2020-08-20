@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "PropertyDescriptor.h"
+
 #include <vector>
+
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 
@@ -55,7 +57,8 @@ void PropertyDescriptor::SerializeValuesTo(SerializerElement& element) const {
   }
 }
 
-void PropertyDescriptor::UnserializeValuesFrom(const SerializerElement& element) {
+void PropertyDescriptor::UnserializeValuesFrom(
+    const SerializerElement& element) {
   currentValue = element.GetChild("value").GetStringValue();
 
   extraInformation.clear();

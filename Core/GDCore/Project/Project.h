@@ -9,13 +9,13 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
-#include "GDCore/Project/ExtensionPropertiesManager.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -295,12 +295,16 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Get all extension properties
    */
-  gd::ExtensionPropertiesManager& GetExtensionPropertiesManager() { return extensionProperties; };
+  gd::ExtensionProperties& GetExtensionPropertiesManager() {
+    return extensionProperties;
+  };
 
   /**
    * \brief Get all extension properties
    */
-  const gd::ExtensionPropertiesManager& GetExtensionPropertiesManager() const { return extensionProperties; };
+  const gd::ExtensionProperties& GetExtensionPropertiesManager() const {
+    return extensionProperties;
+  };
 
   /**
    * Return the list of platforms used by the project.
@@ -974,8 +978,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
-      externalEvents;                   ///< List of all externals events
-  ExtensionPropertiesManager extensionProperties; ///< The properties of the extensions.
+      externalEvents;  ///< List of all externals events
+  ExtensionProperties
+      extensionProperties;              ///< The properties of the extensions.
   mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
   mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last

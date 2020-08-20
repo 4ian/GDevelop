@@ -57,7 +57,7 @@ declare class libGDevelop {
   LoadingScreen: Class<gdLoadingScreen>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
-  ExtensionPropertiesManager: Class<gdExtensionPropertiesManager>;
+  ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorContent: Class<gdBehaviorContent>;

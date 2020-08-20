@@ -322,7 +322,7 @@ interface Project {
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
     [Const, Ref] VectorString GetUsedExtensions();
-    [Ref] ExtensionPropertiesManager GetExtensionPropertiesManager();
+    [Ref] ExtensionProperties GetExtensionPropertiesManager();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 
@@ -395,7 +395,7 @@ interface Project {
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
-interface ExtensionPropertiesManager {
+interface ExtensionProperties {
     [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
     void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
     boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
@@ -643,8 +643,6 @@ interface Layer {
 
 interface PropertyDescriptor {
     void PropertyDescriptor([Const] DOMString propValue);
-
-    PropertyDescriptor Clone();
 
     [Ref] PropertyDescriptor SetValue([Const] DOMString value);
     [Const, Ref] DOMString GetValue();
@@ -1309,9 +1307,7 @@ interface PlatformExtension {
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
     
-    [Ref] PropertyDescriptor GetProperty([Const] DOMString propertyName);
     [Ref] MapStringPropertyDescriptor GetAllProperties();
-
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();

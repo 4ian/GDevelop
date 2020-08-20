@@ -26,7 +26,7 @@ type KeyType =
 const getKeyTypeFromCode = (code: string): KeyType | null => {
   if (code.indexOf('Key') === 0) return 'alphabet';
   if (code.indexOf('Digit') === 0) return 'number';
-  if (code.indexOf('F') === 0) return 'fn-row'; // Improve this
+  if (code.indexOf('F') === 0) return 'fn-row';
   if (code === 'NumpadAdd' || code === 'NumpadSubtract') return 'numpad-arith';
   if (code === 'Equal' || code === 'Minus') return 'numrow-arith';
   if (code === 'Tab' || code === 'Space') return 'other';
@@ -34,35 +34,50 @@ const getKeyTypeFromCode = (code: string): KeyType | null => {
 };
 
 /**
- * Creates a keyboard shortcut string from a keyboard event object
- * Returns null if event does not correspond to valid shortcut press
+ * Returns possibly partial shortcut string corresponding to given event object
  */
-export const getShortcutStringFromEvent = (e: KeyboardEvent): ?string => {
+export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
+  let shortcutString = '';
+  if (e.ctrlKey || e.metaKey) shortcutString += 'CmdOrCtrl+';
+  if (e.shiftKey) shortcutString += 'Shift+';
+  if (e.altKey) shortcutString += 'Alt+';
+
+  const keyType = getKeyTypeFromCode(e.code);
+  if (keyType) shortcutString += e.code;
+  return shortcutString;
+};
+
+/**
+ * Checks if the given event corresponds to a valid shortcut press.
+ * Does not check if shortcut is reserved or not.
+ */
+export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
   // Check if action key is a shortcut supported key
   const keyType = getKeyTypeFromCode(e.code);
-  if (!keyType) return;
+  if (!keyType) return false;
 
   const ctrlOrCmdPressed = e.ctrlKey || e.metaKey;
-  const shiftPressed = e.shiftKey;
   const altPressed = e.altKey;
 
   // Check keytype-specific restrictions
   if (keyType === 'other') {
     // Tab and Space may clash with keyboard navigation - Ctrl or Alt required
-    if (!ctrlOrCmdPressed && !altPressed) return;
+    if (!ctrlOrCmdPressed && !altPressed) return false;
   }
 
-  const shortcutStringPieces = [];
-  if (ctrlOrCmdPressed) shortcutStringPieces.push('CmdOrCtrl');
-  if (shiftPressed) shortcutStringPieces.push('Shift');
-  if (altPressed) shortcutStringPieces.push('Alt');
-  shortcutStringPieces.push(e.code);
-  const shortcutString = shortcutStringPieces.join('+');
+  return true;
+};
 
-  // Check if shortcut string is reserved
-  if (reservedShortcuts.includes(shortcutString)) return;
-
-  return shortcutString;
+/**
+ * Extracts shortcut-related information from given event object
+ */
+export const getShortcutMetadataFromEvent = (
+  e: KeyboardEvent
+): {| shortcutString: string, isValid: boolean |} => {
+  const shortcutString = getShortcutStringFromEvent(e);
+  const isValidShortcut = isValidShortcutEvent(e);
+  const isReserved = reservedShortcuts.includes(shortcutString);
+  return { shortcutString, isValid: isValidShortcut && !isReserved };
 };
 
 /**
@@ -86,10 +101,13 @@ export const useKeyboardShortcuts = (onRunCommand: string => void) => {
   React.useEffect(
     () => {
       const handler = (e: KeyboardEvent) => {
-        // Get shortcut string and corresponding command name from event
-        const shortcutString = getShortcutStringFromEvent(e);
+        // Extract shortcut from event object and check if it's valid
+        const shortcutData = getShortcutMetadataFromEvent(e);
+        if (!shortcutData.isValid) return;
+
+        // Get corresponding command, if it exists
         const commandName = Object.keys(shortcutMap).find(
-          name => shortcutMap[name] === shortcutString
+          name => shortcutMap[name] === shortcutData.shortcutString
         );
         if (!commandName) return;
 

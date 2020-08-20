@@ -5,7 +5,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import { getShortcutDisplayName, getShortcutStringFromEvent } from './index';
+import { getShortcutMetadataFromEvent, getShortcutDisplayName } from './index';
 
 const styles = {
   shortcutBox: {
@@ -21,17 +21,23 @@ type Props = {|
 |};
 
 const DetectShortcutDialog = (props: Props) => {
-  const [shortcutString, setShortcutString] = React.useState<?string>(null);
+  const [shortcutString, setShortcutString] = React.useState('');
+  const [isValid, setIsValid] = React.useState(false);
 
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
-      const shortcut = getShortcutStringFromEvent(e);
-      if (!shortcut) return;
-      setShortcutString(shortcut);
+      const metadata = getShortcutMetadataFromEvent(e);
+      if (e.type === 'keyup') return;
+      setIsValid(metadata.isValid);
+      setShortcutString(metadata.shortcutString);
     };
+    document.addEventListener('keyup', handler);
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+      document.removeEventListener('keyup', handler);
+    };
   }, []);
 
   return (
@@ -55,7 +61,7 @@ const DetectShortcutDialog = (props: Props) => {
             shortcutString && props.onSet(shortcutString);
             props.onClose();
           }}
-          disabled={!shortcutString}
+          disabled={!isValid}
         />,
       ]}
       secondaryActions={[

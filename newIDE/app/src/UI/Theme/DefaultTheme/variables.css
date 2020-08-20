@@ -1,0 +1,124 @@
+:root {
+    --white-default: #ffffff;
+    
+    --gdevelop-purple-default: #9100ce;
+    --canvas-color-default: #f0f0f0;
+    --background-color-default: #f7f7f7;
+    --alternate-canvas-color-default: #ffffff;
+    --system-selection-color-default: #4c92ff;
+  
+  
+  }
+
+  /*gdevelop theme*/
+:root {
+    /*toolbar*/
+    --separator-color-default: #cecece;
+    /*closable tabs*/
+    --text-color-default: #878787;
+    --selected-text-color-default: #ffffff;
+    /*list items*/
+    --group-text-color-default: #0000008a;
+    --deprecated-group-text-color-default: #0000004d;
+    --list-item-separator-color-default: #e0e0e0;
+    --right-icon-color-default: #111;
+    --selected-right-icon-color-default: #111;
+    --error-text-color-default: #ff2e16;
+    --warning-text-color-default: #ffb032;
+    --selected-error-background-color-default: #ff2e16;
+    --selected-warning-background-color-default: #ffb032;
+
+  }
+  
+  /*gd-table*/
+:root {
+    --gdtable-default: black;
+    --tablerow-default: #e0e0e0;
+    --tableheadercolumn-default: #9e9e9e;
+    --tableselectedrow-default: #4c92ff;
+    --tableoddrow-default: #fafafa;
+  }
+  
+  /*mosaic*/
+:root {
+    --mosaic-window-toolbar-default: #9100ce;
+    --mosaic-layout-default: #e0e0e0;
+    --mosaic-window-body-default: #e0e0e0;
+    --mosaic-window-title-default: white;
+    --mosaic-window-toolbar-hover-default: #9100ce;
+    --mosaic-split-line-hover-default: #2b95d6;
+    --mosaic-split-line-default: #e0e0e0;
+    --mosaic-split-column-default: #e0e0e0;
+  }
+
+  /*markdown*/
+:root {
+    --markdown-a-default: #4ab0e4;
+}
+
+/*events sheet*/
+:root {
+    --events-tree-default: #f0f0f2;
+    --rst__moveHandle-default: #4ab0e4;
+    --rst__moveHandle-hover-default: #84d2ff;
+    --linehalf-default: black;
+    --rst__rowContents-bg-color-default: #f0f0f2;
+    --rst__rowContents-color-default: black;
+    --selectable-hover-default: #0000001a;
+    --selectable-selected-bg-default: #0000001a;
+    --selectable-selected-border-default: #4ab0e4;
+    /*large selectable area*/
+    --large-selectable-default: #f0f0f2;
+    --large-selectable-selected-default: #4ab0e4;
+
+    /*conditions and actions*/
+    --conditions-container-bg-default: #f1f2f2;
+    --conditions-container-border-default: #e2e2e2;
+    /*conditions container*/
+    --small-width-container-border-right-default: #e2e2e2;
+    --small-width-container-border-bottom-default: #e2e2e2;
+
+    /*actions container*/
+    --actions-container-bg-default: #ffffff;
+    --sub-instructions-container-border-left-default: #d3d3d3;
+
+    /*instructions parameters color scheme*/
+    --instruction-parameter-default: #4e4e4e;
+    --instruction-parameter-expression-default: #1b8f01;
+    --instruction-parameter-object-default: #3c4698;
+    --instruction-parameter-behavior-default: #777777;
+    --instruction-parameter-operator-default: #3783d3;
+    --instruction-parameter-objectvar-default: #8337a2;
+    --instruction-parameter-scenevar-default: #8337a2;
+    --instruction-parameter-globalvar-default: #8337a2;
+    --instruction-invalid-parameter-default: #bb0000;
+    --instruction-invalid-parameter-text-decoration-default: #bb0000;
+    --instruction-missing-parameter-bg-default: #f3000c26;
+    --instruction-missing-parameter-border-bottom-default: #bb0000;
+
+    /*search result highlights*/
+    --search-results-rst__moveHandle-bg-default: #d3d3d3;
+    --rst__moveHandle-border-default: #d3d3d3;
+    --rst__rowSearchMatch-border-left-default: #18dcf2;
+    --rst__rowSearchFocus-border-left-default: #18dcf2;
+
+    /*drag and drop indicator (events)*/
+    --drop-indicator-border-top-default: black;
+    --cant-drop-indicatorborder-top-default: #ff5c5c;
+
+    /*Skinning the "Link" event*/
+    --link-container-default: #f1f2f2;
+
+    --link-container-selectable-default: #3c4698;
+
+
+
+
+
+
+
+
+
+
+
+}

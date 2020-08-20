@@ -1,16 +1,65 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
 import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
-import './Mosaic.css';
-import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
-import './Table.css';
-import './Markdown.css';
+import './variables.css';
+import './styles.css';
 
-const almostWhite = '#EEE';
-const lightWhite = '#DDD';
-const notSoWhite = '#CCC';
-const gdevelopDarkBlue = '#3c4698';
+const canvas_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--canvas-color-dark');
+const alternate_canvas_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--alternate-canvas-color-dark');
+const system_selection_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--system-selection-color-dark');
+const separator_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--separator-color-dark');
+const list_item_separator_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--list-item-separator-color-dark');
+const text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--text-color-dark');
+const group_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--group-text-color-dark');
+const deprecated_group_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--deprecated-group-text-color-dark');
+const right_icon_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--right-icon-color-dark');
+const selected_right_icon_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-right-icon-color-dark');
+const error_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--error-text-color-dark');
+const warning_text_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--warning-text-color');
+const selected_error_background_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-error-background-color-dark');
+const selected_warning_background_color = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--selected-warning-background-color-dark');
+const almost_white = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--almost-white-dark');
+const not_so_white = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--not-so-white-dark');
+const gdevelop_dark_blue = window
+  .getComputedStyle(document.documentElement)
+  .getPropertyValue('--gdevelop-dark-blue-dark');
+const almostWhite = almost_white;
+const lightWhite = '#ddd';
+const notSoWhite = not_so_white;
+const gdevelopDarkBlue = gdevelop_dark_blue;
 const blue = '#2c6bf5';
 
 // Use the fonts provided by the operating system(s) as possible.
@@ -18,7 +67,7 @@ const blue = '#2c6bf5';
 const fontFamily =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
 
-const systemSelectionColor = '#4c92ff'; //OS X selection
+const systemSelectionColor = system_selection_color; //OS X selection
 
 /**
  * The background color of the main window
@@ -28,13 +77,13 @@ const backgroundColor = '#252525';
 /**
  * The background color of the "papers", "dialogs", etc...
  */
-const canvasColor = '#303030';
+const canvasColor = canvas_color;
 
 /**
  * The alternate background color, for some lists or search box,
  * to distinguish them from other content.
  */
-const alternateCanvasColor = '#494949';
+const alternateCanvasColor = alternate_canvas_color;
 
 // GDevelop specific variables:
 const gdevelopTheme = {
@@ -48,13 +97,13 @@ const gdevelopTheme = {
   },
   toolbar: {
     backgroundColor: backgroundColor,
-    separatorColor: '#4d4d4d',
+    separatorColor: separator_color,
   },
   closableTabs: {
     fontFamily,
     containerBackgroundColor: backgroundColor,
     backgroundColor: canvasColor,
-    textColor: '#878787',
+    textColor: text_color,
     selectedBackgroundColor: gdevelopDarkBlue,
     selectedTextColor: almostWhite,
     width: 200,
@@ -72,17 +121,17 @@ const gdevelopTheme = {
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
-    groupTextColor: '#AAA',
-    deprecatedGroupTextColor: '#888',
-    separatorColor: '#4d4d4d',
+    groupTextColor: group_text_color,
+    deprecatedGroupTextColor: deprecated_group_text_color,
+    separatorColor: list_item_separator_color,
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: almostWhite,
-    rightIconColor: '#fff',
-    selectedRightIconColor: '#fff',
-    errorTextColor: '#ff2e16',
-    warningTextColor: '#ffb032',
-    selectedErrorBackgroundColor: '#ff2e16',
-    selectedWarningBackgroundColor: '#ffb032',
+    rightIconColor: right_icon_color,
+    selectedRightIconColor: selected_right_icon_color,
+    errorTextColor: error_text_color,
+    warningTextColor: warning_text_color,
+    selectedErrorBackgroundColor: selected_error_background_color,
+    selectedWarningBackgroundColor: selected_warning_background_color,
   },
   emptyMessage: {
     shadowColor: '#000',
@@ -90,10 +139,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo.png',
   },
-  mosaicRootClassName: 'mosaic-gd-dark-theme', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet-dark-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-dark-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-dark-theme', // See Markdown.css
+  mosaicRootClassName: 'mosaic-gd-dark-theme', 
+  eventsSheetRootClassName: 'gd-events-sheet-dark-theme', 
+  tableRootClassName: 'gd-table-dark-theme', 
+  markdownRootClassName: 'gd-markdown-dark-theme', 
   gdevelopIconsCSSFilter: '',
 };
 

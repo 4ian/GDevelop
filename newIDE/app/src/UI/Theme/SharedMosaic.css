@@ -1,17 +1,26 @@
-.mosaic-gd .mosaic-window .mosaic-window-title {
+.mosaic-gd-dark-theme .mosaic-window .mosaic-window-title,
+.mosaic-gd-default-theme .mosaic-window .mosaic-window-title,
+.mosaic-gd-nord-theme .mosaic-window .mosaic-window-title,
+.mosaic-gd-solarized-dark-theme .mosaic-window .mosaic-window-title {
   font-weight: 400 !important;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
   font-size: 15px; /* Same as ClosableTabs font size */
 }
 
-.mosaic-gd .mosaic-split.-column .mosaic-split-line {
+.mosaic-gd-dark-theme .mosaic-split.-column .mosaic-split-line,
+.mosaic-gd-default-theme .mosaic-split.-column .mosaic-split-line,
+.mosaic-gd-nord-theme .mosaic-split.-column .mosaic-split-line,
+.mosaic-gd-solarized-dark-theme .mosaic-split.-column .mosaic-split-line {
   height: 1px;
   width: 25px;
   margin: auto;
   bottom: 1px;
 }
 
-.mosaic-gd .mosaic-split:hover .mosaic-split-line {
+.mosaic-gd-dark-theme .mosaic-split:hover .mosaic-split-line,
+.mosaic-gd-default-theme .mosaic-split:hover .mosaic-split-line,
+.mosaic-gd-nord-theme .mosaic-split:hover .mosaic-split-line,
+.mosaic-gd-solarized-dark-theme .mosaic-split:hover .mosaic-split-line {
   box-shadow: none !important;
   cursor: ns-resize;
 }

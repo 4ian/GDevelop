@@ -1,11 +1,9 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
 import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
-import './Mosaic.css';
-import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
-import './Table.css';
-import './Markdown.css';
+import './variables.css';
+import './styles.css';
 
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';
@@ -89,10 +87,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-solarized-dark-theme', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet-solarized-dark-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-solarized-dark-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-solarized-dark-theme', // See Markdown.css
+  mosaicRootClassName: 'mosaic-gd-solarized-dark-theme', 
+  eventsSheetRootClassName: 'gd-events-sheet-solarized-dark-theme',
+  tableRootClassName: 'gd-table-solarized-dark-theme', 
+  markdownRootClassName: 'gd-markdown-solarized-dark-theme', 
   gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(70%) brightness(90%)',
 };
 

@@ -1,61 +1,54 @@
 // @flow
 import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
-import '../SharedEventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
-import '../SharedMarkdown.css';
-import './ThemeColors.css';
-import './Theme.css';
-import '../SharedMosaic.css';
-import '../SharedTable.css';
+import './variables.css';
+import './styles.css';
 
-const background_color = window
-  .getComputedStyle(document.documentElement)
-  .getPropertyValue('--background-color');
 const canvas_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--canvas-color');
+  .getPropertyValue('--canvas-color-default');
 const alternate_canvas_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--alternate-canvas-color');
+  .getPropertyValue('--alternate-canvas-color-default');
 const system_selection_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--system-selection-color');
+  .getPropertyValue('--system-selection-color-default');
 const separator_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--separator-color');
+  .getPropertyValue('--separator-color-default');
 const list_item_separator_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--list-item-separator-color');
+  .getPropertyValue('--list-item-separator-color-default');
 const text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--text-color');
+  .getPropertyValue('--text-color-default');
 const selected_text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--selected-text-color');
+  .getPropertyValue('--selected-text-color-default');
 const group_text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--group-text-color');
+  .getPropertyValue('--group-text-color-default');
 const deprecated_group_text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--deprecated-group-text-color');
+  .getPropertyValue('--deprecated-group-text-color-default');
 const right_icon_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--right-icon-color');
+  .getPropertyValue('--right-icon-color-default');
 const selected_right_icon_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--selected-right-icon-color');
+  .getPropertyValue('--selected-right-icon-color-default');
 const error_text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--error-text-color');
+  .getPropertyValue('--error-text-color-default');
 const warning_text_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--warning-text-color');
+  .getPropertyValue('--warning-text-color-default');
 const selected_error_background_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--selected-error-background-color');
+  .getPropertyValue('--selected-error-background-color-default');
 const selected_warning_background_color = window
   .getComputedStyle(document.documentElement)
-  .getPropertyValue('--selected-warning-background-color');
+  .getPropertyValue('--selected-warning-background-color-default');
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -70,7 +63,7 @@ const fontFamily =
 /**
  * The background color of the main window
  */
-const backgroundColor = background_color;
+const backgroundColor = '#f7f7f7';
 
 /**
  * The background color of the "papers", "dialogs", etc...
@@ -136,10 +129,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet', // See EventsSheet.css
-  tableRootClassName: 'gd-table', // See Table.css
-  markdownRootClassName: 'gd-markdown', // See Markdown.css
+  mosaicRootClassName: 'mosaic-gd-default-theme', 
+  eventsSheetRootClassName: 'gd-events-sheet-default-theme', 
+  tableRootClassName: 'gd-table-default-theme', 
+  markdownRootClassName: 'gd-markdown-default-theme', 
   gdevelopIconsCSSFilter: '',
 };
 

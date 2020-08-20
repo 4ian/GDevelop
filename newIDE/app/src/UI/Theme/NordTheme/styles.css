@@ -1,0 +1,235 @@
+/*markdown*/
+.gd-markdown-nord-theme a {
+    color: var(--markdown-a-nord);
+}
+.gd-markdown-nord-theme blockquote {
+  border-left: 5px solid var(--markdown-blocquote-nord);
+  
+}
+
+
+/*mosaic*/
+/* Mosaic layout */
+.mosaic-gd-nord-theme.mosaic {
+    background-color: var(--mosaic-layout-nord) !important;
+  }
+  
+  /* Mosaic window and tile */
+  .mosaic-gd-nord-theme .mosaic-window-toolbar {
+    background: var(--mosaic-window-toolbar-nord) !important;
+  }
+  .mosaic-gd-nord-theme .mosaic-window-body {
+    background: var(--mosaic-window-body-nord) !important;
+  }
+  .mosaic-gd-nord-theme .mosaic-window .mosaic-window-title {
+    color: var(--mosaic-window-title-nord) !important;
+  }
+  
+  /* Hovered titlebar background */
+  .mosaic-gd-nord-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+  .mosaic-gd-nord-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+    background: var(--mosaic-window-toolbar-hover-nord) !important;
+  }
+  
+  .mosaic-gd-nord-theme .mosaic-split.-column {
+    background-color: var(--mosaic-split-column-nord) !important;
+  }
+  
+  /* Separator draggable background */
+  .mosaic-gd-nord-theme .mosaic-split.-column .mosaic-split-line {
+    border-top: 1px solid var(--mosaic-split-line-nord) !important;
+  }
+  
+  .mosaic-gd-nord-theme .mosaic-split:hover .mosaic-split-line {
+    border-color: var(--mosaic-split-line-hover-nord) !important;
+  }
+  
+
+/*table*/
+.gd-table-nord-theme {
+    color: var(--gdtable-nord);
+  }
+  
+  .gd-table-nord-theme .tableHeaderRow,
+  .gd-table-nord-theme .tableEvenRow,
+  .gd-table-nord-theme .tableSelectedRow,
+  .gd-table-nord-theme .tableOddRow {
+    border-bottom: 1px solid var(--tablerow-nord);
+  }
+  .gd-table-nord-theme .tableOddRow {
+    background-color: var(--tableoddrow-nord);
+  }
+  .gd-table-nord-theme .tableEvenRow {
+    background-color: var(--tableevenrow-nord);
+  }
+  .gd-table-nord-theme .tableSelectedRow {
+    background-color: var(--tableselectedrow-nord); /*OS X selection*/
+    color: var(--tableselectedrow-color-nord);
+  }
+  .gd-table-nord-theme .tableHeaderColumn {
+    color: var(--tableheadercolumn-nord);
+  }
+  
+
+
+/*events sheet*/
+.gd-events-sheet-nord-theme.events-tree {
+  background: var(--events-tree-nord);
+}
+
+/*Draggable handle on the left of an event*/
+.gd-events-sheet-nord-theme .rst__moveHandle {
+  background: var(--rst__moveHandle-nord) !important;
+}
+
+.gd-events-sheet-nord-theme .rst__moveHandle:hover {
+  background-color: var(--rst__moveHandle-hover-nord) !important;
+}
+
+/*Scaffolding lines on the left*/
+.gd-events-sheet-nord-theme.rst__lineHalfHorizontalRight::before,
+.gd-events-sheet-nord-theme .rst__lineFullVertical::after,
+.gd-events-sheet-nord-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet-nord-theme .rst__lineHalfVerticalBottom::after {
+  background-color: var(--linehalf-nord);
+}
+
+/*Background and default text color of content of an event*/
+.gd-events-sheet-nord-theme .rst__rowContents {
+  background-color: var(--rst__rowContents-bg-color-nord);
+  color: var(--rst__rowContents-color-nord);
+}
+
+/*Selectable area (instructions)*/
+.gd-events-sheet-nord-theme .selectable:hover {
+  background-color: var(--selectable-hover-nord);
+}
+
+.gd-events-sheet-nord-theme .selectable.selected {
+  background-color: var(--selectable-selected-bg-nord);
+  border: 1px var(--selectable-selected-border-nord) solid !important;
+}
+
+/* Large selectable area (events)*/
+.gd-events-sheet-nord-theme .large-selectable {
+  border: 1px var(--large-selectable-nord) solid !important;
+}
+.gd-events-sheet-nord-theme .large-selectable.large-selected {
+  border: 1px var(--large-selectable-selected-nord) solid !important;
+}
+
+/*Conditions and actions containers*/
+.gd-events-sheet-nord-theme .conditions-container {
+  background: var(--conditions-container-bg-nord);
+  border: 1px solid var(--conditions-container-border-nord);
+  border-right-color: var(--conditions-container-border-right-nord);
+}
+.gd-events-sheet-nord-theme .conditions-container.small-width-container {
+  border-right-color: var(--small-width-container-border-right-nord);
+  border-bottom-color: var(--small-width-container-border-bottom-nord);
+}
+
+.gd-events-sheet-nord-theme .actions-container {
+  background: var(--actions-container-bg-nord);
+}
+
+
+.gd-events-sheet-nord-theme .sub-instructions-container {
+  border-left: 1px solid var(--sub-instructions-container-border-left-nord);
+}
+
+/**
+ * Instructions parameters color scheme
+ */
+.gd-events-sheet-nord-theme .instruction-parameter {
+  color: var(--instruction-parameter-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.expression {
+  color: var(--instruction-parameter-expression-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.object,
+.gd-events-sheet-nord-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-nord-theme .instruction-parameter.objectList,
+.gd-events-sheet-nord-theme .instruction-parameter.objectListWithoutPicking {
+  color: var(--instruction-parameter-object-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.behavior {
+  color: var(--instruction-parameter-behavior-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.operator {
+  color: var(--instruction-parameter-operator-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.objectvar {
+  color: var(--instruction-parameter-objectvar-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.scenevar {
+  color: var(--instruction-parameter-scenevar-nord);
+}
+
+.gd-events-sheet-nord-theme .instruction-parameter.globalvar {
+  color: var(--instruction-parameter-globalvar-nord);
+}
+
+.gd-events-sheet-nord-theme
+  .instruction-parameter
+  .instruction-invalid-parameter {
+  color: var(--instruction-invalid-parameter-nord);
+  text-decoration: var(--instruction-invalid-parameter-text-decoration-nord) underline wavy;
+}
+
+.gd-events-sheet-nord-theme
+  .instruction-parameter
+  .instruction-missing-parameter {
+  background-color: var(--instruction-missing-parameter-bg-nord);
+  border-bottom: 1px dashed var(--instruction-missing-parameter-border-bottom-nord);
+}
+
+/**
+ * Search results highlight
+ */
+.gd-events-sheet-nord-theme.with-search-results .rst__moveHandle {
+  background: var(--search-results-rst__moveHandle-bg-nord) !important;
+  border: 1px solid var(--rst__moveHandle-border-nord) !important;
+}
+
+.gd-events-sheet-nord-theme .rst__rowSearchMatch {
+  border-left: solid 3px var(--rst__rowSearchMatch-border-left-nord);
+}
+
+.gd-events-sheet-nord-theme .rst__rowSearchFocus {
+  border-left: solid 5px var(--rst__rowSearchFocus-border-left-nord);
+}
+
+/**
+* Drag'n'drop indicator (events)
+*/
+.gd-events-sheet-nord-theme .drop-indicator {
+  border-top: 2px solid var(--drop-indicator-border-top-nord);
+}
+
+.gd-events-sheet-nord-theme .cant-drop-indicator {
+  border-top: 2px solid var(--cant-drop-indicator-border-top-nord);
+}
+
+/**
+* Skinning the "Link" event
+*/
+.gd-events-sheet-nord-theme .link-container {
+  background: var(--link-container-nord);
+}
+.gd-events-sheet-nord-theme .link-container span {
+  color: var(--link-container-span);
+}
+.gd-events-sheet-nord-theme .link-container .selectable {
+  color: var(--link-container-selectable-nord);
+}
+
+
+
+

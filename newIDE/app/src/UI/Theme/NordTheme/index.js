@@ -1,11 +1,11 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
 import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
-import './Mosaic.css';
-import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
-import './Table.css';
-import './Markdown.css';
+import './variables.css';
+import './styles.css';
+
+
 
 const nord4 = '#D8DEE9';
 const nord5 = '#E5E9F0';
@@ -91,10 +91,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-nord-theme', // See Mosaic.css
-  eventsSheetRootClassName: 'gd-events-sheet-nord-theme', // See EventsSheet.css
-  tableRootClassName: 'gd-table-nord-theme', // See Table.css
-  markdownRootClassName: 'gd-markdown-nord-theme', // See Markdown.css
+  mosaicRootClassName: 'mosaic-gd-nord-theme', 
+  eventsSheetRootClassName: 'gd-events-sheet-nord-theme', 
+  tableRootClassName: 'gd-table-nord-theme', 
+  markdownRootClassName: 'gd-markdown-nord-theme', 
   gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(57%) brightness(120%)',
 };
 

@@ -5,6 +5,10 @@ import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
 import { type Theme } from './DefaultTheme';
 import './Global.css';
+import './SharedMarkdown.css';
+import './SharedEventsSheet.css';
+import './SharedMosaic.css';
+import './SharedTable.css';
 
 // To add a new theme:
 // * copy the folder of an existing one (DarkTheme for example),

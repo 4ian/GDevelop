@@ -1,0 +1,232 @@
+/*markdown*/
+.gd-markdown-dark-theme a {
+    color: var(--markdown-a-dark);
+}
+.gd-markdown-dark-theme blockquote {
+  border-left: 5px solid var(--markdown-blocquote-dark);
+  
+}
+
+
+/*mosaic*/
+/* Mosaic layout */
+.mosaic-gd-dark-theme.mosaic {
+    background-color: var(--mosaic-layout-dark) !important;
+  }
+  
+  /* Mosaic window and tile */
+  .mosaic-gd-dark-theme .mosaic-window-toolbar {
+    background: var(--mosaic-window-toolbar-dark) !important;
+  }
+  .mosaic-gd-dark-theme .mosaic-window-body {
+    background: var(--mosaic-window-body-dark) !important;
+  }
+  .mosaic-gd-dark-theme .mosaic-window .mosaic-window-title {
+    color: var(--mosaic-window-title-dark) !important;
+  }
+  
+  /* Hovered titlebar background */
+  .mosaic-gd-dark-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+  .mosaic-gd-dark-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+    background: var(--mosaic-window-toolbar-hover-dark) !important;
+  }
+  
+  .mosaic-gd-dark-theme .mosaic-split.-column {
+    background-color: var(--mosaic-split-column-dark) !important;
+  }
+  
+  /* Separator draggable background */
+  .mosaic-gd-dark-theme .mosaic-split.-column .mosaic-split-line {
+    border-top: 1px solid var(--mosaic-split-line-dark) !important;
+  }
+  
+  .mosaic-gd-dark-theme .mosaic-split:hover .mosaic-split-line {
+    border-color: var(--mosaic-split-line-hover-dark) !important;
+  }
+  
+
+/*table*/
+.gd-table-dark-theme {
+    color: var(--gdtable-dark);
+  }
+  
+  .gd-table-dark-theme .tableHeaderRow,
+  .gd-table-dark-theme .tableEvenRow,
+  .gd-table-dark-theme .tableSelectedRow,
+  .gd-table-dark-theme .tableOddRow {
+    border-bottom: 1px solid var(--tablerow-dark);
+  }
+  .gd-table-dark-theme .tableOddRow {
+    background-color: var(--tableoddrow-dark);
+  }
+  .gd-table-dark-theme .tableEvenRow {
+    background-color: var(--tableevenrow-dark);
+  }
+  .gd-table-dark-theme .tableSelectedRow {
+    background-color: var(--tableselectedrow-dark); /*OS X selection*/
+    color: var(--white);
+  }
+  .gd-table-dark-theme .tableHeaderColumn {
+    color: var(--tableheadercolumn-dark);
+  }
+  
+
+
+/*events sheet*/
+.gd-events-sheet-dark-theme.events-tree {
+  background: var(--events-tree-dark);
+}
+
+/*Draggable handle on the left of an event*/
+.gd-events-sheet-dark-theme .rst__moveHandle {
+  background: var(--rst__moveHandle-dark) !important;
+}
+
+.gd-events-sheet-dark-theme .rst__moveHandle:hover {
+  background-color: var(--rst__moveHandle-hover-dark) !important;
+}
+
+/*Scaffolding lines on the left*/
+.gd-events-sheet-dark-theme.rst__lineHalfHorizontalRight::before,
+.gd-events-sheet-dark-theme .rst__lineFullVertical::after,
+.gd-events-sheet-dark-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet-dark-theme .rst__lineHalfVerticalBottom::after {
+  background-color: var(--linehalf-dark);
+}
+
+/*Background and default text color of content of an event*/
+.gd-events-sheet-dark-theme .rst__rowContents {
+  background-color: var(--rst__rowContents-bg-color-dark);
+  color: var(--rst__rowContents-color-dark);
+}
+
+/*Selectable area (instructions)*/
+.gd-events-sheet-dark-theme .selectable:hover {
+  background-color: var(--selectable-hover-dark);
+}
+
+.gd-events-sheet-dark-theme .selectable.selected {
+  background-color: var(--selectable-selected-bg-dark);
+  border: 1px var(--selectable-selected-border-dark) solid !important;
+}
+
+/* Large selectable area (events)*/
+.gd-events-sheet-dark-theme .large-selectable {
+  border: 1px var(--large-selectable-dark) solid !important;
+}
+.gd-events-sheet-dark-theme .large-selectable.large-selected {
+  border: 1px var(--large-selectable-selected-dark) solid !important;
+}
+
+/*Conditions and actions containers*/
+.gd-events-sheet-dark-theme .conditions-container {
+  background: var(--conditions-container-bg-dark);
+  border: 1px solid var(--conditions-container-border-dark);
+  border-right-color: var(--conditions-container-border-right-dark);
+}
+.gd-events-sheet-dark-theme .conditions-container.small-width-container {
+  border-right-color: var(--small-width-container-border-right-dark);
+  border-bottom-color: var(--small-width-container-border-bottom-dark);
+}
+
+.gd-events-sheet-dark-theme .actions-container {
+  background: var(--actions-container-bg-dark);
+}
+
+
+.gd-events-sheet-dark-theme .sub-instructions-container {
+  border-left: 1px solid var(--sub-instructions-container-border-left-dark);
+}
+
+/**
+ * Instructions parameters color scheme
+ */
+.gd-events-sheet-dark-theme .instruction-parameter {
+  color: var(--instruction-parameter-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.expression {
+  color: var(--instruction-parameter-expression-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.object,
+.gd-events-sheet-dark-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-dark-theme .instruction-parameter.objectList,
+.gd-events-sheet-dark-theme .instruction-parameter.objectListWithoutPicking {
+  color: var(--instruction-parameter-object-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.behavior {
+  color: var(--instruction-parameter-behavior-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.operator {
+  color: var(--instruction-parameter-operator-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.objectvar {
+  color: var(--instruction-parameter-objectvar-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.scenevar {
+  color: var(--instruction-parameter-scenevar-dark);
+}
+
+.gd-events-sheet-dark-theme .instruction-parameter.globalvar {
+  color: var(--instruction-parameter-globalvar-dark);
+}
+
+.gd-events-sheet-dark-theme
+  .instruction-parameter
+  .instruction-invalid-parameter {
+  color: var(--instruction-invalid-parameter-dark);
+  text-decoration: var(--instruction-invalid-parameter-text-decoration-dark) underline wavy;
+}
+
+.gd-events-sheet-dark-theme
+  .instruction-parameter
+  .instruction-missing-parameter {
+  background-color: var(--instruction-missing-parameter-bg-dark);
+  border-bottom: 1px dashed var(--instruction-missing-parameter-border-bottom-dark);
+}
+
+/**
+ * Search results highlight
+ */
+.gd-events-sheet-dark-theme.with-search-results .rst__moveHandle {
+  background: var(--search-results-rst__moveHandle-bg-dark) !important;
+  border: 1px solid var(--rst__moveHandle-border-dark) !important;
+}
+
+.gd-events-sheet-dark-theme .rst__rowSearchMatch {
+  border-left: solid 3px var(--rst__rowSearchMatch-border-left-dark);
+}
+
+.gd-events-sheet-dark-theme .rst__rowSearchFocus {
+  border-left: solid 5px var(--rst__rowSearchFocus-border-left-dark);
+}
+
+/**
+* Drag'n'drop indicator (events)
+*/
+.gd-events-sheet-dark-theme .drop-indicator {
+  border-top: 2px solid var(--drop-indicator-border-top-dark);
+}
+
+.gd-events-sheet-dark-theme .cant-drop-indicator {
+  border-top: 2px solid var(--cant-drop-indicator-border-top-dark);
+}
+
+/**
+* Skinning the "Link" event
+*/
+.gd-events-sheet-dark-theme .link-container {
+  background: var(--link-container-dark);
+}
+.gd-events-sheet-dark-theme .link-container span {
+  color: var(--link-container-span-dark);
+}
+.gd-events-sheet-dark-theme .link-container .selectable {
+  color: var(--link-container-selectable-dark);
+}
+

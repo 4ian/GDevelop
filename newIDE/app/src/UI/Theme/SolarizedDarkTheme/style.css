@@ -1,0 +1,232 @@
+/*markdown*/
+.gd-markdown-solarized-solarized-dark-theme a {
+    color: var(--markdown-a-solarized-solarized-dark);
+}
+.gd-markdown-solarized-solarized-dark-theme blockquote {
+  border-left: 5px solid var(--markdown-blocquote-solarized-solarized-dark);
+  
+}
+
+
+/*mosaic*/
+/* Mosaic layout */
+.mosaic-gd-solarized-dark-theme.mosaic {
+    background-color: var(--mosaic-layout-solarized-dark) !important;
+  }
+  
+  /* Mosaic window and tile */
+  .mosaic-gd-solarized-dark-theme .mosaic-window-toolbar {
+    background: var(--mosaic-window-toolbar-solarized-dark) !important;
+  }
+  .mosaic-gd-solarized-dark-theme .mosaic-window-body {
+    background: var(--mosaic-window-body-solarized-dark) !important;
+  }
+  .mosaic-gd-solarized-dark-theme .mosaic-window .mosaic-window-title {
+    color: var(--mosaic-window-title-solarized-dark) !important;
+  }
+  
+  /* Hovered titlebar background */
+  .mosaic-gd-solarized-dark-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+  .mosaic-gd-solarized-dark-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+    background: var(--mosaic-window-toolbar-hover-solarized-dark) !important;
+  }
+  
+  .mosaic-gd-solarized-dark-theme .mosaic-split.-column {
+    background-color: var(--mosaic-split-column-solarized-dark) !important;
+  }
+  
+  /* Separator draggable background */
+  .mosaic-gd-solarized-dark-theme .mosaic-split.-column .mosaic-split-line {
+    border-top: 1px solid var(--mosaic-split-line-solarized-dark) !important;
+  }
+  
+  .mosaic-gd-solarized-dark-theme .mosaic-split:hover .mosaic-split-line {
+    border-color: var(--mosaic-split-line-hover-solarized-dark) !important;
+  }
+  
+
+/*table*/
+.gd-table-solarized-dark-theme {
+    color: var(--gdtable-solarized-dark);
+  }
+  
+  .gd-table-solarized-dark-theme .tableHeaderRow,
+  .gd-table-solarized-dark-theme .tableEvenRow,
+  .gd-table-solarized-dark-theme .tableSelectedRow,
+  .gd-table-solarized-dark-theme .tableOddRow {
+    border-bottom: 1px solid var(--tablerow-solarized-dark);
+  }
+  .gd-table-solarized-dark-theme .tableOddRow {
+    background-color: var(--tableoddrow-solarized-dark);
+  }
+  .gd-table-solarized-dark-theme .tableEvenRow {
+    background-color: var(--tableevenrow-solarized-dark);
+  }
+  .gd-table-solarized-dark-theme .tableSelectedRow {
+    background-color: var(--tableselectedrow-solarized-dark); /*OS X selection*/
+    color: var(--white);
+  }
+  .gd-table-solarized-dark-theme .tableHeaderColumn {
+    color: var(--tableheadercolumn-solarized-dark);
+  }
+  
+
+
+/*events sheet*/
+.gd-events-sheet-solarized-dark-theme.events-tree {
+  background: var(--events-tree-solarized-dark);
+}
+
+/*Draggable handle on the left of an event*/
+.gd-events-sheet-solarized-dark-theme .rst__moveHandle {
+  background: var(--rst__moveHandle-solarized-dark) !important;
+}
+
+.gd-events-sheet-solarized-dark-theme .rst__moveHandle:hover {
+  background-color: var(--rst__moveHandle-hover-solarized-dark) !important;
+}
+
+/*Scaffolding lines on the left*/
+.gd-events-sheet-solarized-dark-theme.rst__lineHalfHorizontalRight::before,
+.gd-events-sheet-solarized-dark-theme .rst__lineFullVertical::after,
+.gd-events-sheet-solarized-dark-theme .rst__lineHalfVerticalTop::after,
+.gd-events-sheet-solarized-dark-theme .rst__lineHalfVerticalBottom::after {
+  background-color: var(--linehalf-solarized-dark);
+}
+
+/*Background and default text color of content of an event*/
+.gd-events-sheet-solarized-dark-theme .rst__rowContents {
+  background-color: var(--rst__rowContents-bg-color-solarized-dark);
+  color: var(--rst__rowContents-color-solarized-dark);
+}
+
+/*Selectable area (instructions)*/
+.gd-events-sheet-solarized-dark-theme .selectable:hover {
+  background-color: var(--selectable-hover-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .selectable.selected {
+  background-color: var(--selectable-selected-bg-solarized-dark);
+  border: 1px var(--selectable-selected-border-solarized-dark) solid !important;
+}
+
+/* Large selectable area (events)*/
+.gd-events-sheet-solarized-dark-theme .large-selectable {
+  border: 1px var(--large-selectable-solarized-dark) solid !important;
+}
+.gd-events-sheet-solarized-dark-theme .large-selectable.large-selected {
+  border: 1px var(--large-selectable-selected-solarized-dark) solid !important;
+}
+
+/*Conditions and actions containers*/
+.gd-events-sheet-solarized-dark-theme .conditions-container {
+  background: var(--conditions-container-bg-solarized-dark);
+  border: 1px solid var(--conditions-container-border-solarized-dark);
+  border-right-color: var(--conditions-container-border-right-solarized-dark);
+}
+.gd-events-sheet-solarized-dark-theme .conditions-container.small-width-container {
+  border-right-color: var(--small-width-container-border-right-solarized-dark);
+  border-bottom-color: var(--small-width-container-border-bottom-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .actions-container {
+  background: var(--actions-container-bg-solarized-dark);
+}
+
+
+.gd-events-sheet-solarized-dark-theme .sub-instructions-container {
+  border-left: 1px solid var(--sub-instructions-container-border-left-solarized-dark);
+}
+
+/**
+ * Instructions parameters color scheme
+ */
+.gd-events-sheet-solarized-dark-theme .instruction-parameter {
+  color: var(--instruction-parameter-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.expression {
+  color: var(--instruction-parameter-expression-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.object,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectList,
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectListWithoutPicking {
+  color: var(--instruction-parameter-object-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.behavior {
+  color: var(--instruction-parameter-behavior-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.operator {
+  color: var(--instruction-parameter-operator-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.objectvar {
+  color: var(--instruction-parameter-objectvar-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.scenevar {
+  color: var(--instruction-parameter-scenevar-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .instruction-parameter.globalvar {
+  color: var(--instruction-parameter-globalvar-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme
+  .instruction-parameter
+  .instruction-invalid-parameter {
+  color: var(--instruction-invalid-parameter-solarized-dark);
+  text-decoration: var(--instruction-invalid-parameter-text-decoration-solarized-dark) underline wavy;
+}
+
+.gd-events-sheet-solarized-dark-theme
+  .instruction-parameter
+  .instruction-missing-parameter {
+  background-color: var(--instruction-missing-parameter-bg-solarized-dark);
+  border-bottom: 1px dashed var(--instruction-missing-parameter-border-bottom-solarized-dark);
+}
+
+/**
+ * Search results highlight
+ */
+.gd-events-sheet-solarized-dark-theme.with-search-results .rst__moveHandle {
+  background: var(--search-results-rst__moveHandle-bg-solarized-dark) !important;
+  border: 1px solid var(--rst__moveHandle-border-solarized-dark) !important;
+}
+
+.gd-events-sheet-solarized-dark-theme .rst__rowSearchMatch {
+  border-left: solid 3px var(--rst__rowSearchMatch-border-left-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .rst__rowSearchFocus {
+  border-left: solid 5px var(--rst__rowSearchFocus-border-left-solarized-dark);
+}
+
+/**
+* Drag'n'drop indicator (events)
+*/
+.gd-events-sheet-solarized-dark-theme .drop-indicator {
+  border-top: 2px solid var(--drop-indicator-border-top-solarized-dark);
+}
+
+.gd-events-sheet-solarized-dark-theme .cant-drop-indicator {
+  border-top: 2px solid var(--cant-drop-indicator-border-top-solarized-dark);
+}
+
+/**
+* Skinning the "Link" event
+*/
+.gd-events-sheet-solarized-dark-theme .link-container {
+  background: var(--link-container-solarized-dark);
+}
+.gd-events-sheet-solarized-dark-theme .link-container span {
+  color: var(--link-container-span-solarized-dark);
+}
+.gd-events-sheet-solarized-dark-theme .link-container .selectable {
+  color: var(--link-container-selectable-solarized-dark);
+}
+

@@ -1,0 +1,134 @@
+html {
+    --canvas-color-dark: #303030;
+    --alternate-canvas-color-dark: #494949;
+    --nord4: #D8DEE9;
+    --nord5: #E5E9F0;
+    --nord6: #ECEFF4;
+    --nord8: #88C0D0;
+    --nord9: #81A1C1;
+    --nord11: #BF616A;
+    --nord12: #D08770;
+    --nord13: #EBCB8B;
+    --nord14: #A3BE8C;
+  
+  
+  }
+
+  /*gdevelop theme*/
+:root {
+    /*toolbar*/
+    --separator-color-nord: #4d4d4d;
+    /*closable tabs*/
+    --text-color-nord: #878787;
+    --selected-text-color-nord: #ffffff;
+    /*list items*/
+    --group-text-color-nord: #AAA;
+    --deprecated-group-text-color-nord: #888;
+    --list-item-separator-color-nord: #494949;
+    --right-icon-color-nord: #fff;
+    --selected-right-icon-color-nord: #fff;
+    --error-text-color-nord: #ff2e16;
+    --warning-text-color-nord: #ffb032;
+    --selected-error-background-color-nord: #ff2e16;
+    --selected-warning-background-color-nord: #ffb032;
+
+  }
+  
+  /*gd-table*/
+:root {
+    --gdtable-nord: #ECEFF4;
+    --tablerow-nord: #3B4252;
+    --tableheadercolumn-nord: #D8DEE9;
+    --tableselectedrow-bg-nord: #88C0D0;
+    --tableselectedrow-color-nord: #2E3440;
+    --tableoddrow-nord: #3B4252;
+    --tableevenrow-nord: #2E3440;
+
+  }
+  
+  /*mosaic*/
+:root {
+    --mosaic-window-toolbar-nord: #5E81AC;
+    --mosaic-layout-nord: #3B4252;
+    --mosaic-window-body-nord: #3B4252;
+    --mosaic-window-title-nord: #ECEFF4;
+    --mosaic-window-toolbar-hover-nord: #81A1C1;
+    --mosaic-split-line-hover-nord: #88C0D0;
+    --mosaic-split-line-nord: #888888;
+    --mosaic-split-column-nord: #3B4252;
+  }
+
+  /*markdown*/
+:root {
+    --markdown-a-nord: #ECEFF4;
+    --markdown-blocquote-nord: #D8DEE9;
+}
+
+/*events sheet*/
+:root {
+    --events-tree-nord: #2E3440;
+    --rst__moveHandle-nord: #81A1C1;
+    --rst__moveHandle-hover-nord: #88C0D0;
+    --linehalf-nord: #D8DEE9;
+    --rst__rowContents-bg-color-nord: #2E3440;
+    --rst__rowContents-color-nord: #ECEFF4;
+    --selectable-hover-nord: #00000033;
+    --selectable-selected-bg-nord: #00000033;
+    --selectable-selected-border-nord: #88C0D0;
+    /*large selectable area*/
+    --large-selectable-nord: #2E3440;
+    --large-selectable-selected-nord: #88C0D0;
+
+    /*conditions and actions*/
+    --conditions-container-bg-nord: #3B4252;
+    --conditions-container-border-nord:#3B4252;
+    --conditions-container-border-right-nord: black;
+    /*conditions container*/
+    --small-width-container-border-right-nord: #3B4252;
+    --small-width-container-border-bottom-nord: #2E3440;
+
+    /*actions container*/
+    --actions-container-bg-nord: #2E3440;
+    --sub-instructions-container-border-left-nord: #2E3440;
+
+    /*instructions parameters color scheme*/
+    --instruction-parameter-nord: #8FBCBB;
+    --instruction-parameter-expression-nord: #A3BE8C;
+    --instruction-parameter-object-nord: #5E81AC;
+    --instruction-parameter-behavior-nord: #777777;
+    --instruction-parameter-operator-nord: #B48EAD;
+    --instruction-parameter-objectvar-nord: #D08770;
+    --instruction-parameter-scenevar-nord: #D08770;
+    --instruction-parameter-globalvar-nord: #D08770;
+    --instruction-invalid-parameter-nord: #BF616A;
+    --instruction-invalid-parameter-text-decoration-nord: #BF616A;
+    --instruction-missing-parameter-bg-nord: #f3000c26;
+    --instruction-missing-parameter-border-bottom-nord: #BF616A;
+
+    /*search result highlights*/
+    --search-results-rst__moveHandle-bg-nord: #d3d3d3;
+    --rst__moveHandle-border-nord: #d3d3d3;
+    --rst__rowSearchMatch-border-left-nord: #88C0D0;
+    --rst__rowSearchFocus-border-left-nord: #88C0D0;
+
+    /*drag and drop indicator (events)*/
+    --drop-indicator-border-top-nord: #4C566A;
+    --cant-drop-indicatorborder-top-nord: #BF616A;
+
+    /*Skinning the "Link" event*/
+    --link-container-nord: #2E3440;
+    --link-container-span-nord: #d1d1d1;
+    --link-container-selectable-nord: #81A1C1;
+
+
+
+
+
+
+
+
+
+
+
+}
+

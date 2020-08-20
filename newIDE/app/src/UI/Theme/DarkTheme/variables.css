@@ -1,0 +1,129 @@
+:root {
+    --white-dark: #ffffff;
+    --almost-white-dark:#eee;
+    --light-white-dark: rgb(221, 221, 221);
+    --not-so-white-dark: #ccc;
+    --gdevelop-dark-blue-dark: #3c4698;
+    --canvas-color-dark: #303030;
+    --background-color-dark: #252525;
+    --alternate-canvas-color-dark: #494949;
+    --system-selection-color-dark: #4c92ff;
+  
+  
+  }
+
+  /*gdevelop theme*/
+:root {
+    /*toolbar*/
+    --separator-color-dark: #4d4d4d;
+    /*closable tabs*/
+    --text-color-dark: #878787;
+    --selected-text-color-dark: #ffffff;
+    /*list items*/
+    --group-text-color-dark: #AAA;
+    --deprecated-group-text-color-dark: #888;
+    --list-item-separator-color-dark: #494949;
+    --right-icon-color-dark: #fff;
+    --selected-right-icon-color-dark: #fff;
+    --error-text-color-dark: #ff2e16;
+    --warning-text-color-dark: #ffb032;
+    --selected-error-background-color-dark: #ff2e16;
+    --selected-warning-background-color-dark: #ffb032;
+
+  }
+  
+  /*gd-table*/
+:root {
+    --gdtable-dark: #DDD;
+    --tablerow-dark: #303030;
+    --tableheadercolumn-dark: #9e9e9e;
+    --tableselectedrow-dark: #4c92ff;
+    --tableoddrow-dark: #303030;
+    --tableevenrow-dark: #252525;
+  }
+  
+  /*mosaic*/
+:root {
+    --mosaic-window-toolbar-dark: #3c4698;
+    --mosaic-layout-dark: #4d4d4d;
+    --mosaic-window-body-dark: #303030;
+    --mosaic-window-title-dark: white;
+    --mosaic-window-toolbar-hover-dark: #3c4698;
+    --mosaic-split-line-hover-dark: #2b95d6;
+    --mosaic-split-line-dark: #888888;
+    --mosaic-split-column-dark: #4d4d4d;
+  }
+
+  /*markdown*/
+:root {
+    --markdown-a-dark: #dddddd;
+    --markdown-blocquote-dark: #dddddd99;
+}
+
+/*events sheet*/
+:root {
+    --events-tree-dark: #303030;
+    --rst__moveHandle-dark: #494949;
+    --rst__moveHandle-hover-dark: #767676;
+    --linehalf-dark: #aaa;
+    --rst__rowContents-bg-color-dark: #303030;
+    --rst__rowContents-color-dark: #d1d1d1;
+    --selectable-hover-dark: #0000001a;
+    --selectable-selected-bg-dark: #0000001a;
+    --selectable-selected-border-dark: #4ab0e4;
+    /*large selectable area*/
+    --large-selectable-dark: #303030;
+    --large-selectable-selected-dark: #4ab0e4;
+
+    /*conditions and actions*/
+    --conditions-container-bg-dark: #494949;
+    --conditions-container-border-dark:#494949;
+    --conditions-container-border-right-dark: black;
+    /*conditions container*/
+    --small-width-container-border-right-dark: #494949;
+    --small-width-container-border-bottom-dark: black;
+
+    /*actions container*/
+    --actions-container-bg-dark: #303030;
+    --sub-instructions-container-border-left-dark: #303030;
+
+    /*instructions parameters color scheme*/
+    --instruction-parameter-dark: #93e500;
+    --instruction-parameter-expression-dark: #e8dc59;
+    --instruction-parameter-object-dark: #b77cff;
+    --instruction-parameter-behavior-dark: #ff9200;
+    --instruction-parameter-operator-dark: #ff0071;
+    --instruction-parameter-objectvar-dark: #18dcf2;
+    --instruction-parameter-scenevar-dark: #18dcf2;
+    --instruction-parameter-globalvar-dark: #18dcf2;
+    --instruction-invalid-parameter-dark: #ff0000;
+    --instruction-invalid-parameter-text-decoration-dark: #ff0000;
+    --instruction-missing-parameter-bg-dark: #eeff000d;
+    --instruction-missing-parameter-border-bottom-dark: #ff0000;
+
+    /*search result highlights*/
+    --search-results-rst__moveHandle-bg-dark: #d3d3d3;
+    --rst__moveHandle-border-dark: #d3d3d3;
+    --rst__rowSearchMatch-border-left-dark: #18dcf2;
+    --rst__rowSearchFocus-border-left-dark: #18dcf2;
+
+    /*drag and drop indicator (events)*/
+    --drop-indicator-border-top-dark: #18dcf2;
+    --cant-drop-indicatorborder-top-dark: #ff5c5c;
+
+    /*Skinning the "Link" event*/
+    --link-container-dark: #505050;
+    --link-container-span-dark: #d1d1d1;
+    --link-container-selectable-dark: #b77cff;
+
+
+
+
+
+
+
+
+
+
+
+}

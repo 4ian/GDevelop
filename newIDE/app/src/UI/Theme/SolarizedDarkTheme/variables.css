@@ -1,0 +1,107 @@
+
+
+  /*gdevelop theme*/
+:root {
+    /*toolbar*/
+    --separator-color-solarized-dark: #4d4d4d;
+    /*closable tabs*/
+    --text-color-solarized-dark: #878787;
+    --selected-text-color-solarized-dark: #ffffff;
+    /*list items*/
+    --group-text-color-solarized-dark: #AAA;
+    --deprecated-group-text-color-solarized-dark: #888;
+    --list-item-separator-color-solarized-dark: #494949;
+    --right-icon-color-solarized-dark: #fff;
+    --selected-right-icon-color-solarized-dark: #fff;
+    --error-text-color-solarized-dark: #ff2e16;
+    --warning-text-color-solarized-dark: #ffb032;
+    --selected-error-background-color-solarized-dark: #ff2e16;
+    --selected-warning-background-color-solarized-dark: #ffb032;
+
+  }
+  
+  /*gd-table*/
+:root {
+    --gdtable-solarized-dark: #ECEFF4;
+    --tablerow-solarized-dark: #002B36;
+    --tableheadercolumn-solarized-dark: #d8e9d9;
+    --tableselectedrow-solarized-dark: #047AA6;
+    --tableoddrow-solarized-dark: #002B36;
+    --tableevenrow-solarized-dark: #00212B;
+  }
+  
+  /*mosaic*/
+:root {
+    --mosaic-window-toolbar-solarized-dark: #2799b9;
+    --mosaic-layout-solarized-dark: #002B36;
+    --mosaic-window-body-solarized-dark: #002B36;
+    --mosaic-window-title-solarized-dark: #ECEFF4;
+    --mosaic-window-toolbar-hover-solarized-dark: #2799b9;
+    --mosaic-split-line-hover-solarized-dark: #5c767e;
+    --mosaic-split-line-solarized-dark: #002B36;
+    --mosaic-split-column-solarized-dark: #002B36;
+  }
+
+  /*markdown*/
+:root {
+    --markdown-a-solarized-dark: #ECEFF4;
+    --markdown-blocquote-solarized-dark: #D8DEE9;
+}
+
+/*events sheet*/
+:root {
+    --events-tree-solarized-dark: #00212B;
+    --rst__moveHandle-solarized-dark: #2799b9;
+    --rst__moveHandle-hover-solarized-dark: #1f7496;
+    --linehalf-solarized-dark: #D8DEE9;
+    --rst__rowContents-bg-color-solarized-dark: #00212B;
+    --rst__rowContents-color-solarized-dark: #d1d1d1;
+    --selectable-hover-solarized-dark: #00000033;
+    --selectable-selected-bg-solarized-dark: #00000033;
+    --selectable-selected-border-solarized-dark: #787d80;
+    /*large selectable area*/
+    --large-selectable-solarized-dark: #00212B;
+    --large-selectable-selected-solarized-dark: #4ab0e4;
+
+    /*conditions and actions*/
+    --conditions-container-bg-solarized-dark: #002B36;
+    --conditions-container-border-solarized-dark:#002B36;
+    --conditions-container-border-right-solarized-dark: #00212B;
+    /*conditions container*/
+    --small-width-container-border-right-solarized-dark: #002B36;
+    --small-width-container-border-bottom-solarized-dark: #002B36;
+
+    /*actions container*/
+    --actions-container-bg-solarized-dark: #00212B;
+    --sub-instructions-container-border-left-solarized-dark: #00212B;
+
+    /*instructions parameters color scheme*/
+    --instruction-parameter-solarized-dark: #219186;
+    --instruction-parameter-expression-solarized-dark: #859900;
+    --instruction-parameter-object-solarized-dark: #268BD2;
+    --instruction-parameter-behavior-solarized-dark: #586e75;
+    --instruction-parameter-operator-solarized-dark: #D33682;
+    --instruction-parameter-objectvar-solarized-dark: #cb4b16;
+    --instruction-parameter-scenevar-solarized-dark: #cb4b16;
+    --instruction-parameter-globalvar-solarized-dark: #cb4b16;
+    --instruction-invalid-parameter-solarized-dark: #dc322f;
+    --instruction-invalid-parameter-text-decoration-solarized-dark: #dc322f;
+    --instruction-missing-parameter-bg-solarized-dark: #eeff000d;
+    --instruction-missing-parameter-border-bottom-solarized-dark: #dc322f;
+
+    /*search result highlights*/
+    --search-results-rst__moveHandle-bg-solarized-dark: #d3d3d3;
+    --rst__moveHandle-border-solarized-dark: #d3d3d3;
+    --rst__rowSearchMatch-border-left-solarized-dark: #045e9e;
+    --rst__rowSearchFocus-border-left-solarized-dark: #135483;
+
+    /*drag and drop indicator (events)*/
+    --drop-indicator-border-top-solarized-dark: #18dcf2;
+    --cant-drop-indicatorborder-top-solarized-dark: #BF616A;
+
+    /*Skinning the "Link" event*/
+    --link-container-solarized-dark: #00212B;
+    --link-container-span-solarized-dark: #9b9b9b;
+    --link-container-selectable-solarized-dark: #268BD2;
+
+}

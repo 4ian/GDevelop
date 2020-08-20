@@ -15,6 +15,7 @@
  */
 gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._pixiContainer = new PIXI.Container();
+  this._normalMapContainer = new PIXI.Container();
   /** @type Object.<string, gdjsPixiFiltersToolsFilter> */
   this._filters = {};
   this._layer = layer;
@@ -34,6 +35,7 @@ gdjs.LayerPixiRenderer = function (layer, runtimeSceneRenderer) {
   this._clearColor = layer.getClearColor();
 
   runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
+  runtimeSceneRenderer.getNormalMapPIXIContainer().addChild(this._normalMapContainer);
   this._pixiContainer.filters = [];
 
   if (this._isLightingLayer) {
@@ -45,6 +47,10 @@ gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the eng
 
 gdjs.LayerPixiRenderer.prototype.getRendererObject = function () {
   return this._pixiContainer;
+};
+
+gdjs.LayerPixiRenderer.getNormalMapRendererObject = function () {
+  return this._normalMapContainer;
 };
 
 gdjs.LayerPixiRenderer.prototype.getLightingSprite = function () {
@@ -145,6 +151,29 @@ gdjs.LayerPixiRenderer.prototype.removeEffect = function (effectName) {
   delete this._filters[effectName];
 };
 
+
+/**
+ * Add a child to the pixi container associated to the layer.
+ * All objects which are on this layer must be children of this container.
+ *
+ * @param {PIXI.Container} container The container in which the object is to be added.
+ * @param child The child (PIXI object) to be added.
+ * @param zOrder The z order of the associated object.
+ */
+gdjs.LayerPixiRenderer.prototype._addRendererObject = function (container, child, zOrder) {
+  child.zOrder = zOrder; //Extend the pixi object with a z order.
+
+  for (var i = 0, len = container.children.length; i < len; ++i) {
+    // @ts-ignore
+    if (container.children[i].zOrder >= zOrder) {
+      //TODO : Dichotomic search
+      container.addChildAt(child, i);
+      return;
+    }
+  }
+  container.addChild(child);
+}
+
 /**
  * Add a child to the pixi container associated to the layer.
  * All objects which are on this layer must be children of this container.
@@ -153,18 +182,23 @@ gdjs.LayerPixiRenderer.prototype.removeEffect = function (effectName) {
  * @param zOrder The z order of the associated object.
  */
 gdjs.LayerPixiRenderer.prototype.addRendererObject = function (child, zOrder) {
-  child.zOrder = zOrder; //Extend the pixi object with a z order.
+  // child.zOrder = zOrder; //Extend the pixi object with a z order.
 
-  for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
-    // @ts-ignore
-    if (this._pixiContainer.children[i].zOrder >= zOrder) {
-      //TODO : Dichotomic search
-      this._pixiContainer.addChildAt(child, i);
-      return;
-    }
-  }
-  this._pixiContainer.addChild(child);
+  // for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
+  //   // @ts-ignore
+  //   if (this._pixiContainer.children[i].zOrder >= zOrder) {
+  //     //TODO : Dichotomic search
+  //     this._pixiContainer.addChildAt(child, i);
+  //     return;
+  //   }
+  // }
+  // this._pixiContainer.addChild(child);
+  this._addRendererObject(this._pixiContainer, child, zOrder);
 };
+
+gdjs.LayerPixiRenderer.prototype.addNormalMapRendererObject = function (child, zOrder) {
+  this._addRendererObject(this._normalMapContainer, child, zOrder);
+}
 
 /**
  * Change the z order of a child associated to an object.

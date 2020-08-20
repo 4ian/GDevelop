@@ -13,6 +13,8 @@ gdjs.RuntimeScenePixiRenderer = function (runtimeScene, runtimeGameRenderer) {
     : null;
   this._runtimeScene = runtimeScene;
   this._pixiContainer = new PIXI.Container(); // Contains the layers of the scene (and, optionally, debug PIXI objects).
+  this._normalMapContainer = new PIXI.Container(); // Contains the normal map layers of the scene.
+  this._forwardDiffuseFilter = new gdjs.ForwardDiffusedRenderFilter(this);
   this._pixiContainer.sortableChildren = true;
 
   /** @type {?PIXI.Graphics} */
@@ -20,9 +22,6 @@ gdjs.RuntimeScenePixiRenderer = function (runtimeScene, runtimeGameRenderer) {
 
   /** @type {?PIXI.Text} */
   this._profilerText = null;
-
-  /** @type {boolean} */
-  this._isForwardDiffusedActivated = false;
 };
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
@@ -126,6 +125,10 @@ gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function () {
   return this._pixiContainer;
 };
 
+gdjs.RuntimeScenePixiRenderer.prototype.getNormalMapPIXIContainer = function () {
+  return this._normalMapContainer;
+}
+
 gdjs.RuntimeScenePixiRenderer.prototype.getPIXIRenderer = function () {
   return this._pixiRenderer;
 };
@@ -144,6 +147,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.setLayerIndex = function (
 
   /** @type {PIXI.Container | ?PIXI.Sprite} */
   var layerPixiObject = layerPixiRenderer.getRendererObject();
+  var layerNormalMapPixiObject = layerPixiRenderer.getNormalMapRendererObject();
 
   if (layer.isLightingLayer())
     layerPixiObject = layerPixiRenderer.getLightingSprite();
@@ -153,8 +157,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.setLayerIndex = function (
 
   this._pixiContainer.removeChild(layerPixiObject);
   this._pixiContainer.addChildAt(layerPixiObject, index);
-};
 
-gdjs.RuntimeScenePixiRenderer.prototype.activateForwardDiffusedRendering = function () {
-  this._isForwardDiffusedActivated = true;
-}
+  this._normalMapContainer.removeChild(layerNormalMapPixiObject);
+  this._normalMapContainer.addChildAt(layerNormalMapPixiObject, index);
+};

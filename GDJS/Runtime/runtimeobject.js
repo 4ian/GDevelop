@@ -318,6 +318,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
+
     theLayer.getRenderer().removeRendererObject(this.getRendererObject());
 
     for(var j = 0, lenj = this._behaviors.length;j<lenj;++j) {
@@ -336,6 +337,10 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
 gdjs.RuntimeObject.prototype.getRendererObject = function() {
     return undefined;
 };
+
+gdjs.RuntimeObject.prototype.getNormalMapRendererObject = function() {
+    return undefined;
+}
 
 //Common properties:
 

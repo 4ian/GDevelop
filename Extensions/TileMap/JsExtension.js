@@ -430,6 +430,7 @@ module.exports = {
               render,
               layerIndex
             );
+            console.log("result",this._pixiObject)
           }
         }
       );

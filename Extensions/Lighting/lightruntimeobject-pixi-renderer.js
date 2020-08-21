@@ -18,7 +18,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
     objectColor[2] / 255,
   ];
 
-  /** @type {string} */
+  /** @type {?PIXI.Texture} */
   this._texture = null;
   this.updateTexture();
 
@@ -115,14 +115,13 @@ gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function 
   lightObject,
   angle,
   polygons,
-  halfOfDiag
+  boundingSquareHalfDiag
 ) {
   var centerX = lightObject.getX();
   var centerY = lightObject.getY();
-  //var halfOfDiag = Math.sqrt(2) * lightObject.getRadius();
-  var targetX = centerX + halfOfDiag * Math.cos(angle);
-  var targetY = centerY + halfOfDiag * Math.sin(angle);
-  var minSqDist = halfOfDiag * halfOfDiag;
+  var targetX = centerX + boundingSquareHalfDiag * Math.cos(angle);
+  var targetY = centerY + boundingSquareHalfDiag * Math.sin(angle);
+  var minSqDist = boundingSquareHalfDiag * boundingSquareHalfDiag;
   var closestPoint = [null, null];
   for (var poly of polygons) {
     var raycastResult = gdjs.Polygon.raycastTest(
@@ -429,7 +428,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
   obstaclePolygons[0].vertices[3][0] = minX;
   obstaclePolygons[0].vertices[3][1] = maxY;
 
-  var halfOfDiag = Math.max(
+  var boundingSquareHalfDiag = Math.max(
     Math.hypot(this._object.x - minX, this._object.y - minY),
     Math.hypot(maxX - this._object.x, this._object.y - minY),
     Math.hypot(maxX - this._object.x, maxY - this._object.y),
@@ -451,7 +450,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
       this._object,
       angle,
       obstaclePolygons,
-      halfOfDiag
+      boundingSquareHalfDiag
     );
     if (closestVertex) {
       closestVertices.push({
@@ -465,7 +464,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
       this._object,
       angle + 0.0001,
       obstaclePolygons,
-      halfOfDiag
+      boundingSquareHalfDiag
     );
     if (closestVertexOffsetLeft) {
       closestVertices.push({
@@ -477,7 +476,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
       this._object,
       angle - 0.0001,
       obstaclePolygons,
-      halfOfDiag
+      boundingSquareHalfDiag
     );
     if (closestVertexOffsetRight) {
       closestVertices.push({

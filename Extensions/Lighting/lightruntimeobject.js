@@ -32,7 +32,7 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   /** @type {boolean} */
   this._debugMode = lightObjectData.content.debugMode;
 
-  /** @type {?PIXI.Texture} */
+  /** @type {string} */
   this._texture = lightObjectData.content.texture;
 
   /** @type {gdjs.LightObstaclesManager} */
@@ -185,7 +185,7 @@ gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
 };
 
 /**
- * Returns PIXI.Texture if it exists, null otherwise.
+ * Returns the path of texture resource.
  * @returns {string} the path of texture.
  */
 gdjs.LightRuntimeObject.prototype.getTexture = function () {

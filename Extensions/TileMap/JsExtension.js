@@ -57,13 +57,13 @@ module.exports = {
           .setLabel(_('Tilemap atlas image'))
       );
       objectProperties.set(
-        'render',
-        new gd.PropertyDescriptor(objectContent.render)
+        'displayMode',
+        new gd.PropertyDescriptor(objectContent.displayMode)
           .setType('choice')
           .addExtraInfo('visible')
           .addExtraInfo('all')
           .addExtraInfo('index')
-          .setLabel(_('Render'))
+          .setLabel(_('Display mode'))
       );
       objectProperties.set(
         'layerIndex',
@@ -84,7 +84,7 @@ module.exports = {
       JSON.stringify({
         tiledFile: '',
         tilemapAtlasImage: '',
-        render: 'visible',
+        displayMode: 'visible',
         layerIndex: 0,
         visible: true,
       })
@@ -122,7 +122,9 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
       )
-      .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js');
+      .addIncludeFile(
+        'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
+      );
 
     object
       .addCondition(
@@ -184,10 +186,10 @@ module.exports = {
 
     object
       .addCondition(
-        'IsRender',
-        _('Render'),
-        _('Compare the value of the render.'),
-        _('The render of _PARAM0_ is _PARAM1_'),
+        'IsDisplayMode',
+        _('Display mode'),
+        _('Compare the value of the display mode.'),
+        _('The display mode of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/skeletonicon.png',
         'JsPlatform/Extensions/skeletonicon.png'
@@ -195,14 +197,14 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('stringWithSelector')
       .getCodeExtraInformation()
-      .setFunctionName('getRender');
+      .setFunctionName('getDisplayMode');
 
     object
       .addAction(
-        'SetRender',
-        _('Render'),
-        _('Set Render'),
-        _('Set render of _PARAM0_ to _PARAM1_'),
+        'SetDisplayMode',
+        _('Display mode'),
+        _('Set Display mode'),
+        _('Set display mode of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/skeletonicon.png',
         'JsPlatform/Extensions/skeletonicon.png'
@@ -210,13 +212,13 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter(
         'stringWithSelector',
-        _('Render'),
+        _('Display mode'),
         '["visible", "all", "index"]',
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('setRender')
-      .setGetter('getRender');
+      .setFunctionName('setDisplayMode')
+      .setGetter('getDisplayMode');
 
     object
       .addCondition(
@@ -363,8 +365,9 @@ module.exports = {
       console.log(PIXI.tilemap);
       this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
-      //this._pixiObject.anchor.x = 0.5;
-      //this._pixiObject.anchor.y = 0.5;
+      this._pixiObject.transform.x = 0.5;
+      this._pixiObject.transform.y = 0.5;
+      console.log(this._pixiObject);
       this._pixiContainer.addChild(this._pixiObject);
       // this._pixiContainer.addChild(this._tileSet);
       console.log(
@@ -412,9 +415,9 @@ module.exports = {
           .getValue(),
         0
       );
-      const render = this._associatedObject
+      const displayMode = this._associatedObject
         .getProperties(this.project)
-        .get('render')
+        .get('displayMode')
         .getValue();
 
       this._pixiResourcesLoader.getPIXITileSet(
@@ -427,7 +430,7 @@ module.exports = {
             this._pixiResourcesLoader.updatePIXITileMap(
               tileset,
               this._pixiObject,
-              render,
+              displayMode,
               layerIndex
             );
             console.log("result",this._pixiObject)
@@ -453,11 +456,12 @@ module.exports = {
       if (this._pixiObject.tilemapAtlasImage !== tilemapAtlasImage)
         this._pixiObject.tilemapAtlasImage = tilemapAtlasImage;
 
-      const render = this._associatedObject
+      const displayMode = this._associatedObject
         .getProperties(this.project)
-        .get('render')
+        .get('displayMode')
         .getValue();
-      if (this._pixiObject.render !== render) this._pixiObject.render = render;
+      if (this._pixiObject.displayMode !== displayMode)
+        this._pixiObject.displayMode = displayMode;
 
       const layerIndex = this._associatedObject
         .getProperties(this.project)

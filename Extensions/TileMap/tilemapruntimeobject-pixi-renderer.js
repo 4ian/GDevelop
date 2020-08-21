@@ -15,7 +15,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
       0,
       runtimeObject._tilemapAtlasImage.texture
     );
-    // this._pixiObject = new PIXI.Container();
 
     this._object.hidden = !runtimeObject._visible;
   } else {
@@ -46,20 +45,20 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
-  // gdjs.PixiImageManager.getPIXITileSet(
-  //   this._tilemapAtlasImage,
-  //   this._tiledFile,
-  //   function(tileset) {
-  //     console.log("LOADED", tileset);
-  //     if (tileset && this._pixiObject) {
-  //       gdjs.PixiImageManager.updatePIXITileMap(
-  //         tileset,
-  //         this._pixiObject,
-  //         this._render,
-  //         this._layerIndex
-  //       );
-  //     }
-  //   }
+//   gdjs.PixiImageManager.getPIXITileSet(
+//     this._tilemapAtlasImage,
+//     this._tiledFile,
+//     function(tileset) {
+//       console.log("LOADED", tileset);
+//       if (tileset && this._pixiObject) {
+//         gdjs.PixiImageManager.updatePIXITileMap(
+//           tileset,
+//           this._pixiObject,
+//           this._render,
+//           this._layerIndex
+//         );
+//       }
+//     }
   //update the external object here
 };
 
@@ -73,8 +72,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = functi
   //this._pixiObject.dirty = true;
   this.updatePosition();
 };
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateRender = function() {
-  this._pixiObject._render = this._object._render;
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateDisplayMode = function() {
+  this._pixiObject._displayMode = this._object._displayMode;
   //this._pixiObject.dirty = true;
   this.updatePosition();
 };

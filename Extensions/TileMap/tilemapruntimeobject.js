@@ -16,7 +16,7 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type {string} */
   this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
   /** @type {string} */
-  this._render = objectData.content.render;
+  this._displayMode = objectData.content.displayMode;
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
 
@@ -61,8 +61,8 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   ) {
     this.setTilemapAtlasImage(newObjectData.content.tilemapAtlasImage);
   }
-  if (oldObjectData.content.render !== newObjectData.content.render) {
-    this.setRender(newObjectData.content.render);
+  if (oldObjectData.content.displayMode !== newObjectData.content.displayMode) {
+    this.setDisplayMode(newObjectData.content.displayMode);
   }
   if (oldObjectData.content.layerIndex !== newObjectData.content.layerIndex) {
     this.setLayerIndex(newObjectData.content.layerIndex);
@@ -110,13 +110,13 @@ gdjs.RuntimeObject.prototype.setTilemapAtlasImage = function(
 gdjs.RuntimeObject.prototype.getTilemapAtlasImage = function() {
   return this._tilemapAtlasImage;
 };
-gdjs.RuntimeObject.prototype.setRender = function(render) {
-  this._render = render;
-  this._renderer.updateRender();
+gdjs.RuntimeObject.prototype.setDisplayMode = function(displayMode) {
+  this._displayMode = displayMode;
+  this._renderer.updateDisplayMode();
 };
 
-gdjs.RuntimeObject.prototype.getRender = function() {
-  return this._render;
+gdjs.RuntimeObject.prototype.getDisplayMode = function() {
+  return this._displayMode;
 };
 gdjs.RuntimeObject.prototype.setLayerIndex = function(layerIndex) {
   this._layerIndex = layerIndex;

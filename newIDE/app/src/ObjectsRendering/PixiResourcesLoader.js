@@ -205,6 +205,7 @@ export default class PixiResourcesLoader {
     // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
     ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
       tiledData => {
+        console.log(tiledData,texture);
         this.createTileSetResource(
           tiledData,
           texture,

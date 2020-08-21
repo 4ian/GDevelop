@@ -272,7 +272,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
       if (dependencies.GetDependencyType() == "cordova") {
 
         plugins += "<plugin name=\"" + dependencies.GetExportName();
-        if(dependencies.GetVersion() != "-1") {
+        if(dependencies.GetVersion() != "") {
           plugins += "\" spec=\"" + dependencies.GetVersion();
         }
         plugins += "\">\n"; 
@@ -451,8 +451,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
       for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
         if (dependency.GetDependencyType() == "npm") {
-          if(dependency.GetVersion() == "-1") {
-            gd::LogError("Latest Version (-1) not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported.");
+          if(dependency.GetVersion() == "") {
+            gd::LogError("Latest Version not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported. Please specify a version when calling addDependency.");
             continue;
           }
           packages += "\n\t\"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",";

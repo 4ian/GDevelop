@@ -13,7 +13,7 @@ type Props = {|
   project: gdProject,
 |};
 
-function extensionsProperties(props: Props): JSX.Element {
+function ExtensionsProperties(props: Props) {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
   const propertyList = [];
@@ -37,15 +37,13 @@ function extensionsProperties(props: Props): JSX.Element {
             .get(propertyName)
             .getType() === 'boolean'
         ) {
-          if (newValue === '1') {
-            project
-              .getExtensionPropertiesManager()
-              .setValue(extension.getName(), propertyName, 'true');
-          } else {
-            project
-              .getExtensionPropertiesManager()
-              .setValue(extension.getName(), propertyName, 'false');
-          }
+          project
+            .getExtensionPropertiesManager()
+            .setValue(
+              extension.getName(),
+              propertyName,
+              newValue === '1' ? 'true' : 'false'
+            );
         } else {
           project
             .getExtensionPropertiesManager()
@@ -67,13 +65,7 @@ function extensionsProperties(props: Props): JSX.Element {
     );
   }
 
-  return propertyList.length ? (
-    <List>{propertyList}</List>
-  ) : (
-    <EmptyMessage>
-      <Trans>No Extension Properties Available.</Trans>
-    </EmptyMessage>
-  );
+  return propertyList.length ? <List>{propertyList}</List> : null;
 }
 
-export default extensionsProperties;
+export default ExtensionsProperties;

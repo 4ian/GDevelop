@@ -623,14 +623,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   extensionProperties.UnserializeFrom(
       propElement.GetChild("extensionProperties"));
 
-  // Compatibility: Move AdMob App ID from project property to extension
-  // property.
+  // Compatibility with GD <= 5.0.0-beta98
+  // Move AdMob App ID from project property to extension property.
   if (propElement.GetStringAttribute("adMobAppId", "") != "") {
     extensionProperties.SetValue(
         "AdMob",
         "AdMobAppId",
         propElement.GetStringAttribute("adMobAppId", ""));
   }
+  // end of compatibility code
 
 #endif
 

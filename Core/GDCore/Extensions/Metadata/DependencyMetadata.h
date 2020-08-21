@@ -42,7 +42,8 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Set the version of the dependency to install. Use -1 for latest.
+   * \brief Set the version of the dependency to install. 
+   * Use an empty string to use the latest version.
    */
   DependencyMetadata& SetVersion(const gd::String& version_) {
     version = version_;
@@ -88,7 +89,7 @@ class GD_CORE_API DependencyMetadata {
   gd::String exportName =
       "";  ///< The name used to install the package (example: npm package name
            ///< for npm dependency type).
-  gd::String version = "-1";  ///< The version of the dependency
+  gd::String version = "";  ///< The version of the dependency
   gd::String dependencyType =
       "npm";  ///< The tool used to install the dependency.
   std::map<gd::String, gd::PropertyDescriptor>

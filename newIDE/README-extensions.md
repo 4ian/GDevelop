@@ -140,7 +140,7 @@ extension.registerProperty("DummyPropertyString")
   .setLabel("Type in anything :)");
 ```
 
-Once declared, you can access the property from your javascript using the `getExtensionProperty` methods of runtime game. You need to pass it the extension identifier and the property name. This would get the AdMobAppId property of the AdMob extension for example:
+Once declared, you can access the property from JavaScript in the game engine using `getExtensionProperty` method of `gdjs.RuntimeGame`. Pass the extension name and the property name. This would get the AdMobAppId property of the AdMob extension for example:
 ```js
 const appId = runtimeGame.getExtensionProperty("AdMob", "AdMobAppId");
 ```

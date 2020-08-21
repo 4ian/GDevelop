@@ -145,6 +145,13 @@ export interface ProjectPropertiesData {
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
   currentPlatform: string;
+  extensionProperties: Array<ExtensionProperty>;
+}
+
+export interface ExtensionProperty {
+  extension: string;
+  property: string;
+  value: string;
 }
 
 export interface LoadingScreenData {

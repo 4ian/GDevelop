@@ -604,13 +604,13 @@ gdjs.RuntimeGame.prototype.isPreview = function() {
 
 /**
  * Gets an extension property from the project data.
- * @param {string} extension The extension name.
+ * @param {string} extensionName The extension name.
  * @param {string} propertyName The property name.
- * @return {any} The property value.
+ * @return {?string} The property value.
  */
-gdjs.RuntimeGame.prototype.getExtensionProperty = function(extension, propertyName) {
+gdjs.RuntimeGame.prototype.getExtensionProperty = function(extensionName, propertyName) {
   for(let property of this._data.properties.extensionProperties) {
-    if(property.extension === extension && property.property === propertyName) return property.value;
+    if(property.extension === extensionName && property.property === propertyName) return property.value;
   }
   return null;
 }

@@ -60,12 +60,12 @@ class GD_CORE_API NamedPropertyDescriptor : public PropertyDescriptor {
   void UnserializeFrom(const SerializerElement& element);
 
   /**
-   * \brief Serilaize only the Value and Extra Informations.
+   * \brief Serialize only the value and extra informations of the property.
    */
   virtual void SerializeValuesTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserilaize only the Value and Extra Informations.
+   * \brief Unserialize only the value and extra information of the property.
    */
   virtual void UnserializeValuesFrom(const SerializerElement& element);
   ///@}

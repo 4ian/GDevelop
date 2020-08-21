@@ -13,9 +13,8 @@
 
 namespace gd {
 /**
- * \brief Contains a information about a dependency (library, npm/cordova
- * package, or other according to the export) of an extension. 
- * \note Is subject to changes.
+ * \brief Contains information about a dependency (library, npm/cordova
+ * package, or other according to the export) of an extension.
  */
 class GD_CORE_API DependencyMetadata {
  public:
@@ -28,7 +27,10 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Sets the name used by the dependency manager to find the dependency.
+   * \brief Sets the name written by the exporter.
+   * Typically, this is what is used by the dependency manager
+   * to find the dependency.
+   *
    * \example
    * \code
    *  // For depending upon the NPM package is-thirteen
@@ -51,9 +53,9 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Sets the type of dependecy (What will be used to install it)
+   * \brief Sets the type of dependecy (what will be used to install it)
    *
-   * Types can be either "npm", "cordova"
+   * This can either be "npm" or "cordova" for now. 
    */
   DependencyMetadata& SetDependencyType(const gd::String& dependencyType_) {
     dependencyType = dependencyType_;
@@ -85,11 +87,10 @@ class GD_CORE_API DependencyMetadata {
   }
 
  private:
-  gd::String name = "";  ///< The name of the dependency.
-  gd::String exportName =
-      "";  ///< The name used to install the package (example: npm package name
-           ///< for npm dependency type).
-  gd::String version = "";  ///< The version of the dependency
+  gd::String name;  ///< The name of the dependency.
+  gd::String exportName;  ///< The name used to install the package (example: npm package name
+                          ///< for npm dependency type).
+  gd::String version;  ///< The version of the dependency
   gd::String dependencyType =
       "npm";  ///< The tool used to install the dependency.
   std::map<gd::String, gd::PropertyDescriptor>

@@ -229,8 +229,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   gd::String::From(parentContext.GetContextDepth()) + "_" +
                   gd::String::From(parentContext.GetCurrentConditionDepth()) +
                   "final";
-              code += codeGenerator.GetObjectListName(*it, parentContext) +
-                      ".createFrom(" + finalObjList + ");\n";
+              code += "gdjs.copyArray(" + finalObjList + ", " +
+                      codeGenerator.GetObjectListName(*it, parentContext) +
+                      ");\n";
             }
             code += "}\n";
 

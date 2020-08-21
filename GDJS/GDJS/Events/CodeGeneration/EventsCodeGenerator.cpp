@@ -124,8 +124,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
           eventsFunction.GetParameters(), false),
       codeGenerator.GenerateEventsFunctionContext(
-          eventsFunction.GetParameters(),
-          "runtimeScene.getOnceTriggers()"),
+          eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
@@ -154,8 +153,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
 
   // Generate the code setting up the context of the function.
   gd::String fullPreludeCode =
-      preludeCode + "\n" +
-      "var that = this;\n" +
+      preludeCode + "\n" + "var that = this;\n" +
       // runtimeScene is supposed to be always accessible, read
       // it from the behavior
       "var runtimeScene = this._runtimeScene;\n" +
@@ -173,7 +171,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
-          "Object", "Behavior");
+          "Object",
+          "Behavior");
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
       project,
@@ -340,12 +339,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  },\n"
          // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
-         argumentsGetters + "    return \"\";\n" +
-         "  },\n" +
-         // Expose OnceTriggers (will be pointing either to the runtime scene ones,
-         // or the ones from the behavior):
-         "  getOnceTriggers: function() { return " + onceTriggersVariable + "; }\n" +
-         "};\n";
+         argumentsGetters + "    return \"\";\n" + "  },\n" +
+         // Expose OnceTriggers (will be pointing either to the runtime scene
+         // ones, or the ones from the behavior):
+         "  getOnceTriggers: function() { return " + onceTriggersVariable +
+         "; }\n" + "};\n";
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
@@ -739,16 +737,16 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     gd::String copiedListName =
         GetObjectListName(object, *context.GetParentContext());
-    return objectListName + ".createFrom(" + copiedListName + ");\n";
+    return "gdjs.copyArray(" + copiedListName + ", " + objectListName + ");\n";
   };
 
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
-      objectListDeclaration += GetObjectListName(object, context) +
-                               ".createFrom(" +
-                               GenerateAllInstancesGetterCode(object) + ");";
+      objectListDeclaration += "gdjs.copyArray(" +
+                               GenerateAllInstancesGetterCode(object) + ", " +
+                               GetObjectListName(object, context) + ");";
       context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);

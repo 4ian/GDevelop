@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -261,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
+          "persistentUuid": "9289193f-3082-4d3d-911e-2adc0b79ffe3",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -281,6 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
+          "persistentUuid": "489e49fc-ae19-4159-a059-54fbed7496f0",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -296,6 +298,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
+          "persistentUuid": "03e7c6dc-38a8-4ea1-a21c-0d9b02b6a74a",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -311,6 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
+          "persistentUuid": "ac7f860a-0c73-45b3-a763-bc31624028c0",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -326,6 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "ece20553-fe6c-4309-b227-b0af01a57bfc",
           "width": 0,
           "x": 257,
           "y": 202,

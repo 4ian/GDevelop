@@ -13,7 +13,7 @@ export type RGBColor = {|
   a?: number,
 |};
 
-type ColorResult = {
+export type ColorResult = {
   rgb: RGBColor,
 };
 

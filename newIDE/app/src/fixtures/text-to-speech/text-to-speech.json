@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
+          "persistentUuid": "68bcbd42-bd84-4ffe-9f06-33bd4eff1f4d",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -158,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
+          "persistentUuid": "abb36e0c-d562-44ad-841b-a1ed3e06b6f7",
           "width": 0,
           "x": 237,
           "y": 247,

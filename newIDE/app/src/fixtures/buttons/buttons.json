@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -174,6 +174,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "ded30cc0-3fcf-4648-8b62-14b278dfc342",
           "width": 0,
           "x": 186,
           "y": 274.5,
@@ -189,6 +190,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "64a2d62e-b9c0-4279-ba21-c524618a23e3",
           "width": 0,
           "x": 171,
           "y": 369.5,
@@ -641,6 +643,7 @@
           "layer": "",
           "locked": false,
           "name": "Button1",
+          "persistentUuid": "ff71adfc-0ba6-4224-85de-edd286198c63",
           "width": 0,
           "x": 186,
           "y": 135.5,
@@ -656,6 +659,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "e9614cc2-2858-4cfa-b0c5-77084fc8da58",
           "width": 0,
           "x": 172,
           "y": 383.5,
@@ -671,6 +675,7 @@
           "layer": "",
           "locked": false,
           "name": "Button2",
+          "persistentUuid": "5642b8fd-0702-439e-b616-0d43b8126a19",
           "width": 0,
           "x": 184,
           "y": 199.5,
@@ -686,6 +691,7 @@
           "layer": "",
           "locked": false,
           "name": "Button3",
+          "persistentUuid": "8e74cc1f-d6c3-4e22-a2ba-adbca363eec8",
           "width": 0,
           "x": 187,
           "y": 265.5,

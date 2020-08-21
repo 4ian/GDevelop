@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -148,6 +148,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
+          "persistentUuid": "63f97254-94ce-4b8c-afab-bb7d718451e8",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -163,6 +164,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
+          "persistentUuid": "9708c835-a04d-40de-86ed-8ff2eaf2e3bb",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -178,6 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "a6e1f4a8-06b2-4dab-95cc-b4db831e59e6",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -193,6 +196,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "f8bae074-ce45-4a21-9169-1118f53a960b",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -208,6 +212,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
+          "persistentUuid": "b4ec3eb4-ff41-4346-a8da-507c8e4c9d27",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -223,6 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
+          "persistentUuid": "726e49f8-4c84-4e1c-b3c2-1a8e53e057bf",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -238,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
+          "persistentUuid": "969e1cfb-8228-4b1c-b69f-37a38e723fea",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -253,6 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
+          "persistentUuid": "a75646ca-f2ba-404d-b9b2-d973c9d0ac7d",
           "width": 0,
           "x": 10,
           "y": 448,

@@ -9,6 +9,7 @@ import { Line, Spacer } from '../UI/Grid';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
+import FlatButton from '../UI/FlatButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import Text from '../UI/Text';
 import {
@@ -21,6 +22,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
   onReplaceInEvents: ReplaceInEventsInputs => void,
+  onCloseSearchPanel: () => void,
   resultsCount: ?number,
   hasEventSelected: boolean,
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
@@ -116,6 +118,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       hasEventSelected,
       onGoToPreviousSearchResult,
       onGoToNextSearchResult,
+      onCloseSearchPanel,
     } = this.props;
     const { searchText, replaceText, searchInSelection } = this.state;
 
@@ -253,6 +256,14 @@ export default class SearchPanel extends PureComponent<Props, State> {
               >
                 <ChevronRight />
               </IconButton>
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                primary={false}
+                onClick={() => {
+                  onCloseSearchPanel();
+                }}
+              />
             </Line>
           </Line>
         </ColumnStackLayout>

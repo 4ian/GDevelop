@@ -46,45 +46,27 @@ type State = {|
   isFolderProject: boolean,
 |};
 
-class ProjectPropertiesDialog extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = this._loadFrom(props.project);
-  }
+function loadPropertiesFromProject(project: gdProject): State {
+  return {
+    gameResolutionWidth: project.getGameResolutionWidth(),
+    gameResolutionHeight: project.getGameResolutionHeight(),
+    adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
+    name: project.getName(),
+    author: project.getAuthor(),
+    version: project.getVersion(),
+    packageName: project.getPackageName(),
+    orientation: project.getOrientation(),
+    scaleMode: project.getScaleMode(),
+    sizeOnStartupMode: project.getSizeOnStartupMode(),
+    showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
+    minFPS: project.getMinimumFPS(),
+    maxFPS: project.getMaximumFPS(),
+    isFolderProject: project.isFolderProject(),
+  };
+}
 
-  _subscriptionChecker: ?SubscriptionChecker = null;
-
-  _loadFrom(project: gdProject): State {
-    return {
-      gameResolutionWidth: project.getGameResolutionWidth(),
-      gameResolutionHeight: project.getGameResolutionHeight(),
-      adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
-      name: project.getName(),
-      author: project.getAuthor(),
-      version: project.getVersion(),
-      packageName: project.getPackageName(),
-      orientation: project.getOrientation(),
-      scaleMode: project.getScaleMode(),
-      sizeOnStartupMode: project.getSizeOnStartupMode(),
-      showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
-      minFPS: project.getMinimumFPS(),
-      maxFPS: project.getMaximumFPS(),
-      isFolderProject: project.isFolderProject(),
-    };
-  }
-
-  componentWillReceiveProps(newProps: Props) {
-    if (
-      (!this.props.open && newProps.open) ||
-      (newProps.open && this.props.project !== newProps.project)
-    ) {
-      this.setState(this._loadFrom(newProps.project));
-    }
-  }
-
-  _onApply = () => {
-    const t = str => str; //TODO
-    const { project } = this.props;
+function applyPropertiesToProject(project: gdProject, state: State) {
+  const t = str => str; //TODO
     const {
       gameResolutionWidth,
       gameResolutionHeight,
@@ -100,7 +82,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       minFPS,
       maxFPS,
       isFolderProject,
-    } = this.state;
+    } = state;
     project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
     project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
     project.setName(name);
@@ -116,11 +98,14 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setFolderProject(isFolderProject);
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
+}
 
-    this.props.onApply();
-  };
+let subscriptionChecker: ?SubscriptionChecker = null;
 
-  render() {
+function ProjectPropertiesDialog(props: Props) {
+  const { project } = props;
+  let [properties, setProperties] = React.useState(loadPropertiesFromProject(project));
+
     const {
       name,
       gameResolutionWidth,
@@ -136,8 +121,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       minFPS,
       maxFPS,
       isFolderProject,
-    } = this.state;
-    const { project } = this.props;
+    } = properties;
 
     const defaultPackageName = 'com.example.mygame';
     const defaultVersion = '1.0.0';
@@ -149,13 +133,16 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             <FlatButton
               label={<Trans>Cancel</Trans>}
               primary={false}
-              onClick={this.props.onClose}
+              onClick={props.onClose}
               key="cancel"
             />,
             <FlatButton
               label={<Trans>Apply</Trans>}
               primary={true}
-              onClick={this._onApply}
+              onClick={() => {
+                applyPropertiesToProject(project, properties);
+                props.onApply();
+              }}
               key="apply"
             />,
           ]}
@@ -167,8 +154,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           ]}
           title={<Trans>Project properties</Trans>}
           cannotBeDismissed={true}
-          open={this.props.open}
-          onRequestClose={this.props.onClose}
+          open={props.open}
+          onRequestClose={props.onClose}
         >
           <ColumnStackLayout noMargin>
             <SemiControlledTextField
@@ -176,7 +163,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               fullWidth
               type="text"
               value={name}
-              onChange={value => this.setState({ name: value })}
+              onChange={value => setProperties({...properties,  name: value })}
               autoFocus
             />
             <Checkbox
@@ -189,13 +176,13 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               onCheck={(e, checked) => {
                 if (!checked) {
                   if (
-                    this._subscriptionChecker &&
-                    !this._subscriptionChecker.checkHasSubscription()
+                    subscriptionChecker &&
+                    !subscriptionChecker.checkHasSubscription()
                   )
                     return;
                 }
 
-                this.setState({
+                setProperties({...properties, 
                   showGDevelopSplash: checked,
                 });
               }}
@@ -206,7 +193,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               hintText={defaultVersion}
               type="text"
               value={version}
-              onChange={value => this.setState({ version: value })}
+              onChange={value => setProperties({...properties,  version: value })}
             />
             <SemiControlledTextField
               floatingLabelText={
@@ -216,7 +203,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               hintText={defaultPackageName}
               type="text"
               value={packageName}
-              onChange={value => this.setState({ packageName: value })}
+              onChange={value => setProperties({...properties,  packageName: value })}
               errorText={
                 validatePackageName(packageName) ? (
                   undefined
@@ -235,7 +222,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               hintText={t`Your name`}
               type="text"
               value={author}
-              onChange={value => this.setState({ author: value })}
+              onChange={value => setProperties({...properties,  author: value })}
             />
             <Text size="title">
               <Trans>Resolution and rendering</Trans>
@@ -247,7 +234,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 type="number"
                 value={'' + gameResolutionWidth}
                 onChange={value =>
-                  this.setState({
+                  setProperties({...properties, 
                     gameResolutionWidth: Math.max(1, parseInt(value, 10)),
                   })
                 }
@@ -258,7 +245,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 type="number"
                 value={'' + gameResolutionHeight}
                 onChange={value =>
-                  this.setState({
+                  setProperties({...properties, 
                     gameResolutionHeight: Math.max(1, parseInt(value, 10)),
                   })
                 }
@@ -273,7 +260,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               }
               value={sizeOnStartupMode}
               onChange={(e, i, value: string) =>
-                this.setState({ sizeOnStartupMode: value })
+                setProperties({...properties,  sizeOnStartupMode: value })
               }
             >
               <SelectOption
@@ -299,7 +286,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               disabled={sizeOnStartupMode === ''}
               checked={adaptGameResolutionAtRuntime}
               onCheck={(e, checked) => {
-                this.setState({
+                setProperties({...properties, 
                   adaptGameResolutionAtRuntime: checked,
                 });
               }}
@@ -311,7 +298,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 type="number"
                 value={'' + minFPS}
                 onChange={value =>
-                  this.setState({
+                  setProperties({...properties, 
                     minFPS: Math.max(0, parseInt(value, 10)),
                   })
                 }
@@ -322,7 +309,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
                 type="number"
                 value={'' + maxFPS}
                 onChange={value =>
-                  this.setState({
+                  setProperties({...properties, 
                     maxFPS: Math.max(0, parseInt(value, 10)),
                   })
                 }
@@ -364,7 +351,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               }
               value={orientation}
               onChange={(e, i, value: string) =>
-                this.setState({ orientation: value })
+                setProperties({...properties, orientation: value })
               }
             >
               <SelectOption value="default" primaryText={t`Platform default`} />
@@ -378,7 +365,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               }
               value={scaleMode}
               onChange={(e, i, value: string) =>
-                this.setState({ scaleMode: value })
+                setProperties({...properties,  scaleMode: value })
               }
             >
               <SelectOption
@@ -411,7 +398,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               floatingLabelText={<Trans>Project file type</Trans>}
               value={isFolderProject ? 'folder-project' : 'single-file'}
               onChange={(e, i, value: string) =>
-                this.setState({ isFolderProject: value === 'folder-project' })
+                setProperties({...properties, isFolderProject: value === 'folder-project' })
               }
             >
               <SelectOption
@@ -427,12 +414,12 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <ExtensionsProperties project={project} />
         </Dialog>
         <SubscriptionChecker
-          ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)
+          ref={subscriptionChecker_ =>
+            (subscriptionChecker = subscriptionChecker_)
           }
           onChangeSubscription={() => {
-            this.props.onClose();
-            this.props.onChangeSubscription();
+            props.onClose();
+            props.onChangeSubscription();
           }}
           mode="mandatory"
           id="Disable GDevelop splash at startup"
@@ -441,6 +428,5 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       </React.Fragment>
     );
   }
-}
 
 export default ProjectPropertiesDialog;

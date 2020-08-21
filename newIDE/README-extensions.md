@@ -140,6 +140,14 @@ extension.registerProperty("DummyPropertyString")
   .setLabel("Type in anything :)");
 ```
 
+Once declared, you can access the property from your javascript using the `getExtensionProperty` methods of runtime game. You need to pass it the extension identifier and the property name. This would get the AdMobAppId property of the AdMob extension for example:
+```js
+const appId = runtimeGame.getExtensionProperty("AdMob", "AdMobAppId");
+```
+
+If the property doesn't exist it will return null. 
+⚠️ Be careful, it can be non existing if the user never entered a value for that property before!
+
 #### Declare a dependency on an external package
 
 You can declare a dependency on an npm package or cordova plugin with `addDependency`. Example:

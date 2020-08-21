@@ -293,16 +293,22 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Get all extension properties
+   * \brief Get the properties set by extensions. 
+   * 
+   * Each extension can store arbitrary values indexed by a property name, which are
+   * useful to store project wide settings (AdMob id, etc...).
    */
-  gd::ExtensionProperties& GetExtensionPropertiesManager() {
+  gd::ExtensionProperties& GetExtensionProperties() {
     return extensionProperties;
   };
 
   /**
-   * \brief Get all extension properties
+   * \brief Get the properties set by extensions. 
+   * 
+   * Each extension can store arbitrary values indexed by a property name, which are
+   * useful to store project wide settings (AdMob id, etc...).
    */
-  const gd::ExtensionProperties& GetExtensionPropertiesManager() const {
+  const gd::ExtensionProperties& GetExtensionProperties() const {
     return extensionProperties;
   };
 

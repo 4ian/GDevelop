@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXTENSIONPROPERTIESMANAGERS_H
-#define GDCORE_EXTENSIONPROPERTIESMANAGERS_H
+#ifndef GDCORE_EXTENSIONPROPERTIES_H
+#define GDCORE_EXTENSIONPROPERTIES_H
 #include <map>
 
 #include "GDCore/Serialization/SerializerElement.h"
@@ -66,4 +66,4 @@ class GD_CORE_API ExtensionProperties {
 };
 }  // namespace gd
 
-#endif  // EXTENSIONPROPERTIESMANAGERS_H
+#endif  // EXTENSIONPROPERTIES_H

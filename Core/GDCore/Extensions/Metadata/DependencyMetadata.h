@@ -78,7 +78,10 @@ class GD_CORE_API DependencyMetadata {
   const gd::String& GetName() const { return name; };
   const gd::String& GetExportName() const { return exportName; };
   const gd::String& GetVersion() const { return version; };
-  const gd::String& GetDependencyType() const { return dependencyType; };
+  const gd::String& GetDependencyType() const { 
+    if(dependencyType == "") gd::LogWarning("Dependency has no type, it won't be exported.");
+    return dependencyType; 
+  };
   gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) {
     return extraData[settingName];
   };
@@ -91,8 +94,7 @@ class GD_CORE_API DependencyMetadata {
   gd::String exportName;  ///< The name used to install the package (example: npm package name
                           ///< for npm dependency type).
   gd::String version;  ///< The version of the dependency
-  gd::String dependencyType =
-      "npm";  ///< The tool used to install the dependency.
+  gd::String dependencyType;  ///< The tool used to install the dependency.
   std::map<gd::String, gd::PropertyDescriptor>
       extraData;  ///< Contains dependency type specific additional parameters
                   ///< for the dependency.

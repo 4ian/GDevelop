@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
-import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import { List } from '@material-ui/core';
@@ -20,25 +19,25 @@ function ExtensionsProperties(props: Props) {
   for (let i = 0; i < allExtensions.size(); i++) {
     const extension = allExtensions.at(i);
     const properties = project
-      .getExtensionPropertiesManager()
+      .getExtensionProperties()
       .getAllExtensionProperties(extension.getName(), project);
     if (properties.keys().size() === 0) continue;
     const propertiesSchema = propertiesMapToSchema(
       properties,
       instance =>
         project
-          .getExtensionPropertiesManager()
+          .getExtensionProperties()
           .getAllExtensionProperties(extension.getName(), project),
       (instance, propertyName, newValue) => {
         if (
           project
-            .getExtensionPropertiesManager()
+            .getExtensionProperties()
             .getAllExtensionProperties(extension.getName(), project)
             .get(propertyName)
             .getType() === 'boolean'
         ) {
           project
-            .getExtensionPropertiesManager()
+            .getExtensionProperties()
             .setValue(
               extension.getName(),
               propertyName,
@@ -46,7 +45,7 @@ function ExtensionsProperties(props: Props) {
             );
         } else {
           project
-            .getExtensionPropertiesManager()
+            .getExtensionProperties()
             .setValue(extension.getName(), propertyName, newValue);
         }
       }

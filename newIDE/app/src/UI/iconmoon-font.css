@@ -33,3 +33,7 @@
 .icon-discord:before {
   content: "\e900";
 }
+
+.icon-reddit:before {
+  content: "\e901";
+}

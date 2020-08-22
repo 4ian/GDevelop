@@ -219,6 +219,14 @@ export class StartPage extends React.Component<Props, State> {
                       Window.openExternalURL('https://discord.gg/rjdYHvj')
                     }
                   />
+                  <IconButton
+                    className="icon-reddit"
+                    onClick={() =>
+                      Window.openExternalURL(
+                        'https://www.reddit.com/r/gdevelop'
+                      )
+                    }
+                  />
                 </Line>
               </Line>
             </div>

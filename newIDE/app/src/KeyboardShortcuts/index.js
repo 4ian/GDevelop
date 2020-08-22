@@ -73,11 +73,11 @@ export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
  */
 export const getShortcutMetadataFromEvent = (
   e: KeyboardEvent
-): {| shortcutString: string, isValid: boolean |} => {
+): {| shortcutString: string, isValid: boolean, invalidType?: string |} => {
   const shortcutString = getShortcutStringFromEvent(e);
-  const isValidShortcut = isValidShortcutEvent(e);
+  const isValidKey = isValidShortcutEvent(e);
   const isReserved = reservedShortcuts.includes(shortcutString);
-  return { shortcutString, isValid: isValidShortcut && !isReserved };
+  return { shortcutString, isValid: isValidKey && !isReserved };
 };
 
 /**
@@ -87,8 +87,7 @@ export const getShortcutMetadataFromEvent = (
 export const useShortcutMap = (): ShortcutMap => {
   const preferences = React.useContext(PreferencesContext);
   const userShortcutMap = preferences.values.userShortcutMap;
-  const fullShortcutMap = Object.assign({}, defaultShortcuts, userShortcutMap);
-  return fullShortcutMap;
+  return { ...defaultShortcuts, ...userShortcutMap };
 };
 
 /**

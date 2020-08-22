@@ -134,7 +134,7 @@ gdjs.BitmapTextRuntimeObject.prototype.onDestroyFromScene = function(
 };
 
 /**
- * Set the markup text to display.
+ * Set the text to display.
  */
 gdjs.BitmapTextRuntimeObject.prototype.setBitmapText = function(text) {
   this._text = text;
@@ -142,7 +142,7 @@ gdjs.BitmapTextRuntimeObject.prototype.setBitmapText = function(text) {
 };
 
 /**
- * Get the markup text displayed by the object.
+ * Get the text displayed by the object.
  */
 gdjs.BitmapTextRuntimeObject.prototype.getBitmapText = function() {
   return this._text;

@@ -29,15 +29,15 @@ module.exports = {
       .setExtensionInformation(
         'BitmapText',
         _('Bitmap Text Object'),
-        _('Displays a text as an bitmap image.'),
+        _('Displays a text as a bitmap image.'),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/bitmaptext');
 
-    var objectBitmapText = new gd.ObjectJsImplementation();
+    const BitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    objectBitmapText.updateProperty = function(
+    BitmapTextObject.updateProperty = function(
       objectContent,
       propertyName,
       newValue
@@ -54,7 +54,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    objectBitmapText.getProperties = function(objectContent) {
+    BitmapTextObject.getProperties = function(objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
@@ -111,7 +111,7 @@ module.exports = {
 
       return objectProperties;
     };
-    objectBitmapText.setRawJSONContent(
+    BitmapTextObject.setRawJSONContent(
       JSON.stringify({
         text: 'Bitmap Text test',
         opacity: 255,
@@ -125,7 +125,7 @@ module.exports = {
     );
 
     // $FlowExpectedError
-    objectBitmapText.updateInitialInstanceProperty = function(
+    BitmapTextObject.updateInitialInstanceProperty = function(
       objectContent,
       instance,
       propertyName,
@@ -136,7 +136,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    objectBitmapText.getInitialInstanceProperties = function(
+    BitmapTextObject.getInitialInstanceProperties = function(
       content,
       instance,
       project,
@@ -151,243 +151,258 @@ module.exports = {
         'BitmapText',
         _('BitmapText'),
         _(
-          'Displays a rich text label using Bitmap markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
+          'Displays rich text as a sprite by converting a standard font to a Bitmap font.'
         ),
         'JsPlatform/Extensions/bitmapfont32.png',
-        objectBitmapText
+        BitmapTextObject
       )
       .setIncludeFile('Extensions/BitmapText/bitmaptextruntimeobject.js')
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       );
 
-    /**
-     * Utility function to add both a setter and a getter to a property from a list.
-     * Useful for setting multiple generic properties.
-     */
-    const addSettersAndGettersToObject = (gdObject, properties, objectName) => {
-      properties.forEach(property => {
-        const parameterType =
-          property.type === 'boolean' ? 'yesorno' : property.type;
+    object
+      .addCondition(
+        'GetBitmapText',
+        _('Compare the text'),
+        _('Compare the text of the Bitmap text object.'),
+        _('the text'),
+        '',
+        'res/conditions/text24.png',
+        'res/conditions/text.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('string')
+      .getCodeExtraInformation()
+      .setFunctionName('getBitmapText');
 
-        // Add the expression
-        if (parameterType === 'number') {
-          gdObject
-            .addExpression(
-              `Get${property.functionName}`,
-              property.expressionLabel,
-              property.expressionDescription,
-              '',
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .getCodeExtraInformation()
-            .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'string') {
-          gdObject
-            .addStrExpression(
-              `Get${property.functionName}`,
-              property.expressionLabel,
-              property.expressionDescription,
-              '',
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .getCodeExtraInformation()
-            .setFunctionName(`get${property.functionName}`);
-        }
-
-        // Add the action
-        if (parameterType === 'number' || parameterType === 'string') {
-          const expressionType =
-            parameterType === 'number' ? 'expression' : 'string';
-          gdObject
-            .addAction(
-              `Set${property.functionName}`,
-              property.paramLabel,
-              property.actionDescription,
-              property.actionSentence,
-              '',
-              property.iconPath,
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .useStandardOperatorParameters(parameterType)
-            .getCodeExtraInformation()
-            .setFunctionName(`set${property.functionName}`)
-            .setGetter(`get${property.functionName}`);
-        } else {
-          gdObject
-            .addAction(
-              `Set${property.functionName}`,
-              property.paramLabel,
-              property.actionDescription,
-              property.actionSentence,
-              '',
-              property.iconPath,
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .addParameter(
-              parameterType,
-              property.paramLabel,
-              property.options
-                ? '["' + property.options.join('", "') + '"]'
-                : '',
-              false
-            )
-            .getCodeExtraInformation()
-            .setFunctionName(`set${property.functionName}`)
-            .setGetter(`get${property.functionName}`);
-        }
-
-        // Add condition
-        if (parameterType === 'string' || parameterType === 'number') {
-          const propExpressionType =
-            parameterType === 'string' ? 'string' : 'expression';
-          gdObject
-            .addCondition(
-              `Is${property.functionName}`,
-              property.paramLabel,
-              property.conditionDescription,
-              property.conditionSentence,
-              '',
-              property.iconPath,
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .useStandardRelationalOperatorParameters(parameterType)
-            .getCodeExtraInformation()
-            .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'yesorno') {
-          gdObject
-            .addCondition(
-              `Is${property.functionName}`,
-              property.paramLabel,
-              property.conditionDescription,
-              property.conditionSentence,
-              '',
-              property.iconPath,
-              property.iconPath
-            )
-            .addParameter('object', objectName, objectName, false)
-            .getCodeExtraInformation()
-            .setFunctionName(`get${property.functionName}`);
-        }
-      });
-    };
-
-    const setterAndGetterProperties = [
-      {
-        functionName: 'BitmapText',
-        iconPath: 'res/actions/text24.png',
-        type: 'string',
-        paramLabel: _('Bitmap text'),
-        conditionDescription: _('Compare the value of the Bitmap text.'),
-        conditionSentence: _('the Bitmap text'),
-        actionDescription: _('Set Bitmap text'),
-        actionSentence: _('the Bitmap text'),
-        expressionLabel: _('Get Bitmap text'),
-        expressionDescription: _('Get Bitmap text'),
-      },
-      {
-        functionName: 'Color',
-        iconPath: 'res/actions/color24.png',
-        type: 'color',
-        paramLabel: _('Color'),
-        conditionDescription: '', // No conditions for a "color" property
-        conditionSentence: '', // No conditions for a "color" property
-        actionDescription: _('Set base color'),
-        actionSentence: _('Set base color of _PARAM0_ to _PARAM1_'),
-        expressionLabel: '', // No expression for a "color" property
-        expressionDescription: '', // No expression for a "color" property
-      },
-      {
-        functionName: 'Opacity',
-        iconPath: 'res/actions/opacity24.png',
-        type: 'number',
-        paramLabel: _('Opacity'),
-        conditionDescription: _(
-          'Compare the value of the base opacity of the text.'
+    object
+      .addCondition(
+        'GetOpacity',
+        _('Opacity'),
+        _(
+          'Compare the opacity of the Bitmap text object, between 0 (fully transparent) to 255 (opaque).'
         ),
-        conditionSentence: _('the base opacity'),
-        actionDescription: _('Set base opacity'),
-        actionSentence: _('the base opacity'),
-        expressionLabel: _('Get the base opacity'),
-        expressionDescription: _('Get the base opacity'),
-      },
-      {
-        functionName: 'FontSize',
-        iconPath: 'res/actions/characterSize24.png',
-        type: 'number',
-        paramLabel: _('Font size'),
-        conditionDescription: _('Compare the base font size of the text.'),
-        conditionSentence: _('the base font size'),
-        actionDescription: _('Set base font size'),
-        actionSentence: _('the base font size'),
-        expressionLabel: _('Get the base font size'),
-        expressionDescription: _('Get the base font size'),
-      },
-      {
-        functionName: 'FontFamily',
-        iconPath: 'res/actions/font24.png',
-        type: 'string',
-        paramLabel: _('Font family'),
-        conditionDescription: _('Compare the value of font family'),
-        conditionSentence: _('the base font family'),
-        actionDescription: _('Set font family'),
-        actionSentence: _('the base font family'),
-        expressionLabel: _('Get the base font family'),
-        expressionDescription: _('Get the base font family'),
-      },
-      {
-        functionName: 'Alignment',
-        iconPath: 'res/actions/textAlign24.png',
-        type: 'stringWithSelector',
-        paramLabel: _('Alignment'),
-        options: ['left', 'right', 'center'],
-        conditionDescription: _('Check the current text alignment'),
-        conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1_'),
-        actionDescription: _('Change the alignment of the text.'),
-        actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
-        expressionLabel: _('Get the text alignment'),
-        expressionDescription: _('Get the text alignment'),
-      },
-      {
-        functionName: 'WordWrap',
-        iconPath: 'res/actions/scaleWidth24.png',
-        type: 'boolean',
-        paramLabel: _('Word wrap'),
-        conditionDescription: _('Check if word wrap is enabled'),
-        conditionSentence: _('Word wrap is enabled'),
-        actionDescription: _('Set word wrap'),
-        actionSentence: _('Activate word wrap for _PARAM0_: _PARAM1_'),
-        expressionLabel: '',
-        expressionDescription: '',
-      },
-      {
-        functionName: 'WrappingWidth',
-        iconPath: 'res/actions/scaleWidth24.png',
-        type: 'number',
-        paramLabel: _('Wrapping width'),
-        conditionDescription: _(
+        _('the opacity'),
+        '',
+        'res/conditions/opacity24.png',
+        'res/conditions/opacity.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getOpacity');
+
+    object
+      .addCondition(
+        'GetFontSize',
+        _('Font size'),
+        _('Compare the font size of the Bitmap text object.'),
+        _('the font size'),
+        '',
+        'res/conditions/characterSize24.png',
+        'res/conditions/characterSize.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardRelationalOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getFontSize');
+
+    object
+      .addCondition(
+        'GetFontFamily',
+        _('Font family'),
+        _('Compare the font family of the Bitmap text object.'),
+        _('the font family'),
+        _('Style'),
+        'res/conditions/font24.png',
+        'res/conditions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardRelationalOperatorParameters('string')
+      .getCodeExtraInformation()
+      .setFunctionName('getFontFamily');
+
+    object
+      .addCondition(
+        'GetAlignment',
+        _('Alignment'),
+        _('Compare the alignment of the Bitmap text object.'),
+        _('the alignment'),
+        _('Style'),
+        'res/actions/textAlign24.png',
+        'res/actions/textAlign.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardRelationalOperatorParameters('string')
+      .getCodeExtraInformation()
+      .setFunctionName('getAlignment');
+
+    object
+      .addCondition(
+        'GetWordWrap',
+        _('Wrapping'),
+        _('Check if word wrap is enabled'),
+        _('_PARAM0_ word wrapping is activated'),
+        _('Style'),
+        'res/conditions/wordWrap24.png',
+        'res/conditions/wordWrap.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getWordWrap');
+
+    object
+      .addCondition(
+        'GetWrappingWidth',
+        _('Wrapping width'),
+        _(
           'Compare the width, in pixels, after which the text is wrapped on next line.'
         ),
-        conditionSentence: _('the wrapping width'),
-        actionDescription: _(
+        _('the wrapping width'),
+        _('Style'),
+        'res/actions/wordWrap24.png',
+        'res/actions/wordWrap.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardRelationalOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getWrappingWidth');
+
+    object
+      .addAction(
+        'SetBitmapText',
+        _('Text'),
+        _('Modify the text of a Bitmap text object.'),
+        _('the Bitmap text'),
+        '',
+        'res/actions/text24.png',
+        'res/actions/text.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('string')
+      .getCodeExtraInformation()
+      .setFunctionName('setBitmapText')
+      .setGetter('getBitmapText');
+
+    object
+      .addAction(
+        'SetColor',
+        _('Color'),
+        _('Change the color of the text.'),
+        _('Change color of _PARAM0_ to _PARAM1_'),
+        _('Style'),
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .setDefaultValue('0;0;0')
+      .getCodeExtraInformation()
+      .setFunctionName('setColor')
+      .setGetter('getColor');
+
+    object
+      .addAction(
+        'SetOpacity',
+        _('Opacity'),
+        _('Modify the opacity of a Bitmap text object.'),
+        _('the opacity'),
+        '',
+        'res/actions/opacity24.png',
+        'res/actions/opacity.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('setOpacity')
+      .setGetter('getOpacity');
+
+    object
+      .addAction(
+        'SetFontSize',
+        _('Font size'),
+        _('Modify the font size of a Bitmap text object.'),
+        _('the font size'),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('setFontSize')
+      .setGetter('getFontSize');
+
+    object
+      .addAction(
+        'SetFontFamily',
+        _('Font family'),
+        _('Modify the font family of a Bitmap text object.'),
+        _('the font family'),
+        _('Style'),
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('string')
+      .getCodeExtraInformation()
+      .setFunctionName('setFontFamily')
+      .setGetter('getFontFamily');
+
+    object
+      .addAction(
+        'SetAlignment',
+        _('Alignment'),
+        _('Modify the alignment of a Bitmap text object.'),
+        _('Align _PARAM0_: _PARAM1_'),
+        _('Style'),
+        'res/actions/textAlign24.png',
+        'res/actions/textAlign.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Alignment'),
+        '["left", "center", "right"]',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setFontFamily')
+      .setGetter('getFontFamily');
+
+    object
+      .addAction(
+        'SetWordWrap',
+        _('Word wrap'),
+        _('Modify the word wrap of a Bitmap text object.'),
+        _('Set word wrapping of _PARAM0_: _PARAM1_'),
+        _('Style'),
+        'res/actions/wordWrap24.png',
+        'res/actions/wordWrap.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter('yesorno', _('Activate word wrap'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setWordWrap');
+
+    object
+      .addAction(
+        'SetWrappingWidth',
+        _('Wrapping width'),
+        _(
           'Change the width, in pixels, after which the text is wrapped on next line.'
         ),
-        actionSentence: _('the wrapping width'),
-        expressionLabel: _('Get the wrapping width'),
-        expressionDescription: _('Get the wrapping width'),
-      },
-    ];
-
-    addSettersAndGettersToObject(
-      object,
-      setterAndGetterProperties,
-      'BitmapText'
-    );
+        _('the wrapping width'),
+        _('Style'),
+        'res/actions/scaleWidth24.png',
+        'res/actions/scaleWidth.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('setWrappingWidth')
+      .setGetter('getWrappingWidth');
 
     return extension;
   },

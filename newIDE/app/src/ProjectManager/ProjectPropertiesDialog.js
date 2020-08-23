@@ -108,26 +108,39 @@ let subscriptionChecker: ?SubscriptionChecker = null;
 
 function ProjectPropertiesDialog(props: Props) {
   const { project } = props;
-  let [properties, setProperties] = React.useState(
-    loadPropertiesFromProject(project)
-  );
 
-  const {
-    name,
-    gameResolutionWidth,
-    gameResolutionHeight,
+  const initialProperties = loadPropertiesFromProject(project);
+  let [name, setName] = React.useState(initialProperties.name);
+  let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
+    initialProperties.gameResolutionWidth
+  );
+  let [gameResolutionHeight, setGameResolutionHeight] = React.useState(
+    initialProperties.gameResolutionHeight
+  );
+  let [
     adaptGameResolutionAtRuntime,
-    author,
-    version,
-    packageName,
-    orientation,
-    scaleMode,
-    sizeOnStartupMode,
-    showGDevelopSplash,
-    minFPS,
-    maxFPS,
-    isFolderProject,
-  } = properties;
+    setAdaptGameResolutionAtRuntime,
+  ] = React.useState(initialProperties.adaptGameResolutionAtRuntime);
+  let [author, setAuthor] = React.useState(initialProperties.author);
+  let [version, setVersion] = React.useState(initialProperties.version);
+  let [packageName, setPackageName] = React.useState(
+    initialProperties.packageName
+  );
+  let [orientation, setOrientation] = React.useState(
+    initialProperties.orientation
+  );
+  let [scaleMode, setScaleMode] = React.useState(initialProperties.scaleMode);
+  let [sizeOnStartupMode, setSizeOnStartupMode] = React.useState(
+    initialProperties.sizeOnStartupMode
+  );
+  let [showGDevelopSplash, setShowGDevelopSplash] = React.useState(
+    initialProperties.showGDevelopSplash
+  );
+  let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
+  let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
+  let [isFolderProject, setIsFolderProject] = React.useState(
+    initialProperties.isFolderProject
+  );
 
   const defaultPackageName = 'com.example.mygame';
   const defaultVersion = '1.0.0';
@@ -151,7 +164,22 @@ function ProjectPropertiesDialog(props: Props) {
             label={<Trans>Apply</Trans>}
             primary={true}
             onClick={() => {
-              applyPropertiesToProject(project, properties);
+              applyPropertiesToProject(project, {
+                gameResolutionWidth,
+                gameResolutionHeight,
+                adaptGameResolutionAtRuntime,
+                name,
+                author,
+                version,
+                packageName,
+                orientation,
+                scaleMode,
+                sizeOnStartupMode,
+                showGDevelopSplash,
+                minFPS,
+                maxFPS,
+                isFolderProject,
+              });
               props.onApply();
             }}
             key="apply"
@@ -174,7 +202,7 @@ function ProjectPropertiesDialog(props: Props) {
             fullWidth
             type="text"
             value={name}
-            onChange={value => setProperties({ ...properties, name: value })}
+            onChange={setName}
             autoFocus
           />
           <Checkbox
@@ -193,7 +221,7 @@ function ProjectPropertiesDialog(props: Props) {
                   return;
               }
 
-              setProperties({ ...properties, showGDevelopSplash: checked });
+              setShowGDevelopSplash(checked);
             }}
           />
           <SemiControlledTextField
@@ -202,7 +230,7 @@ function ProjectPropertiesDialog(props: Props) {
             hintText={defaultVersion}
             type="text"
             value={version}
-            onChange={value => setProperties({ ...properties, version: value })}
+            onChange={setVersion}
           />
           <SemiControlledTextField
             floatingLabelText={
@@ -212,9 +240,7 @@ function ProjectPropertiesDialog(props: Props) {
             hintText={defaultPackageName}
             type="text"
             value={packageName}
-            onChange={value =>
-              setProperties({ ...properties, packageName: value })
-            }
+            onChange={setPackageName}
             errorText={
               validatePackageName(packageName) ? (
                 undefined
@@ -233,7 +259,7 @@ function ProjectPropertiesDialog(props: Props) {
             hintText={t`Your name`}
             type="text"
             value={author}
-            onChange={value => setProperties({ ...properties, author: value })}
+            onChange={setAuthor}
           />
           <Text size="title">
             <Trans>Resolution and rendering</Trans>
@@ -245,10 +271,7 @@ function ProjectPropertiesDialog(props: Props) {
               type="number"
               value={'' + gameResolutionWidth}
               onChange={value =>
-                setProperties({
-                  ...properties,
-                  gameResolutionWidth: Math.max(1, parseInt(value, 10)),
-                })
+                setGameResolutionWidth(Math.max(1, parseInt(value, 10)))
               }
             />
             <SemiControlledTextField
@@ -257,10 +280,7 @@ function ProjectPropertiesDialog(props: Props) {
               type="number"
               value={'' + gameResolutionHeight}
               onChange={value =>
-                setProperties({
-                  ...properties,
-                  gameResolutionHeight: Math.max(1, parseInt(value, 10)),
-                })
+                setGameResolutionHeight(Math.max(1, parseInt(value, 10)))
               }
             />
           </ResponsiveLineStackLayout>
@@ -270,9 +290,7 @@ function ProjectPropertiesDialog(props: Props) {
               <Trans>Game resolution resize mode (fullscreen or window)</Trans>
             }
             value={sizeOnStartupMode}
-            onChange={(e, i, value: string) =>
-              setProperties({ ...properties, sizeOnStartupMode: value })
-            }
+            onChange={(e, i, value: string) => setSizeOnStartupMode(value)}
           >
             <SelectOption
               value=""
@@ -296,12 +314,7 @@ function ProjectPropertiesDialog(props: Props) {
             }
             disabled={sizeOnStartupMode === ''}
             checked={adaptGameResolutionAtRuntime}
-            onCheck={(e, checked) => {
-              setProperties({
-                ...properties,
-                adaptGameResolutionAtRuntime: checked,
-              });
-            }}
+            onCheck={(e, checked) => setAdaptGameResolutionAtRuntime(checked)}
           />
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
@@ -309,24 +322,14 @@ function ProjectPropertiesDialog(props: Props) {
               fullWidth
               type="number"
               value={'' + minFPS}
-              onChange={value =>
-                setProperties({
-                  ...properties,
-                  minFPS: Math.max(0, parseInt(value, 10)),
-                })
-              }
+              onChange={value => setMinFPS(Math.max(0, parseInt(value, 10)))}
             />
             <SemiControlledTextField
               floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
               fullWidth
               type="number"
               value={'' + maxFPS}
-              onChange={value =>
-                setProperties({
-                  ...properties,
-                  maxFPS: Math.max(0, parseInt(value, 10)),
-                })
-              }
+              onChange={value => setMaxFPS(Math.max(0, parseInt(value, 10)))}
             />
           </ResponsiveLineStackLayout>
           {maxFPS > 0 && maxFPS < 60 && (
@@ -364,9 +367,7 @@ function ProjectPropertiesDialog(props: Props) {
               <Trans>Device orientation (for iOS and Android)</Trans>
             }
             value={orientation}
-            onChange={(e, i, value: string) =>
-              setProperties({ ...properties, orientation: value })
-            }
+            onChange={(e, i, value: string) => setOrientation(value)}
           >
             <SelectOption value="default" primaryText={t`Platform default`} />
             <SelectOption value="landscape" primaryText={t`Landscape`} />
@@ -378,9 +379,7 @@ function ProjectPropertiesDialog(props: Props) {
               <Trans>Scale mode (also called "Sampling")</Trans>
             }
             value={scaleMode}
-            onChange={(e, i, value: string) =>
-              setProperties({ ...properties, scaleMode: value })
-            }
+            onChange={(e, i, value: string) => setScaleMode(value)}
           >
             <SelectOption
               value="linear"
@@ -412,10 +411,7 @@ function ProjectPropertiesDialog(props: Props) {
             floatingLabelText={<Trans>Project file type</Trans>}
             value={isFolderProject ? 'folder-project' : 'single-file'}
             onChange={(e, i, value: string) =>
-              setProperties({
-                ...properties,
-                isFolderProject: value === 'folder-project',
-              })
+              setIsFolderProject(value === 'folder-project')
             }
           >
             <SelectOption

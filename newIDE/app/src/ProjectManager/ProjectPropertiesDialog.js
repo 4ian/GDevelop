@@ -20,6 +20,7 @@ import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import ExtensionsProperties from './ExtensionsProperties';
+import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 
 type Props = {|
   project: gdProject,
@@ -126,6 +127,11 @@ function ProjectPropertiesDialog(props: Props) {
     const defaultPackageName = 'com.example.mygame';
     const defaultVersion = '1.0.0';
 
+    const onCancelChanges = useSerializableObjectCancelableEditor({
+      serializableObject: project.getExtensionProperties(),
+      onCancel: props.onClose,
+    });
+
     return (
       <React.Fragment>
         <Dialog
@@ -133,7 +139,7 @@ function ProjectPropertiesDialog(props: Props) {
             <FlatButton
               label={<Trans>Cancel</Trans>}
               primary={false}
-              onClick={props.onClose}
+              onClick={onCancelChanges}
               key="cancel"
             />,
             <FlatButton

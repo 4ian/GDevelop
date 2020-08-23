@@ -4,6 +4,8 @@ declare class gdExtensionProperties {
   setValue(extension: string, property: string, newValue: string): void;
   hasProperty(extension: string, property: string): boolean;
   getAllExtensionProperties(extension: string, project: gdProject): gdMapStringPropertyDescriptor;
+  serializeTo(element: gdSerializerElement): void;
+  unserializeFrom(element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

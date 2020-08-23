@@ -400,6 +400,9 @@ interface ExtensionProperties {
     void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
     boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
     [Value] MapStringPropertyDescriptor GetAllExtensionProperties([Const] DOMString extension, [Ref] Project project);
+    
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface Behavior {

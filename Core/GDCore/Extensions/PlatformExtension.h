@@ -249,7 +249,6 @@ class GD_CORE_API PlatformExtension {
         .SetLabel(hint);
     return extensionPropertiesMetadata[name];
   };
-#endif
 
   /**
    * \brief Adds a property to the Extension.
@@ -257,6 +256,7 @@ class GD_CORE_API PlatformExtension {
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionPropertiesMetadata[name];
   };
+#endif
 
   /**
    * \brief Return the name extension user friendly name.

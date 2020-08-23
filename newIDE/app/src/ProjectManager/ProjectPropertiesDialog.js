@@ -109,7 +109,10 @@ function ProjectPropertiesDialog(props: Props) {
 
   const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
 
-  const initialProperties = React.useMemo(() => loadPropertiesFromProject(project), [project]);
+  const initialProperties = React.useMemo(
+    () => loadPropertiesFromProject(project),
+    [project]
+  );
   let [name, setName] = React.useState(initialProperties.name);
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth

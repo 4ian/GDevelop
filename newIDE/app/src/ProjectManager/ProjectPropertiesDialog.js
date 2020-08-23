@@ -104,12 +104,12 @@ function applyPropertiesToProject(
   if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 }
 
-let subscriptionChecker: ?SubscriptionChecker = null;
-
 function ProjectPropertiesDialog(props: Props) {
   const { project } = props;
 
-  const initialProperties = loadPropertiesFromProject(project);
+  const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
+
+  const initialProperties = React.useMemo(() => loadPropertiesFromProject(project), [project]);
   let [name, setName] = React.useState(initialProperties.name);
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth
@@ -215,8 +215,8 @@ function ProjectPropertiesDialog(props: Props) {
             onCheck={(e, checked) => {
               if (!checked) {
                 if (
-                  subscriptionChecker &&
-                  !subscriptionChecker.checkHasSubscription()
+                  subscriptionChecker.current &&
+                  !subscriptionChecker.current.checkHasSubscription()
                 )
                   return;
               }
@@ -427,9 +427,7 @@ function ProjectPropertiesDialog(props: Props) {
         <ExtensionsProperties project={project} />
       </Dialog>
       <SubscriptionChecker
-        ref={subscriptionChecker_ =>
-          (subscriptionChecker = subscriptionChecker_)
-        }
+        ref={subscriptionChecker}
         onChangeSubscription={() => {
           props.onClose();
           props.onChangeSubscription();

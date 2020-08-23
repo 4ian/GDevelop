@@ -206,17 +206,26 @@ export class StartPage extends React.Component<Props, State> {
                         'https://www.facebook.com/GDevelopApp'
                       )
                     }
+                    tooltip={
+                      `GDevelop on Facebook`
+                    }
                   />
                   <IconButton
                     className="icon-twitter"
                     onClick={() =>
                       Window.openExternalURL('https://twitter.com/GDevelopApp')
                     }
+                    tooltip={
+                      `GDevelop on Twitter`
+                    }
                   />
                   <IconButton
                     className="icon-discord"
                     onClick={() =>
                       Window.openExternalURL('https://discord.gg/rjdYHvj')
+                    }
+                    tooltip={
+                      `GDevelop on Discord`
                     }
                   />
                   <IconButton
@@ -225,6 +234,9 @@ export class StartPage extends React.Component<Props, State> {
                       Window.openExternalURL(
                         'https://www.reddit.com/r/gdevelop'
                       )
+                      }
+                    tooltip={
+                      `GDevelop on Reddit`
                     }
                   />
                 </Line>

@@ -5,10 +5,12 @@
  */
 
 #include "GDCore/Project/InitialInstance.h"
+
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/UUID/UUID.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Project/PropertyDescriptor.h"
 #endif
@@ -27,7 +29,8 @@ InitialInstance::InitialInstance()
       personalizedSize(false),
       width(0),
       height(0),
-      locked(false) {}
+      locked(false),
+      persistentUuid(UUID::MakeUuid4()) {}
 
 void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetObjectName(element.GetStringAttribute("name", "", "nom"));
@@ -41,6 +44,9 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
   SetLayer(element.GetStringAttribute("layer"));
   SetLocked(element.GetBoolAttribute("locked", false));
+
+  persistentUuid = element.GetStringAttribute("persistentUuid");
+  if (persistentUuid.empty()) ResetPersistentUuid();
 
   floatInfos.clear();
   const SerializerElement& floatPropElement =
@@ -79,6 +85,9 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("height", GetCustomHeight());
   element.SetAttribute("locked", IsLocked());
 
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  element.SetStringAttribute("persistentUuid", persistentUuid);
+
   SerializerElement& floatPropElement = element.AddChild("numberProperties");
   floatPropElement.ConsiderAsArrayOf("property");
   for (std::map<gd::String, float>::const_iterator floatInfo =
@@ -102,6 +111,11 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   }
 
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
+}
+
+InitialInstance& InitialInstance::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  return *this;
 }
 
 #if defined(GD_IDE_ONLY)
@@ -146,13 +160,12 @@ const gd::String& InitialInstance::GetRawStringProperty(
   return it != stringInfos.end() ? it->second : *badStringProperyValue;
 }
 
-void InitialInstance::SetRawFloatProperty(const gd::String& name, float value)
-{
+void InitialInstance::SetRawFloatProperty(const gd::String& name, float value) {
   floatInfos[name] = value;
 }
 
-void InitialInstance::SetRawStringProperty(const gd::String& name, const gd::String& value)
-{
+void InitialInstance::SetRawStringProperty(const gd::String& name,
+                                           const gd::String& value) {
   stringInfos[name] = value;
 }
 #endif

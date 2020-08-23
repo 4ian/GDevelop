@@ -2,8 +2,7 @@
 declare class gdjsExporter {
   constructor(fs: gdAbstractFileSystem, gdjsRoot: string): void;
   setCodeOutputDirectory(path: string): void;
-  exportLayoutForPixiPreview(project: gdProject, layout: gdLayout, exportDir: string): boolean;
-  exportExternalLayoutForPixiPreview(project: gdProject, layout: gdLayout, externalLayout: gdExternalLayout, exportDir: string): boolean;
+  exportProjectForPixiPreview(options: gdPreviewExportOptions): boolean;
   exportWholePixiProject(project: gdProject, exportDir: string, exportOptions: gdMapStringBoolean): boolean;
   exportWholeCocos2dProject(project: gdProject, debugMode: boolean, exportDir: string): boolean;
   getLastError(): string;

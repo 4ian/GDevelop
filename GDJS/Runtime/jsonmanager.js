@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -16,11 +17,20 @@
  * @memberof gdjs
  * @param {ResourceData[]} resources The resources data of the game.
  */
-gdjs.JsonManager = function(resources) {
+gdjs.JsonManager = function (resources) {
   this._resources = resources;
 
   /** @type Object.<string, Object> */
   this._loadedJsons = {};
+};
+
+/**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.JsonManager.prototype.setResources = function (resources) {
+  this._resources = resources;
 };
 
 /**
@@ -41,30 +51,33 @@ gdjs.JsonManager = function(resources) {
 /**
  * Request all the json resources to be preloaded (unless they are marked as not preloaded).
  *
+ * Note that even if a JSON is already loaded, it will be reloaded (useful for hot-reloading,
+ * as JSON files can have been modified without the editor knowing).
+ *
  * @param {JsonManagerOnProgressCallback} onProgress The function called after each json is loaded.
  * @param {JsonManagerOnCompleteCallback} onComplete The function called when all jsons are loaded.
  */
-gdjs.JsonManager.prototype.preloadJsons = function(onProgress, onComplete) {
+gdjs.JsonManager.prototype.preloadJsons = function (onProgress, onComplete) {
   var resources = this._resources;
 
-  var jsonResources = resources.filter(function(resource) {
+  var jsonResources = resources.filter(function (resource) {
     return resource.kind === 'json' && !resource.disablePreload;
   });
   if (jsonResources.length === 0) return onComplete(jsonResources.length);
 
   var loaded = 0;
   /** @type JsonManagerRequestCallback */
-  var onLoad = function(error, jsonContent) {
+  var onLoad = function (error) {
     if (error) {
       console.error('Error while preloading a json resource:' + error);
     }
 
     loaded++;
     if (loaded === jsonResources.length) {
-      return onComplete(jsonResources.length);
+      onComplete(jsonResources.length);
+    } else {
+      onProgress(loaded, jsonResources.length);
     }
-
-    onProgress(loaded, jsonResources.length);
   };
 
   for (var i = 0; i < jsonResources.length; ++i) {
@@ -77,7 +90,7 @@ gdjs.JsonManager.prototype.preloadJsons = function(onProgress, onComplete) {
  * @callback JsonManagerRequestCallback
  * @param {?Error} error The error, if any. `null` otherwise.
  * @param {?Object} jsonContent The content of the json file (or null if an error occured).
- * @returns {undefined} Nothing
+ * @returns {void} Nothing
  */
 
 /**
@@ -88,8 +101,9 @@ gdjs.JsonManager.prototype.preloadJsons = function(onProgress, onComplete) {
  * @param {string} resourceName The resource pointing to the json file to load.
  * @param {JsonManagerRequestCallback} callback The callback function called when json is loaded (or an error occured).
  */
-gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
-  var resource = this._resources.find(function(resource) {
+gdjs.JsonManager.prototype.loadJson = function (resourceName, callback) {
+  // @ts-ignore - find is not ES5
+  var resource = this._resources.find(function (resource) {
     return resource.kind === 'json' && resource.name === resourceName;
   });
   if (!resource) {
@@ -114,7 +128,7 @@ gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
   var xhr = new XMLHttpRequest();
   xhr.responseType = 'json';
   xhr.open('GET', resource.file);
-  xhr.onload = function() {
+  xhr.onload = function () {
     if (xhr.status !== 200) {
       callback(
         new Error('HTTP error: ' + xhr.status + '(' + xhr.statusText + ')'),
@@ -128,10 +142,10 @@ gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
 
     callback(null, xhr.response);
   };
-  xhr.onerror = function() {
+  xhr.onerror = function () {
     callback(new Error('Network error'), null);
   };
-  xhr.onabort = function() {
+  xhr.onabort = function () {
     callback(new Error('Request aborted'), null);
   };
   xhr.send();
@@ -142,7 +156,7 @@ gdjs.JsonManager.prototype.loadJson = function(resourceName, callback) {
  * @param {string} resourceName The name of the json resource.
  * @returns {boolean} true if the content of the json resource is loaded. false otherwise.
  */
-gdjs.JsonManager.prototype.isJsonLoaded = function(resourceName) {
+gdjs.JsonManager.prototype.isJsonLoaded = function (resourceName) {
   return !!this._loadedJsons[resourceName];
 };
 
@@ -153,6 +167,6 @@ gdjs.JsonManager.prototype.isJsonLoaded = function(resourceName) {
  * @param {string} resourceName The name of the json resource.
  * @returns {?Object} the content of the json resource, if loaded. `null` otherwise.
  */
-gdjs.JsonManager.prototype.getLoadedJson = function(resourceName) {
+gdjs.JsonManager.prototype.getLoadedJson = function (resourceName) {
   return this._loadedJsons[resourceName] || null;
 };

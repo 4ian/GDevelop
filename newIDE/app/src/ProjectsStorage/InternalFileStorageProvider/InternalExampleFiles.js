@@ -68,57 +68,58 @@ import exampleFile63 from '../../fixtures/multitouch/multitouch.json';
 import exampleFile64 from '../../fixtures/object-gravity/object-gravity.json';
 import exampleFile65 from '../../fixtures/object-selection/object-selection.json';
 import exampleFile66 from '../../fixtures/objects-timers/objects-timers.json';
-import exampleFile67 from '../../fixtures/open-url-in-browser/open-url-in-browser.json';
-import exampleFile68 from '../../fixtures/pairs/pairs.json';
-import exampleFile69 from '../../fixtures/parallax/parallax.json';
-import exampleFile70 from '../../fixtures/parallax-scrolling/parallax-scrolling.json';
-import exampleFile71 from '../../fixtures/parse-json-from-api/parse-json-from-api.json';
-import exampleFile72 from '../../fixtures/parse-json-string/parse-json-string.json';
-import exampleFile73 from '../../fixtures/particle-effects-demo/particle-effects-demo.json';
-import exampleFile74 from '../../fixtures/particles-explosions/particles-explosions.json';
-import exampleFile75 from '../../fixtures/particles-various-effects/particles-various-effects.json';
-import exampleFile76 from '../../fixtures/pathfinding/pathfinding.json';
-import exampleFile77 from '../../fixtures/pathfinding-basics/pathfinding-basics.json';
-import exampleFile78 from '../../fixtures/physics/physics.json';
-import exampleFile79 from '../../fixtures/physics-joints-demo/physics-joints-demo.json';
-import exampleFile80 from '../../fixtures/physics-joints-settings-demo/physics-joints-settings-demo.json';
-import exampleFile81 from '../../fixtures/pin-object-to-another/pin-object-to-another.json';
-import exampleFile82 from '../../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
-import exampleFile83 from '../../fixtures/pixel-perfect-platform-game/pixel-perfect-platform-game.json';
-import exampleFile84 from '../../fixtures/plane-and-clouds/plane-and-clouds.json';
-import exampleFile85 from '../../fixtures/platformer/platformer.json';
-import exampleFile86 from '../../fixtures/platformer-double-jump/platformer-double-jump.json';
-import exampleFile87 from '../../fixtures/play-music-on-mobile/play-music-on-mobile.json';
-import exampleFile88 from '../../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
-import exampleFile89 from '../../fixtures/racing-game/racing-game.json';
-import exampleFile90 from '../../fixtures/ragdoll/ragdoll.json';
-import exampleFile91 from '../../fixtures/rain/rain.json';
-import exampleFile92 from '../../fixtures/random-color-picker/random-color-picker.json';
-import exampleFile93 from '../../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
-import exampleFile94 from '../../fixtures/rotate-toward-position/rotate-toward-position.json';
-import exampleFile95 from '../../fixtures/rotate-with-keypress/rotate-with-keypress.json';
-import exampleFile96 from '../../fixtures/save-load/save-load.json';
-import exampleFile97 from '../../fixtures/screen-shake/screen-shake.json';
-import exampleFile98 from '../../fixtures/shoot-bullet-in-parabola/shoot-bullet-in-parabola.json';
-import exampleFile99 from '../../fixtures/shoot-bullets/shoot-bullets.json';
-import exampleFile100 from '../../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
-import exampleFile101 from '../../fixtures/simple-space-shooter/simple-space-shooter.json';
-import exampleFile102 from '../../fixtures/snap-object-to-grid/snap-object-to-grid.json';
-import exampleFile103 from '../../fixtures/space-invaders/space-invaders.json';
-import exampleFile104 from '../../fixtures/space-shooter/space-shooter.json';
-import exampleFile105 from '../../fixtures/splash-screen/splash-screen.json';
-import exampleFile106 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
-import exampleFile107 from '../../fixtures/tabbed-menu-with-layers/tabbed-menu-with-layers.json';
-import exampleFile108 from '../../fixtures/take-screenshot/take-screenshot.json';
-import exampleFile109 from '../../fixtures/text-entry-object/text-entry-object.json';
-import exampleFile110 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
-import exampleFile111 from '../../fixtures/text-to-speech/text-to-speech.json';
-import exampleFile112 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile113 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile114 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile115 from '../../fixtures/video-player/video-player.json';
-import exampleFile116 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile117 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile67 from '../../fixtures/online-multiplayer/online-multiplayer.json';
+import exampleFile68 from '../../fixtures/open-url-in-browser/open-url-in-browser.json';
+import exampleFile69 from '../../fixtures/pairs/pairs.json';
+import exampleFile70 from '../../fixtures/parallax/parallax.json';
+import exampleFile71 from '../../fixtures/parallax-scrolling/parallax-scrolling.json';
+import exampleFile72 from '../../fixtures/parse-json-from-api/parse-json-from-api.json';
+import exampleFile73 from '../../fixtures/parse-json-string/parse-json-string.json';
+import exampleFile74 from '../../fixtures/particle-effects-demo/particle-effects-demo.json';
+import exampleFile75 from '../../fixtures/particles-explosions/particles-explosions.json';
+import exampleFile76 from '../../fixtures/particles-various-effects/particles-various-effects.json';
+import exampleFile77 from '../../fixtures/pathfinding/pathfinding.json';
+import exampleFile78 from '../../fixtures/pathfinding-basics/pathfinding-basics.json';
+import exampleFile79 from '../../fixtures/physics/physics.json';
+import exampleFile80 from '../../fixtures/physics-joints-demo/physics-joints-demo.json';
+import exampleFile81 from '../../fixtures/physics-joints-settings-demo/physics-joints-settings-demo.json';
+import exampleFile82 from '../../fixtures/pin-object-to-another/pin-object-to-another.json';
+import exampleFile83 from '../../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
+import exampleFile84 from '../../fixtures/pixel-perfect-platform-game/pixel-perfect-platform-game.json';
+import exampleFile85 from '../../fixtures/plane-and-clouds/plane-and-clouds.json';
+import exampleFile86 from '../../fixtures/platformer/platformer.json';
+import exampleFile87 from '../../fixtures/platformer-double-jump/platformer-double-jump.json';
+import exampleFile88 from '../../fixtures/play-music-on-mobile/play-music-on-mobile.json';
+import exampleFile89 from '../../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
+import exampleFile90 from '../../fixtures/racing-game/racing-game.json';
+import exampleFile91 from '../../fixtures/ragdoll/ragdoll.json';
+import exampleFile92 from '../../fixtures/rain/rain.json';
+import exampleFile93 from '../../fixtures/random-color-picker/random-color-picker.json';
+import exampleFile94 from '../../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
+import exampleFile95 from '../../fixtures/rotate-toward-position/rotate-toward-position.json';
+import exampleFile96 from '../../fixtures/rotate-with-keypress/rotate-with-keypress.json';
+import exampleFile97 from '../../fixtures/save-load/save-load.json';
+import exampleFile98 from '../../fixtures/screen-shake/screen-shake.json';
+import exampleFile99 from '../../fixtures/shoot-bullet-in-parabola/shoot-bullet-in-parabola.json';
+import exampleFile100 from '../../fixtures/shoot-bullets/shoot-bullets.json';
+import exampleFile101 from '../../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
+import exampleFile102 from '../../fixtures/simple-space-shooter/simple-space-shooter.json';
+import exampleFile103 from '../../fixtures/snap-object-to-grid/snap-object-to-grid.json';
+import exampleFile104 from '../../fixtures/space-invaders/space-invaders.json';
+import exampleFile105 from '../../fixtures/space-shooter/space-shooter.json';
+import exampleFile106 from '../../fixtures/splash-screen/splash-screen.json';
+import exampleFile107 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
+import exampleFile108 from '../../fixtures/tabbed-menu-with-layers/tabbed-menu-with-layers.json';
+import exampleFile109 from '../../fixtures/take-screenshot/take-screenshot.json';
+import exampleFile110 from '../../fixtures/text-entry-object/text-entry-object.json';
+import exampleFile111 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
+import exampleFile112 from '../../fixtures/text-to-speech/text-to-speech.json';
+import exampleFile113 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile114 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile115 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile116 from '../../fixtures/video-player/video-player.json';
+import exampleFile117 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile118 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -189,55 +190,56 @@ export default {
   'example://object-gravity': exampleFile64,
   'example://object-selection': exampleFile65,
   'example://objects-timers': exampleFile66,
-  'example://open-url-in-browser': exampleFile67,
-  'example://pairs': exampleFile68,
-  'example://parallax': exampleFile69,
-  'example://parallax-scrolling': exampleFile70,
-  'example://parse-json-from-api': exampleFile71,
-  'example://parse-json-string': exampleFile72,
-  'example://particle-effects-demo': exampleFile73,
-  'example://particles-explosions': exampleFile74,
-  'example://particles-various-effects': exampleFile75,
-  'example://pathfinding': exampleFile76,
-  'example://pathfinding-basics': exampleFile77,
-  'example://physics': exampleFile78,
-  'example://physics-joints-demo': exampleFile79,
-  'example://physics-joints-settings-demo': exampleFile80,
-  'example://pin-object-to-another': exampleFile81,
-  'example://pin-object-to-another-multiple-parents': exampleFile82,
-  'example://pixel-perfect-platform-game': exampleFile83,
-  'example://plane-and-clouds': exampleFile84,
-  'example://platformer': exampleFile85,
-  'example://platformer-double-jump': exampleFile86,
-  'example://play-music-on-mobile': exampleFile87,
-  'example://play-stop-sprite-animation': exampleFile88,
-  'example://racing-game': exampleFile89,
-  'example://ragdoll': exampleFile90,
-  'example://rain': exampleFile91,
-  'example://random-color-picker': exampleFile92,
-  'example://rotate-toward-mouse': exampleFile93,
-  'example://rotate-toward-position': exampleFile94,
-  'example://rotate-with-keypress': exampleFile95,
-  'example://save-load': exampleFile96,
-  'example://screen-shake': exampleFile97,
-  'example://shoot-bullet-in-parabola': exampleFile98,
-  'example://shoot-bullets': exampleFile99,
-  'example://shooting-bullets-explanation': exampleFile100,
-  'example://simple-space-shooter': exampleFile101,
-  'example://snap-object-to-grid': exampleFile102,
-  'example://space-invaders': exampleFile103,
-  'example://space-shooter': exampleFile104,
-  'example://splash-screen': exampleFile105,
-  'example://sprite-fade-in-out': exampleFile106,
-  'example://tabbed-menu-with-layers': exampleFile107,
-  'example://take-screenshot': exampleFile108,
-  'example://text-entry-object': exampleFile109,
-  'example://text-fade-in-out': exampleFile110,
-  'example://text-to-speech': exampleFile111,
-  'example://toggle-music-play-sound': exampleFile112,
-  'example://type-on-text-effect': exampleFile113,
-  'example://unlock-items': exampleFile114,
-  'example://video-player': exampleFile115,
-  'example://z-depth': exampleFile116,
-  'example://zombie-laser': exampleFile117,
+  'example://online-multiplayer': exampleFile67,
+  'example://open-url-in-browser': exampleFile68,
+  'example://pairs': exampleFile69,
+  'example://parallax': exampleFile70,
+  'example://parallax-scrolling': exampleFile71,
+  'example://parse-json-from-api': exampleFile72,
+  'example://parse-json-string': exampleFile73,
+  'example://particle-effects-demo': exampleFile74,
+  'example://particles-explosions': exampleFile75,
+  'example://particles-various-effects': exampleFile76,
+  'example://pathfinding': exampleFile77,
+  'example://pathfinding-basics': exampleFile78,
+  'example://physics': exampleFile79,
+  'example://physics-joints-demo': exampleFile80,
+  'example://physics-joints-settings-demo': exampleFile81,
+  'example://pin-object-to-another': exampleFile82,
+  'example://pin-object-to-another-multiple-parents': exampleFile83,
+  'example://pixel-perfect-platform-game': exampleFile84,
+  'example://plane-and-clouds': exampleFile85,
+  'example://platformer': exampleFile86,
+  'example://platformer-double-jump': exampleFile87,
+  'example://play-music-on-mobile': exampleFile88,
+  'example://play-stop-sprite-animation': exampleFile89,
+  'example://racing-game': exampleFile90,
+  'example://ragdoll': exampleFile91,
+  'example://rain': exampleFile92,
+  'example://random-color-picker': exampleFile93,
+  'example://rotate-toward-mouse': exampleFile94,
+  'example://rotate-toward-position': exampleFile95,
+  'example://rotate-with-keypress': exampleFile96,
+  'example://save-load': exampleFile97,
+  'example://screen-shake': exampleFile98,
+  'example://shoot-bullet-in-parabola': exampleFile99,
+  'example://shoot-bullets': exampleFile100,
+  'example://shooting-bullets-explanation': exampleFile101,
+  'example://simple-space-shooter': exampleFile102,
+  'example://snap-object-to-grid': exampleFile103,
+  'example://space-invaders': exampleFile104,
+  'example://space-shooter': exampleFile105,
+  'example://splash-screen': exampleFile106,
+  'example://sprite-fade-in-out': exampleFile107,
+  'example://tabbed-menu-with-layers': exampleFile108,
+  'example://take-screenshot': exampleFile109,
+  'example://text-entry-object': exampleFile110,
+  'example://text-fade-in-out': exampleFile111,
+  'example://text-to-speech': exampleFile112,
+  'example://toggle-music-play-sound': exampleFile113,
+  'example://type-on-text-effect': exampleFile114,
+  'example://unlock-items': exampleFile115,
+  'example://video-player': exampleFile116,
+  'example://z-depth': exampleFile117,
+  'example://zombie-laser': exampleFile118,
 };

@@ -13,6 +13,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -27,6 +28,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
+#include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace gdjs {
@@ -41,87 +43,124 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String codeOutputDir_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
-bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
-                                                gd::Layout &layout,
-                                                gd::String exportDir,
-                                                gd::String additionalSpec) {
-  fs.MkDir(exportDir);
-  fs.ClearDir(exportDir);
+bool ExporterHelper::ExportProjectForPixiPreview(
+    const PreviewExportOptions &options) {
+  fs.MkDir(options.exportPath);
+  fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
-  gd::Project exportedProject = project;
+  gd::Project exportedProject = options.project;
 
   // Always disable the splash for preview
   exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
-  ExportResources(fs, exportedProject, exportDir);
+  ExportResources(fs, exportedProject, options.exportPath);
 
   // Compatibility with GD <= 5.0-beta56
   // Stay compatible with text objects declaring their font as just a filename
   // without a font resource - by manually adding these resources.
   AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), exportDir);
+      fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
 
+  // Export files for object and behaviors
+  ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
   ExportEffectIncludes(exportedProject, includesFiles);
 
-  // Generate events code
-  if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
-    return false;
+  if (!options.projectDataOnlyExport) {
+    // Generate events code
+    if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
+      return false;
 
-  // Export source files
-  if (!ExportExternalSourceFiles(
-          exportedProject, codeOutputDir, includesFiles)) {
-    gd::LogError(_("Error during exporting! Unable to export source files:\n") +
-                 lastError);
-    return false;
+    // Export source files
+    if (!ExportExternalSourceFiles(
+            exportedProject, codeOutputDir, includesFiles)) {
+      gd::LogError(
+          _("Error during exporting! Unable to export source files:\n") +
+          lastError);
+      return false;
+    }
   }
 
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(exportedProject);
-  exportedProject.SetFirstLayout(layout.GetName());
+  exportedProject.SetFirstLayout(options.layoutName);
+
+  // Strip the includes to only have Pixi.js files (*before* creating
+  // runtimeGameOptions, since otherwise Cocos files will be passed to the
+  // hot-reloader).
+  RemoveIncludes(false, true, includesFiles);
+
+  // Create the setup options passed to the gdjs.RuntimeGame
+  gd::SerializerElement runtimeGameOptions;
+  runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
+  if (!options.externalLayoutName.empty()) {
+    runtimeGameOptions.AddChild("injectExternalLayout")
+        .SetValue(options.externalLayoutName);
+  }
+  runtimeGameOptions.AddChild("projectDataOnlyExport")
+      .SetBoolValue(options.projectDataOnlyExport);
+  runtimeGameOptions.AddChild("debuggerServerAddress")
+      .SetStringValue(options.debuggerServerAddress);
+  runtimeGameOptions.AddChild("debuggerServerPort")
+      .SetStringValue(options.debuggerServerPort);
+
+  // Pass in the options the list of scripts files - useful for hot-reloading.
+  auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
+  scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+
+  for (const auto &includeFile : includesFiles) {
+    auto hashIt = options.includeFileHashes.find(includeFile);
+    gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
+    scriptFilesElement.AddChild("scriptFile")
+        .SetStringAttribute("path", scriptSrc)
+        .SetIntAttribute(
+            "hash",
+            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+  }
 
   // Export the project
-  ExportToJSON(
-      fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+  ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all the dependencies
-  RemoveIncludes(false, true, includesFiles);
-  ExportIncludesAndLibs(includesFiles, exportDir, false);
+  ExportIncludesAndLibs(includesFiles, options.exportPath);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
                            gdjsRoot + "/Runtime/index.html",
-                           exportDir,
+                           options.exportPath,
                            includesFiles,
-                           additionalSpec))
+                           "gdjs.runtimeGameOptions"))
     return false;
 
   return true;
 }
 
-gd::String ExporterHelper::ExportToJSON(gd::AbstractFileSystem &fs,
-                                        const gd::Project &project,
-                                        gd::String filename,
-                                        gd::String wrapIntoVariable) {
+gd::String ExporterHelper::ExportProjectData(
+    gd::AbstractFileSystem &fs,
+    const gd::Project &project,
+    gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-
-  gd::String output = gd::Serializer::ToJSON(rootElement);
-  if (!wrapIntoVariable.empty())
-    output = wrapIntoVariable + " = " + output + ";";
+  gd::String output =
+      "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
+      "gdjs.runtimeGameOptions = " +
+      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
 
   if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
@@ -307,15 +346,21 @@ bool ExporterHelper::ExportCocos2dFiles(
   {
     gd::String includeFilesStr = "";
     bool first = true;
-    for (auto &file : includesFiles) {
-      if (!fs.FileExists(exportDir + "/src/" + file)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + file << "."
+    for (auto &include : includesFiles) {
+      gd::String scriptSrc = GetExportedIncludeFilename(include);
+
+      // Sanity check if the file exists - if not skip it to avoid
+      // including it in the list of scripts.
+      gd::String absoluteFilename = scriptSrc;
+      fs.MakeAbsolute(absoluteFilename, exportDir + "/src");
+      if (!fs.FileExists(absoluteFilename)) {
+        std::cout << "Warning: Unable to find " << absoluteFilename << "."
                   << std::endl;
         continue;
       }
 
       includeFilesStr +=
-          gd::String(first ? "" : ", ") + "\"src/" + file + "\"\n";
+          gd::String(first ? "" : ", ") + "\"src/" + scriptSrc + "\"\n";
       first = false;
     }
 
@@ -425,25 +470,17 @@ bool ExporterHelper::CompleteIndexFile(
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
-  for (std::vector<gd::String>::const_iterator it = includesFiles.begin();
-       it != includesFiles.end();
-       ++it) {
-    gd::String scriptSrc = "";
-    if (fs.IsAbsolute(*it)) {
-      // Most of the time, script source are file paths relative to GDJS root or
-      // have been copied in the output directory, so they are relative. It's
-      // still useful to test here for absolute files as the exporter could be
-      // configured with a file system dealing with URL.
-      scriptSrc = *it;
-    } else {
-      if (!fs.FileExists(exportDir + "/" + *it)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + *it << "."
-                  << std::endl;
-        continue;
-      }
+  for (auto& include: includesFiles) {
+    gd::String scriptSrc = GetExportedIncludeFilename(include);
 
-      scriptSrc = exportDir + "/" + *it;
-      fs.MakeRelative(scriptSrc, exportDir);
+    // Sanity check if the file exists - if not skip it to avoid
+    // including it in the list of scripts.
+    gd::String absoluteFilename = scriptSrc;
+    fs.MakeAbsolute(absoluteFilename, exportDir);
+    if (!fs.FileExists(absoluteFilename)) {
+      std::cout << "Warning: Unable to find " << absoluteFilename << "."
+                << std::endl;
+      continue;
     }
 
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
@@ -500,6 +537,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/networktools.js");
 
   if (websocketDebuggerClient) {
+    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
     InsertUnique(includesFiles,
                  "websocket-debugger-client/websocket-debugger-client.js");
   }
@@ -635,43 +673,95 @@ bool ExporterHelper::ExportExternalSourceFiles(
   return true;
 }
 
+gd::String ExporterHelper::GetExportedIncludeFilename(
+    const gd::String& include) {
+  if (!fs.IsAbsolute(include)) {
+    // By convention, an include file that is relative is relative to
+    // the "<GDJS Root>/Runtime" folder, and will have the same relative
+    // path when exported.
+
+    // We still do this seemingly useless relative to absolute to relative
+    // conversion, because some filesystems are using a URL for gdjsRoot, and
+    // will convert the relative include to an absolute URL.
+    gd::String relativeInclude = gdjsRoot + "/Runtime/" + include;
+    fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+    return relativeInclude;
+  } else {
+    // Note: all the code generated from events are generated in another
+    // folder and fall in this case:
+    return fs.FileNameFrom(include);
+  }
+}
+
 bool ExporterHelper::ExportIncludesAndLibs(
-    std::vector<gd::String> &includesFiles,
-    gd::String exportDir,
-    bool /*minify*/) {
-  for (std::vector<gd::String>::iterator include = includesFiles.begin();
-       include != includesFiles.end();
-       ++include) {
-    if (!fs.IsAbsolute(*include)) {
-      gd::String source = gdjsRoot + "/Runtime/" + *include;
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir) {
+  for (auto& include : includesFiles) {
+    if (!fs.IsAbsolute(include)) {
+      // By convention, an include file that is relative is relative to
+      // the "<GDJS Root>/Runtime" folder, and will have the same relative
+      // path when exported.
+      gd::String source = gdjsRoot + "/Runtime/" + include;
       if (fs.FileExists(source)) {
-        gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
+        gd::String path = fs.DirNameFrom(exportDir + "/" + include);
         if (!fs.DirExists(path)) fs.MkDir(path);
 
-        fs.CopyFile(source, exportDir + "/" + *include);
-
-        gd::String relativeInclude = source;
-        fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-        *include = relativeInclude;
+        fs.CopyFile(source, exportDir + "/" + include);
       } else {
-        std::cout << "Could not find GDJS include file " << *include
+        std::cout << "Could not find GDJS include file " << include
                   << std::endl;
       }
     } else {
       // Note: all the code generated from events are generated in another
       // folder and fall in this case:
-
-      if (fs.FileExists(*include)) {
-        fs.CopyFile(*include, exportDir + "/" + fs.FileNameFrom(*include));
-        *include = fs.FileNameFrom(
-            *include);  // Ensure filename is relative to the export dir.
+      if (fs.FileExists(include)) {
+        fs.CopyFile(include, exportDir + "/" + fs.FileNameFrom(include));
       } else {
-        std::cout << "Could not find include file " << *include << std::endl;
+        std::cout << "Could not find include file " << include << std::endl;
       }
     }
   }
 
   return true;
+}
+
+void ExporterHelper::ExportObjectAndBehaviorsIncludes(
+    gd::Project &project, std::vector<gd::String> &includesFiles) {
+  auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
+    for (const auto &includeFile : newIncludeFiles) {
+      InsertUnique(includesFiles, includeFile);
+    }
+  };
+
+  auto addObjectIncludeFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+    const gd::ObjectMetadata &metadata =
+        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(),
+                                                object.GetType());
+    addIncludeFiles(metadata.includeFiles);
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addIncludeFiles(metadata.includeFiles);
+    }
+  };
+
+  auto addObjectsIncludeFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectIncludeFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsIncludeFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+    addObjectsIncludeFiles(layout);
+  }
 }
 
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,

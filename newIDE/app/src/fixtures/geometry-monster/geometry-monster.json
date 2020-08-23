@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -464,6 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
+          "persistentUuid": "2e18be4e-4aca-49fa-ac9f-cf841bd20a83",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -479,6 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
+          "persistentUuid": "7a159dde-9352-4a31-a828-b4aa80ad9537",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -858,6 +860,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
+          "persistentUuid": "adf0bb70-7b74-479f-a0a2-c5e483397f74",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -873,6 +876,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "72372f8f-6b85-4435-86c4-cb6873a3467f",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -888,6 +892,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
+          "persistentUuid": "68022ea0-ae6d-42c8-b196-79c7e644e12b",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -903,6 +908,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "db189214-d278-4542-a450-f6e9851ce7a0",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -918,6 +924,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
+          "persistentUuid": "36726bd7-36e9-4611-9ee1-c387dd3a55a6",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -933,6 +940,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
+          "persistentUuid": "e2f2c395-84b2-4947-8ec9-38f2e41315b7",
           "width": 0,
           "x": 110,
           "y": 406,

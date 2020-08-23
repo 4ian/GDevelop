@@ -27,6 +27,15 @@ gdjs.CocosImageManager = function(resources)
 gdjs.ImageManager = gdjs.CocosImageManager; //Register the class to let the engine use it.
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.CocosImageManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
+
+/**
  * Return the texture associated to the specified name.
  * Returns a placeholder texture if not found.
  * @param {string} name The name of the resource to get.

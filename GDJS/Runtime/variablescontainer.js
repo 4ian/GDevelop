@@ -17,7 +17,10 @@
 gdjs.VariablesContainer = function(initialVariablesData)
 {
     if ( this._variables === undefined ) this._variables = new Hashtable();
-    if ( this._variablesArray === undefined ) this._variablesArray = [];
+    if ( this._variablesArray === undefined ) {
+        /** @type {gdjs.Variable[]} */
+        this._variablesArray = [];
+    }
 
     if ( initialVariablesData !== undefined ) this.initFrom(initialVariablesData);
 };
@@ -81,11 +84,28 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
 
 /**
  * Add a new variable.
+ * This can be costly, don't use in performance sensitive paths.
+ *
  * @param {string} name Variable name
- * @param {gdjs.Variable} variable The variable to be added
+ * @param {gdjs.Variable} newVariable The variable to be added
  */
-gdjs.VariablesContainer.prototype.add = function(name, variable) {
-	this._variables.put(name, variable);
+gdjs.VariablesContainer.prototype.add = function(name, newVariable) {
+    var oldVariable = this._variables.get(name);
+
+    // Variable is either already defined, considered as undefined
+    // in the container or missing in the container.
+    // Whatever the case, replace it by the new.
+    this._variables.put(name, newVariable);
+
+	if (oldVariable) {
+        // If variable is indexed, ensure that the variable as the index
+        // is replaced too. This can be costly (indexOf) but we assume `add` is not
+        // used in performance sensitive code.
+        var variableIndex = this._variablesArray.indexOf(oldVariable);
+        if (variableIndex !== -1) {
+            this._variablesArray[variableIndex] = newVariable;
+        }
+    }
 };
 
 /**

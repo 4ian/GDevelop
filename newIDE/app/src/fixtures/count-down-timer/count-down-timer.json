@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TimerText",
+          "persistentUuid": "d2f73583-d5a7-4df7-82a7-83ed6a408d23",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -478,6 +479,7 @@
           "layer": "",
           "locked": false,
           "name": "GOText",
+          "persistentUuid": "2f7e8bfd-eeea-4183-a139-09737bb7fb6c",
           "width": 0,
           "x": 136,
           "y": 245,

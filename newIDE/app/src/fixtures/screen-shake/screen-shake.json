@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -288,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "5e6a6032-63de-4897-99c8-83e8aa29b71a",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -303,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "d59496f1-724d-476a-b535-9cd5c03784a7",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -318,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "81dbb79e-c81a-4df3-9913-628558156c85",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -333,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "6665af70-35ab-44dd-9e4f-4e1048b7353a",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -348,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "12f5c3fd-c198-404f-a845-9ae748617ecc",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -363,6 +368,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "a21388a8-39ce-44db-af94-68f3e5ef1b6b",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -378,6 +384,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "8d0d91e9-d1bb-4618-9d6f-eb216a8df207",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -398,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "fe261044-130a-4c24-bb27-bdd9d3a72b33",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -413,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "a7927499-c708-4fe0-8307-a2d849312d47",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -433,6 +442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "a87d88d0-dd5b-4f4e-b851-2c875ed88bd5",
           "width": 0,
           "x": 265.877,
           "y": 545.185,

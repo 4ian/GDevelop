@@ -1,10 +1,24 @@
 // @flow
 import { t } from '@lingui/macro';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 
-export type Hint = {| kind: 'warning' | 'info', message: string |};
+export type Hint = {|
+  kind: 'warning' | 'info',
+  message: MessageDescriptor,
+  identifier?: AlertMessageIdentifier,
+|};
+export type TutorialHint = {|
+  kind: 'tutorial' | 'video-tutorial',
+  name: string,
+  message: MessageDescriptor,
+  iconSrc: string,
+  link: string,
+  identifier: string,
+|};
 
 export const getDeprecatedBehaviorsInformation = (): {
-  [string]: {| warning: string |},
+  [string]: {| warning: MessageDescriptor |},
 } => ({
   'PhysicsBehavior::PhysicsBehavior': {
     warning: t`A new physics engine (Physics Engine 2.0) is now available. You should prefer using it for new game. For existing games, note that the two behaviors are not compatible, so you should only use one of them with your objects.`,
@@ -69,6 +83,159 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Musics will only be played if the user has interacted with the game before (by clicking/touching it or pressing a key on the keyboard). This is due to browser limitations. Make sure to have the user interact with the game before using this action.`,
     };
   }
+  if (type === 'P2P::OnEvent') {
+    return {
+      kind: 'info',
+      message: t`Read the wiki page for more info about the dataloss mode.`,
+    };
+  }
+  if (type.indexOf('P2P::') === 0) {
+    return {
+      kind: 'warning',
+      message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
+      identifier: 'p2p-broker-recommendation',
+    };
+  }
 
   return null;
 };
+
+const tutorialHints = {
+  'tween-behavior': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/tween-behavior.jpg',
+    name: 'Tween Behavior',
+    message: t`Learn how to use the Tween Behavior and how it can be used to add more life and animation to you projects.`,
+    link: 'https://www.youtube.com/watch?v=SLqnwC9D5Q4',
+    identifier: 'tween-behavior',
+  },
+  'responsive-ui': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/responsive-ui.jpg',
+    name: 'Reponsive UI',
+    message: t`Learn how to add responsive UI using anchors.`,
+    link: 'https://www.youtube.com/watch?v=VgrEhg0esCg',
+    identifier: 'responsive-ui',
+  },
+  'smooth-camera-movement': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/smooth-camera-movement.jpg',
+    name: 'Smooth Camera Movement',
+    message: t`Learn how to make the camera follow the player in a smooth movement.`,
+    link: 'https://www.youtube.com/watch?v=yUNisggNh7s',
+    identifier: 'smooth-camera-movement',
+  },
+  'pause-menu': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/pause-menu.jpg',
+    name: 'Pause Menu',
+    message: t`Learn how to stop the time and make a pause menu.`,
+    link: 'https://www.youtube.com/watch?v=k2J784esdkc',
+    identifier: 'pause-menu',
+  },
+  'character-selection-feature': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/character-selection-feature.jpg',
+    name: 'Character Selection',
+    message: t`Learn how to add a selector to choose a character (or anything else) in your game.`,
+    link: 'https://www.youtube.com/watch?v=8DpsjXHd4ro',
+    identifier: 'character-selection-feature',
+  },
+  'push-objects': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/push-objects.jpg',
+    name: 'Push Objects',
+    message: t`Learn how to push objects, like a box, in a platform game.`,
+    link: 'https://www.youtube.com/watch?v=11tjJ0JgYuk',
+    identifier: 'push-objects',
+  },
+  'save-and-load': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/save-and-load.jpg',
+    name: 'Save and Load',
+    message: t`Learn how to save the player progress, and other information, and to load them again later.`,
+    link: 'https://www.youtube.com/watch?v=bXUGJqHhuCo',
+    identifier: 'save-and-load',
+  },
+  'particle-effects': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/particle-effects.jpg',
+    name: 'Particle Effects',
+    message: t`Learn how to use particle emitters in GDevelop to create effects like fire, explosion, magic beam, etc...`,
+    link: 'https://www.youtube.com/watch?v=7sqMmTntvKs',
+    identifier: 'particle-effects',
+  },
+  'opening-chest': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/opening-chest.jpg',
+    name: 'Open a Loot Chest',
+    message: t`How to open a loot chest with a key that the player can find in the level`,
+    link: 'https://www.youtube.com/watch?v=1qsCgwFtYfg',
+    identifier: 'opening-chest',
+  },
+  'health-bar-and-health-potion': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/health-bar-and-health-potion.jpg',
+    name: 'Create a Health Bar and Health Potion',
+    message: t`How to show a health bar on screen and a potion to give back health to the player.`,
+    link: 'https://www.youtube.com/watch?v=P-scQW7PeVg',
+    identifier: 'health-bar-and-health-potion',
+  },
+};
+
+const allTutorialHints = Object.keys(tutorialHints).map(
+  identifier => tutorialHints[identifier]
+);
+
+export const getObjectTutorialHints = (type: string): Array<TutorialHint> => {
+  if (type === 'ParticleSystem::ParticleEmitter') {
+    return [tutorialHints['particle-effects']];
+  }
+
+  return [];
+};
+
+export const getBehaviorTutorialHints = (type: string): Array<TutorialHint> => {
+  if (type === 'Tween::TweenBehavior') {
+    return [tutorialHints['tween-behavior']];
+  }
+  if (type === 'AnchorBehavior::AnchorBehavior') {
+    return [tutorialHints['responsive-ui']];
+  }
+
+  return [];
+};
+
+export const getInstructionTutorialHints = (
+  type: string
+): Array<TutorialHint> => {
+  if (
+    [
+      'CameraX',
+      'CameraY',
+      'RotateCamera',
+      'ZoomCamera',
+      'FixCamera',
+      'CentreCamera',
+    ].includes(type)
+  ) {
+    return [tutorialHints['smooth-camera-movement']];
+  }
+  if (type === 'ChangeTimeScale') {
+    return [tutorialHints['pause-menu']];
+  }
+  if (
+    [
+      'EcrireFichierExp',
+      'EcrireFichierTxt',
+      'LireFichierExp',
+      'LireFichierTxt',
+    ].includes(type)
+  ) {
+    return [tutorialHints['save-and-load']];
+  }
+
+  return [];
+};
+
+export const getAllTutorialHints = (): Array<TutorialHint> => allTutorialHints;

@@ -3,7 +3,7 @@
  * running in Electron Runtime.
  */
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, shell, Menu } = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -30,6 +30,8 @@ function createWindow() {
 
   // and load the index.html of the app.
   mainWindow.loadFile("app/index.html");
+
+  Menu.setApplicationMenu(null);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

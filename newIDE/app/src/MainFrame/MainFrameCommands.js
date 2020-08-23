@@ -39,9 +39,13 @@ type CommandHandlers = {|
   i18n: I18n,
   project: ?gdProject,
   previewEnabled: boolean,
+  hasPreviewsRunning: boolean,
   onOpenProjectManager: () => void,
   onLaunchPreview: () => void | Promise<void>,
   onLaunchDebugPreview: () => void,
+  onLaunchNetworkPreview: () => void,
+  onHotReloadPreview: () => void,
+  allowNetworkPreview: boolean,
   onOpenStartPage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
@@ -72,9 +76,27 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onLaunchPreview,
   });
 
-  useCommand('LAUNCH_DEBUG_PREVIEW', handlers.previewEnabled, {
-    handler: handlers.onLaunchDebugPreview,
+  useCommand('HOT_RELOAD_PREVIEW', handlers.hasPreviewsRunning, {
+    handler: handlers.onHotReloadPreview,
   });
+
+  useCommand(
+    'LAUNCH_DEBUG_PREVIEW',
+    handlers.previewEnabled && handlers.allowNetworkPreview,
+    {
+      // displayText: launchDebugPreviewText,
+      handler: handlers.onLaunchDebugPreview,
+    }
+  );
+
+  useCommand(
+    'LAUNCH_NETWORK_PREVIEW',
+    handlers.previewEnabled && handlers.allowNetworkPreview,
+    {
+      // displayText: launchNetworkPreviewText,
+      handler: handlers.onLaunchNetworkPreview,
+    }
+  );
 
   useCommand('OPEN_START_PAGE', true, {
     handler: handlers.onOpenStartPage,

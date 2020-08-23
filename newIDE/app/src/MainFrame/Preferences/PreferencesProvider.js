@@ -39,6 +39,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     checkUpdates: this._checkUpdates.bind(this),
     setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
     showAlertMessage: this._showAlertMessage.bind(this),
+    showTutorialHint: this._showTutorialHint.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -260,6 +261,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           hiddenAlertMessages: {
             ...state.values.hiddenAlertMessages,
             // $FlowFixMe - Flow won't typecheck this because of https://medium.com/flow-type/spreads-common-errors-fixes-9701012e9d58
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showTutorialHint(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenTutorialHints: {
+            ...state.values.hiddenTutorialHints,
             [identifier]: !show,
           },
         },

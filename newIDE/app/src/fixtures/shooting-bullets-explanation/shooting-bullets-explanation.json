@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -177,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "06e08cbe-568c-4b64-827c-a2c0a06322c1",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -197,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "b772315b-4cc0-48d5-b41f-d6b5b648b425",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -575,6 +577,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "f08d60ea-16b0-49ba-a845-b62427704345",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -595,6 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "35ba93e7-411f-4c60-9782-4e79307ef941",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -615,6 +619,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "5368e3d6-2d2e-431e-88c3-5f7159938963",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -635,6 +640,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "2384d7a1-55b8-43c5-b4d9-e801f714e5c6",
           "width": 0,
           "x": 608.5,
           "y": 178.5,

@@ -74,6 +74,7 @@ export default class Debugger extends React.Component<Props, State> {
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger()}
         canPause={this._hasSelectedDebugger()}
+        canOpenProfiler={this._hasSelectedDebugger()}
         onOpenProfiler={() => {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].openProfiler();
@@ -185,6 +186,8 @@ export default class Debugger extends React.Component<Props, State> {
       this.setState(state => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: false },
       }));
+    } else if (data.command === 'hotReloader.logs') {
+      // Nothing to do.
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -222,14 +225,11 @@ export default class Debugger extends React.Component<Props, State> {
 
   _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
     const { previewDebuggerServer } = this.props;
-    previewDebuggerServer.sendMessage(
-      id,
-      JSON.stringify({
-        command: 'call',
-        path,
-        args,
-      })
-    );
+    previewDebuggerServer.sendMessage(id, {
+      command: 'call',
+      path,
+      args,
+    });
 
     setTimeout(() => this._refresh(id), 100);
     return true;
@@ -287,9 +287,12 @@ export default class Debugger extends React.Component<Props, State> {
               selectedId={selectedId}
               debuggerIds={debuggerIds}
               onChooseDebugger={id =>
-                this.setState({
-                  selectedId: id,
-                })
+                this.setState(
+                  {
+                    selectedId: id,
+                  },
+                  () => this.updateToolbar()
+                )
               }
             />
             {this._hasSelectedDebugger() && (

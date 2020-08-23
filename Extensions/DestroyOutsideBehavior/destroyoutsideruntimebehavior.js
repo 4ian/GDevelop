@@ -20,6 +20,14 @@ gdjs.DestroyOutsideRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 gdjs.DestroyOutsideRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
 gdjs.registerBehavior("DestroyOutsideBehavior::DestroyOutside", gdjs.DestroyOutsideRuntimeBehavior);
 
+gdjs.DestroyOutsideRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
+        this._extraBorder = newBehaviorData.extraBorder;
+    }
+
+    return true;
+}
+
 gdjs.DestroyOutsideRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
     // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point

@@ -6,17 +6,21 @@ export type PreviewOptions = {|
   layout: gdLayout,
   externalLayout: ?gdExternalLayout,
   networkPreview: boolean,
+  hotReload: boolean,
+  projectDataOnlyExport: boolean,
 |};
 
 /** The functions that PreviewLauncher must expose on their class */
 export type PreviewLauncherInterface = {
-  launchPreview: (options: PreviewOptions) => Promise<any>,
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
+  canDoHotReload: () => boolean,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
+  getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
   onChangeSubscription: () => void,
 |};
@@ -48,11 +52,24 @@ export type PreviewDebuggerServerCallbacks = {|
   onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
 |};
 
+/** The address to be used to communicate with the debugger server using WebSockets. */
+export type ServerAddress = {
+  address: string,
+  port: number,
+};
+
 /** Interface to run a debugger server for previews. */
 export type PreviewDebuggerServer = {|
-  startServer: () => void,
+  startServer: () => Promise<void>,
   getServerState: () => 'started' | 'stopped',
+  getServerAddress: () => ?ServerAddress,
   getExistingDebuggerIds: () => Array<DebuggerId>,
   sendMessage: (id: DebuggerId, message: Object) => void,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,
+|};
+
+/** The logs returned by the game hot-reloader. */
+export type HotReloaderLog = {|
+  kind: 'fatal' | 'error' | 'warning' | 'info',
+  message: string,
 |};

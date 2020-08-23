@@ -106,6 +106,20 @@ gdjs.PlatformRuntimeBehavior.LADDER = 2;
 gdjs.PlatformRuntimeBehavior.JUMPTHRU = 1;
 gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM = 0;
 
+gdjs.PlatformRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.platformType !== newBehaviorData.platformType) {
+        this.changePlatformType(newBehaviorData.platformType);
+    }
+    if (oldBehaviorData.canBeGrabbed !== newBehaviorData.canBeGrabbed) {
+        this._canBeGrabbed = newBehaviorData.canBeGrabbed;
+    }
+    if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
+        this._yGrabOffset = newBehaviorData.yGrabOffset;
+    }
+
+    return true;
+};
+
 gdjs.PlatformRuntimeBehavior.prototype.onDestroy = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removePlatform(this);
 };

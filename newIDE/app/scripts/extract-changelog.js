@@ -43,16 +43,28 @@ const extractCommitsFromGit = () => {
       .map(commit => {
         const lowerCaseMessage = commit.message.toLowerCase();
         const shouldHide =
-          lowerCaseMessage.includes('bump newide version') ||
+          lowerCaseMessage.includes("don't mention in changelog") ||
+          lowerCaseMessage.includes("don't show in changelog") ||
+          lowerCaseMessage === 'update translations' ||
+          lowerCaseMessage === 'prettier' ||
+          lowerCaseMessage === 'update jsextension.js' ||
           lowerCaseMessage.includes('run code formatting') ||
           lowerCaseMessage.includes('fix formatting') ||
+          lowerCaseMessage.indexOf('run prettier') === 0 ||
+          lowerCaseMessage.indexOf('regen fixtures') === 0 ||
+          lowerCaseMessage.indexOf('regenerate fixtures') === 0 ||
+          lowerCaseMessage.indexOf('remove arrow function') === 0 ||
+          lowerCaseMessage.indexOf('update fixtures') === 0 ||
+          lowerCaseMessage.indexOf('try to fix flow') === 0 ||
+          lowerCaseMessage.indexOf('fix flow') === 0 ||
+          lowerCaseMessage.indexOf('merge branch') === 0 ||
+          lowerCaseMessage.indexOf('merge pull request #') === 0 ||
+          lowerCaseMessage.includes('bump newide version') ||
           lowerCaseMessage.includes('fix warning') ||
           lowerCaseMessage.includes('fix typo') ||
-          lowerCaseMessage === 'update translations' ||
+          lowerCaseMessage.includes('add files forgotten in last commit') ||
+          lowerCaseMessage.indexOf('apply review') === 0 ||
           lowerCaseMessage.includes('package-lock.json');
-        const forceHide =
-          lowerCaseMessage.includes("don't mention in changelog") ||
-          lowerCaseMessage.includes("don't show in changelog");
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
 
         return {
@@ -60,9 +72,7 @@ const extractCommitsFromGit = () => {
           authorEmail: commit.authorEmail.trim(),
           authorNickname: '',
           isFix,
-          hidden:
-            forceHide ||
-            (commit.authorEmail === 'Florian.Rival@gmail.com' && shouldHide),
+          hidden: shouldHide,
         };
       })
   );
@@ -142,7 +152,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in changelog/i;
+  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in (the )?changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0

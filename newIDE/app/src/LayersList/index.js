@@ -18,6 +18,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -37,12 +38,18 @@ class LayersListBody extends Component<*, LayersListBodyState> {
   };
 
   render() {
-    const { layersContainer, onEditEffects, width } = this.props;
+    const {
+      layersContainer,
+      onEditEffects,
+      onEditLighting,
+      width,
+    } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
       const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
+      const isLightingLayer = layer.isLightingLayer();
 
       return (
         <SortableLayerRow
@@ -50,9 +57,11 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           key={'layer-' + layerName}
           layer={layer}
           layerName={layerName}
+          isLightingLayer={isLightingLayer}
           nameError={this.state.nameErrors[layerName]}
           effectsCount={layer.getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
+          onEditLighting={() => onEditLighting(layer)}
           onBlur={event => {
             const newName = event.target.value;
             if (layerName === newName) return;
@@ -113,6 +122,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
+  onEditLightingLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -120,11 +130,23 @@ type Props = {|
     cb: (done: boolean) => void
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
   effectsEditedLayer: ?gdLayer,
 |};
+
+const hasLightingLayer = (layout: gdLayout) => {
+  const layersCount = layout.getLayersCount();
+  return (
+    mapReverseFor(0, layersCount, i =>
+      layout.getLayerAt(i).isLightingLayer()
+    ).filter(Boolean).length > 0
+  );
+};
 
 export default class LayersList extends Component<Props, State> {
   _addLayer = () => {
@@ -133,6 +155,19 @@ export default class LayersList extends Component<Props, State> {
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+    this._onLayerModified();
+  };
+
+  _addLightingLayer = () => {
+    const { layersContainer } = this.props;
+    const name = newNameGenerator('Lighting', name =>
+      layersContainer.hasLayerNamed(name)
+    );
+    layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+    const layer = layersContainer.getLayer(name);
+    layer.setLightingLayer(true);
+    layer.setFollowBaseLayerCamera(true);
+    layer.setAmbientLightColor(128, 128, 128);
     this._onLayerModified();
   };
 
@@ -147,6 +182,7 @@ export default class LayersList extends Component<Props, State> {
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = this.props.layersContainer.ptr;
+    const isLightingLayerPresent = hasLightingLayer(this.props.layersContainer);
 
     return (
       <Background>
@@ -159,6 +195,7 @@ export default class LayersList extends Component<Props, State> {
                 key={listKey}
                 layersContainer={this.props.layersContainer}
                 onEditEffects={this.props.onEditLayerEffects}
+                onEditLighting={this.props.onEditLightingLayer}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
@@ -182,6 +219,14 @@ export default class LayersList extends Component<Props, State> {
                 label={<Trans>Add a layer</Trans>}
                 primary
                 onClick={this._addLayer}
+                icon={<Add />}
+              />
+            </Line>
+            <Line justifyContent="flex-end" expand>
+              <RaisedButton
+                label={<Trans>Add lighting layer</Trans>}
+                disabled={isLightingLayerPresent}
+                onClick={this._addLightingLayer}
                 icon={<Add />}
               />
             </Line>

@@ -14,6 +14,7 @@ import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEdito
 import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
+import LightingLayerDialog from '../LayersList/LightingLayerDialog';
 import EffectsListDialog from '../EffectsList/EffectsListDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
@@ -68,6 +69,9 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
+import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -113,6 +117,9 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
@@ -123,6 +130,7 @@ type State = {|
   onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
   layerRemoved: ?string,
   effectsEditedLayer: ?gdLayer,
+  lightingEditedLayer: ?gdLayer,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
@@ -139,6 +147,8 @@ type State = {|
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
   showInstancesInfoBar: boolean,
+  showAdditionalWorkInfoBar: boolean,
+  additionalWorkInfoBar: InfoBarDetails,
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
@@ -157,6 +167,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenu;
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
+  _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
 
   constructor(props: Props) {
@@ -171,6 +182,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       effectsEditedLayer: null,
+      lightingEditedLayer: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
       variablesEditedObject: null,
@@ -188,6 +200,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       showPropertiesInfoBar: false,
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
+
+      showAdditionalWorkInfoBar: false,
+      additionalWorkInfoBar: {
+        identifier: 'default-additional-work',
+        message: '',
+        touchScreenMessage: '',
+      },
 
       selectedObjectTags: [],
     };
@@ -330,6 +349,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ effectsEditedLayer: layer });
   };
 
+  editLightingLayer = (layer: ?gdLayer) => {
+    this.setState({ lightingEditedLayer: layer });
+  };
+
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
   };
@@ -451,17 +474,25 @@ export default class SceneEditor extends React.Component<Props, State> {
   _addInstance = (pos: [number, number], objectName: string) => {
     if (!objectName || !this.editor) return;
 
-    this.editor.addInstances(pos, [objectName]);
-    this.setState(
-      {
-        selectedObjectNames: [],
-        history: saveToHistory(this.state.history, this.props.initialInstances),
-      },
-      () => this.updateToolbar()
-    );
+    const instances = this.editor.addInstances(pos, [objectName]);
+    this._onInstancesAdded(instances);
   };
 
-  _onInstancesAdded = () => {
+  _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
+    instances.forEach(instance => {
+      const infoBarDetails = onInstanceAdded(
+        instance,
+        this.props.layout,
+        this.props.project
+      );
+      if (infoBarDetails) {
+        this.setState({
+          additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
+        });
+      }
+    });
+
     this.setState(
       {
         history: saveToHistory(this.state.history, this.props.initialInstances),
@@ -543,6 +574,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
+  _onObjectCreated = (object: gdObject) => {
+    const infoBarDetails = onObjectAdded(
+      object,
+      this.props.layout,
+      this.props.project
+    );
+    if (infoBarDetails) {
+      this.setState({
+        additionalWorkInfoBar: infoBarDetails,
+        showAdditionalWorkInfoBar: true,
+      });
+    }
+
+    this._addInstanceForNewObject(object.getName());
+  };
+
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     this.setState({
       layerRemoveDialogOpen: true,
@@ -570,6 +617,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
             if (this.editor) this.editor.forceRemount();
+            this.forceUpdateLayersList();
             this.updateToolbar();
           }
         );
@@ -822,7 +870,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       .forEach(instance => {
         instance.setX(instance.getX() - x + position[0]);
         instance.setY(instance.getY() - y + position[1]);
-        this.props.initialInstances.insertInitialInstance(instance);
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
         instance.delete();
       });
   };
@@ -834,6 +884,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   forceUpdateObjectsList = () => {
     if (this._objectsList) this._objectsList.forceUpdateList();
+  };
+
+  forceUpdateLayersList = () => {
+    if (this._layersList) this._layersList.forceUpdate();
   };
 
   forceUpdatePropertiesEditor = () => {
@@ -925,10 +979,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
             onEditLayerEffects={this.editLayerEffects}
+            onEditLightingLayer={this.editLightingLayer}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
+            ref={layersList => (this._layersList = layersList)}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         ),
       },
@@ -1003,7 +1060,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             canRenameObject={this._canObjectOrGroupUseNewName}
-            onObjectCreated={this._addInstanceForNewObject}
+            onObjectCreated={this._onObjectCreated}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
@@ -1016,6 +1073,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             getAllObjectTags={this._getAllObjectTags}
             ref={objectsList => (this._objectsList = objectsList)}
             unsavedChanges={this.props.unsavedChanges}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         ),
       },
@@ -1046,6 +1104,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
           onEditLayerEffects={this.editLayerEffects}
+          onEditLightingLayer={this.editLightingLayer}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (
@@ -1108,12 +1167,13 @@ export default class SceneEditor extends React.Component<Props, State> {
               if (this.props.unsavedChanges)
                 this.props.unsavedChanges.triggerUnsavedChanges();
             }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onUpdateBehaviorsSharedData={() => this.updateBehaviorsSharedData()}
           />
         )}
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}
-            open
             group={this.state.editedGroup}
             objectsContainer={layout}
             globalObjectsContainer={project}
@@ -1220,6 +1280,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 this.editInstanceVariables(null);
               }
             }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1239,6 +1300,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               </Trans>
             }
             title={<Trans>Object Variables</Trans>}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (
@@ -1261,6 +1323,17 @@ export default class SceneEditor extends React.Component<Props, State> {
                 effectsEditedLayer: null,
               })
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+          />
+        )}
+        {!!this.state.lightingEditedLayer && (
+          <LightingLayerDialog
+            layer={this.state.lightingEditedLayer}
+            onClose={() =>
+              this.setState({
+                lightingEditedLayer: null,
+              })
+            }
           />
         )}
         {this.state.scenePropertiesDialogOpen && (
@@ -1280,8 +1353,21 @@ export default class SceneEditor extends React.Component<Props, State> {
             layout={layout}
             onApply={() => this.editLayoutVariables(false)}
             onClose={() => this.editLayoutVariables(false)}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
+        <I18n>
+          {({ i18n }) => (
+            <InfoBar
+              show={this.state.showAdditionalWorkInfoBar}
+              identifier={this.state.additionalWorkInfoBar.identifier}
+              message={i18n._(this.state.additionalWorkInfoBar.message)}
+              touchScreenMessage={i18n._(
+                this.state.additionalWorkInfoBar.touchScreenMessage
+              )}
+            />
+          )}
+        </I18n>
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [

@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class Project;
@@ -16,6 +17,7 @@ class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
 }  // namespace gd
+namespace gdjs { struct PreviewExportOptions; }
 
 namespace gdjs {
 
@@ -30,32 +32,13 @@ class Exporter {
   virtual ~Exporter();
 
   /**
-   * \brief Create a preview for the specified layout.
+   * \brief Create a preview for the specified options.
    * \note The preview is not launched, it is the caller responsibility to open
    * a browser pointing to the preview.
    *
-   * \param layout The layout to be previewed.
-   * \param exportDir The directory where the preview must be created.
-   * \return true if export was successful.
+   * \param options The options to generate the preview.
    */
-  bool ExportLayoutForPixiPreview(gd::Project& project,
-                                  gd::Layout& layout,
-                                  gd::String exportDir);
-
-  /**
-   * \brief Create a preview for the specified external layout and layout.
-   * \note The preview is not launched, it is the caller responsibility to open
-   * a browser pointing to the preview.
-   *
-   * \param layout The layout to be previewed.
-   * \param externalLayout The external layout with objects to be created at
-   * scene startup. \param exportDir The directory where the preview must be
-   * created. \return true if export was successful.
-   */
-  bool ExportExternalLayoutForPixiPreview(gd::Project& project,
-                                          gd::Layout& layout,
-                                          gd::ExternalLayout& externalLayout,
-                                          gd::String exportDir);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions& options);
 
   /**
    * \brief Export the specified project, using Pixi.js.

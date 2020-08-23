@@ -16,6 +16,7 @@ import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
+import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { isMacLike } from '../../Utils/Platform';
@@ -34,6 +35,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setCodeEditorThemeName,
     setAutoDownloadUpdates,
     showAlertMessage,
+    showTutorialHint,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -301,6 +303,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                     toggled={!values.hiddenAlertMessages[key]}
                     labelPosition="right"
                     label={label}
+                  />
+                </Line>
+              ))}
+              <Text>
+                <Trans>Show link to tutorials:</Trans>
+              </Text>
+              {getAllTutorialHints().map(({ identifier, name }) => (
+                <Line key={identifier}>
+                  <Toggle
+                    onToggle={(e, check) => showTutorialHint(identifier, check)}
+                    toggled={!values.hiddenTutorialHints[identifier]}
+                    labelPosition="right"
+                    label={name}
                   />
                 </Line>
               ))}

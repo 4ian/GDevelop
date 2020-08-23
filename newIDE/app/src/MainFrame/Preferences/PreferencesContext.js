@@ -8,6 +8,9 @@ import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 
 export type AlertMessageIdentifier =
+  | 'default-additional-work'
+  | 'automatic-lighting-layer'
+  | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
@@ -17,6 +20,7 @@ export type AlertMessageIdentifier =
   | 'empty-events-based-behavior-explanation'
   | 'too-much-effects'
   | 'effects-usage'
+  | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
   | 'instance-drag-n-drop-explanation'
   | 'objects-panel-explanation'
@@ -25,7 +29,8 @@ export type AlertMessageIdentifier =
   | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
-  | 'lifecycle-events-function-included-only-if-extension-used';
+  | 'lifecycle-events-function-included-only-if-extension-used'
+  | 'p2p-broker-recommendation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -75,6 +80,18 @@ export const allAlertMessages: Array<{
     label: <Trans>Using effects</Trans>,
   },
   {
+    key: 'lighting-layer-usage',
+    label: <Trans>Using lighting layer</Trans>,
+  },
+  {
+    key: 'automatic-lighting-layer',
+    label: <Trans>Automatic creation of lighting layer</Trans>,
+  },
+  {
+    key: 'object-moved-in-lighting-layer',
+    label: <Trans>Light object automatically put in lighting layer</Trans>,
+  },
+  {
     key: 'resource-properties-panel-explanation',
     label: <Trans>Using the resource properties panel</Trans>,
   },
@@ -110,6 +127,10 @@ export const allAlertMessages: Array<{
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
+  {
+    key: 'p2p-broker-recommendation',
+    label: <Trans>Peer to peer broker server recommendation</Trans>,
+  },
 ];
 
 /**
@@ -123,6 +144,7 @@ export type PreferencesValues = {|
   themeName: string,
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
+  hiddenTutorialHints: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -152,6 +174,7 @@ export type Preferences = {|
   checkUpdates: (forceDownload?: boolean) => void,
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
+  showTutorialHint: (identifier: string, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -193,6 +216,7 @@ export const initialPreferences = {
     themeName: 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
+    hiddenTutorialHints: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -206,7 +230,7 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    useCommandPalette: false,
+    useCommandPalette: true,
     userShortcutMap: {},
   },
   setLanguage: () => {},
@@ -216,6 +240,7 @@ export const initialPreferences = {
   checkUpdates: () => {},
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
+  showTutorialHint: (identifier: string, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},

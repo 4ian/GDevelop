@@ -66,13 +66,48 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
+ * @param {BBTextObjectDataType} oldObjectData
+ * @param {BBTextObjectDataType} newObjectData
+ */
+gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.visible !== newObjectData.content.visible) {
+    this.hide(!newObjectData.content.visible);
+  }
+  if (oldObjectData.content.text !== newObjectData.content.text) {
+    this.setBBText(newObjectData.content.text);
+  }
+  if (oldObjectData.content.color !== newObjectData.content.color) {
+    this._color = newObjectData.content.color;
+    this._renderer.updateColor();
+  }
+  if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
+    this.setFontFamily(newObjectData.content.fontFamily);
+  }
+  if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
+    this.setFontSize(newObjectData.content.fontSize);
+  }
+  if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
+    this.setWordWrap(newObjectData.content.wordWrap);
+  }
+  if (oldObjectData.content.align !== newObjectData.content.align) {
+    this.setAlignment(newObjectData.content.align);
+  }
+
+  return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);
+  else
+    this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {

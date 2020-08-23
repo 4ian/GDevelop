@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -189,6 +189,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
+          "persistentUuid": "8600b021-ac7a-48da-b2ee-451772b0e157",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -204,6 +205,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "5644063b-e4be-4e59-87dc-d2f6721f547a",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -224,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "b02dcdea-df0b-4c46-b7be-d7dc5c1a0cb4",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -244,6 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "03734257-82a8-43c2-9c85-36ef59db891f",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -259,6 +263,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "de1224cb-7e70-4988-bdde-47a7281b75f6",
           "width": 0,
           "x": 362,
           "y": 303,

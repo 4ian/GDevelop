@@ -132,7 +132,8 @@ export default {
       }
       const originalNodeModuleLoad = module._load;
 
-      const allowedModules = { 'pixi.js-legacy': PIXI };
+      // Allow both "pixi.js" and "pixi.js-legacy" to be found.
+      const allowedModules = { 'pixi.js-legacy': PIXI, 'pixi.js': PIXI };
       module._load = function hookedLoader(request, parent, isMain) {
         const loadedModule = allowedModules[request];
         if (loadedModule) return loadedModule;

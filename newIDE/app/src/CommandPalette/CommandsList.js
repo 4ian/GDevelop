@@ -7,6 +7,8 @@ export type CommandName =
   | 'OPEN_PROJECT_MANAGER'
   | 'LAUNCH_PREVIEW'
   | 'LAUNCH_DEBUG_PREVIEW'
+  | 'LAUNCH_NETWORK_PREVIEW'
+  | 'HOT_RELOAD_PREVIEW'
   | 'OPEN_START_PAGE'
   | 'CREATE_NEW_PROJECT'
   | 'OPEN_PROJECT'
@@ -38,6 +40,8 @@ export type CommandName =
   | 'TOGGLE_GRID'
   | 'OPEN_SETUP_GRID'
   | 'EDIT_LAYER_EFFECTS'
+  | 'EDIT_LIGHTING_LAYER'
+  | 'EDIT_NETWORK_PREVIEW'
   | 'EDIT_OBJECT'
   | 'EDIT_OBJECT_VARIABLES'
   | 'EDIT_OBJECT_GROUP'
@@ -85,6 +89,14 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   LAUNCH_DEBUG_PREVIEW: {
     area: 'PROJECT',
     displayText: t`Launch preview with debugger and profiler`,
+  },
+  LAUNCH_NETWORK_PREVIEW: {
+    area: 'PROJECT',
+    displayText: t`Launch network preview over WiFi/LAN`,
+  },
+  HOT_RELOAD_PREVIEW: {
+    area: 'PROJECT',
+    displayText: t`Apply changes to the running preview`,
   },
   OPEN_START_PAGE: { area: 'IDE', displayText: t`Open start page` },
   CREATE_NEW_PROJECT: {
@@ -211,6 +223,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   EDIT_LAYER_EFFECTS: {
     area: 'SCENE',
     displayText: t`Edit layer effects...`,
+  },
+  EDIT_LIGHTING_LAYER: {
+    area: 'SCENE',
+    displayText: t`Edit lighting layer...`,
   },
 
   // Objects list commands

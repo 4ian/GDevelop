@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "fd63b161-2796-4424-af86-b019e20986c1",
           "width": 0,
           "x": 238,
           "y": 228,
@@ -168,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "3c6beac5-c169-4c85-842c-b7061df7b13a",
           "width": 0,
           "x": 110,
           "y": 228,
@@ -183,6 +185,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "3d5829e7-4967-46bb-adc6-80328987b59c",
           "width": 0,
           "x": 174,
           "y": 292,
@@ -198,6 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "d0df3f86-ef59-4c0d-8186-5e116ca5be71",
           "width": 0,
           "x": 622,
           "y": 228,
@@ -213,6 +217,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "26750a7a-4b55-458a-b21b-c7446d76ed52",
           "width": 0,
           "x": 302,
           "y": 292,
@@ -228,6 +233,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "653d2302-34d7-4dbd-a9c6-3db23428db7f",
           "width": 0,
           "x": 366,
           "y": 228,
@@ -243,6 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "97673608-c2fa-4e3f-bfe8-8f15d68bbd28",
           "width": 0,
           "x": 430,
           "y": 292,
@@ -258,6 +265,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "bc0c24cc-422e-4a3f-b58e-bdf7ea39a66f",
           "width": 0,
           "x": 494,
           "y": 228,
@@ -273,6 +281,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "b7edf7cd-d96c-4b4c-8183-2791db2072b0",
           "width": 0,
           "x": 558,
           "y": 292,

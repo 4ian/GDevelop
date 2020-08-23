@@ -301,6 +301,107 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     eventsFunction.delete();
     project.delete();
   });
+
+  it('generates a working function with BuiltinCommonInstructions::Once', function () {
+    // Create events using the Trigger Once condition.
+    const eventsSerializerElement = gd.Serializer.fromJSON(
+      JSON.stringify([
+        {
+          disabled: false,
+          folded: false,
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: {
+                inverted: false,
+                value: 'BuiltinCommonInstructions::Once',
+              },
+              parameters: [],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { inverted: false, value: 'ModVarScene' },
+              parameters: ['SuccessVariable', '+', '1'],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+        {
+          disabled: false,
+          folded: false,
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: {
+                inverted: false,
+                value: 'BuiltinCommonInstructions::Once',
+              },
+              parameters: [],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { inverted: false, value: 'ModVarScene' },
+              parameters: ['SuccessVariable', '+', '1'],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ])
+    );
+
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunction = new gd.EventsFunction();
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+
+    const runCompiledEvents = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunction
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runtimeScene.getOnceTriggers().startNewFrame();
+    runCompiledEvents(gdjs, runtimeScene);
+    runtimeScene.getOnceTriggers().startNewFrame();
+    runCompiledEvents(gdjs, runtimeScene);
+
+    // Check that after running the compiled events twice, actions were
+    // executed only twice.
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Check that compiling again the events will result in stable ids for Trigger Once conditions
+    // (trigger once should not be launched again), even after a copy of the events function.
+    const eventsFunctionCopy = eventsFunction.clone();
+    const runCompiledEvents2 = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunctionCopy
+    );
+    runtimeScene.getOnceTriggers().startNewFrame();
+    runCompiledEvents2(gdjs, runtimeScene);
+    runtimeScene.getOnceTriggers().startNewFrame();
+    runCompiledEvents2(gdjs, runtimeScene);
+
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    eventsFunction.delete();
+    eventsFunctionCopy.delete();
+    project.delete();
+  });
 });
 
 /**
@@ -335,6 +436,27 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
     `${code};
 return functionNamespace.func(runtimeScene, runtimeScene);`
   );
+
+  return runCompiledEvents;
+}
+
+/** Helper to create compiled events from serialized events, creating a project and the events function. */
+function generateCompiledEventsFromSerializedEvents(
+  gd,
+  eventsSerializerElement
+) {
+  const project = new gd.ProjectHelper.createNewGDJSProject();
+  const eventsFunction = new gd.EventsFunction();
+  eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
+
+  const runCompiledEvents = generateCompiledEventsForEventsFunction(
+    gd,
+    project,
+    eventsFunction
+  );
+
+  eventsFunction.delete();
+  project.delete();
 
   return runCompiledEvents;
 }

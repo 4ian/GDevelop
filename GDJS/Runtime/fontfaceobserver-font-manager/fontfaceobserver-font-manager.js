@@ -30,6 +30,15 @@ gdjs.FontFaceObserverFontManager = function (resources) {
 gdjs.FontManager = gdjs.FontFaceObserverFontManager; //Register the class to let the engine use it.
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.FontFaceObserverFontManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
+
+/**
  * Return the font family associated to the specified font resource name.
  * The font resource must have been loaded before. If that's not the case,
  * a default font family will be returned ("Arial").
@@ -163,6 +172,10 @@ gdjs.FontFaceObserverFontManager.prototype.loadFonts = function (
   for (var i = 0, len = resources.length; i < len; ++i) {
     var res = resources[i];
     if (res.file && res.kind === 'font') {
+      if (!!this._loadedFonts[res.name]) {
+        continue;
+      }
+
       filesResources[res.file] = filesResources[res.file]
         ? filesResources[res.file].concat(res)
         : [res];

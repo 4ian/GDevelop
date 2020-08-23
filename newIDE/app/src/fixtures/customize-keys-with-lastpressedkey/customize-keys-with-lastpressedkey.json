@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -161,6 +161,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyPressed",
+          "persistentUuid": "e8537882-ba89-468a-90ba-0944c1e482d0",
           "width": 0,
           "x": 64,
           "y": 192,
@@ -176,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyText",
+          "persistentUuid": "ea2944b2-30f6-4738-a095-1dded68eae57",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -191,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "c4caced3-974a-42b2-bb1d-be39157e135d",
           "width": 0,
           "x": 356.5,
           "y": 439.5,
@@ -206,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "bdd057fc-55ce-42a0-94c2-3743c52b2867",
           "width": 0,
           "x": 113,
           "y": 323,
@@ -221,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyUsed",
+          "persistentUuid": "d125780c-ec06-4d3a-a034-4ea82e308e36",
           "width": 0,
           "x": 64,
           "y": 224,
@@ -236,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyText",
+          "persistentUuid": "d4686bd4-2a74-46f3-86f0-8d2afe41ab76",
           "width": 0,
           "x": 256,
           "y": 224,

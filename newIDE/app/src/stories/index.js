@@ -196,6 +196,10 @@ import {
   type NamedCommand,
   type CommandOption,
 } from '../CommandPalette/CommandManager';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 
 configureActions({
   depth: 2,
@@ -219,6 +223,11 @@ const buildFakeMenuTemplate = () => [
     click: action('click option 2'),
   },
 ];
+
+const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
+  hasPreviewsRunning: false,
+  launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+};
 
 storiesOf('Welcome', module)
   .addDecorator(muiDecorator)
@@ -1098,6 +1107,30 @@ storiesOf('UI Building Blocks/AlertMessage', module)
       inimicus.
     </AlertMessage>
   ))
+  .add('long text with icon', () => (
+    <AlertMessage
+      kind="info"
+      renderLeftIcon={() => (
+        <img
+          src="res/tutorial_icons/tween-behavior.jpg"
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            maxWidth: 128,
+            maxHeight: 128,
+          }}
+        />
+      )}
+      onHide={() => {}}
+    >
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
   .add('warning', () => (
     <AlertMessage kind="warning">
       Hello World, this is an alert text
@@ -1565,6 +1598,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     }
                     onObjectCreated={() => {}}
                     onObjectSelected={() => {}}
+                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   />
                 </TabContentContainer>
               }
@@ -2807,6 +2841,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('default (no results)', () => (
@@ -2817,6 +2852,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('3 results', () => (
@@ -2827,6 +2863,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ));
 
@@ -3212,6 +3249,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3242,6 +3280,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3341,6 +3380,10 @@ storiesOf('BehaviorsEditor', module)
       <BehaviorsEditor
         project={testProject.project}
         object={testProject.spriteObjectWithBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
   ));
@@ -3957,7 +4000,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4056,6 +4099,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('Error in functions', () => (
@@ -4097,6 +4141,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ));
 
@@ -4166,7 +4211,7 @@ storiesOf('ExtensionsSearchDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4191,6 +4236,7 @@ storiesOf('LayersList', module)
       }}
       resourceSources={[]}
       onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4198,6 +4244,7 @@ storiesOf('LayersList', module)
         cb(true);
       }}
       layersContainer={testProject.testLayout}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('small width and height', () => (
@@ -4211,6 +4258,7 @@ storiesOf('LayersList', module)
         }}
         resourceSources={[]}
         onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4218,6 +4266,7 @@ storiesOf('LayersList', module)
           cb(true);
         }}
         layersContainer={testProject.testLayout}
+        hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       />
     </div>
   ));
@@ -4336,4 +4385,46 @@ storiesOf('CommandPalette', module)
         />
       )}
     </I18n>
+  ));
+
+storiesOf('HotReloadPreviewButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={false}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ))
+  .add('with preview(s) running', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={true}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ));
+
+storiesOf('HotReloadLogsDialog', module)
+  .addDecorator(muiDecorator)
+  .add('with an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'error',
+          message: 'Oops, something could not be hot-reloaded.',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ))
+  .add('without an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'info',
+          message: 'Everything is fine',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
   ));

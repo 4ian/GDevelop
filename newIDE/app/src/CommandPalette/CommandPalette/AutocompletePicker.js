@@ -104,6 +104,7 @@ const AutocompletePicker = (
       renderOption={item => (
         <ListItem
           dense
+          component="div"
           ContainerComponent="div"
           classes={{ container: classes.listItemContainer }}
         >

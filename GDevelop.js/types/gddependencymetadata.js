@@ -9,9 +9,9 @@ declare class gdDependencyMetadata {
   setVersion(version_: string): gdDependencyMetadata;
   getDependencyType(): string;
   setDependencyType(dependencyType_: string): gdDependencyMetadata;
-  getExtraSetting(settingName: string): gdPropertyDescriptor;
   setExtraSetting(settingName: string, settingValue: gdPropertyDescriptor): gdDependencyMetadata;
   getAllExtraSettings(): gdMapStringPropertyDescriptor;
+  onlyIfExtraSettingIsNonEmpty(settingName: string): gdDependencyMetadata;
   delete(): void;
   ptr: number;
 };

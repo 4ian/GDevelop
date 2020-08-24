@@ -131,13 +131,13 @@ Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documen
 
 A property is a global configuration value for your extension. An example would be the App ID for AdMob.
 
-To declare one, just use `registerProperty`: 
+To declare one, just use `registerProperty`:
 ```js
 // From ExampleJsExtension/JsExtension.js:
 extension.registerProperty("DummyPropertyString")
-  .setDescription(_("Dummy Property Name"))
-  .setType("string")
-  .setLabel("Type in anything :)");
+  .setLabel(_("Dummy Property Name"))
+  .setDescription(_("Type in anything :)"))
+  .setType("string");
 ```
 
 Once declared, you can access the property from JavaScript in the game engine using `getExtensionProperty` method of `gdjs.RuntimeGame`. Pass the extension name and the property name. This would get the AdMobAppId property of the AdMob extension for example:
@@ -145,7 +145,7 @@ Once declared, you can access the property from JavaScript in the game engine us
 const appId = runtimeGame.getExtensionProperty("AdMob", "AdMobAppId");
 ```
 
-If the property doesn't exist it will return null. 
+If the property doesn't exist it will return null.
 ⚠️ Be careful, it can be non existing if the user never entered a value for that property before!
 
 #### Declare a dependency on an external package
@@ -178,9 +178,9 @@ You can also use an extension property to determine the value of the plugin vari
 ```js
 // From AdMob/JsExtension.js:
 extension.registerProperty("AdMobAppId") // Remember Property Name
-      .setDescription("AdMob App ID")
-      .setType("string")
-      .setLabel("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY");
+      .setLabel("AdMob App ID")
+      .setDescription("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY")
+      .setType("string");
 
 extension.addDependency()
   .setName("AdMob Cordova Extension")
@@ -188,7 +188,7 @@ extension.addDependency()
   .setExportName("cordova-plugin-admob-free")
   .setVersion("~0.21.0")
   .setExtraSetting(
-    "ADMOB_APP_ID", 
+    "ADMOB_APP_ID",
     new gd.PropertyDescriptor()
       .setType("ExtensionProperty") // Tell the exporter this is an extension property...
       .setValue("AdMobAppId") // ... and what property it is (name of the property).

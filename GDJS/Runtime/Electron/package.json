@@ -5,7 +5,9 @@
     "description": "GDJS_GAME_NAME",
     "author": "GDJS_GAME_AUTHOR",
     "version": "GDJS_GAME_VERSION",
-    "dependencies": {},
+    "dependencies": {
+      "GDJS_EXTENSION_NPM_DEPENDENCY": "0"
+    },
     "devDependencies": {
       "electron": "8.2.5"
     },

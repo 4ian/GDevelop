@@ -10,11 +10,14 @@
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
-#include "GDCore/Extensions/Metadata/EffectMetadata.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
 
@@ -25,6 +28,7 @@ class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
 class EffectMetadata;
+class DependencyMetadata;
 class BaseEvent;
 class EventMetadata;
 class EventCodeGenerator;
@@ -148,6 +152,8 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
 
+  gd::DependencyMetadata& AddDependency();
+
   /**
    * \brief Declare a new object as being part of the extension.
    * \note This method does nothing when used for GD C++ runtime.
@@ -224,6 +230,33 @@ class GD_CORE_API PlatformExtension {
                               const gd::String& group_,
                               const gd::String& smallicon_,
                               std::shared_ptr<gd::BaseEvent> instance);
+
+#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Adds a property to the Extension.
+   * \param name The internal name of the property (to get it later).
+   * \param description The description of the property.
+   * \param type The type of the property. Supported ones are "string", "number"
+   * and "boolean".
+   */
+  gd::PropertyDescriptor& RegisterProperty(const gd::String& name,
+                                           const gd::String& description,
+                                           const gd::String& type,
+                                           const gd::String& hint) {
+    extensionPropertiesMetadata[name]
+        .SetDescription(description)
+        .SetType(type)
+        .SetLabel(hint);
+    return extensionPropertiesMetadata[name];
+  };
+
+  /**
+   * \brief Adds a property to the Extension.
+   */
+  gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
+    return extensionPropertiesMetadata[name];
+  };
+#endif
 
   /**
    * \brief Return the name extension user friendly name.
@@ -366,6 +399,12 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions();
 
   /**
+   * \brief Return a reference to a vector containing the metadata of all the
+   * dependencies of the extension.
+   */
+  std::vector<gd::DependencyMetadata>& GetAllDependencies();
+
+  /**
    * \brief Return a reference to a map containing the names of the actions,
    * related to the object type, and the metadata associated with.
    */
@@ -437,6 +476,13 @@ class GD_CORE_API PlatformExtension {
    * generator.
    */
   void StripUnimplementedInstructionsAndExpressions();
+
+  /**
+   * \brief Get all the properties of the extension
+   */
+  std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
+    return extensionPropertiesMetadata;
+  }
 #endif
 
   /**
@@ -480,7 +526,9 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
+  std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
 #endif
 
   ObjectMetadata badObjectMetadata;

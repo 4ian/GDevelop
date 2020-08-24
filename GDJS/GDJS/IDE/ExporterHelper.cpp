@@ -23,6 +23,10 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
+#include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
@@ -261,15 +265,36 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
-  if (!project.GetAdMobAppId().empty()) {
-    str = str.FindAndReplace(
-        "<!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->",
-        "<plugin name=\"cordova-plugin-admob-free\" spec=\"~0.21.0\">\n"
-        "\t\t<variable name=\"ADMOB_APP_ID\" value=\"" +
-            project.GetAdMobAppId() +
-            "\" />\n"
-            "\t</plugin>");
+  gd::String plugins = "";
+
+  for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
+    for (gd::DependencyMetadata dependencies: extension->GetAllDependencies()) {
+      if (dependencies.GetDependencyType() == "cordova") {
+
+        plugins += "<plugin name=\"" + dependencies.GetExportName();
+        if(dependencies.GetVersion() != "") {
+          plugins += "\" spec=\"" + dependencies.GetVersion();
+        }
+        plugins += "\">\n"; 
+
+        // In cordova all settings are considered a plugin variable
+        for (std::pair<const gd::String, gd::PropertyDescriptor>& dependency : dependencies.GetAllExtraSettings()) {
+          if (dependency.second.GetType() == "ExtensionProperty") {
+            plugins += "\t\t<variable name=\"" + dependency.first + "\" value=\"" + project.GetExtensionProperties().GetValue(extension->GetName(), dependency.second.GetValue()) + "\" />\n";
+          } else {
+            plugins += "\t\t<variable name=\"" + dependency.first + "\" value=\"" + dependency.second.GetValue() + "\" />\n";
+          }
+        }
+
+        plugins += "\t</plugin>";
+      }
+    }
   }
+
+  str = str.FindAndReplace(
+    "<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->",
+    plugins
+  );
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write Cordova config.xml file.";
@@ -420,6 +445,26 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
+
+    gd::String packages = "";
+
+    for(std::shared_ptr<gd::PlatformExtension> extension : project.GetCurrentPlatform().GetAllPlatformExtensions()) { //TODO Add a way to select only used Extensions
+      for (gd::DependencyMetadata dependency: extension->GetAllDependencies()) {
+        if (dependency.GetDependencyType() == "npm") {
+          if(dependency.GetVersion() == "") {
+            gd::LogError("Latest Version not available for NPM dependencies, dependency " + dependency.GetName() + " is not exported. Please specify a version when calling addDependency.");
+            continue;
+          }
+          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" + dependency.GetVersion() + "\",";
+          // For node extra settings are ignored
+        }
+      }
+    }
+
+    packages = packages.substr(1, packages.size()); // Remove first line break for esthetic.
+    packages = packages.substr(0, packages.size()-1); // Remove the , at the end as last item cannot have , in JSON.
+
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"", packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";

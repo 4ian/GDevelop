@@ -4339,7 +4339,7 @@ storiesOf('CommandPalette', module)
                 handler: () => {},
               },
               {
-                name: 'SAVE_PROJECT',
+                name: 'OPEN_PROJECT_PROPERTIES',
                 handler: () => {},
               },
               {

@@ -158,7 +158,6 @@ export type PreferencesValues = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
-  useCommandPalette: boolean,
   userShortcutMap: ShortcutMap,
 |};
 
@@ -204,7 +203,6 @@ export type Preferences = {|
   setAutoOpenMostRecentProject: (enabled: boolean) => void,
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
-  setUseCommandPalette: (enabled: boolean) => void,
   resetShortcutsToDefault: () => void,
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
 |};
@@ -230,7 +228,6 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    useCommandPalette: true,
     userShortcutMap: {},
   },
   setLanguage: () => {},
@@ -266,7 +263,6 @@ export const initialPreferences = {
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
-  setUseCommandPalette: (enabled: boolean) => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
 };

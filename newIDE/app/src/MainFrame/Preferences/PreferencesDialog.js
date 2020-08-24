@@ -18,8 +18,6 @@ import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
 import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import { isMacLike } from '../../Utils/Platform';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 
 type Props = {|
@@ -45,7 +43,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
-    setUseCommandPalette,
     resetShortcutsToDefault,
     setShortcutForCommand,
   } = React.useContext(PreferencesContext);
@@ -264,29 +261,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               />
             </Line>
           )}
-          <Text size="title">
-            <Trans>Command Palette</Trans>
-          </Text>
-          <Line>
-            <Column noMargin>
-              <Toggle
-                onToggle={(e, check) => setUseCommandPalette(check)}
-                toggled={values.useCommandPalette}
-                labelPosition="right"
-                label={<Trans>Enable command palette (experimental)</Trans>}
-              />
-              <FormHelperText>
-                <Trans>
-                  Open the command palette with{' '}
-                  {isMacLike() ? 'Cmd + P' : 'Ctrl + P'}.
-                </Trans>{' '}
-                <Trans>
-                  This is an experimental feature, new commands will be added in
-                  the next versions.
-                </Trans>
-              </FormHelperText>
-            </Column>
-          </Line>
         </Column>
       )}
       {currentTab === 'hints' && (

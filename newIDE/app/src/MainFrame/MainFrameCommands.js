@@ -11,7 +11,6 @@ import {
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
 } from '../ProjectManager/EnumerateProjectItems';
-import PreferencesContext from './Preferences/PreferencesContext';
 
 type Item =
   | gdLayout
@@ -62,8 +61,6 @@ type CommandHandlers = {|
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
-  const preferences = React.useContext(PreferencesContext);
-
   useCommand('QUIT_APP', true, {
     handler: handlers.onCloseApp,
   });
@@ -84,7 +81,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     'LAUNCH_DEBUG_PREVIEW',
     handlers.previewEnabled && handlers.allowNetworkPreview,
     {
-      // displayText: launchDebugPreviewText,
       handler: handlers.onLaunchDebugPreview,
     }
   );
@@ -93,7 +89,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     'LAUNCH_NETWORK_PREVIEW',
     handlers.previewEnabled && handlers.allowNetworkPreview,
     {
-      // displayText: launchNetworkPreviewText,
       handler: handlers.onLaunchNetworkPreview,
     }
   );
@@ -126,7 +121,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onExportGame,
   });
 
-  useCommand('OPEN_COMMAND_PALETTE', preferences.values.useCommandPalette, {
+  useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
   });
 

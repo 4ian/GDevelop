@@ -11,7 +11,7 @@ import {
   type CommandOption,
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
-import commandsList from '../CommandsList';
+import commandsList, { type CommandName } from '../CommandsList';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -22,7 +22,7 @@ const useStyles = makeStyles({
 
 export type CommandPaletteInterface = {|
   open: (open?: boolean) => void,
-  launchCommand: (commandName: string) => void,
+  launchCommand: (commandName: CommandName) => void,
 |};
 
 type PaletteMode = 'closed' | 'command' | 'option';
@@ -73,11 +73,11 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     // manager and launches command accordingly
     const launchCommand = React.useCallback(
       commandName => {
-        const command = commandManager.commands[commandName];
+        const command = commandManager.getNamedCommand(commandName);
         if (!command) return;
-        handleCommandChoose({ ...command, name: commandName });
+        handleCommandChoose(command);
       },
-      [handleCommandChoose, commandManager.commands]
+      [handleCommandChoose, commandManager]
     );
 
     React.useImperativeHandle(ref, () => ({

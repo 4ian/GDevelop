@@ -32,35 +32,42 @@ export type NamedCommandWithOptions = {|
 export interface CommandManagerInterface {
   registerCommand: (commandName: CommandName, command: Command) => void;
   deregisterCommand: (commandName: CommandName) => void;
+  getNamedCommand: (commandName: CommandName) => ?NamedCommand;
   getAllNamedCommands: () => Array<NamedCommand>;
 }
 
 export default class CommandManager implements CommandManagerInterface {
-  commands: { [CommandName]: Command };
+  _commands: { [CommandName]: Command };
 
   constructor() {
-    this.commands = {};
+    this._commands = {};
   }
 
   registerCommand = (commandName: CommandName, command: Command) => {
-    if (this.commands[commandName])
+    if (this._commands[commandName])
       return console.warn(
         `Tried to register command ${commandName}, but it is already registered.`
       );
-    this.commands[commandName] = command;
+    this._commands[commandName] = command;
   };
 
   deregisterCommand = (commandName: CommandName) => {
-    if (!this.commands[commandName])
+    if (!this._commands[commandName])
       return console.warn(
         `Tried to deregister command ${commandName}, but it is not registered.`
       );
-    delete this.commands[commandName];
+    delete this._commands[commandName];
+  };
+
+  getNamedCommand = (commandName: CommandName) => {
+    const command: Command = this._commands[commandName];
+    if (command) return { name: commandName, ...(command: Command) };
+    return null;
   };
 
   getAllNamedCommands = () => {
-    return Object.keys(this.commands).map<NamedCommand>(commandName => {
-      const cmd = this.commands[commandName];
+    return Object.keys(this._commands).map<NamedCommand>(commandName => {
+      const cmd = this._commands[commandName];
       return { ...cmd, name: commandName };
     });
   };

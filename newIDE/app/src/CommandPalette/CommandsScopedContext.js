@@ -10,12 +10,12 @@ import CommandsContext from './CommandsContext';
 import useRefInit from './UseRefInitHook';
 
 class ScopedCommandManager implements CommandManagerInterface {
-  commands: { [CommandName]: Command };
+  _commands: { [CommandName]: Command };
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
 
   constructor(centralCommandManager) {
-    this.commands = {};
+    this._commands = {};
     this._isActive = false;
     this._centralManager = centralCommandManager;
   }
@@ -25,36 +25,42 @@ class ScopedCommandManager implements CommandManagerInterface {
   };
 
   registerCommand = (commandName: CommandName, command: Command) => {
-    this.commands[commandName] = command;
+    this._commands[commandName] = command;
     if (this._isActive)
       this._centralManager.registerCommand(commandName, command);
   };
 
   deregisterCommand = (commandName: CommandName) => {
-    delete this.commands[commandName];
+    delete this._commands[commandName];
     if (this._isActive) this._centralManager.deregisterCommand(commandName);
   };
 
   registerAllCommandsToCentralManager = () => {
-    Object.keys(this.commands).forEach(commandName => {
+    Object.keys(this._commands).forEach(commandName => {
       this._centralManager.registerCommand(
         commandName,
-        this.commands[commandName]
+        this._commands[commandName]
       );
     });
   };
 
   deregisterAllCommandsFromCentralManager = () => {
-    Object.keys(this.commands).forEach(commandName => {
+    Object.keys(this._commands).forEach(commandName => {
       this._centralManager.deregisterCommand(commandName);
     });
   };
 
   getAllNamedCommands = () => {
-    return Object.keys(this.commands).map<NamedCommand>(commandName => {
-      const cmd = this.commands[commandName];
+    return Object.keys(this._commands).map<NamedCommand>(commandName => {
+      const cmd = this._commands[commandName];
       return { ...cmd, name: commandName };
     });
+  };
+
+  getNamedCommand = (commandName: CommandName) => {
+    const command = this._commands[commandName];
+    if (command) return { name: commandName, ...(command: Command) };
+    return this._centralManager.getNamedCommand(commandName);
   };
 }
 

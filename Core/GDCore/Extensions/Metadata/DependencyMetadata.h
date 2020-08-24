@@ -6,6 +6,7 @@
 #ifndef DEPENDENCYMETADATA_H
 #define DEPENDENCYMETADATA_H
 #include <map>
+#include <set>
 
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
@@ -44,7 +45,7 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Set the version of the dependency to install. 
+   * \brief Set the version of the dependency to install.
    * Use an empty string to use the latest version.
    */
   DependencyMetadata& SetVersion(const gd::String& version_) {
@@ -55,7 +56,7 @@ class GD_CORE_API DependencyMetadata {
   /**
    * \brief Sets the type of dependecy (what will be used to install it)
    *
-   * This can either be "npm" or "cordova" for now. 
+   * This can either be "npm" or "cordova" for now.
    */
   DependencyMetadata& SetDependencyType(const gd::String& dependencyType_) {
     dependencyType = dependencyType_;
@@ -75,29 +76,54 @@ class GD_CORE_API DependencyMetadata {
     return *this;
   };
 
+  /**
+   * \brief Mark the dependency to be included in the export only if the
+   * specified setting is not empty.
+   *
+   * If this is called for multiple settings, all settings must be fulfilled for
+   * the dependency to be exported.
+   */
+  DependencyMetadata& OnlyIfExtraSettingIsNonEmpty(
+      const gd::String& settingName) {
+    nonEmptyExtraSettingsForExport.insert(settingName);
+    return *this;
+  };
+
+  /**
+   * \brief Get the list of extra settings that must be fulfilled for the
+   * dependency to be exported.
+   */
+  const std::set<gd::String>& GetRequiredExtraSettingsForExport() const {
+    return nonEmptyExtraSettingsForExport;
+  };
+
   const gd::String& GetName() const { return name; };
   const gd::String& GetExportName() const { return exportName; };
   const gd::String& GetVersion() const { return version; };
-  const gd::String& GetDependencyType() const { 
-    if(dependencyType == "") gd::LogWarning("Dependency has no type, it won't be exported.");
-    return dependencyType; 
+  const gd::String& GetDependencyType() const {
+    if (dependencyType == "")
+      gd::LogWarning("Dependency has no type, it won't be exported.");
+    return dependencyType;
   };
-  gd::PropertyDescriptor& GetExtraSetting(const gd::String& settingName) {
-    return extraData[settingName];
-  };
-  std::map<gd::String, gd::PropertyDescriptor>& GetAllExtraSettings() {
+
+  const std::map<gd::String, gd::PropertyDescriptor>& GetAllExtraSettings()
+      const {
     return extraData;
   }
 
  private:
-  gd::String name;  ///< The name of the dependency.
-  gd::String exportName;  ///< The name used to install the package (example: npm package name
-                          ///< for npm dependency type).
-  gd::String version;  ///< The version of the dependency
+  gd::String name;        ///< The name of the dependency.
+  gd::String exportName;  ///< The name used to install the package (example:
+                          ///< npm package name for npm dependency type).
+  gd::String version;     ///< The version of the dependency
   gd::String dependencyType;  ///< The tool used to install the dependency.
   std::map<gd::String, gd::PropertyDescriptor>
       extraData;  ///< Contains dependency type specific additional parameters
                   ///< for the dependency.
+  std::set<gd::String>
+      nonEmptyExtraSettingsForExport;  ///< The set of extra settings that must
+                                       ///< be non empty for this dependency to
+                                       ///< be included by the exporter.
 };
 }  // namespace gd
 #endif  // DEPENDENCYMETADATA_H

@@ -20,7 +20,10 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'AdMob',
@@ -32,21 +35,23 @@ module.exports = {
       'MIT'
     );
 
-    extension.registerProperty("AdMobAppId")
-      .setDescription("AdMob App ID")
-      .setType("string")
-      .setLabel("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY");
+    extension
+      .registerProperty('AdMobAppId')
+      .setLabel(_('AdMob App ID'))
+      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY')
+      .setType('string');
 
-    extension.addDependency()
-      .setName("AdMob Cordova Extension")
-      .setDependencyType("cordova")
-      .setExportName("cordova-plugin-admob-free")
-      .setVersion("~0.21.0")
+    extension
+      .addDependency()
+      .setName('AdMob Cordova Extension')
+      .setDependencyType('cordova')
+      .setExportName('cordova-plugin-admob-free')
+      .setVersion('~0.21.0')
       .setExtraSetting(
-        "ADMOB_APP_ID", 
-        new gd.PropertyDescriptor("AdMobAppId")
-         .setType("ExtensionProperty")
-      );
+        'ADMOB_APP_ID',
+        new gd.PropertyDescriptor('AdMobAppId').setType('ExtensionProperty')
+      )
+      .onlyIfExtraSettingIsNonEmpty('ADMOB_APP_ID');
 
     // Banner
     extension
@@ -380,7 +385,10 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
 };

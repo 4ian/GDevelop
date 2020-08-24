@@ -34,27 +34,30 @@ module.exports = {
     );
 
     // Register Properties
-    extension.registerProperty("DummyPropertyString")
-      .setDescription(_("Dummy Property Name"))
-      .setType("string")
-      .setLabel("Type in anything :)");
+    extension
+      .registerProperty('DummyPropertyString')
+      .setLabel(_('Dummy Property Name'))
+      .setDescription('Type in anything :)')
+      .setType('string');
 
-    extension.registerProperty("DummyPropertyNumber")
-      .setDescription(_("Dummy Numeric Property Name"))
-      .setType("number")
-      .setLabel("Only numbers here ;)");
-    
-    extension.registerProperty("DummyPropertyBoolean")
-      .setDescription(_("A boolean property"))
-      .setType("boolean");
+    extension
+      .registerProperty('DummyPropertyNumber')
+      .setLabel(_('Dummy Numeric Property Name'))
+      .setDescription('Only numbers here ;)')
+      .setType('number');
+
+    extension
+      .registerProperty('DummyPropertyBoolean')
+      .setDescription(_('A boolean property'))
+      .setType('boolean');
 
     // Register Cordova/NPM dependencies
     extension
       .addDependency()
-      .setName("Thirteen Checker")
-      .setDependencyType("npm")
-      .setExportName("is-thirteen")
-      .setVersion("2.0.0");
+      .setName('Thirteen Checker')
+      .setDependencyType('npm')
+      .setExportName('is-thirteen')
+      .setVersion('2.0.0');
 
     // Declare effects:
     const dummyEffect = extension

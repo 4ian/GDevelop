@@ -233,25 +233,7 @@ class GD_CORE_API PlatformExtension {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Adds a property to the Extension.
-   * \param name The internal name of the property (to get it later).
-   * \param description The description of the property.
-   * \param type The type of the property. Supported ones are "string", "number"
-   * and "boolean".
-   */
-  gd::PropertyDescriptor& RegisterProperty(const gd::String& name,
-                                           const gd::String& description,
-                                           const gd::String& type,
-                                           const gd::String& hint) {
-    extensionPropertiesMetadata[name]
-        .SetDescription(description)
-        .SetType(type)
-        .SetLabel(hint);
-    return extensionPropertiesMetadata[name];
-  };
-
-  /**
-   * \brief Adds a property to the Extension.
+   * \brief Adds a property to the extension.
    */
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionPropertiesMetadata[name];

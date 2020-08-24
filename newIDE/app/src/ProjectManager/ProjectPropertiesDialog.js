@@ -199,7 +199,7 @@ function ProjectPropertiesDialog(props: Props) {
         title={<Trans>Project properties</Trans>}
         cannotBeDismissed={true}
         open={props.open}
-        onRequestClose={props.onClose}
+        onRequestClose={onCancelChanges}
       >
         <ColumnStackLayout noMargin>
           <SemiControlledTextField
@@ -434,7 +434,7 @@ function ProjectPropertiesDialog(props: Props) {
       <SubscriptionChecker
         ref={subscriptionChecker}
         onChangeSubscription={() => {
-          props.onClose();
+          onCancelChanges();
           props.onChangeSubscription();
         }}
         mode="mandatory"

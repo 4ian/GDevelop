@@ -400,7 +400,7 @@ interface ExtensionProperties {
     void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
     boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
     [Value] MapStringPropertyDescriptor GetAllExtensionProperties([Const] DOMString extension, [Ref] Project project);
-    
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
@@ -1054,9 +1054,10 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetVersion([Const] DOMString version_);
     [Const, Ref] DOMString GetDependencyType();
     [Ref] DependencyMetadata SetDependencyType([Const] DOMString dependencyType_);
-    [Ref] PropertyDescriptor GetExtraSetting([Const] DOMString settingName);
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
-    [Ref] MapStringPropertyDescriptor GetAllExtraSettings();
+    [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
+
+    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
 };
 
 interface ParameterMetadata {
@@ -1318,7 +1319,7 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
-    
+
     [Ref] MapStringPropertyDescriptor GetAllProperties();
     [Ref] VectorDependencyMetadata GetAllDependencies();
 

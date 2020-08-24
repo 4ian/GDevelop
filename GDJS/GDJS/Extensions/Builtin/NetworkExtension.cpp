@@ -16,7 +16,9 @@ NetworkExtension::NetworkExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsNetworkExtension(*this);
 
   GetAllActions()["SendRequest"].SetFunctionName(
-      "gdjs.evtTools.network.sendHttpRequest");
+      "gdjs.evtTools.network.sendDeprecatedSynchronousRequest");
+  GetAllActions()["SendAsyncRequest"].SetFunctionName(
+      "gdjs.evtTools.network.sendAsyncRequest");
   GetAllActions()["JSONToVariableStructure"].SetFunctionName(
       "gdjs.evtTools.network.jsonToVariableStructure");
   GetAllActions()["JSONToGlobalVariableStructure"].SetFunctionName(

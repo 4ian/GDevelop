@@ -53,7 +53,7 @@ export type CommandName =
   | 'EVENTS_EDITOR_REDO'
   | 'DELETE_SELECTION'
   | 'SEARCH_EVENTS'
-  | 'OPEN_SETTINGS';
+  | 'OPEN_EXTENSION_SETTINGS';
 
 export const commandAreas = {
   GENERAL: t`General`,
@@ -273,7 +273,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Search in events`,
     noShortcut: true,
   },
-  OPEN_SETTINGS: { area: 'EVENTS', displayText: t`Open settings` },
+  OPEN_EXTENSION_SETTINGS: {
+    area: 'EVENTS',
+    displayText: t`Open extension settings`,
+  },
 };
 
 export default commandsList;

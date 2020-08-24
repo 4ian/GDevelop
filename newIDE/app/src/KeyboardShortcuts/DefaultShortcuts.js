@@ -51,7 +51,7 @@ const defaultShortcuts: ShortcutMap = {
   ADD_SUBEVENT: 'Shift+KeyD',
   ADD_COMMENT_EVENT: '',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
-  OPEN_SETTINGS: '',
+  OPEN_EXTENSION_SETTINGS: '',
 };
 
 export default defaultShortcuts;

@@ -67,7 +67,7 @@ const ToolbarCommands = (props: Props) => {
     handler: props.onToggleSearchPanel,
   });
 
-  useCommand('OPEN_SETTINGS', !!props.onOpenSettings, {
+  useCommand('OPEN_EXTENSION_SETTINGS', !!props.onOpenSettings, {
     handler: props.onOpenSettings || (() => {}),
   });
 

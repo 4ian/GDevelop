@@ -101,7 +101,7 @@ function applyPropertiesToProject(
   project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
   project.setFolderProject(isFolderProject);
 
-  if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
+  return displayProjectErrorsBox(t, getErrors(t, project));
 }
 
 function ProjectPropertiesDialog(props: Props) {
@@ -167,23 +167,25 @@ function ProjectPropertiesDialog(props: Props) {
             label={<Trans>Apply</Trans>}
             primary={true}
             onClick={() => {
-              applyPropertiesToProject(project, {
-                gameResolutionWidth,
-                gameResolutionHeight,
-                adaptGameResolutionAtRuntime,
-                name,
-                author,
-                version,
-                packageName,
-                orientation,
-                scaleMode,
-                sizeOnStartupMode,
-                showGDevelopSplash,
-                minFPS,
-                maxFPS,
-                isFolderProject,
-              });
-              props.onApply();
+              if (
+                applyPropertiesToProject(project, {
+                  gameResolutionWidth,
+                  gameResolutionHeight,
+                  adaptGameResolutionAtRuntime,
+                  name,
+                  author,
+                  version,
+                  packageName,
+                  orientation,
+                  scaleMode,
+                  sizeOnStartupMode,
+                  showGDevelopSplash,
+                  minFPS,
+                  maxFPS,
+                  isFolderProject,
+                })
+              )
+                props.onApply();
             }}
             key="apply"
           />,

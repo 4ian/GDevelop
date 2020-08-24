@@ -5,7 +5,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 export type CommandName =
   | 'QUIT_APP'
   | 'OPEN_PROJECT_MANAGER'
-  | 'LAUNCH_PREVIEW'
+  | 'LAUNCH_NEW_PREVIEW'
   | 'LAUNCH_DEBUG_PREVIEW'
   | 'LAUNCH_NETWORK_PREVIEW'
   | 'HOT_RELOAD_PREVIEW'
@@ -85,7 +85,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Open project manager`,
     handledByElectron: true,
   },
-  LAUNCH_PREVIEW: { area: 'PROJECT', displayText: t`Launch preview` },
+  LAUNCH_NEW_PREVIEW: { area: 'PROJECT', displayText: t`Launch new preview` },
   LAUNCH_DEBUG_PREVIEW: {
     area: 'PROJECT',
     displayText: t`Launch preview with debugger and profiler`,

@@ -72,7 +72,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenProjectManager,
   });
 
-  useCommand('LAUNCH_PREVIEW', handlers.previewEnabled, {
+  useCommand('LAUNCH_NEW_PREVIEW', handlers.previewEnabled, {
     handler: handlers.onLaunchPreview,
   });
 

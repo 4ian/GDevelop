@@ -4336,17 +4336,14 @@ storiesOf('CommandPalette', module)
             ([
               {
                 name: 'OPEN_PROJECT',
-                displayText: t`Open project`,
                 handler: () => {},
               },
               {
-                name: 'SAVE_PROJECT',
-                displayText: t`Save project`,
+                name: 'OPEN_PROJECT_PROPERTIES',
                 handler: () => {},
               },
               {
                 name: 'EDIT_OBJECT',
-                displayText: t`Edit object...`,
                 handler: () => {},
               },
             ]: Array<NamedCommand>)

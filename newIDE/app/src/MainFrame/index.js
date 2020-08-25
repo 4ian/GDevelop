@@ -102,9 +102,11 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
+import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette from '../CommandPalette/CommandPalette';
+import CommandPalette, {
+  type CommandPaletteInterface,
+} from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
@@ -241,9 +243,7 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
-    false
-  );
+  const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -1788,8 +1788,10 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  useKeyboardShortcutForCommandPalette(
-    React.useCallback(() => openCommandPalette(true), [])
+  useKeyboardShortcuts(
+    commandPaletteRef.current
+      ? commandPaletteRef.current.launchCommand
+      : () => {}
   );
 
   useMainFrameCommands({
@@ -1818,6 +1820,9 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
+    onOpenCommandPalette: commandPaletteRef.current
+      ? commandPaletteRef.current.open
+      : () => {},
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;
@@ -2024,6 +2029,7 @@ const MainFrame = (props: Props) => {
           </TabContentContainer>
         );
       })}
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal show={showLoader} />
       <HelpFinder
         open={helpFinderDialogOpen}
@@ -2141,9 +2147,6 @@ const MainFrame = (props: Props) => {
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
       )}
-      {commandPaletteOpen && (
-        <CommandPalette open onClose={() => openCommandPalette(false)} />
-      )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog
           onClose={() => {
@@ -2153,7 +2156,10 @@ const MainFrame = (props: Props) => {
         />
       )}
       {preferencesDialogOpen && (
-        <PreferencesDialog onClose={() => openPreferencesDialog(false)} />
+        <PreferencesDialog
+          i18n={props.i18n}
+          onClose={() => openPreferencesDialog(false)}
+        />
       )}
       {languageDialogOpen && (
         <LanguageDialog

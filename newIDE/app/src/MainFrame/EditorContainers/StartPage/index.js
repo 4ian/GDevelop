@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import Paper from '@material-ui/core/Paper';
@@ -206,27 +206,21 @@ export class StartPage extends React.Component<Props, State> {
                         'https://www.facebook.com/GDevelopApp'
                       )
                     }
-                    tooltip={
-                      `GDevelop on Facebook`
-                    }
+                    tooltip={t`GDevelop on Facebook`}
                   />
                   <IconButton
                     className="icon-twitter"
                     onClick={() =>
                       Window.openExternalURL('https://twitter.com/GDevelopApp')
                     }
-                    tooltip={
-                      `GDevelop on Twitter`
-                    }
+                    tooltip={t`GDevelop on Twitter`}
                   />
                   <IconButton
                     className="icon-discord"
                     onClick={() =>
                       Window.openExternalURL('https://discord.gg/rjdYHvj')
                     }
-                    tooltip={
-                      `GDevelop on Discord`
-                    }
+                    tooltip={t`GDevelop on Discord`}
                   />
                   <IconButton
                     className="icon-reddit"
@@ -234,10 +228,8 @@ export class StartPage extends React.Component<Props, State> {
                       Window.openExternalURL(
                         'https://www.reddit.com/r/gdevelop'
                       )
-                      }
-                    tooltip={
-                      `GDevelop on Reddit`
                     }
+                    tooltip={t`GDevelop on Reddit`}
                   />
                 </Line>
               </Line>

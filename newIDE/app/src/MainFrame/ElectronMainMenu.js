@@ -192,11 +192,13 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
   };
 
   const windowTemplate = {
+    label: i18n._(t`Window`),
     role: 'window',
-    submenu: [{ role: 'minimize' }],
+    submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
   };
 
   const helpTemplate = {
+    label: i18n._(t`Help`),
     role: 'help',
     submenu: [
       {

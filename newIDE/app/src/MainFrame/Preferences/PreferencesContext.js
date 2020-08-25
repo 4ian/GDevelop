@@ -30,7 +30,8 @@ export type AlertMessageIdentifier =
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
-  | 'p2p-broker-recommendation';
+  | 'p2p-broker-recommendation'
+  | 'command-palette-shortcut';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -130,6 +131,10 @@ export const allAlertMessages: Array<{
   {
     key: 'p2p-broker-recommendation',
     label: <Trans>Peer to peer broker server recommendation</Trans>,
+  },
+  {
+    key: 'command-palette-shortcut',
+    label: <Trans>Command palette keyboard shortcut</Trans>,
   },
 ];
 

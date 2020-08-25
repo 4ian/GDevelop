@@ -7,6 +7,7 @@ import Text from '../UI/Text';
 import DetectShortcutDialog from './DetectShortcutDialog';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { type ShortcutMap } from './DefaultShortcuts';
 import { getShortcutDisplayName } from './index';
 import Window from '../Utils/Window';
@@ -79,8 +80,22 @@ const ShortcutsList = (props: Props) => {
     shortcutStringToCommands,
   ] = sortCommandsIntoAreasAndGetReverseMap(props.userShortcutMap);
 
+  const commandPaletteShortcut = getShortcutDisplayName(
+    props.userShortcutMap['OPEN_COMMAND_PALETTE'] ||
+      defaultShortcuts['OPEN_COMMAND_PALETTE']
+  );
+
   return (
     <>
+      <Line>
+        <DismissableAlertMessage
+          kind="info"
+          identifier="command-palette-shortcut"
+        >
+          <Trans>You can open the command palette by pressing</Trans>{' '}
+          {commandPaletteShortcut}
+        </DismissableAlertMessage>
+      </Line>
       <Line>
         <RaisedButton
           label={<Trans>Reset all shortcuts to default</Trans>}

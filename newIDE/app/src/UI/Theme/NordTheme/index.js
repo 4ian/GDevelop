@@ -5,8 +5,6 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './variables.css';
 import './styles.css';
 
-
-
 const nord4 = '#D8DEE9';
 const nord5 = '#E5E9F0';
 const nord6 = '#ECEFF4';
@@ -91,10 +89,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-nord-theme', 
-  eventsSheetRootClassName: 'gd-events-sheet-nord-theme', 
-  tableRootClassName: 'gd-table-nord-theme', 
-  markdownRootClassName: 'gd-markdown-nord-theme', 
+  mosaicRootClassName: 'mosaic-gd-nord-theme' || 'mosaic-gd',
+  eventsSheetRootClassName: 'gd-events-sheet-nord-theme' || 'gd-events-sheet',
+  tableRootClassName: 'gd-table-nord-theme' || 'gd-table',
+  markdownRootClassName: 'gd-markdown-nord-theme' || 'gd-markdown',
   gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(57%) brightness(120%)',
 };
 

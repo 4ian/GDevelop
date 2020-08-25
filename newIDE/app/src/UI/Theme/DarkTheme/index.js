@@ -139,10 +139,10 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo.png',
   },
-  mosaicRootClassName: 'mosaic-gd-dark-theme', 
-  eventsSheetRootClassName: 'gd-events-sheet-dark-theme', 
-  tableRootClassName: 'gd-table-dark-theme', 
-  markdownRootClassName: 'gd-markdown-dark-theme', 
+  mosaicRootClassName: 'mosaic-gd-dark-theme' || 'mosaic-gd',
+  eventsSheetRootClassName: 'gd-events-sheet-dark-theme' || 'gd-events-sheet',
+  tableRootClassName: 'gd-table-dark-theme' || 'gd-table',
+  markdownRootClassName: 'gd-markdown-dark-theme' || 'gd-markdown',
   gdevelopIconsCSSFilter: '',
 };
 

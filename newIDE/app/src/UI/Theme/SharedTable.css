@@ -10,38 +10,20 @@
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
-.gd-table-dark-theme .tableHeaderRow,
-.gd-table-dark-theme .tableEvenRow,
-.gd-table-dark-theme .tableSelectedRow,
-.gd-table-dark-theme .tableOddRow,
-.gd-table-default-theme .tableHeaderRow,
-.gd-table-default-theme .tableEvenRow,
-.gd-table-default-theme .tableSelectedRow,
-.gd-table-default-theme .tableOddRow,
-.gd-table-nord-theme .tableHeaderRow,
-.gd-table-nord-theme .tableEvenRow,
-.gd-table-nord-theme .tableSelectedRow,
-.gd-table-nord-theme .tableOddRow,
-.gd-table-solarized-dark-theme .tableHeaderRow,
-.gd-table-solarized-dark-theme .tableEvenRow,
-.gd-table-solarized-dark-theme .tableSelectedRow,
-.gd-table-solarized-dark-theme .tableOddRow {
+.gd-table .tableHeaderRow,
+.gd-table .tableEvenRow,
+.gd-table .tableSelectedRow,
+.gd-table .tableOddRow {
   font-size: 13px;
 }
 
-.gd-table-dark-theme .tableHeaderColumn,
-.gd-table-default-theme .tableHeaderColumn,
-.gd-table-nord-theme .tableHeaderColumn,
-.gd-table-solarized-dark-theme .tableHeaderColumn {
+.gd-table .tableHeaderColumn{
   text-transform: none;
   font-weight: 600;
   font-size: 12px;
 }
 
-.gd-table-dark-theme .tableColumn,
-.gd-table-default-theme .tableColumn,
-.gd-table-nord-theme .tableColumn,
-.gd-table-solarized-dark-theme .tableColumn {
+.gd-table .tableColumn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

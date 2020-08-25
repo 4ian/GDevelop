@@ -87,10 +87,11 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-solarized-dark-theme', 
-  eventsSheetRootClassName: 'gd-events-sheet-solarized-dark-theme',
-  tableRootClassName: 'gd-table-solarized-dark-theme', 
-  markdownRootClassName: 'gd-markdown-solarized-dark-theme', 
+  mosaicRootClassName: 'mosaic-gd-solarized-dark-theme' || 'mosaic-gd',
+  eventsSheetRootClassName:
+    'gd-events-sheet-solarized-dark-theme' || 'gd-events-sheet',
+  tableRootClassName: 'gd-table-solarized-dark-theme' || 'gd-table',
+  markdownRootClassName: 'gd-markdown-solarized-dark-theme' || 'gd-markdown',
   gdevelopIconsCSSFilter: 'hue-rotate(-15deg) saturate(70%) brightness(90%)',
 };
 

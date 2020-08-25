@@ -4,6 +4,8 @@ import DefaultTheme from './DefaultTheme';
 import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
 import { type Theme } from './DefaultTheme';
+
+// the files below are shared by all themes
 import './Global.css';
 import './SharedMarkdown.css';
 import './SharedEventsSheet.css';
@@ -14,6 +16,7 @@ import './SharedTable.css';
 // * copy the folder of an existing one (DarkTheme for example),
 // * import it at the top of the file
 // * add it below:
+
 export const themes = {
   'GDevelop default': DefaultTheme,
   Dark: DarkTheme,

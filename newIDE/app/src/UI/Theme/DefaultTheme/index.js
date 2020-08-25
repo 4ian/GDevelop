@@ -129,10 +129,11 @@ const gdevelopTheme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  mosaicRootClassName: 'mosaic-gd-default-theme', 
-  eventsSheetRootClassName: 'gd-events-sheet-default-theme', 
-  tableRootClassName: 'gd-table-default-theme', 
-  markdownRootClassName: 'gd-markdown-default-theme', 
+  mosaicRootClassName: 'mosaic-gd-default-theme' || 'mosaic-gd',
+  eventsSheetRootClassName:
+    'gd-events-sheet-default-theme' || 'gd-events-sheet',
+  tableRootClassName: 'gd-table-default-theme' || 'gd-table',
+  markdownRootClassName: 'gd-markdown-default-theme' || 'gd-markdown',
   gdevelopIconsCSSFilter: '',
 };
 

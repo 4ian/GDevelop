@@ -23,7 +23,7 @@ type Props = {|
   commandName: CommandName,
   isDefault: boolean,
   shortcutString: string,
-  clashingCommand: ?CommandName,
+  isClashing: boolean,
   onEditShortcut: () => void,
   onResetShortcut: () => void,
 |};
@@ -35,7 +35,7 @@ const ShortcutsListRow = (props: Props) => {
         primary={props.i18n._(commandsList[props.commandName].displayText)}
       />
       <ListItemSecondaryAction>
-        {props.clashingCommand && (
+        {props.isClashing && (
           <IconButton tooltip={t`This shortcut clashes with another action.`}>
             <WarningIcon />
           </IconButton>

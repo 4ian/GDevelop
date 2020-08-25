@@ -17,6 +17,36 @@ import commandsList, {
   commandAreas,
 } from '../CommandPalette/CommandsList';
 
+/**
+ * Sorts all commands into an object keyed by area name, and also creates a
+ * reverse mapping from shortcut string to list of commands with that shortcut.
+ */
+const sortCommandsIntoAreasAndGetReverseMap = (
+  userShortcutMap: ShortcutMap
+) => {
+  const areaWiseCommands = {};
+  const shortcutStringToCommands: { [string]: Array<CommandName> } = {};
+  Object.keys(commandsList)
+    .filter(name => !commandsList[name].noShortcut)
+    .forEach(name => {
+      // Sort commands by area
+      const areaName = commandsList[name].area;
+      if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
+      areaWiseCommands[areaName].push(name);
+
+      // Add to shortcut-command mapping
+      const userShortcut = userShortcutMap[name];
+      const defaultShortcut = defaultShortcuts[name] || '';
+      const shortcutString = userShortcut || defaultShortcut;
+      if (shortcutString === '') return;
+      shortcutStringToCommands[shortcutString] = (
+        shortcutStringToCommands[shortcutString] || []
+      ).concat(name);
+    });
+
+  return [areaWiseCommands, shortcutStringToCommands];
+};
+
 type Props = {|
   i18n: I18n,
   userShortcutMap: ShortcutMap,
@@ -44,14 +74,10 @@ const ShortcutsList = (props: Props) => {
     props.onEdit(commandName, defaultShortcuts[commandName]);
   };
 
-  const areaWiseCommands = {};
-  Object.keys(commandsList)
-    .filter(name => !commandsList[name].noShortcut)
-    .forEach(name => {
-      const areaName = commandsList[name].area;
-      if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
-      areaWiseCommands[areaName].push(name);
-    });
+  const [
+    areaWiseCommands,
+    shortcutStringToCommands,
+  ] = sortCommandsIntoAreasAndGetReverseMap(props.userShortcutMap);
 
   return (
     <>
@@ -74,19 +100,8 @@ const ShortcutsList = (props: Props) => {
                 shortcutString
               );
               // Check if shortcut clashes with another command
-              const clashingCommandName = Object.keys(commandsList)
-                .filter(commandName => !commandsList[commandName].noShortcut)
-                .find(otherCommandName => {
-                  if (otherCommandName === commandName) return false;
-                  const otherShortcut =
-                    props.userShortcutMap[otherCommandName] ||
-                    defaultShortcuts[otherCommandName] ||
-                    '';
-                  if (shortcutString !== otherShortcut) return false;
-                  if (shortcutString === '') return false;
-                  console.log(otherCommandName);
-                  return true;
-                });
+              const clashingCommands = shortcutStringToCommands[shortcutString];
+              const hasClash = clashingCommands && clashingCommands.length > 1;
 
               return (
                 <ShortcutsListRow
@@ -95,7 +110,7 @@ const ShortcutsList = (props: Props) => {
                   shortcutString={shortcutDisplayName}
                   commandName={commandName}
                   isDefault={!userShortcut}
-                  clashingCommand={clashingCommandName}
+                  isClashing={hasClash}
                   onEditShortcut={() => setEditedShortcut(commandName)}
                   onResetShortcut={() => resetShortcut(commandName)}
                 />

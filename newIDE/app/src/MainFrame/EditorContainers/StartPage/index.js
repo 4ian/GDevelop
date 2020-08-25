@@ -1,7 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import Paper from '@material-ui/core/Paper';

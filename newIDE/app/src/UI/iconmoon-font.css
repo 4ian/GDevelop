@@ -32,7 +32,7 @@
 }
 .icon-discord:before {
   content: "\e903";
-  margin-top: 13%;
+  margin-top: 3px;
 }
 .icon-reddit:before {
   content: "\e902";

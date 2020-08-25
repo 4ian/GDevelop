@@ -72,7 +72,7 @@ const AutocompletePicker = (
     else if (item.name) {
       const { area, displayText } = commandsList[item.name];
       const areaText = commandAreas[area];
-      return props.i18n._(areaText) + ': ' + props.i18n._(displayText);
+      return props.i18n._(areaText) + ' 〉' + props.i18n._(displayText);
     }
   };
 

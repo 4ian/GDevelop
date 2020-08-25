@@ -60,7 +60,7 @@ export default class CommandManager implements CommandManagerInterface {
   };
 
   getNamedCommand = (commandName: CommandName) => {
-    const command: Command = this._commands[commandName];
+    const command = this._commands[commandName];
     if (command) return { name: commandName, ...(command: Command) };
     return null;
   };

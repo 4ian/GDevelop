@@ -162,7 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "Text",
-          "persistentUuid": "2e432c30-d166-44d5-9a06-44e99ebfaf48",
+          "persistentUuid": "cfdd13f8-8398-4ec4-9654-be4e1beda938",
           "width": 0,
           "x": 8,
           "y": 9,
@@ -484,6 +484,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

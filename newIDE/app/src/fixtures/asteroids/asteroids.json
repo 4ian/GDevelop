@@ -374,7 +374,7 @@
           "layer": "",
           "locked": false,
           "name": "button",
-          "persistentUuid": "41878552-baba-4e7f-b2e6-62d255a6f0c5",
+          "persistentUuid": "c6862eab-cf07-4108-8e96-e7c26dfd7012",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -390,7 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
-          "persistentUuid": "eb722376-7283-49f1-bb51-4fdaab1ae52d",
+          "persistentUuid": "4c7ff808-0e47-47a6-81a1-78c39b966fc6",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -660,6 +660,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -744,7 +749,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_left",
-          "persistentUuid": "b666da51-cc99-4aed-9809-dfccf1f75c83",
+          "persistentUuid": "d3b4a98d-7ede-4446-8852-9c3df802a036",
           "width": 0,
           "x": 64,
           "y": 480,
@@ -760,7 +765,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_right",
-          "persistentUuid": "276fdeaf-db19-439a-bf6e-bb5891c5e24b",
+          "persistentUuid": "aaad967e-b272-4b08-bff4-dd729b8e75e6",
           "width": 0,
           "x": 160,
           "y": 480,
@@ -776,7 +781,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_fire",
-          "persistentUuid": "0e0e186a-a472-46bd-8a7f-d3ff7b5b25ea",
+          "persistentUuid": "9fc68b30-7bd8-41b5-8fd4-31f3c6c01118",
           "width": 0,
           "x": 608,
           "y": 480,
@@ -792,7 +797,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_thruster",
-          "persistentUuid": "1e5804fd-f792-413d-a6a7-1d7510f6bde0",
+          "persistentUuid": "d0e19dd6-8e74-45bc-b670-aa60cde6caa3",
           "width": 0,
           "x": 672,
           "y": 416,
@@ -7666,6 +7671,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7683,6 +7693,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "gui",
           "visibility": true,
           "cameras": [
@@ -7700,6 +7715,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "touch",
           "visibility": true,
           "cameras": [],
@@ -7744,7 +7764,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
-          "persistentUuid": "d4cd0f6f-1226-444b-af5e-c78f33173825",
+          "persistentUuid": "d66056b9-9085-4ef1-8646-f764b914c062",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -7760,7 +7780,7 @@
           "layer": "",
           "locked": false,
           "name": "restart",
-          "persistentUuid": "17f065ef-b3fe-4879-a6ee-dd5e2740bcbf",
+          "persistentUuid": "df248dc1-9120-4071-b7af-3d79ae5ddc53",
           "width": 0,
           "x": 311,
           "y": 262,
@@ -8020,6 +8040,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

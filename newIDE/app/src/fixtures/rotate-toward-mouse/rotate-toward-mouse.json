@@ -171,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "b3333f34-46a5-4618-a188-eddcaf679dd6",
+          "persistentUuid": "d9550c22-a68e-4250-bd56-1a9a46f8ec9b",
           "width": 0,
           "x": 335.312,
           "y": 292.07,
@@ -264,6 +264,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

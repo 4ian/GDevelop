@@ -143,7 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
-          "persistentUuid": "68bcbd42-bd84-4ffe-9f06-33bd4eff1f4d",
+          "persistentUuid": "100887c2-26af-480d-81d8-8d9ad7441982",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -159,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
-          "persistentUuid": "abb36e0c-d562-44ad-841b-a1ed3e06b6f7",
+          "persistentUuid": "7d83456d-7232-4863-ba55-5c4476f8b5df",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -364,6 +364,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

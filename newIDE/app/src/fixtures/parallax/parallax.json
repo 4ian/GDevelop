@@ -180,7 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "ObjectToFollow",
-          "persistentUuid": "ee58183e-2ef6-4084-8a6e-994ceee0cd19",
+          "persistentUuid": "e55407cf-dbb2-4ba8-8856-1e8492c8a3f3",
           "width": 0,
           "x": -128,
           "y": 320,
@@ -196,7 +196,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "57b9f76b-8b39-497d-8a6f-546f48e7efb7",
+          "persistentUuid": "94df6e26-069f-43a1-bbfb-804cb1626276",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -212,7 +212,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "2e853d9e-0a87-4143-b002-90a48a180243",
+          "persistentUuid": "e46a454c-1f18-492c-ae0f-455cdd919fbb",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -233,7 +233,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "05a14a7f-852f-4f01-9e00-0f03070b5216",
+          "persistentUuid": "1c7a1cbc-0bfd-4df9-9058-7d3c4f363148",
           "width": 0,
           "x": -608,
           "y": -32,
@@ -254,7 +254,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "7bbd93bd-e24c-4b03-82da-09544310630f",
+          "persistentUuid": "407b24e3-b097-4c4c-869d-e0115789dc1d",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -275,7 +275,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "c84aa9f5-08dc-460a-9e85-c26e58c28aa1",
+          "persistentUuid": "bc3c9a3f-669d-4a95-822c-299c14830c82",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -296,7 +296,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "5c95d7c1-bdbf-4fda-a828-558062577454",
+          "persistentUuid": "1d282e58-6875-4ea3-8808-811f6c253582",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -706,6 +706,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer4",
           "visibility": true,
           "cameras": [
@@ -723,6 +728,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer3",
           "visibility": true,
           "cameras": [
@@ -740,6 +750,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer2",
           "visibility": true,
           "cameras": [
@@ -757,6 +772,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

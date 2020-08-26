@@ -270,7 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "56824e83-e5bd-46d3-88da-e1f3c24bc77c",
+          "persistentUuid": "c61226d4-939b-49cc-9686-b1c570f3366f",
           "width": 0,
           "x": 173,
           "y": 42,
@@ -806,6 +806,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

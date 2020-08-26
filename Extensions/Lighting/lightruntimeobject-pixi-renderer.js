@@ -47,6 +47,14 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   /** @type {?PIXI.Graphics} */
   this._debugGraphics = null;
   this.updateDebugMode();
+
+  /** @type {gdjs.Polygon} */
+  this._lightBoundingPoly = new gdjs.Polygon();
+  for (var i = 0; i < 4; i++) {
+    this._lightBoundingPoly.vertices.push(
+      runtimeObject.getHitBoxes()[0].vertices[i]
+    );
+  }
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
@@ -385,15 +393,22 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
   // Bail out early if there are no obstacles.
   if (lightObstacles.length === 0) return lightObstacles;
 
-  // Adding 1 to the count since light object itself acts as a light obstacle.
-  var obstaclesCount = lightObstacles.length + 1;
+  // Synchronize light bounding polygon with the hitbox.
+  var lightHitboxPoly = this._object.getHitBoxes()[0];
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 2; j++) {
+      this._lightBoundingPoly.vertices[i][j] = lightHitboxPoly.vertices[i][j];
+    }
+  }
+
+  var obstaclesCount = lightObstacles.length;
   var obstacleHitBoxes = new Array(obstaclesCount);
-  obstacleHitBoxes[0] = this._object.getHitBoxes();
-  for (var i = 0; i < obstaclesCount - 1; i++) {
-    obstacleHitBoxes[i + 1] = lightObstacles[i].owner.getHitBoxes();
+  for (var i = 0; i < obstaclesCount; i++) {
+    obstacleHitBoxes[i] = lightObstacles[i].owner.getHitBoxes();
   }
 
   var obstaclePolygons = [];
+  obstaclePolygons.push(this._lightBoundingPoly);
   for (var i = 0; i < obstaclesCount; i++) {
     var noOfHitBoxes = obstacleHitBoxes[i].length;
     for (var j = 0; j < noOfHitBoxes; j++)
@@ -428,14 +443,21 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
   obstaclePolygons[0].vertices[3][0] = minX;
   obstaclePolygons[0].vertices[3][1] = maxY;
 
-  var boundingSquareHalfDiag = Math.max(
-    Math.hypot(this._object.x - minX, this._object.y - minY),
-    Math.hypot(maxX - this._object.x, this._object.y - minY),
-    Math.hypot(maxX - this._object.x, maxY - this._object.y),
-    Math.hypot(this._object.x - minX, maxY - this._object.y)
-  )
+  // Find the largest diagonal length.
+  var boundingSquareHalfDiag = Math.sqrt(
+    Math.max(
+      (this._object.x - minX) * (this._object.x - minX) +
+        (this._object.y - minY) * (this._object.y - minY),
+      (maxX - this._object.x) * (maxX - this._object.x) +
+        (this._object.y - minY) * (this._object.y - minY),
+      (maxX - this._object.x) * (maxX - this._object.x) +
+        (maxY - this._object.y) * (maxY - this._object.y),
+      (this._object.x - minX) * (this._object.x - minX) +
+        (maxY - this._object.y) * (maxY - this._object.y)
+    )
+  );
 
-  for(var i = 0; i < 4; i++) {
+  for (var i = 0; i < 4; i++) {
     flattenVertices.push(obstaclePolygons[0].vertices[i]);
   }
 

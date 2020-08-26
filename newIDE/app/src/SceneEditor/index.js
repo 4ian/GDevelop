@@ -1358,7 +1358,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         )}
         <I18n>
           {({ i18n }) => (
-            <div>
+            <React.Fragment>
               <InfoBar
                 show={this.state.showAdditionalWorkInfoBar}
                 identifier={this.state.additionalWorkInfoBar.identifier}
@@ -1371,12 +1371,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                 ref={contextMenu => (this.contextMenu = contextMenu)}
                 buildMenuTemplate={() => [
                   {
-                    label: i18n._(
-                      this.state.selectedObjectNames.length
-                        ? 'Add an Instance of ' +
-                            shortenString(this.state.selectedObjectNames[0], 7)
-                        : ''
-                    ),
+                    label: this.state.selectedObjectNames.length
+                      ? i18n._(
+                          t`Add an Instance of ${shortenString(
+                            this.state.selectedObjectNames[0],
+                            7
+                          )}`
+                        )
+                      : '',
                     click: () => this._onAddInstanceUnderCursor(),
                     visible: this.state.selectedObjectNames.length > 0,
                   },
@@ -1386,12 +1388,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                     visible: this.state.selectedObjectNames.length === 0,
                   },
                   {
-                    label: i18n._(
-                      this.state.selectedObjectNames.length
-                        ? 'Edit Object ' +
-                            shortenString(this.state.selectedObjectNames[0], 14)
-                        : ''
-                    ),
+                    label: this.state.selectedObjectNames.length
+                      ? i18n._(
+                          t`Edit Object ${shortenString(
+                            this.state.selectedObjectNames[0],
+                            14
+                          )}`
+                        )
+                      : '',
                     click: () =>
                       this.editObjectByName(this.state.selectedObjectNames[0]),
                     visible: this.state.selectedObjectNames.length > 0,
@@ -1439,7 +1443,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   },
                 ]}
               />
-            </div>
+            </React.Fragment>
           )}
         </I18n>
       </div>

@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
+
 import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
@@ -1139,149 +1142,160 @@ export default class EventsSheet extends React.Component<Props, State> {
                             this.props.resourceExternalEditors
                           }
                         />
-                        <ContextMenu
-                          ref={eventContextMenu =>
-                            (this.eventContextMenu = eventContextMenu)
-                          }
-                          buildMenuTemplate={() => [
-                            {
-                              label: 'Edit',
-                              click: () => this.openEventTextDialog(),
-                              visible:
-                                filterEditableWithEventTextDialog(
-                                  getSelectedEvents(this.state.selection)
-                                ).length > 0,
-                            },
-                            {
-                              label: 'Copy',
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: 'Cut',
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: 'Paste',
-                              click: () => this.pasteEvents(),
-                              enabled: hasClipboardEvents(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            {
-                              label: 'Delete',
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            {
-                              label: 'Toggle disabled',
-                              click: () => this.toggleDisabled(),
-                              enabled: this._selectionCanToggleDisabled(),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Add New Event Below',
-                              click: () =>
-                                this.addNewEvent(
-                                  'BuiltinCommonInstructions::Standard'
-                                ),
-                            },
-                            {
-                              label: 'Add Sub Event',
-                              click: () => this.addSubEvents(),
-                              enabled: this._selectionCanHaveSubEvents(),
-                            },
-                            {
-                              label: 'Add Other',
-                              submenu: this.state.allEventsMetadata.map(
-                                metadata => {
-                                  return {
-                                    label: metadata.fullName,
-                                    click: () =>
-                                      this.addNewEvent(metadata.type),
-                                  };
+                        <I18n>
+                          {({ i18n }) => (
+                            <React.Fragment>
+                              <ContextMenu
+                                ref={eventContextMenu =>
+                                  (this.eventContextMenu = eventContextMenu)
                                 }
-                              ),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Undo',
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: 'Redo',
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Extract Events to a Function',
-                              click: () => this.extractEventsToFunction(),
-                            },
-                            {
-                              label: 'Move Events into a Group',
-                              click: () => this.moveEventsIntoNewGroup(),
-                            },
-                            {
-                              label: 'Analyze Objects Used in this Event',
-                              click: this._openEventsContextAnalyzer,
-                            },
-                          ]}
-                        />
-                        <ContextMenu
-                          ref={instructionContextMenu =>
-                            (this.instructionContextMenu = instructionContextMenu)
-                          }
-                          buildMenuTemplate={() => [
-                            {
-                              label: 'Copy',
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: 'Cut',
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: 'Paste',
-                              click: () => this.pasteInstructions(),
-                              enabled:
-                                hasClipboardConditions() ||
-                                hasClipboardActions(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Delete',
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: 'Undo',
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: 'Redo',
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            {
-                              label: 'Invert Condition',
-                              click: () => this._invertSelectedConditions(),
-                              visible: hasSelectedAtLeastOneCondition(
-                                this.state.selection
-                              ),
-                            },
-                          ]}
-                        />
+                                buildMenuTemplate={() => [
+                                  {
+                                    label: i18n._(t`Edit`),
+                                    click: () => this.openEventTextDialog(),
+                                    visible:
+                                      filterEditableWithEventTextDialog(
+                                        getSelectedEvents(this.state.selection)
+                                      ).length > 0,
+                                  },
+                                  {
+                                    label: i18n._(t`Copy`),
+                                    click: () => this.copySelection(),
+                                    accelerator: 'CmdOrCtrl+C',
+                                  },
+                                  {
+                                    label: i18n._(t`Cut`),
+                                    click: () => this.cutSelection(),
+                                    accelerator: 'CmdOrCtrl+X',
+                                  },
+                                  {
+                                    label: i18n._(t`Paste`),
+                                    click: () => this.pasteEvents(),
+                                    enabled: hasClipboardEvents(),
+                                    accelerator: 'CmdOrCtrl+V',
+                                  },
+                                  {
+                                    label: i18n._(t`Delete`),
+                                    click: () => this.deleteSelection(),
+                                    accelerator: 'Delete',
+                                  },
+                                  {
+                                    label: i18n._(t`Toggle disabled`),
+                                    click: () => this.toggleDisabled(),
+                                    enabled: this._selectionCanToggleDisabled(),
+                                  },
+                                  { type: 'separator' },
+                                  {
+                                    label: i18n._(t`Add New Event Below`),
+                                    click: () =>
+                                      this.addNewEvent(
+                                        'BuiltinCommonInstructions::Standard'
+                                      ),
+                                  },
+                                  {
+                                    label: i18n._(t`Add Sub Event`),
+                                    click: () => this.addSubEvents(),
+                                    enabled: this._selectionCanHaveSubEvents(),
+                                  },
+                                  {
+                                    label: i18n._(t`Add Other`),
+                                    submenu: this.state.allEventsMetadata.map(
+                                      metadata => {
+                                        return {
+                                          label: metadata.fullName,
+                                          click: () =>
+                                            this.addNewEvent(metadata.type),
+                                        };
+                                      }
+                                    ),
+                                  },
+                                  { type: 'separator' },
+                                  {
+                                    label: i18n._(t`Undo`),
+                                    click: this.undo,
+                                    enabled: canUndo(this.state.history),
+                                    accelerator: 'CmdOrCtrl+Z',
+                                  },
+                                  {
+                                    label: i18n._(t`Redo`),
+                                    click: this.redo,
+                                    enabled: canRedo(this.state.history),
+                                    accelerator: 'CmdOrCtrl+Shift+Z',
+                                  },
+                                  { type: 'separator' },
+                                  {
+                                    label: i18n._(
+                                      t`Extract Events to a Function`
+                                    ),
+                                    click: () => this.extractEventsToFunction(),
+                                  },
+                                  {
+                                    label: i18n._(t`Move Events into a Group`),
+                                    click: () => this.moveEventsIntoNewGroup(),
+                                  },
+                                  {
+                                    label: i18n._(
+                                      t`Analyze Objects Used in this Event`
+                                    ),
+                                    click: this._openEventsContextAnalyzer,
+                                  },
+                                ]}
+                              />
+                              <ContextMenu
+                                ref={instructionContextMenu =>
+                                  (this.instructionContextMenu = instructionContextMenu)
+                                }
+                                buildMenuTemplate={() => [
+                                  {
+                                    label: i18n._(t`Copy`),
+                                    click: () => this.copySelection(),
+                                    accelerator: 'CmdOrCtrl+C',
+                                  },
+                                  {
+                                    label: i18n._(t`Cut`),
+                                    click: () => this.cutSelection(),
+                                    accelerator: 'CmdOrCtrl+X',
+                                  },
+                                  {
+                                    label: i18n._(t`Paste`),
+                                    click: () => this.pasteInstructions(),
+                                    enabled:
+                                      hasClipboardConditions() ||
+                                      hasClipboardActions(),
+                                    accelerator: 'CmdOrCtrl+V',
+                                  },
+                                  { type: 'separator' },
+                                  {
+                                    label: i18n._(t`Delete`),
+                                    click: () => this.deleteSelection(),
+                                    accelerator: 'Delete',
+                                  },
+                                  { type: 'separator' },
+                                  {
+                                    label: i18n._(t`Undo`),
+                                    click: this.undo,
+                                    enabled: canUndo(this.state.history),
+                                    accelerator: 'CmdOrCtrl+Z',
+                                  },
+                                  {
+                                    label: i18n._(t`Redo`),
+                                    click: this.redo,
+                                    enabled: canRedo(this.state.history),
+                                    accelerator: 'CmdOrCtrl+Shift+Z',
+                                  },
+                                  {
+                                    label: i18n._(t`Invert Condition`),
+                                    click: () =>
+                                      this._invertSelectedConditions(),
+                                    visible: hasSelectedAtLeastOneCondition(
+                                      this.state.selection
+                                    ),
+                                  },
+                                ]}
+                              />
+                            </React.Fragment>
+                          )}
+                        </I18n>
                         {this._renderInstructionEditorDialog(
                           // Force using the new instruction editor on touch screens.
                           values.useNewInstructionEditorDialog ||

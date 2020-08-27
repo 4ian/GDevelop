@@ -18,6 +18,7 @@ const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
+const setUpDiscordRichPresence = require('./DiscordRichPresence');
 
 log.info('GDevelop Electron app starting...');
 
@@ -356,4 +357,6 @@ app.on('ready', function() {
       info,
     });
   });
+
+  setUpDiscordRichPresence(ipcMain);
 });

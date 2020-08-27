@@ -1,8 +1,13 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 
-export type Hint = {| kind: 'warning' | 'info', message: MessageDescriptor |};
+export type Hint = {|
+  kind: 'warning' | 'info',
+  message: MessageDescriptor,
+  identifier?: AlertMessageIdentifier,
+|};
 export type TutorialHint = {|
   kind: 'tutorial' | 'video-tutorial',
   name: string,
@@ -76,6 +81,19 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'warning',
       message: t`Musics will only be played if the user has interacted with the game before (by clicking/touching it or pressing a key on the keyboard). This is due to browser limitations. Make sure to have the user interact with the game before using this action.`,
+    };
+  }
+  if (type === 'P2P::OnEvent') {
+    return {
+      kind: 'info',
+      message: t`Read the wiki page for more info about the dataloss mode.`,
+    };
+  }
+  if (type.indexOf('P2P::') === 0) {
+    return {
+      kind: 'warning',
+      message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
+      identifier: 'p2p-broker-recommendation',
     };
   }
 

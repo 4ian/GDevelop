@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -288,7 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
-          "persistentUuid": "6cff32e4-e801-4b25-b430-b0db5a67b0de",
+          "persistentUuid": "028ca730-f5f2-4468-ba20-60e340206396",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -304,7 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "cb757f2f-73e6-4138-883a-331d268f92db",
+          "persistentUuid": "32f55dff-2912-46a2-bc6a-68163dd9bcef",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -320,7 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "ac86f923-90b4-456d-9072-9bd591fd87a5",
+          "persistentUuid": "d8bc31a3-a63b-4731-8180-1da14268929d",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -336,7 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "b9f742dd-04ad-47d3-9065-130443a875a0",
+          "persistentUuid": "cc9ebf58-7417-4ecd-93f7-22ccc6cb47ed",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -352,7 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
-          "persistentUuid": "1ca574f7-74ec-4806-9361-c6b999861645",
+          "persistentUuid": "590a9d67-6c96-4685-9934-f371ca4579f2",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -368,7 +368,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
-          "persistentUuid": "9c5cec74-7040-4c0c-a60e-a220ecf13ef1",
+          "persistentUuid": "33234dca-5634-4510-b780-b4fc9196222f",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -384,7 +384,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "8c62ee20-c5a8-453a-9baa-c0470cb34a94",
+          "persistentUuid": "0c1cd983-6d12-42f7-b889-c5df23e79ad3",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -405,7 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "1021a328-eace-4f93-9ca2-f111fed8e0eb",
+          "persistentUuid": "f28e684e-5670-40de-95cf-201912e54a9e",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -421,7 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "a0c3052d-c4fd-46d1-badb-c15fc4f7a863",
+          "persistentUuid": "6152454a-00cd-4d95-91ad-aaa383079eaa",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -442,7 +442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "d6061aa6-396c-474c-83ce-8b4d49434acf",
+          "persistentUuid": "4d3c0b48-2886-4bd6-8f2d-71e6b61e0d33",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1648,6 +1648,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1665,6 +1670,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

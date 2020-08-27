@@ -33,6 +33,13 @@ module.exports = {
     ).setExtensionHelpPath("/all-features/device-vibration");
 
     extension
+      .addDependency()
+      .setName('Vibration Cordova Extension')
+      .setDependencyType('cordova')
+      .setExportName('cordova-plugin-vibration')
+      .setVersion('3.1.1');
+
+    extension
       .addAction(
         "StartVibration",
         _("Vibrate"),

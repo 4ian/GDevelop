@@ -5,13 +5,16 @@
  */
 
 #include "Project.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <cctype>
+
 #include <SFML/System/Utf.hpp>
+#include <cctype>
 #include <fstream>
 #include <map>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -51,8 +54,6 @@ Project::Project()
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
-      adMobAppId(""),
-      firebaseConfig("{}"),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -597,8 +598,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
-  SetAdMobAppId(propElement.GetStringAttribute("adMobAppId", ""));
-  SetFirebaseConfig(propElement.GetStringAttribute("firebaseConfig", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
@@ -620,6 +619,20 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetStringAttribute("macExecutableFilename");
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
+
+  extensionProperties.UnserializeFrom(
+      propElement.GetChild("extensionProperties"));
+
+  // Compatibility with GD <= 5.0.0-beta98
+  // Move AdMob App ID from project property to extension property.
+  if (propElement.GetStringAttribute("adMobAppId", "") != "") {
+    extensionProperties.SetValue(
+        "AdMob",
+        "AdMobAppId",
+        propElement.GetStringAttribute("adMobAppId", ""));
+  }
+  // end of compatibility code
+
 #endif
 
   const SerializerElement& extensionsElement =
@@ -868,14 +881,13 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
-  propElement.SetAttribute("adaptGameResolutionAtRuntime", adaptGameResolutionAtRuntime);
+  propElement.SetAttribute("adaptGameResolutionAtRuntime",
+                           adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
-  propElement.SetAttribute("adMobAppId", adMobAppId);
-  propElement.SetAttribute("firebaseConfig", firebaseConfig);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -884,6 +896,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
   propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+  extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
 
   SerializerElement& extensionsElement = propElement.AddChild("extensions");
   extensionsElement.ConsiderAsArrayOf("extension");
@@ -1074,13 +1088,13 @@ void Project::Init(const gd::Project& game) {
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
-  adMobAppId = game.adMobAppId;
-  firebaseConfig = game.firebaseConfig;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
   objectGroups = game.objectGroups;
+
+  extensionProperties = game.extensionProperties;
 
   gdMajorVersion = game.gdMajorVersion;
   gdMinorVersion = game.gdMinorVersion;

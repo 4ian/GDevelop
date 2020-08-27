@@ -2841,6 +2841,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('default (no results)', () => (
@@ -2851,6 +2852,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('3 results', () => (
@@ -2861,6 +2863,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ));
 
@@ -4233,6 +4236,7 @@ storiesOf('LayersList', module)
       }}
       resourceSources={[]}
       onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4254,6 +4258,7 @@ storiesOf('LayersList', module)
         }}
         resourceSources={[]}
         onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4331,17 +4336,14 @@ storiesOf('CommandPalette', module)
             ([
               {
                 name: 'OPEN_PROJECT',
-                displayText: t`Open project`,
                 handler: () => {},
               },
               {
-                name: 'SAVE_PROJECT',
-                displayText: t`Save project`,
+                name: 'OPEN_PROJECT_PROPERTIES',
                 handler: () => {},
               },
               {
                 name: 'EDIT_OBJECT',
-                displayText: t`Edit object...`,
                 handler: () => {},
               },
             ]: Array<NamedCommand>)

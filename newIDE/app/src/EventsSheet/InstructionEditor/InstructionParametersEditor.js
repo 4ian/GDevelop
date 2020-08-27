@@ -186,9 +186,15 @@ export default class InstructionParametersEditor extends React.Component<
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
-          {this.props.isCondition
-            ? 'Choose a condition (or an object then a condition) on the left'
-            : 'Choose an action (or an object then an action) on the left'}
+          {this.props.isCondition ? (
+            <Trans>
+              Choose a condition (or an object then a condition) on the left
+            </Trans>
+          ) : (
+            <Trans>
+              Choose an action (or an object then an action) on the left
+            </Trans>
+          )}
         </EmptyMessage>
       </div>
     );

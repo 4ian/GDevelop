@@ -66,12 +66,14 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.indexOf('apply review') === 0 ||
           lowerCaseMessage.includes('package-lock.json');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
+        const forDev = lowerCaseMessage.includes('developer changelog');
 
         return {
           message: commit.message.trim(),
           authorEmail: commit.authorEmail.trim(),
           authorNickname: '',
           isFix,
+          forDev,
           hidden: shouldHide,
         };
       })
@@ -211,11 +213,7 @@ const formatHiddenCommitMessage = commit => {
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
 
   if (devCommits) {
-    shell.echo(`\n<details>`);
-    shell.echo(`<summary> 🛠 Developers</summary>`);
-    shell.echo(`<ul>`);
-    shell.echo(devCommits.map(e => '<li>'+formatCommitMessage(e)+'</li>').join('\n').replace(`*`,``));
-    shell.echo(`</ul>`);
-    shell.echo(`</details>\n`);
+    shell.echo(`\n### 🛠 Developers\n`);
+    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
   }
 })();

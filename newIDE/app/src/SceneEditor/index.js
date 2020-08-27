@@ -955,18 +955,23 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Properties`,
         renderEditor: () => (
-          <InstancePropertiesEditor
-            project={project}
-            layout={layout}
-            instances={selectedInstances}
-            editInstanceVariables={this.editInstanceVariables}
-            editObjectVariables={this.editObjectVariables}
-            onEditObjectByName={this.editObjectByName}
-            ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)
-            }
-            unsavedChanges={this.props.unsavedChanges}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <InstancePropertiesEditor
+                i18n={i18n}
+                project={project}
+                layout={layout}
+                instances={selectedInstances}
+                editInstanceVariables={this.editInstanceVariables}
+                editObjectVariables={this.editObjectVariables}
+                onEditObjectByName={this.editObjectByName}
+                ref={propertiesEditor =>
+                  (this._propertiesEditor = propertiesEditor)
+                }
+                unsavedChanges={this.props.unsavedChanges}
+              />
+            )}
+          </I18n>
         ),
       },
       'layers-list': {

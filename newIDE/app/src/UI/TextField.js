@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { I18n } from '@lingui/react';
+import { I18n } from '../Utils/i18n';
 import MUITextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
@@ -181,6 +181,7 @@ export default class TextField extends React.Component<Props, {||}> {
 
   render() {
     const { props } = this;
+    const { className='' } = props;
     const onChange = props.onChange || undefined;
 
     const helperText = props.helperMarkdownText ? (
@@ -255,6 +256,7 @@ export default class TextField extends React.Component<Props, {||}> {
             onFocus={props.onFocus}
             onBlur={props.onBlur}
             inputRef={this._input}
+            className={`${className} ${i18n.css}`.trim()}
           />
         )}
       </I18n>

@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { I18n } from "../Utils/i18n";
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -31,23 +33,28 @@ const styles = {
 
 export default (props: Props) => {
   return (
-    <AppBar position="static" style={styles.appBar} color="primary">
-      <Toolbar style={styles.toolbar}>
-        {props.displayLeftCloseButton && (
-          <IconButton onClick={props.onClose} edge="start" color="inherit">
-            <Close />
-          </IconButton>
-        )}
-        <Typography variant="h6" style={styles.title}>
-          {props.title}
-        </Typography>
-
-        {props.displayRightCloseButton && (
-          <IconButton onClick={props.onClose} edge="end" color="inherit">
-            <Close />
-          </IconButton>
-        )}
-      </Toolbar>
-    </AppBar>
+    <I18n>
+      {({ i18n }) => (
+        <AppBar position="static" style={styles.appBar} color="primary">
+          <Toolbar style={styles.toolbar}>
+            {props.displayLeftCloseButton && (
+              <IconButton onClick={props.onClose} edge="start" color="inherit">
+                <Close />
+              </IconButton>
+            )}
+            <Typography variant="h6" style={styles.title}
+                        className={i18n.css}>
+              {props.title}
+            </Typography>
+    
+            {props.displayRightCloseButton && (
+              <IconButton onClick={props.onClose} edge="end" color="inherit">
+                <Close />
+              </IconButton>
+            )}
+          </Toolbar>
+        </AppBar>
+      )}
+    </I18n>
   );
 };

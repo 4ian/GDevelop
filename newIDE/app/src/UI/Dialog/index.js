@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { I18n } from "../../Utils/i18n";
+
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -96,36 +98,41 @@ export default (props: Props) => {
   };
 
   return (
-    <ResponsiveWindowMeasurer>
-      {size => (
-        <Dialog
-          open={open}
-          onClose={onRequestClose}
-          fullWidth
-          fullScreen={size === 'small'}
-          maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={false}
-          disableEscapeKeyDown={false}
-        >
-          {title && (
-            <DialogTitle
-              style={noTitleMargin ? styles.noTitleMargin : undefined}
+    <I18n>
+      {({ i18n }) => (
+        <ResponsiveWindowMeasurer>
+          {size => (
+            <Dialog
+              open={open}
+              onClose={onRequestClose}
+              fullWidth
+              fullScreen={size === 'small'}
+              maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
+              disableBackdropClick={false}
+              disableEscapeKeyDown={false}
             >
-              {title}
-            </DialogTitle>
+              {title && (
+                <DialogTitle
+                  style={noTitleMargin ? styles.noTitleMargin : undefined}
+                  className={i18n.css}
+                >
+                  {title}
+                </DialogTitle>
+              )}
+              <DialogContent style={dialogContentStyle}>{children}</DialogContent>
+              <DialogActions
+                style={
+                  secondaryActions
+                    ? styles.actionsContainerWithSecondaryActions
+                    : undefined
+                }
+              >
+                {dialogActions}
+              </DialogActions>
+            </Dialog>
           )}
-          <DialogContent style={dialogContentStyle}>{children}</DialogContent>
-          <DialogActions
-            style={
-              secondaryActions
-                ? styles.actionsContainerWithSecondaryActions
-                : undefined
-            }
-          >
-            {dialogActions}
-          </DialogActions>
-        </Dialog>
+        </ResponsiveWindowMeasurer>
       )}
-    </ResponsiveWindowMeasurer>
+    </I18n>
   );
 };

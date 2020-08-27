@@ -1,7 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { I18n } from '@lingui/react';
+import { I18n } from '../Utils/i18n';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
@@ -106,7 +106,8 @@ export default class SelectField extends React.Component<Props, {||}> {
             inputRef={this._input}
           >
             {!hasValidValue ? (
-              <option value={INVALID_VALUE} disabled>
+              <option value={INVALID_VALUE} disabled
+                      className={i18n.css}>
                 {props.hintText
                   ? i18n._(props.hintText)
                   : i18n._(t`Choose an option`)}

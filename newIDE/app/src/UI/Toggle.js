@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { I18n } from "../Utils/i18n";
+
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
@@ -22,19 +24,26 @@ type Props = {|
  */
 export default class Toggle extends React.Component<Props, {||}> {
   render() {
+    const { className='' } = this.props;
+    
     return (
-      <FormControlLabel
-        control={
-          <Switch
-            checked={this.props.toggled}
-            onChange={event => this.props.onToggle(event, event.target.checked)}
-            color="primary"
+      <I18n>
+        {({ i18n }) => (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.props.toggled}
+                onChange={event => this.props.onToggle(event, event.target.checked)}
+                color="primary"
+              />
+            }
+            label={this.props.label}
+            disabled={this.props.disabled}
+            style={this.props.style}
+            className={`${className} ${i18n.css}`.trim()}
           />
-        }
-        label={this.props.label}
-        disabled={this.props.disabled}
-        style={this.props.style}
-      />
+        )}
+      </I18n>
     );
   }
 }

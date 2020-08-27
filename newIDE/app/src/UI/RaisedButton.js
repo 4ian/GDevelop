@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { I18n } from "../Utils/i18n";
+
 import Button from '@material-ui/core/Button';
 import { Spacer } from './Grid';
 
@@ -31,7 +33,7 @@ type Props = {|
  */
 export default class RaisedButton extends React.Component<Props, {||}> {
   render() {
-    const { label, primary, icon, ...otherProps } = this.props;
+    const { label, primary, icon, className='', ...otherProps } = this.props;
 
     // In theory, focus ripple is only shown after a keyboard interaction
     // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -40,17 +42,22 @@ export default class RaisedButton extends React.Component<Props, {||}> {
     const focusRipple = true;
 
     return (
-      <Button
-        variant="contained"
-        size="small"
-        color={primary ? 'primary' : 'default'}
-        focusRipple={focusRipple}
-        {...otherProps}
-      >
-        {icon}
-        {icon && <Spacer />}
-        {label}
-      </Button>
-    );
+      <I18n>
+        {({ i18n }) => (
+          <Button
+            variant="contained"
+            size="small"
+            color={primary ? 'primary' : 'default'}
+            focusRipple={focusRipple}
+            className={`${className} ${i18n.css}`.trim()}
+            {...otherProps}
+          >
+            {icon}
+            {icon && <Spacer />}
+            {label}
+          </Button>
+        )}
+      </I18n>
+    )
   }
 }

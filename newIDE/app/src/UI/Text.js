@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
+import {I18n} from "../Utils/i18n";
 
 type Props = {|
   children: ?React.Node,
@@ -37,17 +38,23 @@ export default ({
   align,
   noShrink,
   noMargin,
+  className='',
 }: Props) => (
-  <Typography
-    variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
-    style={{
-      ...style,
-      flexShrink: noShrink ? 0 : undefined,
-      marginTop: noMargin ? 0 : 6,
-      marginBottom: noMargin ? 0 : 6,
-    }}
-    align={align || 'inherit'}
-  >
-    {children}
-  </Typography>
+  <I18n>
+    {({ i18n }) => (
+      <Typography
+        variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
+        style={{
+          ...style,
+          flexShrink: noShrink ? 0 : undefined,
+          marginTop: noMargin ? 0 : 6,
+          marginBottom: noMargin ? 0 : 6,
+        }}
+        align={align || 'inherit'}
+        className={`${className} ${i18n.css}`.trim()}
+      >
+        {children}
+      </Typography>
+    )}
+  </I18n>
 );

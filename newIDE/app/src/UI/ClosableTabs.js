@@ -1,5 +1,7 @@
 // @flow
 import React, { Component, useEffect, type Node, useRef } from 'react';
+import { I18n } from "../Utils/i18n";
+
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
@@ -147,69 +149,74 @@ export function ClosableTab({
           : muiTheme.closableTabs.selectedTextColor;
 
         return (
-          <React.Fragment>
-            <span
-              style={{
-                flexShrink: 0, // Tabs are never resized to fit in flex container
-                position: 'relative',
-                display: 'inline-block',
-                marginRight: 1,
-                backgroundColor: !active
-                  ? muiTheme.closableTabs.backgroundColor
-                  : muiTheme.closableTabs.selectedBackgroundColor,
-              }}
-            >
-              <ButtonBase
-                onClick={onClick}
-                onContextMenu={openContextMenu}
-                focusRipple
-              >
+          <I18n>
+            {({ i18n }) => (
+              <React.Fragment>
                 <span
                   style={{
-                    ...styles.tabLabel,
-                    color: textColor,
-                    fontFamily: muiTheme.closableTabs.fontFamily,
+                    flexShrink: 0, // Tabs are never resized to fit in flex container
+                    position: 'relative',
+                    display: 'inline-block',
+                    marginRight: 1,
+                    backgroundColor: !active
+                      ? muiTheme.closableTabs.backgroundColor
+                      : muiTheme.closableTabs.selectedBackgroundColor,
                   }}
+                  className={i18n.css}
                 >
-                  {label}
+                  <ButtonBase
+                    onClick={onClick}
+                    onContextMenu={openContextMenu}
+                    focusRipple
+                  >
+                    <span
+                      style={{
+                        ...styles.tabLabel,
+                        color: textColor,
+                        fontFamily: muiTheme.closableTabs.fontFamily,
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </ButtonBase>
+                  {closable && (
+                    <ButtonBase
+                      onClick={onClose}
+                      onContextMenu={openContextMenu}
+                      focusRipple
+                    >
+                      <Close
+                        style={{
+                          ...styles.closeButton,
+                          width: muiTheme.closableTabs.height / 2,
+                          height: muiTheme.closableTabs.height / 2,
+                        }}
+                        htmlColor={textColor}
+                      />
+                    </ButtonBase>
+                  )}
                 </span>
-              </ButtonBase>
-              {closable && (
-                <ButtonBase
-                  onClick={onClose}
-                  onContextMenu={openContextMenu}
-                  focusRipple
-                >
-                  <Close
-                    style={{
-                      ...styles.closeButton,
-                      width: muiTheme.closableTabs.height / 2,
-                      height: muiTheme.closableTabs.height / 2,
-                    }}
-                    htmlColor={textColor}
-                  />
-                </ButtonBase>
-              )}
-            </span>
-            <ContextMenu
-              ref={contextMenu}
-              buildMenuTemplate={() => [
-                {
-                  label: 'Close',
-                  click: onClose,
-                  enabled: closable,
-                },
-                {
-                  label: 'Close others',
-                  click: onCloseOthers,
-                },
-                {
-                  label: 'Close all',
-                  click: onCloseAll,
-                },
-              ]}
-            />
-          </React.Fragment>
+                <ContextMenu
+                  ref={contextMenu}
+                  buildMenuTemplate={() => [
+                    {
+                      label: 'Close',
+                      click: onClose,
+                      enabled: closable,
+                    },
+                    {
+                      label: 'Close others',
+                      click: onCloseOthers,
+                    },
+                    {
+                      label: 'Close all',
+                      click: onCloseAll,
+                    },
+                  ]}
+                />
+              </React.Fragment>
+            )}
+          </I18n>
         );
       }}
     </ThemeConsumer>

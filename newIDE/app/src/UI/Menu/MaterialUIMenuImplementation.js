@@ -1,4 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { I18n } from "../../Utils/i18n";
+
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -17,35 +19,39 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
   }, []);
 
   return (
-    <React.Fragment>
-      <MenuItem
-        dense
-        key={item.label}
-        disabled={item.enabled === false}
-        onClick={event => {
-          if (item.enabled === false) {
-            return;
-          }
-
-          if (!anchorElement.current) {
-            setAnchorElement(event.currentTarget);
-          }
-
-          setMenuOpen(!menuOpen);
-        }}
-      >
-        {item.label}
-        <ArrowRightIcon />
-      </MenuItem>
-      <Menu
-        open={menuOpen}
-        anchorEl={anchorElement.current}
-        onClose={() => setMenuOpen(false)}
-        TransitionComponent={Fade}
-      >
-        {buildFromTemplate(item.submenu)}
-      </Menu>
-    </React.Fragment>
+    <I18n>
+      {({ i18n }) => (
+        <React.Fragment>
+          <MenuItem
+            dense
+            key={item.label}
+            disabled={item.enabled === false}
+            onClick={event => {
+              if (item.enabled === false) {
+                return;
+              }
+    
+              if (!anchorElement.current) {
+                setAnchorElement(event.currentTarget);
+              }
+    
+              setMenuOpen(!menuOpen);
+            }}
+          >
+            {item.label}
+            <ArrowRightIcon />
+          </MenuItem>
+          <Menu
+            open={menuOpen}
+            anchorEl={anchorElement.current}
+            onClose={() => setMenuOpen(false)}
+            TransitionComponent={Fade}
+          >
+            {buildFromTemplate(item.submenu)}
+          </Menu>
+        </React.Fragment>
+      )}
+    </I18n>
   );
 };
 
@@ -83,27 +89,32 @@ export default class MaterialUIMenuImplementation {
           // return null;
         } else if (item.type === 'checkbox') {
           return (
-            <MenuItem
-              dense
-              key={'checkbox' + item.label}
-              checked={item.checked}
-              disabled={item.enabled === false}
-              onClick={() => {
-                if (item.enabled === false) {
-                  return;
-                }
-
-                if (item.click) {
-                  item.click();
-                }
-                this._onClose();
-              }}
-            >
-              <ListItemIcon>
-                {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </MenuItem>
+            <I18n>
+              {({ i18n }) => (
+                <MenuItem
+                  dense
+                  key={'checkbox' + item.label}
+                  checked={item.checked}
+                  disabled={item.enabled === false}
+                  onClick={() => {
+                    if (item.enabled === false) {
+                      return;
+                    }
+    
+                    if (item.click) {
+                      item.click();
+                    }
+                    this._onClose();
+                  }}
+                  className={i18n.css}
+                >
+                  <ListItemIcon>
+                    {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </MenuItem>
+              )}
+            </I18n>
           );
         } else if (item.submenu) {
           return (
@@ -115,23 +126,28 @@ export default class MaterialUIMenuImplementation {
           );
         } else {
           return (
-            <MenuItem
-              dense
-              key={'item' + item.label}
-              disabled={item.enabled === false}
-              onClick={() => {
-                if (item.enabled === false) {
-                  return;
-                }
-
-                if (item.click) {
-                  item.click();
-                  this._onClose();
-                }
-              }}
-            >
-              {item.label}
-            </MenuItem>
+            <I18n>
+              {({ i18n }) => (
+                <MenuItem
+                  dense
+                  key={'item' + item.label}
+                  disabled={item.enabled === false}
+                  onClick={() => {
+                    if (item.enabled === false) {
+                      return;
+                    }
+    
+                    if (item.click) {
+                      item.click();
+                      this._onClose();
+                    }
+                  }}
+                  className={i18n.css}
+                >
+                  {item.label}
+                </MenuItem>
+              )}
+            </I18n>
           );
         }
       })

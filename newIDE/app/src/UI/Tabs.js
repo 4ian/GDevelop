@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { I18n } from "../Utils/i18n";
+
 import MUITabs from '@material-ui/core/Tabs';
 import MUITab from '@material-ui/core/Tab';
 
@@ -42,6 +44,15 @@ type TabProps = {|
  */
 export class Tab extends React.Component<TabProps, {||}> {
   render() {
-    return <MUITab {...this.props} />;
+    const { className='', ...otherProps } = this.props;
+    
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <MUITab className={`${className} ${i18n.css}`.trim()}
+                  {...otherProps} />
+        )}
+      </I18n>
+    );
   }
 }

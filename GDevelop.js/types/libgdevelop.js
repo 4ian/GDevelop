@@ -34,6 +34,7 @@ declare class libGDevelop {
 
   VectorString: Class<gdVectorString>;
   VectorPlatformExtension: Class<gdVectorPlatformExtension>;
+  VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
@@ -41,6 +42,7 @@ declare class libGDevelop {
   MapStringExpressionMetadata: Class<gdMapStringExpressionMetadata>;
   MapStringInstructionMetadata: Class<gdMapStringInstructionMetadata>;
   MapStringEventMetadata: Class<gdMapStringEventMetadata>;
+  MapExtensionProperties: Class<gdMapExtensionProperties>;
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
   VersionWrapper: Class<gdVersionWrapper>;
@@ -55,6 +57,7 @@ declare class libGDevelop {
   LoadingScreen: Class<gdLoadingScreen>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorContent: Class<gdBehaviorContent>;
@@ -96,6 +99,7 @@ declare class libGDevelop {
   ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
+  DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -189,7 +189,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
-          "persistentUuid": "85c5898d-31b5-4f9e-bace-fc0f8acd38ff",
+          "persistentUuid": "2171acb0-ab77-4c2f-a4c5-d1bf67d3308a",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -205,7 +205,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "787b3644-6fe4-45ae-8318-6ea57ddbce0f",
+          "persistentUuid": "12e4dcfc-c151-4e20-8c27-8924654b8efd",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -226,7 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "699fd23c-0151-46a1-93b6-ee1de74bff73",
+          "persistentUuid": "77af1e51-c60f-466d-87c7-38d2ae18370f",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -247,7 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "2fe85e8c-b5aa-4676-bf58-a88595df3d6f",
+          "persistentUuid": "e50cc664-8c95-487a-ac1b-54a61b46e965",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -263,7 +263,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
-          "persistentUuid": "986e2654-93ec-4df1-a144-6494d42b9978",
+          "persistentUuid": "05815c7b-da4c-417b-9b84-84b18b7390fb",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -1561,6 +1561,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1578,6 +1583,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

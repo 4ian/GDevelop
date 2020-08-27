@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -165,7 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "8f959f35-29fc-4944-97cf-5af59c37b0ae",
+          "persistentUuid": "573d3a70-ff3d-4827-a069-0fed1f62a205",
           "width": 74,
           "x": 192,
           "y": 114,
@@ -186,7 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "53ce49ba-bdfb-4e20-b000-d90ca5a23282",
+          "persistentUuid": "4b5aee6f-b518-4e2f-a0e4-1f7053ac1e39",
           "width": 74,
           "x": 288,
           "y": 114,
@@ -207,7 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "cd4e1497-64e7-44ff-832e-85ee4bdd012d",
+          "persistentUuid": "d3c83b1d-6cd2-4271-b05d-e69ec80a9af0",
           "width": 74,
           "x": 384,
           "y": 114,
@@ -228,7 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "2df130f7-0bff-4f01-a055-50020a702564",
+          "persistentUuid": "4a86e86d-d5fb-4ca0-ba7d-0d453e737bf0",
           "width": 74,
           "x": 480,
           "y": 114,
@@ -249,7 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "ef131c26-3fae-48f7-ba93-c1b7f7c1771b",
+          "persistentUuid": "1d9c43bd-f694-4099-90e6-11eabe5a7646",
           "width": 74,
           "x": 192,
           "y": 205,
@@ -270,7 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "0a3b266b-c7ce-4b9f-8b0f-caf7aae1eeda",
+          "persistentUuid": "5faefc70-66ae-46dc-87c9-59c434de79da",
           "width": 74,
           "x": 288,
           "y": 205,
@@ -291,7 +291,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "5282b6df-2a20-493c-a4c9-1d173fa32bae",
+          "persistentUuid": "2f3d36f7-c4cc-4328-992b-33860d8156cd",
           "width": 74,
           "x": 384,
           "y": 205,
@@ -312,7 +312,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "1cbd8651-5317-457d-99ae-8c66ca068aa4",
+          "persistentUuid": "3f6ed9be-c888-4e91-b022-fa87b411cac1",
           "width": 74,
           "x": 480,
           "y": 205,
@@ -333,7 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "3aed362c-d290-4bfc-b30d-31fe2889bb84",
+          "persistentUuid": "0397435c-29d3-4a7e-ac97-ebeac829ff69",
           "width": 0,
           "x": 39,
           "y": 415,
@@ -739,6 +739,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

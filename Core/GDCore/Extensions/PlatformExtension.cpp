@@ -4,9 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/PlatformExtension.h"
+
 #include <algorithm>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -117,6 +120,13 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
 #endif
 }
 
+#if defined(GD_IDE_ONLY)
+gd::DependencyMetadata& PlatformExtension::AddDependency() {
+  extensionDependenciesMetadata.push_back(DependencyMetadata());
+  return extensionDependenciesMetadata.back();
+}
+#endif
+
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
     const gd::String& fullname,
@@ -216,8 +226,7 @@ std::vector<gd::String> PlatformExtension::GetExtensionObjectsTypes() const {
 
 std::vector<gd::String> PlatformExtension::GetExtensionEffectTypes() const {
   std::vector<gd::String> effectNames;
-  for (auto& it : effectsMetadata)
-    effectNames.push_back(it.first);
+  for (auto& it : effectsMetadata) effectNames.push_back(it.first);
 
   return effectNames;
 }
@@ -281,6 +290,10 @@ PlatformExtension::GetAllExpressions() {
 std::map<gd::String, gd::ExpressionMetadata>&
 PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
+}
+
+std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
+  return extensionDependenciesMetadata;
 }
 
 std::map<gd::String, gd::EventMetadata>& PlatformExtension::GetAllEvents() {
@@ -404,7 +417,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
       name == "BuiltinCommonConversions" ||
       name == "BuiltinStringInstructions" ||
       name == "BuiltinMathematicalTools" ||
-      name == "Effects" || // Well-known effects are not namespaced.
+      name == "Effects" ||      // Well-known effects are not namespaced.
       name == "CommonDialogs")  // New name for BuiltinInterface
   {
     nameSpace = "";

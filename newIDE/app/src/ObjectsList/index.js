@@ -93,7 +93,7 @@ type Props = {|
   onChangeSelectedObjectTags: SelectedTags => void,
 
   onEditObject: gdObject => void,
-  onObjectCreated: string => void,
+  onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
@@ -177,7 +177,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       () => {
         if (onEditObject) {
           onEditObject(object);
-          onObjectCreated(name);
+          onObjectCreated(object);
           onObjectSelected(name);
         }
       }

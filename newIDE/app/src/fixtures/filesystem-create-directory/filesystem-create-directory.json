@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -225,7 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
-          "persistentUuid": "7b314125-1d47-4b71-a55b-5c615fdb7652",
+          "persistentUuid": "d6038016-7e91-4256-b105-6debc8412fa4",
           "width": 0,
           "x": 10,
           "y": 25,
@@ -241,7 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
-          "persistentUuid": "3d7473e1-4f4b-4eaa-8eda-ec5f0d0c88cb",
+          "persistentUuid": "032704b8-2ca7-4968-956e-919b800f42ce",
           "width": 0,
           "x": 10,
           "y": 135,
@@ -257,7 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "Desktop",
-          "persistentUuid": "0a982aae-3d6d-4195-bd23-2e505a774f01",
+          "persistentUuid": "2f4aba34-15f1-4c63-b2b8-5cf420cac7b3",
           "width": 0,
           "x": 100,
           "y": 50,
@@ -273,7 +273,7 @@
           "layer": "",
           "locked": false,
           "name": "Documents",
-          "persistentUuid": "25fbcfef-8c13-4f7d-b050-f93021f35458",
+          "persistentUuid": "e3d1ada3-4d66-4be1-8d92-d2b2161288b3",
           "width": 0,
           "x": 100,
           "y": 160,
@@ -289,7 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDocuments",
-          "persistentUuid": "a0910dff-db0e-4fc9-adbd-4300705e067a",
+          "persistentUuid": "7f07e4b0-6f80-4475-b3c2-5afe31240c7d",
           "width": 400,
           "x": 10,
           "y": 120,
@@ -305,7 +305,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
-          "persistentUuid": "06e35acb-088d-4860-b38d-89cd97bc35b2",
+          "persistentUuid": "42d94f8d-fa92-48de-a27d-b03004248161",
           "width": 0,
           "x": 415,
           "y": 126,
@@ -321,7 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
-          "persistentUuid": "04de4292-174f-4696-bfbc-5966c1e24406",
+          "persistentUuid": "51650c84-e14e-497f-9c84-eca7bcf8c70e",
           "width": 0,
           "x": 512.867,
           "y": 338.5,
@@ -337,7 +337,7 @@
           "layer": "",
           "locked": false,
           "name": "CreateMessage",
-          "persistentUuid": "d106a02f-1b99-4f55-b687-afa6a35f59b2",
+          "persistentUuid": "d38412a5-9855-43ff-be93-89db2f80f839",
           "width": 0,
           "x": 300,
           "y": 300,
@@ -353,7 +353,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDesktop",
-          "persistentUuid": "3b403ee8-a79d-4cd9-936a-18066ec7d1b0",
+          "persistentUuid": "06a04e81-ebbf-478d-9e14-89e6d25def36",
           "width": 400,
           "x": 10,
           "y": 10,
@@ -769,6 +769,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -833,7 +838,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDesktop",
-          "persistentUuid": "a50c9160-7fdb-4872-aaa2-f0c32f6a3551",
+          "persistentUuid": "3d80f3b9-2058-4af6-b44a-a2e6abdbdef6",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -849,7 +854,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
-          "persistentUuid": "dcb00304-c112-4b52-b9f1-d8519f33db44",
+          "persistentUuid": "a6b8417b-47b4-4d0a-82b7-71e26dccfcec",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1363,6 +1368,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1427,7 +1437,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDocuments",
-          "persistentUuid": "52f2b0e5-bdaa-4b9a-bab2-23f982c6eb07",
+          "persistentUuid": "74a03f8a-ad3b-4465-9c30-460808b17c56",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -1443,7 +1453,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
-          "persistentUuid": "f4644c2c-e234-4235-a9be-70f082b22b8f",
+          "persistentUuid": "3f0ab361-2269-4c7b-98da-f1506d42ccaa",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1957,6 +1967,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -6,6 +6,7 @@
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -120,6 +121,16 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Unserialize the PropertyDescriptor.
    */
   virtual void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Serialize only the value and extra informations.
+   */
+  virtual void SerializeValuesTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize only the value and extra informations.
+   */
+  virtual void UnserializeValuesFrom(const SerializerElement& element);
   ///@}
 
  private:
@@ -127,7 +138,7 @@ class GD_CORE_API PropertyDescriptor {
   gd::String
       type;  ///< The type of the property. This is arbitrary and interpreted by
              ///< the class responsible for updating the property grid.
-  gd::String label;  //< The user-friendly property name
+  gd::String label;        //< The user-friendly property name
   gd::String description;  //< The user-friendly property description
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available

@@ -41,7 +41,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onChangeOptions: (uiSettings: Object) => void,
   instancesSelection: InstancesSelection,
   onDeleteSelection: () => void,
-  onInstancesAdded: () => void,
+  onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
   onInstancesSelected: (instances: Array<gdInitialInstance>) => void,
   onInstanceDoubleClicked: (instance: gdInitialInstance) => void,
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
@@ -462,8 +462,8 @@ export default class InstancesEditor extends Component<Props> {
   addInstances = (
     pos /*: [number, number] */,
     objectNames /*: Array<string> */
-  ) => {
-    this._instancesAdder.addInstances(pos, objectNames);
+  ): Array<gdInitialInstance> => {
+    return this._instancesAdder.addInstances(pos, objectNames);
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -789,9 +789,11 @@ export default class InstancesEditor extends Component<Props> {
             x - canvasRect.left,
             y - canvasRect.top
           );
-          _instancesAdder.updateTemporaryInstancePositions(pos);
+          const instances = _instancesAdder.updateTemporaryInstancePositions(
+            pos
+          );
           _instancesAdder.commitTemporaryInstances();
-          this.props.onInstancesAdded();
+          this.props.onInstancesAdded(instances);
         }}
       >
         {({ connectDropTarget, isOver }) => {

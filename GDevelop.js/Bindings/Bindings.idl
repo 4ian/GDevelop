@@ -34,6 +34,11 @@ interface VectorPlatformExtension {
     [Const] PlatformExtension WRAPPED_at(unsigned long index);
 };
 
+interface VectorDependencyMetadata {
+    unsigned long size();
+    [Const, Ref] DependencyMetadata at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -85,6 +90,13 @@ interface MapStringInstructionMetadata {
 interface MapStringEventMetadata {
     [Ref] EventMetadata MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] EventMetadata prop);
+    boolean MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
+interface MapExtensionProperties {
+    [Ref] MapStringPropertyDescriptor MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, [Const, Ref] MapStringPropertyDescriptor prop);
     boolean MAP_has([Const] DOMString name);
     [Value] VectorString MAP_keys();
 };
@@ -288,8 +300,6 @@ interface Project {
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
-    void SetAdMobAppId([Const] DOMString adMobAppId);
-    [Const, Ref] DOMString GetAdMobAppId();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
     void SetGameResolutionSize(long width, long height);
@@ -312,6 +322,7 @@ interface Project {
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
     [Const, Ref] VectorString GetUsedExtensions();
+    [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 
@@ -382,6 +393,16 @@ interface Project {
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
+};
+
+interface ExtensionProperties {
+    [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
+    void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
+    boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
+    [Value] MapStringPropertyDescriptor GetAllExtensionProperties([Const] DOMString extension, [Ref] Project project);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface Behavior {
@@ -611,6 +632,15 @@ interface Layer {
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+    void SetLightingLayer(boolean lightingLayer);
+    boolean IsLightingLayer();
+    void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);
+    boolean IsFollowingBaseLayerCamera();
+
+    void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
+    unsigned long GetAmbientLightColorRed();
+    unsigned long GetAmbientLightColorGreen();
+    unsigned long GetAmbientLightColorBlue();
 
     boolean HasEffectNamed([Const] DOMString name);
     [Ref] Effect GetEffect([Const] DOMString name);
@@ -641,6 +671,8 @@ interface PropertyDescriptor {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    void SerializeValuesTo([Ref] SerializerElement element);
+    void UnserializeValuesFrom([Const, Ref] SerializerElement element);
 };
 
 interface NamedPropertyDescriptor {
@@ -1011,6 +1043,23 @@ interface ExpressionMetadata {
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
 
+interface DependencyMetadata {
+    void DependencyMetadata();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] DependencyMetadata SetName([Const] DOMString name_);
+    [Const, Ref] DOMString GetExportName();
+    [Ref] DependencyMetadata SetExportName([Const] DOMString exportName_);
+    [Const, Ref] DOMString GetVersion();
+    [Ref] DependencyMetadata SetVersion([Const] DOMString version_);
+    [Const, Ref] DOMString GetDependencyType();
+    [Ref] DependencyMetadata SetDependencyType([Const] DOMString dependencyType_);
+    [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
+    [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
+
+    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
+};
+
 interface ParameterMetadata {
     void ParameterMetadata();
 
@@ -1220,6 +1269,8 @@ interface PlatformExtension {
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
 
+    [Const, Ref] DependencyMetadata AddDependency();
+
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString defaultName,
@@ -1237,6 +1288,8 @@ interface PlatformExtension {
         gdObject instance);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
+
+    [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name);
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
@@ -1266,6 +1319,9 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+
+    [Ref] MapStringPropertyDescriptor GetAllProperties();
+    [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
 };

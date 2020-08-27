@@ -9,6 +9,17 @@
     <title>GDevelop 5</title>
 
     <style>
+      /**
+       * Whenever the currently selected language is written RTL, this
+       * class is added to specific components, at runtime.
+       *
+       * This class is referenced directly by the `Utils/i18n` module.
+       * Any other module shall use this class indirectly, via `i18n.css`.
+       */
+      .is-rtl {
+        direction: rtl;
+      }
+
       html, body {
         margin: 0;
         padding: 0;

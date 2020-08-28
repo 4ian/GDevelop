@@ -154,7 +154,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not|Only) (show|mention) (details|the rest|in) (in the |in |the )?(changelog|developer)/i;
+  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in (the )?changelog/i;;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0

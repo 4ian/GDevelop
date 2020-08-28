@@ -213,7 +213,7 @@ const formatHiddenCommitMessage = commit => {
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
 
   if (devCommits) {
-    shell.echo(`\n### 🛠 Developers\n`);
+    shell.echo(`\n### 🛠 Internal changes (for developers)\n`);
     shell.echo(devCommits.map(formatCommitMessage).join('\n'));
   }
 })();

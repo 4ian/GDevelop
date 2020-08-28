@@ -66,12 +66,14 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.indexOf('apply review') === 0 ||
           lowerCaseMessage.includes('package-lock.json');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
+        const forDev = lowerCaseMessage.includes('developer changelog');
 
         return {
           message: commit.message.trim(),
           authorEmail: commit.authorEmail.trim(),
           authorNickname: '',
           isFix,
+          forDev,
           hidden: shouldHide,
         };
       })
@@ -193,9 +195,9 @@ const formatHiddenCommitMessage = commit => {
 
   const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
   const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
+  const devCommits = displayedCommits.filter(commit => commit.forDev);
   const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix);
-
+  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix && !commit.forDev);
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
       .map(formatHiddenCommitMessage)
@@ -209,4 +211,9 @@ const formatHiddenCommitMessage = commit => {
 
   shell.echo(`\n## 🐛 Bug fixes\n`);
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
+
+  if (devCommits.length > 0) {
+    shell.echo(`\n### 🛠 Internal changes (for developers)\n`);
+    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
+  }
 })();

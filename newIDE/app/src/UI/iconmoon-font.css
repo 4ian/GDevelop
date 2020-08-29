@@ -17,7 +17,7 @@
   font-weight: normal;
   font-variant: normal;
   text-transform: none;
-  line-height: 0.9;
+  line-height: 1;
 
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
@@ -26,14 +26,18 @@
 
 .icon-facebook:before {
   content: "\e900";
+  margin-bottom: -2px;
 }
 .icon-twitter:before {
   content: "\e901";
+  margin-bottom: -2px;
 }
 .icon-discord:before {
   content: "\e903";
-  margin-top: 2px;
+  margin-top: 3px;
+  margin-bottom: -2px;
 }
 .icon-reddit:before {
   content: "\e902";
+  margin-bottom: -2px;
 }

@@ -133,7 +133,7 @@ export default {
       }
       const originalNodeModuleLoad = module._load;
 
-      // Allow both "pixi.js" and "pixi.js-legacy" to be found.
+      // Allow pixi.js to be required by extensions:
       const allowedModules = {
         'pixi.js-legacy': PIXI,
         'pixi.js': PIXI,

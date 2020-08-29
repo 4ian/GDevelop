@@ -958,5 +958,5 @@ void main(void){
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-Object.assign(this.PIXI.tilemap, pixi_tilemap);
+
 //# sourceMappingURL=pixi-tilemap.umd.js.map

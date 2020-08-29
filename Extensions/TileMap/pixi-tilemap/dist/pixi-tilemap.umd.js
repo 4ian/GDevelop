@@ -1,93 +1,66 @@
 /* eslint-disable */
  
 /*!
- * pixi-tilemap - v2.0.6
- * Compiled Thu, 20 Aug 2020 02:13:52 UTC
+ * pixi-tilemap - v2.1.0
+ * Compiled Wed, 26 Aug 2020 14:03:56 UTC
  *
  * pixi-tilemap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  * 
- * Copyright 2016-20, Ivan Popelyshev All Rights Reserved
+ * Copyright 2019-2020, Ivan Popelyshev, All Rights Reserved
  */
-var pixi_tilemap = (function (exports, display, core, constants, math, graphics, sprite) {
-    'use strict';
+this.PIXI = this.PIXI || {};
+this.PIXI.tilemap = this.PIXI.tilemap || {};
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@pixi/display'), require('@pixi/core'), require('@pixi/constants'), require('@pixi/math'), require('@pixi/graphics'), require('@pixi/sprite')) :
+    typeof define === 'function' && define.amd ? define(['exports', '@pixi/display', '@pixi/core', '@pixi/constants', '@pixi/math', '@pixi/graphics', '@pixi/sprite'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.pixi_tilemap = {}, global.PIXI, global.PIXI, global.PIXI, global.PIXI, global.PIXI, global.PIXI));
+}(this, (function (exports, display, core, constants, math, graphics, sprite) { 'use strict';
 
-    var CanvasTileRenderer = (function () {
-        function CanvasTileRenderer(renderer) {
+    class CanvasTileRenderer {
+        constructor(renderer) {
             this.tileAnim = [0, 0];
             this.dontUseTransform = false;
             this.renderer = renderer;
             this.tileAnim = [0, 0];
         }
-        return CanvasTileRenderer;
-    }());
-    var cr = PIXI.CanvasRenderer;
+    }
+    const cr = PIXI.CanvasRenderer;
     if (cr) {
         cr.registerPlugin('tilemap', CanvasTileRenderer);
     }
 
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-    /* global Reflect, Promise */
-
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-
-    function __extends(d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
-
-    var Constant = {
+    const Constant = {
         maxTextures: 16,
         bufferSize: 2048,
         boundSize: 1024,
         boundCountPerBuffer: 1,
         use32bitIndex: false,
-        SCALE_MODE: PIXI.SCALE_MODES.LINEAR,
+        SCALE_MODE: constants.SCALE_MODES.LINEAR,
         DO_CLEAR: true
     };
 
-    var POINT_STRUCT_SIZE = 12;
-    var RectTileLayer = (function (_super) {
-        __extends(RectTileLayer, _super);
-        function RectTileLayer(zIndex, texture) {
-            var _this = _super.call(this) || this;
-            _this.zIndex = 0;
-            _this.modificationMarker = 0;
-            _this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
-            _this._globalMat = null;
-            _this.pointsBuf = [];
-            _this.hasAnim = false;
-            _this.offsetX = 0;
-            _this.offsetY = 0;
-            _this.compositeParent = false;
-            _this.vbId = 0;
-            _this.vb = null;
-            _this.vbBuffer = null;
-            _this.vbArray = null;
-            _this.vbInts = null;
-            _this.initialize(zIndex, texture);
-            return _this;
+    const POINT_STRUCT_SIZE = 12;
+    class RectTileLayer extends display.Container {
+        constructor(zIndex, texture) {
+            super();
+            this.zIndex = 0;
+            this.modificationMarker = 0;
+            this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
+            this._globalMat = null;
+            this.pointsBuf = [];
+            this.hasAnim = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.compositeParent = false;
+            this.vbId = 0;
+            this.vb = null;
+            this.vbBuffer = null;
+            this.vbArray = null;
+            this.vbInts = null;
+            this.initialize(zIndex, texture);
         }
-        RectTileLayer.prototype.initialize = function (zIndex, textures) {
+        initialize(zIndex, textures) {
             if (!textures) {
                 textures = [];
             }
@@ -96,15 +69,15 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             }
             this.textures = textures;
             this.zIndex = zIndex;
-        };
-        RectTileLayer.prototype.clear = function () {
+        }
+        clear() {
             this.pointsBuf.length = 0;
             this.modificationMarker = 0;
             this.hasAnim = false;
-        };
-        RectTileLayer.prototype.addFrame = function (texture_, x, y, animX, animY) {
-            var texture;
-            var textureIndex = 0;
+        }
+        addFrame(texture_, x, y, animX, animY) {
+            let texture;
+            let textureIndex = 0;
             if (typeof texture_ === "number") {
                 textureIndex = texture_;
                 texture = this.textures[textureIndex];
@@ -116,9 +89,9 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 else {
                     texture = texture_;
                 }
-                var found = false;
-                var textureList = this.textures;
-                for (var i = 0; i < textureList.length; i++) {
+                let found = false;
+                let textureList = this.textures;
+                for (let i = 0; i < textureList.length; i++) {
                     if (textureList[i].baseTexture === texture.baseTexture) {
                         textureIndex = i;
                         found = true;
@@ -131,14 +104,9 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             }
             this.addRect(textureIndex, texture.frame.x, texture.frame.y, x, y, texture.orig.width, texture.orig.height, animX, animY, texture.rotate);
             return true;
-        };
-        RectTileLayer.prototype.addRect = function (textureIndex, u, v, x, y, tileWidth, tileHeight, animX, animY, rotate, animCountX, animCountY) {
-            if (animX === void 0) { animX = 0; }
-            if (animY === void 0) { animY = 0; }
-            if (rotate === void 0) { rotate = 0; }
-            if (animCountX === void 0) { animCountX = 1024; }
-            if (animCountY === void 0) { animCountY = 1024; }
-            var pb = this.pointsBuf;
+        }
+        addRect(textureIndex, u, v, x, y, tileWidth, tileHeight, animX = 0, animY = 0, rotate = 0, animCountX = 1024, animCountY = 1024) {
+            let pb = this.pointsBuf;
             this.hasAnim = this.hasAnim || animX > 0 || animY > 0;
             pb.push(u);
             pb.push(v);
@@ -153,43 +121,43 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             pb.push(animCountX);
             pb.push(animCountY);
             return this;
-        };
-        RectTileLayer.prototype.tileRotate = function (rotate) {
-            var pb = this.pointsBuf;
+        }
+        tileRotate(rotate) {
+            const pb = this.pointsBuf;
             pb[pb.length - 3] = rotate;
-        };
-        RectTileLayer.prototype.tileAnimX = function (offset, count) {
-            var pb = this.pointsBuf;
+        }
+        tileAnimX(offset, count) {
+            const pb = this.pointsBuf;
             pb[pb.length - 5] = offset;
             pb[pb.length - 2] = count;
-        };
-        RectTileLayer.prototype.tileAnimY = function (offset, count) {
-            var pb = this.pointsBuf;
+        }
+        tileAnimY(offset, count) {
+            const pb = this.pointsBuf;
             pb[pb.length - 4] = offset;
             pb[pb.length - 1] = count;
-        };
-        RectTileLayer.prototype.renderCanvas = function (renderer) {
-            var plugin = renderer.plugins.tilemap;
+        }
+        renderCanvas(renderer) {
+            let plugin = renderer.plugins.tilemap;
             if (!plugin.dontUseTransform) {
-                var wt = this.worldTransform;
+                let wt = this.worldTransform;
                 renderer.context.setTransform(wt.a, wt.b, wt.c, wt.d, wt.tx * renderer.resolution, wt.ty * renderer.resolution);
             }
             this.renderCanvasCore(renderer);
-        };
-        RectTileLayer.prototype.renderCanvasCore = function (renderer) {
+        }
+        renderCanvasCore(renderer) {
             if (this.textures.length === 0)
                 return;
-            var points = this.pointsBuf;
+            let points = this.pointsBuf;
             renderer.context.fillStyle = '#000000';
-            for (var i = 0, n = points.length; i < n; i += POINT_STRUCT_SIZE) {
-                var x1 = points[i], y1 = points[i + 1];
-                var x2 = points[i + 2], y2 = points[i + 3];
-                var w = points[i + 4];
-                var h = points[i + 5];
+            for (let i = 0, n = points.length; i < n; i += POINT_STRUCT_SIZE) {
+                let x1 = points[i], y1 = points[i + 1];
+                let x2 = points[i + 2], y2 = points[i + 3];
+                let w = points[i + 4];
+                let h = points[i + 5];
                 var rotate = points[i + 6];
                 x1 += points[i + 7] * renderer.plugins.tilemap.tileAnim[0];
                 y1 += points[i + 8] * renderer.plugins.tilemap.tileAnim[1];
-                var textureIndex = points[i + 9];
+                let textureIndex = points[i + 9];
                 if (textureIndex >= 0) {
                     renderer.context.drawImage(this.textures[textureIndex].baseTexture.getDrawableSource(), x1, y1, w, h, x2, y2, w, h);
                 }
@@ -199,35 +167,35 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                     renderer.context.globalAlpha = 1;
                 }
             }
-        };
-        RectTileLayer.prototype.destroyVb = function () {
+        }
+        destroyVb() {
             if (this.vb) {
                 this.vb.destroy();
                 this.vb = null;
             }
-        };
-        RectTileLayer.prototype.render = function (renderer) {
-            var plugin = renderer.plugins['tilemap'];
-            var shader = plugin.getShader();
+        }
+        render(renderer) {
+            let plugin = renderer.plugins['tilemap'];
+            let shader = plugin.getShader();
             renderer.batch.setObjectRenderer(plugin);
             this._globalMat = shader.uniforms.projTransMatrix;
             renderer.globalUniforms.uniforms.projectionMatrix.copyTo(this._globalMat).append(this.worldTransform);
             shader.uniforms.shadowColor = this.shadowColor;
             shader.uniforms.animationFrame = plugin.tileAnim;
             this.renderWebGLCore(renderer, plugin);
-        };
-        RectTileLayer.prototype.renderWebGLCore = function (renderer, plugin) {
-            var points = this.pointsBuf;
+        }
+        renderWebGLCore(renderer, plugin) {
+            let points = this.pointsBuf;
             if (points.length === 0)
                 return;
-            var rectsCount = points.length / POINT_STRUCT_SIZE;
-            var shader = plugin.getShader();
-            var textures = this.textures;
+            let rectsCount = points.length / POINT_STRUCT_SIZE;
+            let shader = plugin.getShader();
+            let textures = this.textures;
             if (textures.length === 0)
                 return;
             plugin.bindTextures(renderer, shader, textures);
             renderer.shader.bind(shader, false);
-            var vb = this.vb;
+            let vb = this.vb;
             if (!vb) {
                 vb = plugin.createVb();
                 this.vb = vb;
@@ -236,16 +204,16 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 this.modificationMarker = 0;
             }
             plugin.checkIndexBuffer(rectsCount, vb);
-            var boundCountPerBuffer = Constant.boundCountPerBuffer;
-            var vertexBuf = vb.getBuffer('aVertexPosition');
-            var vertices = rectsCount * vb.vertPerQuad;
+            const boundCountPerBuffer = Constant.boundCountPerBuffer;
+            let vertexBuf = vb.getBuffer('aVertexPosition');
+            let vertices = rectsCount * vb.vertPerQuad;
             if (vertices === 0)
                 return;
             if (this.modificationMarker !== vertices) {
                 this.modificationMarker = vertices;
-                var vs = vb.stride * vertices;
+                let vs = vb.stride * vertices;
                 if (!this.vbBuffer || this.vbBuffer.byteLength < vs) {
-                    var bk = vb.stride;
+                    let bk = vb.stride;
                     while (bk < vs) {
                         bk *= 2;
                     }
@@ -254,13 +222,14 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                     this.vbInts = new Uint32Array(this.vbBuffer);
                     vertexBuf.update(this.vbBuffer);
                 }
-                var arr = this.vbArray, ints = this.vbInts;
-                var sz = 0;
-                var textureId = 0;
-                var shiftU = this.offsetX;
-                var shiftV = this.offsetY;
-                for (var i = 0; i < points.length; i += POINT_STRUCT_SIZE) {
-                    var eps = 0.5;
+                let arr = this.vbArray, ints = this.vbInts;
+                let sz = 0;
+                let textureId = 0;
+                let shiftU = this.offsetX;
+                let shiftV = this.offsetY;
+                let tint = -1;
+                for (let i = 0; i < points.length; i += POINT_STRUCT_SIZE) {
+                    let eps = 0.5;
                     if (this.compositeParent) {
                         if (boundCountPerBuffer > 1) {
                             textureId = (points[i + 9] >> 2);
@@ -273,15 +242,15 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                             shiftV = 0;
                         }
                     }
-                    var x = points[i + 2], y = points[i + 3];
-                    var w = points[i + 4], h = points[i + 5];
-                    var u = points[i] + shiftU, v = points[i + 1] + shiftV;
-                    var rotate = points[i + 6];
-                    var animX = points[i + 7], animY = points[i + 8];
-                    var animWidth = points[i + 10] || 1024, animHeight = points[i + 11] || 1024;
-                    var animXEncoded = animX + (animWidth * 2048);
-                    var animYEncoded = animY + (animHeight * 2048);
-                    var u0 = void 0, v0 = void 0, u1 = void 0, v1 = void 0, u2 = void 0, v2 = void 0, u3 = void 0, v3 = void 0;
+                    let x = points[i + 2], y = points[i + 3];
+                    let w = points[i + 4], h = points[i + 5];
+                    let u = points[i] + shiftU, v = points[i + 1] + shiftV;
+                    let rotate = points[i + 6];
+                    const animX = points[i + 7], animY = points[i + 8];
+                    const animWidth = points[i + 10] || 1024, animHeight = points[i + 11] || 1024;
+                    const animXEncoded = animX + (animWidth * 2048);
+                    const animYEncoded = animY + (animHeight * 2048);
+                    let u0, v0, u1, v1, u2, v2, u3, v3;
                     if (rotate === 0) {
                         u0 = u;
                         v0 = v;
@@ -293,14 +262,14 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                         v3 = v + h;
                     }
                     else {
-                        var w2 = w / 2;
-                        var h2 = h / 2;
+                        let w2 = w / 2;
+                        let h2 = h / 2;
                         if (rotate % 4 !== 0) {
                             w2 = h / 2;
                             h2 = w / 2;
                         }
-                        var cX = u + w2;
-                        var cY = v + h2;
+                        const cX = u + w2;
+                        const cY = v + h2;
                         rotate = math.groupD8.add(rotate, math.groupD8.NW);
                         u0 = cX + (w2 * math.groupD8.uX(rotate));
                         v0 = cY + (h2 * math.groupD8.uY(rotate));
@@ -363,39 +332,36 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             }
             renderer.geometry.bind(vb, shader);
             renderer.geometry.draw(constants.DRAW_MODES.TRIANGLES, rectsCount * 6, 0);
-        };
-        RectTileLayer.prototype.isModified = function (anim) {
+        }
+        isModified(anim) {
             if (this.modificationMarker !== this.pointsBuf.length ||
                 anim && this.hasAnim) {
                 return true;
             }
             return false;
-        };
-        RectTileLayer.prototype.clearModify = function () {
-            this.modificationMarker = this.pointsBuf.length;
-        };
-        RectTileLayer.prototype.destroy = function (options) {
-            _super.prototype.destroy.call(this, options);
-            this.destroyVb();
-        };
-        return RectTileLayer;
-    }(display.Container));
-
-    var CompositeRectTileLayer = (function (_super) {
-        __extends(CompositeRectTileLayer, _super);
-        function CompositeRectTileLayer(zIndex, bitmaps, texPerChild) {
-            var _this = _super.call(this) || this;
-            _this.modificationMarker = 0;
-            _this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
-            _this._globalMat = null;
-            _this._lastLayer = null;
-            _this.initialize.apply(_this, arguments);
-            return _this;
         }
-        CompositeRectTileLayer.prototype.updateTransform = function () {
+        clearModify() {
+            this.modificationMarker = this.pointsBuf.length;
+        }
+        destroy(options) {
+            super.destroy(options);
+            this.destroyVb();
+        }
+    }
+
+    class CompositeRectTileLayer extends display.Container {
+        constructor(zIndex, bitmaps, texPerChild) {
+            super();
+            this.modificationMarker = 0;
+            this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
+            this._globalMat = null;
+            this._lastLayer = null;
+            this.initialize.apply(this, arguments);
+        }
+        updateTransform() {
             this.displayObjectUpdateTransform();
-        };
-        CompositeRectTileLayer.prototype.initialize = function (zIndex, bitmaps, texPerChild) {
+        }
+        initialize(zIndex, bitmaps, texPerChild) {
             if (texPerChild === true) {
                 texPerChild = 0;
             }
@@ -404,38 +370,38 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             if (bitmaps) {
                 this.setBitmaps(bitmaps);
             }
-        };
-        CompositeRectTileLayer.prototype.setBitmaps = function (bitmaps) {
-            for (var i_1 = 0; i_1 < bitmaps.length; i_1++) {
-                if (bitmaps[i_1] && !bitmaps[i_1].baseTexture) {
-                    throw new Error("pixi-tilemap cannot use destroyed textures. " +
-                        "Probably, you passed resources['myAtlas'].texture in pixi > 5.2.1, it does not exist there.");
+        }
+        setBitmaps(bitmaps) {
+            for (let i = 0; i < bitmaps.length; i++) {
+                if (bitmaps[i] && !bitmaps[i].baseTexture) {
+                    throw new Error(`pixi-tilemap cannot use destroyed textures. ` +
+                        `Probably, you passed resources['myAtlas'].texture in pixi > 5.2.1, it does not exist there.`);
                 }
             }
-            var texPerChild = this.texPerChild;
-            var len1 = this.children.length;
-            var len2 = Math.ceil(bitmaps.length / texPerChild);
-            var i;
+            let texPerChild = this.texPerChild;
+            let len1 = this.children.length;
+            let len2 = Math.ceil(bitmaps.length / texPerChild);
+            let i;
             for (i = 0; i < len1; i++) {
                 this.children[i].textures = bitmaps.slice(i * texPerChild, (i + 1) * texPerChild);
             }
             for (i = len1; i < len2; i++) {
-                var layer = new RectTileLayer(this.zIndex, bitmaps.slice(i * texPerChild, (i + 1) * texPerChild));
+                let layer = new RectTileLayer(this.zIndex, bitmaps.slice(i * texPerChild, (i + 1) * texPerChild));
                 layer.compositeParent = true;
                 layer.offsetX = Constant.boundSize;
                 layer.offsetY = Constant.boundSize;
                 this.addChild(layer);
             }
-        };
-        CompositeRectTileLayer.prototype.clear = function () {
-            for (var i = 0; i < this.children.length; i++) {
+        }
+        clear() {
+            for (let i = 0; i < this.children.length; i++) {
                 this.children[i].clear();
             }
             this.modificationMarker = 0;
-        };
-        CompositeRectTileLayer.prototype.addRect = function (textureIndex, u, v, x, y, tileWidth, tileHeight, animX, animY, rotate, animWidth, animHeight) {
-            var childIndex = textureIndex / this.texPerChild >> 0;
-            var textureId = textureIndex % this.texPerChild;
+        }
+        addRect(textureIndex, u, v, x, y, tileWidth, tileHeight, animX, animY, rotate, animWidth, animHeight) {
+            const childIndex = textureIndex / this.texPerChild >> 0;
+            const textureId = textureIndex % this.texPerChild;
             if (this.children[childIndex] && this.children[childIndex].textures) {
                 this._lastLayer = this.children[childIndex];
                 this._lastLayer.addRect(textureId, u, v, x, y, tileWidth, tileHeight, animX, animY, rotate, animWidth, animHeight);
@@ -444,33 +410,33 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 this._lastLayer = null;
             }
             return this;
-        };
-        CompositeRectTileLayer.prototype.tileRotate = function (rotate) {
+        }
+        tileRotate(rotate) {
             if (this._lastLayer) {
                 this._lastLayer.tileRotate(rotate);
             }
             return this;
-        };
-        CompositeRectTileLayer.prototype.tileAnimX = function (offset, count) {
+        }
+        tileAnimX(offset, count) {
             if (this._lastLayer) {
                 this._lastLayer.tileAnimX(offset, count);
             }
             return this;
-        };
-        CompositeRectTileLayer.prototype.tileAnimY = function (offset, count) {
+        }
+        tileAnimY(offset, count) {
             if (this._lastLayer) {
                 this._lastLayer.tileAnimY(offset, count);
             }
             return this;
-        };
-        CompositeRectTileLayer.prototype.addFrame = function (texture_, x, y, animX, animY, animWidth, animHeight) {
-            var texture;
-            var layer = null;
-            var ind = 0;
-            var children = this.children;
+        }
+        addFrame(texture_, x, y, animX, animY, animWidth, animHeight) {
+            let texture;
+            let layer = null;
+            let ind = 0;
+            let children = this.children;
             this._lastLayer = null;
             if (typeof texture_ === "number") {
-                var childIndex = texture_ / this.texPerChild >> 0;
+                let childIndex = texture_ / this.texPerChild >> 0;
                 layer = children[childIndex];
                 if (!layer) {
                     layer = children[0];
@@ -491,10 +457,10 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 else {
                     texture = texture_;
                 }
-                for (var i = 0; i < children.length; i++) {
-                    var child = children[i];
-                    var tex = child.textures;
-                    for (var j = 0; j < tex.length; j++) {
+                for (let i = 0; i < children.length; i++) {
+                    let child = children[i];
+                    let tex = child.textures;
+                    for (let j = 0; j < tex.length; j++) {
                         if (tex[j].baseTexture === texture.baseTexture) {
                             layer = child;
                             ind = j;
@@ -506,8 +472,8 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                     }
                 }
                 if (!layer) {
-                    for (var i = 0; i < children.length; i++) {
-                        var child = children[i];
+                    for (let i = 0; i < children.length; i++) {
+                        let child = children[i];
                         if (child.textures.length < this.texPerChild) {
                             layer = child;
                             ind = child.textures.length;
@@ -528,69 +494,66 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             this._lastLayer = layer;
             layer.addRect(ind, texture.frame.x, texture.frame.y, x, y, texture.orig.width, texture.orig.height, animX, animY, texture.rotate, animWidth, animHeight);
             return this;
-        };
-        CompositeRectTileLayer.prototype.renderCanvas = function (renderer) {
+        }
+        renderCanvas(renderer) {
             if (!this.visible || this.worldAlpha <= 0 || !this.renderable) {
                 return;
             }
-            var plugin = renderer.plugins.tilemap;
+            let plugin = renderer.plugins.tilemap;
             if (!plugin.dontUseTransform) {
-                var wt = this.worldTransform;
+                let wt = this.worldTransform;
                 renderer.context.setTransform(wt.a, wt.b, wt.c, wt.d, wt.tx * renderer.resolution, wt.ty * renderer.resolution);
             }
-            var layers = this.children;
-            for (var i = 0; i < layers.length; i++) {
+            let layers = this.children;
+            for (let i = 0; i < layers.length; i++) {
                 layers[i].renderCanvasCore(renderer);
             }
-        };
-        CompositeRectTileLayer.prototype.render = function (renderer) {
+        }
+        render(renderer) {
             if (!this.visible || this.worldAlpha <= 0 || !this.renderable) {
                 return;
             }
-            var plugin = renderer.plugins['tilemap'];
-            var shader = plugin.getShader();
+            let plugin = renderer.plugins['tilemap'];
+            let shader = plugin.getShader();
             renderer.batch.setObjectRenderer(plugin);
             this._globalMat = shader.uniforms.projTransMatrix;
             renderer.globalUniforms.uniforms.projectionMatrix.copyTo(this._globalMat).append(this.worldTransform);
             shader.uniforms.shadowColor = this.shadowColor;
             shader.uniforms.animationFrame = plugin.tileAnim;
             renderer.shader.bind(shader, false);
-            var layers = this.children;
-            for (var i = 0; i < layers.length; i++) {
+            let layers = this.children;
+            for (let i = 0; i < layers.length; i++) {
                 layers[i].renderWebGLCore(renderer, plugin);
             }
-        };
-        CompositeRectTileLayer.prototype.isModified = function (anim) {
-            var layers = this.children;
+        }
+        isModified(anim) {
+            let layers = this.children;
             if (this.modificationMarker !== layers.length) {
                 return true;
             }
-            for (var i = 0; i < layers.length; i++) {
+            for (let i = 0; i < layers.length; i++) {
                 if (layers[i].isModified(anim)) {
                     return true;
                 }
             }
             return false;
-        };
-        CompositeRectTileLayer.prototype.clearModify = function () {
-            var layers = this.children;
+        }
+        clearModify() {
+            let layers = this.children;
             this.modificationMarker = layers.length;
-            for (var i = 0; i < layers.length; i++) {
+            for (let i = 0; i < layers.length; i++) {
                 layers[i].clearModify();
             }
-        };
-        return CompositeRectTileLayer;
-    }(display.Container));
-
-    var GraphicsLayer = (function (_super) {
-        __extends(GraphicsLayer, _super);
-        function GraphicsLayer(zIndex) {
-            var _this = _super.call(this) || this;
-            _this.zIndex = zIndex;
-            return _this;
         }
-        GraphicsLayer.prototype.renderCanvas = function (renderer) {
-            var wt = null;
+    }
+
+    class GraphicsLayer extends graphics.Graphics {
+        constructor(zIndex) {
+            super();
+            this.zIndex = zIndex;
+        }
+        renderCanvas(renderer) {
+            let wt = null;
             if (renderer.plugins.tilemap.dontUseTransform) {
                 wt = this.transform.worldTransform;
                 this.transform.worldTransform = math.Matrix.IDENTITY;
@@ -600,57 +563,54 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 this.transform.worldTransform = wt;
             }
             renderer.context.globalAlpha = 1.0;
-        };
-        GraphicsLayer.prototype.isModified = function (anim) {
+        }
+        isModified(anim) {
             return false;
-        };
-        GraphicsLayer.prototype.clearModify = function () {
-        };
-        return GraphicsLayer;
-    }(graphics.Graphics));
+        }
+        clearModify() {
+        }
+    }
 
-    var MultiTextureResource = (function (_super) {
-        __extends(MultiTextureResource, _super);
-        function MultiTextureResource(options) {
-            var _this = _super.call(this, options.bufferSize, options.bufferSize) || this;
-            _this.DO_CLEAR = false;
-            _this.boundSize = 0;
-            _this._clearBuffer = null;
-            _this.baseTex = null;
-            _this.boundSprites = [];
-            _this.dirties = [];
-            var bounds = _this.boundSprites;
-            var dirties = _this.dirties;
-            _this.boundSize = options.boundSize;
-            for (var j = 0; j < options.boundCountPerBuffer; j++) {
-                var spr = new sprite.Sprite();
+    class MultiTextureResource extends core.resources.Resource {
+        constructor(options) {
+            super(options.bufferSize, options.bufferSize);
+            this.DO_CLEAR = false;
+            this.boundSize = 0;
+            this._clearBuffer = null;
+            this.baseTex = null;
+            this.boundSprites = [];
+            this.dirties = [];
+            const bounds = this.boundSprites;
+            const dirties = this.dirties;
+            this.boundSize = options.boundSize;
+            for (let j = 0; j < options.boundCountPerBuffer; j++) {
+                const spr = new sprite.Sprite();
                 spr.position.x = options.boundSize * (j & 1);
                 spr.position.y = options.boundSize * (j >> 1);
                 bounds.push(spr);
                 dirties.push(0);
             }
-            _this.DO_CLEAR = !!options.DO_CLEAR;
-            return _this;
+            this.DO_CLEAR = !!options.DO_CLEAR;
         }
-        MultiTextureResource.prototype.bind = function (baseTexture) {
+        bind(baseTexture) {
             if (this.baseTex) {
                 throw new Error('Only one baseTexture is allowed for this resource!');
             }
             this.baseTex = baseTexture;
-            _super.prototype.bind.call(this, baseTexture);
-        };
-        MultiTextureResource.prototype.setTexture = function (ind, texture) {
-            var spr = this.boundSprites[ind];
+            super.bind(baseTexture);
+        }
+        setTexture(ind, texture) {
+            const spr = this.boundSprites[ind];
             if (spr.texture.baseTexture === texture.baseTexture) {
                 return;
             }
             spr.texture = texture;
             this.baseTex.update();
             this.dirties[ind] = this.baseTex.dirtyId;
-        };
-        MultiTextureResource.prototype.upload = function (renderer, texture, glTexture) {
-            var gl = renderer.gl;
-            var _a = this, width = _a.width, height = _a.height;
+        }
+        upload(renderer, texture, glTexture) {
+            const { gl } = renderer;
+            const { width, height } = this;
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.alphaMode === undefined ||
                 texture.alphaMode === constants.ALPHA_MODES.UNPACK);
             if (glTexture.dirtyId < 0) {
@@ -658,18 +618,18 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 glTexture.height = height;
                 gl.texImage2D(texture.target, 0, texture.format, width, height, 0, texture.format, texture.type, null);
             }
-            var doClear = this.DO_CLEAR;
+            const doClear = this.DO_CLEAR;
             if (doClear && !this._clearBuffer) {
                 this._clearBuffer = new Uint8Array(Constant.boundSize * Constant.boundSize * 4);
             }
-            var bounds = this.boundSprites;
-            for (var i = 0; i < bounds.length; i++) {
-                var spr = bounds[i];
-                var tex = spr.texture.baseTexture;
+            const bounds = this.boundSprites;
+            for (let i = 0; i < bounds.length; i++) {
+                const spr = bounds[i];
+                const tex = spr.texture.baseTexture;
                 if (glTexture.dirtyId >= this.dirties[i]) {
                     continue;
                 }
-                var res = tex.resource;
+                const res = tex.resource;
                 if (!tex.valid || !res || !res.source) {
                     continue;
                 }
@@ -679,18 +639,17 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 gl.texSubImage2D(texture.target, 0, spr.position.x, spr.position.y, texture.format, texture.type, res.source);
             }
             return true;
-        };
-        return MultiTextureResource;
-    }(core.resources.Resource));
+        }
+    }
 
     function fillSamplers(shader, maxTextures) {
-        var sampleValues = [];
-        for (var i = 0; i < maxTextures; i++) {
+        let sampleValues = [];
+        for (let i = 0; i < maxTextures; i++) {
             sampleValues[i] = i;
         }
         shader.uniforms.uSamplers = sampleValues;
-        var samplerSize = [];
-        for (var i = 0; i < maxTextures; i++) {
+        let samplerSize = [];
+        for (let i = 0; i < maxTextures; i++) {
             samplerSize.push(1.0 / Constant.bufferSize);
             samplerSize.push(1.0 / Constant.bufferSize);
         }
@@ -701,13 +660,13 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
             .replace(/%forloop%/gi, generateSampleSrc(maxTextures));
     }
     function generateSampleSrc(maxTextures) {
-        var src = '';
+        let src = '';
         src += '\n';
         src += '\n';
         src += 'if(vTextureId <= -1.0) {';
         src += '\n\tcolor = shadowColor;';
         src += '\n}';
-        for (var i = 0; i < maxTextures; i++) {
+        for (let i = 0; i < maxTextures; i++) {
             src += '\nelse ';
             if (i < maxTextures - 1) {
                 src += 'if(textureId == ' + i + '.0)';
@@ -721,86 +680,115 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
         return src;
     }
 
-    var rectShaderFrag = "\nvarying vec2 vTextureCoord;\nvarying vec4 vFrame;\nvarying float vTextureId;\nuniform vec4 shadowColor;\nuniform sampler2D uSamplers[%count%];\nuniform vec2 uSamplerSize[%count%];\n\nvoid main(void){\n   vec2 textureCoord = clamp(vTextureCoord, vFrame.xy, vFrame.zw);\n   float textureId = floor(vTextureId + 0.5);\n\n   vec4 color;\n   %forloop%\n   gl_FragColor = color;\n}\n";
-    var rectShaderVert = "\nattribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\nattribute vec4 aFrame;\nattribute vec2 aAnim;\nattribute float aTextureId;\n\nuniform mat3 projTransMatrix;\nuniform vec2 animationFrame;\n\nvarying vec2 vTextureCoord;\nvarying float vTextureId;\nvarying vec4 vFrame;\n\nvoid main(void){\n   gl_Position = vec4((projTransMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n   vec2 animCount = floor((aAnim + 0.5) / 2048.0);\n   vec2 animFrameOffset = aAnim - animCount * 2048.0;\n   vec2 animOffset = animFrameOffset * floor(mod(animationFrame + 0.5, animCount));\n\n   vTextureCoord = aTextureCoord + animOffset;\n   vFrame = aFrame + vec4(animOffset, animOffset);\n   vTextureId = aTextureId;\n}\n";
-    var TilemapShader = (function (_super) {
-        __extends(TilemapShader, _super);
-        function TilemapShader(maxTextures, shaderVert, shaderFrag) {
-            var _this = _super.call(this, new PIXI.Program(shaderVert, shaderFrag), {
+    let rectShaderFrag = `
+varying vec2 vTextureCoord;
+varying vec4 vFrame;
+varying float vTextureId;
+uniform vec4 shadowColor;
+uniform sampler2D uSamplers[%count%];
+uniform vec2 uSamplerSize[%count%];
+
+void main(void){
+   vec2 textureCoord = clamp(vTextureCoord, vFrame.xy, vFrame.zw);
+   float textureId = floor(vTextureId + 0.5);
+
+   vec4 color;
+   %forloop%
+   gl_FragColor = color;
+}
+`;
+    let rectShaderVert = `
+attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+attribute vec4 aFrame;
+attribute vec2 aAnim;
+attribute float aTextureId;
+
+uniform mat3 projTransMatrix;
+uniform vec2 animationFrame;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vFrame;
+
+void main(void){
+   gl_Position = vec4((projTransMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+   vec2 animCount = floor((aAnim + 0.5) / 2048.0);
+   vec2 animFrameOffset = aAnim - animCount * 2048.0;
+   vec2 animOffset = animFrameOffset * floor(mod(animationFrame + 0.5, animCount));
+
+   vTextureCoord = aTextureCoord + animOffset;
+   vFrame = aFrame + vec4(animOffset, animOffset);
+   vTextureId = aTextureId;
+}
+`;
+    class TilemapShader extends core.Shader {
+        constructor(maxTextures, shaderVert, shaderFrag) {
+            super(new PIXI.Program(shaderVert, shaderFrag), {
                 animationFrame: new Float32Array(2),
                 uSamplers: [],
                 uSamplerSize: [],
                 projTransMatrix: new math.Matrix()
-            }) || this;
-            _this.maxTextures = 0;
-            _this.maxTextures = maxTextures;
-            fillSamplers(_this, _this.maxTextures);
-            return _this;
+            });
+            this.maxTextures = 0;
+            this.maxTextures = maxTextures;
+            fillSamplers(this, this.maxTextures);
         }
-        return TilemapShader;
-    }(core.Shader));
-    var RectTileShader = (function (_super) {
-        __extends(RectTileShader, _super);
-        function RectTileShader(maxTextures) {
-            var _this = _super.call(this, maxTextures, rectShaderVert, generateFragmentSrc(maxTextures, rectShaderFrag)) || this;
-            fillSamplers(_this, _this.maxTextures);
-            return _this;
+    }
+    class RectTileShader extends TilemapShader {
+        constructor(maxTextures) {
+            super(maxTextures, rectShaderVert, generateFragmentSrc(maxTextures, rectShaderFrag));
+            fillSamplers(this, this.maxTextures);
         }
-        return RectTileShader;
-    }(TilemapShader));
-    var RectTileGeom = (function (_super) {
-        __extends(RectTileGeom, _super);
-        function RectTileGeom() {
-            var _this = _super.call(this) || this;
-            _this.vertSize = 11;
-            _this.vertPerQuad = 4;
-            _this.stride = _this.vertSize * 4;
-            _this.lastTimeAccess = 0;
-            var buf = _this.buf = new core.Buffer(new Float32Array(2), true, false);
-            _this.addAttribute('aVertexPosition', buf, 0, false, 0, _this.stride, 0)
-                .addAttribute('aTextureCoord', buf, 0, false, 0, _this.stride, 2 * 4)
-                .addAttribute('aFrame', buf, 0, false, 0, _this.stride, 4 * 4)
-                .addAttribute('aAnim', buf, 0, false, 0, _this.stride, 8 * 4)
-                .addAttribute('aTextureId', buf, 0, false, 0, _this.stride, 10 * 4);
-            return _this;
+    }
+    class RectTileGeom extends core.Geometry {
+        constructor() {
+            super();
+            this.vertSize = 11;
+            this.vertPerQuad = 4;
+            this.stride = this.vertSize * 4;
+            this.lastTimeAccess = 0;
+            const buf = this.buf = new core.Buffer(new Float32Array(2), true, false);
+            this.addAttribute('aVertexPosition', buf, 0, false, 0, this.stride, 0)
+                .addAttribute('aTextureCoord', buf, 0, false, 0, this.stride, 2 * 4)
+                .addAttribute('aFrame', buf, 0, false, 0, this.stride, 4 * 4)
+                .addAttribute('aAnim', buf, 0, false, 0, this.stride, 8 * 4)
+                .addAttribute('aTextureId', buf, 0, false, 0, this.stride, 10 * 4);
         }
-        return RectTileGeom;
-    }(core.Geometry));
+    }
 
-    var TileRenderer = (function (_super) {
-        __extends(TileRenderer, _super);
-        function TileRenderer(renderer) {
-            var _this = _super.call(this, renderer) || this;
-            _this.sn = -1;
-            _this.indexBuffer = null;
-            _this.ibLen = 0;
-            _this.tileAnim = [0, 0];
-            _this.texLoc = [];
-            _this.texResources = [];
-            _this.rectShader = new RectTileShader(Constant.maxTextures);
-            _this.indexBuffer = new core.Buffer(undefined, true, true);
-            _this.checkIndexBuffer(2000);
-            _this.initBounds();
-            return _this;
+    class TileRenderer extends core.ObjectRenderer {
+        constructor(renderer) {
+            super(renderer);
+            this.sn = -1;
+            this.indexBuffer = null;
+            this.ibLen = 0;
+            this.tileAnim = [0, 0];
+            this.texLoc = [];
+            this.texResources = [];
+            this.rectShader = new RectTileShader(Constant.maxTextures);
+            this.indexBuffer = new core.Buffer(undefined, true, true);
+            this.checkIndexBuffer(2000);
+            this.initBounds();
         }
-        TileRenderer.prototype.initBounds = function () {
+        initBounds() {
             if (Constant.boundCountPerBuffer <= 1) {
                 return;
             }
-            var maxTextures = Constant.maxTextures;
-            for (var i = 0; i < maxTextures; i++) {
-                var resource = new MultiTextureResource(Constant);
-                var baseTex = new core.BaseTexture(resource);
+            const maxTextures = Constant.maxTextures;
+            for (let i = 0; i < maxTextures; i++) {
+                const resource = new MultiTextureResource(Constant);
+                const baseTex = new core.BaseTexture(resource);
                 baseTex.scaleMode = Constant.SCALE_MODE;
                 baseTex.wrapMode = constants.WRAP_MODES.CLAMP;
                 this.texResources.push(resource);
             }
-        };
-        TileRenderer.prototype.bindTexturesWithoutRT = function (renderer, shader, textures) {
-            var samplerSize = shader.uniforms.uSamplerSize;
+        }
+        bindTexturesWithoutRT(renderer, shader, textures) {
+            let samplerSize = shader.uniforms.uSamplerSize;
             this.texLoc.length = 0;
-            for (var i = 0; i < textures.length; i++) {
-                var texture = textures[i];
+            for (let i = 0; i < textures.length; i++) {
+                const texture = textures[i];
                 if (!texture || !texture.valid) {
                     return;
                 }
@@ -809,10 +797,10 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 samplerSize[i * 2 + 1] = 1.0 / textures[i].baseTexture.height;
             }
             shader.uniforms.uSamplerSize = samplerSize;
-        };
-        TileRenderer.prototype.bindTextures = function (renderer, shader, textures) {
-            var len = textures.length;
-            var maxTextures = Constant.maxTextures;
+        }
+        bindTextures(renderer, shader, textures) {
+            const len = textures.length;
+            const maxTextures = Constant.maxTextures;
             if (len > Constant.boundCountPerBuffer * maxTextures) {
                 return;
             }
@@ -820,71 +808,72 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 this.bindTexturesWithoutRT(renderer, shader, textures);
                 return;
             }
-            var i = 0;
+            let i = 0;
             for (; i < len; i++) {
-                var texture = textures[i];
+                const texture = textures[i];
                 if (!texture || !texture.valid)
                     continue;
-                var multi = this.texResources[i >> 2];
+                const multi = this.texResources[i >> 2];
                 multi.setTexture(i & 3, texture);
             }
-            var gltsUsed = (i + 3) >> 2;
+            let gltsUsed = (i + 3) >> 2;
             for (i = 0; i < gltsUsed; i++) {
                 renderer.texture.bind(this.texResources[i].baseTex, i);
             }
-        };
-        TileRenderer.prototype.start = function () {
-        };
-        TileRenderer.prototype.createVb = function () {
-            var geom = new RectTileGeom();
+        }
+        start() {
+        }
+        createVb() {
+            const geom = new RectTileGeom();
             geom.addIndex(this.indexBuffer);
             geom.lastTimeAccess = Date.now();
             return geom;
-        };
-        TileRenderer.prototype.checkIndexBuffer = function (size, vb) {
-            var totalIndices = size * 6;
+        }
+        checkIndexBuffer(size, vb = null) {
+            const totalIndices = size * 6;
             if (totalIndices <= this.ibLen) {
                 return;
             }
+            let len = totalIndices;
+            while (len < totalIndices) {
+                len <<= 1;
+            }
             this.ibLen = totalIndices;
             this.indexBuffer.update(PIXI.utils.createIndicesForQuads(size, Constant.use32bitIndex ? new Uint32Array(size * 6) : undefined));
-        };
-        TileRenderer.prototype.getShader = function () {
+        }
+        getShader() {
             return this.rectShader;
-        };
-        TileRenderer.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
+        }
+        destroy() {
+            super.destroy();
             this.rectShader = null;
-        };
-        return TileRenderer;
-    }(core.ObjectRenderer));
+        }
+    }
     core.Renderer.registerPlugin('tilemap', TileRenderer);
 
-    var ZLayer = (function (_super) {
-        __extends(ZLayer, _super);
-        function ZLayer(tilemap, zIndex) {
-            var _this = _super.call(this) || this;
-            _this._lastAnimationFrame = -1;
-            _this.tilemap = tilemap;
-            _this.z = zIndex;
-            return _this;
+    class ZLayer extends display.Container {
+        constructor(tilemap, zIndex) {
+            super();
+            this._lastAnimationFrame = -1;
+            this.tilemap = tilemap;
+            this.z = zIndex;
         }
-        ZLayer.prototype.clear = function () {
-            var layers = this.children;
-            for (var i = 0; i < layers.length; i++)
+        clear() {
+            let layers = this.children;
+            for (let i = 0; i < layers.length; i++)
                 layers[i].clear();
             this._previousLayers = 0;
-        };
-        ZLayer.prototype.cacheIfDirty = function () {
-            var tilemap = this.tilemap;
-            var layers = this.children;
-            var modified = this._previousLayers !== layers.length;
+        }
+        cacheIfDirty() {
+            let tilemap = this.tilemap;
+            let layers = this.children;
+            let modified = this._previousLayers !== layers.length;
             this._previousLayers = layers.length;
-            var buf = this.canvasBuffer;
-            var tempRender = this._tempRender;
+            let buf = this.canvasBuffer;
+            let tempRender = this._tempRender;
             if (!buf) {
                 buf = this.canvasBuffer = document.createElement('canvas');
-                tempRender = this._tempRender = new PIXI.CanvasRenderer(100, 100, { view: buf });
+                tempRender = this._tempRender = new PIXI.CanvasRenderer({ width: 100, height: 100, view: buf });
                 tempRender.context = tempRender.rootContext;
                 tempRender.plugins.tilemap.dontUseTransform = true;
             }
@@ -894,7 +883,7 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 buf.height = tilemap._layerHeight;
                 modified = true;
             }
-            var i;
+            let i;
             if (!modified) {
                 for (i = 0; i < layers.length; i++) {
                     if (layers[i].isModified(this._lastAnimationFrame !== tilemap.animationFrame)) {
@@ -919,34 +908,34 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
                 this.layerTransform = layers[i].worldTransform;
                 break;
             }
-        };
-        ZLayer.prototype.renderCanvas = function (renderer) {
+        }
+        renderCanvas(renderer) {
             this.cacheIfDirty();
-            var wt = this.layerTransform;
+            let wt = this.layerTransform;
             renderer.context.setTransform(wt.a, wt.b, wt.c, wt.d, wt.tx * renderer.resolution, wt.ty * renderer.resolution);
-            var tilemap = this.tilemap;
+            let tilemap = this.tilemap;
             renderer.context.drawImage(this.canvasBuffer, 0, 0);
-        };
-        return ZLayer;
-    }(display.Container));
+        }
+    }
 
     var pixi_tilemap;
     (function (pixi_tilemap) {
         PIXI.tilemap = pixi_tilemap;
     })(pixi_tilemap || (pixi_tilemap = {}));
+    var exporter = {};
 
-    var pixi_tilemap$1 = {
-        CanvasTileRenderer: CanvasTileRenderer,
-        CompositeRectTileLayer: CompositeRectTileLayer,
-        Constant: Constant,
-        GraphicsLayer: GraphicsLayer,
-        MultiTextureResource: MultiTextureResource,
-        RectTileLayer: RectTileLayer,
-        TilemapShader: TilemapShader,
-        RectTileShader: RectTileShader,
-        RectTileGeom: RectTileGeom,
-        TileRenderer: TileRenderer,
-        ZLayer: ZLayer,
+    const pixi_tilemap$1 = {
+        CanvasTileRenderer,
+        CompositeRectTileLayer,
+        Constant,
+        GraphicsLayer,
+        MultiTextureResource,
+        RectTileLayer,
+        TilemapShader,
+        RectTileShader,
+        RectTileGeom,
+        TileRenderer,
+        ZLayer,
     };
 
     exports.CanvasTileRenderer = CanvasTileRenderer;
@@ -966,10 +955,8 @@ var pixi_tilemap = (function (exports, display, core, constants, math, graphics,
     exports.generateSampleSrc = generateSampleSrc;
     exports.pixi_tilemap = pixi_tilemap$1;
 
-    return exports;
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-}({}, PIXI, PIXI, PIXI, PIXI, PIXI, PIXI));
-
-PIXI.tilemap = PIXI.tilemap || {};
-Object.assign(PIXI.tilemap, pixi_tilemap)
+})));
+Object.assign(this.PIXI.tilemap, pixi_tilemap);
 //# sourceMappingURL=pixi-tilemap.umd.js.map

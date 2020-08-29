@@ -32,20 +32,11 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   /** @type {boolean} */
   this._debugMode = lightObjectData.content.debugMode;
 
-  /** @type {?PIXI.Texture} */
-  this._texture =
-    lightObjectData.content.texture === ''
-      ? null
-      : runtimeScene
-          .getGame()
-          .getImageManager()
-          .getPIXITexture(lightObjectData.content.texture);
+  /** @type {string} */
+  this._texture = lightObjectData.content.texture;
 
-  /** @type {?gdjs.LightObstaclesManager} */
-  this._obstaclesManager =
-    gdjs.LightObstaclesManager !== undefined
-      ? gdjs.LightObstaclesManager.getManager(runtimeScene)
-      : null;
+  /** @type {gdjs.LightObstaclesManager} */
+  this._obstaclesManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -90,14 +81,8 @@ gdjs.LightRuntimeObject.prototype.updateFromObjectData = function (
   }
 
   if (oldObjectData.content.texture !== newObjectData.content.texture) {
-    this._texture =
-      newObjectData.content.texture === ''
-        ? null
-        : this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(newObjectData.content.texture);
-    this._renderer.updateTexture();
+    this._texture = newObjectData.content.texture;
+    this._renderer.updateMesh();
   }
 
   if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
@@ -200,9 +185,9 @@ gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
 };
 
 /**
- * Returns PIXI.Texture if it exists, null otherwise.
- * @returns {?PIXI.Texture} the texture, if any, null otherwise.
+ * Returns the path of texture resource.
+ * @returns {string} the path of texture.
  */
-gdjs.LightRuntimeObject.prototype.getPIXITexture = function () {
+gdjs.LightRuntimeObject.prototype.getTexture = function () {
   return this._texture;
 };

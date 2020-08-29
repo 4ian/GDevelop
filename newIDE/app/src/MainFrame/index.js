@@ -12,7 +12,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import EditorBar from '../UI/EditorBar';
+import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -1856,13 +1856,14 @@ const MainFrame = (props: Props) => {
         open={projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
+          className: "safe-area-aware-left-container"
         }}
         ModalProps={{
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
       >
-        <EditorBar
+        <DrawerTopBar
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }

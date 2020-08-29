@@ -332,7 +332,7 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    const ImportedExtLib = objectsRenderingService.requireModule(
+    const Tilemap = objectsRenderingService.requireModule(
       __dirname,
       'pixi-tilemap/dist/pixi-tilemap.umd'
     );
@@ -363,7 +363,7 @@ module.exports = {
       );
 
       console.log(PIXI.tilemap);
-      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
+      this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
       this._pixiObject.transform.x = 0.5;
       this._pixiObject.transform.y = 0.5;

@@ -44,7 +44,9 @@ const extractCommitsFromGit = () => {
         const lowerCaseMessage = commit.message.toLowerCase();
         const shouldHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
+          lowerCaseMessage.includes("don't mention in the changelog") ||
           lowerCaseMessage.includes("don't show in changelog") ||
+          lowerCaseMessage.includes("don't show in the changelog") ||
           lowerCaseMessage === 'update translations' ||
           lowerCaseMessage === 'prettier' ||
           lowerCaseMessage === 'update jsextension.js' ||
@@ -65,6 +67,7 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('add files forgotten in last commit') ||
           lowerCaseMessage.indexOf('apply review') === 0 ||
           lowerCaseMessage.includes('package-lock.json');
+          lowerCaseMessage.includes('yarn.lock');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
         const forDev = lowerCaseMessage.includes('developer changelog');
 
@@ -154,7 +157,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in (the )?changelog/i;
+  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest )in (the )?changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0

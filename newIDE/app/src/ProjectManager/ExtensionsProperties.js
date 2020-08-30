@@ -1,6 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
 import * as React from 'react';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';

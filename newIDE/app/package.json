@@ -43,6 +43,7 @@
     "element-closest": "2.0.2",
     "firebase": "^6.1.0",
     "fontfaceobserver": "2.0.13",
+    "jss-rtl": "^0.3.0",
     "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",

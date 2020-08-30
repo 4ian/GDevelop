@@ -2097,6 +2097,47 @@ module.exports = {
       }
     ]
   },
+  "lights": {
+    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Lights",
+        "name": "Lighting"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "load-image-from-url": {
     "description": "Advanced example showing how to use JavaScript to load an image from an external URL.",
     "usedExtensions": [
@@ -2813,7 +2854,7 @@ module.exports = {
     ]
   },
   "particle-effects-demo": {
-    "description": "",
+    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",

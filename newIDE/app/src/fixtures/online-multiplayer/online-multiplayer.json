@@ -1357,9 +1357,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",
@@ -2041,9 +2041,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",
@@ -2636,9 +2636,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",
@@ -3349,9 +3349,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",
@@ -3511,9 +3511,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",

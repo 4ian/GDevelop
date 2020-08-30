@@ -477,30 +477,46 @@ module.exports = {
         this._pixiObject.dirty = true;
       }
 
-      this._pixiObject.x = this._instance.getX();
-      this._pixiObject.y = this._instance.getY();
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();
         this._pixiObject.height = this._instance.getCustomHeight();
+      } else {
+        this._pixiObject.scale.x = 1;
+        this._pixiObject.scale.y = 1;
       }
+
+      // Place the center of rotation in the center of the object. Because pivot position in Pixi
+      // is in the **local coordinates of the object**, we need to find back the original width
+      // and height of the object before scaling (then divide by 2 to find the center)
+      const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
+      const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
+      this._pixiObject.pivot.x = originalWidth / 2;
+      this._pixiObject.pivot.y = originalHeight / 2;
+
+      // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
+      // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
+      // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
+      this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
+      this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+
+      // Rotation works as intended because we put the pivot in the center
+      this._pixiObject.rotation = RenderedInstance.toRad(
+        this._instance.getAngle()
+      );
     };
 
     /**
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function() {
-      return this._pixiObject.width;
+      return this._pixiObject.width / this._pixiObject.scale.x;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function() {
-      return this._pixiObject.height;
+      return this._pixiObject.height / this._pixiObject.scale.y;
     };
 
     objectsRenderingService.registerInstanceRenderer(

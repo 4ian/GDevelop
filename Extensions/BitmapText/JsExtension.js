@@ -20,7 +20,7 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(
+  createExtension: function (
     _ /*: (string) => string */,
     gd /*: libGDevelop */
   ) {
@@ -37,7 +37,7 @@ module.exports = {
 
     const BitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    BitmapTextObject.updateProperty = function(
+    BitmapTextObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -54,7 +54,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    BitmapTextObject.getProperties = function(objectContent) {
+    BitmapTextObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
@@ -64,22 +64,10 @@ module.exports = {
         .setLabel(_('Text'));
 
       objectProperties
-        .getOrCreate('color')
-        .setValue(objectContent.color)
-        .setType('color')
-        .setLabel(_('Base color'));
-
-      objectProperties
         .getOrCreate('opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
         .setLabel(_('Opacity (0-255)'));
-
-      objectProperties
-        .getOrCreate('fontSize')
-        .setValue(objectContent.fontSize.toString())
-        .setType('number')
-        .setLabel(_('Base size'));
 
       objectProperties
         .getOrCreate('align')
@@ -88,14 +76,26 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Base alignment'));
+        .setLabel(_('Alignment, when multiple lines are displayed'));
 
       objectProperties
-        .getOrCreate('fontFamily')
-        .setValue(objectContent.fontFamily)
+        .getOrCreate('fontResourceName')
+        .setValue(objectContent.fontResourceName)
         .setType('resource')
         .addExtraInfo('font')
-        .setLabel(_('Base font family'));
+        .setLabel(_('Font'));
+
+      objectProperties
+        .getOrCreate('fontSize')
+        .setValue(objectContent.fontSize.toString())
+        .setType('number')
+        .setLabel(_('Font Size'));
+
+      objectProperties
+        .getOrCreate('fontColor')
+        .setValue(objectContent.fontColor)
+        .setType('color')
+        .setLabel(_('Font Color'));
 
       objectProperties
         .getOrCreate('wordWrap')
@@ -103,29 +103,22 @@ module.exports = {
         .setType('boolean')
         .setLabel(_('Word wrapping'));
 
-      objectProperties
-        .getOrCreate('visible')
-        .setValue(objectContent.visible ? 'true' : 'false')
-        .setType('boolean')
-        .setLabel(_('Visible on start'));
-
       return objectProperties;
     };
     BitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text: 'Bitmap Text test',
+        text: 'This is a text displayed with a Bitmap Text object.',
         opacity: 255,
         fontSize: 20,
-        visible: true,
-        color: '#000000',
-        fontFamily: 'Arial',
+        fontColor: '#000000',
+        fontResourceName: '',
         align: 'left',
         wordWrap: true,
       })
     );
 
     // $FlowExpectedError
-    BitmapTextObject.updateInitialInstanceProperty = function(
+    BitmapTextObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -136,7 +129,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    BitmapTextObject.getInitialInstanceProperties = function(
+    BitmapTextObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -151,7 +144,7 @@ module.exports = {
         'BitmapText',
         _('BitmapText'),
         _(
-          'Displays rich text as a sprite by converting a standard font to a Bitmap font.'
+          'Displays a text using a "Bitmap Font", which is more performant than a traditional text but also less flexible (only alphanumerical characters are supported).'
         ),
         'JsPlatform/Extensions/bitmapfont32.png',
         BitmapTextObject
@@ -163,7 +156,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetBitmapText',
+        'GetText',
         _('Compare the text'),
         _('Compare the text of the Bitmap text object.'),
         _('the text'),
@@ -174,7 +167,7 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardOperatorParameters('string')
       .getCodeExtraInformation()
-      .setFunctionName('getBitmapText');
+      .setFunctionName('getText');
 
     object
       .addCondition(
@@ -210,10 +203,12 @@ module.exports = {
 
     object
       .addCondition(
-        'GetFontFamily',
-        _('Font family'),
-        _('Compare the font family of the Bitmap text object.'),
-        _('the font family'),
+        'GetFont',
+        _('Font'),
+        _(
+          'Compare the name of the font resource used for the Bitmap text object.'
+        ),
+        _('the font'),
         _('Style'),
         'res/conditions/font24.png',
         'res/conditions/font.png'
@@ -221,7 +216,7 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardRelationalOperatorParameters('string')
       .getCodeExtraInformation()
-      .setFunctionName('getFontFamily');
+      .setFunctionName('getFontResourceName');
 
     object
       .addCondition(
@@ -242,7 +237,7 @@ module.exports = {
       .addCondition(
         'GetWordWrap',
         _('Wrapping'),
-        _('Check if word wrap is enabled'),
+        _('Check if word wrap is enabled.'),
         _('_PARAM0_ word wrapping is activated'),
         _('Style'),
         'res/conditions/wordWrap24.png',
@@ -271,7 +266,7 @@ module.exports = {
 
     object
       .addAction(
-        'SetBitmapText',
+        'SetText',
         _('Text'),
         _('Modify the text of a Bitmap text object.'),
         _('the Bitmap text'),
@@ -282,8 +277,8 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardOperatorParameters('string')
       .getCodeExtraInformation()
-      .setFunctionName('setBitmapText')
-      .setGetter('getBitmapText');
+      .setFunctionName('setText')
+      .setGetter('getText');
 
     object
       .addAction(
@@ -299,8 +294,7 @@ module.exports = {
       .addParameter('color', _('Color'), '', false)
       .setDefaultValue('0;0;0')
       .getCodeExtraInformation()
-      .setFunctionName('setColor')
-      .setGetter('getColor');
+      .setFunctionName('setColor');
 
     object
       .addAction(
@@ -336,26 +330,25 @@ module.exports = {
 
     object
       .addAction(
-        'SetFontFamily',
-        _('Font family'),
-        _('Modify the font family of a Bitmap text object.'),
-        _('the font family'),
+        'SetFontResourceName',
+        _('Font'),
+        _('Change the font used by the Bitmap text object.'),
+        _('Set the font of _PARAM0_ to _PARAM1_'),
         _('Style'),
         'res/actions/font24.png',
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('string')
+      .addParameter('font', _('Font resource'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setFontFamily')
-      .setGetter('getFontFamily');
+      .setFunctionName('setFontResourceName');
 
     object
       .addAction(
         'SetAlignment',
         _('Alignment'),
-        _('Modify the alignment of a Bitmap text object.'),
-        _('Align _PARAM0_: _PARAM1_'),
+        _('Change the alignment of a Bitmap text object.'),
+        _('Set alignement of _PARAM0_ to _PARAM1_'),
         _('Style'),
         'res/actions/textAlign24.png',
         'res/actions/textAlign.png'
@@ -368,8 +361,7 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('setFontFamily')
-      .setGetter('getFontFamily');
+      .setFunctionName('setAlignment');
 
     object
       .addAction(
@@ -417,7 +409,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(
+  runExtensionSanityTests: function (
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
@@ -428,7 +420,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(
+  registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
   ) {
     objectsEditorService.registerEditorConfiguration(
@@ -443,7 +435,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(
+  registerInstanceRenderers: function (
     objectsRenderingService /*: ObjectsRenderingService */
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
@@ -474,35 +466,21 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      const style = new PIXI.TextStyle();
+      // Set up and load a default font. It will then be replaced by another
+      // font (see `update` method) so we go ahead with some defaults:
+      this._bitmapFontStyle = new PIXI.TextStyle();
+      this._bitmapFontStyle.fontFamily = 'Arial';
+      this._bitmapFontStyle.fontSize = 20;
+      this._bitmapFontStyle.wordWrap = false;
+      this._bitmapFontStyle.fill = '#ffffff';
 
-      //classic font in GDevelop
-      style.fontFamily = 'Arial';
-      style.fontSize = 20;
-      style.wordWrap = false;
-      style.fill = '#ffffff'; // baked color in font, not doing for be dynamic so it's white here, and real color is handle dynamicaly on bitmapText.
+      // We'll track changes of the font to trigger the loading of the new font.
+      this._currentFontResourceName = '';
 
-      const slugFontName =
-        style.fontFamily +
-        '-' +
-        style.fontSize +
-        '-' +
-        style.fill +
-        '-bitmapFont';
-
-      if (!PIXI.BitmapFont.available[slugFontName]) {
-        PIXI.BitmapFont.from(slugFontName, style, {
-          chars: PIXI.BitmapFont.ASCII,
-          textureWidth: 1024,
-        });
-      }
-
+      const fontName = this._ensureFontAvailableAndGetFontName();
       this._pixiObject = new PIXI.BitmapText('', {
-        fontName: slugFontName,
+        fontName,
       });
-
-      this.style = style;
-      this.constructorSlugFontName = slugFontName;
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -515,7 +493,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedBitmapTextInstance.getThumbnail = function(
+    RenderedBitmapTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -524,50 +502,74 @@ module.exports = {
     };
 
     /**
+     * Generate the PIXI.BitmapFont for the object according to `this._bitmapFontStyle`.
+     * You must ensure that *the font family is already loaded* before calling this.
+     */
+    RenderedBitmapTextInstance.prototype._ensureFontAvailableAndGetFontName = function () {
+      const slugFontName =
+        this._bitmapFontStyle.fontFamily +
+        '-' +
+        this._bitmapFontStyle.fontSize +
+        '-' +
+        this._bitmapFontStyle.fill +
+        '-bitmapFont';
+
+      // Load the font if it's not available yet.
+      if (!PIXI.BitmapFont.available[slugFontName]) {
+        console.info('Generating font "' + slugFontName + '" for BitmapText.');
+        PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
+          chars: PIXI.BitmapFont.ASCII,
+          textureWidth: 1024,
+        });
+      }
+
+      // TODO: find a way to unload the BitmapFont that are not used anymore, otherwise
+      // we risk filling up the memory with useless BitmapFont - especially when the user
+      // plays with the color/size.
+
+      return slugFontName;
+    };
+
+    /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedBitmapTextInstance.prototype.update = function() {
+    RenderedBitmapTextInstance.prototype.update = function () {
       const properties = this._associatedObject.getProperties();
 
-      //NOTE text - bitmapText
+      // Update the rendered text properties (note: Pixi is only
+      // applying changes if there were changed).
       const rawText = properties.get('text').getValue();
-      if (rawText !== this._pixiObject.text) {
-        this._pixiObject.text = rawText;
-      }
+      this._pixiObject.text = rawText;
 
-      //NOTE opacity - bitmapText
       const opacity = properties.get('opacity').getValue();
-      if (opacity !== this._pixiObject.opacity) {
-        this._pixiObject.alpha = opacity / 255;
-      }
+      this._pixiObject.alpha = opacity / 255;
 
-      //NOTE color - bitmapFont
-      const color = properties.get('color').getValue();
-      if (color !== this.style.fill) {
-        this.style.fill = color;
-        this._pixiObject.dirty = true;
-      }
+      const align = properties.get('align').getValue();
+      this._pixiObject.align = align;
 
-      const fontSize = Number(properties.get('fontSize').getValue());
-      if (fontSize !== this.style.fontSize) {
-        this.style.fontSize = fontSize; //size of the bitmapFont, generate a texture
-        this._pixiObject.fontSize = fontSize; // size of the bitmapText
-        this._pixiObject.dirty = true;
-      }
+      // The next properties implies that a new font texture will be generated
+      // when they change.
+      const fontColor = properties.get('fontColor').getValue();
+      this._bitmapFontStyle.fill = fontColor;
 
-      //NOTE fontFamily - bitmapFont
-      const fontResourceName = properties.get('fontFamily').getValue();
-      if (this._fontResourceName !== fontResourceName) {
-        this._fontResourceName = fontResourceName;
+      const fontSize = Number(properties.get('fontSize').getValue()) || 1;
+      this._bitmapFontStyle.fontSize = fontSize;
+      this._pixiObject.fontSize = fontSize; // We also need to update the BitmapText fontSize
+
+      // Track the changes in font to load the new requested font.
+      const fontResourceName = properties.get('fontResourceName').getValue();
+      if (this._currentFontResourceName !== fontResourceName) {
+        this._currentFontResourceName = fontResourceName;
 
         this._pixiResourcesLoader
           .loadFontFamily(this._project, fontResourceName)
-          .then(fontFamily => {
+          .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
-            this.style.fontFamily = fontFamily;
-            this._pixiObject.dirty = true;
+            this._bitmapFontStyle.fontFamily = fontFamily;
+
+            // Next update will pick up the fontFamily change and update the text.
           })
-          .catch(err => {
+          .catch((err) => {
             // Ignore errors
             console.warn(
               'Unable to load font family for RenderedBitmapTextInstance',
@@ -576,65 +578,41 @@ module.exports = {
           });
       }
 
-      const width = this._instance.hasCustomSize()
-        ? this._instance.getCustomWidth()
-        : this.getDefaultWidth();
-      const height = this._instance.hasCustomSize()
-        ? this._instance.getCustomHeight()
-        : this.getDefaultHeight();
-
-      //NOTE wordWrap to maxWidth - bitmapText
+      // Set up the wrapping width if enabled.
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap && this._instance.hasCustomSize()) {
-        this._pixiObject.maxWidth = width;
+        this._pixiObject.maxWidth = this._instance.getCustomWidth();
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
 
-      // NOTE align - bitmapText
-      const align = properties.get('align').getValue();
-      if (align !== this._pixiObject.align) {
-        this._pixiObject.align = align;
-      }
+      // Assign the font name (that will change if fontFamily, fontSize or color were
+      // changed).
+      this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName();
 
-      this._pixiObject.position.x = this._instance.getX() + width / 2;
-      this._pixiObject.position.y = this._instance.getY() + height / 2;
+      // Note: use `textWidth` as `width` seems unreliable.
+      this._pixiObject.position.x =
+        this._instance.getX() + this._pixiObject.textWidth / 2;
+      this._pixiObject.position.y =
+        this._instance.getY() + this._pixiObject.height / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-
-      const slugFontName =
-        this.style.fontFamily +
-        '-' +
-        this.style.fontSize +
-        '-' +
-        this.style.fill +
-        '-bitmapFont';
-
-      if (!PIXI.BitmapFont.available[slugFontName] || this._pixiObject.dirty) {
-        PIXI.BitmapFont.from(slugFontName, this.style, {
-          chars: PIXI.BitmapFont.ASCII,
-          textureWidth: 1024,
-        });
-        this._pixiObject.dirty = true;
-      }
-      this._pixiObject.fontName = slugFontName;
-      this._pixiObject.updateText();
     };
 
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedBitmapTextInstance.prototype.getDefaultWidth = function() {
+    RenderedBitmapTextInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedBitmapTextInstance.prototype.getDefaultHeight = function() {
+    RenderedBitmapTextInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 

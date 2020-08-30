@@ -1,8 +1,8 @@
 /* eslint-disable */
  
 /*!
- * pixi-tilemap - v2.1.0
- * Compiled Wed, 26 Aug 2020 14:03:56 UTC
+ * pixi-tilemap - v2.1.2
+ * Compiled Sun, 30 Aug 2020 00:12:54 UTC
  *
  * pixi-tilemap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -46,6 +46,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             super();
             this.zIndex = 0;
             this.modificationMarker = 0;
+            this._$_localBounds = new display.Bounds();
             this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
             this._globalMat = null;
             this.pointsBuf = [];
@@ -73,6 +74,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
         clear() {
             this.pointsBuf.length = 0;
             this.modificationMarker = 0;
+            this._$_localBounds.clear();
             this.hasAnim = false;
         }
         addFrame(texture_, x, y, animX, animY) {
@@ -120,6 +122,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             pb.push(textureIndex);
             pb.push(animCountX);
             pb.push(animCountY);
+            this._$_localBounds.addFramePad(x, y, x + tileWidth, y + tileHeight, 0, 0);
             return this;
         }
         tileRotate(rotate) {
@@ -343,6 +346,16 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
         clearModify() {
             this.modificationMarker = this.pointsBuf.length;
         }
+        _calculateBounds() {
+            const { minX, minY, maxX, maxY } = this._$_localBounds;
+            this._bounds.addFrame(this.transform, minX, minY, maxX, maxY);
+        }
+        getLocalBounds(rect) {
+            if (this.children.length === 0) {
+                return this._$_localBounds.getRectangle(rect);
+            }
+            return super.getLocalBounds.call(this, rect);
+        }
         destroy(options) {
             super.destroy(options);
             this.destroyVb();
@@ -357,9 +370,6 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             this._globalMat = null;
             this._lastLayer = null;
             this.initialize.apply(this, arguments);
-        }
-        updateTransform() {
-            this.displayObjectUpdateTransform();
         }
         initialize(zIndex, bitmaps, texPerChild) {
             if (texPerChild === true) {
@@ -486,7 +496,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
                         layer.compositeParent = true;
                         layer.offsetX = Constant.boundSize;
                         layer.offsetY = Constant.boundSize;
-                        children.push(layer);
+                        this.addChild(layer);
                         ind = 0;
                     }
                 }
@@ -724,7 +734,7 @@ void main(void){
 `;
     class TilemapShader extends core.Shader {
         constructor(maxTextures, shaderVert, shaderFrag) {
-            super(new PIXI.Program(shaderVert, shaderFrag), {
+            super(new core.Program(shaderVert, shaderFrag), {
                 animationFrame: new Float32Array(2),
                 uSamplers: [],
                 uSamplerSize: [],
@@ -958,5 +968,5 @@ void main(void){
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-
+// Object.assign(this.PIXI.tilemap, pixi_tilemap);
 //# sourceMappingURL=pixi-tilemap.umd.js.map

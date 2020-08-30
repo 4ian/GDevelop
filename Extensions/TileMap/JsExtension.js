@@ -365,8 +365,6 @@ module.exports = {
       console.log(PIXI.tilemap);
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
-      this._pixiObject.transform.x = 0.5;
-      this._pixiObject.transform.y = 0.5;
       console.log(this._pixiObject);
       this._pixiContainer.addChild(this._pixiObject);
       // this._pixiContainer.addChild(this._tileSet);
@@ -479,8 +477,8 @@ module.exports = {
         this._pixiObject.dirty = true;
       }
 
-      this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+      this._pixiObject.x = this._instance.getX();
+      this._pixiObject.y = this._instance.getY();
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );

@@ -39,7 +39,7 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
   /** @type {number} */
-  this._wrappingWidth = 250; // This value is the default wrapping width of the runtime object.
+  this._wrappingWidth = 0;
   /** @type {string} */
   this._align = objectData.content.align;
 

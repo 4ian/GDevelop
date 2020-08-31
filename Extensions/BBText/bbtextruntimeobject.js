@@ -29,8 +29,8 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {string} */
   this._text = objectData.content.text;
-  /** @type {string} */
-  this._color = objectData.content.color;
+  /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
+  this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(objectData.content.color);
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
   /** @type {number} */
@@ -61,6 +61,11 @@ gdjs.BBTextRuntimeObject.prototype = Object.create(
 );
 gdjs.registerObject('BBText::BBText', gdjs.BBTextRuntimeObject);
 
+gdjs.BBTextRuntimeObject.hexToRGBColor = function (hex) {
+  var hexNumber = parseInt(hex.replace('#', ''), 16);
+  return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
+};
+
 gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
@@ -80,7 +85,7 @@ gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
     this.setBBText(newObjectData.content.text);
   }
   if (oldObjectData.content.color !== newObjectData.content.color) {
-    this._color = newObjectData.content.color;
+    this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(newObjectData.content.color);
     this._renderer.updateColor();
   }
   if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
@@ -132,19 +137,19 @@ gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
 gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
-  const hexColor =
-    '#' +
-    gdjs.rgbToHex(
-      parseInt(splitValue[0], 0),
-      parseInt(splitValue[1], 0),
-      parseInt(splitValue[2], 0)
-    );
-  this._color = hexColor;
+
+  this._color[0] = parseInt(splitValue[0], 10);
+  this._color[1] = parseInt(splitValue[1], 10);
+  this._color[2] = parseInt(splitValue[2], 10);
   this._renderer.updateColor();
 };
 
+/**
+ * Get the base color.
+ * @return {string} The color as a "R;G;B" string, for example: "255;0;0"
+ */
 gdjs.BBTextRuntimeObject.prototype.getColor = function() {
-  return this._color;
+  return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {

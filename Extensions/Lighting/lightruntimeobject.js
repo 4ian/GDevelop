@@ -147,11 +147,11 @@ gdjs.LightRuntimeObject.prototype.getDrawableY = function () {
 };
 
 /**
- * Get the color of the light object in format [r, g, b], with components in the range of [0-255].
- * @returns {number[]} the color of light object in rgb format.
+ * Get the color of the light object as a "R;G;B" string.
+ * @returns {string} the color of light object in "R;G;B" format.
  */
 gdjs.LightRuntimeObject.prototype.getColor = function () {
-  return this._color;
+  return this._color[0] + ';' + this._color[1] + ';' + this._color[2];
 };
 
 /**
@@ -161,9 +161,9 @@ gdjs.LightRuntimeObject.prototype.getColor = function () {
 gdjs.LightRuntimeObject.prototype.setColor = function (color) {
   var rgbColor = color.split(';');
   this._color = [
-    parseInt(rgbColor[0]),
-    parseInt(rgbColor[1]),
-    parseInt(rgbColor[2]),
+    parseInt(rgbColor[0], 10),
+    parseInt(rgbColor[1], 10),
+    parseInt(rgbColor[2], 10),
   ];
   this._renderer.updateColor();
 };

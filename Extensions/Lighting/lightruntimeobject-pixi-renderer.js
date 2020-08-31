@@ -11,7 +11,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._runtimeScene = runtimeScene;
   this._manager = runtimeObject.getObstaclesManager();
   this._radius = runtimeObject.getRadius();
-  var objectColor = runtimeObject.getColor();
+  var objectColor = runtimeObject._color;
   this._color = [
     objectColor[0] / 255,
     objectColor[1] / 255,
@@ -205,7 +205,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateRadius = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
-  var objectColor = this._object.getColor();
+  var objectColor = this._object._color;
   this._color = [
     objectColor[0] / 255,
     objectColor[1] / 255,

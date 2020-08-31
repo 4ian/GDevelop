@@ -19,7 +19,11 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     .getFontManager()
     .getFontFamily(runtimeObject._fontResourceName);
   this._bitmapFontStyle.fontSize = runtimeObject._fontSize;
-  this._bitmapFontStyle.fill = runtimeObject._fontColor;
+  this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
+    runtimeObject._fontColor[0],
+    runtimeObject._fontColor[1],
+    runtimeObject._fontColor[2]
+  );
 
   // Load (or reset) the text
   if (this._pixiObject === undefined) {
@@ -81,7 +85,11 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateColor = function () {
-  this._bitmapFontStyle.fill = this._object._fontColor;
+  this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
+    this._object._fontColor[0],
+    this._object._fontColor[1],
+    this._object._fontColor[2]
+  );
   this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName();
 };
 

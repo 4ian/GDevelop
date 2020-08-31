@@ -30,6 +30,16 @@ window.gdjs = {
 };
 
 /**
+ * Convert a string hex color value to an array [r, g, b], where each component is in the range [0, 255].
+ * @param {string} hex Color hexadecimal
+ * @returns {array}
+ */
+gdjs.hexToRGBColor = function (hex) {
+  var hexNumber = parseInt(hex.replace('#', ''), 16);
+  return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
+};
+
+/**
  * Convert a rgb color value to a hex string.
  *
  * No "#" or "0x" are added.
@@ -383,13 +393,13 @@ gdjs.filterPickedObjectsList = function (arr) {
  * @param {Array<any>} src The source array
  * @param {Array<any>} dst The destination array
  */
-gdjs.copyArray = function(src, dst) {
+gdjs.copyArray = function (src, dst) {
   var len = src.length;
   for (var i = 0; i < len; ++i) {
     dst[i] = src[i];
   }
   dst.length = len;
-}
+};
 
 //Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;

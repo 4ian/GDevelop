@@ -19,8 +19,8 @@ type Props = {|
 const getButtonSizes = (screenType: ScreenType) => {
   if (screenType === 'touch') {
     return {
-      buttonSize: 18,
-      smallButtonSize: 13,
+      buttonSize: 25,
+      smallButtonSize: 18,
       buttonPadding: 5,
     };
   }

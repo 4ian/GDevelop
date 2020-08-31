@@ -1856,7 +1856,7 @@ const MainFrame = (props: Props) => {
         open={projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
-          className: "safe-area-aware-left-container"
+          className: 'safe-area-aware-left-container',
         }}
         ModalProps={{
           keepMounted: true,

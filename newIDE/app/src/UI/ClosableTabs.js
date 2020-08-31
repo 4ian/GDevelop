@@ -4,6 +4,7 @@ import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import ContextMenu from './Menu/ContextMenu';
+import { useLongTouch } from '../Utils/UseLongTouch';
 
 const styles = {
   tabsContainerStyle: {
@@ -139,6 +140,18 @@ export function ClosableTab({
     }
   };
 
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        if (contextMenu.current) {
+          contextMenu.current.open(event.clientX, event.clientY);
+        }
+      },
+      [contextMenu]
+    )
+  );
+
   return (
     <ThemeConsumer>
       {muiTheme => {
@@ -162,6 +175,7 @@ export function ClosableTab({
               <ButtonBase
                 onClick={onClick}
                 onContextMenu={openContextMenu}
+                {...longTouchForContextMenuProps}
                 focusRipple
               >
                 <span
@@ -178,6 +192,7 @@ export function ClosableTab({
                 <ButtonBase
                   onClick={onClose}
                   onContextMenu={openContextMenu}
+                  {...longTouchForContextMenuProps}
                   focusRipple
                 >
                   <Close

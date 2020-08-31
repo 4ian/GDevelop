@@ -6,10 +6,10 @@ import Paper from '@material-ui/core/Paper';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import Error from '@material-ui/icons/Error';
-import { Spacer } from './Grid';
+import { Spacer, Line, Column } from './Grid';
 import FlatButton from './FlatButton';
 import Text from './Text';
-import ThemeConsumer from './Theme/ThemeConsumer';
+import GDevelopThemeContext from './Theme/ThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';
 
 const styles = {
@@ -35,47 +35,60 @@ const AlertMessage = ({
   onHide,
   renderRightButton,
   renderLeftIcon,
-}: Props) => (
-  <Paper>
-    <ThemeConsumer>
-      {muiTheme => (
-        <ResponsiveLineStackLayout noMargin alignItems="center">
-          {renderLeftIcon ? (
-            <React.Fragment>
-              <Spacer />
-              {renderLeftIcon()}
-              <Spacer />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {kind === 'info' && <Info style={styles.icon} />}
-              {kind === 'warning' && (
-                <Warning
-                  style={{
-                    ...styles.icon,
-                    color: muiTheme.message.warning,
-                  }}
-                />
-              )}
-              {kind === 'error' && (
-                <Error
-                  style={{
-                    ...styles.icon,
-                    color: muiTheme.message.error,
-                  }}
-                />
-              )}
-            </React.Fragment>
-          )}
-          <Text style={styles.content}>{children}</Text>
-          {renderRightButton && renderRightButton()}
-          {onHide && (
-            <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
-          )}
+}: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <Paper elevation={10} square>
+      <Column expand>
+        <ResponsiveLineStackLayout
+          alignItems="center"
+          justifyContent="space-between"
+          noMargin
+        >
+          <Line noMargin alignItems="center">
+            {renderLeftIcon ? (
+              <React.Fragment>
+                {renderLeftIcon()}
+                <Spacer />
+                <Spacer />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                {kind === 'info' && <Info style={styles.icon} />}
+                {kind === 'warning' && (
+                  <Warning
+                    style={{
+                      ...styles.icon,
+                      color: gdevelopTheme.message.warning,
+                    }}
+                  />
+                )}
+                {kind === 'error' && (
+                  <Error
+                    style={{
+                      ...styles.icon,
+                      color: gdevelopTheme.message.error,
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            )}
+            <Text style={styles.content}>{children}</Text>
+          </Line>
+          <ResponsiveLineStackLayout noMargin alignItems="center">
+            {renderRightButton && renderRightButton()}
+            {onHide && (
+              <FlatButton
+                label={<Trans>Hide</Trans>}
+                onClick={() => onHide()}
+              />
+            )}
+          </ResponsiveLineStackLayout>
         </ResponsiveLineStackLayout>
-      )}
-    </ThemeConsumer>
-  </Paper>
-);
+      </Column>
+    </Paper>
+  );
+};
 
 export default AlertMessage;

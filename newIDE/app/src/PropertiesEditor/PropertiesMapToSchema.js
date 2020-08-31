@@ -47,11 +47,13 @@ export default (
         name,
         valueType,
         getValue: (instance: Instance): number => {
-          return parseFloat(
-            getProperties(instance)
-              .get(name)
-              .getValue()
-          );
+          return (
+            parseFloat(
+              getProperties(instance)
+                .get(name)
+                .getValue()
+            ) || 0
+          ); // Consider a missing value as 0 to avoid propagating NaN.
         },
         setValue: (instance: Instance, newValue: number) => {
           onUpdateProperty(instance, name, '' + newValue);

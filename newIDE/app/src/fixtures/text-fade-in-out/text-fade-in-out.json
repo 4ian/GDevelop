@@ -146,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
-          "persistentUuid": "2ad25361-8811-4192-b43d-48dc78e0678f",
+          "persistentUuid": "da35caba-dc63-43ae-a4cf-ee2ddf51c643",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -274,6 +274,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -329,7 +334,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
-          "persistentUuid": "88b9331b-b1dc-40bd-b18b-dedd57f718f0",
+          "persistentUuid": "546e7174-6dfd-4d83-89ee-b944ef5697f1",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -457,6 +462,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -512,7 +522,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
-          "persistentUuid": "b2b39fee-1506-4b8b-b80f-946539e752ec",
+          "persistentUuid": "68eeb7e6-692e-44ad-b629-91f9803509b5",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -640,6 +650,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -2,13 +2,13 @@
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
+import { getElectronAccelerator } from '../KeyboardShortcuts';
+import { useShortcutMap } from '../KeyboardShortcuts';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
 import { type MainMenuProps } from './MainMenu.flow';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-
-const openRecentProjectCommandText = t`Open recent project...`;
 
 type MainMenuEvent =
   | 'main-menu-open'
@@ -75,19 +75,24 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   );
 };
 
-const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
+const buildAndSendMenuTemplate = (
+  project,
+  i18n,
+  recentProjectFiles,
+  shortcutMap
+) => {
   const fileTemplate = {
     label: i18n._(t`File`),
     submenu: [
       {
         label: i18n._(t`Create a New Project...`),
-        accelerator: 'CommandOrControl+N',
+        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
         onClickSendEvent: 'main-menu-create',
       },
       { type: 'separator' },
       {
         label: i18n._(t`Open...`),
-        accelerator: 'CommandOrControl+O',
+        accelerator: getElectronAccelerator(shortcutMap['OPEN_PROJECT']),
         onClickSendEvent: 'main-menu-open',
       },
       {
@@ -101,27 +106,27 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
       { type: 'separator' },
       {
         label: i18n._(t`Save`),
-        accelerator: 'CommandOrControl+S',
+        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT']),
         onClickSendEvent: 'main-menu-save',
         enabled: !!project,
       },
       {
         label: i18n._(t`Save as...`),
-        accelerator: 'CommandOrControl+Alt+S',
+        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
         enabled: !!project,
       },
       { type: 'separator' },
       {
         label: i18n._(t`Export (web, iOS, Android)...`),
-        accelerator: 'CommandOrControl+E',
+        accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
         onClickSendEvent: 'main-menu-export',
         enabled: !!project,
       },
       { type: 'separator' },
       {
         label: i18n._(t`Close Project`),
-        accelerator: 'CommandOrControl+Shift+W',
+        accelerator: getElectronAccelerator(shortcutMap['CLOSE_PROJECT']),
         onClickSendEvent: 'main-menu-close',
         enabled: !!project,
       },
@@ -145,7 +150,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
       { type: 'separator' },
       {
         label: i18n._(t`Exit GDevelop`),
-        accelerator: 'Control+Q',
+        accelerator: getElectronAccelerator(shortcutMap['QUIT_APP']),
         onClickSendEvent: 'main-menu-close-app',
       }
     );
@@ -171,7 +176,9 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
     submenu: [
       {
         label: i18n._(t`Show Project Manager`),
-        accelerator: 'CommandOrControl+Alt+P',
+        accelerator: getElectronAccelerator(
+          shortcutMap['OPEN_PROJECT_MANAGER']
+        ),
         onClickSendEvent: 'main-menu-open-project-manager',
         enabled: !!project,
       },
@@ -309,6 +316,7 @@ const buildAndSendMenuTemplate = (project, i18n, recentProjectFiles) => {
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
   const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
+  const shortcutMap = useShortcutMap();
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
@@ -333,13 +341,12 @@ const ElectronMainMenu = (props: MainMenuProps) => {
 
   React.useEffect(
     () => {
-      buildAndSendMenuTemplate(project, i18n, recentProjectFiles);
+      buildAndSendMenuTemplate(project, i18n, recentProjectFiles, shortcutMap);
     },
-    [i18n, language, project, recentProjectFiles]
+    [i18n, language, project, recentProjectFiles, shortcutMap]
   );
 
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
-    displayText: openRecentProjectCommandText,
     generateOptions: React.useCallback(
       () =>
         recentProjectFiles.map(item => ({

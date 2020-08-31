@@ -108,6 +108,38 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
 };
 
 const tutorialHints = {
+  'screen-shake-timer-variables': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/screen-shake-timer-variables.jpg',
+    name: 'Screen Shake Effect with Timers and Variables',
+    message: t`Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.`,
+    link: 'https://www.youtube.com/watch?v=0w0NGuj4OFQ',
+    identifier: 'screen-shake-timer-variables',
+  },
+  'ghost-enemy-following-player': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/ghost-enemy-following-player.jpg',
+    name: 'Ghost Enemy Following the Player',
+    message: t`Make a ghost like enemy floating toward the player.`,
+    link: 'https://www.youtube.com/watch?v=SLUlnhKuuqE',
+    identifier: 'ghost-enemy-following-player',
+  },
+  'melee-sword-attack': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/melee-sword-attack.jpg',
+    name: 'Melee/Sword Attack',
+    message: t`Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.`,
+    link: 'https://www.youtube.com/watch?v=3XT40kDRp8g',
+    identifier: 'melee-sword-attack',
+  },
+  'physics-engine-platformer-game': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/physics-engine-platformer-game.jpg',
+    name: 'Platformer with the physics engine',
+    message: t`Learn how to make a platformer game using the physics engine.`,
+    link: 'https://www.youtube.com/watch?v=96gNCmnQwaE',
+    identifier: 'physics-engine-platformer-game',
+  },
   'tween-behavior': {
     kind: 'video-tutorial',
     iconSrc: 'res/tutorial_icons/tween-behavior.jpg',
@@ -208,6 +240,9 @@ export const getBehaviorTutorialHints = (type: string): Array<TutorialHint> => {
   }
   if (type === 'AnchorBehavior::AnchorBehavior') {
     return [tutorialHints['responsive-ui']];
+  }
+  if (type === 'Physics2::Physics2Behavior') {
+    return [tutorialHints['physics-engine-platformer-game']];
   }
 
   return [];

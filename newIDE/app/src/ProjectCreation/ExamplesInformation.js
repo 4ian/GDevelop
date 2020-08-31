@@ -309,7 +309,7 @@ module.exports = {
     ]
   },
   "bbtext-object-demo": {
-    "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\r\n",
+    "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -419,7 +419,7 @@ module.exports = {
     ]
   },
   "board-walk-with-raycast": {
-    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\r\n",
+    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -542,7 +542,7 @@ module.exports = {
     ]
   },
   "breakout": {
-    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\r\n",
+    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -620,7 +620,7 @@ module.exports = {
     ]
   },
   "cannon-ball-with-physics": {
-    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\r\n",
+    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -892,7 +892,7 @@ module.exports = {
     ]
   },
   "count-down-timer": {
-    "description": "Show how to use a variable as a timer and display it on screen like a bomb count down timer.\r\n",
+    "description": "Show how to use a variable as a timer and display it on screen like a bomb count down timer.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -934,7 +934,7 @@ module.exports = {
     ]
   },
   "create-random-object": {
-    "description": "Show how to create a object randomly picked in a list.\r\n",
+    "description": "Show how to create a object randomly picked in a list.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -976,7 +976,7 @@ module.exports = {
     ]
   },
   "custom-mouse-pointer": {
-    "description": "Learn how to replace the mouse cursor by a custom image.\r\n",
+    "description": "Learn how to replace the mouse cursor by a custom image.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1113,7 +1113,7 @@ module.exports = {
     ]
   },
   "dialogue-tree-with-yarn": {
-    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\r\n",
+    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1428,7 +1428,7 @@ module.exports = {
     ]
   },
   "filesystem-create-directory": {
-    "description": "Show how to ask the user for a folder name and create it on the disk.\r\n",
+    "description": "Show how to ask the user for a folder name and create it on the disk.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1502,7 +1502,7 @@ module.exports = {
     ]
   },
   "flappy-bird": {
-    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\r\n",
+    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1563,6 +1563,51 @@ module.exports = {
       {
         "fullName": "System information",
         "name": "SystemInfo"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
+  "game-feel-demo": {
+    "description": "A demo showing how to enhance the \"game feel\" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       },
       {
         "fullName": "Time",
@@ -1636,7 +1681,7 @@ module.exports = {
     ]
   },
   "geometry-monster": {
-    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\r\n",
+    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1959,7 +2004,7 @@ module.exports = {
     ]
   },
   "level-editor": {
-    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\r\n",
+    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2020,7 +2065,7 @@ module.exports = {
     ]
   },
   "level-selection-unlock": {
-    "description": "Show how to save user progress and progressively unlock levels.\r\n",
+    "description": "Show how to save user progress and progressively unlock levels.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2049,6 +2094,47 @@ module.exports = {
       {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "lights": {
+    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Lights",
+        "name": "Lighting"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },
@@ -2140,7 +2226,7 @@ module.exports = {
     ]
   },
   "menu-with-functions-and-text-effects": {
-    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\r\n",
+    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2194,7 +2280,7 @@ module.exports = {
     ]
   },
   "move-object-back-and-forth": {
-    "description": "Use events to move objects back and forth vertically or horizontally.\r\n",
+    "description": "Use events to move objects back and forth vertically or horizontally.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2327,7 +2413,7 @@ module.exports = {
     ]
   },
   "multi-language-menu": {
-    "description": "Show how to translate a menu (titles, buttons) in multiple languages and add an option for the player to choose the language.\r\n",
+    "description": "Show how to translate a menu (titles, buttons) in multiple languages and add an option for the player to choose the language.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2360,7 +2446,7 @@ module.exports = {
     ]
   },
   "multiplayer-platformer-with-gamepads": {
-    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\r\n",
+    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2607,7 +2693,7 @@ module.exports = {
     ]
   },
   "pairs": {
-    "description": "Find all matching pairs of cards in this relaxing game. Use tweens to create smooth, natural animations with a few events.\r\n",
+    "description": "Find all matching pairs of cards in this relaxing game. Use tweens to create smooth, natural animations with a few events.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2768,7 +2854,7 @@ module.exports = {
     ]
   },
   "particle-effects-demo": {
-    "description": "",
+    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -3891,7 +3977,7 @@ module.exports = {
     ]
   },
   "space-shooter": {
-    "description": "A beautiful, retro side-scrolling shooter where you must defeat incoming enemies with your mecha transforming spaceship. Huge boss included!\r\n",
+    "description": "A beautiful, retro side-scrolling shooter where you must defeat incoming enemies with your mecha transforming spaceship. Huge boss included!\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -3990,7 +4076,7 @@ module.exports = {
     ]
   },
   "tabbed-menu-with-layers": {
-    "description": "Example showing how to create a menu with multiple tabs.\r\n",
+    "description": "Example showing how to create a menu with multiple tabs.\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -4197,7 +4283,7 @@ module.exports = {
     ]
   },
   "unlock-items": {
-    "description": "Show how to save the items unlocked by the user and load them later (when the game is launched again for example, or when starting a saved game).\r\n",
+    "description": "Show how to save the items unlocked by the user and load them later (when the game is launched again for example, or when starting a saved game).\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",

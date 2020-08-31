@@ -162,7 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "6268df4c-88ec-443c-b4b6-a99882fb4839",
+          "persistentUuid": "89bb096d-e56d-4c17-9a29-c7524613fde1",
           "width": 0,
           "x": 336.849,
           "y": 241.534,
@@ -178,7 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "4309a7dc-0c03-4f16-8a0f-331104a351a9",
+          "persistentUuid": "f93ecb5f-474c-427d-a290-af90633b492d",
           "width": 0,
           "x": 117.085,
           "y": 1.20455,
@@ -742,6 +742,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

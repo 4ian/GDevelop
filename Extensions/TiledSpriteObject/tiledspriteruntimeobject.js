@@ -213,7 +213,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the tiled sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.TiledSpriteRuntimeObject.prototype.getColor = function() {
     return this._renderer.getColor();

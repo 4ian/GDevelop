@@ -171,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Source",
-          "persistentUuid": "28c7d090-451a-4b9f-9f9f-a2e28885bb86",
+          "persistentUuid": "31763445-73a8-4db9-beb0-15f225c2ec40",
           "width": 0,
           "x": 658.399,
           "y": 247.805,
@@ -187,7 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "1267cea2-339c-4c67-8a54-43ca32dedef4",
+          "persistentUuid": "cf807a01-7445-474d-b603-a5d21c2233bb",
           "width": 0,
           "x": 56.3788,
           "y": 532.427,
@@ -203,7 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "22272b77-cadd-4c4c-9e5b-1e60ba830820",
+          "persistentUuid": "7a58bb38-db2f-4837-87a7-441f7b3bd1e4",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -655,6 +655,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

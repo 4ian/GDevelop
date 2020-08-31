@@ -1,12 +1,8 @@
 // @flow
-import { t } from '@lingui/macro';
 import { useCommand } from '../CommandPalette/CommandHooks';
 import useObjectsListCommands from '../ObjectsList/UseObjectsListCommands';
 import useObjectGroupsListCommands from '../ObjectGroupsList/UseObjectGroupsListCommands';
 import useLayersListCommands from '../LayersList/UseLayersListCommands';
-
-const openScenePropertiesCommandText = t`Open scene properties`;
-const openSceneVariablesCommandText = t`Open scene variables`;
 
 type Props = {|
   project: gdProject,
@@ -34,12 +30,10 @@ const UseSceneEditorCommands = (props: Props) => {
   } = props;
 
   useCommand('OPEN_SCENE_PROPERTIES', true, {
-    displayText: openScenePropertiesCommandText,
     handler: onOpenSceneProperties,
   });
 
   useCommand('OPEN_SCENE_VARIABLES', true, {
-    displayText: openSceneVariablesCommandText,
     handler: onOpenSceneVariables,
   });
 

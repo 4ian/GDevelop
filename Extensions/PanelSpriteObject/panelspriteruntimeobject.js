@@ -258,7 +258,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the panel sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getColor = function() {
   return this._renderer.getColor();

@@ -153,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "bbe65ddd-e67c-4895-90c3-2b70183ae82b",
+          "persistentUuid": "491ea1e6-8ef5-47b1-80e6-ce0d5b332ab6",
           "width": 0,
           "x": 960,
           "y": 0,
@@ -169,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "0c068604-89f8-400b-9fc6-e88cbfe1d677",
+          "persistentUuid": "b96d9b1d-508f-4dc8-bf99-bc9985aff2ea",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -357,6 +357,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -4,6 +4,8 @@ import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -28,7 +30,8 @@ export type AlertMessageIdentifier =
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
-  | 'p2p-broker-recommendation';
+  | 'p2p-broker-recommendation'
+  | 'command-palette-shortcut';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -129,6 +132,10 @@ export const allAlertMessages: Array<{
     key: 'p2p-broker-recommendation',
     label: <Trans>Peer to peer broker server recommendation</Trans>,
   },
+  {
+    key: 'command-palette-shortcut',
+    label: <Trans>Command palette keyboard shortcut</Trans>,
+  },
 ];
 
 /**
@@ -156,7 +163,7 @@ export type PreferencesValues = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
-  useCommandPalette: boolean,
+  userShortcutMap: ShortcutMap,
 |};
 
 /**
@@ -201,7 +208,8 @@ export type Preferences = {|
   setAutoOpenMostRecentProject: (enabled: boolean) => void,
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
-  setUseCommandPalette: (enabled: boolean) => void,
+  resetShortcutsToDefault: () => void,
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
 |};
 
 export const initialPreferences = {
@@ -225,7 +233,7 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    useCommandPalette: true,
+    userShortcutMap: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -260,7 +268,8 @@ export const initialPreferences = {
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
-  setUseCommandPalette: (enabled: boolean) => {},
+  resetShortcutsToDefault: () => {},
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

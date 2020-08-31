@@ -261,7 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
-          "persistentUuid": "9289193f-3082-4d3d-911e-2adc0b79ffe3",
+          "persistentUuid": "5517e6b4-7360-4366-a3e2-18d8ebc4f5f1",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -282,7 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
-          "persistentUuid": "489e49fc-ae19-4159-a059-54fbed7496f0",
+          "persistentUuid": "ec900eda-f05a-495d-a02f-2499495b5d67",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -298,7 +298,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
-          "persistentUuid": "03e7c6dc-38a8-4ea1-a21c-0d9b02b6a74a",
+          "persistentUuid": "2b816abb-e8c5-4e5a-8d5f-01237003a244",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -314,7 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
-          "persistentUuid": "ac7f860a-0c73-45b3-a763-bc31624028c0",
+          "persistentUuid": "178aa5ff-36b0-4daf-96f0-7c11c13b3abb",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -330,7 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
-          "persistentUuid": "ece20553-fe6c-4309-b227-b0af01a57bfc",
+          "persistentUuid": "41e0922a-dc2d-4c8a-a6dc-aa5697ec5c8e",
           "width": 0,
           "x": 257,
           "y": 202,
@@ -3363,6 +3363,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3380,6 +3385,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [

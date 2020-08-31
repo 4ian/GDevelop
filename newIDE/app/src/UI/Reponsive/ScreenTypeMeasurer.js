@@ -30,3 +30,7 @@ export const ScreenTypeMeasurer = ({ children }: Props) => {
 
   return children(userHasTouchedScreen ? 'touch' : 'normal');
 };
+
+export const useScreenType = () => {
+  return userHasTouchedScreen ? 'touch' : 'normal';
+};

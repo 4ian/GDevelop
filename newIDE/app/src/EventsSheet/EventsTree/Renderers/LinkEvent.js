@@ -29,7 +29,10 @@ const styles = {
     padding: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
 

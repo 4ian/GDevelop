@@ -2,7 +2,7 @@
  * @typedef {Object} BBTextObjectDataType Base parameters for {@link gdjs.BBTextRuntimeObject}
  * @property {Object} content The base parameters of the BBText
  * @property {number} content.opacity The opacity of the BBText
- * @property {boolean} content.visible Is the text visible?
+ * @property {boolean} content.visible Deprecated - Is the text visible?
  * @property {string} content.text Content of the text
  * @property {string} content.color The color of the text
  * @property {string} content.fontFamily The font of the text
@@ -25,17 +25,17 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   /** @type {number} */
-  this._opacity = objectData.content.opacity;
-  /** @type {boolean} */
-  this._visible = objectData.content.visible;
+  this._opacity = parseFloat(objectData.content.opacity);
+  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {string} */
   this._text = objectData.content.text;
-  /** @type {string} */
-  this._color = objectData.content.color;
+  /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
+  this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(objectData.content.color);
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
   /** @type {number} */
-  this._fontSize = objectData.content.fontSize;
+  this._fontSize = parseFloat(objectData.content.fontSize);
+  // parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
   /** @type {number} */
@@ -46,8 +46,11 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else
-    /** @type {gdjs.BBTextRuntimeObjectRenderer} */
     this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
+
+  // While this should rather be exposed as a property for all objects, honor the "visible"
+  // property that is specific to this object.
+  this.hidden = !objectData.content.visible;
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();
@@ -58,8 +61,47 @@ gdjs.BBTextRuntimeObject.prototype = Object.create(
 );
 gdjs.registerObject('BBText::BBText', gdjs.BBTextRuntimeObject);
 
+gdjs.BBTextRuntimeObject.hexToRGBColor = function (hex) {
+  var hexNumber = parseInt(hex.replace('#', ''), 16);
+  return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
+};
+
 gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
+};
+
+/**
+ * @param {BBTextObjectDataType} oldObjectData
+ * @param {BBTextObjectDataType} newObjectData
+ */
+gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.visible !== newObjectData.content.visible) {
+    this.hide(!newObjectData.content.visible);
+  }
+  if (oldObjectData.content.text !== newObjectData.content.text) {
+    this.setBBText(newObjectData.content.text);
+  }
+  if (oldObjectData.content.color !== newObjectData.content.color) {
+    this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(newObjectData.content.color);
+    this._renderer.updateColor();
+  }
+  if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
+    this.setFontFamily(newObjectData.content.fontFamily);
+  }
+  if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
+    this.setFontSize(newObjectData.content.fontSize);
+  }
+  if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
+    this.setWordWrap(newObjectData.content.wordWrap);
+  }
+  if (oldObjectData.content.align !== newObjectData.content.align) {
+    this.setAlignment(newObjectData.content.align);
+  }
+
+  return true;
 };
 
 /**
@@ -67,9 +109,10 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
  * @private
  */
 gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-  // The wrapping width value (this._wrappingWidth) is using the object's width as an innitial value
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);
+  else
+    this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
 };
 
 gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
@@ -77,13 +120,16 @@ gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
 };
 
 /**
- * Set/Get BBText base style properties
+ * Set the markup text to display.
  */
 gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
   this._text = text;
   this._renderer.updateText();
 };
 
+/**
+ * Get the markup text displayed by the object.
+ */
 gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
   return this._text;
 };
@@ -91,19 +137,19 @@ gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
 gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
-  const hexColor =
-    '#' +
-    gdjs.rgbToHex(
-      parseInt(splitValue[0], 0),
-      parseInt(splitValue[1], 0),
-      parseInt(splitValue[2], 0)
-    );
-  this._color = hexColor;
+
+  this._color[0] = parseInt(splitValue[0], 10);
+  this._color[1] = parseInt(splitValue[1], 10);
+  this._color[2] = parseInt(splitValue[2], 10);
   this._renderer.updateColor();
 };
 
+/**
+ * Get the base color.
+ * @return {string} The color as a "R;G;B" string, for example: "255;0;0"
+ */
 gdjs.BBTextRuntimeObject.prototype.getColor = function() {
-  return this._color;
+  return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
 };
 
 gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {

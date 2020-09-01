@@ -7,7 +7,7 @@ import {
 } from '.';
 import ObjectsEditorService from '../ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 // The list of "JsExtension.js" files to be bundled in the webapp, keyed by their extension name.
 const jsExtensions = [
@@ -76,6 +76,11 @@ const jsExtensions = [
   {
     name: 'Effects',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'P2P',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
 ];

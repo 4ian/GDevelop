@@ -11,6 +11,13 @@ import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Line, Spacer } from './Grid';
+import { getIDEVersionWithHash } from '../Version';
+import {
+  getArch,
+  getPlatformName,
+  getSystemVersion,
+  getUserAgent,
+} from '../Utils/Platform';
 
 const errorHandler = (error: Error, componentStack: string) => {
   console.error('Error catched by Boundary:', error, componentStack);
@@ -64,6 +71,13 @@ ${error ? error.stack : 'No error found'}
 \`\`\`
 ${componentStack || 'No component stack found'}
 \`\`\`
+
+## Other details
+* IDE version: ${getIDEVersionWithHash()}
+* Arch: ${getArch()},
+* Platform Name: ${getPlatformName()},
+* System Version: ${getSystemVersion()},
+* User Agent: ${getUserAgent()},
         `;
         Window.openExternalURL(
           `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(

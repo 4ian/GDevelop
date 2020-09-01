@@ -12,7 +12,7 @@ const DELETE_KEY = 46;
 const EQUAL_KEY = 187;
 const MINUS_KEY = 189;
 const NUMPAD_ADD = 107;
-const NUMPAD_SUBSTRACT = 109;
+const NUMPAD_SUBTRACT = 109;
 const C_KEY = 67;
 const F_KEY = 70;
 const V_KEY = 86;
@@ -158,20 +158,18 @@ export default class DeprecatedKeyboardShortcuts {
       this.onSearch();
     }
 
-    if (isMacLike()) {
-      //Mac specific shortcuts -- zooming done differently on windows and linux
-      if (this._isControlPressed() && evt.which === MINUS_KEY) {
-        this.onZoomOut();
-      }
-      if (this._isControlPressed() && evt.which === EQUAL_KEY) {
-        this.onZoomIn();
-      }
-      if (evt.which === NUMPAD_SUBSTRACT) {
-        this.onZoomOut();
-      }
-      if (evt.which === NUMPAD_ADD) {
-        this.onZoomIn();
-      }
+    if (this._isControlPressed() && evt.which === MINUS_KEY) {
+      this.onZoomOut();
+    }
+    if (evt.which === NUMPAD_SUBTRACT) {
+      this.onZoomOut();
+    }
+
+    if (this._isControlPressed() && evt.which === EQUAL_KEY) {
+      this.onZoomIn();
+    }
+    if (evt.which === NUMPAD_ADD) {
+      this.onZoomIn();
     }
 
     if (preventDefault) {

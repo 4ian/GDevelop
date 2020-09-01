@@ -101,7 +101,20 @@ gdjs.dialogueTree.isRunning = function() {
 gdjs.dialogueTree.scrollClippedText = function() {
   if (this.pauseScrolling || !this.dialogueIsRunning) return;
 
-  if (this.dialogueText) {
+  // Autoscroll commands so the user doesnt have to press again
+  if (
+    gdjs.dialogueTree._isLineTypeCommand() &&
+    this.dialogueDataType === 'text' &&
+    this.dialogueBranchTitle === this.dialogueData.data.title &&
+    this.lineNum === this.dialogueData.lineNum &&
+    gdjs.dialogueTree.hasClippedScrollingCompleted()
+  ) {
+    gdjs.dialogueTree.goToNextDialogueLine();
+    return
+  }
+
+  // Increment scrolling of clipped text
+  if (this.dialogueText && this.dialogueDataType === 'text' && this.clipTextEnd < this.dialogueText.length) {
     this.clipTextEnd += 1;
   }
 };
@@ -110,7 +123,7 @@ gdjs.dialogueTree.scrollClippedText = function() {
  * Scroll the clipped text to its end, so the entire text is printed. This can be useful in keeping the event sheet logic simpler, while supporting more variation.
  */
 gdjs.dialogueTree.completeClippedTextScrolling = function() {
-  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText)
+  if (this.pauseScrolling || !this.dialogueIsRunning || !this.dialogueText || this.dialogueDataType !== 'text')
     return;
   this.clipTextEnd = this.dialogueText.length;
 };
@@ -120,9 +133,11 @@ gdjs.dialogueTree.completeClippedTextScrolling = function() {
  * Useful to prevent the user from skipping to next line before the current one has been printed fully.
  */
 gdjs.dialogueTree.hasClippedScrollingCompleted = function() {
-  if (!this.dialogueIsRunning) return false;
-  if (this.dialogueData && this.dialogueText.length) {
-    return this.clipTextEnd >= this.dialogueText.length;
+  if (!this.dialogueIsRunning || this.dialogueDataType  === '') return false;
+  
+  if (this.dialogueData && this.dialogueText.length > 0 && this.clipTextEnd >= this.dialogueText.length) {
+    if (gdjs.dialogueTree.getVariable('debug')) console.warn('Scroll completed:', this.clipTextEnd,'/', this.dialogueText.length);
+    return true;
   }
   return false;
 };
@@ -142,7 +157,6 @@ gdjs.dialogueTree.getClippedLineText = function() {
  * Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
  */
 gdjs.dialogueTree.getLineText = function() {
-  this.completeClippedTextScrolling();
   return this.dialogueIsRunning && this.dialogueText.length
     ? this.dialogueText
     : '';
@@ -163,6 +177,7 @@ gdjs.dialogueTree.commandParametersCount = function() {
  * @param {number} paramIndex The index of the parameter to get.
  */
 gdjs.dialogueTree.getCommandParameter = function(paramIndex) {
+  if (paramIndex === -1 && this.commandParameters.length > 0) return this.commandParameters[0];
   if (
     this.commandParameters &&
     this.commandParameters.length >= paramIndex + 1
@@ -188,17 +203,20 @@ gdjs.dialogueTree.isCommandCalled = function(command) {
 
   if (this.pauseScrolling || !commandCalls) return false;
   return this.commandCalls.some(function(call, index) {
-    if (clipTextEnd < call.time) return false;
-    if (call.cmd === 'wait' && clipTextEnd !== dialogueText.length) {
+    if (clipTextEnd !== 0 && clipTextEnd < call.time) return false;
+    if (call.cmd === 'wait' && (clipTextEnd === 0 || clipTextEnd !== dialogueText.length)) {
       gdjs.dialogueTree.pauseScrolling = true;
       setTimeout(function() {
         gdjs.dialogueTree.pauseScrolling = false;
         commandCalls.splice(index, 1);
+        if (gdjs.dialogueTree.getVariable('debug')) console.info('CMD:', call);
       }, parseInt(call.params[1], 10));
     }
     if (call.cmd === command) {
       gdjs.dialogueTree.commandParameters = call.params;
       commandCalls.splice(index, 1);
+      if (gdjs.dialogueTree.getVariable('debug')) console.info('CMD:', call);
+
       return true;
     }
   });
@@ -339,7 +357,7 @@ gdjs.dialogueTree.selectOption = function(optionIndex) {
   if (!this.dialogueIsRunning) return;
   if (this.dialogueData.select) {
     this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
-      this.selectedOption
+      optionIndex
     );
     this.selectedOptionUpdated = true;
   }
@@ -384,16 +402,21 @@ gdjs.dialogueTree.hasSelectedOptionChanged = function() {
  * @param {string} type The type you want to check for ( one of the three above )
  */
 gdjs.dialogueTree.isDialogueLineType = function(type) {
-  if (
-    this.commandCalls &&
-    this.commandCalls.some(function(call) {
-      return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
-    })
-  ) {
-    return !this.pauseScrolling;
+  if (!this.dialogueIsRunning) return false;
+  if (this.commandCalls && type === 'command') {
+    if (
+      this.commandCalls.some(function(call) {
+        return gdjs.dialogueTree.clipTextEnd > call.time && call.cmd === 'wait';
+      })
+    ) {
+      return !this.pauseScrolling;
+    }
+    if (this.commandCalls.length > 0 && this.commandParameters.length > 0) {
+      return true;
+    }
   }
 
-  return this.dialogueIsRunning ? this.dialogueDataType === type : false;
+  return this.dialogueDataType === type;
 };
 
 /**
@@ -420,19 +443,27 @@ gdjs.dialogueTree.startFrom = function(startDialogueNode) {
   if (!this.hasDialogueBranch(startDialogueNode)) return;
   this.optionsCount = 0;
   this.options = [];
-  this.dialogueBranchTitle = '';
-  this.dialogueBranchBody = '';
-  this.dialogueBranchTags = [];
   this.tagParameters = [];
   this.dialogue = this.runner.run(startDialogueNode);
-  this.dialogueData = null;
-  this.dialogueDataType = '';
   this.dialogueText = '';
   this.clipTextEnd = 0;
   this.commandCalls = [];
   this.commandParameters = [];
   this.pauseScrolling = false;
+
   this.dialogueData = this.dialogue.next().value;
+  this.dialogueBranchTags = this.dialogueData.data.tags;
+  this.dialogueBranchTitle = this.dialogueData.data.title;
+  this.dialogueBranchBody = this.dialogueData.data.body;
+  this.lineNum = this.dialogueData.lineNum;
+  if (gdjs.dialogueTree._isLineTypeText()){
+    this.dialogueDataType = 'text';
+  } else if (gdjs.dialogueTree._isLineTypeOptions()){
+    this.dialogueDataType = 'options';
+  } else {
+    this.dialogueDataType = 'command';
+  };
+
   this.dialogueIsRunning = true;
   gdjs.dialogueTree.goToNextDialogueLine();
 };
@@ -462,26 +493,29 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
   this.selectedOption = -1;
   this.selectedOptionUpdated = false;
 
-  if (gdjs.dialogueTree._isLineTypeText()) {
-    if (
-      this.dialogueDataType === 'options' ||
-      this.dialogueDataType === 'text' ||
-      !this.dialogueDataType
-    ) {
-      this.clipTextEnd = 0;
-      this.dialogueText = this.dialogueData.text;
-      this.commandCalls = [];
-    } else {
+  if (gdjs.dialogueTree.getVariable('debug')) console.info('parsing:', this.dialogueData);
+
+  if (!this.dialogueData) {
+    gdjs.dialogueTree.stopRunningDialogue();
+  } else if (gdjs.dialogueTree._isLineTypeText()) {
+    if (this.lineNum === this.dialogueData.lineNum && this.dialogueBranchTitle === this.dialogueData.data.title){
+      this.clipTextEnd = this.dialogueText.length - 1;
       this.dialogueText +=
         (this.dialogueText === '' ? '' : ' ') + this.dialogueData.text;
+    } else {
+      this.clipTextEnd = 0;
+      this.dialogueText = this.dialogueData.text;
     }
 
-    this.dialogueDataType = 'text';
     this.dialogueBranchTags = this.dialogueData.data.tags;
     this.dialogueBranchTitle = this.dialogueData.data.title;
     this.dialogueBranchBody = this.dialogueData.data.body;
+    this.lineNum = this.dialogueData.lineNum;
+    this.dialogueDataType = 'text';
+
     this.dialogueData = this.dialogue.next().value;
   } else if (gdjs.dialogueTree._isLineTypeOptions()) {
+    this.commandCalls = [];
     this.dialogueDataType = 'options';
     this.dialogueText = '';
     this.clipTextEnd = 0;
@@ -490,8 +524,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     this.selectedOptionUpdated = true;
   } else if (gdjs.dialogueTree._isLineTypeCommand()) {
     this.dialogueDataType = 'command';
-    this.clipTextEnd = 0;
-
     var command = this.dialogueData.text.split(' ');
     // If last command was to wait, increase time by one
     var offsetTime =
@@ -508,11 +540,6 @@ gdjs.dialogueTree.goToNextDialogueLine = function() {
     gdjs.dialogueTree.goToNextDialogueLine();
   } else {
     this.dialogueDataType = 'unknown';
-  }
-
-  if (gdjs.dialogueTree._isLineTypeCommand()) {
-    this.dialogueDataType = 'command';
-    gdjs.dialogueTree.goToNextDialogueLine();
   }
 };
 
@@ -631,7 +658,7 @@ gdjs.dialogueTree.getBranchText = function() {
  */
 gdjs.dialogueTree.getVariable = function(key) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
-    return this.runner.variables.data[key];
+    return this.runner.variables.get(key);
   }
   return '';
 };
@@ -639,11 +666,11 @@ gdjs.dialogueTree.getVariable = function(key) {
 /**
  * Check if a specific variable created by the Dialogue parses exists and is equal to a specific value.
  * @param {string} key The name of the variable you want to check the value of
- * @param {string} value The value you want to check against
+ * @param {string|boolean|number} value The value you want to check against
  */
 gdjs.dialogueTree.compareVariable = function(key, value) {
   if (this.dialogueIsRunning && key in this.runner.variables.data) {
-    return this.runner.variables.data[key].toString() === value;
+    return this.runner.variables.get(key) === value;
   }
   return false;
 };
@@ -651,11 +678,11 @@ gdjs.dialogueTree.compareVariable = function(key, value) {
 /**
  * Set a specific variable created by the Dialogue parser to a specific value.
  * @param {string} key The name of the variable you want to set the value of
- * @param {string} value The value you want to set
+ * @param {string|boolean|number} value The value you want to set
  */
 gdjs.dialogueTree.setVariable = function(key, value) {
-  if (this.dialogueIsRunning && this.runner.variables.data) {
-    this.runner.variables.data[key] = value;
+  if (this.runner.variables) {
+    this.runner.variables.set(key, value);
   }
 };
 
@@ -666,7 +693,7 @@ gdjs.dialogueTree.setVariable = function(key, value) {
  * @param {gdjs.Variable} outputVariable The variable where to store the State
  */
 gdjs.dialogueTree.saveState = function(outputVariable) {
-  const dialogueState = {
+  var dialogueState = {
     variables: gdjs.dialogueTree.runner.variables.data,
     visited: gdjs.dialogueTree.runner.visited,
   };
@@ -677,17 +704,32 @@ gdjs.dialogueTree.saveState = function(outputVariable) {
  * Load the current State of the Dialogue Parser from a specified variable.
  * Can be used to implement persistence in dialogue through your game's Load/Save function.
  * That way you can later load all the dialogue choices the player has made.
- * @param {gdjs.Variable} inputVariable The variable where to load the State from.
+ * @param {gdjs.Variable} inputVariable The structured variable where to load the State from.
  */
 gdjs.dialogueTree.loadState = function(inputVariable) {
-  const jsonData = gdjs.evtTools.network.variableStructureToJSON(inputVariable);
-  try {
-    const loadedState = JSON.parse(
-      gdjs.evtTools.network.variableStructureToJSON(inputVariable)
-    );
-    gdjs.dialogueTree.runner.visited = loadedState.visited;
-    gdjs.dialogueTree.runner.variables.data = loadedState.variables;
-  } catch (e) {
-    console.error(e);
+  var loadedState = JSON.parse(
+    gdjs.evtTools.network.variableStructureToJSON(inputVariable)
+  );
+  if (!loadedState) {
+    console.error('Load state variable is empty:', inputVariable);
+    return
   }
+  try {
+    gdjs.dialogueTree.runner.visited = loadedState.visited;
+    gdjs.dialogueTree.runner.variables.data = {};
+    Object.keys(loadedState.variables).forEach(function(key) {
+      var value = loadedState.variables[key];
+      gdjs.dialogueTree.runner.variables.set(key, value);
+    });
+  } catch (e) {
+    console.error('Failed to load state from variable:', inputVariable, e);
+  }
+};
+
+/**
+ * Clear the current State of the Dialogue Parser.
+ */
+gdjs.dialogueTree.clearState = function() {
+  gdjs.dialogueTree.runner.visited = {};
+  gdjs.dialogueTree.runner.variables.data = {};
 };

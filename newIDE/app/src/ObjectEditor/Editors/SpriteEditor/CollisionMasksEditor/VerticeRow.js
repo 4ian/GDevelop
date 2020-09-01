@@ -51,7 +51,7 @@ const VerticeRow = ({
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>
           {!!onRemove && (
-            <IconButton onClick={onRemove} disabled={!canRemove}>
+            <IconButton size="small" onClick={onRemove} disabled={!canRemove}>
               <Delete />
             </IconButton>
           )}

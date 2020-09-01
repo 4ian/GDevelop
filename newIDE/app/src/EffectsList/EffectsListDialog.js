@@ -10,6 +10,9 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
 
 type Props = {|
   project: gdProject,
@@ -18,6 +21,9 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onApply: () => void,
   effectsContainer: gdEffectsContainer,
+
+  // Preview:
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 export default class EffectsListDialog extends React.Component<Props, {||}> {
@@ -32,6 +38,10 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
             key="help"
             helpPagePath="/interface/scene-editor/layer-effects"
           />,
+          <HotReloadPreviewButton
+            key="hot-reload-preview-button"
+            {...this.props.hotReloadPreviewButtonProps}
+          />,
         ]}
         actions={[
           <FlatButton
@@ -42,7 +52,7 @@ export default class EffectsListDialog extends React.Component<Props, {||}> {
             key={'Apply'}
           />,
         ]}
-        modal
+        cannotBeDismissed={true}
         open
         onRequestClose={onApply}
         title={<Trans>Effects</Trans>}

@@ -1,4 +1,6 @@
 // @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -6,60 +8,63 @@ const electron = optionalRequire('electron');
 
 type Props = {|
   shouldPrompt: boolean,
+  i18n: I18nType,
+  language: string, // Should be i18n.language.
+  hasUnsavedChanges: boolean,
 |};
 
-export default class CloseConfirmDialog extends React.Component<Props, *> {
-  _delayElectronClose = true;
+export default React.memo<Props>(function CloseConfirmDialog({
+  shouldPrompt,
+  i18n,
+  language,
+  hasUnsavedChanges,
+}: Props) {
+  const delayElectronClose = React.useRef(true);
 
-  componentDidMount() {
-    this._setup(this.props);
-  }
+  React.useEffect(
+    () => {
+      if (Window.isDev()) return; // Don't prevent live-reload in development
 
-  componentWillReceiveProps(newProps: Props) {
-    if (newProps.shouldPrompt !== this.props.shouldPrompt)
-      this._setup(newProps);
-  }
+      const quitMessage = i18n._(t`Are you sure you want to quit GDevelop?`);
+      const unsavedChangesMessage = hasUnsavedChanges
+        ? i18n._(t`Any unsaved changes in the project will be lost.`)
+        : '';
+      const message = [quitMessage, unsavedChangesMessage]
+        .filter(Boolean)
+        .join('\n');
 
-  _setup(props: Props) {
-    if (Window.isDev()) return; // Don't prevent live-reload in development
+      if (electron) {
+        window.onbeforeunload = e => {
+          if (delayElectronClose.current && shouldPrompt) {
+            // Use setTimeout to avoiding blocking the thread with the "confirm" dialog,
+            // which would make Electron to close the window for some weird reason.
+            // See https://github.com/electron/electron/issues/7977
+            setTimeout(() => {
+              const answer = Window.showConfirmDialog(message);
+              if (answer) {
+                // If answer is positive, re-trigger the close
+                delayElectronClose.current = false;
+                electron.remote.getCurrentWindow().close();
+              }
+            }, 10);
 
-    const { shouldPrompt } = props;
-    const message =
-      'Are you sure you want to quit GDevelop? Any unsaved changes will be lost.';
-
-    if (electron) {
-      window.onbeforeunload = e => {
-        if (this._delayElectronClose && shouldPrompt) {
-          // Use setTimeout to avoiding blocking the thread with the "confirm" dialog,
-          // which would make Electron to close the window for some weird reason.
-          // See https://github.com/electron/electron/issues/7977
-          setTimeout(() => {
-            //eslint-disable-next-line
-            const answer = confirm(message);
-            if (answer) {
-              // If answer is positive, re-trigger the close
-              this._delayElectronClose = false;
-              electron.remote.getCurrentWindow().close();
-            }
-          }, 10);
-
-          // Prevents closing the window immediately. See https://github.com/electron/electron/blob/master/docs/api/browser-window.md#event-close
-          e.returnValue = true; //"It is recommended to always set the event.returnValue explicitly, instead of only returning a value, as the former works more consistently within Electron.""
-          return false; //"In Electron, returning any value other than undefined would cancel the close"
+            // Prevents closing the window immediately. See https://github.com/electron/electron/blob/master/docs/api/browser-window.md#event-close
+            e.returnValue = true; //"It is recommended to always set the event.returnValue explicitly, instead of only returning a value, as the former works more consistently within Electron.""
+            return false; //"In Electron, returning any value other than undefined would cancel the close"
+          } else {
+            // Returning undefined will let the window close
+          }
+        };
+      } else if (window) {
+        if (shouldPrompt) {
+          window.onbeforeunload = () => message;
         } else {
-          // Returning undefined will let the window close
+          window.onbeforeunload = null;
         }
-      };
-    } else if (window) {
-      if (shouldPrompt) {
-        window.onbeforeunload = () => message;
-      } else {
-        window.onbeforeunload = null;
       }
-    }
-  }
+    },
+    [shouldPrompt, i18n, language, hasUnsavedChanges]
+  );
 
-  render() {
-    return null;
-  }
-}
+  return null;
+});

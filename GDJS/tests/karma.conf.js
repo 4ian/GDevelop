@@ -44,6 +44,7 @@ module.exports = function(config) {
       '../Runtime/events-tools/storagetools.js',
       '../Runtime/events-tools/stringtools.js',
       '../Runtime/events-tools/windowtools.js',
+      '../Runtime/websocket-debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../Extensions/DraggableBehavior/draggableruntimebehavior.js',
@@ -52,6 +53,9 @@ module.exports = function(config) {
       '../../Extensions/LinkedObjects/linkedobjects.js',
       '../../Extensions/Inventory/inventory.js',
       '../../Extensions/Inventory/inventorytools.js',
+      '../../Extensions/Lighting/lightruntimeobject.js',
+      '../../Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
+      '../../Extensions/Lighting/lightobstacleruntimebehavior.js',
 
       // Test extensions:
       './tests/Extensions/**.js',

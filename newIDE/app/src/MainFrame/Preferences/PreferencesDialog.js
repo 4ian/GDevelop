@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n } from '@lingui/core';
 
 import React from 'react';
 import SelectField from '../../UI/SelectField';
@@ -7,7 +8,7 @@ import FlatButton from '../../UI/FlatButton';
 import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
@@ -15,12 +16,16 @@ import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
+import { getAllTutorialHints } from '../../Hints';
+import RaisedButton from '../../UI/RaisedButton';
+import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 
 type Props = {|
+  i18n: I18n,
   onClose: Function,
 |};
 
-const PreferencesDialog = ({ onClose }: Props) => {
+const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const {
     values,
@@ -28,12 +33,18 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setCodeEditorThemeName,
     setAutoDownloadUpdates,
     showAlertMessage,
+    showTutorialHint,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
     setUseNewInstructionEditorDialog,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
+    getDefaultEditorMosaicNode,
+    setDefaultEditorMosaicNode,
+    setAutoOpenMostRecentProject,
+    resetShortcutsToDefault,
+    setShortcutForCommand,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -47,6 +58,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
         />,
       ]}
       onRequestClose={onClose}
+      cannotBeDismissed={true}
       open
       title={<Trans>GDevelop Preferences</Trans>}
       maxWidth="sm"
@@ -55,6 +67,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab label={<Trans>Preferences</Trans>} value="preferences" />
         <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
+        <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
       </Tabs>
       {currentTab === 'preferences' && (
         <Column>
@@ -103,6 +116,55 @@ const PreferencesDialog = ({ onClose }: Props) => {
                 );
               }}
             />
+          </Line>
+          <Text size="title">
+            <Trans>Layouts</Trans>
+          </Text>
+          <Line>
+            <Column>
+              <RaisedButton
+                label={<Trans>Reset Scene Editor layout</Trans>}
+                onClick={() => setDefaultEditorMosaicNode('scene-editor', null)}
+                disabled={!getDefaultEditorMosaicNode('scene-editor')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Scene Editor (small window) layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode('scene-editor-small', null)
+                }
+                disabled={!getDefaultEditorMosaicNode('scene-editor-small')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Debugger layout</Trans>}
+                onClick={() => setDefaultEditorMosaicNode('debugger', null)}
+                disabled={!getDefaultEditorMosaicNode('debugger')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Resource Editor layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode('resources-editor', null)
+                }
+                disabled={!getDefaultEditorMosaicNode('resources-editor')}
+              />
+              <Spacer />
+              <RaisedButton
+                label={<Trans>Reset Extension Editor layout</Trans>}
+                onClick={() =>
+                  setDefaultEditorMosaicNode(
+                    'events-functions-extension-editor',
+                    null
+                  )
+                }
+                disabled={
+                  !getDefaultEditorMosaicNode(
+                    'events-functions-extension-editor'
+                  )
+                }
+              />
+            </Column>
           </Line>
           <Text size="title">
             <Trans>Updates</Trans>
@@ -172,6 +234,18 @@ const PreferencesDialog = ({ onClose }: Props) => {
               label={<Trans>Auto-save project on Preview</Trans>}
             />
           </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
+              toggled={values.autoOpenMostRecentProject}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Automatically re-open the project edited during last session
+                </Trans>
+              }
+            />
+          </Line>
           {Window.isDev() && (
             <Line>
               <Toggle
@@ -197,7 +271,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
                 <Trans>Warn/show explanation about:</Trans>
               </Text>
               {allAlertMessages.map(({ key, label }) => (
-                <Line>
+                <Line key={key}>
                   <Toggle
                     onToggle={(e, check) => showAlertMessage(key, check)}
                     toggled={!values.hiddenAlertMessages[key]}
@@ -206,8 +280,31 @@ const PreferencesDialog = ({ onClose }: Props) => {
                   />
                 </Line>
               ))}
+              <Text>
+                <Trans>Show link to tutorials:</Trans>
+              </Text>
+              {getAllTutorialHints().map(({ identifier, name }) => (
+                <Line key={identifier}>
+                  <Toggle
+                    onToggle={(e, check) => showTutorialHint(identifier, check)}
+                    toggled={!values.hiddenTutorialHints[identifier]}
+                    labelPosition="right"
+                    label={name}
+                  />
+                </Line>
+              ))}
             </Column>
           </Line>
+        </Column>
+      )}
+      {currentTab === 'shortcuts' && (
+        <Column>
+          <ShortcutsList
+            i18n={i18n}
+            userShortcutMap={values.userShortcutMap}
+            onEdit={setShortcutForCommand}
+            onReset={resetShortcutsToDefault}
+          />
         </Column>
       )}
     </Dialog>

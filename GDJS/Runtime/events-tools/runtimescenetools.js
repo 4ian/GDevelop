@@ -159,5 +159,7 @@ gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout = function(scene, ext
     var externalLayoutData = scene.getGame().getExternalLayoutData(externalLayout);
     if ( externalLayoutData === null ) return;
 
-    scene.createObjectsFrom(externalLayoutData.instances, xPos, yPos);
+    // trackByPersistentUuid is set to false as we don't want external layouts
+    // instantiated at runtime to be hot-reloaded.
+    scene.createObjectsFrom(externalLayoutData.instances, xPos, yPos, /*trackByPersistentUuid=*/ false);
 };

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 
 // Keep first as it creates the `global.gd` object:
 import GDevelopJsInitializerDecorator, {
@@ -7,15 +7,14 @@ import GDevelopJsInitializerDecorator, {
 } from './GDevelopJsInitializerDecorator';
 
 import { storiesOf, addDecorator } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
-import { linkTo } from '@storybook/addon-links';
+import { action, configureActions } from '@storybook/addon-actions';
 
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import StartPage from '../MainFrame/Editors/StartPage';
+import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -58,7 +57,7 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
-import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
+import LayoutChooserDialog from '../MainFrame/EditorContainers/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
@@ -184,7 +183,28 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { emptyPreviewButtonSettings } from '../MainFrame/Toolbar/PreviewButtons';
+import TextField from '../UI/TextField';
+import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
+import {
+  getFakePopperJsAnchorElement,
+  makeFakeExpressionAutocompletions,
+  makeFakeExactExpressionAutocompletion,
+} from '../fixtures/TestExpressionAutocompletions';
+import LayersList from '../LayersList';
+import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
+import {
+  type NamedCommand,
+  type CommandOption,
+} from '../CommandPalette/CommandManager';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+
+configureActions({
+  depth: 2,
+  limit: 20,
+});
 
 addDecorator(GDevelopJsInitializerDecorator);
 
@@ -204,9 +224,14 @@ const buildFakeMenuTemplate = () => [
   },
 ];
 
-storiesOf('Welcome', module).add('to Storybook', () => (
-  <Welcome showApp={linkTo('Button')} />
-));
+const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
+  hasPreviewsRunning: false,
+  launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+};
+
+storiesOf('Welcome', module)
+  .addDecorator(muiDecorator)
+  .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/Buttons', module)
   .addDecorator(muiDecorator)
@@ -359,101 +384,149 @@ storiesOf('UI Building Blocks/SelectField', module)
     />
   ));
 
+storiesOf('UI Building Blocks/TextField', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <TextField value={value} onChange={(_, text) => setValue(text)} />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  });
+
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField value={value} onChange={onChange} />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('default (commitOnBlur)', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
+  .add('default', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField value={value} onChange={setValue} />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('default (commitOnBlur)', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value}
+          onChange={setValue}
+          commitOnBlur
+        />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('example that is storing a float in the state', () => {
+    const [value, setValue] = React.useState(12.35);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value.toString()}
+          onChange={newValue => setValue(parseFloat(newValue))}
+        />
+        <p>
+          State value is {value} ({typeof value})
+        </p>
+      </React.Fragment>
+    );
+  })
+  .add('example that is storing a float in the state (commitOnBlur)', () => {
+    const [value, setValue] = React.useState(12.35);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          value={value.toString()}
+          onChange={newValue => setValue(parseFloat(newValue))}
+          commitOnBlur
+        />
+        <p>
+          State value is {value} ({typeof value})
+        </p>
+      </React.Fragment>
+    );
+  })
+  .add('reduced margin, in a MiniToolbar', () => {
+    const [value, setValue] = React.useState('Some value');
+
+    return (
+      <React.Fragment>
+        <MiniToolbar>
+          <MiniToolbarText>Please enter something:</MiniToolbarText>
           <SemiControlledTextField
+            margin="none"
             value={value}
-            onChange={onChange}
+            onChange={setValue}
             commitOnBlur
           />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('example that is storing a float in the state', () => (
-    <ValueStateHolder
-      initialValue={12.35}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            value={value.toString()}
-            onChange={newValue => onChange(parseFloat(newValue))}
-          />
-          <p>
-            State value is {value} ({typeof value})
-          </p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('example that is storing a float in the state (commitOnBlur)', () => (
-    <ValueStateHolder
-      initialValue={12.35}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            value={value.toString()}
-            onChange={newValue => onChange(parseFloat(newValue))}
-            commitOnBlur
-          />
-          <p>
-            State value is {value} ({typeof value})
-          </p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('reduced margin, in a MiniToolbar', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <MiniToolbar>
-            <MiniToolbarText>Please enter something:</MiniToolbarText>
-            <SemiControlledTextField
-              margin="none"
-              value={value}
-              onChange={onChange}
-              commitOnBlur
-            />
-          </MiniToolbar>
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('with a (markdown) helper text', () => (
-    <ValueStateHolder
-      initialValue={'Hello World'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledTextField
-            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            value={value}
-            onChange={onChange}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ));
+        </MiniToolbar>
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('with a (markdown) helper text', () => {
+    const [value, setValue] = React.useState('Hello World!');
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+          value={value}
+          onChange={setValue}
+        />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('forceSetValue and forceSetSelection', () => {
+    const [value, setValue] = React.useState('Hello World!');
+    const field = React.useRef(null);
+
+    return (
+      <React.Fragment>
+        <SemiControlledTextField
+          ref={field}
+          value={value}
+          onChange={setValue}
+        />
+        <p>State value is {value}</p>
+        <p>
+          Clicking on these buttons will focus the field, then do the action
+          after 1 second.
+        </p>
+        <RaisedButton
+          onClick={() => {
+            field.current && field.current.focus();
+            setTimeout(
+              () =>
+                field.current &&
+                field.current.forceSetValue('Forced Hello World'),
+              1000
+            );
+          }}
+          label="Force change the value"
+        />
+        <RaisedButton
+          onClick={() => {
+            field.current && field.current.focus();
+            setTimeout(
+              () => field.current && field.current.forceSetSelection(2, 4),
+              1000
+            );
+          }}
+          label="Change the selection"
+        />
+      </React.Fragment>
+    );
+  });
 
 storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
   <DragAndDropContextProvider>
@@ -863,7 +936,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
       renderTextField={() => (
         <SemiControlledTextField
           floatingLabelText="Hello"
-          multiLine
+          multiline
           value={'123\n456\n789\nblablabla bla bla'}
           onChange={() => {}}
         />
@@ -961,6 +1034,41 @@ storiesOf('UI Building Blocks/EmptyMessage', module)
     </EmptyMessage>
   ));
 
+storiesOf('UI Building Blocks/Text', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Column>
+      <Text size="title">Title text</Text>
+      <Text size="body">
+        Usual body text. For most usages. Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.
+      </Text>
+      <Text size="body2">
+        Smaller text. For rare use cases. Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.
+      </Text>
+    </Column>
+  ))
+  .add('on a Background', () => (
+    <Background>
+      <Column>
+        <Text size="title">Title text</Text>
+        <Text size="body">
+          Usual body text. For most usages. Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua.
+        </Text>
+        <Text size="body2">
+          Smaller text. For rare use cases. Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua.
+        </Text>
+      </Column>
+    </Background>
+  ));
+
 storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -999,10 +1107,37 @@ storiesOf('UI Building Blocks/AlertMessage', module)
       inimicus.
     </AlertMessage>
   ))
+  .add('long text with icon', () => (
+    <AlertMessage
+      kind="info"
+      renderLeftIcon={() => (
+        <img
+          src="res/tutorial_icons/tween-behavior.jpg"
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            maxWidth: 128,
+            maxHeight: 128,
+          }}
+        />
+      )}
+      onHide={() => {}}
+    >
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
   .add('warning', () => (
     <AlertMessage kind="warning">
       Hello World, this is an alert text
     </AlertMessage>
+  ))
+  .add('error', () => (
+    <AlertMessage kind="error">Hello World, this is an alert text</AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)
@@ -1055,7 +1190,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
     <EditorMosaicPlayground
       renderButtons={({ openEditor }) => (
         <FlatButton
-          onClick={() => openEditor('thirdEditor', 'end', 65)}
+          onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
           label="Open the third editor"
         />
       )}
@@ -1109,15 +1244,15 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('firstEditor', 'end', 65)}
+            onClick={() => openEditor('firstEditor', 'end', 65, 'column')}
             label="Open the 1st secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('secondEditor', 'end', 65)}
+            onClick={() => openEditor('secondEditor', 'end', 65, 'column')}
             label="Open the 2nd secondary editor"
           />
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the 3rd secondary editor"
           />
         </React.Fragment>
@@ -1170,11 +1305,13 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65)}
+            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
             label="Open the third editor"
           />
           <FlatButton
-            onClick={() => openEditor('noTransitionsEditor', 'end', 65)}
+            onClick={() =>
+              openEditor('noTransitionsEditor', 'end', 65, 'column')
+            }
             label="Open the editor without transitions"
           />
         </React.Fragment>
@@ -1461,6 +1598,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     }
                     onObjectCreated={() => {}}
                     onObjectSelected={() => {}}
+                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   />
                 </TabContentContainer>
               }
@@ -1947,6 +2085,57 @@ storiesOf('ParameterFields', module)
     />
   ));
 
+storiesOf('ExpressionAutcompletionsDisplayer', module)
+  .addDecorator(muiDecorator)
+  .add('autocompletions (first selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject.project}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletions (second selected)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject.project}
+      expressionAutocompletions={makeFakeExpressionAutocompletions()}
+      remainingCount={3}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={1}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('autocompletion for an exact expression', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject.project}
+      expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
+  .add('empty autocompletions (nothing shown)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject.project}
+      expressionAutocompletions={[]}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ));
+
 storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -2218,7 +2407,36 @@ storiesOf('LocalFilePicker', module)
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <StartPage onOpenLanguageDialog={action('open language dialog')} />
+    <StartPage
+      project={null}
+      isActive={true}
+      projectItemName={null}
+      setToolbar={() => {}}
+      canOpen={true}
+      onOpen={() => action('onOpen')()}
+      onCreate={() => action('onCreate')()}
+      onOpenProjectManager={() => action('onOpenProjectManager')()}
+      onCloseProject={() => action('onCloseProject')()}
+      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+      onOpenLanguageDialog={() => action('open language dialog')()}
+    />
+  ))
+  .add('project opened', () => (
+    <StartPage
+      project={testProject.project}
+      isActive={true}
+      projectItemName={null}
+      setToolbar={() => {}}
+      canOpen={true}
+      onOpen={() => action('onOpen')()}
+      onCreate={() => action('onCreate')()}
+      onOpenProjectManager={() => action('onOpenProjectManager')()}
+      onCloseProject={() => action('onCloseProject')()}
+      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+      onOpenLanguageDialog={() => action('open language dialog')()}
+    />
   ));
 
 storiesOf('DebuggerContent', module)
@@ -2499,6 +2717,44 @@ storiesOf('EventsTree', module)
         </FixedHeightFlexContainer>
       </div>
     </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (no scope)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.emptyEventsList}
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'small'}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet', module)
@@ -2518,16 +2774,11 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2547,16 +2798,11 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
-          onPreview={action('preview')}
           setToolbar={() => {}}
-          showNetworkPreviewButton={false}
-          showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2595,6 +2841,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('default (no results)', () => (
@@ -2605,6 +2852,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('3 results', () => (
@@ -2615,6 +2863,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ));
 
@@ -3000,6 +3249,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3030,6 +3280,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3129,6 +3380,10 @@ storiesOf('BehaviorsEditor', module)
       <BehaviorsEditor
         project={testProject.project}
         object={testProject.spriteObjectWithBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
   ));
@@ -3610,20 +3865,24 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
 storiesOf('ResourcesList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div style={{ height: 200 }}>
-      <ValueStateHolder
-        initialValue={null}
-        render={(value, onChange) => (
-          <ResourcesList
-            onSelectResource={onChange}
-            selectedResource={value}
-            onDeleteResource={() => {}}
-            onRenameResource={() => {}}
-            project={testProject.project}
-          />
-        )}
-      />
-    </div>
+    <DragAndDropContextProvider>
+      <div style={{ height: 200 }}>
+        <ValueStateHolder
+          initialValue={null}
+          render={(value, onChange) => (
+            <ResourcesList
+              onSelectResource={onChange}
+              selectedResource={value}
+              onDeleteResource={() => {}}
+              onRenameResource={() => {}}
+              project={testProject.project}
+              onRemoveUnusedResources={() => {}}
+              onRemoveAllResourcesWithInvalidPath={() => {}}
+            />
+          )}
+        />
+      </div>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsFunctionConfigurationEditor', module)
@@ -3713,7 +3972,6 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
-          previewButtonSettings={emptyPreviewButtonSettings}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3742,7 +4000,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -3841,6 +4099,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('Error in functions', () => (
@@ -3882,24 +4141,35 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ));
 
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={''}
       onChange={action('change')}
+      objectType=""
     />
   ))
-  .add('with a non existing behavior selected', () => (
+  .add('with a non existing behavior selected, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
+      objectType=""
+    />
+  ))
+  .add('default, for a text object', () => (
+    <BehaviorTypeSelector
+      project={testProject.project}
+      value={''}
+      onChange={action('change')}
+      objectType="TextObject::Text"
     />
   ));
 
@@ -3941,7 +4211,7 @@ storiesOf('ExtensionsSearchDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -3952,6 +4222,53 @@ storiesOf('ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('LayersList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LayersList
+      project={testProject.project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
+      onRemoveLayer={(layerName, cb) => {
+        cb(true);
+      }}
+      onRenameLayer={(oldName, newName, cb) => {
+        cb(true);
+      }}
+      layersContainer={testProject.testLayout}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+    />
+  ))
+  .add('small width and height', () => (
+    <div style={{ width: 250, height: 200 }}>
+      <LayersList
+        project={testProject.project}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
+        onRemoveLayer={(layerName, cb) => {
+          cb(true);
+        }}
+        onRenameLayer={(oldName, newName, cb) => {
+          cb(true);
+        }}
+        layersContainer={testProject.testLayout}
+        hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      />
+    </div>
   ));
 
 storiesOf('EffectsList', module)
@@ -4005,5 +4322,109 @@ storiesOf('NewObjectDialog', module)
       project={testProject.project}
       onClose={action('close')}
       onChoose={action('choose')}
+    />
+  ));
+
+storiesOf('CommandPalette', module)
+  .addDecorator(muiDecorator)
+  .add('commands', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                name: 'OPEN_PROJECT',
+                handler: () => {},
+              },
+              {
+                name: 'OPEN_PROJECT_PROPERTIES',
+                handler: () => {},
+              },
+              {
+                name: 'EDIT_OBJECT',
+                handler: () => {},
+              },
+            ]: Array<NamedCommand>)
+          }
+          onClose={() => {}}
+          onSelect={action('Open command')}
+          placeholder="Start typing a command..."
+        />
+      )}
+    </I18n>
+  ))
+  .add('command options', () => (
+    <I18n>
+      {({ i18n }) => (
+        <AutocompletePicker
+          i18n={i18n}
+          items={
+            ([
+              {
+                text: 'Player',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Platform',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+              {
+                text: 'Enemy',
+                handler: () => {},
+                iconSrc: 'res/unknown32.png',
+              },
+            ]: Array<CommandOption>)
+          }
+          onClose={() => {}}
+          onSelect={action('Select command option')}
+          placeholder="Edit object..."
+        />
+      )}
+    </I18n>
+  ));
+
+storiesOf('HotReloadPreviewButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={false}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ))
+  .add('with preview(s) running', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={true}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ));
+
+storiesOf('HotReloadLogsDialog', module)
+  .addDecorator(muiDecorator)
+  .add('with an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'error',
+          message: 'Oops, something could not be hot-reloaded.',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ))
+  .add('without an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'info',
+          message: 'Everything is fine',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
     />
   ));

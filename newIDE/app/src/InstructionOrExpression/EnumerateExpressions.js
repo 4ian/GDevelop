@@ -1,11 +1,11 @@
 // @flow
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedExpressionMetadata,
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
@@ -28,7 +28,7 @@ const enumerateExpressionMetadataMap = (
   prefix: string,
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   return mapVector(expressions.keys(), expressionType => {
     const exprMetadata = expressions.get(expressionType);
     if (!exprMetadata.isShown()) {
@@ -61,7 +61,7 @@ const enumerateExpressionMetadataMap = (
 /** Enumerate all the free expressions available. */
 export const enumerateFreeExpressions = (
   type: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -87,7 +87,7 @@ export const enumerateFreeExpressions = (
 export const enumerateObjectExpressions = (
   type: string,
   objectType: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
     gd.JsPlatform.get(),
     objectType
@@ -131,7 +131,7 @@ export const enumerateObjectExpressions = (
 export const enumerateBehaviorExpressions = (
   type: string,
   behaviorType: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
     gd.JsPlatform.get(),
     behaviorType
@@ -152,7 +152,7 @@ export const enumerateBehaviorExpressions = (
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
   type: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   const freeExpressions = enumerateFreeExpressions(type);
   const objectsExpressions = [];
   const behaviorsExpressions = [];
@@ -198,16 +198,38 @@ export const enumerateAllExpressions = (
 };
 
 export const filterExpressions = (
-  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+  list: Array<EnumeratedExpressionMetadata>,
   searchText: string
-): Array<EnumeratedInstructionOrExpressionMetadata> => {
+): Array<EnumeratedExpressionMetadata> => {
   if (!searchText) return list;
+
   const lowercaseSearchText = searchText.toLowerCase();
 
-  return list.filter(enumeratedExpression => {
+  const matchCritera = (enumeratedExpression: EnumeratedExpressionMetadata) => {
     return (
       enumeratedExpression.type.toLowerCase().indexOf(lowercaseSearchText) !==
       -1
     );
-  });
+  };
+
+  const favorExactMatch = (
+    list: Array<EnumeratedExpressionMetadata>
+  ): Array<EnumeratedExpressionMetadata> => {
+    if (!searchText) {
+      return list;
+    }
+
+    for (var i = 0; i < list.length; ++i) {
+      if (list[i].type.toLowerCase() === lowercaseSearchText) {
+        const exactMatch = list[i];
+        list.splice(i, 1);
+        list.unshift(exactMatch);
+      }
+    }
+
+    return list;
+  };
+
+  // See EnumerateInstructions for a similar logic for instructions
+  return favorExactMatch(list.filter(matchCritera));
 };

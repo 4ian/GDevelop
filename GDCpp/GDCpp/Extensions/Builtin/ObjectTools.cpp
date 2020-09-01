@@ -108,3 +108,14 @@ MovesToward(std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
                    obj1->TotalForceAngle(), objAngle)) <= tolerance / 2;
       });
 }
+
+bool GD_API CursorOnObject(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
+    RuntimeScene &scene,
+    bool precise,
+    bool conditionInverted) {
+  return PickObjectsIf(
+      objectsLists, conditionInverted, [&scene, precise](RuntimeObject *obj) {
+        return obj->CursorOnObject(scene, precise);
+      });
+}

@@ -20,7 +20,7 @@ namespace gd {
 class PropertyDescriptor;
 class Project;
 class Layout;
-}
+}  // namespace gd
 #endif
 
 /**
@@ -29,20 +29,21 @@ class Layout;
  */
 class GD_EXTENSION_API PlatformBehavior : public Behavior {
  public:
-  PlatformBehavior() {};
-  virtual ~PlatformBehavior() {};
-  virtual Behavior* Clone() const override { return new PlatformBehavior(*this); }
+  PlatformBehavior(){};
+  virtual ~PlatformBehavior(){};
+  virtual Behavior* Clone() const override {
+    return new PlatformBehavior(*this);
+  }
 
 #if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-    const gd::SerializerElement& behaviorContent,
-      gd::Project& project) const override;
+      const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
-  const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) override;
+                              const gd::String& name,
+                              const gd::String& value) override;
 #endif
-  virtual void InitializeContent(gd::SerializerElement& behaviorContent) override;
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override;
 
  private:
 };

@@ -14,6 +14,7 @@ import EventsFunctionsExtensionsContext, {
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -107,11 +108,12 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   key={'close'}
                 />,
               ]}
+              cannotBeDismissed={true}
               open={this.props.open}
               title={<Trans>Edit Extension Options</Trans>}
               onRequestClose={this.props.onClose}
             >
-              <Column>
+              <ColumnStackLayout noMargin>
                 <TextField
                   floatingLabelText={<Trans>Name</Trans>}
                   value={eventsFunctionsExtension.getName()}
@@ -134,7 +136,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     eventsFunctionsExtension.setShortDescription(text);
                     this.forceUpdate();
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                   rows={2}
                   rowsMax={2}
@@ -148,7 +150,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     eventsFunctionsExtension.setDescription(text);
                     this.forceUpdate();
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                   rows={5}
                   rowsMax={5}
@@ -182,7 +184,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   }}
                   fullWidth
                 />
-              </Column>
+              </ColumnStackLayout>
               {exportDialogOpen && (
                 <Dialog
                   secondaryActions={[
@@ -197,6 +199,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                     />,
                   ]}
                   open
+                  cannotBeDismissed={false}
                   onRequestClose={() =>
                     this.setState({ exportDialogOpen: false })
                   }

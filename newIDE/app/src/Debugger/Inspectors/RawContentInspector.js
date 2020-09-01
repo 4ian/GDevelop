@@ -11,19 +11,12 @@ type Props = {|
   onEdit: (path: Array<string>, newValue: any) => boolean,
 |};
 
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
-
 /**
  * A very simple inspector that display the raw information given by the gameData
  * object.
  */
 export default ({ gameData, onEdit }: Props) => (
-  <div style={styles.container}>
+  <React.Fragment>
     <EmptyMessage>
       <Trans>
         You are in raw mode. You can edit the fields, but be aware that this can
@@ -40,5 +33,5 @@ export default ({ gameData, onEdit }: Props) => (
       groupArraysAfterLength={50}
       theme="monokai"
     />
-  </div>
+  </React.Fragment>
 );

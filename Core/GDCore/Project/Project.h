@@ -8,6 +8,8 @@
 #define GDCORE_PROJECT_H
 #include <memory>
 #include <vector>
+
+#include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -112,20 +114,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Get project orientation ("default", "landscape", "portrait").
    */
   const gd::String& GetOrientation() const { return orientation; }
-
-  /**
-   * \brief Change the project AdMob application ID (needed
-   * to use the AdMob extension). This has no effect on desktop
-   * and web browsers.
-   */
-  void SetAdMobAppId(const gd::String& adMobAppId_) {
-    adMobAppId = adMobAppId_;
-  };
-
-  /**
-   * \brief Get the project AdMob application ID.
-   */
-  const gd::String& GetAdMobAppId() const { return adMobAppId; }
 
   /**
    * Called when project file has changed.
@@ -305,6 +293,26 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
+   * \brief Get the properties set by extensions. 
+   * 
+   * Each extension can store arbitrary values indexed by a property name, which are
+   * useful to store project wide settings (AdMob id, etc...).
+   */
+  gd::ExtensionProperties& GetExtensionProperties() {
+    return extensionProperties;
+  };
+
+  /**
+   * \brief Get the properties set by extensions. 
+   * 
+   * Each extension can store arbitrary values indexed by a property name, which are
+   * useful to store project wide settings (AdMob id, etc...).
+   */
+  const gd::ExtensionProperties& GetExtensionProperties() const {
+    return extensionProperties;
+  };
+
+  /**
    * Return the list of platforms used by the project.
    */
   const std::vector<Platform*>& GetUsedPlatforms() const { return platforms; };
@@ -460,22 +468,27 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetLayoutsCount() const;
 
   /**
-   * \brief \brief Adds a new empty layout called "name" at the specified
+   * \brief Add a new empty layout called "name" at the specified
    * position in the layout list.
    */
   gd::Layout& InsertNewLayout(const gd::String& name, std::size_t position);
 
   /**
-   * \brief \brief Adds a new layout constructed from the layout passed as
-   * parameter. \note No pointer or reference must be kept on the layout passed
-   * as parameter. \param layout The layout that must be copied and inserted
-   * into the project \param position Insertion position. Even if the position
+   * \brief Add a new layout constructed from the layout passed as
+   * parameter.
+   * \param layout The layout that must be copied and inserted
+   * into the project
+   * \param position Insertion position. Even if the position
    * is invalid, the layout must be inserted at the end of the layout list.
+   *
+   * \note No pointer or reference must be kept on the layout passed
+   * as parameter.
+   *
    */
   gd::Layout& InsertLayout(const Layout& layout, std::size_t position);
 
   /**
-   * Must delete layout named "name".
+   * \brief Delete layout named "name".
    */
   void RemoveLayout(const gd::String& name);
 
@@ -592,7 +605,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                        std::size_t position);
 
   /**
-   * Must delete external events named "name".
+   * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
 #endif
@@ -673,7 +686,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            std::size_t position);
 
   /**
-   * Must delete external layout named "name".
+   * \brief Delete external layout named "name".
    */
   void RemoveExternalLayout(const gd::String& name);
 
@@ -694,37 +707,37 @@ class GD_CORE_API Project : public ObjectsContainer {
 ///@{
 #if defined(GD_IDE_ONLY)
   /**
-   * Return true if events functions extension called "name" exists.
+   * \brief  Check if events functions extension called "name" exists.
    */
   bool HasEventsFunctionsExtensionNamed(const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(const gd::String& name);
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(std::size_t index);
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       std::size_t index) const;
 
   /**
-   * Return the position of the events functions extension called "name" in the
-   * list
+   * \brief Return the position of the events functions extension called "name"
+   * in the list.
    */
   std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
 
@@ -736,7 +749,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SwapEventsFunctionsExtensions(std::size_t first, std::size_t second);
 
   /**
-   * Return the number of events functions extension.
+   * \brief Returns the number of events functions extension.
    */
   std::size_t GetEventsFunctionsExtensionsCount() const;
 
@@ -759,9 +772,14 @@ class GD_CORE_API Project : public ObjectsContainer {
       std::size_t position);
 
   /**
-   * Must delete the events functions extension named "name".
+   * \brief Delete the events functions extension named "name".
    */
   void RemoveEventsFunctionsExtension(const gd::String& name);
+
+  /**
+   * \brief Remove all the events functions extensions.
+   */
+  void ClearEventsFunctionsExtensions();
 #endif
   ///@}
 
@@ -957,7 +975,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String packageName;   ///< Game package name
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
-  gd::String adMobAppId;    ///< AdMob application ID.
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String gameFile;                    ///< File of the game
@@ -967,7 +984,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
-      externalEvents;                   ///< List of all externals events
+      externalEvents;  ///< List of all externals events
+  ExtensionProperties
+      extensionProperties;              ///< The properties of the extensions.
   mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
   mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last

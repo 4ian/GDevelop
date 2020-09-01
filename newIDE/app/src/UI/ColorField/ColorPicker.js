@@ -3,6 +3,8 @@
 
 import * as React from 'react';
 import { SketchPicker } from 'react-color';
+import Popover from '@material-ui/core/Popover';
+import muiZIndex from '@material-ui/core/styles/zIndex';
 
 export type RGBColor = {|
   r: number,
@@ -11,7 +13,7 @@ export type RGBColor = {|
   a?: number,
 |};
 
-type ColorResult = {
+export type ColorResult = {
   rgb: RGBColor,
 };
 
@@ -46,20 +48,15 @@ const styles = {
     cursor: 'pointer',
   },
   popover: {
-    position: 'fixed',
-    zIndex: '2',
-    transform: 'translateX(-174px)',
-  },
-  cover: {
-    position: 'fixed',
-    top: '0px',
-    right: '0px',
-    bottom: '0px',
-    left: '0px',
+    // Ensure the popover is above everything (modal, dialog, snackbar, tooltips, etc).
+    // There will be only one ColorPicker opened at a time, so it's fair to put the
+    // highest z index. If this is breaking, check the z-index of material-ui.
+    zIndex: muiZIndex.tooltip + 100,
   },
 };
 
 class ColorPicker extends React.Component<Props, State> {
+  _swatch = React.createRef<HTMLDivElement>();
   state = {
     displayColorPicker: false,
   };
@@ -90,7 +87,11 @@ class ColorPicker extends React.Component<Props, State> {
 
     return (
       <div style={style}>
-        <div style={styles.swatch} onClick={this.handleClick}>
+        <div
+          style={styles.swatch}
+          onClick={this.handleClick}
+          ref={this._swatch}
+        >
           <div
             style={{
               ...styles.color,
@@ -102,13 +103,15 @@ class ColorPicker extends React.Component<Props, State> {
             {color ? null : '?'}
           </div>
         </div>
-        {this.state.displayColorPicker ? (
-          <React.Fragment>
-            <div style={styles.cover} onClick={this.handleClose} />
-            <div style={styles.popover}>
-              <SketchPicker color={displayedColor} {...otherProps} />
-            </div>
-          </React.Fragment>
+        {this.state.displayColorPicker && this._swatch.current ? (
+          <Popover
+            open
+            onClose={this.handleClose}
+            anchorEl={this._swatch.current}
+            style={styles.popover}
+          >
+            <SketchPicker color={displayedColor} {...otherProps} />
+          </Popover>
         ) : null}
       </div>
     );

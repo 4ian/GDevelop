@@ -1,10 +1,8 @@
-const electron = require("electron");
+const electron = require('electron');
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
-const isDev = require("electron-is").dev();
+const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
-const {
-  load
-} = require('./Utils/UrlLoader');
+const { load } = require('./Utils/UrlLoader');
 
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
@@ -23,10 +21,9 @@ const loadModalWindow = ({
   indexSubPath,
   relativeWidth = 0.7,
   relativeHeight = 0.9,
-  backgroundColor = "white",
+  backgroundColor = 'white',
   show = false,
 }) => {
-
   if (modalWindow) {
     modalWindow.show();
     onReady(modalWindow);
@@ -40,8 +37,9 @@ const loadModalWindow = ({
     modal: true,
     center: true,
     webPreferences: {
-      webSecurity: false
-    }
+      webSecurity: false,
+      nodeIntegration: true,
+    },
   };
 
   modalWindow = new BrowserWindow(windowOptions);
@@ -56,31 +54,31 @@ const loadModalWindow = ({
   load({
     window: modalWindow,
     isDev,
-    path: "/external/" + indexSubPath,
-    devTools
+    path: '/external/' + indexSubPath,
+    devTools,
   });
 
   //Prevent any navigation inside the modal window.
-  modalWindow.webContents.on("will-navigate", (e, url) => {
+  modalWindow.webContents.on('will-navigate', (e, url) => {
     if (url !== modalWindow.webContents.getURL()) {
-      console.info("Opening in browser (because of will-navigate):", url);
+      console.info('Opening in browser (because of will-navigate):', url);
       e.preventDefault();
       electron.shell.openExternal(url);
     }
   });
 
   //Prevent opening any website or url inside Electron.
-  modalWindow.webContents.on("new-window", (e, url) => {
-    console.info("Opening in browser (because of new-window): ", url);
+  modalWindow.webContents.on('new-window', (e, url) => {
+    console.info('Opening in browser (because of new-window): ', url);
     e.preventDefault();
     electron.shell.openExternal(url);
   });
 
-  modalWindow.on("closed", event => {
+  modalWindow.on('closed', event => {
     modalWindow = null;
   });
 
-  modalWindow.on("close", event => {
+  modalWindow.on('close', event => {
     // use destroy as a wordaround to force window closing, which is not done properly otherwise on Windows
     modalWindow.destroy();
     modalWindow = null;
@@ -88,5 +86,5 @@ const loadModalWindow = ({
 };
 
 module.exports = {
-  loadModalWindow
+  loadModalWindow,
 };

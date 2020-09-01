@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -156,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "3e6d949f-5b14-4712-8280-2a7924694340",
           "width": 0,
           "x": 155,
           "y": 63,
@@ -171,6 +172,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "f296934e-54f7-492b-b65d-70aea27292bc",
           "width": 0,
           "x": 364,
           "y": 247,
@@ -337,6 +339,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -392,6 +399,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "f4bfb484-a4ac-4f15-8cd8-74878b77da3a",
           "width": 0,
           "x": 93,
           "y": 58,
@@ -407,6 +415,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "22f1c1e9-a96f-47ba-ae90-6fc325a35e50",
           "width": 0,
           "x": 356,
           "y": 275,
@@ -607,6 +616,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -662,6 +676,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a747c294-cd32-40b6-8521-820fdc78ca50",
           "width": 0,
           "x": 193,
           "y": 68,
@@ -677,6 +692,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "e3ad2980-4178-4592-b783-9ffaac91080d",
           "width": 0,
           "x": 361,
           "y": 298,
@@ -843,6 +859,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -1,4 +1,6 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
+import GDevelopThemeContext from '../Theme/ThemeContext';
 
 const styles = {
   row: {
@@ -6,19 +8,45 @@ const styles = {
   },
   cell: {
     display: 'flex',
-    flex: 1,
     alignItems: 'center',
-    paddingLeft: 8,
-    paddingRight: 8,
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 };
 
-export const TreeTable = props => <div>{props.children}</div>;
+type TreeTableRowProps = {|
+  children: React.Node,
+|};
 
-export const TreeTableRow = props => (
-  <div style={{ ...styles.row, ...props.style }}>{props.children}</div>
-);
+export const TreeTableRow = (props: TreeTableRowProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-export const TreeTableCell = props => (
-  <div style={{ ...styles.cell, ...props.style }}>{props.children}</div>
+  return (
+    <div
+      style={{
+        ...styles.row,
+        backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+type TreeTableCellProps = {|
+  style?: Object,
+  expand?: boolean,
+  children?: React.Node,
+|};
+
+export const TreeTableCell = (props: TreeTableCellProps) => (
+  <div
+    style={{
+      ...styles.cell,
+      flex: props.expand ? 1 : undefined,
+      ...props.style,
+    }}
+  >
+    {props.children}
+  </div>
 );

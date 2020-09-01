@@ -279,6 +279,43 @@ bool EventsRefactorer::RenameObjectInConditions(
   return somethingModified;
 }
 
+bool EventsRefactorer::RenameObjectInEventParameters(
+    const gd::Platform& platform,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::Expression& expression,
+    gd::ParameterMetadata parameterMetadata,
+    gd::String oldName,
+    gd::String newName) {
+  bool somethingModified = false;
+
+  if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()) &&
+      expression.GetPlainString() == oldName)
+    expression = gd::Expression(newName);
+  // Replace object's name in expressions
+  else if (ParameterMetadata::IsExpression(
+               "number", parameterMetadata.GetType())) {
+    gd::ExpressionParser2 parser(platform, project, layout);
+    auto node = parser.ParseExpression("number", expression.GetPlainString());
+
+    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+      expression = ExpressionParser2NodePrinter::PrintNode(*node);
+    }
+  }
+  // Replace object's name in text expressions
+  else if (ParameterMetadata::IsExpression(
+               "string", parameterMetadata.GetType())) {
+    gd::ExpressionParser2 parser(platform, project, layout);
+    auto node = parser.ParseExpression("string", expression.GetPlainString());
+
+    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+      expression = ExpressionParser2NodePrinter::PrintNode(*node);
+    }
+  }
+
+  return somethingModified;
+}
+
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
                                             gd::ObjectsContainer& project,
                                             gd::ObjectsContainer& layout,
@@ -298,6 +335,15 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool somethingModified = RenameObjectInActions(
           platform, project, layout, *actionsVectors[j], oldName, newName);
+    }
+
+    vector<pair<gd::Expression*, gd::ParameterMetadata>> expressionsWithMetadata =
+        events[i].GetAllExpressionsWithMetadata();
+    for (std::size_t j = 0; j < expressionsWithMetadata.size(); ++j) {
+      gd::Expression* expression = expressionsWithMetadata[j].first;
+      gd::ParameterMetadata parameterMetadata = expressionsWithMetadata[j].second;
+      bool somethingModified = RenameObjectInEventParameters(
+        platform, project, layout, *expression, parameterMetadata, oldName, newName);
     }
 
     if (events[i].CanHaveSubEvents())

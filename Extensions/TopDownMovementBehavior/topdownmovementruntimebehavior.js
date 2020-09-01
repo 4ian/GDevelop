@@ -46,6 +46,34 @@ gdjs.registerBehavior(
   gdjs.TopDownMovementRuntimeBehavior
 );
 
+gdjs.TopDownMovementRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  if (oldBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
+    this._allowDiagonals = newBehaviorData.allowDiagonals;
+  }
+  if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
+    this._acceleration = newBehaviorData.acceleration;
+  }
+  if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
+    this._deceleration = newBehaviorData.deceleration;
+  }
+  if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
+    this._maxSpeed = newBehaviorData.maxSpeed;
+  }
+  if (oldBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
+    this._angularMaxSpeed = newBehaviorData.angularMaxSpeed;
+  }
+  if (oldBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
+    this._rotateObject = newBehaviorData.rotateObject;
+  }
+  if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
+    this._angleOffset = newBehaviorData.angleOffset;
+  }
+  if (oldBehaviorData.ignoreDefaultControls !== newBehaviorData.ignoreDefaultControls) {
+    this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
+  }
+  return true;
+}
+
 gdjs.TopDownMovementRuntimeBehavior.prototype.setAcceleration = function(
   acceleration
 ) {

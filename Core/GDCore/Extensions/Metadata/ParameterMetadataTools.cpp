@@ -90,7 +90,7 @@ size_t ParameterMetadataTools::GetObjectParameterIndexFor(
   // the object in the list of parameters (if possible, just after).
   // Search "lastObjectName" in the codebase for other place where this
   // convention is enforced.
-  for (std::size_t pNb = parameterIndex - 1; pNb < parametersMetadata.size();
+  for (std::size_t pNb = parameterIndex; pNb < parametersMetadata.size();
        pNb--) {
     if (gd::ParameterMetadata::IsObject(parametersMetadata[pNb].GetType())) {
       return pNb;

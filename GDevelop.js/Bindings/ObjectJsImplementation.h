@@ -1,6 +1,6 @@
-#include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/Project.h>
+#include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <emscripten.h>
@@ -10,6 +10,9 @@ using namespace gd;
 /**
  * \brief A gd::Object that stores its content in JSON and forward the
  * properties related functions to Javascript with Emscripten.
+ *
+ * It also implements "ExposeResources" to expose the properties of type
+ * "resource".
  */
 class ObjectJsImplementation : public gd::Object {
  public:
@@ -18,13 +21,10 @@ class ObjectJsImplementation : public gd::Object {
          // that is copied (see calls to AddObject).
         Object("ObjectJsImplementation"),
         jsonContent("{}") {}
-  virtual std::unique_ptr<gd::Object> Clone() const override;
+  std::unique_ptr<gd::Object> Clone() const override;
 
-  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const override;
-  virtual bool UpdateProperty(const gd::String& name,
-                              const gd::String& value,
-                              gd::Project& project) override;
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
       const gd::InitialInstance& instance,
@@ -44,9 +44,10 @@ class ObjectJsImplementation : public gd::Object {
     return *this;
   };
 
+  void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+
  protected:
-  virtual void DoSerializeTo(SerializerElement& arg0) const override;
-  virtual void DoUnserializeFrom(Project& arg0,
-                                 const SerializerElement& arg1) override;
+  void DoSerializeTo(SerializerElement& arg0) const override;
+  void DoUnserializeFrom(Project& arg0, const SerializerElement& arg1) override;
   gd::String jsonContent;
 };

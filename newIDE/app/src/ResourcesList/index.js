@@ -7,6 +7,7 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import Window from '../Utils/Window';
 import {
   createOrUpdateResource,
   getLocalResourceFullPath,
@@ -14,13 +15,14 @@ import {
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
+import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 
+const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
-const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -46,6 +48,8 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveAllResourcesWithInvalidPath: () => void,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -110,6 +114,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     extensions: string,
     createResource: () => gdResource
   ) => {
+    const glob = lazyRequireGlob();
+    if (!glob) return;
+
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
@@ -131,34 +138,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       }
       this.forceUpdate();
     });
-  };
-
-  _removeUnusedResources = (resourceType: ResourceKind) => {
-    const { project } = this.props;
-    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
-      .toJSArray()
-      .forEach(resourceName => {
-        console.info(
-          `Removing unused` + resourceType + ` resource: ${resourceName}`
-        );
-      });
-    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
-    this.forceUpdate();
-  };
-
-  _removeAllResourcesWithInvalidPath = () => {
-    const { project } = this.props;
-    const resourcesManager = project.getResourcesManager();
-    resourcesManager
-      .getAllResourceNames()
-      .toJSArray()
-      .forEach(resourceName => {
-        if (getResourceFilePathStatus(project, resourceName) === 'error') {
-          resourcesManager.removeResource(resourceName);
-          console.info('Removed due to invalid path: ' + resourceName);
-        }
-      });
-    this.forceUpdate();
   };
 
   _editName = (resource: ?gdResource) => {
@@ -185,8 +164,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    // eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
     );
     if (!answer) return;
@@ -286,25 +264,25 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Remove Unused Images',
         click: () => {
-          this._removeUnusedResources('image');
+          this.props.onRemoveUnusedResources('image');
         },
       },
       {
         label: 'Remove Unused Audio',
         click: () => {
-          this._removeUnusedResources('audio');
+          this.props.onRemoveUnusedResources('audio');
         },
       },
       {
         label: 'Remove Unused Fonts',
         click: () => {
-          this._removeUnusedResources('font');
+          this.props.onRemoveUnusedResources('font');
         },
       },
       {
         label: 'Remove Resources with Invalid Path',
         click: () => {
-          this._removeAllResourcesWithInvalidPath();
+          this.props.onRemoveAllResourcesWithInvalidPath();
         },
         enabled: hasElectron,
       },

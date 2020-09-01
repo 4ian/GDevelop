@@ -99,14 +99,12 @@ std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
 }
 
 #if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }
 
-std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Smooth the image")]
       .SetValue(smooth ? "true" : "false")
@@ -119,8 +117,7 @@ std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties(
 }
 
 bool ImageResource::UpdateProperty(const gd::String& name,
-                                   const gd::String& value,
-                                   gd::Project& project) {
+                                   const gd::String& value) {
   if (name == _("Smooth the image"))
     smooth = value == "1";
   else if (name == _("Always loaded in memory"))
@@ -563,8 +560,7 @@ void JsonResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("disablePreload", IsPreloadDisabled());
 }
 
-std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties["disablePreload"]
       .SetValue(disablePreload ? "true" : "false")
@@ -575,8 +571,7 @@ std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties(
 }
 
 bool JsonResource::UpdateProperty(const gd::String& name,
-                                  const gd::String& value,
-                                  gd::Project& project) {
+                                  const gd::String& value) {
   if (name == "disablePreload") disablePreload = value == "1";
 
   return true;

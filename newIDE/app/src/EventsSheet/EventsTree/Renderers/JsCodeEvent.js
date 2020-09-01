@@ -13,7 +13,7 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
 
@@ -46,7 +46,6 @@ const styles = {
 };
 
 type State = {|
-  width: number,
   editing: boolean,
   editingObject: boolean,
   anchorEl: ?any,
@@ -56,19 +55,16 @@ export default class JsCodeEvent extends React.Component<
   EventRendererProps,
   State
 > {
+  _objectField: ?ObjectField = null;
   state = {
-    width: 0,
     editing: false,
     editingObject: false,
     anchorEl: null,
   };
 
   _input: ?any;
-  _container: ?any;
 
   edit = () => {
-    if (!this._container) return;
-
     this.setState(
       {
         editing: true,
@@ -105,18 +101,27 @@ export default class JsCodeEvent extends React.Component<
   };
 
   editObject = (domEvent: any) => {
-    // We should not need to stop the event propagation, but
+    // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
-    // Caveat: we can open multiple InlinePopover.
-    // Search the rest of the codebase for onlinepopover-event-hack
-    domEvent.preventDefault();
-    domEvent.stopPropagation();
-
-    this.setState({
-      editingObject: true,
-      anchorEl: domEvent.currentTarget,
-    });
+    // Search the rest of the codebase for inlinepopover-event-hack
+    const anchorEl = domEvent.currentTarget;
+    setTimeout(
+      () =>
+        this.setState(
+          {
+            editingObject: true,
+            anchorEl,
+          },
+          () => {
+            // Give a bit of time for the popover to mount itself
+            setTimeout(() => {
+              if (this._objectField) this._objectField.focus();
+            }, 10);
+          }
+        ),
+      10
+    );
   };
 
   endObjectEditing = () => {
@@ -129,12 +134,16 @@ export default class JsCodeEvent extends React.Component<
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
+
+    const textStyle = this.props.disabled ? styles.comment : undefined;
+
     const objects = (
       <span
         className={classNames({
           [selectableArea]: true,
         })}
         onClick={this.editObject}
+        style={textStyle}
       >
         {parameterObjects
           ? `, objects /*${parameterObjects}*/`
@@ -143,23 +152,29 @@ export default class JsCodeEvent extends React.Component<
     );
 
     const eventsFunctionContext = this.props.scope.eventsFunction ? (
-      <span>, eventsFunctionContext</span>
+      <span style={textStyle}>, eventsFunctionContext</span>
     ) : null;
 
     const functionStart = (
       <p style={styles.wrappingText}>
-        <span>{'(function(runtimeScene'}</span>
+        <span style={textStyle}>
+          {this.props.disabled ? '/*' : ''}
+          {'(function(runtimeScene'}
+        </span>
         {objects}
         {eventsFunctionContext}
-        <span>{') {'}</span>
+        <span style={textStyle}>{') {'}</span>
       </p>
     );
     const functionEnd = (
       <p style={styles.wrappingText}>
-        <span>{'})(runtimeScene'}</span>
+        <span style={textStyle}>{'})(runtimeScene'}</span>
         {objects}
         {eventsFunctionContext}
-        <span>{');'}</span>
+        <span style={textStyle}>
+          {');'}
+          {this.props.disabled ? '*/' : ''}
+        </span>
         <span style={styles.comment}>
           {' // '}
           <a
@@ -175,42 +190,45 @@ export default class JsCodeEvent extends React.Component<
     );
 
     return (
-      <Measure onMeasure={({ width }) => this.setState({ width })}>
-        <div
-          style={styles.container}
-          className={classNames({
-            [largeSelectableArea]: true,
-            [largeSelectedArea]: this.props.selected,
-          })}
-          ref={container => (this._container = container)}
-        >
-          {functionStart}
-          <CodeEditor
-            value={jsCodeEvent.getInlineCode()}
-            onChange={this.onChange}
-            width={this.state.width}
-            onEditorMounted={() => this.props.onUpdate()}
-          />
-          {functionEnd}
-          <InlinePopover
-            open={this.state.editingObject}
-            anchorEl={this.state.anchorEl}
-            onRequestClose={this.endObjectEditing}
+      <Measure bounds>
+        {({ measureRef, contentRect }) => (
+          <div
+            style={styles.container}
+            className={classNames({
+              [largeSelectableArea]: true,
+              [largeSelectedArea]: this.props.selected,
+            })}
+            ref={measureRef}
           >
-            <ObjectField
-              project={this.props.project}
-              scope={this.props.scope}
-              globalObjectsContainer={this.props.globalObjectsContainer}
-              objectsContainer={this.props.objectsContainer}
-              value={parameterObjects}
-              onChange={text => {
-                jsCodeEvent.setParameterObjects(text);
-                this.props.onUpdate();
-              }}
-              isInline
+            {functionStart}
+            <CodeEditor
+              value={jsCodeEvent.getInlineCode()}
+              onChange={this.onChange}
+              width={contentRect.bounds.width}
+              onEditorMounted={() => this.props.onUpdate()}
             />
-          </InlinePopover>
-        </div>
+            {functionEnd}
+            <InlinePopover
+              open={this.state.editingObject}
+              anchorEl={this.state.anchorEl}
+              onRequestClose={this.endObjectEditing}
+            >
+              <ObjectField
+                project={this.props.project}
+                scope={this.props.scope}
+                globalObjectsContainer={this.props.globalObjectsContainer}
+                objectsContainer={this.props.objectsContainer}
+                value={parameterObjects}
+                onChange={text => {
+                  jsCodeEvent.setParameterObjects(text);
+                  this.props.onUpdate();
+                }}
+                isInline
+                ref={objectField => (this._objectField = objectField)}
+              />
+            </InlinePopover>
+          </div>
+        )}
       </Measure>
     );
   }

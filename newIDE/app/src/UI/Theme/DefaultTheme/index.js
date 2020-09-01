@@ -26,6 +26,12 @@ const backgroundColor = '#f7f7f7';
  */
 const canvasColor = '#f0f0f0';
 
+/**
+ * The alternate background color, for some lists or search box,
+ * to distinguish them from other content.
+ */
+const alternateCanvasColor = '#ffffff';
+
 // GDevelop specific variables:
 const gdevelopTheme = {
   palette: {
@@ -34,6 +40,7 @@ const gdevelopTheme = {
   message: {
     warning: '#ffa500',
     error: '#f00',
+    valid: '#00aa00',
   },
   toolbar: {
     backgroundColor: backgroundColor,
@@ -41,7 +48,8 @@ const gdevelopTheme = {
   },
   closableTabs: {
     fontFamily,
-    backgroundColor: backgroundColor,
+    containerBackgroundColor: backgroundColor,
+    backgroundColor: canvasColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopLightBlue,
     selectedTextColor: '#ffffff',
@@ -52,7 +60,10 @@ const gdevelopTheme = {
     selectedBorderColor: systemSelectionColor,
   },
   list: {
-    itemsBackgroundColor: '#FFFFFF',
+    itemsBackgroundColor: alternateCanvasColor,
+  },
+  searchBar: {
+    backgroundColor: alternateCanvasColor,
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
@@ -61,6 +72,8 @@ const gdevelopTheme = {
     separatorColor: '#e0e0e0',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
+    rightIconColor: '#111',
+    selectedRightIconColor: '#111',
     errorTextColor: '#ff2e16',
     warningTextColor: '#ffb032',
     selectedErrorBackgroundColor: '#ff2e16',
@@ -135,21 +148,74 @@ const muiTheme = createMuiTheme({
         color: '#111',
       },
     },
+    // Reduce right margins from 16px to 8px in lists:
+    MuiListItem: {
+      secondaryAction: {
+        paddingRight: 40,
+      },
+      gutters: {
+        paddingRight: 8,
+      },
+    },
+    MuiListItemSecondaryAction: {
+      root: {
+        right: 8,
+      },
+    },
     // Use a more visible color scheme for tabs:
     MuiTabs: {
       root: {
         backgroundColor: gdevelopLightBlue,
+        minHeight: 32, // Reduce the height of tabs to 32px
       },
     },
     MuiTab: {
       textColorPrimary: {
         color: '#fff !important',
       },
+      root: {
+        // Reduce the height of tabs to 32px
+        paddingTop: 0,
+        paddingBottom: 0,
+        minHeight: 32,
+      },
     },
     MuiButtonBase: {
       // Remove the web-ish "pointer" (hand) cursor from buttons
       root: {
         cursor: 'default',
+      },
+    },
+    // Reduce default margins on tables:
+    MuiTableCell: {
+      sizeSmall: {
+        paddingTop: 0,
+        paddingBottom: 0,
+      },
+    },
+    // Reduce default margins on Dialogs:
+    MuiDialogTitle: {
+      root: {
+        padding: 8,
+      },
+    },
+    MuiDialogContent: {
+      root: {
+        padding: 8,
+      },
+    },
+    // Remove default margins on form controls (we already use a Grid)
+    MuiFormControl: {
+      marginDense: {
+        marginTop: 0,
+        marginBottom: 0,
+      },
+    },
+    MuiCheckbox: {
+      root: {
+        // Cancel padding around Checkbox
+        marginTop: -9,
+        marginBottom: -9,
       },
     },
     // Use non rounded buttons

@@ -1,6 +1,10 @@
 /**
- * Launch this script to re-generate the files containing the list of extensions
- * being used by each example.
+ * Launch this script to re-generate VersionMetadata.js, used by the IDE
+ * to know about the current version number.
+ *
+ * The version is read from `newIDE/electron-app/app/package.json`. It must
+ * always be the source of truth and the only place to update when the version
+ * is changed.
  */
 const fs = require('fs');
 var shell = require('shelljs');

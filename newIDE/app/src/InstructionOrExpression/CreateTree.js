@@ -1,45 +1,53 @@
 // @flow
 import update from 'lodash/update';
 import compact from 'lodash/compact';
-import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
+import {
+  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedInstructionMetadata,
+  type EnumeratedExpressionMetadata,
+} from './EnumeratedInstructionOrExpressionMetadata.js';
 
 const GROUP_DELIMITER = '/';
 
-export type InstructionOrExpressionTreeNode =
-  | EnumeratedInstructionOrExpressionMetadata
+export type TreeNode<T> =
+  | T
   | {
-      [string]: InstructionOrExpressionTreeNode,
+      [string]: TreeNode<T>,
     };
 
-export const createTree = (
-  allExpressions: Array<EnumeratedInstructionOrExpressionMetadata>
-): InstructionOrExpressionTreeNode => {
-  const tree = {};
-  allExpressions.forEach(
-    (expressionInfo: EnumeratedInstructionOrExpressionMetadata) => {
-      let pathInTree = compact(
-        expressionInfo.fullGroupName.split(GROUP_DELIMITER)
-      );
-      if (!pathInTree.length) {
-        // Group items without a group in an empty group
-        pathInTree = [''];
-      }
+export type InstructionTreeNode = TreeNode<EnumeratedInstructionMetadata>;
+export type ExpressionTreeNode = TreeNode<EnumeratedExpressionMetadata>;
+export type InstructionOrExpressionTreeNode =
+  | InstructionTreeNode
+  | EnumeratedExpressionMetadata;
 
-      update(tree, pathInTree, groupInfo => {
-        const existingGroupInfo = groupInfo || {};
-        return {
-          ...existingGroupInfo,
-          [expressionInfo.displayedName]: expressionInfo,
-        };
-      });
+export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
+  allExpressions: Array<T>
+): TreeNode<T> => {
+  const tree = {};
+  allExpressions.forEach((expressionInfo: T) => {
+    let pathInTree = compact(
+      expressionInfo.fullGroupName.split(GROUP_DELIMITER)
+    );
+    if (!pathInTree.length) {
+      // Group items without a group in an empty group
+      pathInTree = [''];
     }
-  );
+
+    update(tree, pathInTree, groupInfo => {
+      const existingGroupInfo = groupInfo || {};
+      return {
+        ...existingGroupInfo,
+        [expressionInfo.displayedName]: expressionInfo,
+      };
+    });
+  });
 
   return tree;
 };
 
-export const findInTree = (
-  instructionTreeNode: InstructionOrExpressionTreeNode,
+export const findInTree = <T: Object>(
+  instructionTreeNode: TreeNode<T>,
   instructionType: ?string
 ): ?Array<string> => {
   if (!instructionType) return null;
@@ -64,7 +72,7 @@ export const findInTree = (
       }
     } else {
       // $FlowFixMe - see above
-      const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
+      const groupOfInstructionInformation: TreeNode<T> = instructionOrGroup;
       const searchResult = findInTree(
         groupOfInstructionInformation,
         instructionType

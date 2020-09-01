@@ -238,6 +238,24 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             options={props.dataSource}
             renderOption={renderItem}
             getOptionDisabled={isOptionDisabled}
+            ListboxProps={{
+              // We need to stop the propagation since ClickAwayListener of InlinePopover does not
+              // recognise listbox as a part of Autocomplete, which is fair since it's in a different DOM tree.
+              // We have basically killed these events completely by using stopImmediatePropagation() since Portals dont
+              // stop propagation by simply using stopPropagation(), more about this issue https://github.com/facebook/react/issues/11387
+              // Material-UI has issues regarding this too, https://github.com/mui-org/material-ui/issues/18586.
+              // This change was implemented in this PR https://github.com/4ian/GDevelop/pull/1586,
+              // which is meant to solve this issue, https://github.com/4ian/GDevelop/issues/1562
+              // Important takeaway: Never try to catch these events, our underlying assumption is that we don't need these events
+              // anymore after selection of option. Stopping propagation of events is never a good idea,
+              // but this is meant to be a hack and not a proper solution.
+              onClick: (event: SyntheticMouseEvent<HTMLUListElement>) => {
+                event.nativeEvent.stopImmediatePropagation();
+              },
+              onTouchEnd: (event: SyntheticTouchEvent<HTMLUListElement>) => {
+                event.nativeEvent.stopImmediatePropagation();
+              },
+            }}
             getOptionLabel={(option: Option) =>
               getOptionLabel(option, currentInputValue)
             }

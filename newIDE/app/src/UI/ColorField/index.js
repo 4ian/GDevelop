@@ -11,7 +11,7 @@ const styles = {
   picker: {
     position: 'absolute',
     right: '8px',
-    top: '26px',
+    top: '19px',
   },
 };
 

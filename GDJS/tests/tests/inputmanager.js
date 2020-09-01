@@ -136,10 +136,11 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     properties: { windowWidth: 800, windowHeight: 600 },
+    resources: { resources: [] }
   });
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true }],
+    layers: [{ name: '', visibility: true, effects: [] }],
     variables: [],
     behaviorsSharedData: [],
     objects: [],

@@ -5,7 +5,7 @@ import IconButton from '../IconButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 
-type PropsType = {
+type PropsType = {|
   helpPagePath: ?string,
   disabled?: boolean,
   style?: {|
@@ -21,7 +21,8 @@ type PropsType = {
     marginTop?: number,
     marginBottom?: number,
   |},
-};
+  size?: 'small',
+|};
 
 /**
  * The icon that can be used in any dialog to open a help page
@@ -35,6 +36,7 @@ export default (props: PropsType) => {
       onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}
       disabled={props.disabled}
       style={props.style}
+      size={props.size}
     >
       <HelpOutline />
     </IconButton>

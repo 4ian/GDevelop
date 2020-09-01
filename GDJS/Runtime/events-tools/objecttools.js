@@ -173,42 +173,46 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
     objectsLists.values(lists);
 
-    //Create a boolean for each object
-    for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            arr[k].pick = false;
-        }
-    }
-
-    //Pick only objects that are fulfilling the predicate
+    // Pick only objects that are fulfilling the predicate.
     for(var i = 0, leni = lists.length;i<leni;++i) {
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            if (negatePredicate ^ predicate(arr[k], extraArg)) {
+            var object = arr[k];
+            if (negatePredicate ^ predicate(object, extraArg)) {
                 isTrue = true;
-                arr[k].pick = true; //Pick the objects
+                object.pick = true;
+            } else {
+                object.pick = false;
             }
         }
     }
 
-    //Trim not picked objects from lists.
+    // Trim not picked objects from lists.
     for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        var finalSize = 0;
-
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            var obj = arr[k];
-            if ( arr[k].pick ) {
-                arr[finalSize] = obj;
-                finalSize++;
-            }
-        }
-        arr.length = finalSize;
+        gdjs.evtTools.object.filterPickedObjectsList(lists[i]);
     }
 
     return isTrue;
+};
+
+/**
+ * Filter in-place the specified array to remove objects for which
+ * `pick` property is set to false.
+ * @param {gdjs.RuntimeObject[]} arr
+ */
+gdjs.evtTools.object.filterPickedObjectsList = function (arr) {
+    var finalSize = 0;
+
+    for (var k = 0, lenk = arr.length; k < lenk; ++k) {
+        var obj = arr[k];
+        if (obj.pick) {
+            arr[finalSize] = obj;
+            finalSize++;
+        }
+    }
+
+    arr.length = finalSize;
 };
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {

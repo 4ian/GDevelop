@@ -18,7 +18,7 @@ echo ℹ️ Generated GDCpp docs
 cd ../..
 cd GDJS
 npm install
-jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+npm run generate-doc
 echo ℹ️ Generated GDJS Runtime docs
 cd ..
 cd scripts

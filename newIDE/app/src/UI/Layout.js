@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Spacer, Line } from './Grid';
+import { Spacer, Line, Column } from './Grid';
 import { ResponsiveWindowMeasurer } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
@@ -31,23 +31,23 @@ const textFieldWithButtonLayoutStyles = {
   },
   filledTextFieldWithLabelRightButtonMargins: {
     ...buttonCommonStyles,
-    marginTop: 24, // Properly align with the text field (only dense "filled" text fields supported)
-    marginLeft: 10,
+    marginTop: 15, // Properly align with the text field (only dense "filled" text fields supported)
+    marginLeft: 8,
   },
   filledTextFieldWithoutLabelRightButtonMargins: {
     ...buttonCommonStyles,
-    marginTop: 15, // Properly align with the text field (only dense "filled" text fields supported)
-    marginLeft: 10,
+    marginTop: 6, // Properly align with the text field (only dense "filled" text fields supported)
+    marginLeft: 8,
   },
   standardTextFieldWithLabelRightButtonMargins: {
     ...buttonCommonStyles,
     marginTop: 17, // Properly align with the text field (only "standard" text fields with margin "none" supported)
-    marginLeft: 10,
+    marginLeft: 8,
   },
   standardTextFieldWithoutLabelRightButtonMargins: {
     ...buttonCommonStyles,
     marginTop: 0, // Properly align with the text field (only "standard" text fields with margin "none" supported)
-    marginLeft: 10,
+    marginLeft: 8,
   },
 };
 
@@ -96,9 +96,9 @@ export const ResponsiveLineStackLayout = ({
     <ResponsiveWindowMeasurer>
       {windowWidth =>
         windowWidth === 'small' ? (
-          React.Children.map(children, (child, index) => {
-            return <Line expand>{child}</Line>;
-          })
+          <ColumnStackLayout noMargin={noMargin} expand>
+            {children}
+          </ColumnStackLayout>
         ) : (
           <Line
             alignItems={alignItems}
@@ -115,7 +115,6 @@ export const ResponsiveLineStackLayout = ({
               return (
                 <React.Fragment>
                   {addSpacers && <Spacer />}
-                  {addSpacers && <Spacer />}
                   {child}
                 </React.Fragment>
               );
@@ -124,5 +123,45 @@ export const ResponsiveLineStackLayout = ({
         )
       }
     </ResponsiveWindowMeasurer>
+  );
+};
+
+type ColumnStackLayoutProps = {|
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  noMargin?: boolean,
+  children: React.Node,
+|};
+
+export const ColumnStackLayout = ({
+  alignItems,
+  justifyContent,
+  expand,
+  noMargin,
+  children,
+}: ColumnStackLayoutProps) => {
+  let isFirstChild = true;
+  return (
+    <Column
+      alignItems={alignItems}
+      justifyContent={justifyContent}
+      expand={expand}
+      noMargin={noMargin}
+    >
+      {React.Children.map(children, (child, index) => {
+        if (!child) return null;
+
+        const addSpacers = !isFirstChild;
+        isFirstChild = false;
+
+        return (
+          <React.Fragment>
+            {addSpacers && <Spacer />}
+            {child}
+          </React.Fragment>
+        );
+      })}
+    </Column>
   );
 };

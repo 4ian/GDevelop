@@ -217,7 +217,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Begin fill path"),
                 _("Begin to draw a simple one-color fill. Subsequent actions, such as \"Path line\" (in the Advanced category) can be used to draw. Be sure to use \"End fill path\" action when you're done drawing the shape."),
                 _("Begins drawing filling of an advanced path "
-                  "with _PARAM0_"),
+                  "with _PARAM0_ (start: _PARAM1_;_PARAM2_)"),
                 _("Advanced"),
                 "res/actions/beginFillPath24.png",
                 "res/actions/beginFillPath.png")
@@ -337,6 +337,33 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("ClearBetweenFrames",
+                _("Clear between frames"),
+                _("Activate (or deactivate) the clearing of the rendered shape at the beginning of each frame."),
+                _("Clear the rendered image of _PARAM0_ between each frame: _PARAM1_"),
+                _("Setup"),
+                "res/actions/visibilite24.png",
+                "res/actions/visibilite.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("yesorno", _("Clear between each frame"), "", true)
+      .SetDefaultValue("yes")
+      .SetFunctionName("SetClearBetweenFrames")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddCondition(
+         "ClearBetweenFrames",
+         _("Clear between frames"),
+         _("Check if the rendered image is cleared between frames."),
+         _("_PARAM0_ is clearing its rendered image between each frame"),
+         _("Setup"),
+         "res/conditions/visibilite24.png",
+         "res/conditions/visibilite.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("IsClearedBetweenFrames")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("FillColor",

@@ -92,13 +92,26 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this._livingOnScene = true;
     /**
      * @type {number}
-     * @protected
+     * @readonly
      */
     this.id = runtimeScene.createNewUniqueId();
     /**
      * @type {gdjs.RuntimeScene}
      */
     this._runtimeScene = runtimeScene;
+    /**
+     * An optional UUID associated to the object to be used
+     * for hot reload. Don't modify or use otherwise.
+     * @type {?string}
+     */
+    this.persistentUuid = null;
+
+    /**
+     * A property to be used by external algorithms to indicate if the
+     * object is picked or not in an object selection. By construction, this is
+     * not "thread safe" or "re-entrant algorithm" safe.
+     */
+    this.pick = false;
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
@@ -269,6 +282,19 @@ gdjs.RuntimeObject.prototype.update = function(runtimeScene) {
 gdjs.RuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     //Nothing to do.
 };
+
+/**
+ * Called when the object must be updated using the specified objectData. This is the
+ * case during hot-reload, and is only called if the object was modified.
+ *
+ * @param {ObjectData} oldObjectData The previous data for the object.
+ * @param {ObjectData} newObjectData The new data for the object.
+ * @returns {boolean} true if the object was updated, false if it could not (i.e: hot-reload is not supported).
+ */
+gdjs.RuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    // If not redefined, mark by default the hot-reload as failed.
+    return false;
+}
 
 /**
  * Remove an object from a scene.
@@ -665,7 +691,7 @@ gdjs.RuntimeObject.prototype.hide = function(enable) {
 /**
  * Return true if the object is not hidden.
  *
- * Note: This is unrelated to the actual visibility of the objec on the screen.
+ * Note: This is unrelated to the actual visibility of the object on the screen.
  * For this, see `getVisibilityAABB` to get the bounding boxes of the object as displayed
  * on the scene.
  *
@@ -682,6 +708,18 @@ gdjs.RuntimeObject.prototype.isVisible = function() {
 gdjs.RuntimeObject.prototype.isHidden = function() {
     return this.hidden;
 };
+
+/**
+ * Set the width of the object, if applicable.
+ * @param {number} width The new width in pixels.
+ */
+gdjs.RuntimeObject.prototype.setWidth = function(width) {};
+
+/**
+ * Set the height of the object, if applicable.
+ * @param {number} height The new height in pixels.
+ */
+gdjs.RuntimeObject.prototype.setHeight = function(height) {};
 
 /**
  * Return the width of the object.
@@ -1031,12 +1069,24 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
 };
 
 /**
+ * Called when the object was hot reloaded, to notify behaviors
+ * that the object was modified. Useful for behaviors that
+ */
+gdjs.RuntimeObject.prototype.notifyBehaviorsObjectHotReloaded = function() {
+    for(var i = 0, len = this._behaviors.length;i<len;++i) {
+        this._behaviors[i].onObjectHotReloaded();
+    }
+}
+
+/**
  * Get a behavior from its name.
+ * If the behavior does not exists, `undefined` is returned.
  *
- * Be careful, the behavior must exists, no check is made on the name.
+ * **Never keep a reference** to a behavior, as they can be hot-reloaded. Instead,
+ * always call getBehavior on the object.
  *
  * @param name {String} The behavior name.
- * @return {gdjs.RuntimeBehavior} The behavior with the given name, or undefined.
+ * @return {gdjs.RuntimeBehavior?} The behavior with the given name, or undefined.
  */
 gdjs.RuntimeObject.prototype.getBehavior = function(name) {
     return this._behaviorsTable.get(name);
@@ -1066,7 +1116,7 @@ gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
 /**
  * Check if a behavior is activated
  *
- * @param name {String} The behavior name.
+ * @param {string} name The behavior name.
  * @return true if the behavior is activated.
  */
 gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
@@ -1075,6 +1125,44 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
     }
 
     return false;
+};
+
+/**
+ * Remove the behavior with the given name. Usually only used by
+ * hot-reloading, as performance of this operation is not guaranteed
+ * (in the future, this could lead to re-organization of arrays
+ * holding behaviors).
+ *
+ * @param {string} name The name of the behavior to remove.
+ * @returns {boolean} true if the behavior was properly removed, false otherwise.
+ */
+gdjs.RuntimeObject.prototype.removeBehavior = function(name) {
+    var behavior = this._behaviorsTable.get(name);
+    if (!behavior) return false;
+
+    behavior.onDestroy();
+
+    var behaviorIndex = this._behaviors.indexOf(behavior);
+    if (behaviorIndex !== -1) this._behaviors.splice(behaviorIndex, 1);
+    this._behaviorsTable.remove(name);
+
+    return true;
+};
+
+/**
+ * Create the behavior decribed by the given BehaviorData
+ *
+ * @param {BehaviorData} behaviorData The data to be used to construct the behavior.
+ * @returns {boolean} true if the behavior was properly created, false otherwise.
+ */
+gdjs.RuntimeObject.prototype.addNewBehavior = function(behaviorData) {
+    var Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
+    if (!Ctor) return false;
+
+    var newRuntimeBehavior = new Ctor(this._runtimeScene, behaviorData, this);
+    this._behaviors.push(newRuntimeBehavior);
+    this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
+    return true;
 };
 
 //Timers:

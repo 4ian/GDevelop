@@ -7,8 +7,8 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from './EventsScope.flow';
-const gd = global.gd;
+import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,

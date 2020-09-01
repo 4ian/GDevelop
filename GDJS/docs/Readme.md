@@ -4,22 +4,20 @@
 
 ## How to generate the documentation
 
-- Install [Doxygen](www.doxygen.org) and [JSDoc](http://usejsdoc.org/).
-
 - To generate the GDJS Runtime (game engine) documentation:
 
   ```bash
-  cd GDJS
-  jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+  cd <GDevelop repository>/GDJS
+  npm run generate-doc
   ```
 
-  Output will be in `docs/GDJS Documentation` in the GDevelop repository root.
+  Output will be in `<GDevelop repository>/docs/GDJS Documentation`.
 
-- To generate the GDJS Platform documentation for the IDE:
+- To generate the GDJS Platform documentation for the IDE, install [Doxygen](www.doxygen.org). Then:
 
   ```bash
-  cd GDJS/docs
+  cd <GDevelop repository>/GDJS/docs
   doxygen
   ```
 
-  Output will be in `docs/GDJS Runtime Documentation` in the GDevelop repository root.
+  Output will be in `<GDevelop repository>/docs/GDJS Runtime Documentation`.

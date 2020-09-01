@@ -7,7 +7,7 @@ import Dialog from '../UI/Dialog';
 import Star from '@material-ui/icons/Star';
 import Favorite from '@material-ui/icons/Favorite';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import {
   sendSubscriptionCheckDialogShown,
   sendSubscriptionCheckDismiss,
@@ -34,7 +34,6 @@ type DialogState = {|
 const styles = {
   icon: { width: 40, height: 40, marginRight: 20 },
   iconText: { flex: 1 },
-  thanksText: { marginRight: 20, marginBottom: 0 },
 };
 
 export class SubscriptionCheckDialog extends React.Component<
@@ -102,6 +101,7 @@ export class SubscriptionCheckDialog extends React.Component<
             onClick={this._closeDialog}
           />,
         ]}
+        cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
         title={this.props.title}
@@ -144,7 +144,11 @@ export class SubscriptionCheckDialog extends React.Component<
               </Trans>
             </Text>
           </Line>
-          <Text style={styles.thanksText} align="right">
+          <Spacer />
+          <Spacer />
+          <Spacer />
+          <Spacer />
+          <Text align="right">
             <b>
               <Trans>Thanks!</Trans>
             </b>

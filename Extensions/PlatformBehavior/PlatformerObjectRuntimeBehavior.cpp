@@ -27,6 +27,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       roundCoordinates(true),
       gravity(1000),
       maxFallingSpeed(700),
+      ladderClimbingSpeed(150),
       acceleration(1500),
       deceleration(1500),
       maxSpeed(250),
@@ -64,6 +65,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       behaviorContent.GetBoolAttribute("roundCoordinates", false);
   gravity = behaviorContent.GetDoubleAttribute("gravity");
   maxFallingSpeed = behaviorContent.GetDoubleAttribute("maxFallingSpeed");
+  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderClimbingSpeed");
   acceleration = behaviorContent.GetDoubleAttribute("acceleration");
   deceleration = behaviorContent.GetDoubleAttribute("deceleration");
   maxSpeed = behaviorContent.GetDoubleAttribute("maxSpeed");
@@ -245,8 +247,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     downKey |=
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (upKey) requestedDeltaY -= 150 * timeDelta;
-    if (downKey) requestedDeltaY += 150 * timeDelta;
+    if (upKey) requestedDeltaY -= ladderClimbingSpeed * timeDelta;
+    if (downKey) requestedDeltaY += ladderClimbingSpeed * timeDelta;
 
     // Coming to an extremity of a ladder
     if (!IsOverlappingLadder(potentialObjects)) {
@@ -323,6 +325,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
   }
 
   if (jumping) {
+    // TODO: Port the jump sustain feature
     requestedDeltaY -= currentJumpSpeed * timeDelta;
     currentJumpSpeed -= gravity * timeDelta;
     if (currentJumpSpeed < 0) {
@@ -448,7 +451,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
       // this extra check).
       bool canLand = requestedDeltaY >= 0;
 
-      // Check if landing on a new floor: (Exclude already overlapped jump truh)
+      // Check if landing on a new floor: (Exclude already overlapped jump thru)
       std::set<PlatformRuntimeBehavior*> collidingObjects =
           GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
       if (canLand && !collidingObjects.empty()) {  // Just landed on floor

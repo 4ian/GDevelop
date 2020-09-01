@@ -43,7 +43,7 @@ void PhysicsBehavior::InitializeContent(
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> PhysicsBehavior::GetProperties(
-    const gd::SerializerElement &behaviorContent, gd::Project &project) const {
+    const gd::SerializerElement &behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   gd::String shapeTypeStr = _("Box (rectangle)");
@@ -88,8 +88,7 @@ std::map<gd::String, gd::PropertyDescriptor> PhysicsBehavior::GetProperties(
 
 bool PhysicsBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
                                      const gd::String &name,
-                                     const gd::String &value,
-                                     gd::Project &project) {
+                                     const gd::String &value) {
   if (name == _("Shape")) {
     if (value == _("Box (rectangle)"))
       behaviorContent.SetAttribute("shapeType", "Box");

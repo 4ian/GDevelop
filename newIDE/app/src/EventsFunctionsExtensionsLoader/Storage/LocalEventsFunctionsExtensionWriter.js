@@ -30,29 +30,24 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 
 export default class LocalEventsFunctionsExtensionWriter {
   static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
-    return new Promise((resolve, reject) => {
-      if (!dialog) return reject('Not supported');
+    if (!dialog) return Promise.reject('Not supported');
+    const browserWindow = electron.remote.getCurrentWindow();
 
-      const browserWindow = electron.remote.getCurrentWindow();
-      dialog.showSaveDialog(
-        browserWindow,
-        {
-          title: 'Export an extension of the project',
-          filters: [
-            {
-              name: 'GDevelop 5 "events based" extension',
-              extensions: ['json'],
-            },
-          ],
-          defaultPath: 'Extension.json',
-        },
-        path => {
-          if (!path) return resolve(null);
-
-          return resolve(path);
-        }
-      );
-    });
+    return dialog
+      .showSaveDialog(browserWindow, {
+        title: 'Export an extension of the project',
+        filters: [
+          {
+            name: 'GDevelop 5 "events based" extension',
+            extensions: ['json'],
+          },
+        ],
+        defaultPath: 'Extension.json',
+      })
+      .then(({ filePath }) => {
+        if (!filePath) return null;
+        return filePath;
+      });
   };
 
   static writeEventsFunctionsExtension = (

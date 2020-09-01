@@ -36,6 +36,7 @@ export default class BetaIntroDialog extends Component {
                 key="close"
               />,
             ]}
+            cannotBeDismissed={false}
             open={open}
             onRequestClose={onClose}
           >
@@ -76,7 +77,6 @@ export default class BetaIntroDialog extends Component {
                             this.forceUpdate();
                           }, 250 /* Let a bit of time for the fullscreen to kick in */);
                         }}
-                        labelPosition="before"
                         icon={<Fullscreen />}
                       />
                     </Line>
@@ -87,7 +87,6 @@ export default class BetaIntroDialog extends Component {
                       label={<Trans>Start using GDevelop</Trans>}
                       primary
                       onClick={onClose}
-                      labelPosition="before"
                     />
                   </Line>
                 ))}

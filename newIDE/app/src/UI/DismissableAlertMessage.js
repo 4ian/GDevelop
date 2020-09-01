@@ -4,6 +4,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../MainFrame/Preferences/PreferencesContext';
 import AlertMessage from './AlertMessage';
+import Window from '../Utils/Window';
 
 type Props = {|
   kind: 'info' | 'warning',
@@ -23,8 +24,7 @@ const DismissableAlertMessage = ({ identifier, kind, children }: Props) => (
           kind={kind}
           children={children}
           onHide={() => {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               "Are you sure you want to hide this hint? You won't see it again, unless you re-activate it from the preferences."
             );
 

@@ -10,18 +10,19 @@ import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from '../UI/List';
+import Subheader from '../UI/Subheader';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { findEmptyPath } from './LocalPathFinder';
 import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import { findEmptyPath } from './LocalPathFinder';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   onOpen: (
@@ -33,29 +34,16 @@ type Props = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => void,
+  onChangeOutputPath: (outputPath: string) => void,
   onShowExamples: () => void,
-|};
-
-type State = {|
   outputPath: string,
 |};
 
+type State = {||};
+
 export default class LocalStarters extends Component<Props, State> {
-  state = {
-    outputPath: findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ),
-  };
-
-  _handleChangePath = (outputPath: string) =>
-    this.setState({
-      outputPath,
-    });
-
   createFromExample(i18n: I18nType, exampleName: string) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     findExamples(examplesPath => {
@@ -75,7 +63,7 @@ export default class LocalStarters extends Component<Props, State> {
   }
 
   createEmptyGame(i18n: I18nType) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     try {
@@ -85,7 +73,7 @@ export default class LocalStarters extends Component<Props, State> {
       return;
     }
 
-    const project = gd.ProjectHelper.createNewGDJSProject();
+    const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
     const filePath = path.join(outputPath, 'game.json');
     project.setProjectFile(filePath);
     this.props.onCreate(project, LocalFileStorageProvider, {
@@ -94,11 +82,32 @@ export default class LocalStarters extends Component<Props, State> {
     sendNewGameCreated('');
   }
 
+  componentDidMount() {
+    if (this.props.outputPath === '')
+      if (path && app)
+        this.props.onChangeOutputPath(
+          findEmptyPath(
+            path.join(app.getPath('documents'), 'GDevelop projects')
+          )
+        );
+  }
+
   render() {
     return (
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
+            <Line expand>
+              <Column expand>
+                <LocalFolderPicker
+                  fullWidth
+                  value={this.props.outputPath}
+                  onChange={this.props.onChangeOutputPath}
+                  type="create-game"
+                />
+              </Column>
+            </Line>
+            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -230,6 +239,49 @@ export default class LocalStarters extends Component<Props, State> {
                     secondaryTextLines={2}
                     onClick={() => this.createEmptyGame(i18n)}
                   />
+                  <Subheader>
+                    <Trans>Advanced</Trans>
+                  </Subheader>
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/particle-effects-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Particle Effects Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo of various high quality particle effects (fire,
+                        magic, snow, rune spell...) that you can try and use in
+                        your game.
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'particle-effects-demo')
+                    }
+                  />
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/game-feel-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Game Feel Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo showing how to enhance the "game feel" of your
+                        project: VFX, shot trail, ambient sounds and SFX,
+                        screenshake, wobble...
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'game-feel-demo')
+                    }
+                  />
                 </List>
                 <Line alignItems="center" justifyContent="center">
                   <RaisedButton
@@ -237,17 +289,6 @@ export default class LocalStarters extends Component<Props, State> {
                     onClick={() => this.props.onShowExamples()}
                   />
                 </Line>
-              </Column>
-            </Line>
-            <Divider />
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
-                  type="create-game"
-                />
               </Column>
             </Line>
           </Column>

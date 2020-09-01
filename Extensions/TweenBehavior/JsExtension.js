@@ -1,8 +1,9 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -10,8 +11,16 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -25,6 +34,7 @@ module.exports = {
 
     var tweenBehavior = new gd.BehaviorJsImplementation();
 
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -33,11 +43,13 @@ module.exports = {
       return false;
     };
 
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
 
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.initializeContent = function(behaviorContent) {};
 
     const behavior = extension
@@ -54,8 +66,8 @@ module.exports = {
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js")
-      .addIncludeFile("Extensions/TweenBehavior/shifty.js");
+      .setIncludeFile("Extensions/TweenBehavior/shifty.js")
+      .addIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js");
 
     const easingChoices = JSON.stringify([
       "linear",
@@ -550,7 +562,6 @@ module.exports = {
         _("Progress of a tween"),
         _("Progress of a tween (between 0.0 and 1.0)"),
         "",
-        "JsPlatform/Extensions/tween_behavior24.png",
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
@@ -562,7 +573,7 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
     return [];
   }
 };

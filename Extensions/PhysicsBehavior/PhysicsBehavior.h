@@ -31,12 +31,10 @@ class GD_EXTENSION_API PhysicsBehavior : public gd::Behavior {
 
 #if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializerElement &behaviorContent,
-      gd::Project &project) const override;
+      const gd::SerializerElement &behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement &behaviorContent,
                               const gd::String &name,
-                              const gd::String &value,
-                              gd::Project &project) override;
+                              const gd::String &value) override;
 #endif
   /**
    * Serialize the behavior

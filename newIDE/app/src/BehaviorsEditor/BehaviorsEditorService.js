@@ -16,8 +16,5 @@ export default {
     'Physics2::Physics2Behavior': {
       component: Physics2Editor,
     },
-    'Physics3::Physics3Behavior': {
-      component: Physics2Editor,
-    },
   },
 };

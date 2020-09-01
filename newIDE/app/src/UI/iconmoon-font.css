@@ -35,7 +35,7 @@
 .icon-discord:before {
   content: "\e903";
   margin-top: 3px;
-  margin-bottom: -2px;
+  margin-bottom: -3px;
 }
 .icon-reddit:before {
   content: "\e902";

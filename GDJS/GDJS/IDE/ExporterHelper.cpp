@@ -58,8 +58,8 @@ std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
   return values;
 };
 
-bool AreMapKeysMissingElementOfSet(std::map<gd::String, gd::String> map,
-                                   std::set<gd::String> set) {
+bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
+                                   const std::set<gd::String> &set) {
   bool missingKey = false;
   for (auto &key : set) {
     if (map.find(key) == map.end()) {
@@ -512,12 +512,10 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
       }
     }
 
-    packages = packages.substr(
-        1, packages.size());  // Remove first line break for esthetic.
-    packages = packages.substr(
-        0,
-        packages.size() -
-            1);  // Remove the , at the end as last item cannot have , in JSON.
+    if (!packages.empty()) {
+      // Remove the , at the end as last item cannot have , in JSON.
+      packages = packages.substr(0, packages.size() - 1);
+    }
 
     str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
                              packages);

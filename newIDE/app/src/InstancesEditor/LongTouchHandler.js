@@ -1,5 +1,4 @@
 // @flow
-import ViewPosition from './ViewPosition';
 
 type CallbackEvent = {|
   /* The X position, relative to the viewport, not including scroll offset, of the long touch */

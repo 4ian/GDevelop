@@ -72,6 +72,9 @@ gdjs.RuntimeGame = function(data, options) {
   //Inputs :
   this._inputManager = new gdjs.InputManager();
 
+  //BitmapFontManager :
+  this._bitmapFontManager = new gdjs.BitmapFontManager();
+
   //Allow to specify an external layout to insert in the first scene:
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;
@@ -155,6 +158,14 @@ gdjs.RuntimeGame.prototype.getImageManager = function() {
 gdjs.RuntimeGame.prototype.getFontManager = function() {
   // @ts-ignore
   return this._fontManager;
+};
+
+/**
+ * Get the gdjs.BitmapFontManager of the RuntimeGame.
+ * @return {gdjs.BitmapFontManager} The font manager.
+ */
+gdjs.RuntimeGame.prototype.getBitmapFontManager = function() {
+  return this._bitmapFontManager;
 };
 
 /**

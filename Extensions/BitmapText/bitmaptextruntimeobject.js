@@ -124,9 +124,8 @@ gdjs.BitmapTextRuntimeObject.prototype.extraInitializationFromInitialInstance = 
 gdjs.BitmapTextRuntimeObject.prototype.onDestroyFromScene = function (
   runtimeScene
 ) {
-  // TODO: mark the font as not used anymore in the "BitmapFont manager".
-
   gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
+  this._renderer.onDestroy();
 };
 
 /**

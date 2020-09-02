@@ -15,12 +15,11 @@ gdjs.evtTools.firebase = {};
  */
 gdjs.evtTools.firebase.onAppCreated = [];
 
-/** Callback to initialize the Firebase SDK */
 gdjs.registerFirstRuntimeSceneLoadedCallback(function (runtimeScene) {
   let firebaseConfig;
   try {
     firebaseConfig = JSON.parse(
-      runtimeScene.getGame().getGameData().properties.firebaseConfig
+      runtimeScene.getGame().getExtensionProperty("Firebase", "FirebaseConfig")
     );
   } catch {
     console.error('The Firebase configuration is invalid!');

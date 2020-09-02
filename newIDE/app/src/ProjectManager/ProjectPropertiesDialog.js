@@ -14,7 +14,6 @@ import {
   getErrors,
   displayProjectErrorsBox,
   validatePackageName,
-  validateJSON,
 } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';

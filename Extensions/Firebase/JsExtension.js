@@ -32,6 +32,11 @@ module.exports = {
       )
       .setExtensionHelpPath('/all-features/firebase');
 
+    extension
+      .registerProperty('FirebaseConfig')
+      .setLabel(_('Firebase configuration string'))
+      .setType('textarea');
+
     /* ====== ANALYTICS ====== */
     extension
       .addAction(

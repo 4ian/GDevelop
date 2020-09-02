@@ -17,6 +17,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
+import { useLongTouch } from '../Utils/UseLongTouch';
 
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
@@ -88,23 +89,26 @@ type ListItemProps = {|
   secondaryTextLines?: 1 | 2,
 |};
 
-type ListItemState = {|
-  isOpen: boolean,
-|};
-
 /**
  * A ListItem to be used in a List.
  *
  * Also used outside of a List by virtualized lists.
  */
-export class ListItem extends React.Component<ListItemProps, ListItemState> {
-  state = {
-    isOpen: !!this.props.initiallyOpen,
-  };
-  _elementWithMenu: ?ElementWithMenu;
+export function ListItem(props: ListItemProps) {
+  const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
+  const elementWithMenu = React.useRef<?ElementWithMenu>(null);
 
-  _renderListItemSecondaryAction = () => {
-    const { props } = this;
+  const openContextMenu = React.useCallback(
+    () => {
+      if (elementWithMenu.current) {
+        elementWithMenu.current.open();
+      }
+    },
+    [elementWithMenu]
+  );
+  const longTouchForContextMenuProps = useLongTouch(openContextMenu);
+
+  const renderListItemSecondaryAction = () => {
     if (props.displayReloadButton) {
       return (
         <MUIListItemSecondaryAction>
@@ -125,7 +129,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       return props.displayMenuButton ? (
         <MUIListItemSecondaryAction>
           <ElementWithMenu
-            ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
+            ref={elementWithMenu}
             element={
               <IconButton size="small" edge="end" aria-label="menu">
                 <MoreVert style={{ color: props.rightIconColor }} />
@@ -136,7 +140,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
         </MUIListItemSecondaryAction>
       ) : (
         <ElementWithMenu
-          ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
+          ref={elementWithMenu}
           element={
             <div /> /* We still need a dummy div for context menu placement */
           }
@@ -176,34 +180,57 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
     return null;
   };
 
-  _openContextMenu = (event: any) => {
-    if (this._elementWithMenu) {
-      this._elementWithMenu.open(event);
-    }
-  };
+  const { renderNestedItems } = props;
 
-  render() {
-    const { props, state } = this;
-    const { renderNestedItems } = props;
-
-    if (!renderNestedItems) {
-      return (
+  if (!renderNestedItems) {
+    return (
+      <MUIListItem
+        button
+        dense={useDenseLists}
+        disableRipple
+        ContainerComponent={
+          'div' /* Otherwise, when ListItemSecondaryAction is defined, we would get a li, that is not playing well in virtualized list, that are using ListItem without List */
+        }
+        onClick={props.onClick}
+        onDoubleClick={props.onDoubleClick}
+        disabled={props.disabled}
+        selected={props.selected}
+        style={props.style}
+        onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
+        {...longTouchForContextMenuProps}
+        alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
+      >
+        {props.leftIcon && <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>}
+        <MUIListItemText
+          style={styles.listItemText}
+          primary={props.primaryText}
+          secondary={props.secondaryText}
+        />
+        {renderListItemSecondaryAction()}
+        {props.displayAddIcon && (
+          <Add style={{ color: props.rightIconColor }} />
+        )}
+        {props.displaySearchIcon && (
+          <Search style={{ color: props.rightIconColor }} />
+        )}
+      </MUIListItem>
+    );
+  } else {
+    const isItemOpen = props.open === undefined ? isOpen : props.open;
+    return (
+      <React.Fragment>
         <MUIListItem
           button
           dense={useDenseLists}
           disableRipple
-          ContainerComponent={
-            'div' /* Otherwise, when ListItemSecondaryAction is defined, we would get a li, that is not playing well in virtualized list, that are using ListItem without List */
-          }
-          onClick={props.onClick}
-          onDoubleClick={props.onDoubleClick}
+          onClick={() => {
+            setIsOpen(!isItemOpen);
+            if (props.onClick) {
+              props.onClick();
+            }
+          }}
           disabled={props.disabled}
-          selected={props.selected}
           style={props.style}
-          onContextMenu={
-            props.buildMenuTemplate ? this._openContextMenu : undefined
-          }
-          alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -213,65 +240,30 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             primary={props.primaryText}
             secondary={props.secondaryText}
           />
-          {this._renderListItemSecondaryAction()}
-          {props.displayAddIcon && (
-            <Add style={{ color: props.rightIconColor }} />
-          )}
-          {props.displaySearchIcon && (
-            <Search style={{ color: props.rightIconColor }} />
-          )}
+          {props.autoGenerateNestedIndicator ? (
+            isItemOpen ? (
+              <ExpandLess />
+            ) : (
+              <ExpandMore />
+            )
+          ) : null}
+          {renderListItemSecondaryAction()}
         </MUIListItem>
-      );
-    } else {
-      const isOpen = props.open === undefined ? state.isOpen : props.open;
-      return (
-        <React.Fragment>
-          <MUIListItem
-            button
-            dense={useDenseLists}
-            disableRipple
-            onClick={() => {
-              this.setState(state => ({ isOpen: !state.isOpen }));
-              if (props.onClick) {
-                props.onClick();
-              }
+        {isItemOpen && (
+          <MUIList
+            component="div"
+            disablePadding
+            style={{
+              paddingLeft: 16,
+              ...props.nestedListStyle,
             }}
-            disabled={props.disabled}
-            style={props.style}
+            dense={useDenseLists}
           >
-            {props.leftIcon && (
-              <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
-            )}
-            <MUIListItemText
-              style={styles.listItemText}
-              primary={props.primaryText}
-              secondary={props.secondaryText}
-            />
-            {props.autoGenerateNestedIndicator ? (
-              isOpen ? (
-                <ExpandLess />
-              ) : (
-                <ExpandMore />
-              )
-            ) : null}
-            {this._renderListItemSecondaryAction()}
-          </MUIListItem>
-          {isOpen && (
-            <MUIList
-              component="div"
-              disablePadding
-              style={{
-                paddingLeft: 16,
-                ...props.nestedListStyle,
-              }}
-              dense={useDenseLists}
-            >
-              {renderNestedItems()}
-            </MUIList>
-          )}
-        </React.Fragment>
-      );
-    }
+            {renderNestedItems()}
+          </MUIList>
+        )}
+      </React.Fragment>
+    );
   }
 }
 

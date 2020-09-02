@@ -36,16 +36,16 @@ const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
 );
 
-const defaultIndentWidth = 11;
-const smallIndentWidth = 0;
+const defaultIndentWidth = 22;
+const smallIndentWidth = 11;
 
 const styles = {
   container: { flex: 1 },
   defaultEventContainer: {
-    marginRight: defaultIndentWidth,
+    marginRight: 10,
   },
   smallEventContainer: {
-    marginRight: smallIndentWidth,
+    marginRight: 0,
   },
 };
 

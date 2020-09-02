@@ -20,7 +20,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenu;
   _wrappedElement: ?any;
 
-  open = (element: any) => {
+  open = () => {
     const { _contextMenu } = this;
     if (!_contextMenu) return;
 

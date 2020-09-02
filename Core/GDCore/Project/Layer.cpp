@@ -68,9 +68,9 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
   SetFollowBaseLayerCamera(element.GetBoolAttribute("followBaseLayerCamera", false));
-  SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 128), 
-                       element.GetIntAttribute("ambientLightColorG", 128),
-                       element.GetIntAttribute("ambientLightColorB", 128));
+  SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200), 
+                       element.GetIntAttribute("ambientLightColorG", 200),
+                       element.GetIntAttribute("ambientLightColorB", 200));
 
   // Compatibility with GD <= 3.3
   if (element.HasChild("Camera")) {

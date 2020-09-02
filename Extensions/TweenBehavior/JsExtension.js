@@ -66,8 +66,8 @@ module.exports = {
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js")
-      .addIncludeFile("Extensions/TweenBehavior/shifty.js");
+      .setIncludeFile("Extensions/TweenBehavior/shifty.js")
+      .addIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js");
 
     const easingChoices = JSON.stringify([
       "linear",

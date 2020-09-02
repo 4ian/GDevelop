@@ -8,9 +8,10 @@
  */
 gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._object = runtimeObject;
+  this._runtimeScene = runtimeScene;
   this._manager = runtimeObject.getObstaclesManager();
   this._radius = runtimeObject.getRadius();
-  var objectColor = runtimeObject.getColor();
+  var objectColor = runtimeObject._color;
   this._color = [
     objectColor[0] / 255,
     objectColor[1] / 255,
@@ -18,9 +19,10 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   ];
 
   /** @type {?PIXI.Texture} */
-  this._texture = runtimeObject.getPIXITexture();
-  this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
+  this._texture = null;
+  this.updateTexture();
 
+  this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
   this._defaultVertexBuffer = new Float32Array(8);
   this._vertexBuffer = new Float32Array([
     runtimeObject.x - this._radius,
@@ -36,7 +38,7 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
 
   /** @type {?PIXI.Mesh} */
   this._light = null;
-  this._updateMesh();
+  this.updateMesh();
 
   this._isPreview = runtimeScene.getGame().isPreview();
   this._debugMode = null;
@@ -45,6 +47,14 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   /** @type {?PIXI.Graphics} */
   this._debugGraphics = null;
   this.updateDebugMode();
+
+  /** @type {gdjs.Polygon} */
+  this._lightBoundingPoly = new gdjs.Polygon();
+  for (var i = 0; i < 4; i++) {
+    this._lightBoundingPoly.vertices.push(
+      runtimeObject.getHitBoxes()[0].vertices[i]
+    );
+  }
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
@@ -112,14 +122,14 @@ gdjs.LightRuntimeObjectPixiRenderer._verticesWithAngleComparator = function (
 gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint = function (
   lightObject,
   angle,
-  polygons
+  polygons,
+  boundingSquareHalfDiag
 ) {
   var centerX = lightObject.getX();
   var centerY = lightObject.getY();
-  var halfOfDiag = Math.sqrt(2) * lightObject.getRadius();
-  var targetX = centerX + halfOfDiag * Math.cos(angle);
-  var targetY = centerY + halfOfDiag * Math.sin(angle);
-  var minSqDist = halfOfDiag * halfOfDiag;
+  var targetX = centerX + boundingSquareHalfDiag * Math.cos(angle);
+  var targetY = centerY + boundingSquareHalfDiag * Math.sin(angle);
+  var minSqDist = boundingSquareHalfDiag * boundingSquareHalfDiag;
   var closestPoint = [null, null];
   for (var poly of polygons) {
     var raycastResult = gdjs.Polygon.raycastTest(
@@ -157,7 +167,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
   this._updateBuffers();
 };
 
-gdjs.LightRuntimeObjectPixiRenderer.prototype._updateMesh = function () {
+gdjs.LightRuntimeObjectPixiRenderer.prototype.updateMesh = function () {
+  this.updateTexture();
   var fragmentShader =
     this._texture === null
       ? gdjs.LightRuntimeObjectPixiRenderer.defaultFragmentShader
@@ -194,7 +205,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateRadius = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
-  var objectColor = this._object.getColor();
+  var objectColor = this._object._color;
   this._color = [
     objectColor[0] / 255,
     objectColor[1] / 255,
@@ -204,8 +215,11 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
-  this._texture = this._object.getPIXITexture();
-  this._updateMesh();
+  var texture = this._object.getTexture();
+  this._texture =
+    texture !== ''
+      ? this._runtimeScene.getGame().getImageManager().getPIXITexture(texture)
+      : null;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugMode = function () {
@@ -261,17 +275,20 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
   }
 
   this._debugGraphics.clear();
-  for (var i = 0; i < vertices.length; i += 2) {
+  this._debugGraphics.moveTo(vertices[2], vertices[3]);
+  var verticesCount = vertices.length;
+  for (var i = 2; i < verticesCount; i += 2) {
     var lineColor = i % 4 === 0 ? 0xff0000 : 0x00ff00;
+    var lastX = i + 2 >= verticesCount ? 2 : i + 2;
+    var lastY = i + 3 >= verticesCount ? 3 : i + 3;
     this._debugGraphics
       .lineStyle(1, lineColor, 1)
+      .lineTo(vertices[i], vertices[i + 1])
+      .lineTo(vertices[lastX], vertices[lastY])
       .moveTo(vertices[0], vertices[1])
-      .lineTo(vertices[i], vertices[i + 1]);
-    if (i !== vertices.length - 2) {
-      this._debugGraphics.lineTo(vertices[i + 2], vertices[i + 3]);
-    } else {
-      this._debugGraphics.lineTo(vertices[2], vertices[3]);
-    }
+      .lineTo(vertices[i], vertices[i + 1])
+      .moveTo(vertices[0], vertices[1])
+      .lineTo(vertices[lastX], vertices[lastY]);
   }
 };
 
@@ -376,26 +393,72 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
   // Bail out early if there are no obstacles.
   if (lightObstacles.length === 0) return lightObstacles;
 
-  // Adding 1 to the count since light object itself acts as a light obstacle.
-  var obstaclesCount = lightObstacles.length + 1;
+  // Synchronize light bounding polygon with the hitbox.
+  var lightHitboxPoly = this._object.getHitBoxes()[0];
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 2; j++) {
+      this._lightBoundingPoly.vertices[i][j] = lightHitboxPoly.vertices[i][j];
+    }
+  }
+
+  var obstaclesCount = lightObstacles.length;
   var obstacleHitBoxes = new Array(obstaclesCount);
-  obstacleHitBoxes[0] = this._object.getHitBoxes();
-  for (var i = 0; i < obstaclesCount - 1; i++) {
-    obstacleHitBoxes[i + 1] = lightObstacles[i].owner.getHitBoxes();
+  for (var i = 0; i < obstaclesCount; i++) {
+    obstacleHitBoxes[i] = lightObstacles[i].owner.getHitBoxes();
   }
 
   var obstaclePolygons = [];
+  obstaclePolygons.push(this._lightBoundingPoly);
   for (var i = 0; i < obstaclesCount; i++) {
     var noOfHitBoxes = obstacleHitBoxes[i].length;
     for (var j = 0; j < noOfHitBoxes; j++)
       obstaclePolygons.push(obstacleHitBoxes[i][j]);
   }
 
+  var maxX = this._object.x + this._radius;
+  var minX = this._object.x - this._radius;
+  var maxY = this._object.y + this._radius;
+  var minY = this._object.y - this._radius;
+
   var flattenVertices = [];
-  for (var i = 0; i < obstaclePolygons.length; i++) {
+  for (var i = 1; i < obstaclePolygons.length; i++) {
     var vertices = obstaclePolygons[i].vertices;
     var verticesCount = vertices.length;
-    for (var j = 0; j < verticesCount; j++) flattenVertices.push(vertices[j]);
+    for (var j = 0; j < verticesCount; j++) {
+      flattenVertices.push(vertices[j]);
+
+      if (vertices[j][0] < minX) minX = vertices[j][0];
+      if (vertices[j][0] > maxX) maxX = vertices[j][0];
+      if (vertices[j][1] < minY) minY = vertices[j][1];
+      if (vertices[j][1] > maxY) maxY = vertices[j][1];
+    }
+  }
+
+  obstaclePolygons[0].vertices[0][0] = minX;
+  obstaclePolygons[0].vertices[0][1] = minY;
+  obstaclePolygons[0].vertices[1][0] = maxX;
+  obstaclePolygons[0].vertices[1][1] = minY;
+  obstaclePolygons[0].vertices[2][0] = maxX;
+  obstaclePolygons[0].vertices[2][1] = maxY;
+  obstaclePolygons[0].vertices[3][0] = minX;
+  obstaclePolygons[0].vertices[3][1] = maxY;
+
+  // Find the largest diagonal length.
+  var boundingSquareHalfDiag = Math.sqrt(
+    Math.max(
+      (this._object.x - minX) * (this._object.x - minX) +
+        (this._object.y - minY) * (this._object.y - minY),
+      (maxX - this._object.x) * (maxX - this._object.x) +
+        (this._object.y - minY) * (this._object.y - minY),
+      (maxX - this._object.x) * (maxX - this._object.x) +
+        (maxY - this._object.y) * (maxY - this._object.y),
+      (this._object.x - minX) * (this._object.x - minX) +
+        (maxY - this._object.y) * (maxY - this._object.y)
+    )
+  );
+
+  for (var i = 0; i < 4; i++) {
+    flattenVertices.push(obstaclePolygons[0].vertices[i]);
   }
 
   var closestVertices = [];
@@ -408,7 +471,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertex = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle,
-      obstaclePolygons
+      obstaclePolygons,
+      boundingSquareHalfDiag
     );
     if (closestVertex) {
       closestVertices.push({
@@ -421,7 +485,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertexOffsetLeft = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle + 0.0001,
-      obstaclePolygons
+      obstaclePolygons,
+      boundingSquareHalfDiag
     );
     if (closestVertexOffsetLeft) {
       closestVertices.push({
@@ -432,7 +497,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._computeLightVertices = function (
     var closestVertexOffsetRight = gdjs.LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
       this._object,
       angle - 0.0001,
-      obstaclePolygons
+      obstaclePolygons,
+      boundingSquareHalfDiag
     );
     if (closestVertexOffsetRight) {
       closestVertices.push({

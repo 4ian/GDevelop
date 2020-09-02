@@ -32,20 +32,11 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   /** @type {boolean} */
   this._debugMode = lightObjectData.content.debugMode;
 
-  /** @type {?PIXI.Texture} */
-  this._texture =
-    lightObjectData.content.texture === ''
-      ? null
-      : runtimeScene
-          .getGame()
-          .getImageManager()
-          .getPIXITexture(lightObjectData.content.texture);
+  /** @type {string} */
+  this._texture = lightObjectData.content.texture;
 
-  /** @type {?gdjs.LightObstaclesManager} */
-  this._obstaclesManager =
-    gdjs.LightObstaclesManager !== undefined
-      ? gdjs.LightObstaclesManager.getManager(runtimeScene)
-      : null;
+  /** @type {gdjs.LightObstaclesManager} */
+  this._obstaclesManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
   if (this._renderer)
     gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -90,14 +81,8 @@ gdjs.LightRuntimeObject.prototype.updateFromObjectData = function (
   }
 
   if (oldObjectData.content.texture !== newObjectData.content.texture) {
-    this._texture =
-      newObjectData.content.texture === ''
-        ? null
-        : this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(newObjectData.content.texture);
-    this._renderer.updateTexture();
+    this._texture = newObjectData.content.texture;
+    this._renderer.updateMesh();
   }
 
   if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
@@ -162,11 +147,11 @@ gdjs.LightRuntimeObject.prototype.getDrawableY = function () {
 };
 
 /**
- * Get the color of the light object in format [r, g, b], with components in the range of [0-255].
- * @returns {number[]} the color of light object in rgb format.
+ * Get the color of the light object as a "R;G;B" string.
+ * @returns {string} the color of light object in "R;G;B" format.
  */
 gdjs.LightRuntimeObject.prototype.getColor = function () {
-  return this._color;
+  return this._color[0] + ';' + this._color[1] + ';' + this._color[2];
 };
 
 /**
@@ -176,9 +161,9 @@ gdjs.LightRuntimeObject.prototype.getColor = function () {
 gdjs.LightRuntimeObject.prototype.setColor = function (color) {
   var rgbColor = color.split(';');
   this._color = [
-    parseInt(rgbColor[0]),
-    parseInt(rgbColor[1]),
-    parseInt(rgbColor[2]),
+    parseInt(rgbColor[0], 10),
+    parseInt(rgbColor[1], 10),
+    parseInt(rgbColor[2], 10),
   ];
   this._renderer.updateColor();
 };
@@ -200,9 +185,9 @@ gdjs.LightRuntimeObject.prototype.getDebugMode = function () {
 };
 
 /**
- * Returns PIXI.Texture if it exists, null otherwise.
- * @returns {?PIXI.Texture} the texture, if any, null otherwise.
+ * Returns the path of texture resource.
+ * @returns {string} the path of texture.
  */
-gdjs.LightRuntimeObject.prototype.getPIXITexture = function () {
+gdjs.LightRuntimeObject.prototype.getTexture = function () {
   return this._texture;
 };

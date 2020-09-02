@@ -146,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "Text",
-          "persistentUuid": "72df0fe2-3d80-40ab-8477-c9204167162e",
+          "persistentUuid": "ca57177b-2be7-4fa0-af6b-6cc923c4955e",
           "width": 0,
           "x": 9,
           "y": 13,
@@ -224,9 +224,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "New layer",
@@ -246,9 +246,9 @@
           "effects": []
         },
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",

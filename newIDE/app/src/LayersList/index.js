@@ -167,7 +167,7 @@ export default class LayersList extends Component<Props, State> {
     const layer = layersContainer.getLayer(name);
     layer.setLightingLayer(true);
     layer.setFollowBaseLayerCamera(true);
-    layer.setAmbientLightColor(128, 128, 128);
+    layer.setAmbientLightColor(200, 200, 200);
     this._onLayerModified();
   };
 

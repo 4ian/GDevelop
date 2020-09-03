@@ -12,11 +12,15 @@ type Props = {|
   onLongTouch: (event: CallbackEvent) => void,
 |};
 
-const delay = 600; //ms
+const delay = 600; // ms
+const moveTolerance = 10; // px
 
 /**
  * Listen for a long touch on a canvas. Useful for platforms (Safari on iOS)
  * not supporting "contextmenu" event.
+ *
+ * A long press is characterized by starting a touch and staying pressed, without
+ * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
 export default class LongTouchHandler {
   _lastTouchX: number = 0;
@@ -67,8 +71,8 @@ export default class LongTouchHandler {
     // it's not a long press anymore.
     const touch = event.touches[0];
     if (
-      Math.abs(touch.clientX - this._lastTouchX) > 10 ||
-      Math.abs(touch.clientY - this._lastTouchY) > 10
+      Math.abs(touch.clientX - this._lastTouchX) > moveTolerance ||
+      Math.abs(touch.clientY - this._lastTouchY) > moveTolerance
     ) {
       this._clear();
       return;

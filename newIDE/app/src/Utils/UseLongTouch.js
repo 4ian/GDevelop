@@ -9,8 +9,7 @@ type CallbackEvent = {|
 |};
 
 // Find the position of an event on the screen
-const getClientXY = (event: TouchEvent | MouseEvent): CallbackEvent => {
-  // $FlowFixMe - seems the only way to check if event is a TouchEvent is to check for `touches` property.
+const getClientXY = (event: TouchEvent): CallbackEvent => {
   if (event.touches && event.touches.length > 0) {
     return {
       clientX: event.touches[0].clientX,
@@ -19,21 +18,27 @@ const getClientXY = (event: TouchEvent | MouseEvent): CallbackEvent => {
   }
 
   return {
-    // $FlowFixMe - assume we have a MouseEvent now.
-    clientX: event.clientX || 0,
-    // $FlowFixMe - assume we have a MouseEvent now.
-    clientY: event.clientY || 0,
+    clientX: 0,
+    clientY: 0,
   };
 };
 
 const delay = 600; // ms
+const moveTolerance = 10; // px
 
 /**
  * A hook to listen to a long touch ("long press") on an element, to workaround the
  * non working onContextMenu on some platforms (Safari on iOS).
+ *
+ * A long press is characterized by starting a touch and staying pressed, without
+ * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
 export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
   const timeout = React.useRef<?TimeoutID>(null);
+  const currentTouchCallbackEvent = React.useRef<CallbackEvent>({
+    clientX: 0,
+    clientY: 0,
+  });
   const clear = React.useCallback(() => {
     timeout.current && clearTimeout(timeout.current);
   }, []);
@@ -65,25 +70,47 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
   );
 
   const start = React.useCallback(
-    (event: TouchEvent | MouseEvent) => {
+    (event: TouchEvent) => {
       // Ensure we remove the timeout waiting for the long press
       // if there is one already. This can happen if start is called
       // multiple times.
       timeout.current && clearTimeout(timeout.current);
 
-      const eventClientXY = getClientXY(event);
+      currentTouchCallbackEvent.current = getClientXY(event);
       timeout.current = setTimeout(() => {
-        callback(eventClientXY);
+        callback(currentTouchCallbackEvent.current);
       }, delay);
     },
     [callback]
   );
 
+  const onMove = React.useCallback(
+    (event: TouchEvent) => {
+      // If more than one touch,
+      // it's not a long press anymore.
+      if (event.touches.length !== 1) {
+        clear();
+        return;
+      }
+
+      // If touch moved too far from the initial touch position,
+      // it's not a long press anymore.
+      const touch = event.touches[0];
+      const { clientX, clientY } = currentTouchCallbackEvent.current;
+      if (
+        Math.abs(touch.clientX - clientX) > moveTolerance ||
+        Math.abs(touch.clientY - clientY) > moveTolerance
+      ) {
+        clear();
+        return;
+      }
+    },
+    [currentTouchCallbackEvent]
+  );
+
   return {
-    // onMouseDown: (e: any) => start(e),
-    onTouchStart: (e: any) => start(e),
-    // onMouseUp: clear,
-    // onMouseLeave: clear,
+    onTouchStart: start,
+    onTouchMove: onMove,
     onTouchEnd: clear,
   };
 };

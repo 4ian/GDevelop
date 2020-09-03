@@ -89,148 +89,120 @@ type ListItemProps = {|
   secondaryTextLines?: 1 | 2,
 |};
 
+export type ListItemRefType = any; // Should be a material-ui ListIten
+
 /**
  * A ListItem to be used in a List.
  *
  * Also used outside of a List by virtualized lists.
  */
-export function ListItem(props: ListItemProps) {
-  const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
-  const elementWithMenu = React.useRef<?ElementWithMenu>(null);
+export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+  (props: ListItemProps, ref) => {
+    const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
+    const elementWithMenu = React.useRef<?ElementWithMenu>(null);
 
-  const openContextMenu = React.useCallback(
-    () => {
-      if (elementWithMenu.current) {
-        elementWithMenu.current.open();
+    const openContextMenu = React.useCallback(
+      () => {
+        if (elementWithMenu.current) {
+          elementWithMenu.current.open();
+        }
+      },
+      [elementWithMenu]
+    );
+    const longTouchForContextMenuProps = useLongTouch(openContextMenu);
+
+    const renderListItemSecondaryAction = () => {
+      if (props.displayReloadButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <Tooltip title={props.reloadButtonTooltip}>
+              <IconButton
+                size="small"
+                edge="end"
+                aria-label="reload"
+                onClick={props.onReload}
+              >
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+          </MUIListItemSecondaryAction>
+        );
       }
-    },
-    [elementWithMenu]
-  );
-  const longTouchForContextMenuProps = useLongTouch(openContextMenu);
-
-  const renderListItemSecondaryAction = () => {
-    if (props.displayReloadButton) {
-      return (
-        <MUIListItemSecondaryAction>
-          <Tooltip title={props.reloadButtonTooltip}>
-            <IconButton
-              size="small"
-              edge="end"
-              aria-label="reload"
-              onClick={props.onReload}
-            >
-              <Refresh />
-            </IconButton>
-          </Tooltip>
-        </MUIListItemSecondaryAction>
-      );
-    }
-    if (props.buildMenuTemplate) {
-      return props.displayMenuButton ? (
-        <MUIListItemSecondaryAction>
+      if (props.buildMenuTemplate) {
+        return props.displayMenuButton ? (
+          <MUIListItemSecondaryAction>
+            <ElementWithMenu
+              ref={elementWithMenu}
+              element={
+                <IconButton size="small" edge="end" aria-label="menu">
+                  <MoreVert style={{ color: props.rightIconColor }} />
+                </IconButton>
+              }
+              buildMenuTemplate={props.buildMenuTemplate}
+            />
+          </MUIListItemSecondaryAction>
+        ) : (
           <ElementWithMenu
             ref={elementWithMenu}
             element={
-              <IconButton size="small" edge="end" aria-label="menu">
-                <MoreVert style={{ color: props.rightIconColor }} />
-              </IconButton>
+              <div /> /* We still need a dummy div for context menu placement */
             }
             buildMenuTemplate={props.buildMenuTemplate}
           />
-        </MUIListItemSecondaryAction>
-      ) : (
-        <ElementWithMenu
-          ref={elementWithMenu}
-          element={
-            <div /> /* We still need a dummy div for context menu placement */
-          }
-          buildMenuTemplate={props.buildMenuTemplate}
-        />
-      );
-    }
-    if (props.displayLinkButton) {
+        );
+      }
+      if (props.displayLinkButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <IconButton
+              size="small"
+              edge="end"
+              aria-label="open link"
+              onClick={props.onOpenLink}
+            >
+              <OpenInNew style={{ color: props.rightIconColor }} />
+            </IconButton>
+          </MUIListItemSecondaryAction>
+        );
+      }
+      if (props.displayRemoveButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <IconButton
+              size="small"
+              edge="end"
+              aria-label="remove"
+              onClick={props.onRemove}
+            >
+              <Remove style={{ color: props.rightIconColor }} />
+            </IconButton>
+          </MUIListItemSecondaryAction>
+        );
+      }
+
+      return null;
+    };
+
+    const { renderNestedItems } = props;
+
+    if (!renderNestedItems) {
       return (
-        <MUIListItemSecondaryAction>
-          <IconButton
-            size="small"
-            edge="end"
-            aria-label="open link"
-            onClick={props.onOpenLink}
-          >
-            <OpenInNew style={{ color: props.rightIconColor }} />
-          </IconButton>
-        </MUIListItemSecondaryAction>
-      );
-    }
-    if (props.displayRemoveButton) {
-      return (
-        <MUIListItemSecondaryAction>
-          <IconButton
-            size="small"
-            edge="end"
-            aria-label="remove"
-            onClick={props.onRemove}
-          >
-            <Remove style={{ color: props.rightIconColor }} />
-          </IconButton>
-        </MUIListItemSecondaryAction>
-      );
-    }
-
-    return null;
-  };
-
-  const { renderNestedItems } = props;
-
-  if (!renderNestedItems) {
-    return (
-      <MUIListItem
-        button
-        dense={useDenseLists}
-        disableRipple
-        ContainerComponent={
-          'div' /* Otherwise, when ListItemSecondaryAction is defined, we would get a li, that is not playing well in virtualized list, that are using ListItem without List */
-        }
-        onClick={props.onClick}
-        onDoubleClick={props.onDoubleClick}
-        disabled={props.disabled}
-        selected={props.selected}
-        style={props.style}
-        onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
-        {...longTouchForContextMenuProps}
-        alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
-      >
-        {props.leftIcon && <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>}
-        <MUIListItemText
-          style={styles.listItemText}
-          primary={props.primaryText}
-          secondary={props.secondaryText}
-        />
-        {renderListItemSecondaryAction()}
-        {props.displayAddIcon && (
-          <Add style={{ color: props.rightIconColor }} />
-        )}
-        {props.displaySearchIcon && (
-          <Search style={{ color: props.rightIconColor }} />
-        )}
-      </MUIListItem>
-    );
-  } else {
-    const isItemOpen = props.open === undefined ? isOpen : props.open;
-    return (
-      <React.Fragment>
         <MUIListItem
           button
           dense={useDenseLists}
           disableRipple
-          onClick={() => {
-            setIsOpen(!isItemOpen);
-            if (props.onClick) {
-              props.onClick();
-            }
-          }}
+          ContainerComponent={
+            'div' /* Otherwise, when ListItemSecondaryAction is defined, we would get a li, that is not playing well in virtualized list, that are using ListItem without List */
+          }
+          onClick={props.onClick}
+          onDoubleClick={props.onDoubleClick}
           disabled={props.disabled}
+          selected={props.selected}
           style={props.style}
+          onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
+          {...longTouchForContextMenuProps}
+          alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
+          ref={ref}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -240,32 +212,68 @@ export function ListItem(props: ListItemProps) {
             primary={props.primaryText}
             secondary={props.secondaryText}
           />
-          {props.autoGenerateNestedIndicator ? (
-            isItemOpen ? (
-              <ExpandLess />
-            ) : (
-              <ExpandMore />
-            )
-          ) : null}
           {renderListItemSecondaryAction()}
+          {props.displayAddIcon && (
+            <Add style={{ color: props.rightIconColor }} />
+          )}
+          {props.displaySearchIcon && (
+            <Search style={{ color: props.rightIconColor }} />
+          )}
         </MUIListItem>
-        {isItemOpen && (
-          <MUIList
-            component="div"
-            disablePadding
-            style={{
-              paddingLeft: 16,
-              ...props.nestedListStyle,
-            }}
+      );
+    } else {
+      const isItemOpen = props.open === undefined ? isOpen : props.open;
+      return (
+        <React.Fragment>
+          <MUIListItem
+            button
             dense={useDenseLists}
+            disableRipple
+            onClick={() => {
+              setIsOpen(!isItemOpen);
+              if (props.onClick) {
+                props.onClick();
+              }
+            }}
+            disabled={props.disabled}
+            style={props.style}
+            ref={ref}
           >
-            {renderNestedItems()}
-          </MUIList>
-        )}
-      </React.Fragment>
-    );
+            {props.leftIcon && (
+              <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
+            )}
+            <MUIListItemText
+              style={styles.listItemText}
+              primary={props.primaryText}
+              secondary={props.secondaryText}
+            />
+            {props.autoGenerateNestedIndicator ? (
+              isItemOpen ? (
+                <ExpandLess />
+              ) : (
+                <ExpandMore />
+              )
+            ) : null}
+            {renderListItemSecondaryAction()}
+          </MUIListItem>
+          {isItemOpen && (
+            <MUIList
+              component="div"
+              disablePadding
+              style={{
+                paddingLeft: 16,
+                ...props.nestedListStyle,
+              }}
+              dense={useDenseLists}
+            >
+              {renderNestedItems()}
+            </MUIList>
+          )}
+        </React.Fragment>
+      );
+    }
   }
-}
+);
 
 // We support a subset of the props supported by Material-UI v0.x List
 // They should be self descriptive - refer to Material UI docs otherwise.

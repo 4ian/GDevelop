@@ -2,8 +2,8 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { List } from '../../../UI/List';
-import SearchBar from '../../../UI/SearchBar';
+import { List, type ListItemRefType } from '../../../UI/List';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import {
   type TreeNode,
@@ -16,7 +16,6 @@ import { renderInstructionOrExpressionTree } from '../SelectorListItems/Selector
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
-import { ListItem } from '../../../UI/List';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 
 const styles = {
@@ -54,7 +53,7 @@ export default class InstructionOrExpressionSelector<
   };
   _searchBar: ?SearchBar;
   _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItem>();
+  _selectedItem = React.createRef<ListItemRefType>();
 
   initialInstructionTypePath = findInTree(
     this.props.instructionsInfoTree,
@@ -62,7 +61,11 @@ export default class InstructionOrExpressionSelector<
   );
 
   componentDidMount() {
-    if (this.props.focusOnMount && this._searchBar) {
+    if (
+      this.props.focusOnMount &&
+      useShouldAutofocusSearchbar() &&
+      this._searchBar
+    ) {
       this._searchBar.focus();
     }
     if (this._selectedItem.current && this._scrollView.current) {

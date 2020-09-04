@@ -1,6 +1,5 @@
 // TODO: this needs to be flow-typed
 import React from 'react';
-import { I18n } from '@lingui/react';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
@@ -43,25 +42,21 @@ class MaterialUIContextMenu extends React.Component {
 
   render() {
     return this.state.open ? (
-      <I18n>
-        {({ i18n }) => (
-          <Menu
-            open={this.state.open}
-            anchorPosition={{
-              left: this.state.anchorX,
-              top: this.state.anchorY,
-            }}
-            anchorReference={'anchorPosition'}
-            onClose={this._onClose}
-            TransitionComponent={Fade}
-            {...this.menuImplementation.getMenuProps()}
-          >
-            {this.menuImplementation.buildFromTemplate(
-              this.props.buildMenuTemplate(i18n)
-            )}
-          </Menu>
+      <Menu
+        open={this.state.open}
+        anchorPosition={{
+          left: this.state.anchorX,
+          top: this.state.anchorY,
+        }}
+        anchorReference={'anchorPosition'}
+        onClose={this._onClose}
+        TransitionComponent={Fade}
+        {...this.menuImplementation.getMenuProps()}
+      >
+        {this.menuImplementation.buildFromTemplate(
+          this.props.buildMenuTemplate(this.props.i18n)
         )}
-      </I18n>
+      </Menu>
     ) : // Don't render the menu when it's not opened, as `buildMenuTemplate` could
     // be running logic to compute some labels or `enabled` flag values - and might
     // not be prepared to do that when the menu is not opened.
@@ -76,7 +71,9 @@ class ElectronContextMenu extends React.Component {
   }
 
   open = (x, y) => {
-    this.menuImplementation.buildFromTemplate(this.props.buildMenuTemplate());
+    this.menuImplementation.buildFromTemplate(
+      this.props.buildMenuTemplate(this.props.i18n)
+    );
     this.menuImplementation.showMenu({
       left: x || 0,
       top: y || 0,

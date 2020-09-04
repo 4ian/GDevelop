@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import ReactDOM from 'react-dom';
 import ContextMenu from './ContextMenu';
@@ -50,10 +51,15 @@ export default class ElementWithMenu extends React.Component<Props, State> {
           ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
         })}
-        <ContextMenu
-          ref={contextMenu => (this._contextMenu = contextMenu)}
-          buildMenuTemplate={buildMenuTemplate}
-        />
+        <I18n>
+          {({ i18n }) => (
+            <ContextMenu
+              ref={contextMenu => (this._contextMenu = contextMenu)}
+              buildMenuTemplate={buildMenuTemplate}
+              i18n={i18n}
+            />
+          )}
+        </I18n>
       </React.Fragment>
     );
   }

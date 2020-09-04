@@ -57,7 +57,7 @@ type RootMenuTemplate =
   | {|
       label?: string,
       role?: string,
-      submenu?: Array<MenuItemTemplate>,
+      submenu: Array<MenuItemTemplate>,
     |}
   | {|
       role: string,

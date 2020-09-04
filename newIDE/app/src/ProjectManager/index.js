@@ -140,7 +140,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  buildExtraMenuTemplate?: () => Array<MenuItemTemplate>,
+  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 
@@ -188,7 +188,7 @@ class Item extends React.Component<ItemProps, {||}> {
                 }}
                 primaryText={label}
                 displayMenuButton
-                buildMenuTemplate={() => [
+                buildMenuTemplate={(i18n: I18nType) => [
                   {
                     label: i18n._(t`Edit`),
                     click: () => this.props.onEdit(),

@@ -35,6 +35,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      role?: string,
       eventArgs?: any,
     |}
   | {|
@@ -54,11 +55,15 @@ type MenuItemTemplate =
 
 type RootMenuTemplate =
   | {|
-      label: string,
-      submenu: Array<MenuItemTemplate>,
+      label?: string,
+      role?: string,
+      submenu?: Array<MenuItemTemplate>,
     |}
   | {|
       role: string,
+      submenu: Array<MenuItemTemplate>,
+    |}
+  | {|
       submenu: Array<MenuItemTemplate>,
     |};
 

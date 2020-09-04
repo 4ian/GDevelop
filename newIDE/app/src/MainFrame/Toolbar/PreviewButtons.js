@@ -1,5 +1,6 @@
 // @flow
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import ToolbarIcon from '../../UI/ToolbarIcon';
@@ -63,7 +64,7 @@ export default function PreviewButtons({
           <ElementWithMenu
             element={previewIcon}
             openMenuWithSecondaryClick
-            buildMenuTemplate={() => [
+            buildMenuTemplate={(i18n: I18nType) => [
               {
                 label: i18n._(t`Launch another preview in a new window`),
                 click: onPreviewWithoutHotReload,
@@ -128,7 +129,7 @@ export default function PreviewButtons({
                   tooltip={t`Advanced preview options (debugger, network preview...)`}
                 />
               }
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
                   label: i18n._(
                     t`Start Network Preview (Preview over WiFi/LAN)`

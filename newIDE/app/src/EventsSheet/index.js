@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree from './EventsTree';
@@ -1149,7 +1150,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 ref={eventContextMenu =>
                                   (this.eventContextMenu = eventContextMenu)
                                 }
-                                buildMenuTemplate={() => [
+                                buildMenuTemplate={(i18n: I18nType) => [
                                   {
                                     label: i18n._(t`Edit`),
                                     click: () => this.openEventTextDialog(),
@@ -1245,7 +1246,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 ref={instructionContextMenu =>
                                   (this.instructionContextMenu = instructionContextMenu)
                                 }
-                                buildMenuTemplate={() => [
+                                buildMenuTemplate={(i18n: I18nType) => [
                                   {
                                     label: i18n._(t`Copy`),
                                     click: () => this.copySelection(),

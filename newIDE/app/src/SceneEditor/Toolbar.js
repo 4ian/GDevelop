@@ -1,7 +1,7 @@
 // @flow
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -114,7 +114,7 @@ export class Toolbar extends PureComponent<Props> {
                     tooltip={t`Toggle/edit grid`}
                   />
                 }
-                buildMenuTemplate={() => [
+                buildMenuTemplate={(i18n: I18nType) => [
                   {
                     type: 'checkbox',
                     label: i18n._(t`Show Mask`),
@@ -141,7 +141,7 @@ export class Toolbar extends PureComponent<Props> {
                     tooltip={t`Change editor zoom`}
                   />
                 }
-                buildMenuTemplate={() => [
+                buildMenuTemplate={(i18n: I18nType) => [
                   {
                     label: i18n._(t`Zoom in`),
                     click: this.props.zoomIn,

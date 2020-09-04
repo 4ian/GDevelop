@@ -1046,7 +1046,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <I18n key="tags">
             {({ i18n }) => (
               <TagsButton
-                buildMenuTemplate={() =>
+                buildMenuTemplate={(i18n: I18nType) =>
                   this._buildObjectTagsMenuTemplate(i18n)
                 }
               />
@@ -1374,7 +1374,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <ContextMenu
                 ref={contextMenu => (this.contextMenu = contextMenu)}
-                buildMenuTemplate={() => [
+                buildMenuTemplate={(i18n: I18nType) => [
                   {
                     label: this.state.selectedObjectNames.length
                       ? i18n._(

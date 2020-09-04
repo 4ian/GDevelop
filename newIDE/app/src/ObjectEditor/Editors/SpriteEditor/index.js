@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
@@ -373,7 +373,7 @@ class AnimationsListContainer extends React.Component<
               ref={spriteContextMenu =>
                 (this.spriteContextMenu = spriteContextMenu)
               }
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
                   label: i18n._(t`Delete selection`),
                   click: () => this.deleteSelection(),

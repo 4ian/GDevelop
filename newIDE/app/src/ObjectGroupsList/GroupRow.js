@@ -1,5 +1,6 @@
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import React from 'react';
 import { ListItem } from '../UI/List';
@@ -84,7 +85,7 @@ export default class GroupRow extends React.Component<Props, {||}> {
                 }}
                 primaryText={label}
                 displayMenuButton
-                buildMenuTemplate={() => [
+                buildMenuTemplate={(i18n: I18nType) => [
                   {
                     label: i18n._(t`Edit group`),
                     click: () => this.props.onEdit(group),

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemIcon from '@material-ui/core/ListItemIcon';
@@ -40,7 +39,7 @@ type ListItemRightButtonProps =
     |}
   | {|
       displayMenuButton: boolean,
-      buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+      buildMenuTemplate: () => Array<MenuItemTemplate>,
     |}
   | {|
       displayLinkButton: boolean,

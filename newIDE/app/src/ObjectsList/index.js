@@ -40,6 +40,7 @@ import {
 } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const styles = {
   listContainer: {
@@ -558,6 +559,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                     buildMenuTemplate={this._renderObjectMenuTemplate(i18n)}
                     onMoveSelectionToItem={this._moveSelectionTo}
                     canMoveSelectionToItem={this._canMoveSelectionTo}
+                    scaleUpItemIconWhenSelected={useScreenType() === 'touch'}
                     reactDndType={objectWithContextReactDndType}
                   />
                 )}

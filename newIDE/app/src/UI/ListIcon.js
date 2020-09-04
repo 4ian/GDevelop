@@ -17,6 +17,7 @@ type Props = {|
   tooltip?: string,
   disabled?: boolean,
   isGDevelopIcon?: boolean,
+  cssAnimation?: string,
   ...SizeProps,
 |};
 
@@ -26,7 +27,7 @@ type Props = {|
  */
 export default class ListIcon extends PureComponent<Props> {
   render() {
-    const { src, tooltip, disabled, isGDevelopIcon } = this.props;
+    const { src, tooltip, disabled, isGDevelopIcon, cssAnimation } = this.props;
 
     const iconWidth =
       this.props.iconWidth !== undefined
@@ -62,6 +63,7 @@ export default class ListIcon extends PureComponent<Props> {
                 maxWidth: iconWidth,
                 maxHeight: iconHeight,
                 verticalAlign: 'middle', // Vertical centering
+                animation: cssAnimation,
                 filter: !isGDevelopIcon
                   ? undefined
                   : disabled

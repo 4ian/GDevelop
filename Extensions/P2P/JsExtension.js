@@ -215,7 +215,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.sendDataToAll');
+      .setFunctionName('gdjs.evtTools.p2p.sendVariableToAll');
 
     extension
       .addAction(

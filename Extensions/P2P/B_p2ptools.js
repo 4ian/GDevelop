@@ -53,17 +53,12 @@ gdjs.evtTools.p2p = {
   lastError: '',
 
   /**
-   * True if a peer diconnected.
+   * List of peers that just disconnected.
    */
-  peerJustDisconnected: false,
-
-  /**
-   * The last peer that has disconnected.
-   */
-  lastDisconnectedPeerId: '',
+  disconnectedPeers: [],
 };
 
-gdjs.evtTools.p2p.loadPeerJS = function () {
+gdjs.evtTools.p2p._loadPeerJS = function () {
   if (gdjs.evtTools.p2p.peer != null) return;
   gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig);
   gdjs.evtTools.p2p.peer.on('open', function () {
@@ -76,7 +71,7 @@ gdjs.evtTools.p2p.loadPeerJS = function () {
   gdjs.evtTools.p2p.peer.on('connection', gdjs.evtTools.p2p._onConnection);
   gdjs.evtTools.p2p.peer.on('close', function () {
     gdjs.evtTools.p2p.peer = null;
-    gdjs.evtTools.p2p.loadPeerJS();
+    gdjs.evtTools.p2p._loadPeerJS();
   });
   gdjs.evtTools.p2p.peer.on('disconnected', gdjs.evtTools.p2p.peer.reconnect);
 };
@@ -118,8 +113,7 @@ gdjs.evtTools.p2p._onConnection = function (connection) {
 };
 
 gdjs.evtTools.p2p._onDisconnect = function (connectionID) {
-  gdjs.evtTools.p2p.peerJustDisconnected = true;
-  gdjs.evtTools.p2p.lastDisconnectedPeerId = connectionID;
+  gdjs.evtTools.p2p.disconnectedPeers.push(connectionID);
   delete gdjs.evtTools.p2p.connections[connectionID];
 };
 
@@ -193,11 +187,7 @@ gdjs.evtTools.p2p.sendDataToAll = function (eventName, eventData) {
  * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableTo = function (id, eventName, variable) {
-  if (gdjs.evtTools.p2p.connections[id])
-    gdjs.evtTools.p2p.connections[id].send({
-      eventName: eventName,
-      data: gdjs.evtTools.network.variableStructureToJSON(variable),
-    });
+  gdjs.evtTools.p2p.sendDataTo(id, eventName, gdjs.evtTools.network.variableStructureToJSON(variable))
 };
 
 /**
@@ -206,12 +196,7 @@ gdjs.evtTools.p2p.sendVariableTo = function (id, eventName, variable) {
  * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableToAll = function (eventName, variable) {
-  for (var id in gdjs.evtTools.p2p.connections) {
-    gdjs.evtTools.p2p.connections[id].send({
-      eventName: eventName,
-      data: gdjs.evtTools.network.variableStructureToJSON(variable),
-    });
-  }
+  gdjs.evtTools.p2p.sendDataToAll(eventName, gdjs.evtTools.network.variableStructureToJSON(variable))
 };
 
 /**
@@ -265,7 +250,7 @@ gdjs.evtTools.p2p.useCustomBrokerServer = function (
     secure: ssl,
     key,
   };
-  gdjs.evtTools.p2p.loadPeerJS();
+  gdjs.evtTools.p2p._loadPeerJS();
 };
 
 /**
@@ -274,7 +259,7 @@ gdjs.evtTools.p2p.useCustomBrokerServer = function (
  * this server should only be used for quick testing in development.
  */
 gdjs.evtTools.p2p.useDefaultBrokerServer = function () {
-  gdjs.evtTools.p2p.loadPeerJS();
+  gdjs.evtTools.p2p._loadPeerJS();
 };
 
 /**
@@ -319,13 +304,11 @@ gdjs.evtTools.p2p.getLastError = function () {
  * @returns {boolean}
  */
 gdjs.evtTools.p2p.onDisconnect = function () {
-  var returnValue = gdjs.evtTools.p2p.peerJustDisconnected;
-  gdjs.evtTools.p2p.peerJustDisconnected = false;
-  return returnValue;
+  return gdjs.evtTools.p2p.disconnectedPeers.length > 0;
 };
 
 gdjs.evtTools.p2p.getDisconnectedPeer = function () {
-  return gdjs.evtTools.p2p.lastDisconnectedPeerId;
+  return gdjs.evtTools.p2p.disconnectedPeers[gdjs.evtTools.p2p.disconnectedPeers.length - 1] || '';
 };
 
 gdjs.callbacksRuntimeScenePostEvents.push(function () {
@@ -336,4 +319,5 @@ gdjs.callbacksRuntimeScenePostEvents.push(function () {
     )
       gdjs.evtTools.p2p.lastEventData[i].pop();
   }
+  if(gdjs.evtTools.p2p.disconnectedPeers.length > 0) gdjs.evtTools.p2p.disconnectedPeers.pop();
 });

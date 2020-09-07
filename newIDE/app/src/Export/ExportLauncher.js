@@ -186,7 +186,8 @@ export default class ExportLauncher extends Component<Props, State> {
           exportStep: 'done',
         });
       })
-      .catch(() => {
+      .catch(error => {
+        console.error('An error happened during export:', error);
         /* Error handled previously */
       });
   };

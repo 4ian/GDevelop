@@ -6,7 +6,7 @@ import { List, ListItem } from '../UI/List';
 import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
@@ -333,7 +333,8 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
-      if (this._searchBar) this._searchBar.focus();
+      if (useShouldAutofocusSearchbar() && this._searchBar)
+        this._searchBar.focus();
     }
   }
 

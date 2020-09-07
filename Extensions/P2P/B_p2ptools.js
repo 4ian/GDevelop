@@ -35,9 +35,9 @@ gdjs.evtTools.p2p = {
 
   /**
    * Contains the latest data sent with each event.
-   * If the event is in dataloss mode, maps an event name (string) 
+   * If the event is in dataloss mode, maps an event name (string)
    * to the string sent with that event.
-   * If the event is in no dataloss mode, maps an event name (string) 
+   * If the event is in no dataloss mode, maps an event name (string)
    * to an array containing the data of each call of that event.
    * @type {Object<string, string | Array>}
    */
@@ -45,7 +45,7 @@ gdjs.evtTools.p2p = {
 
   /**
    * Tells how to handle an event (with or without data loss).
-   * Maps the event name (string) to a boolean: 
+   * Maps the event name (string) to a boolean:
    * true for dataloss, false for no dataloss.
    * @type {Object<string, string>}
    */
@@ -83,7 +83,7 @@ gdjs.evtTools.p2p = {
 };
 
 /**
- * Internal function called to initialize PeerJS after it's 
+ * Internal function called to initialize PeerJS after it's
  * broker server has been configured.
  * @private
  */
@@ -97,8 +97,8 @@ gdjs.evtTools.p2p._loadPeerJS = function () {
     gdjs.evtTools.p2p.error = true;
     gdjs.evtTools.p2p.lastError = errorMessage;
   });
-  gdjs.evtTools.p2p.peer.on('connection', function(connection) {
-    connection.on("open", function() {
+  gdjs.evtTools.p2p.peer.on('connection', function (connection) {
+    connection.on('open', function () {
       gdjs.evtTools.p2p._onConnection(connection);
       gdjs.evtTools.p2p.connectedPeers.push(connection.peer);
     });
@@ -231,7 +231,11 @@ gdjs.evtTools.p2p.sendDataToAll = function (eventName, eventData) {
  * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableTo = function (id, eventName, variable) {
-  gdjs.evtTools.p2p.sendDataTo(id, eventName, gdjs.evtTools.network.variableStructureToJSON(variable))
+  gdjs.evtTools.p2p.sendDataTo(
+    id,
+    eventName,
+    gdjs.evtTools.network.variableStructureToJSON(variable)
+  );
 };
 
 /**
@@ -240,7 +244,10 @@ gdjs.evtTools.p2p.sendVariableTo = function (id, eventName, variable) {
  * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
 gdjs.evtTools.p2p.sendVariableToAll = function (eventName, variable) {
-  gdjs.evtTools.p2p.sendDataToAll(eventName, gdjs.evtTools.network.variableStructureToJSON(variable))
+  gdjs.evtTools.p2p.sendDataToAll(
+    eventName,
+    gdjs.evtTools.network.variableStructureToJSON(variable)
+  );
 };
 
 /**
@@ -356,7 +363,11 @@ gdjs.evtTools.p2p.onDisconnect = function () {
  * @returns {string}
  */
 gdjs.evtTools.p2p.getDisconnectedPeer = function () {
-  return gdjs.evtTools.p2p.disconnectedPeers[gdjs.evtTools.p2p.disconnectedPeers.length - 1] || '';
+  return (
+    gdjs.evtTools.p2p.disconnectedPeers[
+      gdjs.evtTools.p2p.disconnectedPeers.length - 1
+    ] || ''
+  );
 };
 
 /**
@@ -372,7 +383,11 @@ gdjs.evtTools.p2p.onConnection = function () {
  * @returns {string}
  */
 gdjs.evtTools.p2p.getConnectedPeer = function () {
-  return gdjs.evtTools.p2p.connectedPeers[gdjs.evtTools.p2p.connectedPeers.length - 1] || '';
+  return (
+    gdjs.evtTools.p2p.connectedPeers[
+      gdjs.evtTools.p2p.connectedPeers.length - 1
+    ] || ''
+  );
 };
 
 gdjs.callbacksRuntimeScenePostEvents.push(function () {
@@ -383,6 +398,8 @@ gdjs.callbacksRuntimeScenePostEvents.push(function () {
     )
       gdjs.evtTools.p2p.lastEventData[i].pop();
   }
-  if(gdjs.evtTools.p2p.disconnectedPeers.length > 0) gdjs.evtTools.p2p.disconnectedPeers.pop();
-  if(gdjs.evtTools.p2p.connectedPeers.length > 0) gdjs.evtTools.p2p.connectedPeers.pop();
+  if (gdjs.evtTools.p2p.disconnectedPeers.length > 0)
+    gdjs.evtTools.p2p.disconnectedPeers.pop();
+  if (gdjs.evtTools.p2p.connectedPeers.length > 0)
+    gdjs.evtTools.p2p.connectedPeers.pop();
 });

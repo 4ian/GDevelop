@@ -8,6 +8,7 @@
 gdjs.evtTools.p2p = {
   /**
    * The peer to peer configuration.
+   * @type {Peer.PeerJSOption}
    */
   peerConfig: { debug: 1 }, // Enable logging of critical errors
 
@@ -18,51 +19,74 @@ gdjs.evtTools.p2p = {
   peer: null,
 
   /**
-   * All connected p2p clients, keyed by their id.
+   * All connected p2p clients, keyed by their ID.
+   * @type {Object<string, Peer.DataConnection>}
    */
   connections: {},
 
   /**
    * Contains a list of events triggered by other p2p clients.
+   * Maps an event name (string) to a boolean:
+   * true if the event has been triggered, otherwise false.
+   * @note This is ignored if the event is in no dataloss mode.
+   * @type {Object<string, boolean>}
    */
   triggeredEvents: {},
 
   /**
    * Contains the latest data sent with each event.
+   * If the event is in dataloss mode, maps an event name (string) 
+   * to the string sent with that event.
+   * If the event is in no dataloss mode, maps an event name (string) 
+   * to an array containing the data of each call of that event.
+   * @type {Object<string, string | Array>}
    */
   lastEventData: {},
 
   /**
-   * Tells how to handle an event (with or without data loss)
+   * Tells how to handle an event (with or without data loss).
+   * Maps the event name (string) to a boolean: 
+   * true for dataloss, false for no dataloss.
+   * @type {Object<string, string>}
    */
   eventHandling: {},
 
   /**
    * True if PeerJS is initialized and ready.
+   * @type {boolean}
    */
   ready: false,
 
   /**
    * True if an error occured.
+   * @type {boolean}
    */
   error: false,
 
   /**
    * Last error's message.
+   * @type {string}
    */
   lastError: '',
 
   /**
-   * List of peers that just disconnected.
+   * List of IDs of peers that just disconnected.
+   * @type {Array<string>}
    */
   disconnectedPeers: [],
 
   /**
-   * List of peers that just remotely initiated a connection.
+   * List of IDs of peers that just remotely initiated a connection.
+   * @type {Array<string>}
    */
   connectedPeers: [],
 };
 
+/**
+ * Internal function called to initialize PeerJS after it's 
+ * broker server has been configured.
+ * @private
+ */
 gdjs.evtTools.p2p._loadPeerJS = function () {
   if (gdjs.evtTools.p2p.peer != null) return;
   gdjs.evtTools.p2p.peer = new Peer(gdjs.evtTools.p2p.peerConfig);
@@ -86,6 +110,11 @@ gdjs.evtTools.p2p._loadPeerJS = function () {
   gdjs.evtTools.p2p.peer.on('disconnected', gdjs.evtTools.p2p.peer.reconnect);
 };
 
+/**
+ * Internal function called when a connection with a remote peer is initiated.
+ * @private
+ * @param {Peer.DataConnection} connection The DataConnection of the peer
+ */
 gdjs.evtTools.p2p._onConnection = function (connection) {
   gdjs.evtTools.p2p.connections[connection.peer] = connection;
   connection.on('data', function (data) {
@@ -122,6 +151,11 @@ gdjs.evtTools.p2p._onConnection = function (connection) {
   disconnectChecker();
 };
 
+/**
+ * Internal function called when a remote client disconnects.
+ * @private
+ * @param {string} connectionID The ID of the peer that disconnected.
+ */
 gdjs.evtTools.p2p._onDisconnect = function (connectionID) {
   gdjs.evtTools.p2p.disconnectedPeers.push(connectionID);
   delete gdjs.evtTools.p2p.connections[connectionID];
@@ -129,7 +163,7 @@ gdjs.evtTools.p2p._onDisconnect = function (connectionID) {
 
 /**
  * Connects to another p2p client.
- * @param {string} id - The other client's id.
+ * @param {string} id - The other client's ID.
  */
 gdjs.evtTools.p2p.connect = function (id) {
   var connection = gdjs.evtTools.p2p.peer.connect(id);
@@ -141,14 +175,14 @@ gdjs.evtTools.p2p.connect = function (id) {
 /**
  * Returns true when the event got triggered by another p2p client.
  * @param {string} eventName
- * @param {boolean} _dataLoss Is data loss allowed (accelerates event handling when true)?
+ * @param {boolean} defaultDataLoss Is data loss allowed (accelerates event handling when true)?
  * @returns {boolean}
  */
-gdjs.evtTools.p2p.onEvent = function (eventName, _dataLoss) {
+gdjs.evtTools.p2p.onEvent = function (eventName, defaultDataLoss) {
   var dataLoss = gdjs.evtTools.p2p.eventHandling[eventName];
   if (dataLoss == undefined) {
-    gdjs.evtTools.p2p.eventHandling[eventName] = _dataLoss;
-    return gdjs.evtTools.p2p.onEvent(eventName, _dataLoss);
+    gdjs.evtTools.p2p.eventHandling[eventName] = defaultDataLoss;
+    return gdjs.evtTools.p2p.onEvent(eventName, defaultDataLoss);
   }
   if (dataLoss) {
     var returnValue = gdjs.evtTools.p2p.triggeredEvents[eventName];
@@ -164,7 +198,7 @@ gdjs.evtTools.p2p.onEvent = function (eventName, _dataLoss) {
 
 /**
  * Send an event to one specific connected client.
- * @param {string} id - The id of the client to send the event to.
+ * @param {string} id - The ID of the client to send the event to.
  * @param {string} eventName - The event to trigger.
  * @param {string} [eventData] - Additional data to send with the event.
  */
@@ -192,7 +226,7 @@ gdjs.evtTools.p2p.sendDataToAll = function (eventName, eventData) {
 
 /**
  * Send an event to one specific connected client.
- * @param {string} id - The id of the client to send the event to.
+ * @param {string} id - The ID of the client to send the event to.
  * @param {string} eventName - The event to trigger.
  * @param {gdjs.Variable} variable - Additional variable to send with the event.
  */
@@ -273,7 +307,7 @@ gdjs.evtTools.p2p.useDefaultBrokerServer = function () {
 };
 
 /**
- * Returns the own current peer ID
+ * Returns the own current peer ID.
  * @see Peer.id
  * @returns {string}
  */
@@ -283,7 +317,7 @@ gdjs.evtTools.p2p.getCurrentId = function () {
 };
 
 /**
- * Returns true once PeerJS is initialized
+ * Returns true once PeerJS finished initialization.
  * @see gdjs.evtTools.p2p.ready
  * @returns {boolean}
  */
@@ -317,14 +351,26 @@ gdjs.evtTools.p2p.onDisconnect = function () {
   return gdjs.evtTools.p2p.disconnectedPeers.length > 0;
 };
 
+/**
+ * Get the ID of the peer that triggered onDisconnect.
+ * @returns {string}
+ */
 gdjs.evtTools.p2p.getDisconnectedPeer = function () {
   return gdjs.evtTools.p2p.disconnectedPeers[gdjs.evtTools.p2p.disconnectedPeers.length - 1] || '';
 };
 
+/**
+ * Returns true once if a remote peer just initiated a connection.
+ * @returns {boolean}
+ */
 gdjs.evtTools.p2p.onConnection = function () {
   return gdjs.evtTools.p2p.connectedPeers.length > 0;
 };
 
+/**
+ * Get the ID of the peer that triggered onConnection.
+ * @returns {string}
+ */
 gdjs.evtTools.p2p.getConnectedPeer = function () {
   return gdjs.evtTools.p2p.connectedPeers[gdjs.evtTools.p2p.connectedPeers.length - 1] || '';
 };

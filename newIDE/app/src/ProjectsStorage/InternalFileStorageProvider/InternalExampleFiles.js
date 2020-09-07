@@ -70,8 +70,8 @@ import exampleFile65 from '../../fixtures/multitouch/multitouch.json';
 import exampleFile66 from '../../fixtures/object-gravity/object-gravity.json';
 import exampleFile67 from '../../fixtures/object-selection/object-selection.json';
 import exampleFile68 from '../../fixtures/objects-timers/objects-timers.json';
-import exampleFile69 from '../../fixtures/open-url-in-browser/open-url-in-browser.json';
-import exampleFile70 from '../../fixtures/p2p-networking/p2p-networking.json';
+import exampleFile69 from '../../fixtures/online-multiplayer/online-multiplayer.json';
+import exampleFile70 from '../../fixtures/open-url-in-browser/open-url-in-browser.json';
 import exampleFile71 from '../../fixtures/pairs/pairs.json';
 import exampleFile72 from '../../fixtures/parallax/parallax.json';
 import exampleFile73 from '../../fixtures/parallax-scrolling/parallax-scrolling.json';
@@ -194,8 +194,8 @@ export default {
   'example://object-gravity': exampleFile66,
   'example://object-selection': exampleFile67,
   'example://objects-timers': exampleFile68,
-  'example://open-url-in-browser': exampleFile69,
-  'example://p2p-networking': exampleFile70,
+  'example://online-multiplayer': exampleFile69,
+  'example://open-url-in-browser': exampleFile70,
   'example://pairs': exampleFile71,
   'example://parallax': exampleFile72,
   'example://parallax-scrolling': exampleFile73,

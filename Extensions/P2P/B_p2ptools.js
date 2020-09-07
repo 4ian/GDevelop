@@ -83,7 +83,7 @@ gdjs.evtTools.p2p = {
 };
 
 /**
- * Internal function called to initialize PeerJS after it's
+ * Internal function called to initialize PeerJS after its
  * broker server has been configured.
  * @private
  */

@@ -56,6 +56,11 @@ gdjs.evtTools.p2p = {
    * List of peers that just disconnected.
    */
   disconnectedPeers: [],
+
+  /**
+   * List of peers that just remotely initiated a connection.
+   */
+  connectedPeers: [],
 };
 
 gdjs.evtTools.p2p._loadPeerJS = function () {
@@ -68,7 +73,12 @@ gdjs.evtTools.p2p._loadPeerJS = function () {
     gdjs.evtTools.p2p.error = true;
     gdjs.evtTools.p2p.lastError = errorMessage;
   });
-  gdjs.evtTools.p2p.peer.on('connection', gdjs.evtTools.p2p._onConnection);
+  gdjs.evtTools.p2p.peer.on('connection', function(connection) {
+    connection.on("open", function() {
+      gdjs.evtTools.p2p._onConnection(connection);
+      gdjs.evtTools.p2p.connectedPeers.push(connection.peer);
+    });
+  });
   gdjs.evtTools.p2p.peer.on('close', function () {
     gdjs.evtTools.p2p.peer = null;
     gdjs.evtTools.p2p._loadPeerJS();
@@ -311,6 +321,14 @@ gdjs.evtTools.p2p.getDisconnectedPeer = function () {
   return gdjs.evtTools.p2p.disconnectedPeers[gdjs.evtTools.p2p.disconnectedPeers.length - 1] || '';
 };
 
+gdjs.evtTools.p2p.onConnection = function () {
+  return gdjs.evtTools.p2p.connectedPeers.length > 0;
+};
+
+gdjs.evtTools.p2p.getConnectedPeer = function () {
+  return gdjs.evtTools.p2p.connectedPeers[gdjs.evtTools.p2p.connectedPeers.length - 1] || '';
+};
+
 gdjs.callbacksRuntimeScenePostEvents.push(function () {
   for (var i in gdjs.evtTools.p2p.lastEventData) {
     if (
@@ -320,4 +338,5 @@ gdjs.callbacksRuntimeScenePostEvents.push(function () {
       gdjs.evtTools.p2p.lastEventData[i].pop();
   }
   if(gdjs.evtTools.p2p.disconnectedPeers.length > 0) gdjs.evtTools.p2p.disconnectedPeers.pop();
+  if(gdjs.evtTools.p2p.connectedPeers.length > 0) gdjs.evtTools.p2p.connectedPeers.pop();
 });

@@ -1,1 +1,0 @@
-A showcase of some multiplayer possibilities using the P2P extension.

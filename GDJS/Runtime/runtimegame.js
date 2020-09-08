@@ -72,9 +72,6 @@ gdjs.RuntimeGame = function(data, options) {
   //Inputs :
   this._inputManager = new gdjs.InputManager();
 
-  //BitmapFontManager :
-  this._bitmapFontManager = new gdjs.BitmapFontManager();
-
   //Allow to specify an external layout to insert in the first scene:
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;

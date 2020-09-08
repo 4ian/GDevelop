@@ -29,7 +29,6 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._lastId = 0;
     this._name = "";
     this._timeManager = new gdjs.TimeManager();
-    this._bitmapFontManager = new gdjs.BitmapFontManager();
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.

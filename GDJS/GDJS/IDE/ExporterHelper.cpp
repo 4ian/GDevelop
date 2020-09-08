@@ -610,7 +610,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
-  InsertUnique(includesFiles, "bitmapFontmanager.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
   InsertUnique(includesFiles, "runtimescene.js");

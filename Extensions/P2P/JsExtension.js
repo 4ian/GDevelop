@@ -106,6 +106,21 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.p2p.onDisconnect');
 
     extension
+      .addCondition(
+        'OnConnection',
+        _('Peer Connected'),
+        _('Triggers once when a remote peer initiates a connection.'),
+        _('P2P peer connected'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.onConnection');
+
+    extension
       .addAction(
         'Connect',
         _('Connect to another client'),
@@ -215,7 +230,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.sendDataToAll');
+      .setFunctionName('gdjs.evtTools.p2p.sendVariableToAll');
 
     extension
       .addAction(
@@ -313,7 +328,7 @@ module.exports = {
       .addStrExpression(
         'GetLastDisconnectedPeer',
         _('Get last disconnected peer'),
-        _('Gets the id of the latest peer that has disconnected.'),
+        _('Gets the ID of the latest peer that has disconnected.'),
         _('P2P (experimental)'),
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -321,6 +336,19 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.getDisconnectedPeer');
+
+    extension
+      .addStrExpression(
+        'GetLastConnectedPeer',
+        _('Get ID of the connected peer'),
+        _('Gets the ID of the newly connected peer.'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.getConnectedPeer');
 
     return extension;
   },

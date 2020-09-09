@@ -9,7 +9,7 @@ import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
-import NewObjectDialog from './NewObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard from '../Utils/Clipboard';
@@ -41,6 +41,11 @@ import {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 const styles = {
   listContainer: {
@@ -80,7 +85,12 @@ type State = {|
 
 type Props = {|
   project: gdProject,
+  layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  events: gdEventsList,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -186,6 +196,13 @@ export default class ObjectsList extends React.Component<Props, State> {
         }
       }
     );
+  };
+
+  _onObjectAddedFromAsset = (object: gdObject) => {
+    const { onObjectCreated } = this.props;
+
+    object.setTags(getStringFromTags(this.props.selectedObjectTags));
+    onObjectCreated(object);
   };
 
   onAddNewObject = () => {
@@ -501,7 +518,16 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   render() {
-    const { project, objectsContainer, selectedObjectTags } = this.props;
+    const {
+      project,
+      layout,
+      objectsContainer,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+      selectedObjectTags,
+      events,
+    } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
@@ -578,14 +604,20 @@ export default class ObjectsList extends React.Component<Props, State> {
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
-            open={this.state.newObjectDialogOpen}
             onClose={() =>
               this.setState({
                 newObjectDialogOpen: false,
               })
             }
-            onChoose={this.addObject}
+            onCreateNewObject={this.addObject}
+            onObjectAddedFromAsset={this._onObjectAddedFromAsset}
             project={project}
+            layout={layout}
+            objectsContainer={objectsContainer}
+            events={events}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
           />
         )}
         {this.state.variablesEditedObject && (

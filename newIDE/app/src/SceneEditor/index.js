@@ -1062,6 +1062,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             )}
             project={project}
             objectsContainer={layout}
+            layout={layout}
+            events={layout.getEvents()}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
             selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}

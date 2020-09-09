@@ -37,6 +37,7 @@
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
+#include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/Effect.h>

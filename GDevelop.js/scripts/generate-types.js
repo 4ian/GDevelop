@@ -248,12 +248,6 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdHighestZOrderFinder extends gdInitialInstanceFunctor {',
       'types/gdhighestzorderfinder.js'
     );
-    shell.sed(
-      '-i',
-      'declare class gdResourcesInUseHelper {',
-      'declare class gdResourcesInUseHelper extends gdArbitraryResourceWorker {',
-      'types/gdresourcesinusehelper.js'
-    );
 
     // Rename classes from GDJS:
     shell.sed(

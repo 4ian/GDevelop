@@ -160,6 +160,7 @@ declare class libGDevelop {
   ArbitraryResourceWorker: Class<gdArbitraryResourceWorker>;
   ArbitraryResourceWorkerJS: Class<gdArbitraryResourceWorkerJS>;
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
+  ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   LayoutEditorCanvasOptions: Class<gdLayoutEditorCanvasOptions>;

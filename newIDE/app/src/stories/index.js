@@ -99,6 +99,11 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  fakeAssetShortHeader1,
+  fakeAssetShortHeader2,
+  fakeAssetShortHeader3,
+  fakeAssetWithBehaviorCustomizations1,
+  fakeAssetWithEventCustomizationsAndFlashExtension1,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -152,7 +157,7 @@ import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../ObjectsList/NewObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -200,6 +205,16 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { AssetStore } from '../AssetStore';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import ScrollView from '../UI/ScrollView';
+
+import '../UI/Theme/Global.css';
+import { AssetCard } from '../AssetStore/AssetCard';
+import { useFilters } from '../AssetStore/FiltersChooser';
+import { SearchResults } from '../AssetStore/SearchResults';
+import { AssetDetails } from '../AssetStore/AssetDetails';
+import CustomizationFields from '../AssetStore/CustomizationFields';
 
 configureActions({
   depth: 2,
@@ -733,6 +748,33 @@ storiesOf('UI Building Blocks/SearchBar', module)
         },
       ]}
     />
+  ));
+
+storiesOf('UI Building Blocks/Layout/Grid', module)
+  .addDecorator(muiDecorator)
+  .add('Line and ScrollView in a fixed height container', () => (
+    <FixedHeightFlexContainer height={100}>
+      <Column expand>
+        <Line overflow="hidden">
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+        </Line>
+      </Column>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
@@ -1585,6 +1627,11 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     getThumbnail={() => 'res/unknown32.png'}
                     project={testProject.project}
                     objectsContainer={testProject.testLayout}
+                    layout={testProject.testLayout}
+                    events={testProject.testLayout.getEvents()}
+                    resourceSources={[]}
+                    onChooseResource={() => Promise.reject('unimplemented')}
+                    resourceExternalEditors={fakeResourceExternalEditors}
                     onEditObject={action('On edit object')}
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
@@ -3238,6 +3285,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3262,6 +3314,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -4322,10 +4379,18 @@ storiesOf('NewObjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <NewObjectDialog
-      open
       project={testProject.project}
-      onClose={action('close')}
-      onChoose={action('choose')}
+      layout={testProject.testLayout}
+      onClose={action('onClose')}
+      onCreateNewObject={action('onCreateNewObject')}
+      events={testProject.testLayout.getEvents()}
+      objectsContainer={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));
 
@@ -4430,5 +4495,141 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
+    />
+  ));
+
+storiesOf('AssetStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <AssetStoreStateProvider>
+        <AssetStore
+          onOpenDetails={action('onOpenDetails')}
+          events={testProject.testLayout.getEvents()}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+        />
+      </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/SearchResults', module)
+  .addDecorator(muiDecorator)
+  .add('loading', () => (
+    <SearchResults
+      error={null}
+      assetShortHeaders={null}
+      onRetry={action('onRetry')}
+      onOpenDetails={action('onOpenDetails')}
+    />
+  ))
+  .add('errored', () => (
+    <SearchResults
+      error={new Error('Fake error')}
+      assetShortHeaders={null}
+      onRetry={action('onRetry')}
+      onOpenDetails={action('onOpenDetails')}
+    />
+  ))
+  .add('no results', () => (
+    <SearchResults
+      error={null}
+      assetShortHeaders={[]}
+      onRetry={action('onRetry')}
+      onOpenDetails={action('onOpenDetails')}
+    />
+  ))
+  .add('some results', () => (
+    <SearchResults
+      error={null}
+      assetShortHeaders={[
+        fakeAssetShortHeader1,
+        fakeAssetShortHeader2,
+        fakeAssetShortHeader3,
+      ]}
+      onRetry={action('onRetry')}
+      onOpenDetails={action('onOpenDetails')}
+    />
+  ));
+
+storiesOf('AssetStore/AssetCard', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetCard
+      size={128}
+      onOpenDetails={action('onOpenDetails')}
+      assetShortHeader={fakeAssetShortHeader1}
+    />
+  ));
+
+storiesOf('AssetStore/AssetDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetDetails
+      canInstall={true}
+      isBeingInstalled={false}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('being installed', () => (
+    <AssetDetails
+      canInstall={false}
+      isBeingInstalled={true}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ));
+
+storiesOf('AssetStore/CustomizationFields', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('with behavior customizations', () => (
+    <CustomizationFields
+      asset={fakeAssetWithBehaviorCustomizations1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('with event customizations', () => (
+    <CustomizationFields
+      asset={fakeAssetWithEventCustomizationsAndFlashExtension1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));

@@ -7,13 +7,14 @@ import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import CloudDownload from '@material-ui/icons/CloudDownload';
-import ExtensionsSearch, { addSerializedExtensionToProject } from '.';
+import ExtensionsSearch from '.';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../UI/HelpButton';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
+import { addSerializedExtensionsToProject } from '../AssetStore/InstallAsset';
 
 type Props = {|
   project: gdProject,
@@ -47,10 +48,10 @@ const importExtension = (
             if (!answer) return;
           }
 
-          return addSerializedExtensionToProject(
+          return addSerializedExtensionsToProject(
             eventsFunctionsExtensionsState,
             project,
-            serializedExtension
+            [serializedExtension]
           );
         });
     })

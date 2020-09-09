@@ -4,53 +4,55 @@
  * @class BitmapFontManager
  */
 gdjs.BitmapFontManager = {
-  _fontUsed: [],
+  _fontUsed: {},
   _fontTobeUnloaded: [],
 };
 
 /**
- * When an object use an bitmapFont register the slug of the font,
- * and how many objects use it.
+ * When an object use an bitmapFont register the slug of the font and how many objects use it.
  * @param {string} name Slug of the bitmapFont
  */
 gdjs.BitmapFontManager.setFontUsed = function (name) {
-  if (gdjs.BitmapFontManager._fontUsed[name]) {
-    gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont =
-      gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont + 1 || 1;
-  } else {
-    gdjs.BitmapFontManager._fontUsed[name] = {
-      objectsUsingTheFont: 1,
-    };
+  gdjs.BitmapFontManager._fontUsed[name] = gdjs.BitmapFontManager._fontUsed[name] || { objectsUsingTheFont: 0 };
+  gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont++;
+
+  const fontCachePosition = gdjs.BitmapFontManager._fontTobeUnloaded.indexOf(name);
+  if (fontCachePosition !== -1) {
+    // The font is in the cache of unloaded font, because it was previously used and then marked as not used anymore.
+    // Remove it from the cache to avoid the font getting unloaded.
+    gdjs.BitmapFontManager._fontTobeUnloaded.splice(fontCachePosition, 1);
   }
 };
 
 /**
  * When an bitmapText object is removed, decrease the count of objects related to the font in the manager.
- * When an font is unused the font goes in a temporary cache where if there is more than 10 fonts, the lastest is deleted.
+ * When a font is not unused anymore, it goes in a temporary cache. The cache holds up to 10 fonts.
+ * If the cache reaches its maximum capacity, the oldest font is unloaded from memory.
  * @param {string} name Slug of the bitmapFont
  */
 gdjs.BitmapFontManager.removeFontUsed = function (name) {
-  if (gdjs.BitmapFontManager._fontUsed[name]) {
-    gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont =
-      gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont - 1 || 0;
+  if (!gdjs.BitmapFontManager._fontUsed[name]) {
+    // We tried to remove font that was never marked as used.
+    console.error('BitmapFont with name ' + name + ' was tried to be removed but was never marked as used.');
+    return;
   }
 
+  gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont--;
+
   if (gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont <= 0) {
-    gdjs.BitmapFontManager._fontTobeUnloaded[name] =
-      gdjs.BitmapFontManager._fontUsed[name];
     delete gdjs.BitmapFontManager._fontUsed[name];
 
-    const countFontToBeUnloaded = Object.keys(
-      gdjs.BitmapFontManager._fontTobeUnloaded
-    ).length;
-    const lastFontStored = Object.keys(gdjs.BitmapFontManager._fontTobeUnloaded)[Object.keys(gdjs.BitmapFontManager._fontTobeUnloaded).length - 1];
+    // Add the font name at the last position of the cache.
+    if (!gdjs.BitmapFontManager._fontTobeUnloaded.includes(name))
+      gdjs.BitmapFontManager._fontTobeUnloaded.push(name);
 
-    //Cache for minimum 10 bitmap fonts
-    if (countFontToBeUnloaded > 10) {
-      PIXI.BitmapFont.uninstall(lastFontStored);
-      delete gdjs.BitmapFontManager._fontTobeUnloaded[lastFontStored];
-      console.log('Delete the bitmapFont: ' + lastFontStored);
+    if (gdjs.BitmapFontManager._fontTobeUnloaded.length > 10) {
+      // Remove the first font (i.e: the oldest one)
+      const oldestUnloadedFont = gdjs.BitmapFontManager._fontTobeUnloaded.shift();
+      PIXI.BitmapFont.uninstall(oldestUnloadedFont);
+      console.log('Uninstall bitmapFont: ' + oldestUnloadedFont);
     }
+
   }
 };
 
@@ -116,10 +118,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getRendererObject = function 
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.onDestroy = function () {
-  //TODO: Mark the font from the object not used anymore
-
-  console.log('onDestroyFromScene');
-  console.log('Uninstall bitmapFont: ' + this._pixiObject._fontName);
+  // Mark the font from the object not used anymore.
   gdjs.BitmapFontManager.removeFontUsed(this._pixiObject._fontName);
 };
 
@@ -139,7 +138,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
     console.info('Generating font "' + slugFontName + '" for BitmapText.');
     PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
       chars: PIXI.BitmapFont.ASCII,
-      textureWidth: 1024,
     });
   }
 

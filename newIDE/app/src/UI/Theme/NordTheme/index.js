@@ -150,6 +150,11 @@ const muiTheme = createMuiTheme({
       },
     },
     MuiInput: {
+      input: {
+        padding: 0,
+        paddingBottom: 1,
+        zIndex: 1,
+      },
       underline: {
         '&:before': {
           borderBottom: `1px solid ##D8DEE9`,

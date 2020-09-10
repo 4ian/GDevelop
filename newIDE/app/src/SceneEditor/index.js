@@ -903,6 +903,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getAllImages()
       .toNewVectorString()
       .toJSArray();
+    resourcesInUse.delete();
 
     PixiResourcesLoader.loadTextures(
       project,

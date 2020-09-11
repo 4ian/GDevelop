@@ -127,8 +127,7 @@ const muiTheme = createMuiTheme({
     MuiInput: {
       input: {
         padding: 0,
-        paddingBottom: 1,
-        zIndex: 1,
+        paddingBottom: 3,
       },
       underline: {
         '&:before': {

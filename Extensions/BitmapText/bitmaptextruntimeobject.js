@@ -64,7 +64,7 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
 gdjs.BitmapTextRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.registerObject('BitmapText::BitmapText', gdjs.BitmapTextRuntimeObject);
+gdjs.registerObject('BitmapText::BitmapTextObject', gdjs.BitmapTextRuntimeObject);
 
 gdjs.BitmapTextRuntimeObject.prototype.getRendererObject = function () {
   return this._renderer.getRendererObject();

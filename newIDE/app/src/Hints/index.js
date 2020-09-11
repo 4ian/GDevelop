@@ -29,7 +29,7 @@ export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
   'Video::VideoObject': true,
-  'BitmapText::BitmapText': true,
+  'BitmapText::BitmapTextObject': true,
   'SkeletonObject::Skeleton': true,
 });
 
@@ -50,7 +50,7 @@ export const getExtraObjectsInformation = (): {
       message: t`Video format supported can vary according to devices and browsers. For maximum compatibility, use H.264/mp4 file format (and AAC for audio).`,
     },
   ],
-  'BitmapText::BitmapText': [
+  'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
       message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop.`,

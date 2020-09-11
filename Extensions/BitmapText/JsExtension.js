@@ -35,9 +35,9 @@ module.exports = {
       )
       .setExtensionHelpPath('/objects/bitmaptext');
 
-    const BitmapTextObject = new gd.ObjectJsImplementation();
+    const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    BitmapTextObject.updateProperty = function (
+    bitmapTextObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -54,7 +54,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    BitmapTextObject.getProperties = function (objectContent) {
+    bitmapTextObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
@@ -105,7 +105,7 @@ module.exports = {
 
       return objectProperties;
     };
-    BitmapTextObject.setRawJSONContent(
+    bitmapTextObject.setRawJSONContent(
       JSON.stringify({
         text: 'This is a text displayed with a Bitmap Text object.',
         opacity: 255,
@@ -118,7 +118,7 @@ module.exports = {
     );
 
     // $FlowExpectedError
-    BitmapTextObject.updateInitialInstanceProperty = function (
+    bitmapTextObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -129,7 +129,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError
-    BitmapTextObject.getInitialInstanceProperties = function (
+    bitmapTextObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -141,13 +141,13 @@ module.exports = {
 
     const object = extension
       .addObject(
-        'BitmapText',
+        'BitmapTextObject',
         _('BitmapText'),
         _(
           'Displays a text using a "Bitmap Font", which is more performant than a traditional text but also less flexible (only alphanumerical characters are supported).'
         ),
         'JsPlatform/Extensions/bitmapfont32.png',
-        BitmapTextObject
+        bitmapTextObject
       )
       .setIncludeFile('Extensions/BitmapText/bitmaptextruntimeobject.js')
       .addIncludeFile(
@@ -424,7 +424,7 @@ module.exports = {
     objectsEditorService /*: ObjectsEditorService */
   ) {
     objectsEditorService.registerEditorConfiguration(
-      'BitmapText::BitmapText',
+      'BitmapText::BitmapTextObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
         helpPagePath: '/objects/bitmaptext',
       })
@@ -617,7 +617,7 @@ module.exports = {
     };
 
     objectsRenderingService.registerInstanceRenderer(
-      'BitmapText::BitmapText',
+      'BitmapText::BitmapTextObject',
       RenderedBitmapTextInstance
     );
   },

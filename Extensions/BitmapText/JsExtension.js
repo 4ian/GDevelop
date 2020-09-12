@@ -103,6 +103,12 @@ module.exports = {
         .setType('boolean')
         .setLabel(_('Word wrapping'));
 
+      objectProperties
+        .getOrCreate('specialChars')
+        .setValue(objectContent.specialChars)
+        .setType('string')
+        .setLabel(_('Special chars to include'));
+
       return objectProperties;
     };
     bitmapTextObject.setRawJSONContent(
@@ -114,6 +120,7 @@ module.exports = {
         fontResourceName: '',
         align: 'left',
         wordWrap: true,
+        specialChars: '',
       })
     );
 
@@ -473,6 +480,7 @@ module.exports = {
       this._bitmapFontStyle.fontSize = 20;
       this._bitmapFontStyle.wordWrap = false;
       this._bitmapFontStyle.fill = '#ffffff';
+      this._bitmapFontStyle.specialChars= '';
 
       // We'll track changes of the font to trigger the loading of the new font.
       this._currentFontResourceName = '';
@@ -512,13 +520,15 @@ module.exports = {
         this._bitmapFontStyle.fontSize +
         '-' +
         this._bitmapFontStyle.fill +
+        '-' +
+        this._bitmapFontStyle.specialChars +
         '-bitmapFont';
 
       // Load the font if it's not available yet.
       if (!PIXI.BitmapFont.available[slugFontName]) {
         console.info('Generating font "' + slugFontName + '" for BitmapText.');
         PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-          chars: PIXI.BitmapFont.ASCII,
+          chars: [[' ', '~'], this._bitmapFontStyle.specialChars],
         });
       }
 
@@ -586,6 +596,10 @@ module.exports = {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
+
+      // Set up the characters wanted by the user for the generation of the bitmapFont.
+      const specialChars = properties.get('specialChars').getValue();
+      this._bitmapFontStyle.specialChars = specialChars;
 
       // Assign the font name (that will change if fontFamily, fontSize or color were
       // changed).

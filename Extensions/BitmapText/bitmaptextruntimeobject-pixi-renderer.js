@@ -77,6 +77,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     .getFontManager()
     .getFontFamily(runtimeObject._fontResourceName);
   this._bitmapFontStyle.fontSize = runtimeObject._fontSize;
+  this._bitmapFontStyle.specialChars = runtimeObject._specialChars;
   this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
     runtimeObject._fontColor[0],
     runtimeObject._fontColor[1],
@@ -131,13 +132,15 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
     this._bitmapFontStyle.fontSize +
     '-' +
     this._bitmapFontStyle.fill +
+    '-' +
+    this._bitmapFontStyle.specialChars +
     '-bitmapFont';
 
   // Load the font if it's not available yet.
   if (!PIXI.BitmapFont.available[slugFontName]) {
     console.info('Generating font "' + slugFontName + '" for BitmapText.');
     PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-      chars: PIXI.BitmapFont.ASCII,
+        chars: [[' ', '~'], this._bitmapFontStyle.specialChars],
     });
   }
 
@@ -173,6 +176,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
   this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
     this._pixiObject.fontName
   );
+  this._bitmapFontStyle.specialChars = this._object._specialChars;
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function () {

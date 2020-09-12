@@ -44,6 +44,8 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
   this._wrappingWidth = 0;
   /** @type {string} */
   this._align = objectData.content.align;
+  /** @type {string} */
+  this._specialChars = objectData.content.specialChars;
 
   if (this._renderer)
     gdjs.BitmapTextRuntimeObjectRenderer.call(
@@ -104,6 +106,9 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
   }
   if (oldObjectData.content.align !== newObjectData.content.align) {
     this.setAlignment(newObjectData.content.align);
+  }
+  if (oldObjectData.content.specialChars !== newObjectData.content.specialChars) {
+    this.updateFont();
   }
 
   return true;

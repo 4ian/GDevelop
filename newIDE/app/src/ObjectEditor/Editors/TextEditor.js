@@ -108,6 +108,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               this.forceUpdate();
             }}
             hintText={<Trans>Choose a font</Trans>}
+            style={{ alignSelf: 'center' }}
           />
         </MiniToolbar>
         <Line noMargin>

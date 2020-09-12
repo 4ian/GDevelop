@@ -140,7 +140,10 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
   if (!PIXI.BitmapFont.available[slugFontName]) {
     console.info('Generating font "' + slugFontName + '" for BitmapText.');
     PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-        chars: [[' ', '~'], this._bitmapFontStyle.specialChars],
+        chars: [
+          [' ', '~'], // All the printable ASCII characters
+          this._bitmapFontStyle.specialChars
+        ],
     });
   }
 
@@ -169,6 +172,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateColor = function () {
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
+  this._bitmapFontStyle.specialChars = this._object._specialChars;
   this._bitmapFontStyle.fontFamily = this._object._runtimeScene
     .getGame()
     .getFontManager()
@@ -176,7 +180,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
   this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
     this._pixiObject.fontName
   );
-  this._bitmapFontStyle.specialChars = this._object._specialChars;
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function () {

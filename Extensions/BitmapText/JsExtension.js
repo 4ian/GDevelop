@@ -528,7 +528,10 @@ module.exports = {
       if (!PIXI.BitmapFont.available[slugFontName]) {
         console.info('Generating font "' + slugFontName + '" for BitmapText.');
         PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-          chars: [[' ', '~'], this._bitmapFontStyle.specialChars],
+          chars: [
+            [' ', '~'], // All the printable ASCII characters
+            this._bitmapFontStyle.specialChars
+            ],
         });
       }
 

@@ -153,6 +153,8 @@ gdjs.LayerPixiRenderer.prototype.removeEffect = function (effectName) {
  * @param zOrder The z order of the associated object.
  */
 gdjs.LayerPixiRenderer.prototype.addRendererObject = function (child, zOrder) {
+  if(!child) return;
+
   child.zOrder = zOrder; //Extend the pixi object with a z order.
 
   for (var i = 0, len = this._pixiContainer.children.length; i < len; ++i) {

@@ -255,6 +255,7 @@ export default class TextField extends React.Component<Props, {||}> {
             onFocus={props.onFocus}
             onBlur={props.onBlur}
             inputRef={this._input}
+            spellCheck="false"
           />
         )}
       </I18n>

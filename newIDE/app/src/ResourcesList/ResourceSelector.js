@@ -37,7 +37,7 @@ type Props = {|
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
   margin?: 'none' | 'dense',
-  style?: Object,
+  style?: {| alignSelf?: 'center' |},
 |};
 
 type State = {|

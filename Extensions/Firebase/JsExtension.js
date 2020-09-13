@@ -1,8 +1,4 @@
 // @flow
-/*::
-import { type Trans } from '../../newIDE/app/node_modules/@lingui/macro'
-*/
-
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -17,10 +13,10 @@ import { type Trans } from '../../newIDE/app/node_modules/@lingui/macro'
  */
 module.exports = {
   createExtension: function (
-      _ /*: Trans */, 
+      _ /*: (string) => string */, 
       gd /*: libGDevelop */
     ) {
-    const extension /*: gdPlatformExtension */ = new gd.PlatformExtension();
+    const extension = new gd.PlatformExtension();
 
     extension
       .setExtensionInformation(

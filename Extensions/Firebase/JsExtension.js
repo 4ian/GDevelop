@@ -604,7 +604,7 @@ module.exports = {
             "Changes the user's email address."
         ),
         _(
-          "Change the user's email to _PARAM0_ and store result in _PARAM4_ (Send verification email: _PARAM3_)"
+          "Change the user's email to _PARAM0_ and store result in _PARAM4_ (send verification email: _PARAM3_)"
         ),
         _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
@@ -640,7 +640,7 @@ module.exports = {
             'This is the same as Change the user email but reauthenticates via an external provider.'
         ),
         _(
-          "Change the user's email to _PARAM0_ and store result in _PARAM2_ (Send verification email: _PARAM1_)"
+          "Change the user's email to _PARAM0_ and store result in _PARAM2_ (send verification email: _PARAM1_)"
         ),
         _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
@@ -674,7 +674,7 @@ module.exports = {
         ),
         _(
           'Change the user password to _PARAM2_ and store result in ' +
-            '_PARAM4_ (Send verification email: _PARAM3_)'
+            '_PARAM4_ (send verification email: _PARAM3_)'
         ),
         _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
@@ -711,7 +711,7 @@ module.exports = {
         ),
         _(
           'Change the user password to _PARAM0_ and store result in ' +
-            '_PARAM2_ (Send verification email: _PARAM1_)'
+            '_PARAM2_ (send verification email: _PARAM1_)'
         ),
         _('Firebase/Authentification/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
@@ -882,7 +882,7 @@ module.exports = {
             'Use this if you want to measure the performance for a specified duration.'
         ),
         _(
-          'Record performance for _PARAM1_ms with a delay of _PARAM2_ms (Store in tracker _PARAM0_)'
+          'Record performance for _PARAM1_ms with a delay of _PARAM2_ms (store in tracker _PARAM0_)'
         ),
         _('Firebase/Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
@@ -976,7 +976,7 @@ module.exports = {
         _('Write a document to firestore'),
         _('Writes a document (variable) to cloud firestore.'),
         _(
-          'Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (Store result state in _PARAM3_)'
+          'Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1008,7 +1008,7 @@ module.exports = {
         _('Write a field in firestore'),
         _('Writes a field of a firestore document.'),
         _(
-          'Write _PARAM3_ to firestore in field _PARAM2_ of document _PARAM1_ in collection _PARAM0_ (Store result state in _PARAM4_, Merge: _PARAM5_)'
+          'Write _PARAM3_ to firestore in field _PARAM2_ of document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM4_, Merge: _PARAM5_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1042,7 +1042,7 @@ module.exports = {
         _('Update a document in firestore'),
         _('Updates a firestore document (variable).'),
         _(
-          'Update firestore document _PARAM1_ in collection _PARAM0_ with _PARAM2_ (Store result state in _PARAM3_)'
+          'Update firestore document _PARAM1_ in collection _PARAM0_ with _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1074,7 +1074,7 @@ module.exports = {
         _('Update a field of a document'),
         _('Updates a field of a firestore document.'),
         _(
-          'Update field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with _PARAM3_ (Store result state in _PARAM4_)'
+          'Update field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with _PARAM3_ (store result state in _PARAM4_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1107,7 +1107,7 @@ module.exports = {
         _('Delete a document in firestore'),
         _('Deletes a firestore document (variable).'),
         _(
-          'Delete firestore document _PARAM1_ in collection _PARAM0_ (Store result state in _PARAM2_)'
+          'Delete firestore document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1138,7 +1138,7 @@ module.exports = {
         _('Delete a field of a document'),
         _('Deletes a field of a firestore document.'),
         _(
-          'Delete field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with (Store result state in _PARAM3_)'
+          'Delete field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with (store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1170,7 +1170,7 @@ module.exports = {
         _('Get a document from firestore'),
         _('Gets a firestore document and store it in a variable.'),
         _(
-          'Load firestore document _PARAM1_ from collection _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'
+          'Load firestore document _PARAM1_ from collection _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1207,7 +1207,7 @@ module.exports = {
         _('Get a field of a document'),
         _('Gets the value of a field in a firestore document.'),
         _(
-          'Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (Store result state in _PARAM4_)'
+          'Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (store result state in _PARAM4_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1247,7 +1247,7 @@ module.exports = {
           'Checks for the existence of a document. Sets the result variable to 1 if it exists else to 2.'
         ),
         _(
-          'Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM3_ (Store result state in _PARAM3_)'
+          'Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1286,7 +1286,7 @@ module.exports = {
           'Checks for the existence of a field in a document. Sets the result variable to 1 if it exists else to 2.'
         ),
         _(
-          'Check for existence of _PARAM2_ in document _PARAM1_ of collection _PARAM0_ and store result in _PARAM3_ (Store result state in _PARAM4_)'
+          'Check for existence of _PARAM2_ in document _PARAM1_ of collection _PARAM0_ and store result in _PARAM3_ (store result state in _PARAM4_)'
         ),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
@@ -1374,7 +1374,7 @@ module.exports = {
         _('Get Download URL'),
         _('Get a unique download URL for a file.'),
         _(
-          'Get a download url for _PARAM0_ and store it in _PARAM1_ (Store result state in _PARAM2_)'
+          'Get a download url for _PARAM0_ and store it in _PARAM1_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Storage'),
         'JsPlatform/Extensions/firebase.png',
@@ -1409,7 +1409,7 @@ module.exports = {
         _('Write a variable to Database'),
         _('Writes a variable to Database.'),
         _(
-          'Write _PARAM1_ to Database in _PARAM0_ (Store result state in _PARAM2_)'
+          'Write _PARAM1_ to Database in _PARAM0_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1436,7 +1436,7 @@ module.exports = {
         _('Write a field in Database'),
         _('Writes a field of a Database document.'),
         _(
-          'Write _PARAM2_ in field _PARAM1_ of _PARAM0_ (Store result state in _PARAM3_)'
+          'Write _PARAM2_ in field _PARAM1_ of _PARAM0_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1464,7 +1464,7 @@ module.exports = {
         _('Update a document in Database'),
         _('Updates a variable on the database.'),
         _(
-          'Update varable _PARAM0_ with _PARAM1_ (Store result state in _PARAM2_)'
+          'Update varable _PARAM0_ with _PARAM1_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1491,7 +1491,7 @@ module.exports = {
         _('Update a field of a document'),
         _('Updates a field of a Database document.'),
         _(
-          'Update field _PARAM1_ of _PARAM0_ with _PARAM2_ (Store result state in _PARAM3_)'
+          'Update field _PARAM1_ of _PARAM0_ with _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1519,7 +1519,7 @@ module.exports = {
         _('Delete a database variable'),
         _('Deletes a variable from the database.'),
         _(
-          'Delete variable _PARAM0_ from database (Store result state in _PARAM1_)'
+          'Delete variable _PARAM0_ from database (store result state in _PARAM1_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1545,7 +1545,7 @@ module.exports = {
         _('Delete a field of a variable'),
         _('Deletes a field of a variable on the database.'),
         _(
-          'Delete field _PARAM1_ of variable _PARAM0_ on the database (Store result state in _PARAM2_)'
+          'Delete field _PARAM1_ of variable _PARAM0_ on the database (store result state in _PARAM2_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1574,7 +1574,7 @@ module.exports = {
           'Gets a variable from the database and store it in a Scene variable.'
         ),
         _(
-          'Load database variable _PARAM0_ into _PARAM1_ (Store result state in _PARAM2_)'
+          'Load database variable _PARAM0_ into _PARAM1_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1608,7 +1608,7 @@ module.exports = {
           'Gets the value of a field in a variable from the database and store it in a scene variable.'
         ),
         _(
-          'Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (Store result state in _PARAM3_)'
+          'Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1643,7 +1643,7 @@ module.exports = {
           'Checks for the existence of a variable. Sets the result variable to 1 if it exists else to 2.'
         ),
         _(
-          'Check for existence of _PARAM0_ and store result in _PARAM1_ (Store result state in _PARAM2_)'
+          'Check for existence of _PARAM0_ and store result in _PARAM1_ (store result state in _PARAM2_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
@@ -1677,7 +1677,7 @@ module.exports = {
           'Checks for the existence of a field in a variable. Sets the result variable to 1 if it exists else to 2.'
         ),
         _(
-          'Check for existence of _PARAM1_ in database variable _PARAM0_ and store result in _PARAM2_ (Store result state in _PARAM3_)'
+          'Check for existence of _PARAM1_ in database variable _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'
         ),
         _('Firebase/Realtime Database'),
         'JsPlatform/Extensions/firebase.png',

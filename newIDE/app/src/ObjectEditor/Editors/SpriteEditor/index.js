@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -367,25 +366,21 @@ class AnimationsListContainer extends React.Component<
           lockAxis="y"
           axis="y"
         />
-        <I18n>
-          {({ i18n }) => (
-            <ContextMenu
-              ref={spriteContextMenu =>
-                (this.spriteContextMenu = spriteContextMenu)
-              }
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Delete selection`),
-                  click: () => this.deleteSelection(),
-                },
-                {
-                  label: i18n._(t`Duplicate selection`),
-                  click: () => this.duplicateSelection(),
-                },
-              ]}
-            />
-          )}
-        </I18n>
+        <ContextMenu
+          ref={spriteContextMenu =>
+            (this.spriteContextMenu = spriteContextMenu)
+          }
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              label: i18n._(t`Delete selection`),
+              click: () => this.deleteSelection(),
+            },
+            {
+              label: i18n._(t`Duplicate selection`),
+              click: () => this.duplicateSelection(),
+            },
+          ]}
+        />
       </div>
     );
   }

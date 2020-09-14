@@ -128,9 +128,7 @@ export default function PreviewButtons({
           }
           buildMenuTemplate={(i18n: I18nType) => [
             {
-              label: i18n._(
-                t`Start Network Preview (Preview over WiFi/LAN)`
-              ),
+              label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
               click: () => onNetworkPreview(),
             },
             { type: 'separator' },

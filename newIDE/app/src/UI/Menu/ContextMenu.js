@@ -93,14 +93,20 @@ class ElectronContextMenu extends React.Component {
 }
 
 const ElectronContextMenuWrapper = React.forwardRef((props, ref) => {
-    const electronContextMenu = React.useRef(null);
-    React.useImperativeHandle(ref, () => ({
-      open: (x, y) => {
-        if (electronContextMenu.current) electronContextMenu.current.open(x,y);
-      },
-    }));
+  const electronContextMenu = React.useRef(null);
+  React.useImperativeHandle(ref, () => ({
+    open: (x, y) => {
+      if (electronContextMenu.current) electronContextMenu.current.open(x, y);
+    },
+  }));
 
-    return <I18n>{({i18n}) => <ElectronContextMenu {...props} i18n={i18n} ref={electronContextMenu} />}</I18n>;
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <ElectronContextMenu {...props} i18n={i18n} ref={electronContextMenu} />
+      )}
+    </I18n>
+  );
 });
 
 export default (electron ? ElectronContextMenuWrapper : MaterialUIContextMenu);

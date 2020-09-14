@@ -1221,9 +1221,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             { type: 'separator' },
                             {
-                              label: i18n._(
-                                t`Extract Events to a Function`
-                              ),
+                              label: i18n._(t`Extract Events to a Function`),
                               click: () => this.extractEventsToFunction(),
                             },
                             {
@@ -1282,8 +1280,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             {
                               label: i18n._(t`Invert Condition`),
-                              click: () =>
-                                this._invertSelectedConditions(),
+                              click: () => this._invertSelectedConditions(),
                               visible: hasSelectedAtLeastOneCondition(
                                 this.state.selection
                               ),

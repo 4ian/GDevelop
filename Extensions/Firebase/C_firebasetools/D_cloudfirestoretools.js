@@ -267,7 +267,7 @@ gdjs.evtTools.firebase.firestore.hasDocument = function (
 };
 
 /**
- * Checks for existence of a Field.
+ * Checks for existence of a field.
  * @param {string} collectionName - The collection where the document is stored.
  * @param {string} documentName - The name of the document.
  * @param {string} field - The field to check.

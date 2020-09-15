@@ -5,12 +5,12 @@
  */
 
 /**
- * A special array where push assigns to the mearest null.
+ * A special array where push tries to reuse old unused indices.
  * Why? This is for storing UIDs. You can see this as a sort of memory optimization:
  * Each time an object is removed, it is replaced with null in the array.
  * Then a new object can reuse that emplacement when pushing, instead of adding an element
  * to the array. Technically the push function is not really pushing anymore,
- * but the name is kept to make it easier for new devs to use (almost same API as classic Array).
+ * but the name is kept to make it easier for new devs to use (almost same API as classic array).
  * @class
  * @extends Array
  */
@@ -21,7 +21,7 @@ gdjs.UIDArray = function () {
 gdjs.UIDArray.prototype = Object.create(Array.prototype);
 
 /**
- * Adds an object to the UIDs Array and returns it's UID.
+ * Adds an object to the UIDs array and returns it's UID.
  * @param {any} item - The item to assign a UID to.
  * @returns {number} - The new UID of the object.
  */
@@ -36,10 +36,10 @@ gdjs.UIDArray.prototype.push = function (item) {
 };
 
 /**
- * Removes an element from the UIDArray by UID.
+ * Removes an element from the UIDs array by UID.
  * @param {number} uid - The UID of the object to remove.
  */
 gdjs.UIDArray.prototype.remove = function (uid) {
-  if (uid >= this.length) return; // Don't pollute the array with uneccessary nulls.
+  if (uid >= this.length) return; // Don't pollute the array with unecessary nulls.
   this[uid] = null;
 };

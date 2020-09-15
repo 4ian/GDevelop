@@ -48,7 +48,8 @@ gdjs.evtTools.firebase.storage.upload = function (
 
   let uploadID;
   if (typeof callbackUIDVariable !== 'undefined') {
-    uploadID = gdjs.evtTools.firebase.storage.uploads.push(uploadTask); // Only bother pushing if the ID will be stored
+    // Only bother pushing if the ID will be stored.
+    uploadID = gdjs.evtTools.firebase.storage.uploads.push(uploadTask);
     if (typeof callbackUIDVariable !== 'undefined')
       callbackUIDVariable.setNumber(uploadID);
   }
@@ -60,7 +61,7 @@ gdjs.evtTools.firebase.storage.upload = function (
         gdjs.evtTools.network._objectToVariable(
           uploadProgress,
           callbackProgressVariable,
-          ['tasks'] // Remove circular reference
+          ['tasks'] // Remove circular reference.
         );
     },
     (error) => {
@@ -71,7 +72,7 @@ gdjs.evtTools.firebase.storage.upload = function (
       if (typeof callbackStateVariable !== 'undefined')
         callbackStateVariable.setString('ok');
       if (typeof callbackUIDVariable !== 'undefined') {
-        gdjs.evtTools.firebase.storage.uploads.remove(uploadID); // Free memory
+        gdjs.evtTools.firebase.storage.uploads.remove(uploadID); // Free memory.
       }
       uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
         if (typeof callbackStateVariable !== 'undefined')

@@ -57,15 +57,15 @@ gdjs.evtTools.firebase.analytics.setProperty = function (
   analytics.setUserProperties(properties);
 };
 
-/** Initialize Analytics SDK */
+// Initialization step required by firebase analytics
 gdjs.registerFirstRuntimeSceneLoadedCallback(function () {
   gdjs.evtTools.firebase.analytics._analyticsInstance = firebase.analytics();
 });
 
-/** Callback for setting the analytics current view to the current scene */
+// Callback for setting the analytics current view to the current scene.
 gdjs.registerRuntimeSceneLoadedCallback(function (runtimeScene) {
-  if (runtimeScene.getGame()._analyticsInstance)
-    runtimeScene
-      .getGame()
-      ._analyticsInstance.setCurrentScreen(runtimeScene.getName());
+  if (gdjs.evtTools.firebase.analytics._analyticsInstance)
+    gdjs.evtTools.firebase.analytics._analyticsInstance.setCurrentScreen(
+      runtimeScene.getName()
+    );
 });

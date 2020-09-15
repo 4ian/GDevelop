@@ -31,19 +31,16 @@ gdjs.evtTools.firebase.functions = {
 
     firebase
       .functions()
-      .httpsCallable(httpFunctionName)
-      (param)
+      .httpsCallable(httpFunctionName)(param)
       .then((response) => response.data)
       .then((data) => {
         if (callbackValueVariable)
           gdjs.evtTools.network._objectToVariable(data, callbackValueVariable);
-        if (callbackStateVariable) 
-          callbackStateVariable.setString('ok');
+        if (callbackStateVariable) callbackStateVariable.setString('ok');
       })
       .catch((error) => {
-        if (callbackValueVariable)
-          gdjs.evtTools.network._objectToVariable(error, callbackValueVariable);
-        if (callbackStateVariable) callbackStateVariable.setString('error');
+        if (callbackStateVariable)
+          callbackStateVariable.setString(error.message);
       });
   },
 };

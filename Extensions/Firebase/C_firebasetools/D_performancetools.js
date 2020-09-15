@@ -20,7 +20,9 @@ gdjs.evtTools.firebase.performance = {
  */
 gdjs.evtTools.firebase.performance.getTracer = function (tracerName) {
   if (!gdjs.evtTools.firebase.performance.tracers.hasOwnProperty(tracerName)) {
-    gdjs.evtTools.firebase.performance.tracers[tracerName] = firebase.performance().trace(tracerName);
+    gdjs.evtTools.firebase.performance.tracers[
+      tracerName
+    ] = firebase.performance().trace(tracerName);
   }
   return gdjs.evtTools.firebase.performance.tracers[tracerName];
 };

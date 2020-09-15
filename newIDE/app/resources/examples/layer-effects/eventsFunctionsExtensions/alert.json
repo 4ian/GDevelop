@@ -1,0 +1,43 @@
+{
+  "author": "The Gem Dev",
+  "description": "",
+  "extensionNamespace": "",
+  "fullName": "Alert",
+  "name": "Alert",
+  "shortDescription": "Popup an alert with  a message",
+  "tags": "",
+  "version": "0.01",
+  "eventsFunctions": [
+    {
+      "description": "Popup an alert and display a message",
+      "fullName": "Popup an alert",
+      "functionType": "Action",
+      "name": "alert",
+      "sentence": "Alert message _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "alert(eventsFunctionContext.getArgument(\"message\"));",
+          "parameterObjects": "",
+          "useStrict": true
+        }
+      ],
+      "parameters": [
+        {
+          "codeOnly": false,
+          "defaultValue": "",
+          "description": "The message to display on alert",
+          "longDescription": "",
+          "name": "message",
+          "optional": false,
+          "supplementaryInformation": "",
+          "type": "string"
+        }
+      ],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

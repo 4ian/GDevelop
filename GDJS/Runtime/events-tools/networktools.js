@@ -141,7 +141,9 @@ gdjs.evtTools.network.objectVariableStructureToJSON = function (
 };
 
 gdjs.evtTools.network._objectToVariable = function (obj, variable) {
-  if (!isNaN(obj)) {
+  if (obj == null) {
+    variable.setString("null");
+  } else if (!isNaN(obj)) {
     //Number
     variable.setNumber(obj);
   } else if (typeof obj == 'string' || obj instanceof String) {

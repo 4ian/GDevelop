@@ -259,7 +259,7 @@ gdjs.evtTools.firebase.firestore.hasDocument = function (
     .get()
     .then(function (doc) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setNumber(doc.exists ? 1 : 2);
+      callbackValueVariable.setString(doc.exists ? "true" : "false");
     })
     .catch(function (error) {
       if (callbackStateVariable) callbackStateVariable.setString(error.message);
@@ -288,7 +288,7 @@ gdjs.evtTools.firebase.firestore.hasField = function (
     .get()
     .then(function (doc) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setNumber(doc.get(field) === undefined ? 2 : 1);
+      callbackValueVariable.setString(doc.get(field) === undefined ? "false" : "true");
     })
     .catch(function (error) {
       if (callbackStateVariable) callbackStateVariable.setString(error.message);

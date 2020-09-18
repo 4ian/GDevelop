@@ -230,8 +230,8 @@ gdjs.evtTools.firebase.database.hasVariable = function (
     .once('value')
     .then(function (snapshot) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setNumber(
-        snapshot.exists() && snapshot.val() !== null ? 1 : 2
+      callbackValueVariable.setString(
+        (snapshot.exists() && snapshot.val() !== null) ? "true" : "false"
       );
     })
     .catch(function (error) {
@@ -258,8 +258,8 @@ gdjs.evtTools.firebase.database.hasField = function (
     .once('value')
     .then(function (snapshot) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setNumber(
-        snapshot.val() == null || snapshot.val()[field] == null ? 2 : 1
+      callbackValueVariable.setString(
+        (snapshot.val() == null || snapshot.val()[field] == null) ? "false" : "true"
       );
     })
     .catch(function (error) {

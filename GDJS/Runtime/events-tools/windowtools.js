@@ -22,11 +22,8 @@ gdjs.evtTools.window.setFullScreen = function(runtimeScene, enable, keepAspectRa
     runtimeScene.getGame().getRenderer().setFullScreen(enable);
 };
 
-gdjs.evtTools.window.isFullScreen = function() {
-	if (typeof require === "function") {
-		return require("electron").remote.getCurrentWindow().isFullScreen();
-	}
-	return window.screen.height === window.innerHeight;
+gdjs.evtTools.window.isFullScreen = function(runtimeScene) {
+	return runtimeScene.getGame().getRenderer().isFullScreen();
 };
 
 gdjs.evtTools.window.setWindowSize = function(runtimeScene, width, height, updateGameResolution) {

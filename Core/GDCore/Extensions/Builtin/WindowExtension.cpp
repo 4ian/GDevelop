@@ -46,7 +46,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           _("Is the game in fullscreen?"),
           _("Game's window and resolution"),
           "res/actions/fullscreen24.png",
-          "res/actions/fullscreen.png");
+          "res/actions/fullscreen.png")
+      .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddAction("SetWindowMargins",

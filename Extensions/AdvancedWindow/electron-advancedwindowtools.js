@@ -1,9 +1,9 @@
 // @ts-check
 /**
- * A set of wrappers arround the electron APIs 
- * that don't crash the game on non-electron platforms.
+ * A set of wrappers around the Electron windowing APIs.
+ * They don't have any effect on non Electron runtimes.
  * 
- * Docstrings are only used for typing here, for propper 
+ * Docstrings are only used for typing here, for proper 
  * documentation check the electron docs at
  * https://www.electronjs.org/docs/api.
  * 
@@ -15,28 +15,28 @@
  * Wrappers for the electron APIs.
  * @namespace
  */
-gdjs.evtTools.electron = {
+gdjs.evtTools.advancedWindow = {
     /**
      * The games BrowserWindow instance (or null on 
      * non-electron platforms)
      * @type {?Object}
      */
-    window: null,
+    electronBrowserWindow: null,
 };
 
 if(typeof require === "function") {
-    gdjs.evtTools.electron.window = require("electron").remote.getCurrentWindow();
+    gdjs.evtTools.advancedWindow.electronBrowserWindow = require("electron").remote.getCurrentWindow();
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.focus = function(activate) {
-    if(gdjs.evtTools.electron.window) {
+gdjs.evtTools.advancedWindow.focus = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
         if (activate) {
-            gdjs.evtTools.electron.window.focus();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.focus();
         } else {
-            gdjs.evtTools.electron.window.blur();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.blur();
         }
     }
 }
@@ -44,20 +44,20 @@ gdjs.evtTools.electron.focus = function(activate) {
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isFocused = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isFocused();
+gdjs.evtTools.advancedWindow.isFocused = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isFocused();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.show = function(activate) {
-    if(gdjs.evtTools.electron.window) {
+gdjs.evtTools.advancedWindow.show = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
         if (activate) {
-            gdjs.evtTools.electron.window.showInactive();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.showInactive();
         } else {
-            gdjs.evtTools.electron.window.hide();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.hide();
         }
     }
 }
@@ -65,20 +65,20 @@ gdjs.evtTools.electron.show = function(activate) {
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isVisible = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isVisible();
+gdjs.evtTools.advancedWindow.isVisible = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isVisible();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.maximize = function(activate) {
-    if(gdjs.evtTools.electron.window) {
+gdjs.evtTools.advancedWindow.maximize = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
         if (activate) {
-            gdjs.evtTools.electron.window.maximize();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.maximize();
         } else {
-            gdjs.evtTools.electron.window.unmaximize();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.unmaximize();
         }
     }
 }
@@ -86,20 +86,20 @@ gdjs.evtTools.electron.maximize = function(activate) {
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isMaximized = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isMaximized();
+gdjs.evtTools.advancedWindow.isMaximized = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isMaximized();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.minimize = function(activate) {
-    if(gdjs.evtTools.electron.window) {
+gdjs.evtTools.advancedWindow.minimize = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
         if (activate) {
-            gdjs.evtTools.electron.window.minimize();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.minimize();
         } else {
-            gdjs.evtTools.electron.window.restore();
+            gdjs.evtTools.advancedWindow.electronBrowserWindow.restore();
         }
     }
 }
@@ -107,113 +107,113 @@ gdjs.evtTools.electron.minimize = function(activate) {
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isMinimized = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isMinimized();
+gdjs.evtTools.advancedWindow.isMinimized = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isMinimized();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.enable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setEnabled(activate);
+gdjs.evtTools.advancedWindow.enable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setEnabled(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isEnabled = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isEnabled();
+gdjs.evtTools.advancedWindow.isEnabled = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isEnabled();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setResizable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setResizable(activate);
+gdjs.evtTools.advancedWindow.setResizable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setResizable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isResizable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isResizable();
+gdjs.evtTools.advancedWindow.isResizable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isResizable();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setMovable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setMovable(activate);
+gdjs.evtTools.advancedWindow.setMovable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setMovable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isMovable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isMovable();
+gdjs.evtTools.advancedWindow.isMovable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isMovable();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setMaximizable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setMaximizable(activate);
+gdjs.evtTools.advancedWindow.setMaximizable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setMaximizable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isMaximizable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isMaximizable();
+gdjs.evtTools.advancedWindow.isMaximizable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isMaximizable();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setMinimizable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setMinimizable(activate);
+gdjs.evtTools.advancedWindow.setMinimizable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setMinimizable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isMinimizable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isMinimizable();
+gdjs.evtTools.advancedWindow.isMinimizable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isMinimizable();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setFullScreenable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setFullScreenable(activate);
+gdjs.evtTools.advancedWindow.setFullScreenable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setFullScreenable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isFullScreenable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isFullScreenable();
+gdjs.evtTools.advancedWindow.isFullScreenable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isFullScreenable();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setClosable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setClosable(activate);
+gdjs.evtTools.advancedWindow.setClosable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setClosable(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isClosable = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isClosable();
+gdjs.evtTools.advancedWindow.isClosable = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isClosable();
     return false;
 }
 
@@ -221,36 +221,32 @@ gdjs.evtTools.electron.isClosable = function() {
  * @param {boolean} activate 
  * @param {"normal" | "floating" | "torn-off-menu" | "modal-panel" |"main-menu" | "status" | "pop-up-menu" | "screen-saver"} level
  */
-gdjs.evtTools.electron.setAlwaysOnTop = function(activate, level) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setAlwaysOnTop(activate, level);
+gdjs.evtTools.advancedWindow.setAlwaysOnTop = function(activate, level) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setAlwaysOnTop(activate, level);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isAlwaysOnTop = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isAlwaysOnTop();
+gdjs.evtTools.advancedWindow.isAlwaysOnTop = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isAlwaysOnTop();
     return false;
-}
-
-gdjs.evtTools.electron.center = function() {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.center();
 }
 
 /**
  * @param {number} x
  * @param {number} y
  */
-gdjs.evtTools.electron.setPosition = function(x, y) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setPosition(x, y);
+gdjs.evtTools.advancedWindow.setPosition = function(x, y) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setPosition(x, y);
 }
 
 /**
  * @return {number}
  */
-gdjs.evtTools.electron.getPositionX = function() {
-    if(gdjs.evtTools.electron.window) {
-        return gdjs.evtTools.electron.window.getPosition()[0];
+gdjs.evtTools.advancedWindow.getPositionX = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
+        return gdjs.evtTools.advancedWindow.electronBrowserWindow.getPosition()[0];
     }
     return 0;
 }
@@ -258,9 +254,9 @@ gdjs.evtTools.electron.getPositionX = function() {
 /**
  * @return {number}
  */
-gdjs.evtTools.electron.getPositionY = function() {
-    if(gdjs.evtTools.electron.window) {
-        return gdjs.evtTools.electron.window.getPosition()[1];
+gdjs.evtTools.advancedWindow.getPositionY = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) {
+        return gdjs.evtTools.advancedWindow.electronBrowserWindow.getPosition()[1];
     }
     return 0;
 }
@@ -268,65 +264,65 @@ gdjs.evtTools.electron.getPositionY = function() {
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setKiosk = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setKiosk(activate);
+gdjs.evtTools.advancedWindow.setKiosk = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setKiosk(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.isKiosk = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.isKiosk();
+gdjs.evtTools.advancedWindow.isKiosk = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.isKiosk();
     return false;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.flash = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.flashFrame(activate);
+gdjs.evtTools.advancedWindow.flash = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.flashFrame(activate);
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setHasShadow = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setHasShadow(activate);
+gdjs.evtTools.advancedWindow.setHasShadow = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setHasShadow(activate);
 }
 
 /**
  * @return {boolean}
  */
-gdjs.evtTools.electron.hasShadow = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.hasShadow();
+gdjs.evtTools.advancedWindow.hasShadow = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.hasShadow();
     return false;
 }
 
 /**
  * @param {number} opacity 
  */
-gdjs.evtTools.electron.setOpacity = function(opacity) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setOpacity(opacity);
+gdjs.evtTools.advancedWindow.setOpacity = function(opacity) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setOpacity(opacity);
 }
 
 /**
  * @return {number}
  */
-gdjs.evtTools.electron.getOpacity = function() {
-    if(gdjs.evtTools.electron.window) return gdjs.evtTools.electron.window.getOpacity();
+gdjs.evtTools.advancedWindow.getOpacity = function() {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) return gdjs.evtTools.advancedWindow.electronBrowserWindow.getOpacity();
     return 1;
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setContentProtection = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setContentProtection(activate);
+gdjs.evtTools.advancedWindow.setContentProtection = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setContentProtection(activate);
 }
 
 /**
  * @param {boolean} activate 
  */
-gdjs.evtTools.electron.setFocusable = function(activate) {
-    if(gdjs.evtTools.electron.window) gdjs.evtTools.electron.window.setFocusable(activate);
+gdjs.evtTools.advancedWindow.setFocusable = function(activate) {
+    if(gdjs.evtTools.advancedWindow.electronBrowserWindow) gdjs.evtTools.advancedWindow.electronBrowserWindow.setFocusable(activate);
 }

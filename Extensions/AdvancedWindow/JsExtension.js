@@ -39,8 +39,8 @@ module.exports = {
       .addParameter('yesorno', _('Focus the window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.focus');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.focus');
     
     extension
       .addCondition(
@@ -53,8 +53,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isFocused');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isFocused');
 
     extension
       .addAction(
@@ -69,8 +69,8 @@ module.exports = {
       .addParameter('yesorno', _('Show window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.show');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.show');
     
     extension
       .addCondition(
@@ -83,8 +83,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isVisible');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isVisible');
 
     extension
       .addAction(
@@ -99,8 +99,8 @@ module.exports = {
       .addParameter('yesorno', _('Maximize window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.maximize');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.maximize');
     
     extension
       .addCondition(
@@ -113,8 +113,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isMaximized');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isMaximized');
 
     extension
       .addAction(
@@ -129,8 +129,8 @@ module.exports = {
       .addParameter('yesorno', _('Minimize window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.minimize');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.minimize');
     
     extension
       .addCondition(
@@ -143,8 +143,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isMinimized');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isMinimized');
 
     extension
       .addAction(
@@ -159,8 +159,8 @@ module.exports = {
       .addParameter('yesorno', _('Enable window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.enable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.enable');
     
     extension
       .addCondition(
@@ -173,8 +173,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isEnabled');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isEnabled');
 
     extension
       .addAction(
@@ -189,8 +189,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow resizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setResizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setResizable');
     
     extension
       .addCondition(
@@ -203,8 +203,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isResizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isResizable');
 
     extension
       .addAction(
@@ -219,8 +219,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow moving?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setMovable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setMovable');
     
     extension
       .addCondition(
@@ -233,8 +233,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isMovable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isMovable');
 
     extension
       .addAction(
@@ -249,8 +249,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow maximizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setMaximizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setMaximizable');
     
     extension
       .addCondition(
@@ -263,8 +263,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isMaximizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isMaximizable');
 
     extension
       .addAction(
@@ -279,8 +279,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow minimizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setMinimizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setMinimizable');
     
     extension
       .addCondition(
@@ -293,8 +293,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isMinimizable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isMinimizable');
 
     extension
       .addAction(
@@ -309,22 +309,22 @@ module.exports = {
       .addParameter('yesorno', _('Allow full-screening?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setFullScreenable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setFullScreenable');
     
     extension
       .addCondition(
         'IsFullScreenable',
         _('Window full-screenable'),
         _('Checks if the window can be full-screened.'),
-        _('The window can be full-screened'),
+        _('The window can be set in fullscreen'),
         _('Advanced window tools/Windows, Linux, MacOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isFullScreenable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isFullScreenable');
 
     extension
       .addAction(
@@ -339,8 +339,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow closing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setClosable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setClosable');
     
     extension
       .addCondition(
@@ -353,8 +353,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isClosable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isClosable');
 
     const levelChoices = JSON.stringify([
       "normal",
@@ -381,8 +381,8 @@ module.exports = {
       .setDefaultValue('true')
       .addParameter("stringWithSelector", _("Level"), levelChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setAlwaysOnTop');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setAlwaysOnTop');
     
     extension
       .addCondition(
@@ -395,14 +395,14 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isAlwaysOnTop');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isAlwaysOnTop');
 
     extension
       .addAction(
         'SetKiosk',
         _('Enable kiosk mode'),
-        _('Puts the window in kiosk mode.'),
+        _('Puts the window in kiosk mode. This prevents the user from exiting fullscreen.'),
         _('Enable kiosk mode: _PARAM0_'),
         _('Advanced window tools/Windows, Linux, MacOS'),
         'res/actions/window24.png',
@@ -411,8 +411,8 @@ module.exports = {
       .addParameter('yesorno', _('Enable kiosk mode?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setKiosk');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setKiosk');
     
     extension
       .addCondition(
@@ -425,8 +425,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.isKiosk');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.isKiosk');
 
     extension
       .addAction(
@@ -441,8 +441,8 @@ module.exports = {
       .addParameter('yesorno', _('Enable shadow?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setHasShadow');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setHasShadow');
     
     extension
       .addCondition(
@@ -455,8 +455,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.hasShadow');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.hasShadow');
     
     extension
       .addAction(
@@ -474,8 +474,8 @@ module.exports = {
       .addParameter('yesorno', _('Enable content protection?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setContentProtection');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setContentProtection');
 
     extension
       .addAction(
@@ -490,8 +490,8 @@ module.exports = {
       .addParameter('yesorno', _('Allow focus?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setFocusable');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setFocusable');
 
     extension
       .addAction(
@@ -506,8 +506,8 @@ module.exports = {
       .addParameter('yesorno', _('Flash the window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.flash');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.flash');
 
     extension
       .addAction(
@@ -522,29 +522,15 @@ module.exports = {
       .addParameter('number', _('New opacity'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setOpacity');
-
-    extension
-      .addAction(
-        'Center',
-        _('Center window'),
-        _('Centers the current window.'),
-        _('Center window'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
-        'res/actions/window24.png',
-        'res/actions/window.png'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.center');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setOpacity');
 
     extension
       .addAction(
         'SetWindowPosition',
         _('Set window position'),
         _('Changes the window position.'),
-        _('Set the window position to _PARAM0_X and _PARAM0_Y'),
+        _('Set the window position to _PARAM0_;_PARAM1_'),
         _('Advanced window tools/Windows, Linux, MacOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -553,8 +539,8 @@ module.exports = {
       .addParameter('number', _('Y position'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.setPosition');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.setPosition');
 
     extension
       .addExpression(
@@ -565,8 +551,8 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.getPositionX');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.getPositionX');
 
     extension
       .addExpression(
@@ -577,20 +563,20 @@ module.exports = {
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.getPositionY');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.getPositionY');
     
     extension
       .addExpression(
         'WindowOpacity',
         _('Window opacity'),
-        _('Returns the current window opacity (a number from 0 to 1).'),
+        _('Returns the current window opacity (a number from 0 to 1, 1 being fully opaque).'),
         _('Advanced window tools/Windows, Linux, MacOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Electron/electron-advancedwindowtools.js')
-      .setFunctionName('gdjs.evtTools.electron.getOpacity');
+      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setFunctionName('gdjs.evtTools.advancedWindow.getOpacity');
 
     return extension;
   },

@@ -49,7 +49,7 @@ module.exports = {
         'IsFocused',
         _('Window focused'),
         _('Checks if the window is focused.'),
-        _('Is the window focused?'),
+        _('The window is focused'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -79,7 +79,7 @@ module.exports = {
         'IsVisible',
         _('Window visibile'),
         _('Checks if the window is visible.'),
-        _('Is the window visible?'),
+        _('The window is visible'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -109,7 +109,7 @@ module.exports = {
         'IsMaximized',
         _('Window maximized'),
         _('Checks if the window is maximized.'),
-        _('Is the window maximized?'),
+        _('The window is maximized'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -139,7 +139,7 @@ module.exports = {
         'IsMinimized',
         _('Window minimized'),
         _('Checks if the window is minimized.'),
-        _('Is the window minimized?'),
+        _('The window is minimized'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -169,7 +169,7 @@ module.exports = {
         'IsWindowEnabled',
         _('Window enabled'),
         _('Checks if the window is enabled.'),
-        _('Is the window enabled?'),
+        _('The window is enabled'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -199,7 +199,7 @@ module.exports = {
         'IsResizable',
         _('Window resizable'),
         _('Checks if the window can be resized.'),
-        _('Is the window resizable?'),
+        _('The window can be resized'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -229,7 +229,7 @@ module.exports = {
         'IsMovable',
         _('Window movable'),
         _('Checks if the window can be moved.'),
-        _('Is the window movable?'),
+        _('The window can be moved'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -259,7 +259,7 @@ module.exports = {
         'IsMaximizable',
         _('Window maximizable'),
         _('Checks if the window can be maximized.'),
-        _('Is the window maximizable?'),
+        _('The window can be maximized'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -289,7 +289,7 @@ module.exports = {
         'IsMinimizable',
         _('Window minimizable'),
         _('Checks if the window can be minimized.'),
-        _('Is the window minimizable?'),
+        _('The window can be minimized'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -319,7 +319,7 @@ module.exports = {
         'IsFullScreenable',
         _('Window full-screenable'),
         _('Checks if the window can be full-screened.'),
-        _('Is the window full-screenable?'),
+        _('The window can be full-screened'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -349,7 +349,7 @@ module.exports = {
         'IsClosable',
         _('Window closable'),
         _('Checks if the window can be closed.'),
-        _('Is the window closable?'),
+        _('The window can be closed'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -391,7 +391,7 @@ module.exports = {
         'IsAlwaysOnTop',
         _('Window always on top'),
         _('Checks if the window is always on top.'),
-        _('Is the window always on top?'),
+        _('The window is always on top'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -421,7 +421,7 @@ module.exports = {
         'IsKiosk',
         _('Kiosk mode'),
         _('Checks if the window is currently in kiosk mode.'),
-        _('Is the window in kiosk mode?'),
+        _('The window is in kiosk mode'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'
@@ -451,7 +451,7 @@ module.exports = {
         'HasShadow',
         _('Shadow enabled'),
         _('Checks if the window currently has it\'s shadow enabled.'),
-        _('Has the window a shadow?'),
+        _('The window has a shadow'),
         _('Electron Window'),
         'res/actions/window24.png',
         'res/actions/window.png'

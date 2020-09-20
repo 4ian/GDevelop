@@ -12,13 +12,15 @@
  * to the array. Technically the push function is not really pushing anymore,
  * but the name is kept to make it easier for new devs to use (almost same API as classic array).
  * @class
- * @extends Array
  */
 gdjs.UIDArray = function () {
-  Array.call(this);
+  /**
+   * The internal array of UIDs.
+   * @type {Array<any>}
+   * @private
+   */
+  this._array = [];
 };
-
-gdjs.UIDArray.prototype = Object.create(Array.prototype);
 
 /**
  * Adds an object to the UIDs array and returns it's UID.
@@ -26,13 +28,13 @@ gdjs.UIDArray.prototype = Object.create(Array.prototype);
  * @returns {number} - The new UID of the object.
  */
 gdjs.UIDArray.prototype.push = function (item) {
-  for (let i in this) {
-    if (this[i] === null) {
-      this[i] = item;
+  for (let i in this._array) {
+    if (this._array[i] === null) {
+      this._array[i] = item;
       return parseInt(i);
     }
   }
-  return Array.prototype.push.call(this, item) - 1;
+  return this._array.push(item) - 1;
 };
 
 /**
@@ -40,6 +42,15 @@ gdjs.UIDArray.prototype.push = function (item) {
  * @param {number} uid - The UID of the object to remove.
  */
 gdjs.UIDArray.prototype.remove = function (uid) {
-  if (uid >= this.length) return; // Don't pollute the array with unecessary nulls.
-  this[uid] = null;
+  if (uid >= this._array.length) return; // Don't pollute the array with unecessary nulls.
+  this._array[uid] = null;
+};
+
+/**
+ * Get an element from the UIDs array by UID.
+ * @param {number} uid - The UID of the object to get.
+ */
+gdjs.UIDArray.prototype.get = function (uid) {
+  if (uid >= this._array.length) return null; // Prevent out of range getting.
+  return this._array[uid];
 };

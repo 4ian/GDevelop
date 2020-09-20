@@ -50,8 +50,7 @@ gdjs.evtTools.firebase.storage.upload = function (
   if (typeof callbackUIDVariable !== 'undefined') {
     // Only bother pushing if the ID will be stored.
     uploadID = gdjs.evtTools.firebase.storage.uploads.push(uploadTask);
-    if (typeof callbackUIDVariable !== 'undefined')
-      callbackUIDVariable.setNumber(uploadID);
+    callbackUIDVariable.setNumber(uploadID);
   }
 
   uploadTask.on(

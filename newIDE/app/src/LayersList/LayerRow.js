@@ -1,5 +1,6 @@
 // @flow
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import React from 'react';
@@ -71,7 +72,7 @@ export default ({
                   <MoreVert />
                 </IconButton>
               }
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
                   label: i18n._(t`Edit effects (${effectsCount})`),
                   click: onEditEffects,

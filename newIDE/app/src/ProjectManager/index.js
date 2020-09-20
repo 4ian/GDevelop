@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
@@ -137,7 +140,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  buildExtraMenuTemplate?: () => Array<MenuItemTemplate>,
+  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 
@@ -176,73 +179,77 @@ class Item extends React.Component<ItemProps, {||}> {
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <ListItem
-            style={{
-              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-              ...this.props.style,
-            }}
-            primaryText={label}
-            displayMenuButton
-            buildMenuTemplate={() => [
-              {
-                label: 'Edit',
-                click: () => this.props.onEdit(),
-              },
-              ...(this.props.buildExtraMenuTemplate
-                ? this.props.buildExtraMenuTemplate()
-                : []),
-              { type: 'separator' },
-              {
-                label: 'Rename',
-                click: () => this.props.onEditName(),
-              },
-              {
-                label: 'Delete',
-                click: () => this.props.onDelete(),
-              },
-              {
-                label: this.props.addLabel,
-                visible: !!this.props.onAdd,
-                click: () => this.props.onAdd(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Copy',
-                click: () => this.props.onCopy(),
-              },
-              {
-                label: 'Cut',
-                click: () => this.props.onCut(),
-              },
-              {
-                label: 'Paste',
-                enabled: this.props.canPaste(),
-                click: () => this.props.onPaste(),
-              },
-              {
-                label: 'Duplicate',
-                click: () => this.props.onDuplicate(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Move up',
-                enabled: this.props.canMoveUp,
-                click: () => this.props.onMoveUp(),
-              },
-              {
-                label: 'Move down',
-                enabled: this.props.canMoveDown,
-                click: () => this.props.onMoveDown(),
-              },
-            ]}
-            onClick={() => {
-              // It's essential to discard clicks when editing the name,
-              // to avoid weird opening of an editor (accompanied with a
-              // closing of the project manager) when clicking on the text
-              // field.
-              if (!this.props.editingName) this.props.onEdit();
-            }}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ListItem
+                style={{
+                  borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+                  ...this.props.style,
+                }}
+                primaryText={label}
+                displayMenuButton
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Edit`),
+                    click: () => this.props.onEdit(),
+                  },
+                  ...(this.props.buildExtraMenuTemplate
+                    ? this.props.buildExtraMenuTemplate(i18n)
+                    : []),
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Rename`),
+                    click: () => this.props.onEditName(),
+                  },
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => this.props.onDelete(),
+                  },
+                  {
+                    label: this.props.addLabel,
+                    visible: !!this.props.onAdd,
+                    click: () => this.props.onAdd(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => this.props.onCopy(),
+                  },
+                  {
+                    label: i18n._(t`Cut`),
+                    click: () => this.props.onCut(),
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    enabled: this.props.canPaste(),
+                    click: () => this.props.onPaste(),
+                  },
+                  {
+                    label: i18n._(t`Duplicate`),
+                    click: () => this.props.onDuplicate(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Move up`),
+                    enabled: this.props.canMoveUp,
+                    click: () => this.props.onMoveUp(),
+                  },
+                  {
+                    label: i18n._(t`Move down`),
+                    enabled: this.props.canMoveDown,
+                    click: () => this.props.onMoveDown(),
+                  },
+                ]}
+                onClick={() => {
+                  // It's essential to discard clicks when editing the name,
+                  // to avoid weird opening of an editor (accompanied with a
+                  // closing of the project manager) when clicking on the text
+                  // field.
+                  if (!this.props.editingName) this.props.onEdit();
+                }}
+              />
+            )}
+          </I18n>
         )}
       </ThemeConsumer>
     );
@@ -827,14 +834,14 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
-                      buildExtraMenuTemplate={() => [
+                      buildExtraMenuTemplate={(i18n: I18nType) => [
                         {
-                          label: 'Edit Scene Properties',
+                          label: i18n._(t`Edit Scene Properties`),
                           enabled: true,
                           click: () => this._onOpenLayoutProperties(layout),
                         },
                         {
-                          label: 'Edit Scene Variables',
+                          label: i18n._(t`Edit Scene Variables`),
                           enabled: true,
                           click: () => this._onOpenLayoutVariables(layout),
                         },

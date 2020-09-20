@@ -43,7 +43,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "IsFullScreen",
           _("Fullscreen activated?"),
           _("Check if the game is currently in fullscreen."),
-          _("Is the game in fullscreen?"),
+          _("The game is in fullscreen"),
           _("Game's window and resolution"),
           "res/actions/fullscreen24.png",
           "res/actions/fullscreen.png")

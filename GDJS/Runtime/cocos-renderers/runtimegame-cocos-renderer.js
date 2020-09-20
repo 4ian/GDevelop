@@ -50,6 +50,17 @@ gdjs.RuntimeGameCocosRenderer.prototype.setFullScreen = function(enable) {
 };
 
 /**
+ * Checks if the game is in full screen.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function() {
+    var electron = this.getElectron();
+    if (electron) {
+      return electron.remote.getCurrentWindow().isFullScreen();
+    }
+    return false; // Unsupported
+  }
+
+/**
  * Update the window size, if possible.
  * @param {number} width The new width, in pixels.
  * @param {number} height The new height, in pixels.

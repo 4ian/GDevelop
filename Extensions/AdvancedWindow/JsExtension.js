@@ -21,7 +21,9 @@ module.exports = {
     extension.setExtensionInformation(
       'AdvancedWindow',
       _('Advanced window management'),
-      _('Allows advanced control of the game window'),
+      _(
+        'Provides advanced features related to the game window positioning and interaction with the operating system.'
+      ),
       'Arthur Pacaud (arthuro555)',
       'MIT'
     );

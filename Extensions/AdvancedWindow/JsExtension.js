@@ -32,28 +32,32 @@ module.exports = {
         _('Change focus of the window'),
         _('Make the window gain or lose focus.'),
         _('Focus the window: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Focus the window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.focus');
-    
+
     extension
       .addCondition(
         'IsFocused',
         _('Window focused'),
         _('Checks if the window is focused.'),
         _('The window is focused'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isFocused');
 
     extension
@@ -62,28 +66,32 @@ module.exports = {
         _('Change visibility of the window'),
         _('Make the window visible or invisible.'),
         _('Window visible: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Show window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.show');
-    
+
     extension
       .addCondition(
         'IsVisible',
         _('Window visibile'),
         _('Checks if the window is visible.'),
         _('The window is visible'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isVisible');
 
     extension
@@ -92,28 +100,32 @@ module.exports = {
         _('Maximize the window'),
         _('Maximize or unmaximize the window.'),
         _('Maximize window: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Maximize window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.maximize');
-    
+
     extension
       .addCondition(
         'IsMaximized',
         _('Window maximized'),
         _('Checks if the window is maximized.'),
         _('The window is maximized'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isMaximized');
 
     extension
@@ -122,28 +134,32 @@ module.exports = {
         _('Minimize the window'),
         _('Minimize or unminimize the window.'),
         _('Minimize window: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Minimize window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.minimize');
-    
+
     extension
       .addCondition(
         'IsMinimized',
         _('Window minimized'),
         _('Checks if the window is minimized.'),
         _('The window is minimized'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isMinimized');
 
     extension
@@ -152,28 +168,32 @@ module.exports = {
         _('Enable the window'),
         _('Enables or disables the window.'),
         _('Enable window: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Enable window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.enable');
-    
+
     extension
       .addCondition(
         'IsWindowEnabled',
         _('Window enabled'),
         _('Checks if the window is enabled.'),
         _('The window is enabled'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isEnabled');
 
     extension
@@ -182,28 +202,32 @@ module.exports = {
         _('Allow resizing'),
         _('Enables or disables resizing of the window by the user.'),
         _('Enable window resizing: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow resizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setResizable');
-    
+
     extension
       .addCondition(
         'IsResizable',
         _('Window resizable'),
         _('Checks if the window can be resized.'),
         _('The window can be resized'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isResizable');
 
     extension
@@ -212,28 +236,32 @@ module.exports = {
         _('Allow moving'),
         _('Enables or disables moving of the window by the user.'),
         _('Enable window moving: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow moving?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setMovable');
-    
+
     extension
       .addCondition(
         'IsMovable',
         _('Window movable'),
         _('Checks if the window can be moved.'),
         _('The window can be moved'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isMovable');
 
     extension
@@ -242,28 +270,32 @@ module.exports = {
         _('Allow maximizing'),
         _('Enables or disables maximizing of the window by the user.'),
         _('Enable window maximizing: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow maximizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setMaximizable');
-    
+
     extension
       .addCondition(
         'IsMaximizable',
         _('Window maximizable'),
         _('Checks if the window can be maximized.'),
         _('The window can be maximized'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isMaximizable');
 
     extension
@@ -272,28 +304,32 @@ module.exports = {
         _('Allow mimizing'),
         _('Enables or disables minimizing of the window by the user.'),
         _('Enable window minimizing: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow minimizing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setMinimizable');
-    
+
     extension
       .addCondition(
         'IsMinimizable',
         _('Window minimizable'),
         _('Checks if the window can be minimized.'),
         _('The window can be minimized'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isMinimizable');
 
     extension
@@ -302,28 +338,32 @@ module.exports = {
         _('Allow full-screening'),
         _('Enables or disables full-screening of the window by the user.'),
         _('Enable window full-screening: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow full-screening?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setFullScreenable');
-    
+
     extension
       .addCondition(
         'IsFullScreenable',
         _('Window full-screenable'),
         _('Checks if the window can be full-screened.'),
         _('The window can be set in fullscreen'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isFullScreenable');
 
     extension
@@ -332,39 +372,43 @@ module.exports = {
         _('Allow closing'),
         _('Enables or disables closing of the window by the user.'),
         _('Enable window closing: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow closing?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setClosable');
-    
+
     extension
       .addCondition(
         'IsClosable',
         _('Window closable'),
         _('Checks if the window can be closed.'),
         _('The window can be closed'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isClosable');
 
     const levelChoices = JSON.stringify([
-      "normal",
-      "floating",
-      "torn-off-menu",
-      "modal-panel",
-      "main-menu",
-      "status",
-      "pop-up-menu",
-      "screen-saver"
+      'normal',
+      'floating',
+      'torn-off-menu',
+      'modal-panel',
+      'main-menu',
+      'status',
+      'pop-up-menu',
+      'screen-saver',
     ]);
 
     extension
@@ -373,59 +417,69 @@ module.exports = {
         _('Make the windows always on top'),
         _('Puts the window constantly above all other windows.'),
         _('Make window always on top: _PARAM0_, level: _PARAM1_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Enable always on top?'), '', false)
       .setDefaultValue('true')
-      .addParameter("stringWithSelector", _("Level"), levelChoices, false)
+      .addParameter('stringWithSelector', _('Level'), levelChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setAlwaysOnTop');
-    
+
     extension
       .addCondition(
         'IsAlwaysOnTop',
         _('Window always on top'),
         _('Checks if the window is always on top.'),
         _('The window is always on top'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isAlwaysOnTop');
 
     extension
       .addAction(
         'SetKiosk',
         _('Enable kiosk mode'),
-        _('Puts the window in kiosk mode. This prevents the user from exiting fullscreen.'),
+        _(
+          'Puts the window in kiosk mode. This prevents the user from exiting fullscreen.'
+        ),
         _('Enable kiosk mode: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Enable kiosk mode?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setKiosk');
-    
+
     extension
       .addCondition(
         'IsKiosk',
         _('Kiosk mode'),
         _('Checks if the window is currently in kiosk mode.'),
         _('The window is in kiosk mode'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.isKiosk');
 
     extension
@@ -434,47 +488,52 @@ module.exports = {
         _('Enable window shadow'),
         _('Enables or disables the window shadow.'),
         _('Enable window shadow: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Enable shadow?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setHasShadow');
-    
+
     extension
       .addCondition(
         'HasShadow',
         _('Shadow enabled'),
-        _('Checks if the window currently has it\'s shadow enabled.'),
+        _("Checks if the window currently has it's shadow enabled."),
         _('The window has a shadow'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.hasShadow');
-    
+
     extension
       .addAction(
         'EnableContentProtection',
         _('Enable content protection'),
         _(
-          'Enables or disables the content protection mode.' + 
-          'This should prevent screenshots of the game from being taken.'
+          'Enables or disables the content protection mode. This should prevent screenshots of the game from being taken.'
         ),
         _('Enable content protection: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Enable content protection?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setContentProtection');
 
     extension
@@ -482,15 +541,17 @@ module.exports = {
         'SetFocusable',
         _('Allow focusing'),
         _('Allow or disallow the user to focus the window.'),
-        _('Allow window focus: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Allow to focus the window: _PARAM0_'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Allow focus?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setFocusable');
 
     extension
@@ -499,30 +560,36 @@ module.exports = {
         _('Flash the window'),
         _('Make the window flash or end flashing.'),
         _('Make the window flash: _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('yesorno', _('Flash the window?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.flash');
 
     extension
       .addAction(
         'SetOpacity',
         _('Set window opacity'),
-        _('Changes the window opacity. The new opacity should be between 0 and 1.'),
+        _(
+          'Changes the window opacity. The new opacity should be between 0 and 1.'
+        ),
         _('Set the window opacity to _PARAM0_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
       .addParameter('number', _('New opacity'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setOpacity');
 
     extension
@@ -531,7 +598,7 @@ module.exports = {
         _('Set window position'),
         _('Changes the window position.'),
         _('Set the window position to _PARAM0_;_PARAM1_'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -539,7 +606,9 @@ module.exports = {
       .addParameter('number', _('Y position'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.setPosition');
 
     extension
@@ -547,11 +616,13 @@ module.exports = {
         'WindowX',
         _('Window X position'),
         _('Returns the current window X position.'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.getPositionX');
 
     extension
@@ -559,23 +630,29 @@ module.exports = {
         'WindowY',
         _('Window Y position'),
         _('Returns the current window Y position.'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.getPositionY');
-    
+
     extension
       .addExpression(
         'WindowOpacity',
         _('Window opacity'),
-        _('Returns the current window opacity (a number from 0 to 1, 1 being fully opaque).'),
-        _('Advanced window tools/Windows, Linux, MacOS'),
+        _(
+          'Returns the current window opacity (a number from 0 to 1, 1 being fully opaque).'
+        ),
+        _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdvancedWindow/electron-advancedwindowtools.js')
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
       .setFunctionName('gdjs.evtTools.advancedWindow.getOpacity');
 
     return extension;

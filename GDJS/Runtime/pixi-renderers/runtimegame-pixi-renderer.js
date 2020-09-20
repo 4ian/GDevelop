@@ -264,7 +264,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function() {
   if (electron) {
     return electron.remote.getCurrentWindow().isFullScreen();
   }
-  // Height check is used to detect F11 triggered full screen.
+  // Height check is used to detect user triggered full screen (for example F11 shortcut).
   return this._isFullscreen || window.screen.height === window.innerHeight;
 }
 

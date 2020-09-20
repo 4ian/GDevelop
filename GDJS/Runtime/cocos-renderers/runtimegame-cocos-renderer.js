@@ -57,7 +57,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function() {
     if (electron) {
       return electron.remote.getCurrentWindow().isFullScreen();
     }
-    return window.screen.height === window.innerHeight;
+    return false; // Unsupported
   }
 
 /**

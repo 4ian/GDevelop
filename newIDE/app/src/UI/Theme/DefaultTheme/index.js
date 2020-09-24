@@ -233,4 +233,5 @@ const theme = {
   muiTheme,
 };
 export type Theme = $Exact<typeof theme>;
+export const themeName = 'GDevelop default';
 export default theme;

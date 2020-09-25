@@ -1,9 +1,14 @@
 // @flow
+import { createMuiTheme } from '@material-ui/core/styles';
+import { isLtr } from '../../Utils/i18n/RtlLanguages';
+import memoize from '../../Utils/Memoize';
+import DefaultTheme, {
+  themeName as defaultThemeName,
+  type Theme,
+} from './DefaultTheme';
 import DarkTheme from './DarkTheme';
-import DefaultTheme from './DefaultTheme';
 import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
-import { type Theme } from './DefaultTheme';
 import './Global.css';
 
 // To add a new theme:
@@ -11,13 +16,69 @@ import './Global.css';
 // * import it at the top of the file
 // * add it below:
 export const themes = {
-  'GDevelop default': DefaultTheme,
+  [defaultThemeName]: DefaultTheme,
   Dark: DarkTheme,
   Nord: NordTheme,
   'Solarized Dark': SolarizedDarkTheme,
 };
 
-export const getTheme = (themeName: string): Theme =>
-  themes[themeName] || themes['GDevelop default'];
+export function getTheme({ themeName, language }: {| themeName: string, language: string |}): ActualTheme {
+  let theme: Theme = themes[themeName];
+
+  if (!theme) {
+    console.warn(`Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`);
+    theme = themes[defaultThemeName];
+  }
+
+  const ltr: boolean = isLtr(language);
+  const { gdevelopTheme, muiThemeOptions } = theme;
+  return {
+    gdevelopTheme,
+    muiTheme: ltr ? createLtrTheme(muiThemeOptions) : createRtlTheme(muiThemeOptions),
+  };
+};
+
+const defaultTheme: ActualTheme = {
+  gdevelopTheme: DefaultTheme.gdevelopTheme,
+  muiTheme: createLtrTheme(DefaultTheme.muiThemeOptions);
+};
+
+export default defaultTheme;
 
 export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
+export type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |}
+export type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
+
+const createLtrTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
+  return createMuiTheme(muiThemeOptions);
+});
+
+const createRtlTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
+  return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
+});
+
+const rtlDirection = { direction: 'rtl' };
+const rtlOrder = { order: 100 };
+const rtlOverrides = {
+  MuiTypography: {
+    root: rtlDirection,
+  },
+  MuiInput: {
+    root: rtlDirection,
+  },
+  MuiTab: {
+    root: rtlDirection,
+  },
+  MuiButton: {
+    label: rtlDirection,
+  },
+  MuiSvgIcon: {
+    root: rtlOrder,
+  },
+  MuiFormControlLabel: {
+    root: rtlDirection,
+  },
+  MuiTextField: {
+    root: rtlDirection,
+  },
+};

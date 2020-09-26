@@ -24,8 +24,7 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 };
 
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
-    //TODO: Workaround a not working property in PIXI.js:
-    this._tiledSprite.alpha = this._tiledSprite.visible ? this._object.opacity/255 : 0;
+    this._tiledSprite.alpha = this._object.opacity/255;
 }
 
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

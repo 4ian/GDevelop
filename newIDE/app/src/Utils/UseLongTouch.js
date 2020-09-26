@@ -105,7 +105,7 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
         return;
       }
     },
-    [currentTouchCallbackEvent]
+    [currentTouchCallbackEvent, clear]
   );
 
   return {

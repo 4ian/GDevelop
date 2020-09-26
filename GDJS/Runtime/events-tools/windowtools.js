@@ -22,6 +22,10 @@ gdjs.evtTools.window.setFullScreen = function(runtimeScene, enable, keepAspectRa
     runtimeScene.getGame().getRenderer().setFullScreen(enable);
 };
 
+gdjs.evtTools.window.isFullScreen = function(runtimeScene) {
+	return runtimeScene.getGame().getRenderer().isFullScreen();
+};
+
 gdjs.evtTools.window.setWindowSize = function(runtimeScene, width, height, updateGameResolution) {
 	runtimeScene.getGame().getRenderer().setWindowSize(width, height);
 	if (updateGameResolution) {

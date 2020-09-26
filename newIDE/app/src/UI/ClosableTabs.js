@@ -1,4 +1,6 @@
 // @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component, useEffect, type Node, useRef } from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -208,18 +210,18 @@ export function ClosableTab({
             </span>
             <ContextMenu
               ref={contextMenu}
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
-                  label: 'Close',
+                  label: i18n._(t`Close`),
                   click: onClose,
                   enabled: closable,
                 },
                 {
-                  label: 'Close others',
+                  label: i18n._(t`Close others`),
                   click: onCloseOthers,
                 },
                 {
-                  label: 'Close all',
+                  label: i18n._(t`Close all`),
                   click: onCloseAll,
                 },
               ]}

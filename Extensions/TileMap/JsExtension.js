@@ -419,7 +419,6 @@ module.exports = {
         .getValue();
 
       this.getPIXITileSet(
-        this._project,
         tilemapAtlasImage,
         tiledFile,
         (tileset) => {
@@ -427,7 +426,6 @@ module.exports = {
           if (tileset && this._pixiObject) {
             this.updatePIXITileMap(
               tileset,
-              this._pixiObject,
               displayMode,
               layerIndex
             );
@@ -519,8 +517,15 @@ module.exports = {
       return this._pixiObject.height / this._pixiObject.scale.y;
     };
 
+    /**
+     * Tileset/Tilemap related data.
+     */
     RenderedTileMapInstance.prototype.loadedTileSets = {};
 
+    /**
+     * Creates a Tileset resource from a tiledData json file exported from https://www.mapeditor.org/.
+     * Later on this can potentially be refactored to support other data structures (LED editor for example) https://github.com/deepnight/led
+     */
     RenderedTileMapInstance.prototype.createTileSetResource = function(
       tiledData,
       tex,
@@ -556,21 +561,24 @@ module.exports = {
       this.loadedTileSets[requestedTileSetId] = newTileset;
     }
 
+     /**
+     * Re-renders the tilemap whenever its rendering settings have been changed
+     */
     RenderedTileMapInstance.prototype.updatePIXITileMap = function(
       tileSet,
-      tileMap,
       render,
       layerIndex
     ) {
+      const tileMap = this._pixiObject;
       if (!tileMap || !tileSet) return;
   
-      tileSet.layers.forEach((layer, index) => {
+      tileSet.layers.forEach(function(layer, index) {
         if (render === 'index' && layerIndex !== index) return;
         else if (render === 'visible' && !layer.visible) return;
   
         // todo filter groups
         if (layer.type === 'objectgroup') {
-          layer.objects.forEach(object => {
+          layer.objects.forEach(function(object) {
             const { gid, x, y, visible } = object;
             if (render === 'visible' && !visible) return;
             if (tileSet.textureCache[gid]) {
@@ -592,7 +600,7 @@ module.exports = {
   
               if (tileUid !== 0) {
                 const tileData = tileSet.tiles.find(
-                  tile => tile.id === tileUid - 1
+                  function(tile) { return tile.id === tileUid - 1}
                 );
   
                 // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
@@ -620,12 +628,11 @@ module.exports = {
   // Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
   // tileset id == jsonResourceName + imageResourcename
   RenderedTileMapInstance.prototype.getPIXITileSet = function(
-    project,
     imageResourceName,
     jsonResourceName,
     onLoad
   ) {
-    const texture = this._pixiResourcesLoader.getPIXITexture(project, imageResourceName);
+    const texture = this._pixiResourcesLoader.getPIXITexture(this._project, imageResourceName);
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
 
     // If the tileset is already in the cache, just load it
@@ -634,7 +641,7 @@ module.exports = {
       return;
     }
     // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
-    this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
+    this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, jsonResourceName).then(
       tiledData => {
         console.log(tiledData,texture);
         this.createTileSetResource(

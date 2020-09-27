@@ -115,7 +115,7 @@ module.exports = {
         'TileMap',
         _('TileMap'),
         _('Displays a tiled file tilemap'),
-        'JsPlatform/Extensions/skeletonicon.png',
+        'JsPlatform/Extensions/tile_map32.png',
         objectTileMap
       )
       .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
@@ -132,8 +132,8 @@ module.exports = {
         _('Tiled file'),
         _('Compare the value of the tiled file.'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
@@ -146,8 +146,8 @@ module.exports = {
         _('Set Tiled file'),
         _('Set the tiled file of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tiled file'), '', false)
@@ -161,8 +161,8 @@ module.exports = {
         _('Tilemap atlas image'),
         _('Compare the value of the tilemap atlas image.'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
@@ -175,8 +175,8 @@ module.exports = {
         _('Set Tilemap atlas image'),
         _('Set the tilemap atlas image of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('image', _('Tilemap atlas image'), '', false)
@@ -191,8 +191,8 @@ module.exports = {
         _('Compare the value of the display mode.'),
         _('The display mode of _PARAM0_ is _PARAM1_'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('stringWithSelector')
@@ -206,8 +206,8 @@ module.exports = {
         _('Set Display mode'),
         _('Set display mode of _PARAM0_ to _PARAM1_'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter(
@@ -227,8 +227,8 @@ module.exports = {
         _('Compare the value of the layer index.'),
         _('the layer index'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('number')
@@ -242,8 +242,8 @@ module.exports = {
         _('Set Layer index'),
         _('the layer index'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardOperatorParameters('expression')
@@ -257,7 +257,7 @@ module.exports = {
         _('Get the Layer index'),
         _('Get the Layer index'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
@@ -270,8 +270,8 @@ module.exports = {
         _('Compare the value of the visible.'),
         _('Visible is enabled'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
@@ -284,8 +284,8 @@ module.exports = {
         _('Set Visible'),
         _('Activate visible for _PARAM0_: _PARAM1_'),
         '',
-        'JsPlatform/Extensions/skeletonicon.png',
-        'JsPlatform/Extensions/skeletonicon.png'
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('boolean', _('Visible'), '', false)
@@ -382,7 +382,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'JsPlatform/Extensions/skeletonicon.png';
+      return 'JsPlatform/Extensions/tile_map32.png';
     };
     /**
      * This is called to update the TileMap

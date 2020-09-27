@@ -433,8 +433,8 @@ module.exports = {
           }
         );
       } else {
-        // We can npt pnly hie the tilemap, but also clear it when its not visible. Should we do that?
-        // this._pixiObject.clear();
+        // We can not only hide the tilemap, but also clear it when its not visible. Should we do that?
+        this._pixiObject.clear();
       }
       
     };

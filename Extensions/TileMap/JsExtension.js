@@ -367,15 +367,6 @@ module.exports = {
       this._tileSet = null;
       console.log(this._pixiObject);
       this._pixiContainer.addChild(this._pixiObject);
-      // this._pixiContainer.addChild(this._tileSet);
-      console.log(
-        project,
-        layout,
-        instance,
-        associatedObject,
-        pixiContainer,
-        pixiResourcesLoader
-      );
       this.update();
       this.updateTileMap();
     }
@@ -418,21 +409,34 @@ module.exports = {
         .get('displayMode')
         .getValue();
 
-      this.getPIXITileSet(
-        tilemapAtlasImage,
-        tiledFile,
-        (tileset) => {
-          console.log('LOADED', tileset);
-          if (tileset && this._pixiObject) {
-            this.updatePIXITileMap(
-              tileset,
-              displayMode,
-              layerIndex
-            );
-            console.log("result",this._pixiObject)
+      const isVisible = this._associatedObject
+        .getProperties(this.project)
+        .get('visible')
+        .getValue() === "true";
+      this._pixiObject.visible = isVisible;
+      if (isVisible) {
+        this._pixiObject.visible = isVisible;
+        this.getPIXITileSet(
+          tilemapAtlasImage,
+          tiledFile,
+          (tileset) => {
+            console.log('LOADED', tileset);
+            if (tileset && this._pixiObject) {
+              this.updatePIXITileMap(
+                tileset,
+                displayMode,
+                layerIndex
+              );
+              
+              console.log("result",this._pixiObject)
+            }
           }
-        }
-      );
+        );
+      } else {
+        // We can npt pnly hie the tilemap, but also clear it when its not visible. Should we do that?
+        // this._pixiObject.clear();
+      }
+      
     };
     /**
      * This is called to update the PIXI object on the scene editor

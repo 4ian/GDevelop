@@ -71,12 +71,6 @@ module.exports = {
           .setType('number')
           .setLabel(_('Layer index'))
       );
-      objectProperties.set(
-        'visible',
-        new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Visible'))
-      );
 
       return objectProperties;
     };
@@ -86,7 +80,6 @@ module.exports = {
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
-        visible: true,
       })
     );
 
@@ -263,36 +256,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLayerIndex');
 
-    object
-      .addCondition(
-        'IsVisible',
-        _('Visible'),
-        _('Compare the value of the visible.'),
-        _('Visible is enabled'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getVisible');
-
-    object
-      .addAction(
-        'SetVisible',
-        _('Visible'),
-        _('Set Visible'),
-        _('Activate visible for _PARAM0_: _PARAM1_'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('boolean', _('Visible'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setVisible')
-      .setGetter('getVisible');
-
     return extension;
   },
 
@@ -409,34 +372,22 @@ module.exports = {
         .get('displayMode')
         .getValue();
 
-      const isVisible = this._associatedObject
-        .getProperties(this.project)
-        .get('visible')
-        .getValue() === "true";
-      this._pixiObject.visible = isVisible;
-      if (isVisible) {
-        this._pixiObject.visible = isVisible;
-        this.getPIXITileSet(
-          tilemapAtlasImage,
-          tiledFile,
-          (tileset) => {
-            console.log('LOADED', tileset);
-            if (tileset && this._pixiObject) {
-              this.updatePIXITileMap(
-                tileset,
-                displayMode,
-                layerIndex
-              );
-              
-              console.log("result",this._pixiObject)
-            }
+      this.getPIXITileSet(
+        tilemapAtlasImage,
+        tiledFile,
+        (tileset) => {
+          console.log('LOADED', tileset);
+          if (tileset && this._pixiObject) {
+            this.updatePIXITileMap(
+              tileset,
+              displayMode,
+              layerIndex
+            );
+            
+            console.log("result",this._pixiObject)
           }
-        );
-      } else {
-        // We can not only hide the tilemap, but also clear it when its not visible. Should we do that?
-        this._pixiObject.clear();
-      }
-      
+        }
+      );
     };
     /**
      * This is called to update the PIXI object on the scene editor
@@ -469,15 +420,6 @@ module.exports = {
         .getValue();
       if (this._pixiObject.layerIndex !== layerIndex)
         this._pixiObject.layerIndex = layerIndex;
-
-      const visible = this._associatedObject
-        .getProperties(this.project)
-        .get('visible')
-        .getValue();
-      if (visible !== this._pixiObject._visible) {
-        this._pixiObject._visible = visible === 'true';
-        this._pixiObject.dirty = true;
-      }
 
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();

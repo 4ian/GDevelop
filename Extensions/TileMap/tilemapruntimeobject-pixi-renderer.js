@@ -16,7 +16,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
       runtimeObject._tilemapAtlasImage.texture
     );
 
-    this._object.hidden = !runtimeObject._visible;
   } else {
     // Run updates a single time once loaded here
   }
@@ -36,7 +35,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this.updateAngle();
   this.updateOpacity();
   this.updateTileMap();
-  this.updateVisible();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -87,10 +85,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
-};
-
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateVisible = function() {
-  this._pixiObject.hidden = !this._object._visible;
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAngle = function() {

@@ -9,8 +9,6 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
 
   /** @type {number} */
   this._opacity = objectData.content.opacity;
-  /** @type {boolean} */
-  this._visible = objectData.content.visible;
   /** @type {string} */
   this._tiledFile = objectData.content.tiledFile;
   /** @type {string} */
@@ -48,9 +46,6 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
 ) {
   if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
     this.setOpacity(newObjectData.content.opacity);
-  }
-  if (oldObjectData.content.visible !== newObjectData.content.visible) {
-    this.hide(!newObjectData.content.visible);
   }
   if (oldObjectData.content.tiledFile !== newObjectData.content.tiledFile) {
     this.setTiledFile(newObjectData.content.tiledFile);
@@ -125,14 +120,6 @@ gdjs.RuntimeObject.prototype.setLayerIndex = function(layerIndex) {
 
 gdjs.RuntimeObject.prototype.getLayerIndex = function() {
   return this._layerIndex;
-};
-gdjs.TileMapRuntimeObject.prototype.setVisible = function(visible) {
-  this._visible = visible;
-  this._renderer.updateVisible();
-};
-
-gdjs.TileMapRuntimeObject.prototype.getVisible = function() {
-  return this._visible;
 };
 
 /**

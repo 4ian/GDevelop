@@ -2,6 +2,7 @@
 import * as React from 'react';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import { ThemeProvider } from '@material-ui/styles';
+import { StylesProvider, jssPreset } from '@material-ui/core/styles';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
@@ -25,6 +26,13 @@ import {
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
 import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
+import { create } from 'jss';
+import rtl from 'jss-rtl';
+
+// Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
+const jss = create({
+  plugins: [...jssPreset().plugins, rtl()],
+});
 
 type Props = {|
   authentification: Authentification,
@@ -58,11 +66,12 @@ export default class Providers extends React.Component<Props, {||}> {
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => {
-                const theme = getTheme(values.themeName);
+                const theme = getTheme({ themeName: values.themeName, language: values.language });
                 return (
                   <GDI18nProvider language={values.language}>
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
-                      <ThemeProvider theme={theme.muiTheme}>
+                      <StylesProvider jss={jss}>
+                        <ThemeProvider theme={theme.muiTheme}>
                         <UserProfileProvider
                           authentification={authentification}
                         >
@@ -94,7 +103,8 @@ export default class Providers extends React.Component<Props, {||}> {
                             )}
                           </I18n>
                         </UserProfileProvider>
-                      </ThemeProvider>
+                        </ThemeProvider>
+                      </StylesProvider>
                     </GDevelopThemeContext.Provider>
                   </GDI18nProvider>
                 );

@@ -115,25 +115,18 @@
     * Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
     * tileset id == jsonResourceName + imageResourcename
     */
-    exports.getPIXITileSet = (project, pixiResourcesLoader, imageResourceName, jsonResourceName, onLoad) => {
+    exports.getPIXITileSet = (texture, tiledData, imageResourceName, jsonResourceName, onLoad) => {
       const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
       // If the tileset is already in the cache, just load it
       if (loadedTileSets[requestedTileSetId]) {
         onLoad(loadedTileSets[requestedTileSetId]);
         return;
       }
-      const texture = pixiResourcesLoader.getPIXITexture(project, imageResourceName);
-      // Otherwise proceed to creating it as an object that can easily be consumed by a tilemap
-      pixiResourcesLoader.ResourcesLoader.getResourceJsonData(project, jsonResourceName).then(
-        tiledData => {
-          console.log(tiledData,texture);
-          createTileSetResource(
-            tiledData,
-            texture,
-            requestedTileSetId,
-            onLoad
-          );
-        }
+      createTileSetResource(
+        tiledData,
+        texture,
+        requestedTileSetId,
+        onLoad
       );
     };
 }));

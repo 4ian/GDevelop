@@ -15,6 +15,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
       0,
       runtimeObject._tilemapAtlasImage.texture
     );
+    // this._tilemapHelper = new PixiTileMapHelper();
+    console.log("HELPER", this)
 
   } else {
     // Run updates a single time once loaded here

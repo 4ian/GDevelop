@@ -302,7 +302,7 @@ module.exports = {
       __dirname,
       'pixi-tilemap/dist/pixi-tilemap.umd'
     );
-    const TilemapTools = objectsRenderingService.requireModule(
+    const PixiTilemapHelper = objectsRenderingService.requireModule(
       __dirname,
       'pixi-tilemap-helper'
     );
@@ -332,7 +332,7 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      console.log(PIXI.tilemap, "TOOLS::",TilemapTools);
+      console.log(PIXI.tilemap, "PixiTilemapHelper::",PixiTilemapHelper);
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
       console.log(this._pixiObject);
@@ -359,7 +359,7 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.updateTileMap = function() {
       // Get the tileset resource to use
-      console.log("UPDATE--", TilemapTools, this.project, this._project)
+      console.log("UPDATE--", PixiTilemapHelper, this.project, this._project)
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
         .get('tilemapAtlasImage')
@@ -379,24 +379,28 @@ module.exports = {
         .getProperties(this.project)
         .get('displayMode')
         .getValue();
-       
-        TilemapTools.getPIXITileSet(
-        this._project,
-        this._pixiResourcesLoader,
-        tilemapAtlasImage,
-        tiledFile,
-        (tileset) => {
-          console.log('LOADED', tileset);
-          if (tileset && this._pixiObject) {
-            TilemapTools.updatePIXITileMap(
-              this._pixiObject,
-              tileset,
-              displayMode,
-              layerIndex
-            );
-            
-            console.log("result",this._pixiObject)
-          }
+
+      const texture = this._pixiResourcesLoader.getPIXITexture(this._project, tilemapAtlasImage);
+      this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, tiledFile).then(
+        tiledData => {
+          console.log(tiledData,texture);
+          PixiTilemapHelper.getPIXITileSet(
+            texture,
+            tiledData,
+            tilemapAtlasImage,
+            tiledFile,
+            (tileset) => {
+              console.log('LOADED', tileset);
+              if (tileset && this._pixiObject) {
+                PixiTilemapHelper.updatePIXITileMap(
+                  this._pixiObject,
+                  tileset,
+                  displayMode,
+                  layerIndex
+                );
+              }
+            }
+          )
         }
       );
     };

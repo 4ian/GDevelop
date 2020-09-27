@@ -66,43 +66,46 @@ export default class Providers extends React.Component<Props, {||}> {
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => {
-                const theme = getTheme({ themeName: values.themeName, language: values.language });
+                const theme = getTheme({
+                  themeName: values.themeName,
+                  language: values.language,
+                });
                 return (
                   <GDI18nProvider language={values.language}>
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                        <UserProfileProvider
-                          authentification={authentification}
-                        >
-                          <I18n update>
-                            {({ i18n }) => (
-                              <EventsFunctionsExtensionsProvider
-                                i18n={i18n}
-                                makeEventsFunctionCodeWriter={
-                                  makeEventsFunctionCodeWriter
-                                }
-                                eventsFunctionsExtensionWriter={
-                                  eventsFunctionsExtensionWriter
-                                }
-                                eventsFunctionsExtensionOpener={
-                                  eventsFunctionsExtensionOpener
-                                }
-                              >
-                                <CommandsContextProvider>
-                                  <EventsFunctionsExtensionsContext.Consumer>
-                                    {eventsFunctionsExtensionsState =>
-                                      children({
-                                        i18n,
-                                        eventsFunctionsExtensionsState,
-                                      })
-                                    }
-                                  </EventsFunctionsExtensionsContext.Consumer>
-                                </CommandsContextProvider>
-                              </EventsFunctionsExtensionsProvider>
-                            )}
-                          </I18n>
-                        </UserProfileProvider>
+                          <UserProfileProvider
+                            authentification={authentification}
+                          >
+                            <I18n update>
+                              {({ i18n }) => (
+                                <EventsFunctionsExtensionsProvider
+                                  i18n={i18n}
+                                  makeEventsFunctionCodeWriter={
+                                    makeEventsFunctionCodeWriter
+                                  }
+                                  eventsFunctionsExtensionWriter={
+                                    eventsFunctionsExtensionWriter
+                                  }
+                                  eventsFunctionsExtensionOpener={
+                                    eventsFunctionsExtensionOpener
+                                  }
+                                >
+                                  <CommandsContextProvider>
+                                    <EventsFunctionsExtensionsContext.Consumer>
+                                      {eventsFunctionsExtensionsState =>
+                                        children({
+                                          i18n,
+                                          eventsFunctionsExtensionsState,
+                                        })
+                                      }
+                                    </EventsFunctionsExtensionsContext.Consumer>
+                                  </CommandsContextProvider>
+                                </EventsFunctionsExtensionsProvider>
+                              )}
+                            </I18n>
+                          </UserProfileProvider>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>

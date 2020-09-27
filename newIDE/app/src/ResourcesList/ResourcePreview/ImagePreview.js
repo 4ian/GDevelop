@@ -195,6 +195,7 @@ export default class ImagePreview extends React.Component<Props, State> {
                 </IconButton>
               </MiniToolbar>
               <div
+                dir={"ltr" /* Force LTR layout to avoid issues with image positioning */}
                 style={styles.imagePreviewContainer}
                 ref={measureRef}
                 onWheel={event => {

@@ -151,6 +151,16 @@ const muiThemeOptions = {
         backgroundColor: gdevelopDarkBlue,
       },
     },
+    MuiIconButton: {
+      root: {
+        color: '#fff',
+      },
+    },
+    MuiListItemIcon: {
+      root: {
+        color: '#fff',
+      },
+    },
     // Reduce right margins from 16px to 8px in lists:
     MuiListItem: {
       secondaryAction: {

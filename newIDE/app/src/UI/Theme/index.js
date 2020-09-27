@@ -22,40 +22,47 @@ export const themes = {
   'Solarized Dark': SolarizedDarkTheme,
 };
 
-export function getTheme({ themeName, language }: {| themeName: string, language: string |}): ActualTheme {
+export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
+type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
+type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
+
+export function getTheme({
+  themeName,
+  language,
+}: {|
+  themeName: string,
+  language: string,
+|}): ActualTheme {
   let theme: Theme = themes[themeName];
 
   if (!theme) {
-    console.warn(`Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`);
+    console.warn(
+      `Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`
+    );
     theme = themes[defaultThemeName];
   }
 
-  const ltr: boolean = isLtr(language);
+  const ltr = isLtr(language);
   const { gdevelopTheme, muiThemeOptions } = theme;
   return {
     gdevelopTheme,
-    muiTheme: ltr ? createLtrTheme(muiThemeOptions) : createRtlTheme(muiThemeOptions),
+    muiTheme: ltr
+      ? createLtrTheme(muiThemeOptions)
+      : createRtlTheme(muiThemeOptions),
   };
-};
+}
 
-const defaultTheme: ActualTheme = {
-  gdevelopTheme: DefaultTheme.gdevelopTheme,
-  muiTheme: createLtrTheme(DefaultTheme.muiThemeOptions);
-};
+const createLtrTheme = memoize(
+  (muiThemeOptions: MuiThemeOptions): Object => {
+    return createMuiTheme(muiThemeOptions);
+  }
+);
 
-export default defaultTheme;
-
-export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
-export type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |}
-export type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
-
-const createLtrTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
-  return createMuiTheme(muiThemeOptions);
-});
-
-const createRtlTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
-  return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
-});
+const createRtlTheme = memoize(
+  (muiThemeOptions: MuiThemeOptions): Object => {
+    return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
+  }
+);
 
 const rtlDirection = { direction: 'rtl' };
 const rtlOrder = { order: 100 };
@@ -81,4 +88,9 @@ const rtlOverrides = {
   MuiTextField: {
     root: rtlDirection,
   },
+};
+
+export const defaultTheme: ActualTheme = {
+  gdevelopTheme: DefaultTheme.gdevelopTheme,
+  muiTheme: createLtrTheme(DefaultTheme.muiThemeOptions),
 };

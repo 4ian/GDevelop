@@ -172,7 +172,6 @@ const muiThemeOptions = {
     },
     MuiListItemIcon: {
       root: {
-        // Fix color being grey if not set to (almost) black
         color: '#D8DEE9',
       },
     },

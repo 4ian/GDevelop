@@ -7,10 +7,15 @@
         factory((root.PixiTileMapHelper= {}));
     }
 }(typeof self !== 'undefined' ? self : this, function (exports) {
-    // Your module can have "private" variables (that's how we do private stuff in JS):
+    /**
+     * Tileset/Tilemap related data.
+     */
     const loadedTileSets = {};
 
-    // Implement your functions that are exposed:
+    /**
+     * Creates a Tileset resource from a tiledData json file exported from https://www.mapeditor.org/.
+     * Later on this can potentially be refactored to support other data structures (LED editor for example) https://github.com/deepnight/led
+     */
     const createTileSetResource = (
         tiledData,
         tex,
@@ -46,6 +51,10 @@
         loadedTileSets[requestedTileSetId] = newTileset;
     }
     exports.createTileSetResource = createTileSetResource;
+
+    /**
+     * Re-renders the tilemap whenever its rendering settings have been changed
+    */
     exports.updatePIXITileMap = (tileMap, tileSet, render, layerIndex) => {
         if (!tileMap || !tileSet) return;
   
@@ -98,6 +107,14 @@
         });
     }
     exports.getLoadedTileSets = () => { return loadedTileSets; }
+    /**
+    * If a Tileset changes (json or image), a tilemap using it needs to re-render
+    * The tileset needs to be rebuilt for use
+    * But we need to have the capacity to instance a tilemap, so more than one tilemaps with different tileset layers
+    * We need to cache the tileset somewhere, the tilemap instance will have to re-render it
+    * Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
+    * tileset id == jsonResourceName + imageResourcename
+    */
     exports.getPIXITileSet = (project, pixiResourcesLoader, imageResourceName, jsonResourceName, onLoad) => {
       const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
       // If the tileset is already in the cache, just load it

@@ -28,9 +28,10 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
   // Set the anchor in the center, so that the object rotates around
   // its center
-  this._pixiObject.anchor.x = 0.5;
-  this._pixiObject.anchor.y = 0.5;
+  // this._pixiObject.anchor.x = 0.5;
+  // this._pixiObject.anchor.y = 0.5;
 
+  console.log(this._pixiObject)
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();

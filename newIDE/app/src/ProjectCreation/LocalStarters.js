@@ -234,7 +234,7 @@ export default class LocalStarters extends Component<Props, State> {
                   <ListItem
                     leftIcon={
                       <ListIcon
-                        iconSize={30}
+                        iconSize={40}
                         src="res/starters_icons/new.png"
                       />
                     }

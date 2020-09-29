@@ -11,13 +11,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
-    this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(
-      0,
-      runtimeObject._tilemapAtlasImage.texture
-    );
-    // this._tilemapHelper = new PixiTileMapHelper();
-    console.log("HELPER", this)
-
+    this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
   } else {
     // Run updates a single time once loaded here
   }
@@ -32,11 +26,11 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   // this._pixiObject.anchor.x = 0.5;
   // this._pixiObject.anchor.y = 0.5;
 
-  console.log(this._pixiObject)
-  this.updatePosition();
+  
   this.updateAngle();
   this.updateOpacity();
-  this.updateTileMap();
+  this.updateTileMap(runtimeScene);
+  this.updatePosition();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -45,22 +39,55 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
 };
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
-//   gdjs.PixiImageManager.getPIXITileSet(
-//     this._tilemapAtlasImage,
-//     this._tiledFile,
-//     function(tileset) {
-//       console.log("LOADED", tileset);
-//       if (tileset && this._pixiObject) {
-//         gdjs.PixiImageManager.updatePIXITileMap(
-//           tileset,
-//           this._pixiObject,
-//           this._render,
-//           this._layerIndex
-//         );
-//       }
-//     }
-  //update the external object here
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtimeScene) {
+
+  var atlasTexture = runtimeScene
+    .getGame()
+    .getImageManager()
+    .getPIXITexture(this._object._tilemapAtlasImage);
+  
+  runtimeScene
+    .getGame()
+    .getJsonManager()
+    .loadJson(this._object._tiledFile, (error, content)=> {
+      if (error) {
+        console.error('An error happened while loading JSON resource:', error);
+      } else {
+        if (!content) return;
+        console.log("JSON", content, atlasTexture)
+
+        console.log(
+          this._pixiObject,
+          PixiTileMapHelper,
+          this,
+          this._object._tiledFile,
+          this._object._tilemapAtlasImage,
+          this._object._displayMode
+          )
+  
+          
+        // ReloadTilemap
+        PixiTileMapHelper.getPIXITileSet(
+          atlasTexture,
+          content,
+          this._object._tilemapAtlasImage,
+          this._object._tiledFile,
+          (tileset) => {
+            
+            if (tileset && this._pixiObject) {
+              PixiTileMapHelper.updatePIXITileMap(
+                this._pixiObject,
+                tileset,
+                this._object._displayMode,
+                this._object._layerIndex
+              );
+              console.log('LOADED', tileset, this._pixiObject);
+            }
+          }
+        )
+        //
+      }
+    });   
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
@@ -85,6 +112,11 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
+  const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
+  const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
+  this._pixiObject.pivot.x = originalWidth / 2;
+  this._pixiObject.pivot.y = originalHeight / 2;
+
   this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };

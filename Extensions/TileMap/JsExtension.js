@@ -119,7 +119,7 @@ module.exports = {
         'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
       )
       .addIncludeFile(
-        'Extensions/TileMap/pixi-tilemap/pixi-tilemap-helper.js'
+        'Extensions/TileMap/pixi-tilemap-helper.js'
       );
 
     object

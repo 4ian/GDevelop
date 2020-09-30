@@ -79,13 +79,15 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
                 this._pixiObject,
                 tileset,
                 this._object._displayMode,
-                this._object._layerIndex
+                this._object._layerIndex,
+                runtimeScene._renderer._pixiRenderer
               );
               console.log('LOADED', tileset, this._pixiObject);
             }
           }
         )
-        //
+        console.log(this, runtimeScene._renderer._pixiRenderer)
+        // this._runtimeScene.getTimeManager().getTimeFromStart()
       }
     });   
 };

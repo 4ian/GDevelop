@@ -150,7 +150,7 @@ module.exports = {
 
     extension
       .addExpression(
-        'GetRemoteConfigString',
+        'GetRemoteConfigNumber',
         _('Get Remote setting as Number'),
         _('Get a setting from Firebase Remote Config as Number.'),
         _('Firebase/Remote Config'),

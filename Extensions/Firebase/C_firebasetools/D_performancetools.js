@@ -41,6 +41,7 @@ gdjs.evtTools.firebase.performance.startTracer = function (tracerName) {
  */
 gdjs.evtTools.firebase.performance.stopTracer = function (tracerName) {
   gdjs.evtTools.firebase.performance.getTracer(tracerName).stop();
+  delete gdjs.evtTools.firebase.performance.tracers[tracerName];
 };
 
 /**

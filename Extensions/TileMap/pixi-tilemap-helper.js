@@ -55,7 +55,7 @@
     /**
      * Re-renders the tilemap whenever its rendering settings have been changed
     */
-    exports.updatePIXITileMap = (tileMap, tileSet, render, layerIndex, pixiRenderer) => {
+    exports.updatePIXITileMap = (tileMap, tileSet, render, layerIndex) => {
         if (!tileMap || !tileSet) return;
   
         tileSet.layers.forEach(function(layer, index) {
@@ -106,14 +106,14 @@
           }
         });
 
-        if (pixiRenderer) {
-          let TIME = 0;
-          console.log("===>",tileMap)
-          setInterval(() => {
-            TIME += 1;
-            pixiRenderer.plugins.tilemap.tileAnim[0] = TIME;            
-          }, 100);
-        }
+        // if (pixiRenderer) {
+        //   let TIME = 0;
+        //   console.log("===>",tileMap)
+        //   setInterval(() => {
+        //     TIME += 1;
+        //     pixiRenderer.plugins.tilemap.tileAnim[0] = TIME;            
+        //   }, 100);
+        // }
     }
     exports.getLoadedTileSets = () => { return loadedTileSets; }
     /**

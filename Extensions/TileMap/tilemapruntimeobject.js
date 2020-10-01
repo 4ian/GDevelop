@@ -36,6 +36,9 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
 
+gdjs.TileMapRuntimeObject.prototype._updateAnimationFrame = function() {
+  console.log("ANIMATTTEE") // not updating :(
+};
 /**
  * @param { TileMapObjectDataType} oldObjectData
  * @param { TileMapObjectDataType} newObjectData
@@ -62,6 +65,8 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   if (oldObjectData.content.layerIndex !== newObjectData.content.layerIndex) {
     this.setLayerIndex(newObjectData.content.layerIndex);
   }
+  
+  this._updateAnimationFrame();
 
   return true;
 };

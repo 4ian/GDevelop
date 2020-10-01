@@ -8,10 +8,14 @@
  */
 gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
+  this._pixiRenderer = runtimeScene.getGame().getRenderer().getPIXIRenderer();
+  this._tileAnimX = null// runtimeScene.getGame().getRenderer().getPIXIRenderer().tilemap.tileAnim[0];
+  console.log("PLUGINS",this._pixiRenderer, this._tileAnimX)
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
     this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
+    this._tileAnimX = this._pixiRenderer.plugins.tilemap.tileAnim[0];
   } else {
     // Run updates a single time once loaded here
   }
@@ -79,19 +83,21 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
                 this._pixiObject,
                 tileset,
                 this._object._displayMode,
-                this._object._layerIndex,
-                runtimeScene._renderer._pixiRenderer
+                this._object._layerIndex
               );
               console.log('LOADED', tileset, this._pixiObject);
             }
           }
         )
-        console.log(this, runtimeScene._renderer._pixiRenderer)
+        // runtimeScene._renderer._pixiRenderer
         // this._runtimeScene.getTimeManager().getTimeFromStart()
       }
     });   
 };
 
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationFrame = function() {
+  console.log("UPDATING....")
+};
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
   this._pixiObject._tiledFile = this._object._tiledFile;
   //this._pixiObject.dirty = true;

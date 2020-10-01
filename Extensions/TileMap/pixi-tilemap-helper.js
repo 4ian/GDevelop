@@ -105,15 +105,6 @@
             }
           }
         });
-
-        // if (pixiRenderer) {
-        //   let TIME = 0;
-        //   console.log("===>",tileMap)
-        //   setInterval(() => {
-        //     TIME += 1;
-        //     pixiRenderer.plugins.tilemap.tileAnim[0] = TIME;            
-        //   }, 100);
-        // }
     }
     exports.getLoadedTileSets = () => { return loadedTileSets; }
     /**

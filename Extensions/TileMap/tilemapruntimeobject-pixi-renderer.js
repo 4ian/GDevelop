@@ -9,8 +9,6 @@
 gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
   this._pixiRenderer = runtimeScene.getGame().getRenderer().getPIXIRenderer();
-  this._tileAnimX = null// runtimeScene.getGame().getRenderer().getPIXIRenderer().tilemap.tileAnim[0];
-  console.log("PLUGINS",this._pixiRenderer, this._tileAnimX)
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
@@ -24,12 +22,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getLayer('')
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
-
-  // Set the anchor in the center, so that the object rotates around
-  // its center
-  // this._pixiObject.anchor.x = 0.5;
-  // this._pixiObject.anchor.y = 0.5;
-
   
   this.updateAngle();
   this.updateOpacity();
@@ -41,6 +33,11 @@ gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
+};
+
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = function(runtimeScene){
+  console.log("update")
+  this._pixiRenderer.plugins.tilemap.tileAnim[0] += 1;
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtimeScene) {

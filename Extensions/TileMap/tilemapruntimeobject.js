@@ -6,6 +6,7 @@
  */
 gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+  this._frameElapsedTime = 0;
 
   /** @type {number} */
   this._opacity = objectData.content.opacity;
@@ -17,6 +18,8 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   this._displayMode = objectData.content.displayMode;
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
+  //TODO expose to event sheet
+  this._animationSpeedScale = 2;
 
   if (this._renderer)
     gdjs.TileMapRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -36,8 +39,18 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
 
-gdjs.TileMapRuntimeObject.prototype._updateAnimationFrame = function() {
-  console.log("ANIMATTTEE") // not updating :(
+gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
+  var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
+  
+  this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale; 
+  console.log(this._frameElapsedTime);
+  // 0.25 = 4 fps - todo expose fps - calculate fps like in IDE?
+  if ( this._frameElapsedTime > 0.25 ) {
+    this._renderer.incrementAnimationFrameX();
+    this._frameElapsedTime -= 0.25;
+    if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0; 
+  }
+  
 };
 /**
  * @param { TileMapObjectDataType} oldObjectData
@@ -65,8 +78,6 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   if (oldObjectData.content.layerIndex !== newObjectData.content.layerIndex) {
     this.setLayerIndex(newObjectData.content.layerIndex);
   }
-  
-  this._updateAnimationFrame();
 
   return true;
 };

@@ -71,11 +71,3 @@ gdjs.TextEntryRuntimeObject.prototype.activate = function(enable) {
     this._activated = enable;
     this._renderer.activate(this._activated);
 };
-
-gdjs.TextEntryRuntimeObject.prototype.setLayer = function(layer) {
-     // No renderable object
-};
-
-gdjs.TextEntryRuntimeObject.prototype.setZOrder = function(z) {
-     // No renderable object
-};

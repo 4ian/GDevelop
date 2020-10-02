@@ -61,6 +61,13 @@ describe('gdjs.LightRuntimeObject', function () {
     properties: { windowWidth: 800, windowHeight: 600 },
   });
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
   const lightObj = addLightObject(runtimeScene, 100);
   lightObj.setPosition(200, 200);
 

@@ -57,10 +57,11 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   }
 
   // Objects will be added in lighting layer, this is just to maintain consistency.
-  runtimeScene
-    .getLayer("")
-    .getRenderer()
-    .addRendererObject(this.getRendererObject(), runtimeObject.getZOrder());
+  if (this._light)
+    runtimeScene
+      .getLayer('')
+      .getRenderer()
+      .addRendererObject(this.getRendererObject(), runtimeObject.getZOrder());
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

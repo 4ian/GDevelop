@@ -312,6 +312,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
+  if (!this._light) return;
+
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
 
@@ -327,7 +329,6 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
     this._defaultVertexBuffer[6] = this._object.x - this._radius;
     this._defaultVertexBuffer[7] = this._object.y - this._radius;
 
-    if (!this._light) return;
     this._light.shader.uniforms.center = this._center;
     this._light.geometry
       .getBuffer('aVertexPosition')
@@ -384,7 +385,6 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
     else this._indexBuffer[i + 2] = 1;
   }
 
-  if (!this._light) return;
   this._light.shader.uniforms.center = this._center;
   if (!isSubArrayUsed) {
     this._light.geometry

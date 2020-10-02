@@ -53,6 +53,7 @@ const addLightObstacle = (runtimeScene, width, height) => {
 };
 
 describe('gdjs.LightRuntimeObject', function () {
+  PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {
@@ -61,6 +62,13 @@ describe('gdjs.LightRuntimeObject', function () {
     properties: { windowWidth: 800, windowHeight: 600 },
   });
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
   const lightObj = addLightObject(runtimeScene, 100);
   lightObj.setPosition(200, 200);
 
@@ -85,6 +93,7 @@ describe('gdjs.LightRuntimeObject', function () {
 });
 
 describe('Light with obstacles around it', function () {
+  PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {

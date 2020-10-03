@@ -97,10 +97,14 @@ export default class ExportLauncher extends Component<Props, State> {
         this.setState({
           errored: true,
         });
-        showErrorBox(message + (err.message ? `\n${err.message}` : ''), {
-          exportStep: this.state.exportStep,
-          rawError: err,
-        });
+        showErrorBox(
+          message +
+            (err.message ? `\n\nDetails of the error: ${err.message}` : ''),
+          {
+            exportStep: this.state.exportStep,
+            rawError: err,
+          }
+        );
       }
 
       throw err;
@@ -144,7 +148,7 @@ export default class ExportLauncher extends Component<Props, State> {
           exportPipelineContext,
           resourcesDownloadOutput
         );
-      }, handleError(t('Error while exporting the game.')))
+      }, handleError(t('Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.')))
       .then(compressionOutput => {
         const { launchUpload, launchOnlineBuild } = exportPipeline;
         if (!!launchUpload && !!launchOnlineBuild) {

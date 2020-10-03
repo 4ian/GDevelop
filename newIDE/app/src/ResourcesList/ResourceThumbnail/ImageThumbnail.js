@@ -80,8 +80,7 @@ const ImageThumbnail = ({
           <img
             style={styles.spriteThumbnailImage}
             alt={resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName)}
-            crossOrigin="anonymous"
+            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
           />
           {selectable && (
             <div style={styles.checkboxContainer}>

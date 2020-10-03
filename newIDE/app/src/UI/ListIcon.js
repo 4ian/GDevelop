@@ -58,7 +58,6 @@ export default class ListIcon extends PureComponent<Props> {
               title={tooltip}
               alt={tooltip}
               src={src}
-              crossOrigin="anonymous"
               style={{
                 maxWidth: iconWidth,
                 maxHeight: iconHeight,

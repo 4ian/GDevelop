@@ -474,7 +474,6 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         })}
         alt=""
         src={getThumbnail(project, object)}
-        crossOrigin="anonymous"
       />
     );
   };

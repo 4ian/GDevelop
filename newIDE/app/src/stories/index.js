@@ -1114,7 +1114,6 @@ storiesOf('UI Building Blocks/AlertMessage', module)
         <img
           src="res/tutorial_icons/tween-behavior.jpg"
           alt=""
-          crossOrigin="anonymous"
           style={{
             maxWidth: 128,
             maxHeight: 128,

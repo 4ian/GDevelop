@@ -14,24 +14,28 @@
  * @memberof gdjs
  * @class HowlerSound
  */
-gdjs.HowlerSound = function (o) {
-  Howl.call(this, o);
+gdjs.HowlerSound = function (howl) {
+  this._howl = howl;
+  // Get a unique sound playing ID.
+  this.id = howl.play();
+  howl.stop(this.id);
+
   this._paused = false;
   this._stopped = true;
   this._canBeDestroyed = false;
-  this._rate = o.rate || 1;
+  this._rate = 1;
 
   //Add custom events listener to keep
   //track of the sound status.
   var that = this;
-  this.on('end', function () {
-    if (!that.loop()) {
+  this._howl.on('end', function () {
+    if (!that._howl.loop()) {
       that._canBeDestroyed = true;
       that._paused = false;
       that._stopped = true;
     }
   });
-  this.on('playerror', function (id, error) {
+  this._howl.on('playerror', function (id, error) {
     console.error(
       "Can't play a sound, considering it as stopped. Error is:",
       error
@@ -44,16 +48,21 @@ gdjs.HowlerSound = function (o) {
   // sync'ed with the sound - though this should be redundant
   // with `play`/`pause` methods already doing that. Keeping
   // that to be sure that the status is always correct.
-  this.on('play', function () {
+  this._howl.on('play', function () {
     that._paused = false;
     that._stopped = false;
   });
-  this.on('pause', function () {
+  this._howl.on('pause', function () {
     that._paused = true;
     that._stopped = false;
   });
 };
-gdjs.HowlerSound.prototype = Object.create(Howl.prototype);
+
+for(var item in Howl.prototype) {
+  gdjs.HowlerSound.prototype[item] = function() {
+    this._howl[item].apply(this, [arguments, this.id]);
+  }
+}
 
 // Redefine `stop`/`play`/`pause` to ensure the status of the sound
 // is immediately updated (so that calling `stopped` just after
@@ -62,17 +71,17 @@ gdjs.HowlerSound.prototype = Object.create(Howl.prototype);
 gdjs.HowlerSound.prototype.stop = function () {
   this._paused = false;
   this._stopped = true;
-  return Howl.prototype.stop.call(this);
+  return this._howl.stop(this.id);
 };
 gdjs.HowlerSound.prototype.play = function () {
   this._paused = false;
   this._stopped = false;
-  return Howl.prototype.play.call(this);
+  return this._howl.play(this.id);
 };
 gdjs.HowlerSound.prototype.pause = function () {
   this._paused = true;
   this._stopped = false;
-  return Howl.prototype.pause.call(this);
+  return this._howl.pause(this.id);
 };
 
 // Add methods to query the status of the sound:
@@ -94,7 +103,7 @@ gdjs.HowlerSound.prototype.getRate = function () {
 };
 gdjs.HowlerSound.prototype.setRate = function (rate) {
   this._rate = gdjs.HowlerSoundManager.clampRate(rate);
-  this.rate(this._rate);
+  this._howl.rate(this._rate, this.id);
 };
 
 /**
@@ -108,6 +117,10 @@ gdjs.HowlerSound.prototype.setRate = function (rate) {
  */
 gdjs.HowlerSoundManager = function (resources) {
   this._resources = resources;
+  this._loaded = {
+    music: {},
+    sound: {},
+  };
   this._availableResources = {}; //Map storing "audio" resources for faster access.
 
   this._globalVolume = 100;
@@ -240,20 +253,40 @@ gdjs.HowlerSoundManager.prototype._storeSoundInArray = function (arr, sound) {
   return sound;
 };
 
+/**
+ * Creates a new gdjs.HowlerSound using preloaded/cached Howl instances.
+ * @param {string} soundName The name of the file or resource to play.
+ * @param {boolean} isMusic True if a music, false if a sound.
+ * @returns {gdjs.HowlerSound}
+ */
+gdjs.HowlerSoundManager.prototype.createHowlerSound = function (soundName, isMusic) {
+  var soundFile = this._getFileFromSoundName(soundName);
+  var container = this._loaded[isMusic ? "music" : "sound"];
+
+  if (
+    container.hasOwnProperty(soundFile)
+  ) {
+    return new gdjs.HowlerSound(container[soundFile]);
+  } else {
+    container[soundFile] = new Howl({
+      src: [soundFile],
+      preload: true,
+      html5: isMusic
+    });
+    return new gdjs.HowlerSound(container[soundFile]);
+  }
+};
+
 gdjs.HowlerSoundManager.prototype.playSound = function (
   soundName,
   loop,
   volume,
   pitch
 ) {
-  var soundFile = this._getFileFromSoundName(soundName);
-
-  var sound = new gdjs.HowlerSound({
-    src: [soundFile], //TODO: ogg, mp3...
-    loop: loop,
-    volume: volume / 100,
-    rate: gdjs.HowlerSoundManager.clampRate(pitch),
-  });
+  var sound = this.createHowlerSound(soundName, false /*: isMusic */);
+  sound.loop(loop);
+  sound.volume(volume / 100);
+  sound.rate(gdjs.HowlerSoundManager.clampRate(pitch))
 
   this._storeSoundInArray(this._freeSounds, sound).play();
 
@@ -269,17 +302,13 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function (
 ) {
   var oldSound = this._sounds[channel];
   if (oldSound) {
-    oldSound.unload();
+    oldSound.stop();
   }
 
-  var soundFile = this._getFileFromSoundName(soundName);
-
-  var sound = new gdjs.HowlerSound({
-    src: [soundFile], //TODO: ogg, mp3...
-    loop: loop,
-    volume: volume / 100,
-    rate: gdjs.HowlerSoundManager.clampRate(pitch),
-  });
+  var sound = this.createHowlerSound(soundName, false /*: isMusic */);
+  sound.loop(loop);
+  sound.volume(volume / 100);
+  sound.rate(gdjs.HowlerSoundManager.clampRate(pitch))
 
   sound.play();
   this._sounds[channel] = sound;
@@ -297,15 +326,10 @@ gdjs.HowlerSoundManager.prototype.playMusic = function (
   volume,
   pitch
 ) {
-  var soundFile = this._getFileFromSoundName(soundName);
-
-  var sound = new gdjs.HowlerSound({
-    src: [soundFile], //TODO: ogg, mp3...
-    loop: loop,
-    html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
-    volume: volume / 100,
-    rate: gdjs.HowlerSoundManager.clampRate(pitch),
-  });
+  var music = this.createHowlerSound(soundName, true /*: isMusic */);
+  music.loop(loop);
+  music.volume(volume / 100);
+  music.rate(gdjs.HowlerSoundManager.clampRate(pitch))
 
   this._storeSoundInArray(this._freeMusics, sound).play();
 
@@ -324,15 +348,10 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
     oldMusic.unload();
   }
 
-  var soundFile = this._getFileFromSoundName(soundName);
-
-  var music = new gdjs.HowlerSound({
-    src: [soundFile], //TODO: ogg, mp3...
-    loop: loop,
-    html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
-    volume: volume / 100,
-    rate: gdjs.HowlerSoundManager.clampRate(pitch),
-  });
+  var music = this.createHowlerSound(soundName, true /*: isMusic */);
+  music.loop(loop);
+  music.volume(volume / 100);
+  music.rate(gdjs.HowlerSoundManager.clampRate(pitch))
 
   music.play();
   this._musics[channel] = music;
@@ -357,23 +376,23 @@ gdjs.HowlerSoundManager.prototype.getGlobalVolume = function () {
 
 gdjs.HowlerSoundManager.prototype.clearAll = function () {
   for (var i = 0; i < this._freeSounds.length; ++i) {
-    if (this._freeSounds[i]) this._freeSounds[i].unload();
+    if (this._freeSounds[i]) this._freeSounds[i].stop();
   }
   for (var i = 0; i < this._freeMusics.length; ++i) {
-    if (this._freeMusics[i]) this._freeMusics[i].unload();
+    if (this._freeMusics[i]) this._freeMusics[i].stop();
   }
   this._freeSounds.length = 0;
   this._freeMusics.length = 0;
 
   for (var p in this._sounds) {
     if (this._sounds.hasOwnProperty(p) && this._sounds[p]) {
-      this._sounds[p].unload();
+      this._sounds[p].stop();
       delete this._sounds[p];
     }
   }
   for (var p in this._musics) {
     if (this._musics.hasOwnProperty(p) && this._musics[p]) {
-      this._musics[p].unload();
+      this._musics[p].stop();
       delete this._musics[p];
     }
   }
@@ -385,6 +404,7 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
   onComplete,
   resources
 ) {
+  window.s = this;
   resources = resources || this._resources;
 
   //Construct the list of files to be loaded.
@@ -409,7 +429,9 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
 
   var loadedCount = 0;
   var that = this;
-  function onLoad() {
+  function onLoad(_, error) {
+    if(error) console.error(error);
+
     loadedCount++;
     if (loadedCount === totalCount) {
       return onComplete(totalCount);
@@ -420,12 +442,24 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
 
   for (var file in files) {
     if (files.hasOwnProperty(file)) {
-      var httpRequest = new XMLHttpRequest();
-      httpRequest.addEventListener('load', onLoad);
-      httpRequest.addEventListener('error', onLoad);
-      httpRequest.addEventListener('abort', onLoad);
-      httpRequest.open('GET', file);
-      httpRequest.send();
+      // Load as sound
+      var sound = new Howl({
+        src: [file],
+        preload: true,
+        onload: onLoad,
+        onloaderror: onLoad,
+      })
+      that._loaded.sound[file] = sound;
+
+      // Load as music
+      var music = new Howl({
+        src: [file],
+        preload: true,
+        onload: onLoad,
+        onloaderror: onLoad,
+        html5: true,
+      })
+      that._loaded.music[file] = music
     }
   }
 };

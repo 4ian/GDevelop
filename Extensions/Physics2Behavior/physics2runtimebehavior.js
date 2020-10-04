@@ -1,3 +1,7 @@
+Box2D().then(function(Box2D) { 
+  window.Box2D = Box2D;
+});
+
 gdjs.Physics2SharedData = function(runtimeScene, sharedData) {
   this.gravityX = sharedData.gravityX;
   this.gravityY = sharedData.gravityY;

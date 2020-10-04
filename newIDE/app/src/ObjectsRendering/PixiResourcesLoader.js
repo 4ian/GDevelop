@@ -127,7 +127,7 @@ export default class PixiResourcesLoader {
       resource,
       loadedTextures[resourceName].pixi
     );
-    return loadedTextures[resourceName].pixi;
+    return loadedTextures[resourceName];
   }
 
   /**

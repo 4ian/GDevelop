@@ -115,7 +115,7 @@ export const ResourcesWatcher = (props: Props) => {
                 let warningSize = false;
 
                 const img = new Image();
-                img.src = resourcesLoader.getResourceFullUrl(project, filename);
+                img.src = resourcesLoader.getResourceFullUrl(project, filename, {});
 
                 if (img.width > 2048 || img.height > 2048) {
                   warningSize = true;

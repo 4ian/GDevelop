@@ -17,9 +17,8 @@ class UrlsCache {
 
   getCachedUrl(project: gdProject, url: string): ?string {
     const cache = this._getProjectCache(project);
-
     if(!cache[url]) return;
-    return cache[url];
+    return cache[url]["systemFilename"];
   }
 
   cacheUrl(project: gdProject, url: string): string {

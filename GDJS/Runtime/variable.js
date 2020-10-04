@@ -111,6 +111,21 @@ gdjs.Variable.prototype.getChild = function(childName) {
 };
 
 /**
+ * Add a child variable with the specified name.
+ *
+ * If there is an existing child variable with this name, it is erased.
+ * @method
+ * @param {string} childName The name of the variable to add
+ * @param {gdjs.Variable} childVariable The variable to add as a child
+ * @returns {gdjs.Variable} The variable (for chaining calls)
+ */
+gdjs.Variable.prototype.addChild = function(childName, childVariable) {
+	this._isStructure = true;
+	this._children[childName] = childVariable;
+	return this;
+};
+
+/**
  * Return the child in a variable.
  *
  * Check if the variable has the specified children

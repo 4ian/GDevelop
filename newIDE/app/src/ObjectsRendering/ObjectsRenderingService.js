@@ -132,7 +132,18 @@ export default {
       }
       const originalNodeModuleLoad = module._load;
 
-      const allowedModules = { 'pixi.js-legacy': PIXI };
+      // Allow pixi.js to be required by extensions:
+      const allowedModules = {
+        'pixi.js-legacy': PIXI,
+        'pixi.js': PIXI,
+        '@pixi/core': PIXI,
+        '@pixi/display': PIXI,
+        '@pixi/constants': PIXI,
+        '@pixi/sprite': PIXI,
+        '@pixi/math': PIXI,
+        '@pixi/utils': PIXI,
+        '@pixi/graphics': PIXI,
+      };
       module._load = function hookedLoader(request, parent, isMain) {
         const loadedModule = allowedModules[request];
         if (loadedModule) return loadedModule;

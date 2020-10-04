@@ -16,7 +16,9 @@ gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
     this._layer = layer;
     this.convertYPosition = runtimeSceneRenderer.convertYPosition;
 
-    var effects = this._layer.getEffectsData();
+    // Read effects from the layer as we can't dynamically add effects
+    // in Cocos2d-JS.
+    var effects = this._layer.getInitialEffectsData();
     if (effects.length === 0) {
         this._cocosLayer = new CocosLayer();
         runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
@@ -60,7 +62,7 @@ gdjs.LayerCocosRenderer.prototype._makeShaders = function() {
         return;
     }
 
-    var effects = this._layer.getEffectsData();
+    var effects = this._layer.getInitialEffectsData();
     if (effects.length === 0) {
         return;
     } else if (effects.length > 1) {
@@ -127,7 +129,11 @@ gdjs.LayerCocosRenderer.prototype.updateVisibility = function(visible) {
     this._cocosLayer.setVisible(visible);
 }
 
-gdjs.LayerCocosRenderer.prototype.updateTime = function() {
+gdjs.LayerCocosRenderer.prototype.update = function() {
+    // Unimplemented
+}
+
+gdjs.LayerCocosRenderer.prototype.updateClearColor = function() {
     // Unimplemented
 }
 
@@ -180,7 +186,8 @@ gdjs.LayerCocosRenderer.prototype.enableEffect = function(name, value) {
 };
 
 gdjs.LayerCocosRenderer.prototype.addEffect = function(effectData) {
-    // Unimplemented
+    // Unimplemented - adding effects is not supported in Cocos2d-JS.
+    // All effects are supposed to be added to the layer at its creation.
 };
 
 gdjs.LayerCocosRenderer.prototype.removeEffect = function(effect) {
@@ -189,4 +196,9 @@ gdjs.LayerCocosRenderer.prototype.removeEffect = function(effect) {
 
 gdjs.LayerCocosRenderer.prototype.isEffectEnabled = function(name) {
     return this.hasEffect(name);
+};
+
+
+gdjs.LayerCocosRenderer.prototype.setLayerIndex = function(layer, index) {
+    // Unimplemented
 };

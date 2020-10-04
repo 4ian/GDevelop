@@ -12,7 +12,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import EditorBar from '../UI/EditorBar';
+import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -68,7 +68,9 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
-import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import EventsFunctionsExtensionsContext, {
+  type EventsFunctionsExtensionsState,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -100,12 +102,20 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
+import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette from '../CommandPalette/CommandPalette';
+import CommandPalette, {
+  type CommandPaletteInterface,
+} from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
-import { type PreviewState } from './PreviewState.flow';
+import {
+  type PreviewState,
+  usePreviewDebuggerServerWatcher,
+} from './PreviewState';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { ResourcesWatcher } from '../ResourcesLoader/ResourcesWatcher.js';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -142,6 +152,12 @@ const initialPreviewState: PreviewState = {
   isPreviewOverriden: false,
   overridenPreviewLayoutName: null,
   overridenPreviewExternalLayoutName: null,
+};
+
+type LaunchPreviewOptions = {
+  networkPreview?: boolean,
+  hotReload?: boolean,
+  projectDataOnlyExport?: boolean,
 };
 
 export type Props = {
@@ -199,6 +215,7 @@ const MainFrame = (props: Props) => {
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
     false
   );
+  const [isSavingProject, setIsSavingProject] = React.useState<boolean>(false);
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
@@ -227,9 +244,19 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
-    false
+  const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+  const eventsFunctionsExtensionsContext = React.useContext(
+    EventsFunctionsExtensionsContext
   );
+  const previewDebuggerServer =
+    _previewLauncher.current &&
+    _previewLauncher.current.getPreviewDebuggerServer();
+  const {
+    previewDebuggerIds,
+    hotReloadLogs,
+    clearHotReloadLogs,
+  } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
+  const hasPreviewsRunning = !!previewDebuggerIds.length;
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -428,6 +455,8 @@ const MainFrame = (props: Props) => {
         }
       });
   };
+
+  useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
     (): Promise<void> => {
@@ -1033,12 +1062,18 @@ const MainFrame = (props: Props) => {
   );
 
   const launchPreview = React.useCallback(
-    (networkPreview: boolean) => {
+    ({
+      networkPreview,
+      hotReload,
+      projectDataOnlyExport,
+    }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
-      setPreviewLoading(true);
+      const previewLauncher = _previewLauncher.current;
+      if (!previewLauncher) return;
 
+      setPreviewLoading(true);
       notifyPreviewWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
@@ -1060,28 +1095,27 @@ const MainFrame = (props: Props) => {
 
       autosaveProjectIfNeeded();
 
-      const previewLauncher = _previewLauncher.current;
-      if (previewLauncher) {
-        return eventsFunctionsExtensionsState
-          .ensureLoadFinished()
-          .then(() =>
-            previewLauncher.launchPreview({
-              project: currentProject,
-              layout,
-              externalLayout,
-              networkPreview,
-            })
-          )
-          .catch(error => {
-            console.error(
-              'Error caught while launching preview, this should never happen.',
-              error
-            );
+      eventsFunctionsExtensionsState
+        .ensureLoadFinished()
+        .then(() =>
+          previewLauncher.launchPreview({
+            project: currentProject,
+            layout,
+            externalLayout,
+            networkPreview: !!networkPreview,
+            hotReload: !!hotReload,
+            projectDataOnlyExport: !!projectDataOnlyExport,
           })
-          .then(() => {
-            setPreviewLoading(false);
-          });
-      }
+        )
+        .catch(error => {
+          console.error(
+            'Error caught while launching preview, this should never happen.',
+            error
+          );
+        })
+        .then(() => {
+          setPreviewLoading(false);
+        });
     },
     [
       autosaveProjectIfNeeded,
@@ -1090,6 +1124,30 @@ const MainFrame = (props: Props) => {
       previewState,
       state.editorTabs,
     ]
+  );
+
+  const launchNewPreview = React.useCallback(
+    () => launchPreview({ networkPreview: false }),
+    [launchPreview]
+  );
+
+  const launchHotReloadPreview = React.useCallback(
+    () => launchPreview({ networkPreview: false, hotReload: true }),
+    [launchPreview]
+  );
+
+  const launchNetworkPreview = React.useCallback(
+    () => launchPreview({ networkPreview: true, hotReload: false }),
+    [launchPreview]
+  );
+
+  const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
+    () => ({
+      hasPreviewsRunning,
+      launchProjectDataOnlyPreview: () =>
+        launchPreview({ hotReload: true, projectDataOnlyExport: true }),
+    }),
+    [hasPreviewsRunning, launchPreview]
   );
 
   const openLayout = React.useCallback(
@@ -1230,6 +1288,14 @@ const MainFrame = (props: Props) => {
       }));
     },
     [i18n, setState]
+  );
+
+  const launchDebuggerAndPreview = React.useCallback(
+    () => {
+      openDebugger();
+      launchHotReloadPreview();
+    },
+    [openDebugger, launchHotReloadPreview]
   );
 
   const openInstructionOrExpression = (
@@ -1478,12 +1544,20 @@ const MainFrame = (props: Props) => {
       saveUiSettings(state.editorTabs);
 
       getStorageProviderOperations().then(storageProviderOperations => {
-        if (!storageProviderOperations.onSaveProjectAs) {
+        const { onSaveProjectAs } = storageProviderOperations;
+        if (!onSaveProjectAs) {
           return;
         }
 
-        storageProviderOperations
-          .onSaveProjectAs(currentProject, currentFileMetadata)
+        // Protect against concurrent saves, which can trigger issues with the
+        // file system.
+        if (isSavingProject) {
+          console.info('Project is already being saved, not triggering save.');
+          return;
+        }
+        setIsSavingProject(true);
+
+        onSaveProjectAs(currentProject, currentFileMetadata)
           .then(
             ({ wasSaved, fileMetadata }) => {
               if (wasSaved) {
@@ -1507,11 +1581,14 @@ const MainFrame = (props: Props) => {
                 err
               );
             }
-          );
+          )
+          .catch(() => {})
+          .then(() => setIsSavingProject(false));
       });
     },
     [
       i18n,
+      isSavingProject,
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
@@ -1564,26 +1641,38 @@ const MainFrame = (props: Props) => {
         saveUiSettings(state.editorTabs);
         _showSnackMessage(i18n._(t`Saving...`));
 
-        onSaveProject(currentProject, currentFileMetadata).then(
-          ({ wasSaved }) => {
-            if (wasSaved) {
-              if (props.unsavedChanges)
-                props.unsavedChanges.sealUnsavedChanges();
-              _showSnackMessage(i18n._(t`Project properly saved`));
+        // Protect against concurrent saves, which can trigger issues with the
+        // file system.
+        if (isSavingProject) {
+          console.info('Project is already being saved, not triggering save.');
+          return;
+        }
+        setIsSavingProject(true);
+
+        onSaveProject(currentProject, currentFileMetadata)
+          .then(
+            ({ wasSaved }) => {
+              if (wasSaved) {
+                if (props.unsavedChanges)
+                  props.unsavedChanges.sealUnsavedChanges();
+                _showSnackMessage(i18n._(t`Project properly saved`));
+              }
+            },
+            err => {
+              showErrorBox(
+                i18n._(
+                  t`Unable to save the project! Please try again by choosing another location.`
+                ),
+                err
+              );
             }
-          },
-          err => {
-            showErrorBox(
-              i18n._(
-                t`Unable to save the project! Please try again by choosing another location.`
-              ),
-              err
-            );
-          }
-        );
+          )
+          .catch(() => {})
+          .then(() => setIsSavingProject(false));
       });
     },
     [
+      isSavingProject,
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
@@ -1700,8 +1789,10 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  useKeyboardShortcutForCommandPalette(
-    React.useCallback(() => openCommandPalette(true), [])
+  useKeyboardShortcuts(
+    commandPaletteRef.current
+      ? commandPaletteRef.current.launchCommand
+      : () => {}
   );
 
   useMainFrameCommands({
@@ -1710,17 +1801,14 @@ const MainFrame = (props: Props) => {
     previewEnabled:
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
-    onLaunchPreview: React.useCallback(
-      () => launchPreview(/*networkPreview=*/ false),
-      [launchPreview]
-    ),
-    onLaunchDebugPreview: React.useCallback(
-      () => {
-        openDebugger();
-        launchPreview(/*networkPreview=*/ false);
-      },
-      [openDebugger, launchPreview]
-    ),
+    hasPreviewsRunning,
+    allowNetworkPreview:
+      !!_previewLauncher.current &&
+      _previewLauncher.current.canDoNetworkPreview(),
+    onLaunchPreview: launchNewPreview,
+    onHotReloadPreview: launchHotReloadPreview,
+    onLaunchDebugPreview: launchDebuggerAndPreview,
+    onLaunchNetworkPreview: launchNetworkPreview,
     onOpenStartPage: openStartPage,
     onCreateProject: openCreateDialog,
     onOpenProject: chooseProject,
@@ -1733,6 +1821,9 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
+    onOpenCommandPalette: commandPaletteRef.current
+      ? commandPaletteRef.current.open
+      : () => {},
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;
@@ -1766,13 +1857,14 @@ const MainFrame = (props: Props) => {
         open={projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
+          className: 'safe-area-aware-left-container',
         }}
         ModalProps={{
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
       >
-        <EditorBar
+        <DrawerTopBar
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
@@ -1823,6 +1915,7 @@ const MainFrame = (props: Props) => {
             }}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={props.unsavedChanges}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         )}
         {!state.currentProject && (
@@ -1840,16 +1933,11 @@ const MainFrame = (props: Props) => {
         requestUpdate={props.requestUpdate}
         simulateUpdateDownloaded={simulateUpdateDownloaded}
         simulateUpdateAvailable={simulateUpdateAvailable}
-        onOpenDebugger={() => {
-          openDebugger();
-          launchPreview(/*networkPreview=*/ false);
-        }}
-        onPreview={() => {
-          launchPreview(/*networkPreview=*/ false);
-        }}
-        onNetworkPreview={() => {
-          launchPreview(/*networkPreview=*/ true);
-        }}
+        onOpenDebugger={launchDebuggerAndPreview}
+        hasPreviewsRunning={hasPreviewsRunning}
+        onPreviewWithoutHotReload={launchNewPreview}
+        onNetworkPreview={launchNetworkPreview}
+        onHotReloadPreview={launchHotReloadPreview}
         showNetworkPreviewButton={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()
@@ -1894,9 +1982,8 @@ const MainFrame = (props: Props) => {
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,
                   onOpenExternalEvents: openExternalEvents,
-                  previewDebuggerServer:
-                    _previewLauncher.current &&
-                    _previewLauncher.current.getPreviewDebuggerServer(),
+                  previewDebuggerServer,
+                  hotReloadPreviewButtonProps,
                   onOpenLayout: name =>
                     openLayout(name, {
                       openEventsEditor: true,
@@ -1944,6 +2031,7 @@ const MainFrame = (props: Props) => {
           </TabContentContainer>
         );
       })}
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal show={showLoader} />
       <HelpFinder
         open={helpFinderDialogOpen}
@@ -2029,6 +2117,8 @@ const MainFrame = (props: Props) => {
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(
           {
+            getIncludeFileHashs:
+              eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openExportDialog(true),
             onChangeSubscription: () => openSubscriptionDialog(true),
           },
@@ -2059,9 +2149,6 @@ const MainFrame = (props: Props) => {
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
       )}
-      {commandPaletteOpen && (
-        <CommandPalette open onClose={() => openCommandPalette(false)} />
-      )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog
           onClose={() => {
@@ -2071,7 +2158,10 @@ const MainFrame = (props: Props) => {
         />
       )}
       {preferencesDialogOpen && (
-        <PreferencesDialog onClose={() => openPreferencesDialog(false)} />
+        <PreferencesDialog
+          i18n={props.i18n}
+          onClose={() => openPreferencesDialog(false)}
+        />
       )}
       {languageDialogOpen && (
         <LanguageDialog
@@ -2142,8 +2232,19 @@ const MainFrame = (props: Props) => {
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}
+
       {state.currentProject && (
         <ResourcesWatcher project={state.currentProject} />
+      )}
+      {!!hotReloadLogs.length && (
+        <HotReloadLogsDialog
+          logs={hotReloadLogs}
+          onClose={clearHotReloadLogs}
+          onLaunchNewPreview={() => {
+            clearHotReloadLogs();
+            launchNewPreview();
+          }}
+        />
       )}
     </div>
   );

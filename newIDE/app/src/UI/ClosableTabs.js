@@ -1,9 +1,12 @@
 // @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component, useEffect, type Node, useRef } from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import ContextMenu from './Menu/ContextMenu';
+import { useLongTouch } from '../Utils/UseLongTouch';
 
 const styles = {
   tabsContainerStyle: {
@@ -139,6 +142,18 @@ export function ClosableTab({
     }
   };
 
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        if (contextMenu.current) {
+          contextMenu.current.open(event.clientX, event.clientY);
+        }
+      },
+      [contextMenu]
+    )
+  );
+
   return (
     <ThemeConsumer>
       {muiTheme => {
@@ -162,6 +177,7 @@ export function ClosableTab({
               <ButtonBase
                 onClick={onClick}
                 onContextMenu={openContextMenu}
+                {...longTouchForContextMenuProps}
                 focusRipple
               >
                 <span
@@ -178,6 +194,7 @@ export function ClosableTab({
                 <ButtonBase
                   onClick={onClose}
                   onContextMenu={openContextMenu}
+                  {...longTouchForContextMenuProps}
                   focusRipple
                 >
                   <Close
@@ -193,18 +210,18 @@ export function ClosableTab({
             </span>
             <ContextMenu
               ref={contextMenu}
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
-                  label: 'Close',
+                  label: i18n._(t`Close`),
                   click: onClose,
                   enabled: closable,
                 },
                 {
-                  label: 'Close others',
+                  label: i18n._(t`Close others`),
                   click: onCloseOthers,
                 },
                 {
-                  label: 'Close all',
+                  label: i18n._(t`Close all`),
                   click: onCloseAll,
                 },
               ]}

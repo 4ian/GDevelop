@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "change_text",
+          "persistentUuid": "3dc2947c-7d26-4e6d-8910-ce83ee269cd9",
           "width": 0,
           "x": 10.9457,
           "y": 205.185,
@@ -158,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_text",
+          "persistentUuid": "8a0b41ce-064a-4da0-8029-839bc549b28d",
           "width": 0,
           "x": 117.72,
           "y": 309.31,
@@ -173,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_text",
+          "persistentUuid": "c13eba06-e21c-4143-a48d-59477eef47b5",
           "width": 0,
           "x": 206.035,
           "y": 411.212,
@@ -761,6 +764,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

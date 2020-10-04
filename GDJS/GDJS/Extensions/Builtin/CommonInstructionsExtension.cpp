@@ -4,8 +4,10 @@
  * reserved. This project is released under the MIT License.
  */
 #include "CommonInstructionsExtension.h"
+
 #include <algorithm>
 #include <set>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -227,8 +229,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   gd::String::From(parentContext.GetContextDepth()) + "_" +
                   gd::String::From(parentContext.GetCurrentConditionDepth()) +
                   "final";
-              code += codeGenerator.GetObjectListName(*it, parentContext) +
-                      ".createFrom(" + finalObjList + ");\n";
+              code += "gdjs.copyArray(" + finalObjList + ", " +
+                      codeGenerator.GetObjectListName(*it, parentContext) +
+                      ");\n";
             }
             code += "}\n";
 
@@ -325,7 +328,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& context) {
-            size_t uniqueId = (size_t)&instruction;
+            size_t uniqueId = codeGenerator.GenerateSingleUsageUniqueIdFor(
+                instruction.GetOriginalInstruction().lock().get());
             gd::String outputCode = codeGenerator.GenerateBooleanFullName(
                                         "conditionTrue", context) +
                                     ".val = ";

@@ -36,7 +36,7 @@ describe('gdjs.VariablesContainer', function() {
       expect(container.has('MyVariable3')).to.be(true);
     });
 
-    it('can be constructed from data', function() {
+    it('can be constructed from data, so that variables are indexed', function() {
         const container = new gdjs.VariablesContainer([{
             name: 'Var1',
             value: 123
@@ -65,7 +65,7 @@ describe('gdjs.VariablesContainer', function() {
         expect(container.getFromIndex(1).getAsString()).to.be('Hello World');
         expect(container.getFromIndex(2).isStructure()).to.be(true);
 
-        // Call initFrom to add more variables (overriding the existing ones)
+        // Call initFrom to add more variables (not overriding the existing ones)
         container.initFrom([{
             name: 'Var4',
             value: 456
@@ -107,6 +107,43 @@ describe('gdjs.VariablesContainer', function() {
         expect(container.get('Var5').getAsNumber()).to.be(789);
         expect(container.has('Var6')).to.be(true);
         expect(container.get('Var6').getAsString()).to.be('The Only Hello World');
+    });
 
+    it('persists index of variables constructed from data', function() {
+        const container = new gdjs.VariablesContainer([{
+            name: 'Var1',
+            value: 123
+        },{
+            name: 'Var2',
+            value: 'Hello World'
+        }, {
+            name: 'Var3',
+            children: [{
+                name: 'Var3.1',
+                value: 1,
+            }]
+        }]);
+
+        // Check that getFromIndex works (for faster lookup in case we know
+        // the order of variables).
+        expect(container.getFromIndex(0).getAsNumber()).to.be(123);
+        expect(container.getFromIndex(1).getAsString()).to.be('Hello World');
+        expect(container.getFromIndex(2).isStructure()).to.be(true);
+
+        // Remove a variable (that is indexed) and add it back
+        container.remove('Var2');
+        const newVar2 = new gdjs.Variable();
+        newVar2.setNumber(456);
+        container.add('Var2', newVar2);
+
+        // Also replace a variable (that is indexed)
+        const newVar3 = new gdjs.Variable();
+        newVar3.setNumber(789);
+        container.add('Var3', newVar3);
+
+        // Verify that we can still access indexed variables using getFromIndex
+        expect(container.getFromIndex(0).getAsNumber()).to.be(123);
+        expect(container.getFromIndex(1).getAsNumber()).to.be(456);
+        expect(container.getFromIndex(2).getAsNumber()).to.be(789);
     });
   });

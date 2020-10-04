@@ -157,6 +157,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
             unsavedChanges={this.props.unsavedChanges}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
             project={project}
             layout={layout}

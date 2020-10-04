@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -177,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "7a581938-cf98-40bd-8449-b44d074fb180",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -197,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "2f18101e-aefa-4e2a-8c1b-50c3c734cc8a",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -520,6 +522,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -575,6 +582,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "a2ca8182-a559-474e-8cc6-52eba82fd2a5",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -595,6 +603,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "c874d526-810d-4d03-973e-41225740b799",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -615,6 +624,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "6714bca8-f468-44ff-83c6-5f1528ceb355",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -635,6 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "73fe536e-3553-4b32-ae9f-945acf6cac5b",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -984,6 +995,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

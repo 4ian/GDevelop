@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -8,26 +9,29 @@
  * The `gdjs` namespace contains all classes and objects of the game engine.
  * @namespace
  */
-window.gdjs = {
-  objectsTypes: new Hashtable(),
-  behaviorsTypes: new Hashtable(),
-  /**
-   * Contains functions used by events (this is a convention only, functions can actually
-   * be anywhere).
-   * @namespace
-   * @memberOf gdjs
-   */
-  evtTools: {},
-  callbacksFirstRuntimeSceneLoaded: [],
-  callbacksRuntimeSceneLoaded: [],
-  callbacksRuntimeScenePreEvents: [],
-  callbacksRuntimeScenePostEvents: [],
-  callbacksRuntimeScenePaused: [],
-  callbacksRuntimeSceneResumed: [],
-  callbacksRuntimeSceneUnloading: [],
-  callbacksRuntimeSceneUnloaded: [],
-  callbacksObjectDeletedFromScene: [],
-};
+// @ts-ignore - creating the global object acting as a namespace
+window.gdjs = {};
+
+/**
+ * Contains functions used by events (this is a convention only, functions can actually
+ * be anywhere).
+ * @namespace
+ * @memberOf gdjs
+ */
+gdjs.evtTools = {};
+
+gdjs.objectsTypes = new Hashtable();
+gdjs.behaviorsTypes = new Hashtable();
+
+/** @type {Function[]} */ gdjs.callbacksFirstRuntimeSceneLoaded = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneLoaded = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePreEvents = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePostEvents = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeScenePaused = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneResumed = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneUnloading = [];
+/** @type {Function[]} */ gdjs.callbacksRuntimeSceneUnloaded = [];
+/** @type {Function[]} */ gdjs.callbacksObjectDeletedFromScene = [];
 
 /**
  * Convert a rgb color value to a hex string.
@@ -38,7 +42,7 @@ window.gdjs = {
  * @param {number} b Blue
  * @returns {string}
  */
-gdjs.rgbToHex = function(r, g, b) {
+gdjs.rgbToHex = function (r, g, b) {
   return '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
 
@@ -49,7 +53,7 @@ gdjs.rgbToHex = function(r, g, b) {
  * @param {number} b Blue
  * @returns {number}
  */
-gdjs.rgbToHexNumber = function(r, g, b) {
+gdjs.rgbToHexNumber = function (r, g, b) {
   return (r << 16) + (g << 8) + b;
 };
 
@@ -58,7 +62,7 @@ gdjs.rgbToHexNumber = function(r, g, b) {
  * @param {number} max The maximum value (inclusive).
  * @returns {number}
  */
-gdjs.random = function(max) {
+gdjs.random = function (max) {
   if (max <= 0) return 0;
   return Math.floor(Math.random() * (max + 1));
 };
@@ -69,7 +73,7 @@ gdjs.random = function(max) {
  * @param {number} max The maximum value (inclusive).
  * @returns {number}
  */
-gdjs.randomInRange = function(min, max) {
+gdjs.randomInRange = function (min, max) {
   return min + gdjs.random(max - min); // return min if min >= max
 };
 
@@ -78,7 +82,7 @@ gdjs.randomInRange = function(min, max) {
  * @param {number} max The maximum value (exclusive).
  * @returns {number}
  */
-gdjs.randomFloat = function(max) {
+gdjs.randomFloat = function (max) {
   if (max <= 0) return 0;
   return Math.random() * max;
 };
@@ -89,7 +93,7 @@ gdjs.randomFloat = function(max) {
  * @param {number} max The maximum value (exclusive).
  * @returns {number}
  */
-gdjs.randomFloatInRange = function(min, max) {
+gdjs.randomFloatInRange = function (min, max) {
   return min + gdjs.randomFloat(max - min); // return min if min >= max
 };
 
@@ -100,7 +104,7 @@ gdjs.randomFloatInRange = function(min, max) {
  * @param {number} step The interval between each value.
  * @returns {number}
  */
-gdjs.randomWithStep = function(min, max, step) {
+gdjs.randomWithStep = function (min, max, step) {
   if (step <= 0) return min + gdjs.random(max - min);
   return min + gdjs.random(Math.floor((max - min) / step)) * step; // return min if min >= max
 };
@@ -110,7 +114,7 @@ gdjs.randomWithStep = function(min, max, step) {
  * @param {number} angleInDegrees The angle in degrees.
  * @returns {number}
  */
-gdjs.toRad = function(angleInDegrees) {
+gdjs.toRad = function (angleInDegrees) {
   return (angleInDegrees / 180) * 3.14159;
 };
 
@@ -119,17 +123,9 @@ gdjs.toRad = function(angleInDegrees) {
  * @param {number} angleInRadians The angle in radians.
  * @returns {number}
  */
-gdjs.toDegrees = function(angleInRadians) {
+gdjs.toDegrees = function (angleInRadians) {
   return (angleInRadians * 180) / 3.14159;
 };
-
-/**
- * A Constructor for a {@link gdjs.RuntimeObject}.
- * @name RuntimeObjectConstructor
- * @function
- * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to.
- * @param {ObjectData} objectData The initial properties of the object.
- */
 
 /**
  * Register a runtime object (class extending {@link gdjs.RuntimeObject}) that can be used in a scene.
@@ -139,20 +135,11 @@ gdjs.toDegrees = function(angleInRadians) {
  * of the type of the object is "TextObject::Text".
  *
  * @param {string} objectTypeName The name of the type of the Object.
- * @param {RuntimeObjectConstructor} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeObject} Ctor The constructor of the Object.
  */
-gdjs.registerObject = function(objectTypeName, Ctor) {
+gdjs.registerObject = function (objectTypeName, Ctor) {
   gdjs.objectsTypes.put(objectTypeName, Ctor);
 };
-
-/**
- * A Constructor for a {@link gdjs.RuntimeBehavior}.
- * @name RuntimeBehaviorConstructor
- * @function
- * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
- * @param {BehaviorData} behaviorData The properties used to setup the behavior
- * @param {gdjs.RuntimeObject} owner The object owning the behavior
- */
 
 /**
  * Register a runtime behavior (class extending {@link gdjs.RuntimeBehavior}) that can be used by a
@@ -163,9 +150,9 @@ gdjs.registerObject = function(objectTypeName, Ctor) {
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
  * @param {string} behaviorTypeName The name of the type of the behavior.
- * @param {RuntimeBehaviorConstructor} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeBehavior} Ctor The constructor of the Object.
  */
-gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
+gdjs.registerBehavior = function (behaviorTypeName, Ctor) {
   gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
 };
 
@@ -175,7 +162,7 @@ gdjs.registerBehavior = function(behaviorTypeName, Ctor) {
  *
  * @param {Function} callback The function to be called.
  */
-gdjs.registerFirstRuntimeSceneLoadedCallback = function(callback) {
+gdjs.registerFirstRuntimeSceneLoadedCallback = function (callback) {
   gdjs.callbacksFirstRuntimeSceneLoaded.push(callback);
 };
 
@@ -183,7 +170,7 @@ gdjs.registerFirstRuntimeSceneLoadedCallback = function(callback) {
  * Register a function to be called when a scene is loaded.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeSceneLoadedCallback = function(callback) {
+gdjs.registerRuntimeSceneLoadedCallback = function (callback) {
   gdjs.callbacksRuntimeSceneLoaded.push(callback);
 };
 
@@ -192,7 +179,7 @@ gdjs.registerRuntimeSceneLoadedCallback = function(callback) {
  * before events are run.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeScenePreEventsCallback = function(callback) {
+gdjs.registerRuntimeScenePreEventsCallback = function (callback) {
   gdjs.callbacksRuntimeScenePreEvents.push(callback);
 };
 
@@ -201,7 +188,7 @@ gdjs.registerRuntimeScenePreEventsCallback = function(callback) {
  * after events are run and before rendering.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeScenePostEventsCallback = function(callback) {
+gdjs.registerRuntimeScenePostEventsCallback = function (callback) {
   gdjs.callbacksRuntimeScenePostEvents.push(callback);
 };
 
@@ -209,7 +196,7 @@ gdjs.registerRuntimeScenePostEventsCallback = function(callback) {
  * Register a function to be called when a scene is paused.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeScenePausedCallback = function(callback) {
+gdjs.registerRuntimeScenePausedCallback = function (callback) {
   gdjs.callbacksRuntimeScenePaused.push(callback);
 };
 
@@ -217,7 +204,7 @@ gdjs.registerRuntimeScenePausedCallback = function(callback) {
  * Register a function to be called when a scene is resumed.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeSceneResumedCallback = function(callback) {
+gdjs.registerRuntimeSceneResumedCallback = function (callback) {
   gdjs.callbacksRuntimeSceneResumed.push(callback);
 };
 
@@ -229,7 +216,7 @@ gdjs.registerRuntimeSceneResumedCallback = function(callback) {
  *
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeSceneUnloadingCallback = function(callback) {
+gdjs.registerRuntimeSceneUnloadingCallback = function (callback) {
   gdjs.callbacksRuntimeSceneUnloading.push(callback);
 };
 
@@ -240,7 +227,7 @@ gdjs.registerRuntimeSceneUnloadingCallback = function(callback) {
  *
  * @param {Function} callback The function to be called.
  */
-gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
+gdjs.registerRuntimeSceneUnloadedCallback = function (callback) {
   gdjs.callbacksRuntimeSceneUnloaded.push(callback);
 };
 
@@ -248,7 +235,7 @@ gdjs.registerRuntimeSceneUnloadedCallback = function(callback) {
  * Register a function to be called when an object is deleted from a scene.
  * @param {Function} callback The function to be called.
  */
-gdjs.registerObjectDeletedFromSceneCallback = function(callback) {
+gdjs.registerObjectDeletedFromSceneCallback = function (callback) {
   gdjs.callbacksObjectDeletedFromScene.push(callback);
 };
 
@@ -257,8 +244,8 @@ gdjs.registerObjectDeletedFromSceneCallback = function(callback) {
  * @deprecated
  * @private
  */
-gdjs.registerGlobalCallbacks = function() {
-  console.warning(
+gdjs.registerGlobalCallbacks = function () {
+  console.warn(
     "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
   );
 };
@@ -268,7 +255,7 @@ gdjs.registerGlobalCallbacks = function() {
  *
  * Should only be used for testing - this should never be used at runtime.
  */
-gdjs.clearGlobalCallbacks = function() {
+gdjs.clearGlobalCallbacks = function () {
   gdjs.callbacksFirstRuntimeSceneLoaded = [];
   gdjs.callbacksRuntimeSceneLoaded = [];
   gdjs.callbacksRuntimeScenePreEvents = [];
@@ -284,9 +271,9 @@ gdjs.clearGlobalCallbacks = function() {
  * Get the constructor of an object.
  *
  * @param {string} name The name of the type of the object.
- * @returns {ObjectCtor}
+ * @returns {typeof gdjs.RuntimeObject}
  */
-gdjs.getObjectConstructor = function(name) {
+gdjs.getObjectConstructor = function (name) {
   if (name !== undefined && gdjs.objectsTypes.containsKey(name))
     return gdjs.objectsTypes.get(name);
 
@@ -298,9 +285,9 @@ gdjs.getObjectConstructor = function(name) {
  * Get the constructor of a behavior.
  *
  * @param {string} name The name of the type of the behavior.
- * @returns {BehaviorCtor}
+ * @returns {typeof gdjs.RuntimeBehavior}
  */
-gdjs.getBehaviorConstructor = function(name) {
+gdjs.getBehaviorConstructor = function (name) {
   if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
     return gdjs.behaviorsTypes.get(name);
 
@@ -313,7 +300,7 @@ gdjs.getBehaviorConstructor = function(name) {
  * @param {any} owner The owner of the Array.
  * @returns {Array<any>}
  */
-gdjs.staticArray = function(owner) {
+gdjs.staticArray = function (owner) {
   owner._staticArray = owner._staticArray || [];
   return owner._staticArray;
 };
@@ -323,7 +310,7 @@ gdjs.staticArray = function(owner) {
  * @param {any} owner The owner of the Array.
  * @returns {Array<any>}
  */
-gdjs.staticArray2 = function(owner) {
+gdjs.staticArray2 = function (owner) {
   owner._staticArray2 = owner._staticArray2 || [];
   return owner._staticArray2;
 };
@@ -333,7 +320,7 @@ gdjs.staticArray2 = function(owner) {
  * @param {any} owner The owner of the Array.
  * @returns {Object}
  */
-gdjs.staticObject = function(owner) {
+gdjs.staticObject = function (owner) {
   owner._staticObject = owner._staticObject || {};
   return owner._staticObject;
 };
@@ -344,7 +331,7 @@ gdjs.staticObject = function(owner) {
  * @param objectsLists
  * @returns {Array}
  */
-gdjs.objectsListsToArray = function(objectsLists) {
+gdjs.objectsListsToArray = function (objectsLists) {
   var lists = gdjs.staticArray(gdjs.objectsListsToArray);
   objectsLists.values(lists);
 
@@ -358,20 +345,18 @@ gdjs.objectsListsToArray = function(objectsLists) {
   return result;
 };
 
-Array.prototype.remove = function(from) {
-  //Adapted from the nice article available at
-  //https://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript
-  for (var i = from, len = this.length - 1; i < len; i++) this[i] = this[i + 1];
-
-  this.length = len;
-};
-
-Array.prototype.createFrom = function(arr) {
-  var len = arr.length;
+/**
+ * Copy the element for the first array into the second array, so that
+ * both array contains the same elements.
+ * @param {Array<any>} src The source array
+ * @param {Array<any>} dst The destination array
+ */
+gdjs.copyArray = function (src, dst) {
+  var len = src.length;
   for (var i = 0; i < len; ++i) {
-    this[i] = arr[i];
+    dst[i] = src[i];
   }
-  this.length = len;
+  dst.length = len;
 };
 
 //Make sure console.warn and console.error are available.

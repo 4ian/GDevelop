@@ -398,7 +398,11 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.getResourceFullUrl(project, panelSprite.getTexture());
+  return resourcesLoader.getResourceFullUrl(
+    project,
+    panelSprite.getTexture(),
+    {}
+  );
 };
 
 export default RenderedPanelSpriteInstance;

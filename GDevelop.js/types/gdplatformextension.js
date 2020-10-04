@@ -8,9 +8,11 @@ declare class gdPlatformExtension {
   addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
+  addDependency(): gdDependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObject): gdObjectMetadata;
   addEffect(name: string): gdEffectMetadata;
+  registerProperty(name: string): gdPropertyDescriptor;
   getFullName(): string;
   getName(): string;
   getDescription(): string;
@@ -38,6 +40,8 @@ declare class gdPlatformExtension {
   getAllConditionsForBehavior(autoType: string): gdMapStringInstructionMetadata;
   getAllExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
   getAllStrExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
+  getAllProperties(): gdMapStringPropertyDescriptor;
+  getAllDependencies(): gdVectorDependencyMetadata;
   static getNamespaceSeparator(): string;
   delete(): void;
   ptr: number;

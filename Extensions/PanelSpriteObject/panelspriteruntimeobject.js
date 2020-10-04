@@ -13,7 +13,7 @@
  * @property {number} width The object width
  * @property {number} height The object height
  * @property {string} texture The name of the resource containing the texture to use
- * 
+ *
  * @typedef {ObjectData & PanelSpriteObjectDataType} PanelSpriteObjectData
  */
 
@@ -79,6 +79,49 @@ gdjs.PanelSpriteRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
 gdjs.registerObject("PanelSpriteObject::PanelSprite", gdjs.PanelSpriteRuntimeObject);
+
+/**
+ * @param {PanelSpriteObjectData} oldObjectData
+ * @param {PanelSpriteObjectData} newObjectData
+ */
+gdjs.PanelSpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.width !== newObjectData.width) {
+    this.setWidth(newObjectData.width);
+  }
+  if (oldObjectData.height !== newObjectData.height) {
+    this.setHeight(newObjectData.height);
+  }
+
+  var updateTexture = false;
+  if (oldObjectData.rightMargin !== newObjectData.rightMargin) {
+    this._rBorder = newObjectData.rightMargin;
+    updateTexture = true;
+  }
+  if (oldObjectData.leftMargin !== newObjectData.leftMargin) {
+    this._lBorder = newObjectData.leftMargin;
+    updateTexture = true;
+  }
+  if (oldObjectData.topMargin !== newObjectData.topMargin) {
+    this._tBorder = newObjectData.topMargin;
+    updateTexture = true;
+  }
+  if (oldObjectData.bottomMargin !== newObjectData.bottomMargin) {
+    this._bBorder = newObjectData.bottomMargin;
+    updateTexture = true;
+  }
+  if (oldObjectData.texture !== newObjectData.texture) {
+    updateTexture = true;
+  }
+  if (updateTexture) {
+    this.setTexture(newObjectData.texture, this._runtimeScene);
+  }
+
+  if (oldObjectData.tiled !== newObjectData.tiled) {
+    return false;
+  }
+
+  return true;
+};
 
 gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
@@ -215,7 +258,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the panel sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.PanelSpriteRuntimeObject.prototype.getColor = function() {
   return this._renderer.getColor();

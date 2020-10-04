@@ -12,7 +12,7 @@ gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen) {
   this._isFullscreen = false; //Used to track if the window is displayed as fullscreen (see setFullscreen method).
   this._forceFullscreen = forceFullscreen; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
 
-  /** @type {PIXI.SystemRenderer} */
+  /** @type {?PIXI.Renderer} */
   this._pixiRenderer = null;
   this._canvasWidth = 0; // Current width of the canvas (might be scaled down/up compared to renderer)
   this._canvasHeight = 0; // Current height of the canvas (might be scaled down/up compared to renderer)
@@ -41,7 +41,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
   );
   parentElement.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
   this._pixiRenderer.view.style['position'] = 'absolute';
-  this._pixiRenderer.view.tabindex = '1'; //Ensure that the canvas has the focus.
+  this._pixiRenderer.view.tabIndex = 1; //Ensure that the canvas has the focus.
   this._resizeCanvas();
 
   // Handle scale mode
@@ -255,6 +255,18 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
     this._notifySceneForResize = true;
   }
 };
+
+/**
+ * Checks if the game is in full screen.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function() {
+  var electron = this.getElectron();
+  if (electron) {
+    return electron.remote.getCurrentWindow().isFullScreen();
+  }
+  // Height check is used to detect user triggered full screen (for example F11 shortcut).
+  return this._isFullscreen || window.screen.height === window.innerHeight;
+}
 
 /**
  * Add the standard events handler.

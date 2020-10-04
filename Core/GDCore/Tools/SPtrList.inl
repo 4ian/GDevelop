@@ -90,7 +90,7 @@ template <typename T>
 void SPtrList<T>::Init(const gd::SPtrList<T>& other) {
   elements.clear();
   for (size_t i = 0; i < other.elements.size(); ++i)
-    elements.push_back(std::make_shared<T>(other[i]));
+    elements.push_back(CloneRememberingOriginalElement(other.elements[i]));
 }
 
 }  // namespace gd

@@ -91,7 +91,11 @@ export default class ImagePreview extends React.Component<Props, State> {
     const { project, resourceName, resourcesLoader } = props;
     return {
       errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
+      imageSource: resourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        {}
+      ),
     };
   }
 
@@ -195,6 +199,9 @@ export default class ImagePreview extends React.Component<Props, State> {
                 </IconButton>
               </MiniToolbar>
               <div
+                dir={
+                  'ltr' /* Force LTR layout to avoid issues with image positioning */
+                }
                 style={styles.imagePreviewContainer}
                 ref={measureRef}
                 onWheel={event => {
@@ -223,7 +230,6 @@ export default class ImagePreview extends React.Component<Props, State> {
                     src={imageSource}
                     onError={this._handleImageError}
                     onLoad={this._handleImageLoaded}
-                    crossOrigin="anonymous"
                   />
                 )}
                 {imageLoaded && renderOverlay && (

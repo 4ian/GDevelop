@@ -11,16 +11,14 @@ const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
-const {
-  serveFolder,
-  stopServer,
-  getLocalNetworkIps,
-} = require('./ServeFolder');
+const { serveFolder, stopServer } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor, buildPlaceholderMainMenu } = require('./MainMenu');
 const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
+const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
+const setUpDiscordRichPresence = require('./DiscordRichPresence');
 
 log.info('GDevelop Electron app starting...');
 
@@ -263,8 +261,8 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('get-local-network-ips', event => {
-    event.sender.send('local-network-ips', getLocalNetworkIps());
+  ipcMain.on('get-local-network-ip', event => {
+    event.sender.send('local-network-ip', findLocalIp());
   });
 
   // DebuggerServer events:
@@ -279,7 +277,8 @@ app.on('ready', function() {
         event.sender.send('debugger-connection-closed', { id }),
       onConnectionOpen: ({ id }) =>
         event.sender.send('debugger-connection-opened', { id }),
-      onListening: () => event.sender.send('debugger-start-server-done'),
+      onListening: ({ address }) =>
+        event.sender.send('debugger-start-server-done', { address }),
     });
   });
 
@@ -358,4 +357,6 @@ app.on('ready', function() {
       info,
     });
   });
+
+  setUpDiscordRichPresence(ipcMain);
 });

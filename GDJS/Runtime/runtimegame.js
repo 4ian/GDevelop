@@ -6,12 +6,29 @@
  */
 
 /**
+ * @typedef {Object} RuntimeGameOptionsScriptFile
+ * @property {string} path The path for this script file.
+ * @property {number} hash The hash of the script file content.
+ */
+
+/**
+ * @typedef {Object} RuntimeGameOptions
+ * @property {boolean=} forceFullscreen if true, force fullscreen.
+ * @property {boolean=} isPreview if true, game is run as a preview launched from an editor.
+ * @property {string=} injectExternalLayout The name of the external layout to create in the scene at position 0;0.
+ * @property {RuntimeGameOptionsScriptFile[]} [scriptFiles] Script files, used for hot-reloading.
+ * @property {boolean=} projectDataOnlyExport if true, export is a partial preview without events.
+ * @property {string=} debuggerServerAddress The address of the debugger server, to reach out using WebSocket.
+ * @property {string=} debuggerServerPort The port of the debugger server, to reach out using WebSocket.
+ */
+
+/**
  * Represents a game being played.
  *
  * @memberof gdjs
  * @class RuntimeGame
  * @param {ProjectData} data The object (usually stored in data.json) containing the full project data
- * @param {Object=} options Optional object for specifiying additional options: {forceFullscreen: ...}
+ * @param {RuntimeGameOptions=} options Optional object for specifiying additional options: {forceFullscreen: ...}
  */
 gdjs.RuntimeGame = function(data, options) {
   options = options || {};
@@ -19,27 +36,27 @@ gdjs.RuntimeGame = function(data, options) {
   this._variables = new gdjs.VariablesContainer(data.variables);
   this._data = data;
   this._imageManager = new gdjs.ImageManager(
-    data.resources.resources
+    this._data.resources.resources
   );
   this._soundManager = new gdjs.SoundManager(
-    data.resources.resources
+    this._data.resources.resources
   );
   this._fontManager = new gdjs.FontManager(
-    data.resources.resources
+    this._data.resources.resources
   );
   this._jsonManager = new gdjs.JsonManager(
-    data.resources.resources
+    this._data.resources.resources
   );
-  this._maxFPS = data ? data.properties.maxFPS : 60;
-  this._minFPS = data ? data.properties.minFPS : 15;
+  this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
+  this._minFPS = this._data ? this._data.properties.minFPS : 15;
 
-  this._gameResolutionWidth = data.properties.windowWidth;
-  this._gameResolutionHeight = data.properties.windowHeight;
+  this._gameResolutionWidth = this._data.properties.windowWidth;
+  this._gameResolutionHeight = this._data.properties.windowHeight;
   this._originalWidth = this._gameResolutionWidth;
   this._originalHeight = this._gameResolutionHeight;
-  this._resizeMode = data.properties.sizeOnStartupMode;
+  this._resizeMode = this._data.properties.sizeOnStartupMode;
   this._adaptGameResolutionAtRuntime =
-    data.properties.adaptGameResolutionAtRuntime;
+    this._data.properties.adaptGameResolutionAtRuntime;
   /** @type {string} */
   this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
@@ -59,9 +76,9 @@ gdjs.RuntimeGame = function(data, options) {
   this._injectExternalLayout = options.injectExternalLayout || '';
   this._options = options;
 
-  /** 
+  /**
    * Optional client to connect to a debugger
-   * @type {?gdjs.IDebuggerClient} 
+   * @type {?gdjs.IDebuggerClient}
    */
   this._debuggerClient = gdjs.DebuggerClient
     ? new gdjs.DebuggerClient(this)
@@ -72,8 +89,30 @@ gdjs.RuntimeGame = function(data, options) {
 };
 
 /**
+ * Update the project data. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ProjectData} projectData The object (usually stored in data.json) containing the full project data
+ */
+gdjs.RuntimeGame.prototype.setProjectData = function(projectData) {
+  this._data = projectData;
+
+  this._imageManager.setResources(
+    this._data.resources.resources
+  );
+  this._soundManager.setResources(
+    this._data.resources.resources
+  );
+  this._fontManager.setResources(
+    this._data.resources.resources
+  );
+  this._jsonManager.setResources(
+    this._data.resources.resources
+  );
+}
+
+/**
  * Return the additional options passed to the RuntimeGame when created.
- * @returns {?Object} The additional options, if any.
+ * @returns {?RuntimeGameOptions} The additional options, if any.
  */
 gdjs.RuntimeGame.prototype.getAdditionalOptions = function() {
   return this._options;
@@ -561,4 +600,17 @@ gdjs.RuntimeGame.prototype.getSceneStack = function() {
  */
 gdjs.RuntimeGame.prototype.isPreview = function() {
   return this._isPreview;
+}
+
+/**
+ * Gets an extension property from the project data.
+ * @param {string} extensionName The extension name.
+ * @param {string} propertyName The property name.
+ * @return {?string} The property value.
+ */
+gdjs.RuntimeGame.prototype.getExtensionProperty = function(extensionName, propertyName) {
+  for(let property of this._data.properties.extensionProperties) {
+    if(property.extension === extensionName && property.property === propertyName) return property.value;
+  }
+  return null;
 }

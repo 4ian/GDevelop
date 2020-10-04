@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -36,6 +39,8 @@ import {
   getTagsFromString,
 } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const styles = {
   listContainer: {
@@ -92,13 +97,14 @@ type Props = {|
   onChangeSelectedObjectTags: SelectedTags => void,
 
   onEditObject: gdObject => void,
-  onObjectCreated: string => void,
+  onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
 
   getThumbnail: (project: gdProject, object: Object) => string,
   unsavedChanges?: ?UnsavedChanges,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 export default class ObjectsList extends React.Component<Props, State> {
@@ -175,7 +181,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       () => {
         if (onEditObject) {
           onEditObject(object);
-          onObjectCreated(name);
+          onObjectCreated(object);
           onObjectSelected(name);
         }
       }
@@ -420,23 +426,23 @@ export default class ObjectsList extends React.Component<Props, State> {
   _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
     this.props.getThumbnail(this.props.project, objectWithContext.object);
 
-  _renderObjectMenuTemplate = (
+  _renderObjectMenuTemplate = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     index: number
   ) => {
     const { object } = objectWithContext;
     return [
       {
-        label: 'Edit object',
+        label: i18n._(t`Edit object`),
         click: () => this.props.onEditObject(object),
       },
       {
-        label: 'Edit object variables',
+        label: i18n._(t`Edit object variables`),
         click: () => this._editVariables(object),
       },
       { type: 'separator' },
       {
-        label: 'Tags',
+        label: i18n._(t`Tags`),
         submenu: buildTagsMenuTemplate({
           noTagLabel: 'No tags',
           getAllTags: this.props.getAllObjectTags,
@@ -449,29 +455,29 @@ export default class ObjectsList extends React.Component<Props, State> {
         }),
       },
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(objectWithContext),
       },
       {
-        label: 'Set as a global object',
+        label: i18n._(t`Set as a global object`),
         click: () => this._setAsGlobalObject(objectWithContext),
       },
       {
-        label: 'Delete',
+        label: i18n._(t`Delete`),
         click: () => this._deleteObject(objectWithContext),
       },
       { type: 'separator' },
       {
-        label: 'Add a new object...',
+        label: i18n._(t`Add a new object...`),
         click: () => this.onAddNewObject(),
       },
       { type: 'separator' },
       {
-        label: 'Copy',
+        label: i18n._(t`Copy`),
         click: () => this._copyObject(objectWithContext),
       },
       {
-        label: 'Cut',
+        label: i18n._(t`Cut`),
         click: () => this._cutObject(objectWithContext),
       },
       {
@@ -480,7 +486,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this._paste(objectWithContext),
       },
       {
-        label: 'Duplicate',
+        label: i18n._(t`Duplicate`),
         click: () => this._duplicateObject(objectWithContext),
       },
     ];
@@ -530,29 +536,34 @@ export default class ObjectsList extends React.Component<Props, State> {
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={this._displayedObjectWithContextsList}
-                width={width}
-                height={height}
-                getItemName={getObjectWithContextName}
-                getItemThumbnail={this._getObjectThumbnail}
-                isItemBold={isObjectWithContextGlobal}
-                onEditItem={objectWithContext =>
-                  this.props.onEditObject(objectWithContext.object)
-                }
-                onAddNewItem={this.onAddNewObject}
-                addNewItemLabel={<Trans>Add a new object</Trans>}
-                selectedItems={selectedObjects}
-                onItemSelected={this._selectObject}
-                renamedItem={renamedObjectWithContext}
-                onRename={this._rename}
-                buildMenuTemplate={this._renderObjectMenuTemplate}
-                onMoveSelectionToItem={this._moveSelectionTo}
-                canMoveSelectionToItem={this._canMoveSelectionTo}
-                reactDndType={objectWithContextReactDndType}
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={this._displayedObjectWithContextsList}
+                    width={width}
+                    height={height}
+                    getItemName={getObjectWithContextName}
+                    getItemThumbnail={this._getObjectThumbnail}
+                    isItemBold={isObjectWithContextGlobal}
+                    onEditItem={objectWithContext =>
+                      this.props.onEditObject(objectWithContext.object)
+                    }
+                    onAddNewItem={this.onAddNewObject}
+                    addNewItemLabel={<Trans>Add a new object</Trans>}
+                    selectedItems={selectedObjects}
+                    onItemSelected={this._selectObject}
+                    renamedItem={renamedObjectWithContext}
+                    onRename={this._rename}
+                    buildMenuTemplate={this._renderObjectMenuTemplate(i18n)}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    canMoveSelectionToItem={this._canMoveSelectionTo}
+                    scaleUpItemIconWhenSelected={useScreenType() === 'touch'}
+                    reactDndType={objectWithContextReactDndType}
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>
@@ -600,6 +611,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                 the health of the object.
               </Trans>
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {tagEditedObject && (

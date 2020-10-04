@@ -24,6 +24,15 @@ gdjs.PixiImageManager = function(resources)
 gdjs.ImageManager = gdjs.PixiImageManager; //Register the class to let the engine use it.
 
 /**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.PixiImageManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
+
+/**
  * Return the PIXI texture associated to the specified resource name.
  * Returns a placeholder texture if not found.
  * @param {string} resourceName The name of the resource
@@ -124,7 +133,6 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete) 
 
         if ( res.file && res.kind === "image" ) {
         	if (this._loadedTextures.containsKey(res.name)) {
-				console.log("Texture \"" + res.name + "\" is already loaded.");
         		continue;
         	}
 

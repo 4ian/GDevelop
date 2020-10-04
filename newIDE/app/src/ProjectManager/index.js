@@ -1,12 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
 import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
@@ -36,7 +39,6 @@ import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -45,6 +47,7 @@ import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -136,7 +139,7 @@ type ItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
-  buildExtraMenuTemplate?: () => Array<MenuItemTemplate>,
+  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 
@@ -175,73 +178,77 @@ class Item extends React.Component<ItemProps, {||}> {
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <ListItem
-            style={{
-              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-              ...this.props.style,
-            }}
-            primaryText={label}
-            displayMenuButton
-            buildMenuTemplate={() => [
-              {
-                label: 'Edit',
-                click: () => this.props.onEdit(),
-              },
-              ...(this.props.buildExtraMenuTemplate
-                ? this.props.buildExtraMenuTemplate()
-                : []),
-              { type: 'separator' },
-              {
-                label: 'Rename',
-                click: () => this.props.onEditName(),
-              },
-              {
-                label: 'Delete',
-                click: () => this.props.onDelete(),
-              },
-              {
-                label: this.props.addLabel,
-                visible: !!this.props.onAdd,
-                click: () => this.props.onAdd(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Copy',
-                click: () => this.props.onCopy(),
-              },
-              {
-                label: 'Cut',
-                click: () => this.props.onCut(),
-              },
-              {
-                label: 'Paste',
-                enabled: this.props.canPaste(),
-                click: () => this.props.onPaste(),
-              },
-              {
-                label: 'Duplicate',
-                click: () => this.props.onDuplicate(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Move up',
-                enabled: this.props.canMoveUp,
-                click: () => this.props.onMoveUp(),
-              },
-              {
-                label: 'Move down',
-                enabled: this.props.canMoveDown,
-                click: () => this.props.onMoveDown(),
-              },
-            ]}
-            onClick={() => {
-              // It's essential to discard clicks when editing the name,
-              // to avoid weird opening of an editor (accompanied with a
-              // closing of the project manager) when clicking on the text
-              // field.
-              if (!this.props.editingName) this.props.onEdit();
-            }}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ListItem
+                style={{
+                  borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+                  ...this.props.style,
+                }}
+                primaryText={label}
+                displayMenuButton
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Edit`),
+                    click: () => this.props.onEdit(),
+                  },
+                  ...(this.props.buildExtraMenuTemplate
+                    ? this.props.buildExtraMenuTemplate(i18n)
+                    : []),
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Rename`),
+                    click: () => this.props.onEditName(),
+                  },
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => this.props.onDelete(),
+                  },
+                  {
+                    label: this.props.addLabel,
+                    visible: !!this.props.onAdd,
+                    click: () => this.props.onAdd(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => this.props.onCopy(),
+                  },
+                  {
+                    label: i18n._(t`Cut`),
+                    click: () => this.props.onCut(),
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    enabled: this.props.canPaste(),
+                    click: () => this.props.onPaste(),
+                  },
+                  {
+                    label: i18n._(t`Duplicate`),
+                    click: () => this.props.onDuplicate(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Move up`),
+                    enabled: this.props.canMoveUp,
+                    click: () => this.props.onMoveUp(),
+                  },
+                  {
+                    label: i18n._(t`Move down`),
+                    enabled: this.props.canMoveDown,
+                    click: () => this.props.onMoveDown(),
+                  },
+                ]}
+                onClick={() => {
+                  // It's essential to discard clicks when editing the name,
+                  // to avoid weird opening of an editor (accompanied with a
+                  // closing of the project manager) when clicking on the text
+                  // field.
+                  if (!this.props.editingName) this.props.onEdit();
+                }}
+              />
+            )}
+          </I18n>
         )}
       </ThemeConsumer>
     );
@@ -279,6 +286,7 @@ type Props = {|
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
@@ -331,7 +339,8 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
-      if (this._searchBar) this._searchBar.focus();
+      if (useShouldAutofocusSearchbar() && this._searchBar)
+        this._searchBar.focus();
     }
   }
 
@@ -692,14 +701,6 @@ export default class ProjectManager extends React.Component<Props, State> {
           leftIcon={<AccountCircle />}
           onClick={() => this.props.onOpenProfile()}
         />
-        {!Window.isFullscreen() && (
-          <ListItem
-            key="fullscreen"
-            primaryText={<Trans>Turn on Fullscreen</Trans>}
-            leftIcon={<Fullscreen />}
-            onClick={() => Window.requestFullscreen()}
-          />
-        )}
       </React.Fragment>
     );
   }
@@ -824,14 +825,14 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
-                      buildExtraMenuTemplate={() => [
+                      buildExtraMenuTemplate={(i18n: I18nType) => [
                         {
-                          label: 'Edit Scene Properties',
+                          label: i18n._(t`Edit Scene Properties`),
                           enabled: true,
                           click: () => this._onOpenLayoutProperties(layout),
                         },
                         {
-                          label: 'Edit Scene Variables',
+                          label: i18n._(t`Edit Scene Variables`),
                           enabled: true,
                           click: () => this._onOpenLayoutVariables(layout),
                         },
@@ -1112,6 +1113,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 representing the number of levels unlocked by the player.
               </Trans>
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {this.state.projectPropertiesDialogOpen && (
@@ -1156,6 +1158,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 this.props.unsavedChanges.triggerUnsavedChanges();
               this._onOpenLayoutVariables(null);
             }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {this.state.extensionsSearchDialogOpen && (

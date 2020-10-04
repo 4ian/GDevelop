@@ -25,7 +25,6 @@ const AutocompletionIcon = React.memo(({ src }) => (
   <img
     alt=""
     src={src}
-    crossOrigin="anonymous"
     style={{
       maxWidth: 16,
       maxHeight: 16,

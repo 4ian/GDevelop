@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -261,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
+          "persistentUuid": "5517e6b4-7360-4366-a3e2-18d8ebc4f5f1",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -281,6 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
+          "persistentUuid": "ec900eda-f05a-495d-a02f-2499495b5d67",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -296,6 +298,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
+          "persistentUuid": "2b816abb-e8c5-4e5a-8d5f-01237003a244",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -311,6 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
+          "persistentUuid": "178aa5ff-36b0-4daf-96f0-7c11c13b3abb",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -326,6 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "41e0922a-dc2d-4c8a-a6dc-aa5697ec5c8e",
           "width": 0,
           "x": 257,
           "y": 202,
@@ -3358,6 +3363,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3375,6 +3385,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [

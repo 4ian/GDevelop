@@ -25,6 +25,7 @@ import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
+import LongTouchHandler from './LongTouchHandler';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -41,7 +42,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onChangeOptions: (uiSettings: Object) => void,
   instancesSelection: InstancesSelection,
   onDeleteSelection: () => void,
-  onInstancesAdded: () => void,
+  onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
   onInstancesSelected: (instances: Array<gdInitialInstance>) => void,
   onInstanceDoubleClicked: (instance: gdInitialInstance) => void,
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
@@ -93,10 +94,12 @@ export default class InstancesEditor extends Component<Props> {
   backgroundColor: BackgroundColor;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
+  longTouchHandler: LongTouchHandler;
   grid: Grid;
   _unmounted = false;
   _renderingPaused = false;
   nextFrame: AnimationFrameID;
+  contextMenuLongTouchTimeoutID: TimeoutID;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -135,6 +138,13 @@ export default class InstancesEditor extends Component<Props> {
       // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
     canvasArea.appendChild(this.pixiRenderer.view);
+
+    this.longTouchHandler = new LongTouchHandler({
+      canvas: this.pixiRenderer.view,
+      onLongTouch: event =>
+        this.props.onContextMenu(event.clientX, event.clientY),
+    });
+
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
 
@@ -145,6 +155,7 @@ export default class InstancesEditor extends Component<Props> {
 
       return false;
     });
+
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomBy(event.wheelDelta / 5000);
@@ -375,6 +386,7 @@ export default class InstancesEditor extends Component<Props> {
     this.instancesRenderer.delete();
     this._instancesAdder.unmount();
     this.pinchHandler.unmount();
+    this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }
@@ -462,8 +474,8 @@ export default class InstancesEditor extends Component<Props> {
   addInstances = (
     pos /*: [number, number] */,
     objectNames /*: Array<string> */
-  ) => {
-    this._instancesAdder.addInstances(pos, objectNames);
+  ): Array<gdInitialInstance> => {
+    return this._instancesAdder.addInstances(pos, objectNames);
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -559,7 +571,9 @@ export default class InstancesEditor extends Component<Props> {
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
       for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
-        this.props.initialInstances.insertInitialInstance(instance);
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
       }
     } else {
       this.props.instancesSelection.selectInstance(
@@ -787,9 +801,11 @@ export default class InstancesEditor extends Component<Props> {
             x - canvasRect.left,
             y - canvasRect.top
           );
-          _instancesAdder.updateTemporaryInstancePositions(pos);
+          const instances = _instancesAdder.updateTemporaryInstancePositions(
+            pos
+          );
           _instancesAdder.commitTemporaryInstances();
-          this.props.onInstancesAdded();
+          this.props.onInstancesAdded(instances);
         }}
       >
         {({ connectDropTarget, isOver }) => {

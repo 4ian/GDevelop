@@ -7,6 +7,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
+import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 export type RenderEditorContainerProps = {|
@@ -31,6 +32,7 @@ export type RenderEditorContainerProps = {|
     externalLayoutName?: ?string
   ) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 
   // Opening other editors:
   onOpenExternalEvents: string => void,

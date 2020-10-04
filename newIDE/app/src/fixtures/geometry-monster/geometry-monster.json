@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -464,6 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
+          "persistentUuid": "7d47e4e7-199b-4219-8095-add2aa669bc9",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -479,6 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
+          "persistentUuid": "e1110617-cc09-4d97-be0b-1ce809cad66b",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -775,6 +777,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -858,6 +865,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
+          "persistentUuid": "f1592747-907b-4885-a777-a2cde4ef15cb",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -873,6 +881,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "a873d2d9-238e-4526-ad97-70f39ad5f695",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -888,6 +897,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
+          "persistentUuid": "bd2872eb-09c9-49a3-8a3b-84418557191f",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -903,6 +913,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "5693761c-7ebf-46a0-bc78-ff47c0b3dddc",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -918,6 +929,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
+          "persistentUuid": "64e1dab6-941e-4671-96d2-6b4c5061a288",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -933,6 +945,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
+          "persistentUuid": "cb9ef46a-803d-4a4e-9afc-e2496e5b390c",
           "width": 0,
           "x": 110,
           "y": 406,
@@ -3380,6 +3393,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

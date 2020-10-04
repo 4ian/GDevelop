@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -285,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "51c005e1-9bf0-4973-8b88-0e01f652389c",
           "width": 0,
           "x": 56,
           "y": 334,
@@ -317,6 +318,7 @@
           "layer": "",
           "locked": false,
           "name": "XButton",
+          "persistentUuid": "c04abc93-aa43-4004-9b4a-ea3f996bfb06",
           "width": 0,
           "x": 456,
           "y": 443,
@@ -332,6 +334,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "ea395906-9a60-4179-82af-a53ff5d9b649",
           "width": 0,
           "x": 4,
           "y": 559,
@@ -347,6 +350,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "e012efd2-177c-4d4a-aa91-dcaf50bb3b95",
           "width": 0,
           "x": 56,
           "y": 256,
@@ -379,6 +383,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "b68e4dcf-6dd2-4f63-bc4a-4878c4e5e37c",
           "width": 0,
           "x": 55,
           "y": 183,
@@ -411,6 +416,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "83d47aca-4d62-4a65-804e-847e4412fd42",
           "width": 0,
           "x": 57,
           "y": 418,
@@ -443,6 +449,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "51988d4a-1e21-4d56-bc94-c1e69984cad1",
           "width": 0,
           "x": 446,
           "y": 364,
@@ -475,6 +482,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "12de1a3a-a512-4775-96fd-64a3f3346f2c",
           "width": 0,
           "x": 446,
           "y": 295,
@@ -507,6 +515,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "70f22437-daf9-49d4-97b4-5a75e9c22d1c",
           "width": 0,
           "x": 446,
           "y": 226,
@@ -539,6 +548,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "1d6125e9-5f2d-4960-b33a-b4ca0524b6d9",
           "width": 0,
           "x": 230,
           "y": 225,
@@ -571,6 +581,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "bdc5f932-eeeb-42e6-88e2-2a436a46a510",
           "width": 0,
           "x": 231,
           "y": 305,
@@ -603,6 +614,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "31318456-e379-439d-b735-48993bc02132",
           "width": 0,
           "x": 229,
           "y": 378,
@@ -635,6 +647,7 @@
           "layer": "",
           "locked": false,
           "name": "ExampleDescription",
+          "persistentUuid": "5865fa61-cd36-4ad8-a821-c33528e07b14",
           "width": 0,
           "x": 17,
           "y": 15,
@@ -2538,6 +2551,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

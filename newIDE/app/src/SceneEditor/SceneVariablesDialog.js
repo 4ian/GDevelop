@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 type Props = {|
   open: boolean,
   layout: gdLayout,
   onApply: () => void,
   onClose: () => void,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 export default (props: Props) => {
@@ -30,6 +32,7 @@ export default (props: Props) => {
           current score of the player.
         </Trans>
       }
+      hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
     />
   );
 };

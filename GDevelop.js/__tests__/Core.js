@@ -593,6 +593,38 @@ describe('libGD.js', function() {
       expect(initialInstance2.getCustomWidth()).toBe(34);
       expect(initialInstance2.getCustomHeight()).toBe(30);
     });
+    it('can be serialized with a persistent UUID called persistentUuid', function() {
+      const initialInstance = new gd.InitialInstance();
+      initialInstance.setObjectName("MyObject");
+
+      // Serialized object must have a non empty "persistentUuid".
+      var element = new gd.SerializerElement();
+      initialInstance.serializeTo(element);
+      const persistentUuid = element.getStringAttribute("persistentUuid");
+      expect(persistentUuid).toBeTruthy();
+
+      // The UUID must persist across serializations.
+      const initialInstance2 = new gd.InitialInstance();
+      initialInstance2.unserializeFrom(element);
+
+      var element2 = new gd.SerializerElement();
+      initialInstance.serializeTo(element2);
+      const persistentUuid2 = element2.getStringAttribute("persistentUuid");
+      expect(persistentUuid2).toBe(persistentUuid);
+
+      // The UUID can be reset
+      initialInstance2.resetPersistentUuid();
+      var element3 = new gd.SerializerElement();
+      initialInstance2.serializeTo(element3);
+      const persistentUuid3 = element3.getStringAttribute("persistentUuid");
+      expect(persistentUuid3).not.toBe(persistentUuid2);
+
+      element.delete();
+      element2.delete();
+      element3.delete();
+      initialInstance.delete();
+      initialInstance2.delete();
+    });
 
     afterAll(function() {
       project.delete();
@@ -2609,8 +2641,12 @@ describe('libGD.js', function() {
         done();
       };
 
-      var exporter = new gd.Exporter(fs);
-      exporter.exportLayoutForPixiPreview(project, layout, '/path/for/export/');
+      const exporter = new gd.Exporter(fs);
+      const previewExportOptions =
+        new gd.PreviewExportOptions(project, '/path/for/export/');
+      previewExportOptions.setLayoutName('Scene');
+      exporter.exportProjectForPixiPreview(previewExportOptions);
+      previewExportOptions.delete();
       exporter.delete();
     });
   });

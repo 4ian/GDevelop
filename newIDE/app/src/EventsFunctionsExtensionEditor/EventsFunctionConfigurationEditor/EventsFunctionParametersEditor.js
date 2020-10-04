@@ -236,7 +236,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               <MoreVert />
                             </IconButton>
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),

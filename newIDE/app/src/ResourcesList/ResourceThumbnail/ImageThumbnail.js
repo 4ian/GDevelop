@@ -7,6 +7,7 @@ import {
 } from '../../Utils/ImageSizeChecker';
 import Tooltip from '@material-ui/core/Tooltip';
 import Warning from '@material-ui/icons/Warning';
+import { useLongTouch } from '../../Utils/UseLongTouch';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -62,6 +63,7 @@ const ImageThumbnail = ({
   onContextMenu,
   muiTheme,
 }) => {
+
   const [hasSizeWarning, setHasWarningSize] = React.useState(false);
   const [hasThumbnailMissing, setThumbnailMissing] = React.useState(false);
 
@@ -85,6 +87,17 @@ const ImageThumbnail = ({
     }
     setThumbnailMissing(false);
   };
+
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        if (onContextMenu) onContextMenu(event.clientX, event.clientY);
+      },
+      [onContextMenu]
+    )
+  );
+
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -103,11 +116,12 @@ const ImageThumbnail = ({
             e.stopPropagation();
             if (onContextMenu) onContextMenu(e.clientX, e.clientY);
           }}
+          {...longTouchForContextMenuProps}
         >
           <img
             style={styles.spriteThumbnailImage}
             alt={hasThumbnailMissing ? '' : resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName)}
+            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
             crossOrigin="anonymous"
             onLoad={_callbackImageThumbnailLoaded}
             onError={() => {

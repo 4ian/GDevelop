@@ -1,18 +1,17 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { AssetCard } from './AssetCard';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
+import ErrorBoundary from '../UI/ErrorBoundary';
 import { AutoSizer, Grid } from 'react-virtualized';
 import EmptyMessage from '../UI/EmptyMessage';
 
-type Props = {|
-  assetShortHeaders: ?Array<AssetShortHeader>,
+type Props<SearchItem> = {|
+  searchItems: ?Array<SearchItem>,
+  renderSearchItem: (item: SearchItem, size: number) => React.Node,
   error: ?Error,
   onRetry: () => void,
-  onOpenDetails: AssetShortHeader => void,
 |};
 
 const styles = {
@@ -20,13 +19,13 @@ const styles = {
   grid: { overflowX: 'hidden' },
 };
 
-export const SearchResults = ({
-  assetShortHeaders,
+export const SearchResults = <SearchItem>({
+  searchItems,
+  renderSearchItem,
   error,
   onRetry,
-  onOpenDetails,
-}: Props) => {
-  if (!assetShortHeaders) {
+}: Props<SearchItem>) => {
+  if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
     else {
       return (
@@ -38,7 +37,7 @@ export const SearchResults = ({
         </PlaceholderError>
       );
     }
-  } else if (assetShortHeaders.length === 0) {
+  } else if (searchItems.length === 0) {
     return (
       <EmptyMessage>
         <Trans>
@@ -50,53 +49,51 @@ export const SearchResults = ({
   }
 
   return (
-    <div style={styles.container}>
-      <AutoSizer>
-        {({ width, height }) => {
-          if (!width || !height) return null;
+    <ErrorBoundary>
+      <div style={styles.container}>
+        <AutoSizer>
+          {({ width, height }) => {
+            if (!width || !height) return null;
 
-          const baseSize = 128;
-          const columnCount = Math.floor((width - 5) / baseSize);
-          const columnWidth = Math.floor(width / columnCount);
-          const rowCount = Math.max(
-            1,
-            Math.ceil(assetShortHeaders.length / columnCount)
-          );
+            const baseSize = 128;
+            const columnCount = Math.floor((width - 5) / baseSize);
+            const columnWidth = Math.floor(width / columnCount);
+            const rowCount = Math.max(
+              1,
+              Math.ceil(searchItems.length / columnCount)
+            );
 
-          function cellRenderer({ columnIndex, key, rowIndex, style }) {
-            const indexInList = rowIndex * columnCount + columnIndex;
-            const assetShortHeader =
-              indexInList < assetShortHeaders.length
-                ? assetShortHeaders[indexInList]
-                : null;
+            function cellRenderer({ columnIndex, key, rowIndex, style }) {
+              const indexInList = rowIndex * columnCount + columnIndex;
+              const searchItem =
+                indexInList < searchItems.length
+                  ? searchItems[indexInList]
+                  : null;
+
+              return (
+                <div key={key} style={style}>
+                  {searchItem
+                    ? renderSearchItem(searchItem, columnWidth)
+                    : null}
+                </div>
+              );
+            }
 
             return (
-              <div key={key} style={style}>
-                {assetShortHeader ? (
-                  <AssetCard
-                    size={columnWidth}
-                    onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                    assetShortHeader={assetShortHeader}
-                  />
-                ) : null}
-              </div>
+              <Grid
+                width={width}
+                height={height}
+                columnCount={columnCount}
+                columnWidth={columnWidth}
+                rowHeight={columnWidth}
+                rowCount={rowCount}
+                cellRenderer={cellRenderer}
+                style={styles.grid}
+              />
             );
-          }
-
-          return (
-            <Grid
-              width={width}
-              height={height}
-              columnCount={columnCount}
-              columnWidth={columnWidth}
-              rowHeight={columnWidth}
-              rowCount={rowCount}
-              cellRenderer={cellRenderer}
-              style={styles.grid}
-            />
-          );
-        }}
-      </AutoSizer>
-    </div>
+          }}
+        </AutoSizer>
+      </div>
+    </ErrorBoundary>
   );
 };

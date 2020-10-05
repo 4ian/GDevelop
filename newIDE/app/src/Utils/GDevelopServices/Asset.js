@@ -80,6 +80,8 @@ export type AllAssets = {|
 
 export type Resource = {|
   url: string,
+  name: string,
+  license: string,
   type: string,
   tags: Array<string>,
 |};
@@ -88,7 +90,6 @@ export type AllResources = {|
   resources: Array<Resource>,
   filters: Filters,
 |};
-
 
 /** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
 export const isCompatibleWithAsset = (

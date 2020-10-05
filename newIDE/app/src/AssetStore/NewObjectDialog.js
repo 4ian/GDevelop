@@ -144,7 +144,13 @@ export default function NewObjectDialog({
         setAssetBeingInstalled(null);
       })();
     },
-    [eventsFunctionsExtensionsState, project, objectsContainer, events]
+    [
+      eventsFunctionsExtensionsState,
+      project,
+      objectsContainer,
+      events,
+      onObjectAddedFromAsset,
+    ]
   );
 
   return (

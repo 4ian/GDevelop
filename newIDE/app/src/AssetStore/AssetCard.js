@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
 
 const paddingSize = 10;
 const styles = {
@@ -54,7 +55,7 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
     <ButtonBase onClick={onOpenDetails} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
         <div style={{ ...styles.previewBackground, width: size, height: size }}>
-          <img
+          <CorsAwareImage
             key={assetShortHeader.previewImageUrls[0]}
             style={{
               ...styles.previewImage,

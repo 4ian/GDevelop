@@ -8,27 +8,9 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { SearchResults } from './SearchResults';
 import { FiltersChooser } from './FiltersChooser';
 import { AssetStoreContext } from './AssetStoreContext';
+import { AssetCard } from './AssetCard';
 
 const styles = {
-  previewBackground: {
-    background: 'url("res/transparentback.png") repeat',
-    width: 150,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chip: {
-    marginBottom: 2,
-    marginRight: 2,
-  },
-  previewImage: {
-    maxWidth: 150,
-    verticalAlign: 'middle',
-    pointerEvents: 'none',
-  },
-  content: {
-    flex: '1',
-  },
   searchBar: {
     // TODO: Can we put this in the search bar by default?
     flexShrink: 0,
@@ -88,10 +70,16 @@ export const AssetStore = ({
           </ScrollView>
         </Background>
         <SearchResults
-          onOpenDetails={onOpenDetails}
           onRetry={fetchAssetsAndFilters}
           error={error}
-          assetShortHeaders={searchResults}
+          searchItems={searchResults}
+          renderSearchItem={(assetShortHeader, size) => (
+            <AssetCard
+              size={size}
+              onOpenDetails={() => onOpenDetails(assetShortHeader)}
+              assetShortHeader={assetShortHeader}
+            />
+          )}
         />
       </Line>
     </Column>

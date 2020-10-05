@@ -37,7 +37,7 @@ jest.mock('../Utils/GDevelopServices/Asset');
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 describe('InstallAsset', () => {
-  describe('sanitizeObjectName', () => {
+  test('sanitizeObjectName', () => {
     expect(sanitizeObjectName('')).toBe('UnnamedObject');
     expect(sanitizeObjectName('HelloWorld')).toBe('HelloWorld');
     expect(sanitizeObjectName('Hello World')).toBe('HelloWorld');

@@ -14,7 +14,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
+    "projectFile": "",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -2594,10 +2594,10 @@
           "variables": [],
           "behaviors": [
             {
-              "jumpSpeed": 800,
-              "jumpSustainTime": 0.4,
               "name": "PlatformerObject",
               "type": "PlatformBehavior::PlatformerObjectBehavior",
+              "jumpSpeed": 800,
+              "jumpSustainTime": 0.4,
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,

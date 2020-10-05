@@ -59,7 +59,11 @@ export default class ExpressionParametersEditorDialog extends Component<
 
     return (
       <Dialog
-        title={<Trans>Enter the expression parameters</Trans>}
+        title={<>
+          <Trans>Enter the expression parameters</Trans>
+          <br/>
+          <p style={{fontSize: "18px", marginTop: "-3px"}}>{expressionMetadata.getDescription()}</p>
+        </>}
         cannotBeDismissed={true}
         open
         actions={

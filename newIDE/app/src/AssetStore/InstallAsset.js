@@ -265,7 +265,7 @@ export const addAssetToProject = async ({
 
   return {
     createdObjects,
-  }
+  };
 };
 
 type RequiredBehavior = {|
@@ -472,6 +472,11 @@ export const installAsset = async ({
     );
   }
 
-  const output = await addAssetToProject({ project, asset, events, objectsContainer });
+  const output = await addAssetToProject({
+    project,
+    asset,
+    events,
+    objectsContainer,
+  });
   return output;
 };

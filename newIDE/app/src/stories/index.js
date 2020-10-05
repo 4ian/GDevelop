@@ -208,13 +208,13 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { AssetStore } from '../AssetStore';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import ScrollView from '../UI/ScrollView';
-
 import '../UI/Theme/Global.css';
 import { AssetCard } from '../AssetStore/AssetCard';
-import { useFilters } from '../AssetStore/FiltersChooser';
 import { SearchResults } from '../AssetStore/SearchResults';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import CustomizationFields from '../AssetStore/CustomizationFields';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ResourceStore } from '../AssetStore/ResourceStore';
 
 configureActions({
   depth: 2,
@@ -4378,20 +4378,23 @@ storiesOf('EffectsList', module)
 storiesOf('NewObjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <NewObjectDialog
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onClose={action('onClose')}
-      onCreateNewObject={action('onCreateNewObject')}
-      events={testProject.testLayout.getEvents()}
-      objectsContainer={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
+    <AssetStoreStateProvider>
+      <NewObjectDialog
+        project={testProject.project}
+        layout={testProject.testLayout}
+        onClose={action('onClose')}
+        onCreateNewObject={action('onCreateNewObject')}
+        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        events={testProject.testLayout.getEvents()}
+        objectsContainer={testProject.testLayout}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+      />
+    </AssetStoreStateProvider>
   ));
 
 storiesOf('CommandPalette', module)
@@ -4513,43 +4516,28 @@ storiesOf('AssetStore', module)
     </FixedHeightFlexContainer>
   ));
 
-storiesOf('AssetStore/SearchResults', module)
+storiesOf('AssetStore/ResourceStore', module)
   .addDecorator(muiDecorator)
-  .add('loading', () => (
-    <SearchResults
-      error={null}
-      assetShortHeaders={null}
-      onRetry={action('onRetry')}
-      onOpenDetails={action('onOpenDetails')}
-    />
+  .add('resourceKind: image', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ))
-  .add('errored', () => (
-    <SearchResults
-      error={new Error('Fake error')}
-      assetShortHeaders={null}
-      onRetry={action('onRetry')}
-      onOpenDetails={action('onOpenDetails')}
-    />
+  .add('resourceKind: audio', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ))
-  .add('no results', () => (
-    <SearchResults
-      error={null}
-      assetShortHeaders={[]}
-      onRetry={action('onRetry')}
-      onOpenDetails={action('onOpenDetails')}
-    />
-  ))
-  .add('some results', () => (
-    <SearchResults
-      error={null}
-      assetShortHeaders={[
-        fakeAssetShortHeader1,
-        fakeAssetShortHeader2,
-        fakeAssetShortHeader3,
-      ]}
-      onRetry={action('onRetry')}
-      onOpenDetails={action('onOpenDetails')}
-    />
+  .add('resourceKind: font', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('AssetStore/AssetCard', module)

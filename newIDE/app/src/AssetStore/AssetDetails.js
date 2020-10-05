@@ -24,6 +24,7 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
 
 const styles = {
   previewBackground: {
@@ -141,7 +142,7 @@ export const AssetDetails = ({
                     : styles.verticalPreviewBackground),
                 }}
               >
-                <img
+                <CorsAwareImage
                   style={styles.previewImage}
                   src={assetShortHeader.previewImageUrls[0]}
                   alt={assetShortHeader.name}

@@ -2119,22 +2119,6 @@ module.exports = {
       {
         "fullName": "",
         "name": ""
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },
@@ -2618,8 +2602,29 @@ module.exports = {
       }
     ]
   },
-  "online-multiplayer": {
-    "description": "A showcase of some multiplayer possibilities using the P2P extension.",
+  "open-url-in-browser": {
+    "description": "This shows how to open a website on the system default browser.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
+  "p2p-networking": {
+    "description": "A showcase of some multiplayer/networking possibilities using the P2P extension.",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2658,37 +2663,12 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Time",
-        "name": "BuiltinTime"
-      },
-      {
         "fullName": "",
         "name": ""
       },
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
-      }
-    ]
-  },
-  "open-url-in-browser": {
-    "description": "This shows how to open a website on the system default browser.",
-    "usedExtensions": [
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Storage",
-        "name": "BuiltinFile"
       }
     ]
   },
@@ -3267,6 +3247,10 @@ module.exports = {
       {
         "fullName": "Anchor",
         "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Scene management features",

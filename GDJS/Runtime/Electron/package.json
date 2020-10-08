@@ -9,7 +9,7 @@
       "GDJS_EXTENSION_NPM_DEPENDENCY": "0"
     },
     "devDependencies": {
-      "electron": "8.2.5"
+      "electron": "10.1.3"
     },
     "build": {
         "directories": {

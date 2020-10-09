@@ -263,8 +263,8 @@ export default class SelectedInstances {
     //Position the resize button.
     //
     const show = selection.length !== 0;
-    let instanceProps = this.toCanvasCoordinates((x1 + x2) / 2, (y1 + y2) / 2);
-    instanceProps.push(angle);
+    let instancePos = this.toCanvasCoordinates((x1 + x2) / 2, (y1 + y2) / 2);
+    let instanceProps = [instancePos[0], instancePos[1], angle];
 
     const resizeButtonPos = this.toCanvasCoordinates(x2, y2);
     resizeButtonPos[0] += buttonPadding;

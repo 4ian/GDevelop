@@ -64,8 +64,8 @@ export default class InstancesRenderer {
 
         return layerRenderer.getInstanceHeight(instance);
       },
-      getInstanceAngle : instance =>{
-	      return instance.getAngle() ;
+      getInstanceAngle: instance => {
+        return instance.getAngle();
       },
 
       getInstanceRect: instance => {
@@ -74,9 +74,6 @@ export default class InstancesRenderer {
           y: this.instanceMeasurer.getInstanceTop(instance),
           width: this.instanceMeasurer.getInstanceWidth(instance),
           height: this.instanceMeasurer.getInstanceHeight(instance),
-
-	  angle :this.instanceMeasurer.getInstanceAngle(instance)
-
         };
       },
     };

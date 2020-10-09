@@ -58,14 +58,14 @@ export default class InstancesSelection {
 
     //IF INSTANCERECT/HIGHLIGHETEDINSTANCERECT NEEDS TO BE ROTATED
 
-    /*this.highlightRectangle.position.x =
+    /*  this.highlightRectangle.position.x =
       highlightRectangle.x + highlightRectangle.width / 2;
     this.highlightRectangle.position.y =
       highlightRectangle.y + highlightRectangle.height / 2;
     this.highlightRectangle.pivot.x = this.highlightRectangle.position.x;
     this.highlightRectangle.pivot.y = this.highlightRectangle.position.y;
     this.highlightRectangle.rotation =
-      (Math.PI * highlightRectangle.angle) / 180; */
+      (Math.PI * this.highlightedInstance.getAngle()) / 180; */
 
     this.highlightRectangle.endFill();
 

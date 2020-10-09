@@ -6,6 +6,5 @@ export default function transformRect(transformPoint, { x, y, width, height,angl
     y: startPos[1],
     width: endPos[0] - startPos[0],
     height: endPos[1] - startPos[1],
-angle : angle
   };
 }

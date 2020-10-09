@@ -217,7 +217,7 @@ export default class SelectedInstances {
         this.toCanvasCoordinates,
         instanceRect
       );
-      angle = (selectionRectangle.angle * Math.PI) / 180;
+      angle = (instance.getAngle() * Math.PI) / 180;
       this.selectedRectangles[i].clear();
       this.selectedRectangles[i].beginFill(0x6868e8);
       this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);

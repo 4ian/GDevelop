@@ -94,3 +94,4 @@ export default class InstancesSelection {
     this.tooltipBackground.endFill();
   }
 }
+

@@ -282,3 +282,4 @@ export default class SelectedInstances {
     );
   }
 }
+

@@ -1,4 +1,4 @@
-export default function transformRect(transformPoint, { x, y, width, height }) {
+export default function transformRect(transformPoint, { x, y, width, height,angle }) {
   const startPos = transformPoint(x, y);
   const endPos = transformPoint(x + width, y + height);
   return {
@@ -6,5 +6,6 @@ export default function transformRect(transformPoint, { x, y, width, height }) {
     y: startPos[1],
     width: endPos[0] - startPos[0],
     height: endPos[1] - startPos[1],
+angle : angle
   };
 }

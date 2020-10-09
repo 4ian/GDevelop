@@ -19,9 +19,10 @@ type Props = {|
 const getButtonSizes = (screenType: ScreenType) => {
   if (screenType === 'touch') {
     return {
-      buttonSize: 18,
-      smallButtonSize: 13,
+      buttonSize: 16,
+      smallButtonSize: 14,
       buttonPadding: 5,
+      hitAreaPadding: 20,
     };
   }
 
@@ -29,6 +30,7 @@ const getButtonSizes = (screenType: ScreenType) => {
     buttonSize: 10,
     smallButtonSize: 8,
     buttonPadding: 5,
+    hitAreaPadding: 5,
   };
 };
 
@@ -148,7 +150,9 @@ export default class SelectedInstances {
     buttonObject: PIXI.Graphics,
     canvasPosition: [number, number],
     size: number,
-    shape: 0 | 1 = RECTANGLE_BUTTON_SHAPE
+    shape: 0 | 1,
+    hitAreaPadding: number,
+    instanceProps: [number, number, number]
   ) {
     buttonObject.clear();
     if (!show) {
@@ -159,6 +163,7 @@ export default class SelectedInstances {
     buttonObject.beginFill(0xffffff);
     buttonObject.lineStyle(1, 0x6868e8, 1);
     buttonObject.fill.alpha = 0.9;
+
     if (shape === RECTANGLE_BUTTON_SHAPE) {
       buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
     } else if (shape === CIRCLE_BUTTON_SHAPE) {
@@ -168,26 +173,35 @@ export default class SelectedInstances {
         size / 2
       );
     }
+    buttonObject.position.x = instanceProps[0];
+    buttonObject.position.y = instanceProps[1];
 
+    buttonObject.pivot.x = instanceProps[0];
+    buttonObject.pivot.y = instanceProps[1];
+    buttonObject.rotation = instanceProps[2];
     buttonObject.endFill();
     buttonObject.hitArea = new PIXI.Rectangle(
-      canvasPosition[0],
-      canvasPosition[1],
-      size,
-      size
+      canvasPosition[0] - hitAreaPadding,
+      canvasPosition[1] - hitAreaPadding,
+      size + hitAreaPadding * 2,
+      size + hitAreaPadding * 2
     );
   }
 
   render() {
-    const { buttonSize, smallButtonSize, buttonPadding } = getButtonSizes(
-      this._screenType
-    );
+    const {
+      buttonSize,
+      smallButtonSize,
+      buttonPadding,
+      hitAreaPadding,
+    } = getButtonSizes(this._screenType);
     const selection = this.instancesSelection.getSelectedInstances();
     let x1 = 0;
     let y1 = 0;
     let x2 = 0;
     let y2 = 0;
 
+    let angle = 0;
     //Update the selection rectangle of each instance
     for (var i = 0; i < selection.length; i++) {
       if (this.selectedRectangles.length === i) {
@@ -203,18 +217,28 @@ export default class SelectedInstances {
         this.toCanvasCoordinates,
         instanceRect
       );
-
+      angle = (selectionRectangle.angle * Math.PI) / 180;
       this.selectedRectangles[i].clear();
       this.selectedRectangles[i].beginFill(0x6868e8);
       this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);
       this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
+
       this.selectedRectangles[i].drawRect(
         selectionRectangle.x,
         selectionRectangle.y,
         selectionRectangle.width,
         selectionRectangle.height
       );
+      this.selectedRectangles[i].position.x =
+        selectionRectangle.x + selectionRectangle.width / 2;
+      this.selectedRectangles[i].position.y =
+        selectionRectangle.y + selectionRectangle.height / 2;
+      this.selectedRectangles[i].pivot.x =
+        selectionRectangle.x + selectionRectangle.width / 2;
+      this.selectedRectangles[i].pivot.y =
+        selectionRectangle.y + selectionRectangle.height / 2;
+      this.selectedRectangles[i].rotation = angle;
       this.selectedRectangles[i].endFill();
 
       if (i === 0) {
@@ -237,7 +261,11 @@ export default class SelectedInstances {
     }
 
     //Position the resize button.
+    //
     const show = selection.length !== 0;
+    let instanceProps = this.toCanvasCoordinates((x1 + x2) / 2, (y1 + y2) / 2);
+    instanceProps.push(angle);
+
     const resizeButtonPos = this.toCanvasCoordinates(x2, y2);
     resizeButtonPos[0] += buttonPadding;
     resizeButtonPos[1] += buttonPadding;
@@ -260,26 +288,41 @@ export default class SelectedInstances {
     rotateButtonPos[0] -= smallButtonSize / 2;
     rotateButtonPos[1] -= buttonPadding * 4;
 
-    this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);
+    this._renderButton(
+      show,
+      this.resizeButton,
+      resizeButtonPos,
+      buttonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding,
+      instanceProps
+    );
     this._renderButton(
       show,
       this.rightResizeButton,
       rightResizeButtonPos,
-      smallButtonSize
+      smallButtonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding,
+      instanceProps
     );
     this._renderButton(
       show,
       this.bottomResizeButton,
       bottomResizeButtonPos,
-      smallButtonSize
+      smallButtonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding,
+      instanceProps
     );
     this._renderButton(
       show,
       this.rotateButton,
       rotateButtonPos,
       smallButtonSize,
-      CIRCLE_BUTTON_SHAPE
+      CIRCLE_BUTTON_SHAPE,
+      hitAreaPadding,
+      instanceProps
     );
   }
 }
-

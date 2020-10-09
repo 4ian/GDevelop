@@ -55,6 +55,18 @@ export default class InstancesSelection {
       highlightRectangle.width,
       highlightRectangle.height
     );
+
+    //IF INSTANCERECT/HIGHLIGHETEDINSTANCERECT NEEDS TO BE ROTATED
+
+    /*this.highlightRectangle.position.x =
+      highlightRectangle.x + highlightRectangle.width / 2;
+    this.highlightRectangle.position.y =
+      highlightRectangle.y + highlightRectangle.height / 2;
+    this.highlightRectangle.pivot.x = this.highlightRectangle.position.x;
+    this.highlightRectangle.pivot.y = this.highlightRectangle.position.y;
+    this.highlightRectangle.rotation =
+      (Math.PI * highlightRectangle.angle) / 180; */
+
     this.highlightRectangle.endFill();
 
     const tooltipInfo =
@@ -94,4 +106,3 @@ export default class InstancesSelection {
     this.tooltipBackground.endFill();
   }
 }
-

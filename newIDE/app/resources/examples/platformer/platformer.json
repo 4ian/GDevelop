@@ -1811,7 +1811,7 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 855,
+          "height": 724,
           "layer": "Background",
           "locked": true,
           "name": "TiledForestBackground",
@@ -4118,9 +4118,11 @@
             {
               "type": {
                 "inverted": true,
-                "value": "SystemInfo::IsMobile"
+                "value": "SystemInfo::HasTouchScreen"
               },
-              "parameters": [],
+              "parameters": [
+                ""
+              ],
               "subInstructions": []
             }
           ],
@@ -4274,7 +4276,7 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 1702453580,
+          "ambientLightColorB": 1702453632,
           "ambientLightColorG": 0,
           "ambientLightColorR": 0,
           "followBaseLayerCamera": false,

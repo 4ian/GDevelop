@@ -96,6 +96,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       identifier: 'p2p-broker-recommendation',
     };
   }
+  if (type === 'SystemInfo::IsMobile') {
+    return {
+      kind: 'warning',
+      message: t`Note that the distinction between what is a mobile device and what is not is becoming blurry (with devices like iPad pro and other "desktop-class" tablets). If you use this for mobile controls, prefer to check if the device has touchscreen support.`,
+    };
+  }
 
   return null;
 };

@@ -30,6 +30,7 @@ import './style.css';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 const gd: libGDevelop = global.gd;
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
@@ -468,7 +469,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     if (!object) return null;
 
     return (
-      <img
+      <CorsAwareImage
         className={classNames({
           [icon]: true,
         })}

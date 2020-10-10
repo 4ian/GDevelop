@@ -1,5 +1,6 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 
@@ -77,7 +78,7 @@ const ImageThumbnail = ({
           }}
           {...longTouchForContextMenuProps}
         >
-          <img
+          <CorsAwareImage
             style={styles.spriteThumbnailImage}
             alt={resourceName}
             src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}

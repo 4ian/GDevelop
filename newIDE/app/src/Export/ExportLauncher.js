@@ -97,14 +97,16 @@ export default class ExportLauncher extends Component<Props, State> {
         this.setState({
           errored: true,
         });
-        showErrorBox(
-          message +
+        showErrorBox({
+          message:
+            message +
             (err.message ? `\n\nDetails of the error: ${err.message}` : ''),
-          {
+          rawError: {
             exportStep: this.state.exportStep,
             rawError: err,
-          }
-        );
+          },
+          errorId: 'export-error',
+        });
       }
 
       throw err;

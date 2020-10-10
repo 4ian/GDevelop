@@ -12,7 +12,7 @@ import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../UI/HelpButton';
-import { showWarningBox } from '../UI/Messages/MessageBox';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
 
 type Props = {|
@@ -54,13 +54,14 @@ const importExtension = (
           );
         });
     })
-    .catch(error => {
-      showWarningBox(
-        i18n._(
-          t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`,
-          error
-        )
-      );
+    .catch(rawError => {
+      showErrorBox({
+        message: i18n._(
+          t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`
+        ),
+        rawError,
+        errorId: 'extension-loading-error',
+      });
     });
 };
 

@@ -35,6 +35,21 @@ describe('FormatExpressionCall', () => {
     ).toBe('CameraHeight("My layer", 0)');
   });
 
+  it('properly format a free function, with "code-only" and optional parameters', () => {
+    const freeExpressions = enumerateFreeExpressions('number');
+    const touchExpression = filterExpressions(freeExpressions, 'TouchX')[0];
+    expect(formatExpressionCall(touchExpression, ['', '1'])).toBe('TouchX(1)');
+    expect(formatExpressionCall(touchExpression, ['', '1', '"My layer"'])).toBe(
+      'TouchX(1, "My layer")'
+    );
+    expect(formatExpressionCall(touchExpression, ['', '1', '', ''])).toBe(
+      'TouchX(1)'
+    );
+    expect(formatExpressionCall(touchExpression, ['', '1', '', '2'])).toBe(
+      'TouchX(1, "", 2)'
+    );
+  });
+
   it('properly format an object function', () => {
     const objectsExpressions = enumerateObjectExpressions('number', 'Sprite');
     const variableStringExpression = filterExpressions(

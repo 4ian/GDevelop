@@ -182,6 +182,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                            gdjsRoot + "/Runtime/index.html",
                            options.exportPath,
                            includesFiles,
+                           options.nonRuntimeScriptsCacheBurst,
                            "gdjs.runtimeGameOptions"))
     return false;
 
@@ -213,11 +214,16 @@ bool ExporterHelper::ExportPixiIndexFile(
     gd::String source,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
   // Generate the file
-  if (!CompleteIndexFile(str, exportDir, includesFiles, additionalSpec))
+  if (!CompleteIndexFile(str,
+                         exportDir,
+                         includesFiles,
+                         nonRuntimeScriptsCacheBurst,
+                         additionalSpec))
     return false;
 
   // Write the index.html file
@@ -397,7 +403,11 @@ bool ExporterHelper::ExportCocos2dFiles(
 
     // Generate the file
     std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(str, exportDir, noIncludesInThisFile, "")) {
+    if (!CompleteIndexFile(str,
+                           exportDir,
+                           noIncludesInThisFile,
+                           /*nonRuntimeScriptsCacheBurst=*/0,
+                           "")) {
       lastError = "Unable to complete Cocos2d-JS index.html file.";
       return false;
     }
@@ -565,12 +575,14 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String &str,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
-    gd::String scriptSrc = GetExportedIncludeFilename(include);
+    gd::String scriptSrc =
+        GetExportedIncludeFilename(include, nonRuntimeScriptsCacheBurst);
 
     // Sanity check if the file exists - if not skip it to avoid
     // including it in the list of scripts.
@@ -773,7 +785,14 @@ bool ExporterHelper::ExportExternalSourceFiles(
 }
 
 gd::String ExporterHelper::GetExportedIncludeFilename(
-    const gd::String &include) {
+    const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst) {
+  auto addSearchParameterToUrl = [](const gd::String &url,
+                                    const gd::String &urlEncodedParameterName,
+                                    const gd::String &urlEncodedValue) {
+    gd::String separator = url.find("?") == gd::String::npos ? "?" : "&";
+    return url + separator + urlEncodedParameterName + "=" + urlEncodedValue;
+  };
+
   if (!fs.IsAbsolute(include)) {
     // By convention, an include file that is relative is relative to
     // the "<GDJS Root>/Runtime" folder, and will have the same relative
@@ -788,7 +807,19 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
   } else {
     // Note: all the code generated from events are generated in another
     // folder and fall in this case:
-    return fs.FileNameFrom(include);
+    gd::String resolvedInclude = fs.FileNameFrom(include);
+
+    if (nonRuntimeScriptsCacheBurst == 0) {
+      return resolvedInclude;
+    }
+
+    // Add the parameter to force the browser to reload the code - useful
+    // for cases where the browser is caching files that are getting
+    // overwritten.
+    return addSearchParameterToUrl(
+        resolvedInclude,
+        "gdCacheBurst",
+        gd::String::From(nonRuntimeScriptsCacheBurst));
   }
 }
 

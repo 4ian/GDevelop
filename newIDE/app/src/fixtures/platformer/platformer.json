@@ -202,33 +202,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk09.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk09.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk10.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk10.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk11.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk11.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
         "file": "https://resources.gdevelop-app.com/examples/platformer/brickWall.png",
         "kind": "image",
         "metadata": "",
@@ -1811,7 +1784,7 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 855,
+          "height": 724,
           "layer": "Background",
           "locked": true,
           "name": "TiledForestBackground",
@@ -4118,9 +4091,11 @@
             {
               "type": {
                 "inverted": true,
-                "value": "SystemInfo::IsMobile"
+                "value": "SystemInfo::HasTouchScreen"
               },
-              "parameters": [],
+              "parameters": [
+                ""
+              ],
               "subInstructions": []
             }
           ],

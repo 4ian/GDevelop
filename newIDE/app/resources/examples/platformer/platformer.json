@@ -202,33 +202,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "p1_walk09.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk09.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "p1_walk10.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk10.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "p1_walk11.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk11.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
         "file": "brickWall.png",
         "kind": "image",
         "metadata": "",

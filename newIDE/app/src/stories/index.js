@@ -212,7 +212,6 @@ import '../UI/Theme/Global.css';
 import { AssetCard } from '../AssetStore/AssetCard';
 import { SearchResults } from '../AssetStore/SearchResults';
 import { AssetDetails } from '../AssetStore/AssetDetails';
-import CustomizationFields from '../AssetStore/CustomizationFields';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
 
@@ -4578,38 +4577,6 @@ storiesOf('AssetStore/AssetDetails', module)
       onAdd={action('onAdd')}
       onClose={action('onClose')}
       assetShortHeader={fakeAssetShortHeader1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
-  ));
-
-storiesOf('AssetStore/CustomizationFields', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('with behavior customizations', () => (
-    <CustomizationFields
-      asset={fakeAssetWithBehaviorCustomizations1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
-  ))
-  .add('with event customizations', () => (
-    <CustomizationFields
-      asset={fakeAssetWithEventCustomizationsAndFlashExtension1}
       project={testProject.project}
       objectsContainer={testProject.testLayout}
       layout={testProject.testLayout}

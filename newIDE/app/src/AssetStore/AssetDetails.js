@@ -13,7 +13,6 @@ import {
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import CustomizationFields from './CustomizationFields';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -187,19 +186,6 @@ export const AssetDetails = ({
             )}
           </Column>
         </ResponsiveLineStackLayout>
-        {asset ? (
-          <Column>
-            <CustomizationFields
-              project={project}
-              layout={layout}
-              objectsContainer={objectsContainer}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
-              asset={asset}
-            />
-          </Column>
-        ) : null}
       </Column>
     </Dialog>
   );

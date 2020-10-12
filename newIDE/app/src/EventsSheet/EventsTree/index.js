@@ -30,18 +30,32 @@ import './style.css';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
+const gd: libGDevelop = global.gd;
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
 );
 
-const gd: libGDevelop = global.gd;
-
-const indentWidth = 22;
+const defaultIndentWidth = 22;
+const smallIndentWidth = 11;
 
 const styles = {
   container: { flex: 1 },
+  defaultEventContainer: {
+    marginRight: 10,
+  },
+  smallEventContainer: {
+    marginRight: 0,
+  },
 };
+
+const getIndentWidth = (windowWidth: WidthType) =>
+  windowWidth === 'small' ? smallIndentWidth : defaultIndentWidth;
+const getEventContainerStyle = (windowWidth: WidthType) =>
+  windowWidth === 'small'
+    ? styles.smallEventContainer
+    : styles.defaultEventContainer;
 
 type EventsContainerProps = {|
   eventsHeightsCache: EventHeightsCache,
@@ -113,6 +127,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
         ref={container => (this._container = container)}
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
+        style={getEventContainerStyle(this.props.windowWidth)}
       >
         {EventComponent && (
           <EventComponent
@@ -454,13 +469,12 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     if (!object) return null;
 
     return (
-      <img
+      <CorsAwareImage
         className={classNames({
           [icon]: true,
         })}
         alt=""
         src={getThumbnail(project, object)}
-        crossOrigin="anonymous"
       />
     );
   };
@@ -479,7 +493,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         key={event.ptr}
         eventsHeightsCache={this.eventsHeightsCache}
         selection={this.props.selection}
-        leftIndentWidth={depth * indentWidth}
+        leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
         onAddNewInstruction={this.props.onAddNewInstruction}
         onPasteInstructions={this.props.onPasteInstructions}
         onMoveToInstruction={this.props.onMoveToInstruction}
@@ -543,7 +557,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
       <div style={styles.container}>
         <SortableTree
           treeData={treeData}
-          scaffoldBlockPxWidth={indentWidth}
+          scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}

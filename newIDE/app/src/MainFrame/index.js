@@ -12,7 +12,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import EditorBar from '../UI/EditorBar';
+import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -102,9 +102,11 @@ import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcutForCommandPalette } from '../CommandPalette/CommandHooks';
+import { useKeyboardShortcuts } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette from '../CommandPalette/CommandPalette';
+import CommandPalette, {
+  type CommandPaletteInterface,
+} from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
@@ -113,6 +115,7 @@ import {
 } from './PreviewState';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -240,9 +243,7 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
-  const [commandPaletteOpen, openCommandPalette] = React.useState<boolean>(
-    false
-  );
+  const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -454,6 +455,8 @@ const MainFrame = (props: Props) => {
       });
   };
 
+  useDiscordRichPresence(currentProject);
+
   const closeProject = React.useCallback(
     (): Promise<void> => {
       preferences.setHasProjectOpened(false);
@@ -647,13 +650,14 @@ const MainFrame = (props: Props) => {
             const errorMessage = getOpenErrorMessage
               ? getOpenErrorMessage(error)
               : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-            showErrorBox(
-              [
+            showErrorBox({
+              message: [
                 i18n._(t`Unable to open the project.`),
                 i18n._(errorMessage),
               ].join('\n'),
-              error
-            );
+              errorId: 'project-open-error',
+              rawError: error,
+            });
             setIsLoadingProject(false);
             return Promise.reject(error);
           });
@@ -1444,13 +1448,14 @@ const MainFrame = (props: Props) => {
             const errorMessage = storageProviderOperations.getOpenErrorMessage
               ? storageProviderOperations.getOpenErrorMessage(error)
               : t`Verify that you have the authorizations for reading the file you're trying to access.`;
-            showErrorBox(
-              [
+            showErrorBox({
+              message: [
                 i18n._(t`Unable to open the project.`),
                 i18n._(errorMessage),
               ].join('\n'),
-              error
-            );
+              errorId: 'project-open-with-picker-error',
+              rawError: error,
+            });
           });
       });
     },
@@ -1569,13 +1574,14 @@ const MainFrame = (props: Props) => {
                 }
               }
             },
-            err => {
-              showErrorBox(
-                i18n._(
+            rawError => {
+              showErrorBox({
+                message: i18n._(
                   t`Unable to save as the project! Please try again by choosing another location.`
                 ),
-                err
-              );
+                rawError,
+                errorId: 'project-save-as-error',
+              });
             }
           )
           .catch(() => {})
@@ -1654,13 +1660,14 @@ const MainFrame = (props: Props) => {
                 _showSnackMessage(i18n._(t`Project properly saved`));
               }
             },
-            err => {
-              showErrorBox(
-                i18n._(
-                  t`Unable to save the project! Please try again by choosing another location.`
+            rawError => {
+              showErrorBox({
+                message: i18n._(
+                  t`Unable to save as the project! Please try again by choosing another location.`
                 ),
-                err
-              );
+                rawError,
+                errorId: 'project-save-error',
+              });
             }
           )
           .catch(() => {})
@@ -1785,8 +1792,10 @@ const MainFrame = (props: Props) => {
       message: 'Update available',
     });
 
-  useKeyboardShortcutForCommandPalette(
-    React.useCallback(() => openCommandPalette(true), [])
+  useKeyboardShortcuts(
+    commandPaletteRef.current
+      ? commandPaletteRef.current.launchCommand
+      : () => {}
   );
 
   useMainFrameCommands({
@@ -1815,6 +1824,9 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
+    onOpenCommandPalette: commandPaletteRef.current
+      ? commandPaletteRef.current.open
+      : () => {},
   });
 
   const showLoader = isLoadingProject || previewLoading || props.loading;
@@ -1848,13 +1860,14 @@ const MainFrame = (props: Props) => {
         open={projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
+          className: 'safe-area-aware-left-container',
         }}
         ModalProps={{
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
       >
-        <EditorBar
+        <DrawerTopBar
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
@@ -2021,6 +2034,7 @@ const MainFrame = (props: Props) => {
           </TabContentContainer>
         );
       })}
+      <CommandPalette ref={commandPaletteRef} />
       <LoaderModal show={showLoader} />
       <HelpFinder
         open={helpFinderDialogOpen}
@@ -2138,9 +2152,6 @@ const MainFrame = (props: Props) => {
           onChangeSubscription={() => openSubscriptionDialog(true)}
         />
       )}
-      {commandPaletteOpen && (
-        <CommandPalette open onClose={() => openCommandPalette(false)} />
-      )}
       {subscriptionDialogOpen && (
         <SubscriptionDialog
           onClose={() => {
@@ -2150,7 +2161,10 @@ const MainFrame = (props: Props) => {
         />
       )}
       {preferencesDialogOpen && (
-        <PreferencesDialog onClose={() => openPreferencesDialog(false)} />
+        <PreferencesDialog
+          i18n={props.i18n}
+          onClose={() => openPreferencesDialog(false)}
+        />
       )}
       {languageDialogOpen && (
         <LanguageDialog

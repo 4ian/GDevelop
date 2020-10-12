@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -171,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "NewGameText",
-          "persistentUuid": "23338907-7163-4a46-bb08-d76f6744a3aa",
+          "persistentUuid": "5306c2c3-5013-41a8-86c1-f00fa1cad74d",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -187,7 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadGameText",
-          "persistentUuid": "53913905-e4f5-44b6-93dd-38addad0aac6",
+          "persistentUuid": "e79a72dc-1193-4e35-b33f-aab968cde76a",
           "width": 0,
           "x": 320,
           "y": 128,
@@ -203,7 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "ExitText",
-          "persistentUuid": "5e6e803c-c01c-4612-8552-45c2b3d973a5",
+          "persistentUuid": "ebe8a81b-05da-4c2c-a5b8-b5db29235d74",
           "width": 0,
           "x": 352,
           "y": 192,
@@ -219,7 +219,7 @@
           "layer": "",
           "locked": false,
           "name": "SettingsText",
-          "persistentUuid": "fc71d5f9-e309-40fc-8581-22f4e109e282",
+          "persistentUuid": "df91c082-63a4-43ce-99a8-9b48e8ba028f",
           "width": 0,
           "x": 334,
           "y": 161,
@@ -235,7 +235,7 @@
           "layer": "",
           "locked": false,
           "name": "MenuTitleText",
-          "persistentUuid": "c3e0bcff-592e-47b6-ab4f-9afe34277483",
+          "persistentUuid": "221eb772-2263-4598-be39-c7c65755b1b0",
           "width": 0,
           "x": 241,
           "y": 22,
@@ -852,6 +852,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -925,7 +930,7 @@
           "layer": "",
           "locked": false,
           "name": "MenuTitle",
-          "persistentUuid": "a9657ccf-8158-4f4f-b885-3784561d13ec",
+          "persistentUuid": "6015dd1b-51d0-46f8-913d-d4d43a7d8218",
           "width": 0,
           "x": 273,
           "y": 35,
@@ -941,7 +946,7 @@
           "layer": "",
           "locked": false,
           "name": "SelectLangText",
-          "persistentUuid": "1de3be41-86c2-47ae-94c3-7b270ed9a7bb",
+          "persistentUuid": "c1678b2f-3571-4103-9b24-914037ff9121",
           "width": 0,
           "x": 10,
           "y": 141,
@@ -957,7 +962,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionEnglishText",
-          "persistentUuid": "79629bad-0ea2-45b0-84db-47bbf0e3748f",
+          "persistentUuid": "0a40500f-16fc-46c6-9dc9-38623c3d8694",
           "width": 0,
           "x": 13,
           "y": 186,
@@ -973,7 +978,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionHungarianText",
-          "persistentUuid": "a379e93c-49bd-4a81-91af-8efe2a592368",
+          "persistentUuid": "dd8a7ffd-0f6f-4366-9d90-6438272cc51c",
           "width": 0,
           "x": 13,
           "y": 218,
@@ -989,7 +994,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionFrenchText",
-          "persistentUuid": "4f083cc9-6901-4876-a4ed-1dfe5fa857fd",
+          "persistentUuid": "425b9fa4-1727-4a3d-b02f-e1a181d521b8",
           "width": 0,
           "x": 13,
           "y": 250,
@@ -1005,7 +1010,7 @@
           "layer": "",
           "locked": false,
           "name": "OptionSpanishText",
-          "persistentUuid": "c48e72e3-63f7-4a1e-af30-b6420b8d7b3e",
+          "persistentUuid": "b51d91a0-950b-4210-be34-457eff3e769b",
           "width": 0,
           "x": 13,
           "y": 282,
@@ -1021,7 +1026,7 @@
           "layer": "",
           "locked": false,
           "name": "BackToMenuText",
-          "persistentUuid": "9286dd1c-547b-4ebd-bf73-c9be38950d15",
+          "persistentUuid": "c3e83d47-e489-486f-972a-f0cb2a3c73d4",
           "width": 0,
           "x": 7,
           "y": 569,
@@ -2054,6 +2059,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

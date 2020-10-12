@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -207,7 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "7955c014-d29d-4d5c-9d34-ac42335c1017",
+          "persistentUuid": "06a711a1-64a9-45c5-aaf7-8f6e0f94f395",
           "width": 0,
           "x": 331,
           "y": 298,
@@ -223,7 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "1cc1b794-9c74-4ec3-8f72-c07e2e26a6e6",
+          "persistentUuid": "708ba312-16fd-48e1-b8d8-04c3cb31f095",
           "width": 0,
           "x": 113,
           "y": 33,
@@ -239,7 +239,7 @@
           "layer": "",
           "locked": false,
           "name": "pause_message",
-          "persistentUuid": "d55317be-1c84-4d7e-b7ff-6ffbd89df647",
+          "persistentUuid": "df835c93-5320-4299-9eac-f36ab63d1d9e",
           "width": 0,
           "x": 192,
           "y": 432,
@@ -255,7 +255,7 @@
           "layer": "",
           "locked": false,
           "name": "animation_message",
-          "persistentUuid": "7080db1f-09e4-477d-9f01-23bdca30df4f",
+          "persistentUuid": "371532da-0f09-4ff3-8dea-b3f3caccda12",
           "width": 0,
           "x": 341,
           "y": 250,
@@ -1111,6 +1111,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

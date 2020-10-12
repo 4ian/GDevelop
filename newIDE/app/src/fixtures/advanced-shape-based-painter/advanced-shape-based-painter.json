@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -322,7 +322,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "761982d4-45e3-4dfd-abf9-2654b41309cd",
+          "persistentUuid": "5524b5fb-3a94-409a-9c93-7949bdf9ad01",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -343,7 +343,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "4e1b1179-8410-4c6b-9054-376754849e86",
+          "persistentUuid": "1e856f7d-dd02-4632-9b12-e4555f2014eb",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -364,7 +364,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "35dee078-916a-455f-b359-3ee05336ef2c",
+          "persistentUuid": "c351f03d-6736-42ec-8af0-79d83a57c056",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -385,7 +385,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "9c90af08-9097-4a56-9b74-a3add6c85f70",
+          "persistentUuid": "4b650e92-1978-4521-ac44-9bcadf8bc723",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -406,7 +406,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "a3a1783a-94e2-4226-88c7-da9cc08a7974",
+          "persistentUuid": "c86d9bf1-e217-4525-a01f-cdff7796b729",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -427,7 +427,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "54090c74-e762-4579-a6af-5a3d65dff82c",
+          "persistentUuid": "68282c4a-c7d6-4c45-b5b6-5413746a1c48",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -2627,6 +2627,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

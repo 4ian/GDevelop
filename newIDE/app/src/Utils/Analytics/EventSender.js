@@ -164,16 +164,18 @@ export const sendHelpSearch = (searchText: string) => {
 };
 
 export const sendErrorMessage = (
-  errorMessage: string,
-  type: string,
-  rawError: any
+  message: string,
+  type: 'error' | 'error-boundary',
+  rawError: any,
+  errorId: string
 ) => {
   if (isDev || !client) return;
 
   client.recordEvent('error_message', {
-    message: errorMessage,
+    message,
     type,
     rawError,
+    errorId,
   });
 };
 

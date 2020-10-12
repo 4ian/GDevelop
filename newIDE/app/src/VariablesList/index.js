@@ -373,6 +373,15 @@ export default class VariablesList extends React.Component<Props, State> {
       />
     );
 
+    // Put all variables in the **same** array so that if a variable that was shown
+    // as inherited is redefined by the user, React can reconcile the variable rows
+    // (VariableRow going from containerInheritedVariablesTree array to
+    // containerVariablesTree array) and the **focus** won't be lost.
+    const allVariables = [
+      ...containerInheritedVariablesTree,
+      ...containerVariablesTree,
+    ];
+
     return (
       <SortableVariablesListBody
         variablesContainer={this.props.variablesContainer}
@@ -384,10 +393,8 @@ export default class VariablesList extends React.Component<Props, State> {
         useDragHandle
         lockToContainerEdges
       >
-        {!!containerInheritedVariablesTree.length &&
-          containerInheritedVariablesTree}
-        {!containerVariablesTree.length && this._renderEmpty()}
-        {!!containerVariablesTree.length && containerVariablesTree}
+        {allVariables}
+        {!allVariables.length && this._renderEmpty()}
         {editRow}
       </SortableVariablesListBody>
     );

@@ -6,7 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Close from '@material-ui/icons/Close';
 
-export const editorBarHeight = 32;
+const appBarHeight = 32;
 
 type Props = {|
   title: React.Node,
@@ -17,12 +17,12 @@ type Props = {|
 
 const styles = {
   appBar: {
-    height: editorBarHeight,
-    minHeight: editorBarHeight,
+    height: appBarHeight,
+    minHeight: appBarHeight,
   },
   toolbar: {
-    height: editorBarHeight,
-    minHeight: editorBarHeight,
+    height: appBarHeight,
+    minHeight: appBarHeight,
     paddingLeft: 15,
     paddingRight: 15,
   },
@@ -31,7 +31,12 @@ const styles = {
 
 export default (props: Props) => {
   return (
-    <AppBar position="static" style={styles.appBar} color="primary">
+    <AppBar
+      position="static"
+      style={styles.appBar}
+      className="safe-area-aware-top-margin"
+      color="primary"
+    >
       <Toolbar style={styles.toolbar}>
         {props.displayLeftCloseButton && (
           <IconButton onClick={props.onClose} edge="start" color="inherit">

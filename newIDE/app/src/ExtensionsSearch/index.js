@@ -170,13 +170,14 @@ export default class ExtensionsSearch extends Component<Props, State> {
             );
           });
         },
-        err => {
-          showErrorBox(
-            i18n._(
+        rawError => {
+          showErrorBox({
+            message: i18n._(
               t`Unable to download and install the extension. Verify that your internet connection is working or try again later.`
             ),
-            err
-          );
+            rawError,
+            errorId: 'download-extension-error',
+          });
         }
       )
       .then(() => {

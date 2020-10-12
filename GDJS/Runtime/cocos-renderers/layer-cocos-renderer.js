@@ -129,7 +129,11 @@ gdjs.LayerCocosRenderer.prototype.updateVisibility = function(visible) {
     this._cocosLayer.setVisible(visible);
 }
 
-gdjs.LayerCocosRenderer.prototype.updateTime = function() {
+gdjs.LayerCocosRenderer.prototype.update = function() {
+    // Unimplemented
+}
+
+gdjs.LayerCocosRenderer.prototype.updateClearColor = function() {
     // Unimplemented
 }
 

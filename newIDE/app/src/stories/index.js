@@ -1114,7 +1114,6 @@ storiesOf('UI Building Blocks/AlertMessage', module)
         <img
           src="res/tutorial_icons/tween-behavior.jpg"
           alt=""
-          crossOrigin="anonymous"
           style={{
             maxWidth: 128,
             maxHeight: 128,
@@ -3332,16 +3331,21 @@ storiesOf('InstancePropertiesEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <InstancePropertiesEditor
-        project={testProject.project}
-        layout={testProject.testLayout}
-        instances={[testProject.testLayoutInstance1]}
-        editInstanceVariables={action('edit instance variables')}
-        editObjectVariables={action('edit object variables')}
-        onEditObjectByName={action('edit object')}
-      />
-    </SerializedObjectDisplay>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.testLayout}>
+          <InstancePropertiesEditor
+            i18n={i18n}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testLayoutInstance1]}
+            editInstanceVariables={action('edit instance variables')}
+            editObjectVariables={action('edit object variables')}
+            onEditObjectByName={action('edit object')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
   ));
 
 storiesOf('ObjectGroupEditor', module)
@@ -4236,6 +4240,7 @@ storiesOf('LayersList', module)
       }}
       resourceSources={[]}
       onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4257,6 +4262,7 @@ storiesOf('LayersList', module)
         }}
         resourceSources={[]}
         onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4334,17 +4340,14 @@ storiesOf('CommandPalette', module)
             ([
               {
                 name: 'OPEN_PROJECT',
-                displayText: t`Open project`,
                 handler: () => {},
               },
               {
-                name: 'SAVE_PROJECT',
-                displayText: t`Save project`,
+                name: 'OPEN_PROJECT_PROPERTIES',
                 handler: () => {},
               },
               {
                 name: 'EDIT_OBJECT',
-                displayText: t`Edit object...`,
                 handler: () => {},
               },
             ]: Array<NamedCommand>)

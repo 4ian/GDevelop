@@ -17,6 +17,7 @@ import {
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import Window from '../../Utils/Window';
 import {
   getExtraInstructionInformation,
@@ -185,9 +186,15 @@ export default class InstructionParametersEditor extends React.Component<
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
-          {this.props.isCondition
-            ? 'Choose a condition (or an object then a condition) on the left'
-            : 'Choose an action (or an object then an action) on the left'}
+          {this.props.isCondition ? (
+            <Trans>
+              Choose a condition (or an object then a condition) on the left
+            </Trans>
+          ) : (
+            <Trans>
+              Choose an action (or an object then an action) on the left
+            </Trans>
+          )}
         </EmptyMessage>
       </div>
     );
@@ -254,9 +261,18 @@ export default class InstructionParametersEditor extends React.Component<
             </Line>
             {instructionExtraInformation && (
               <Line>
-                <AlertMessage kind={instructionExtraInformation.kind}>
-                  {i18n._(instructionExtraInformation.message)}
-                </AlertMessage>
+                {instructionExtraInformation.identifier === undefined ? (
+                  <AlertMessage kind={instructionExtraInformation.kind}>
+                    {i18n._(instructionExtraInformation.message)}
+                  </AlertMessage>
+                ) : (
+                  <DismissableAlertMessage
+                    kind={instructionExtraInformation.kind}
+                    identifier={instructionExtraInformation.identifier}
+                  >
+                    {i18n._(instructionExtraInformation.message)}
+                  </DismissableAlertMessage>
+                )}
               </Line>
             )}
             {tutorialHints.length ? (

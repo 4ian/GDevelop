@@ -1,8 +1,13 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
 
-export type Hint = {| kind: 'warning' | 'info', message: MessageDescriptor |};
+export type Hint = {|
+  kind: 'warning' | 'info',
+  message: MessageDescriptor,
+  identifier?: AlertMessageIdentifier,
+|};
 export type TutorialHint = {|
   kind: 'tutorial' | 'video-tutorial',
   name: string,
@@ -78,11 +83,62 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Musics will only be played if the user has interacted with the game before (by clicking/touching it or pressing a key on the keyboard). This is due to browser limitations. Make sure to have the user interact with the game before using this action.`,
     };
   }
+  if (type === 'P2P::OnEvent') {
+    return {
+      kind: 'info',
+      message: t`Read the wiki page for more info about the dataloss mode.`,
+    };
+  }
+  if (type.indexOf('P2P::') === 0) {
+    return {
+      kind: 'warning',
+      message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
+      identifier: 'p2p-broker-recommendation',
+    };
+  }
+  if (type === 'SystemInfo::IsMobile') {
+    return {
+      kind: 'warning',
+      message: t`Note that the distinction between what is a mobile device and what is not is becoming blurry (with devices like iPad pro and other "desktop-class" tablets). If you use this for mobile controls, prefer to check if the device has touchscreen support.`,
+    };
+  }
 
   return null;
 };
 
 const tutorialHints = {
+  'screen-shake-timer-variables': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/screen-shake-timer-variables.jpg',
+    name: 'Screen Shake Effect with Timers and Variables',
+    message: t`Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.`,
+    link: 'https://www.youtube.com/watch?v=0w0NGuj4OFQ',
+    identifier: 'screen-shake-timer-variables',
+  },
+  'ghost-enemy-following-player': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/ghost-enemy-following-player.jpg',
+    name: 'Ghost Enemy Following the Player',
+    message: t`Make a ghost like enemy floating toward the player.`,
+    link: 'https://www.youtube.com/watch?v=SLUlnhKuuqE',
+    identifier: 'ghost-enemy-following-player',
+  },
+  'melee-sword-attack': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/melee-sword-attack.jpg',
+    name: 'Melee/Sword Attack',
+    message: t`Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.`,
+    link: 'https://www.youtube.com/watch?v=3XT40kDRp8g',
+    identifier: 'melee-sword-attack',
+  },
+  'physics-engine-platformer-game': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/physics-engine-platformer-game.jpg',
+    name: 'Platformer with the physics engine',
+    message: t`Learn how to make a platformer game using the physics engine.`,
+    link: 'https://www.youtube.com/watch?v=96gNCmnQwaE',
+    identifier: 'physics-engine-platformer-game',
+  },
   'tween-behavior': {
     kind: 'video-tutorial',
     iconSrc: 'res/tutorial_icons/tween-behavior.jpg',
@@ -183,6 +239,9 @@ export const getBehaviorTutorialHints = (type: string): Array<TutorialHint> => {
   }
   if (type === 'AnchorBehavior::AnchorBehavior') {
     return [tutorialHints['responsive-ui']];
+  }
+  if (type === 'Physics2::Physics2Behavior') {
+    return [tutorialHints['physics-engine-platformer-game']];
   }
 
   return [];

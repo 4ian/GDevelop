@@ -1,6 +1,8 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import { useLongTouch } from '../../Utils/UseLongTouch';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -48,6 +50,16 @@ const ImageThumbnail = ({
   onContextMenu,
   muiTheme,
 }) => {
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        if (onContextMenu) onContextMenu(event.clientX, event.clientY);
+      },
+      [onContextMenu]
+    )
+  );
+
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -64,12 +76,12 @@ const ImageThumbnail = ({
             e.stopPropagation();
             if (onContextMenu) onContextMenu(e.clientX, e.clientY);
           }}
+          {...longTouchForContextMenuProps}
         >
-          <img
+          <CorsAwareImage
             style={styles.spriteThumbnailImage}
             alt={resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName)}
-            crossOrigin="anonymous"
+            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
           />
           {selectable && (
             <div style={styles.checkboxContainer}>

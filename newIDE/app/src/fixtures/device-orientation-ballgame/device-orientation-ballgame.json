@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -180,7 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "board",
-          "persistentUuid": "26ba8318-9be7-46a7-8ac5-5ee069af5173",
+          "persistentUuid": "a354269e-021f-41e8-a2f8-a15522ded507",
           "width": 640,
           "x": 0,
           "y": 16,
@@ -196,7 +196,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "ed5ae49b-cc32-4904-993e-7e84ab326a96",
+          "persistentUuid": "a5e5d88a-4f6e-41a5-a4bc-39b54deb5fa5",
           "width": 32,
           "x": -16,
           "y": -16,
@@ -212,7 +212,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "25a9176b-1423-4895-940a-2e36ef8ddd03",
+          "persistentUuid": "d049817a-3d50-49b2-97de-f47e0c8ef0b0",
           "width": 592,
           "x": 16,
           "y": -16,
@@ -228,7 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "ball",
-          "persistentUuid": "989f39c3-cd1c-4719-b903-5db506ff9ad8",
+          "persistentUuid": "0d24e985-4bd4-4c0c-a42b-9d644f1125aa",
           "width": 0,
           "x": 512,
           "y": 480,
@@ -244,7 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "57a8378f-c2cc-4d84-9b88-bc299a2bd7df",
+          "persistentUuid": "4799055a-81e3-4712-ab2e-3ebf936d2e4c",
           "width": 32,
           "x": 608,
           "y": -16,
@@ -260,7 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "ef834f73-9a6c-480f-9705-71dd1d8e6529",
+          "persistentUuid": "f1bd4912-9e3f-42df-b995-b8966c286366",
           "width": 592,
           "x": 16,
           "y": 584,
@@ -276,7 +276,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "096c696b-4a35-4a4f-9992-e3937e31263f",
+          "persistentUuid": "d25fcf66-8356-459c-9d67-6a8464e1030a",
           "width": 32,
           "x": 416,
           "y": 128,
@@ -292,7 +292,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
-          "persistentUuid": "2e2188ce-1d8b-44b7-9cc4-6c15fc0261ab",
+          "persistentUuid": "562d37d0-6428-464d-afab-eaff5e6fe720",
           "width": 32,
           "x": 192,
           "y": 0,
@@ -308,7 +308,7 @@
           "layer": "",
           "locked": false,
           "name": "pit",
-          "persistentUuid": "85edc8af-3192-45a2-b529-a5ec2f5c596c",
+          "persistentUuid": "41099cf3-af6c-4012-a7bb-bb1c49743cc6",
           "width": 0,
           "x": 32,
           "y": 32,
@@ -324,7 +324,7 @@
           "layer": "",
           "locked": false,
           "name": "you_win",
-          "persistentUuid": "20184812-e316-4859-8e22-de378694a01a",
+          "persistentUuid": "14ddca16-345b-4657-8649-b9561cdc2acf",
           "width": 0,
           "x": 192,
           "y": 256,
@@ -743,6 +743,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -204,24 +207,24 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this._onEventsBasedBehaviorModified();
   };
 
-  _renderEventsBasedBehaviorMenuTemplate = (
+  _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     index: number
   ) => {
     return [
       {
-        label: 'Properties',
+        label: i18n._(t`Properties`),
         click: () => this.props.onEditProperties(eventsBasedBehavior),
       },
       {
         type: 'separator',
       },
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsBasedBehavior),
       },
       {
-        label: 'Remove',
+        label: i18n._(t`Remove`),
         click: () =>
           this._deleteEventsBasedBehavior(eventsBasedBehavior, {
             askForConfirmation: true,
@@ -231,15 +234,15 @@ export default class EventsBasedBehaviorsList extends React.Component<
         type: 'separator',
       },
       {
-        label: 'Copy',
+        label: i18n._(t`Copy`),
         click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
       },
       {
-        label: 'Cut',
+        label: i18n._(t`Cut`),
         click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
       },
       {
-        label: 'Paste',
+        label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
         click: () => this._pasteEventsBasedBehavior(index),
       },
@@ -289,27 +292,33 @@ export default class EventsBasedBehaviorsList extends React.Component<
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={list}
-                width={width}
-                height={height}
-                onAddNewItem={this._addNewEventsBasedBehavior}
-                addNewItemLabel={<Trans>Add a new behavior</Trans>}
-                getItemName={getEventsBasedBehaviorName}
-                selectedItems={
-                  selectedEventsBasedBehavior
-                    ? [selectedEventsBasedBehavior]
-                    : []
-                }
-                onItemSelected={onSelectEventsBasedBehavior}
-                renamedItem={this.state.renamedEventsBasedBehavior}
-                onRename={this._rename}
-                onMoveSelectionToItem={this._moveSelectionTo}
-                buildMenuTemplate={this._renderEventsBasedBehaviorMenuTemplate}
-                reactDndType="GD_EVENTS_BASED_BEHAVIOR"
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={list}
+                    width={width}
+                    height={height}
+                    onAddNewItem={this._addNewEventsBasedBehavior}
+                    addNewItemLabel={<Trans>Add a new behavior</Trans>}
+                    getItemName={getEventsBasedBehaviorName}
+                    selectedItems={
+                      selectedEventsBasedBehavior
+                        ? [selectedEventsBasedBehavior]
+                        : []
+                    }
+                    onItemSelected={onSelectEventsBasedBehavior}
+                    renamedItem={this.state.renamedEventsBasedBehavior}
+                    onRename={this._rename}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    buildMenuTemplate={this._renderEventsBasedBehaviorMenuTemplate(
+                      i18n
+                    )}
+                    reactDndType="GD_EVENTS_BASED_BEHAVIOR"
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>

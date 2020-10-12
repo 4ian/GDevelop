@@ -127,6 +127,74 @@ Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documen
 
 > ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
 
+#### Declare a property
+
+A property is a global configuration value for your extension. An example would be the App ID for AdMob.
+
+To declare one, just use `registerProperty`:
+```js
+// From ExampleJsExtension/JsExtension.js:
+extension.registerProperty("DummyPropertyString")
+  .setLabel(_("Dummy Property Name"))
+  .setDescription(_("Type in anything :)"))
+  .setType("string");
+```
+
+Once declared, you can access the property from JavaScript in the game engine using `getExtensionProperty` method of `gdjs.RuntimeGame`. Pass the extension name and the property name. This would get the AdMobAppId property of the AdMob extension for example:
+```js
+const appId = runtimeGame.getExtensionProperty("AdMob", "AdMobAppId");
+```
+
+If the property doesn't exist it will return null.
+⚠️ Be careful, it can be non existing if the user never entered a value for that property before!
+
+#### Declare a dependency on an external package
+
+You can declare a dependency on an npm package or cordova plugin with `addDependency`. Example:
+```js
+// From ExampleJsExtension/JsExtension.js:
+extension
+  .addDependency()
+  .setName("Thirteen Checker")
+  .setDependencyType("npm")
+  .setExportName("is-thirteen")
+  .setVersion("2.0.0");
+```
+
+On cordova you can add plugin variables as extra properties:
+```js
+extension.addDependency()
+  .setName("Some Cordova Extension")
+  .setDependencyType("cordova")
+  .setExportName("cordova-some-plugin")
+  .setVersion("1.0.0")
+  .setExtraSetting(
+    "VARIABLE_NAME",
+    new gd.PropertyDescriptor().setValue("42")
+  );
+```
+
+You can also use an extension property to determine the value of the plugin variable:
+```js
+// From AdMob/JsExtension.js:
+extension.registerProperty("AdMobAppId") // Remember Property Name
+      .setLabel("AdMob App ID")
+      .setDescription("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY")
+      .setType("string");
+
+extension.addDependency()
+  .setName("AdMob Cordova Extension")
+  .setDependencyType("cordova")
+  .setExportName("cordova-plugin-admob-free")
+  .setVersion("~0.21.0")
+  .setExtraSetting(
+    "ADMOB_APP_ID",
+    new gd.PropertyDescriptor()
+      .setType("ExtensionProperty") // Tell the exporter this is an extension property...
+      .setValue("AdMobAppId") // ... and what property it is (name of the property).
+  );
+```
+
 #### Declare an object editor
 
 To add an editor to your object, implement the function `registerEditorConfigurations` in your extension module. For now, only a default editor, displaying the object properties, is supported:

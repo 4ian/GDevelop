@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "7d38f139-ef5e-4761-9429-c66802840ee8",
+          "persistentUuid": "d5fc2495-2b57-4945-9159-6950ee511942",
           "width": 0,
           "x": 288,
           "y": 64,
@@ -169,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "MousePointer",
-          "persistentUuid": "30d739e7-693d-400a-9a8c-6854bd922fdc",
+          "persistentUuid": "fe2171a6-e1f6-4f43-ab37-80691194de69",
           "width": 0,
           "x": 369,
           "y": 214,
@@ -341,6 +341,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

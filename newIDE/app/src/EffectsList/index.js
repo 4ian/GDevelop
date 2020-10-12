@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
@@ -193,7 +194,7 @@ export default function EffectsList(props: Props) {
                           <MoreVert />
                         </IconButton>
                       }
-                      buildMenuTemplate={() => [
+                      buildMenuTemplate={(i18n: I18nType) => [
                         {
                           label: i18n._(t`Delete`),
                           click: () => removeEffect(effect.getName()),

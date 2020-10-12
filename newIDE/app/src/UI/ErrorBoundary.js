@@ -21,10 +21,15 @@ import {
 
 const errorHandler = (error: Error, componentStack: string) => {
   console.error('Error catched by Boundary:', error, componentStack);
-  sendErrorMessage('Error catched by error boundary', 'error-boundary', {
-    error,
-    componentStack,
-  });
+  sendErrorMessage(
+    'Error catched by error boundary',
+    'error-boundary',
+    {
+      error,
+      componentStack,
+    },
+    'error-boundary-error'
+  );
 };
 
 export const ErrorFallbackComponent = ({

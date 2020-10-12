@@ -296,7 +296,7 @@ export const getRequiredBehaviorsFromAsset = (
           .filter(Boolean);
       })
     ),
-    ({ behaviorType }) => behaviorType // TODO: extension name??
+    ({ behaviorType }) => behaviorType // TODO: Verify if we could use the extension name instead?
   );
 };
 

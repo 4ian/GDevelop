@@ -91,6 +91,16 @@ export type AllResources = {|
   filters: Filters,
 |};
 
+export type License = {|
+  name: string,
+  website: string,
+|};
+
+export type Author = {|
+  name: string,
+  website: string,
+|};
+
 /** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
 export const isCompatibleWithAsset = (
   ideVersion: string,
@@ -107,6 +117,9 @@ export const listAllAssets = (): Promise<AllAssets> => {
     .get(`${GDevelopAssetApi.baseUrl}/asset`)
     .then(response => response.data)
     .then(({ assetShortHeadersUrl, filtersUrl }) => {
+      if (!assetShortHeadersUrl || !filtersUrl) {
+        throw new Error('Unexpected response from the resource endpoint.');
+      }
       return Promise.all([
         axios.get(assetShortHeadersUrl).then(response => response.data),
         axios.get(filtersUrl).then(response => response.data),
@@ -123,7 +136,13 @@ export const getAsset = (
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`)
     .then(response => response.data)
-    .then(({ assetUrl }) => axios.get(assetUrl))
+    .then(({ assetUrl }) => {
+      if (!assetUrl) {
+        throw new Error('Unexpected response from the asset endpoint.');
+      }
+
+      return axios.get(assetUrl);
+    })
     .then(response => response.data);
 };
 
@@ -132,6 +151,9 @@ export const listAllResources = (): Promise<AllResources> => {
     .get(`${GDevelopAssetApi.baseUrl}/resource`)
     .then(response => response.data)
     .then(({ resourcesUrl, filtersUrl }) => {
+      if (!resourcesUrl || !filtersUrl) {
+        throw new Error('Unexpected response from the resource endpoint.');
+      }
       return Promise.all([
         axios.get(resourcesUrl).then(response => response.data),
         axios.get(filtersUrl).then(response => response.data),
@@ -140,4 +162,28 @@ export const listAllResources = (): Promise<AllResources> => {
         filters,
       }));
     });
+};
+
+export const listAllAuthors = (): Promise<Array<Author>> => {
+  return axios
+    .get(`${GDevelopAssetApi.baseUrl}/author`)
+    .then(response => response.data)
+    .then(({ authorsUrl }) => {
+      if (!authorsUrl)
+        throw new Error('Unexpected response from author endpoint.');
+      return axios.get(authorsUrl);
+    })
+    .then(response => response.data);
+};
+
+export const listAllLicenses = (): Promise<Array<License>> => {
+  return axios
+    .get(`${GDevelopAssetApi.baseUrl}/license`)
+    .then(response => response.data)
+    .then(({ licensesUrl }) => {
+      if (!licensesUrl)
+        throw new Error('Unexpected response from license endpoint.');
+      return axios.get(licensesUrl);
+    })
+    .then(response => response.data);
 };

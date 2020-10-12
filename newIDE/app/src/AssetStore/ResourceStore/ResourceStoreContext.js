@@ -4,6 +4,10 @@ import { type FiltersState, useFilters } from '../FiltersChooser';
 import {
   type Resource,
   type Filters,
+  type Author,
+  type License,
+  listAllAuthors,
+  listAllLicenses,
   listAllResources,
 } from '../../Utils/GDevelopServices/Asset';
 import { useSearchItem } from '../UseSearchItem';
@@ -12,6 +16,8 @@ const defaultSearchText = '';
 
 type ResourceStoreState = {|
   filters: ?Filters,
+  authors: ?Array<Author>,
+  licenses: ?Array<License>,
   searchResults: ?Array<Resource>,
   fetchResourcesAndFilters: () => void,
   error: ?Error,
@@ -22,6 +28,8 @@ type ResourceStoreState = {|
 
 export const ResourceStoreContext = React.createContext<ResourceStoreState>({
   filters: null,
+  authors: null,
+  licenses: null,
   searchResults: null,
   fetchResourcesAndFilters: () => {},
   error: null,
@@ -51,6 +59,8 @@ export const ResourceStoreStateProvider = ({
     [string]: Resource,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [authors, setAuthors] = React.useState<?Array<Author>>(null);
+  const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -69,6 +79,8 @@ export const ResourceStoreStateProvider = ({
 
         try {
           const { resources, filters } = await listAllResources();
+          const authors = await listAllAuthors();
+          const licenses = await listAllLicenses();
 
           const resourcesByUrl = {};
           resources.forEach(resource => {
@@ -80,7 +92,10 @@ export const ResourceStoreStateProvider = ({
           );
           setResourcesByUrl(resourcesByUrl);
           setFilters(filters);
+          setAuthors(authors);
+          setLicenses(licenses);
         } catch (error) {
+          console.error(`Unable to load the assets from the asset store:`, error);
           setError(error);
         }
 
@@ -119,6 +134,8 @@ export const ResourceStoreStateProvider = ({
       searchResults,
       fetchResourcesAndFilters,
       filters,
+      authors,
+      licenses,
       error,
       searchText,
       setSearchText,
@@ -128,6 +145,8 @@ export const ResourceStoreStateProvider = ({
       searchResults,
       error,
       filters,
+      authors,
+      licenses,
       searchText,
       filtersState,
       fetchResourcesAndFilters,

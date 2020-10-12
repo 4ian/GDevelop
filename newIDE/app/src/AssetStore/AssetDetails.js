@@ -8,6 +8,7 @@ import RaisedButton from '../UI/RaisedButton';
 import {
   type AssetShortHeader,
   type Asset,
+  type Author,
   getAsset,
 } from '../Utils/GDevelopServices/Asset';
 import LeftLoader from '../UI/LeftLoader';
@@ -24,6 +25,9 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
+import { AssetStoreContext } from './AssetStoreContext';
+import Link from '@material-ui/core/Link';
+import Window from '../Utils/Window';
 
 const styles = {
   previewBackground: {
@@ -83,6 +87,7 @@ export const AssetDetails = ({
   canInstall,
   isBeingInstalled,
 }: Props) => {
+  const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [error, setError] = React.useState<?Error>(null);
   const loadAsset = React.useCallback(
@@ -94,7 +99,6 @@ export const AssetDetails = ({
         } catch (error) {
           console.log('Error while loading asset:', error);
           setError(error);
-          // TODO: handle error
         }
       })();
     },
@@ -107,6 +111,19 @@ export const AssetDetails = ({
     },
     [loadAsset]
   );
+
+  const assetAuthors: ?Array<Author> =
+    asset && authors
+      ? asset.authors
+          .map(authorName => {
+            return authors.find(({ name }) => name === authorName);
+          })
+          .filter(Boolean)
+      : [];
+  const assetLicense =
+    asset && licenses
+      ? licenses.find(({ name }) => name === asset.license)
+      : null;
 
   return (
     <Dialog
@@ -154,10 +171,14 @@ export const AssetDetails = ({
               <Text size="title" style={styles.inlineText}>
                 {assetShortHeader.name}
               </Text>{' '}
-              -{' '}
-              <Text size="body" style={styles.inlineText}>
-                {assetShortHeader.shortDescription}
-              </Text>
+              {assetShortHeader.shortDescription && (
+                <React.Fragment>
+                  -{' '}
+                  <Text size="body" style={styles.inlineText}>
+                    {assetShortHeader.shortDescription}
+                  </Text>
+                </React.Fragment>
+              )}
             </div>
             <span>
               {assetShortHeader.tags.map(tag => (
@@ -167,10 +188,37 @@ export const AssetDetails = ({
             {asset ? (
               <React.Fragment>
                 <Text size="body">
-                  <Trans>By {asset.authors.join(', ')}</Trans>
+                  <Trans>By:</Trans>{' '}
+                  {!!assetAuthors &&
+                    assetAuthors.map(author => {
+                      return (
+                        <Link
+                          component="button"
+                          onClick={() => {
+                            Window.openExternalURL(author.website);
+                          }}
+                        >
+                          {author.name}
+                        </Link>
+                      );
+                    })}
                 </Text>
                 <Text size="body">
-                  <Trans>License: {asset.license}</Trans>
+                  {!!assetLicense && (
+                    <Trans>
+                      License:{' '}
+                      {
+                        <Link
+                          component="button"
+                          onClick={() => {
+                            Window.openExternalURL(assetLicense.website);
+                          }}
+                        >
+                          {assetLicense.name}
+                        </Link>
+                      }
+                    </Trans>
+                  )}
                 </Text>
                 <Text size="body">{asset.description}</Text>
               </React.Fragment>

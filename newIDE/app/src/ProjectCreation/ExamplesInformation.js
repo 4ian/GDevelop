@@ -4270,6 +4270,68 @@ module.exports = {
       }
     ]
   },
+  "tween-animations": {
+    "description": "Examples of how to use a variety of tween animations, including object position, color, opacity, angle, and scale.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
+  "tween-test": {
+    "description": "An example project that tests all Tween extension functionality.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      }
+    ]
+  },
   "type-on-text-effect": {
     "description": "This show how to create an effect where a text is progressively typed on the screen.",
     "usedExtensions": [

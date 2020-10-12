@@ -238,6 +238,12 @@ export const sendAssetAddedToProject = ({
   client.recordEvent('asset-added-to-project', { id, name });
 };
 
+export const sendNewObjectCreated = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('new-object-created', { name });
+};
+
 export const sendChoosePlanClicked = (planId: string | null) => {
   if (isDev || !client) return;
 

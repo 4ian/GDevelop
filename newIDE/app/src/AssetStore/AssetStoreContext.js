@@ -4,7 +4,11 @@ import { type FiltersState, useFilters } from './FiltersChooser';
 import {
   type AssetShortHeader,
   type Filters,
+  type Author,
+  type License,
   listAllAssets,
+  listAllAuthors,
+  listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
 import { useSearchItem } from './UseSearchItem';
 
@@ -12,6 +16,8 @@ const defaultSearchText = '';
 
 type AssetStoreState = {|
   filters: ?Filters,
+  authors: ?Array<Author>,
+  licenses: ?Array<License>,
   searchResults: ?Array<AssetShortHeader>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
@@ -22,6 +28,8 @@ type AssetStoreState = {|
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
+  authors: null,
+  licenses: null,
   searchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
@@ -57,6 +65,8 @@ export const AssetStoreStateProvider = ({
     [string]: AssetShortHeader,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [authors, setAuthors] = React.useState<?Array<Author>>(null);
+  const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -75,6 +85,8 @@ export const AssetStoreStateProvider = ({
 
         try {
           const { assetShortHeaders, filters } = await listAllAssets();
+          const authors = await listAllAuthors();
+          const licenses = await listAllLicenses();
 
           const assetShortHeadersById = {};
           assetShortHeaders.forEach(assetShortHeader => {
@@ -86,7 +98,10 @@ export const AssetStoreStateProvider = ({
           );
           setAssetShortHeadersById(assetShortHeadersById);
           setFilters(filters);
+          setAuthors(authors);
+          setLicenses(licenses);
         } catch (error) {
+          console.error(`Unable to load the assets from the asset store:`, error);
           setError(error);
         }
 
@@ -125,6 +140,8 @@ export const AssetStoreStateProvider = ({
       searchResults,
       fetchAssetsAndFilters,
       filters,
+      authors,
+      licenses,
       error,
       searchText,
       setSearchText,
@@ -134,6 +151,8 @@ export const AssetStoreStateProvider = ({
       searchResults,
       error,
       filters,
+      authors,
+      licenses,
       searchText,
       filtersState,
       fetchAssetsAndFilters,

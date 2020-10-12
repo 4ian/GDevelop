@@ -29,8 +29,10 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import {
   sendAssetAddedToProject,
   sendAssetOpened,
+  sendNewObjectCreated,
 } from '../Utils/Analytics/EventSender';
 import optionalRequire from '../Utils/OptionalRequire';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 const electron = optionalRequire('electron');
 
 const ObjectListItem = ({
@@ -137,8 +139,14 @@ export default function NewObjectDialog({
             onObjectAddedFromAsset(object);
           });
         } catch (error) {
-          console.error('Error while installing asset:', error);
-          //TODO: Handle error
+          console.error('Error while installing the asset:', error);
+          showErrorBox({
+            message: `There was an error while installing the asset \"${
+              assetShortHeader.name
+            }\". Verify your internet connection or try again later.`,
+            rawError: error,
+            errorId: 'install-asset-error',
+          });
         }
 
         setAssetBeingInstalled(null);
@@ -205,7 +213,10 @@ export default function NewObjectDialog({
                 <ObjectListItem
                   key={objectMetadata.name}
                   objectMetadata={objectMetadata}
-                  onClick={() => onCreateNewObject(objectMetadata.name)}
+                  onClick={() => {
+                    sendNewObjectCreated(objectMetadata.name);
+                    onCreateNewObject(objectMetadata.name);
+                  }}
                 />
               ))}
               {showExperimental && (
@@ -218,7 +229,10 @@ export default function NewObjectDialog({
                   <ObjectListItem
                     key={objectMetadata.name}
                     objectMetadata={objectMetadata}
-                    onClick={() => onCreateNewObject(objectMetadata.name)}
+                    onClick={() => {
+                      sendNewObjectCreated(objectMetadata.name);
+                      onCreateNewObject(objectMetadata.name);
+                    }}
                   />
                 ))}
             </List>

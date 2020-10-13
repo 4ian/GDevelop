@@ -177,6 +177,7 @@ export enum ResourceKind {
   Audio = 'audio',
   Image = 'image',
   Font = 'font',
+  BitmapFont = 'bitmapFont',
   Video = 'video',
   Json = 'json',
 }

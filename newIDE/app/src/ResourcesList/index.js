@@ -247,6 +247,10 @@ export default class ResourcesList extends React.Component<Props, State> {
             RESOURCE_EXTENSIONS.font,
             () => new gd.FontResource()
           );
+          this._scanForNewResources(
+            RESOURCE_EXTENSIONS.bitmapFont,
+            () => new gd.BitmapFontResource()
+          );
         },
         enabled: hasElectron,
       },

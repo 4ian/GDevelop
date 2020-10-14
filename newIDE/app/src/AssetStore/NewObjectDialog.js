@@ -15,6 +15,7 @@ import {
 import HelpButton from '../UI/HelpButton';
 import { getExperimentalObjects } from '../Hints';
 import { Line, Column } from '../UI/Grid';
+import InfoBar from '../UI/Messages/InfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -90,6 +91,7 @@ export default function NewObjectDialog({
   onCreateNewObject,
   onObjectAddedFromAsset,
 }: Props) {
+  const [assetWasInstalled, setAssetWasInstalled] = React.useState(false);
   const [openedAsset, setOpenedAsset] = React.useState<null | AssetShortHeader>(
     null
   );
@@ -138,12 +140,14 @@ export default function NewObjectDialog({
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
           });
+          setOpenedAsset(null);
+          setAssetWasInstalled(true);
         } catch (error) {
           console.error('Error while installing the asset:', error);
           showErrorBox({
-            message: `There was an error while installing the asset \"${
+            message: `There was an error while installing the asset "${
               assetShortHeader.name
-            }\". Verify your internet connection or try again later.`,
+            }". Verify your internet connection or try again later.`,
             rawError: error,
             errorId: 'install-asset-error',
           });
@@ -275,6 +279,16 @@ export default function NewObjectDialog({
           }
         />
       ) : null}
+      <InfoBar
+        identifier="asset-installed-explanation"
+        message={
+          <Trans>
+            The object was added to the list of objects. You can now use it on
+            the scene, in events, and customize it.
+          </Trans>
+        }
+        show={assetWasInstalled}
+      />
     </Dialog>
   );
 }

@@ -31,7 +31,8 @@ export type AlertMessageIdentifier =
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-broker-recommendation'
-  | 'command-palette-shortcut';
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -135,6 +136,12 @@ export const allAlertMessages: Array<{
   {
     key: 'command-palette-shortcut',
     label: <Trans>Command palette keyboard shortcut</Trans>,
+  },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
   },
 ];
 

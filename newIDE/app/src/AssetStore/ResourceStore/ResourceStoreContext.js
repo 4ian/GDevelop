@@ -95,7 +95,10 @@ export const ResourceStoreStateProvider = ({
           setAuthors(authors);
           setLicenses(licenses);
         } catch (error) {
-          console.error(`Unable to load the assets from the asset store:`, error);
+          console.error(
+            `Unable to load the assets from the asset store:`,
+            error
+          );
           setError(error);
         }
 

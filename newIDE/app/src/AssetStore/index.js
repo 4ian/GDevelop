@@ -9,6 +9,7 @@ import { SearchResults } from './SearchResults';
 import { FiltersChooser } from './FiltersChooser';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   searchBar: {
@@ -48,41 +49,49 @@ export const AssetStore = ({
   );
 
   return (
-    <Column expand noMargin useFullHeight>
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-        onRequestSearch={() => {}}
-        style={styles.searchBar}
-      />
-      <Line
-        expand
-        overflow={
-          'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
-        }
-      >
-        <Background noFullHeight noExpand width={250}>
-          <ScrollView>
-            <FiltersChooser
-              allFilters={filters}
-              filtersState={filtersState}
+    <ResponsiveWindowMeasurer>
+      {windowWidth => (
+        <Column expand noMargin useFullHeight>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            onRequestSearch={() => {}}
+            style={styles.searchBar}
+          />
+          <Line
+            expand
+            overflow={
+              'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+            }
+          >
+            <Background
+              noFullHeight
+              noExpand
+              width={windowWidth === 'small' ? 150 : 250}
+            >
+              <ScrollView>
+                <FiltersChooser
+                  allFilters={filters}
+                  filtersState={filtersState}
+                  error={error}
+                />
+              </ScrollView>
+            </Background>
+            <SearchResults
+              onRetry={fetchAssetsAndFilters}
               error={error}
+              searchItems={searchResults}
+              renderSearchItem={(assetShortHeader, size) => (
+                <AssetCard
+                  size={size}
+                  onOpenDetails={() => onOpenDetails(assetShortHeader)}
+                  assetShortHeader={assetShortHeader}
+                />
+              )}
             />
-          </ScrollView>
-        </Background>
-        <SearchResults
-          onRetry={fetchAssetsAndFilters}
-          error={error}
-          searchItems={searchResults}
-          renderSearchItem={(assetShortHeader, size) => (
-            <AssetCard
-              size={size}
-              onOpenDetails={() => onOpenDetails(assetShortHeader)}
-              assetShortHeader={assetShortHeader}
-            />
-          )}
-        />
-      </Line>
-    </Column>
+          </Line>
+        </Column>
+      )}
+    </ResponsiveWindowMeasurer>
   );
 };

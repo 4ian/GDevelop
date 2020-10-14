@@ -173,8 +173,9 @@ export default function NewObjectDialog({
       title={<Trans>Add a new object</Trans>}
       secondaryActions={[
         <HelpButton helpPagePath="/objects" key="help" />,
-        screenType !== 'touch' ? (
+        !electron && screenType !== 'touch' ? (
           <FlatButton
+            key="download-gdevelop"
             label={<Trans>Download GDevelop to import your images</Trans>}
             onClick={() =>
               Window.openExternalURL('https://gdevelop-app.com/download')

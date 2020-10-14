@@ -41,7 +41,7 @@ module.exports = [
     "languageCode": "cs_CZ",
     "languageName": "Czech",
     "languageNativeName": "čeština",
-    "translationRatio": 0.14748849309585754
+    "translationRatio": 0.15009005403241948
   },
   {
     "languageCode": "da_DK",
@@ -77,7 +77,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9457674604762858
+    "translationRatio": 0.9469681809085452
   },
   {
     "languageCode": "fa_IR",
@@ -101,7 +101,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.935361216730038
+    "translationRatio": 0.9519711827096258
   },
   {
     "languageCode": "ha_HG",
@@ -125,19 +125,19 @@ module.exports = [
     "languageCode": "hu_HU",
     "languageName": "Hungarian",
     "languageNativeName": "magyar",
-    "translationRatio": 0.222333400040024
+    "translationRatio": 0.22393436061636984
   },
   {
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0.4928957374424655
+    "translationRatio": 0.4938963378026816
   },
   {
     "languageCode": "it_IT",
     "languageName": "Italian",
     "languageNativeName": "Italiano",
-    "translationRatio": 0.9409645787472484
+    "translationRatio": 0.9549729837902742
   },
   {
     "languageCode": "ja_JP",
@@ -149,7 +149,7 @@ module.exports = [
     "languageCode": "ko_KR",
     "languageName": "Korean",
     "languageNativeName": "한국어",
-    "translationRatio": 0.24894936962177305
+    "translationRatio": 0.2523514108465079
   },
   {
     "languageCode": "lt_LT",
@@ -197,7 +197,7 @@ module.exports = [
     "languageCode": "pl_PL",
     "languageName": "Polish",
     "languageNativeName": "język polski",
-    "translationRatio": 0.6748048829297579
+    "translationRatio": 0.6770062037222333
   },
   {
     "languageCode": "pseudo_LOCALE",
@@ -227,19 +227,19 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9429657794676806
+    "translationRatio": 0.9469681809085452
   },
   {
     "languageCode": "sk_SK",
     "languageName": "Slovak",
     "languageNativeName": "slovenčina",
-    "translationRatio": 0.01701020612367421
+    "translationRatio": 0.02461476886131675
   },
   {
     "languageCode": "sl_SI",
     "languageName": "Slovene",
     "languageNativeName": "slovenski jezik",
-    "translationRatio": 0.929157494496698
+    "translationRatio": 0.9319591755053032
   },
   {
     "languageCode": "sr_CS",
@@ -257,7 +257,7 @@ module.exports = [
     "languageCode": "sv_SE",
     "languageName": "Swedish",
     "languageNativeName": "svenska",
-    "translationRatio": 0.15169101460876522
+    "translationRatio": 0.18170902541524914
   },
   {
     "languageCode": "th_TH",
@@ -299,7 +299,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.6635981588953372
+    "translationRatio": 0.6768060836501901
   },
   {
     "languageCode": "zh_TW",

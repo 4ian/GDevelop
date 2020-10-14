@@ -34,6 +34,8 @@ import {
 } from '../Utils/Analytics/EventSender';
 import optionalRequire from '../Utils/OptionalRequire';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
 
 const ObjectListItem = ({
@@ -104,6 +106,7 @@ export default function NewObjectDialog({
     project,
   ]);
   const experimentalObjectsInformation = getExperimentalObjects();
+  const screenType = useScreenType();
 
   const objects = objectMetadata.filter(
     ({ name }) => !experimentalObjectsInformation[name]
@@ -168,7 +171,17 @@ export default function NewObjectDialog({
   return (
     <Dialog
       title={<Trans>Add a new object</Trans>}
-      secondaryActions={<HelpButton helpPagePath="/objects" />}
+      secondaryActions={[
+        <HelpButton helpPagePath="/objects" key="help" />,
+        screenType !== 'touch' ? (
+          <FlatButton
+            label={<Trans>Download GDevelop to import your images</Trans>}
+            onClick={() =>
+              Window.openExternalURL('https://gdevelop-app.com/download')
+            }
+          />
+        ) : null,
+      ]}
       actions={[
         <FlatButton
           key="close"

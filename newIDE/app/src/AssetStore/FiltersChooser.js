@@ -140,6 +140,12 @@ const MemoizedTagsTree = React.memo(function TagsTree({
   );
 });
 
+const capitalize = (str: string) => {
+  if (!str) return '';
+
+  return str[0].toUpperCase() + str.substr(1);
+};
+
 type Props = {|
   filtersState: FiltersState,
   allFilters: ?Filters,
@@ -178,7 +184,7 @@ export const FiltersChooser = ({ filtersState, allFilters, error }: Props) => {
           selectedCategoryTags.map(tag => (
             <InlineCheckbox
               key={tag}
-              label={tag}
+              label={capitalize(tag)}
               checked={filtersState.chosenFilters.has(tag)}
               onCheck={() => {
                 if (filtersState.chosenFilters.has(tag)) {

@@ -56,8 +56,8 @@ export const SearchResults = <SearchItem>({
             if (!width || !height) return null;
 
             const baseSize = 128;
-            const columnCount = Math.floor((width - 5) / baseSize);
-            const columnWidth = Math.floor(width / columnCount);
+            const columnCount = Math.max(Math.floor((width - 5) / baseSize), 1);
+            const columnWidth = Math.max(Math.floor(width / columnCount), 30);
             const rowCount = Math.max(
               1,
               Math.ceil(searchItems.length / columnCount)

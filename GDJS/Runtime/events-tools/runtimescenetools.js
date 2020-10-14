@@ -47,7 +47,7 @@ gdjs.evtTools.runtimeScene.getTimeScale = function(runtimeScene) {
     return runtimeScene.getTimeManager().getTimeScale();
 };
 
-gdjs.evtTools.runtimeScene.timerElapsedTime = function(runtimeScene, timeInSeconds, timerName) {
+gdjs.evtTools.runtimeScene.timerElapsedTime = function(runtimeScene, timerName, timeInSeconds) {
     var timeManager = runtimeScene.getTimeManager();
     if ( !timeManager.hasTimer(timerName) ) {
         timeManager.addTimer(timerName);

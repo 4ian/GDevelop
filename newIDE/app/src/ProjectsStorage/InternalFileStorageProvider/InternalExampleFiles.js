@@ -118,11 +118,13 @@ import exampleFile113 from '../../fixtures/text-entry-object/text-entry-object.j
 import exampleFile114 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
 import exampleFile115 from '../../fixtures/text-to-speech/text-to-speech.json';
 import exampleFile116 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile117 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile118 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile119 from '../../fixtures/video-player/video-player.json';
-import exampleFile120 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile121 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile117 from '../../fixtures/tween-animations/tween-animations.json';
+import exampleFile118 from '../../fixtures/tween-test/tween-test.json';
+import exampleFile119 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile120 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile121 from '../../fixtures/video-player/video-player.json';
+import exampleFile122 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile123 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -243,9 +245,11 @@ export default {
   'example://text-fade-in-out': exampleFile114,
   'example://text-to-speech': exampleFile115,
   'example://toggle-music-play-sound': exampleFile116,
-  'example://type-on-text-effect': exampleFile117,
-  'example://unlock-items': exampleFile118,
-  'example://video-player': exampleFile119,
-  'example://z-depth': exampleFile120,
-  'example://zombie-laser': exampleFile121,
+  'example://tween-animations': exampleFile117,
+  'example://tween-test': exampleFile118,
+  'example://type-on-text-effect': exampleFile119,
+  'example://unlock-items': exampleFile120,
+  'example://video-player': exampleFile121,
+  'example://z-depth': exampleFile122,
+  'example://zombie-laser': exampleFile123,
 };

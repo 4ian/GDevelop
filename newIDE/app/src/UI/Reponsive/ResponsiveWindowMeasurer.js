@@ -10,7 +10,7 @@ type Props = {|
 const useForceUpdate = () => {
   const [value, setValue] = React.useState(true);
   return () => setValue(value => !value);
-}
+};
 
 /**
  * Pass the proper size to the children according to the window size.
@@ -23,13 +23,13 @@ export const ResponsiveWindowMeasurer = ({ children }: Props) => {
   React.useEffect(() => {
     // Use timeouts to only rerender when the resize is finished.
     let timeout;
-    const listener = window.addEventListener("resize", () => {
+    const listener = window.addEventListener('resize', () => {
       clearTimeout(timeout);
       timeout = setTimeout(forceUpdate, 200);
     });
 
-    return () => window.removeEventListener("resize", listener);
-  })
+    return () => window.removeEventListener('resize', listener);
+  });
 
   if (typeof window === 'undefined') {
     return children('medium');

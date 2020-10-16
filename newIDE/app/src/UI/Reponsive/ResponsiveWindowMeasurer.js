@@ -1,16 +1,12 @@
 // @flow
 import * as React from 'react';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 export type WidthType = 'small' | 'medium' | 'large';
 
 type Props = {|
   children: (width: WidthType) => React.Node,
 |};
-
-const useForceUpdate = () => {
-  const [value, setValue] = React.useState(true);
-  return () => setValue(value => !value);
-};
 
 /**
  * Pass the proper size to the children according to the window size.

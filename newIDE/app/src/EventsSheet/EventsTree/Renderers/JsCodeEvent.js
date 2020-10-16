@@ -29,6 +29,8 @@ const styles = {
     fontSize: '12px',
     paddingLeft: 5,
     paddingRight: 5,
+    paddingTop: 2,
+    paddingBottom: 2,
     margin: 0,
     backgroundColor: '#1e1e1e',
     color: '#d4d4d4',
@@ -204,7 +206,7 @@ export default class JsCodeEvent extends React.Component<
             <CodeEditor
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
-              width={contentRect.bounds.width}
+              width={contentRect.bounds.width - 5}
               onEditorMounted={() => this.props.onUpdate()}
             />
             {functionEnd}

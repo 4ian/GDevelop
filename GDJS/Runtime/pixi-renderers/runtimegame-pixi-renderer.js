@@ -18,6 +18,8 @@ gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen) {
   this._canvasHeight = 0; // Current height of the canvas (might be scaled down/up compared to renderer)
   this._keepRatio = true;
   this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
+
+  this._setupOrientation();
 };
 
 gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to let the engine use it.
@@ -81,6 +83,16 @@ gdjs.RuntimeGamePixiRenderer.getWindowInnerHeight = function() {
  */
 gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function() {
   this._resizeCanvas();
+};
+
+/**
+ * Set the proper screen orientation from the project properties.
+ * @private
+ */
+gdjs.RuntimeGamePixiRenderer.prototype._setupOrientation = function() {
+  if (!window || !window.screen || !window.screen.orientation) return;
+  var gameOrientation = this._game.getGameData().properties.orientation;
+  gameOrientation === "default" ? window.screen.orientation.unlock() : window.screen.orientation.lock(gameOrientation);
 };
 
 /**

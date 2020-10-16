@@ -41,5 +41,5 @@ export const GDevelopExtensionApi = {
 export const GDevelopAssetApi = {
   baseUrl: isDev
     ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
-    : 'TODO',
+    : 'https://api.gdevelop-app.com/asset',
 };

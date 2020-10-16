@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useOnResize } from '../../Utils/UseOnResize';
 
 export type WidthType = 'small' | 'medium' | 'large';
 
@@ -14,18 +15,7 @@ type Props = {|
  * are small.
  */
 export const ResponsiveWindowMeasurer = ({ children }: Props) => {
-  const forceUpdate = useForceUpdate();
-
-  React.useEffect(() => {
-    // Use timeouts to only rerender when the resize is finished.
-    let timeout;
-    const listener = window.addEventListener('resize', () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(forceUpdate, 200);
-    });
-
-    return () => window.removeEventListener('resize', listener);
-  });
+  useOnResize(useForceUpdate());
 
   if (typeof window === 'undefined') {
     return children('medium');

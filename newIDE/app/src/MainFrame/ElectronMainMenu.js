@@ -35,6 +35,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      role?: string,
       eventArgs?: any,
     |}
   | {|
@@ -54,11 +55,15 @@ type MenuItemTemplate =
 
 type RootMenuTemplate =
   | {|
-      label: string,
+      label?: string,
+      role?: string,
       submenu: Array<MenuItemTemplate>,
     |}
   | {|
       role: string,
+      submenu: Array<MenuItemTemplate>,
+    |}
+  | {|
       submenu: Array<MenuItemTemplate>,
     |};
 
@@ -199,11 +204,13 @@ const buildAndSendMenuTemplate = (
   };
 
   const windowTemplate = {
+    label: i18n._(t`Window`),
     role: 'window',
-    submenu: [{ role: 'minimize' }],
+    submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
   };
 
   const helpTemplate = {
+    label: i18n._(t`Help`),
     role: 'help',
     submenu: [
       {

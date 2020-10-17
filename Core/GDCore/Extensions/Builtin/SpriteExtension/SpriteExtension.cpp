@@ -417,7 +417,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedX",
                    _("Horizontally flipped"),
-                   _("Return true if the object is horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
                    _("_PARAM0_ is horizontally flipped"),
                    _("Effects"),
                    "res/actions/flipX24.png",
@@ -427,7 +427,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
-                   _("Return true if the object is vertically flipped"),
+                   _("Check if the object is vertically flipped"),
                    _("_PARAM0_ is vertically flipped"),
                    _("Effects"),
                    "res/actions/flipY24.png",

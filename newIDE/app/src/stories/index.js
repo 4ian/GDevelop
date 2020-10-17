@@ -99,6 +99,11 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  fakeAssetShortHeader1,
+  fakeAssetShortHeader2,
+  fakeAssetShortHeader3,
+  fakeAssetWithBehaviorCustomizations1,
+  fakeAssetWithEventCustomizationsAndFlashExtension1,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -152,7 +157,7 @@ import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../ObjectsList/NewObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -200,6 +205,15 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { AssetStore } from '../AssetStore';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import ScrollView from '../UI/ScrollView';
+import '../UI/Theme/Global.css';
+import { AssetCard } from '../AssetStore/AssetCard';
+import { SearchResults } from '../AssetStore/SearchResults';
+import { AssetDetails } from '../AssetStore/AssetDetails';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ResourceStore } from '../AssetStore/ResourceStore';
 
 configureActions({
   depth: 2,
@@ -735,6 +749,33 @@ storiesOf('UI Building Blocks/SearchBar', module)
     />
   ));
 
+storiesOf('UI Building Blocks/Layout/Grid', module)
+  .addDecorator(muiDecorator)
+  .add('Line and ScrollView in a fixed height container', () => (
+    <FixedHeightFlexContainer height={100}>
+      <Column expand>
+        <Line overflow="hidden">
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+        </Line>
+      </Column>
+    </FixedHeightFlexContainer>
+  ));
+
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   .addDecorator(muiDecorator)
   .add('Default', () => (
@@ -1114,7 +1155,6 @@ storiesOf('UI Building Blocks/AlertMessage', module)
         <img
           src="res/tutorial_icons/tween-behavior.jpg"
           alt=""
-          crossOrigin="anonymous"
           style={{
             maxWidth: 128,
             maxHeight: 128,
@@ -1586,6 +1626,11 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     getThumbnail={() => 'res/unknown32.png'}
                     project={testProject.project}
                     objectsContainer={testProject.testLayout}
+                    layout={testProject.testLayout}
+                    events={testProject.testLayout.getEvents()}
+                    resourceSources={[]}
+                    onChooseResource={() => Promise.reject('unimplemented')}
+                    resourceExternalEditors={fakeResourceExternalEditors}
                     onEditObject={action('On edit object')}
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
@@ -3239,6 +3284,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3263,6 +3313,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3332,16 +3387,21 @@ storiesOf('InstancePropertiesEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <InstancePropertiesEditor
-        project={testProject.project}
-        layout={testProject.testLayout}
-        instances={[testProject.testLayoutInstance1]}
-        editInstanceVariables={action('edit instance variables')}
-        editObjectVariables={action('edit object variables')}
-        onEditObjectByName={action('edit object')}
-      />
-    </SerializedObjectDisplay>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.testLayout}>
+          <InstancePropertiesEditor
+            i18n={i18n}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testLayoutInstance1]}
+            editInstanceVariables={action('edit instance variables')}
+            editObjectVariables={action('edit object variables')}
+            onEditObjectByName={action('edit object')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
   ));
 
 storiesOf('ObjectGroupEditor', module)
@@ -4317,12 +4377,23 @@ storiesOf('EffectsList', module)
 storiesOf('NewObjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <NewObjectDialog
-      open
-      project={testProject.project}
-      onClose={action('close')}
-      onChoose={action('choose')}
-    />
+    <AssetStoreStateProvider>
+      <NewObjectDialog
+        project={testProject.project}
+        layout={testProject.testLayout}
+        onClose={action('onClose')}
+        onCreateNewObject={action('onCreateNewObject')}
+        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        events={testProject.testLayout.getEvents()}
+        objectsContainer={testProject.testLayout}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+      />
+    </AssetStoreStateProvider>
   ));
 
 storiesOf('CommandPalette', module)
@@ -4426,5 +4497,94 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
+    />
+  ));
+
+storiesOf('AssetStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <AssetStoreStateProvider>
+        <AssetStore
+          onOpenDetails={action('onOpenDetails')}
+          events={testProject.testLayout.getEvents()}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+        />
+      </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ResourceStore', module)
+  .addDecorator(muiDecorator)
+  .add('resourceKind: image', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: audio', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: font', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/AssetCard', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetCard
+      size={128}
+      onOpenDetails={action('onOpenDetails')}
+      assetShortHeader={fakeAssetShortHeader1}
+    />
+  ));
+
+storiesOf('AssetStore/AssetDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetDetails
+      canInstall={true}
+      isBeingInstalled={false}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('being installed', () => (
+    <AssetDetails
+      canInstall={false}
+      isBeingInstalled={true}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));

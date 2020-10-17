@@ -32,6 +32,7 @@ type Props<Item> = {
   buildMenuTemplate: () => Array<MenuItemTemplate>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
+  scaleUpItemIconWhenSelected?: boolean,
   connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 };
 
@@ -57,6 +58,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
       onEdit,
       onItemSelected,
       hideMenuButton,
+      scaleUpItemIconWhenSelected,
       connectIconDragSource,
     } = this.props;
 
@@ -112,7 +114,15 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           };
 
           const leftIcon = getThumbnail ? (
-            <ListIcon iconSize={24} src={getThumbnail()} />
+            <ListIcon
+              iconSize={24}
+              src={getThumbnail()}
+              cssAnimation={
+                scaleUpItemIconWhenSelected && selected
+                  ? 'scale-and-jiggle 0.8s forwards'
+                  : ''
+              }
+            />
           ) : null;
 
           return (

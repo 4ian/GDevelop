@@ -23,7 +23,7 @@ import {
   enumerateBehaviorsMetadata,
   filterEnumeratedBehaviorMetadata,
 } from './EnumerateBehaviorsMetadata';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import ExtensionsSearch from '../ExtensionsSearch';
 import Window from '../Utils/Window';
@@ -86,7 +86,8 @@ export default class NewBehaviorDialog extends Component<Props, State> {
 
   componentDidMount() {
     setTimeout(() => {
-      if (this._searchBar.current) this._searchBar.current.focus();
+      if (useShouldAutofocusSearchbar() && this._searchBar.current)
+        this._searchBar.current.focus();
     }, 20 /* Be sure that the search bar is shown */);
   }
 

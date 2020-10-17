@@ -90,17 +90,21 @@ export const displayProjectErrorsBox = (
 ): boolean => {
   if (!Object.keys(errors).length) return true;
 
-  showErrorBox(
-    t(
-      'Your game has some invalid elements, please fix these before continuing:'
-    ) +
+  showErrorBox({
+    message:
+      t(
+        'Your game has some invalid elements, please fix these before continuing:'
+      ) +
       '\n\n' +
       values(errors)
         .map(errors =>
           errors.map((error: ProjectError) => `- ${error.message}`).join('\n')
         )
-        .join('\n')
-  );
+        .join('\n'),
+    rawError: undefined,
+    errorId: 'project-invalid-settings-error',
+    doNotReport: true,
+  });
 
   return false;
 };

@@ -55,6 +55,13 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       runtimeObject.getHitBoxes()[0].vertices[i]
     );
   }
+
+  // Objects will be added in lighting layer, this is just to maintain consistency.
+  if (this._light)
+    runtimeScene
+      .getLayer('')
+      .getRenderer()
+      .addRendererObject(this.getRendererObject(), runtimeObject.getZOrder());
 };
 
 gdjs.LightRuntimeObjectRenderer = gdjs.LightRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
@@ -168,6 +175,12 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateMesh = function () {
+  if (!PIXI.utils.isWebGLSupported()) {
+    console.warn(
+      'This device does not support webgl, which is required for Lighting Extension.'
+    );
+    return;
+  }
   this.updateTexture();
   var fragmentShader =
     this._texture === null
@@ -200,11 +213,15 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateMesh = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateRadius = function () {
+  if (!this._light) return;
+
   this._radius = this._object.getRadius();
   this._light.shader.uniforms.radius = this._radius;
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
+  if (!this._light) return;
+
   var objectColor = this._object._color;
   this._color = [
     objectColor[0] / 255,
@@ -215,6 +232,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
+  if (!this._light) return;
   var texture = this._object.getTexture();
   this._texture =
     texture !== ''
@@ -223,6 +241,8 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateDebugMode = function () {
+  if (!this._light) return;
+
   this._debugMode = this._object.getDebugMode();
   if (!this._debugLight && (this._isPreview || this._debugMode)) {
     this._debugLight = new PIXI.Container();
@@ -293,9 +313,10 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateDebugGraphics = function ()
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
+  if (!this._light) return;
+
   this._center[0] = this._object.x;
   this._center[1] = this._object.y;
-  this._light.shader.uniforms.center = this._center;
 
   var vertices = this._computeLightVertices();
   // Fallback to simple quad when there are no obstacles around.
@@ -309,6 +330,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
     this._defaultVertexBuffer[6] = this._object.x - this._radius;
     this._defaultVertexBuffer[7] = this._object.y - this._radius;
 
+    this._light.shader.uniforms.center = this._center;
     this._light.geometry
       .getBuffer('aVertexPosition')
       .update(this._defaultVertexBuffer);
@@ -364,6 +386,7 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype._updateBuffers = function () {
     else this._indexBuffer[i + 2] = 1;
   }
 
+  this._light.shader.uniforms.center = this._center;
   if (!isSubArrayUsed) {
     this._light.geometry
       .getBuffer('aVertexPosition')

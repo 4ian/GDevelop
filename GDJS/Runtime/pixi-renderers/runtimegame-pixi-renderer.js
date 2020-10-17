@@ -257,6 +257,18 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
 };
 
 /**
+ * Checks if the game is in full screen.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function() {
+  var electron = this.getElectron();
+  if (electron) {
+    return electron.remote.getCurrentWindow().isFullScreen();
+  }
+  // Height check is used to detect user triggered full screen (for example F11 shortcut).
+  return this._isFullscreen || window.screen.height === window.innerHeight;
+}
+
+/**
  * Add the standard events handler.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(

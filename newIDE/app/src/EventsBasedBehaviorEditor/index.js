@@ -69,9 +69,11 @@ export default class EventsBasedBehaviorEditor extends React.Component<
               identifier="events-based-behavior-explanation"
               kind="info"
             >
-              This is the configuration of your behavior. Make sure to choose a
-              proper internal name as it's hard to change it later. Enter a
-              description explaining what the behavior is doing to the object.
+              <Trans>
+                This is the configuration of your behavior. Make sure to choose
+                a proper internal name as it's hard to change it later. Enter a
+                description explaining what the behavior is doing to the object.
+              </Trans>
             </DismissableAlertMessage>
             <TextField
               floatingLabelText={<Trans>Internal Name</Trans>}

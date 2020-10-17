@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -21,7 +20,7 @@
     "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
-    "name": "Multiplayer Game Example",
+    "name": "P2P Networking Example",
     "author": "Arthur Pacaud (arthuro555)",
     "windowWidth": 800,
     "windowHeight": 600,
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "Assets/button_icon.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/button_icon.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\button_icon.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/chat_icon.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/chat_icon.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\chat_icon.png",
@@ -121,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/textEntry.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/textEntry.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\textEntry.png",
@@ -130,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/void.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/void.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\void.png",
@@ -139,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/box.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/box.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\box.png",
@@ -148,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/Checkmark.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/Checkmark.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\Checkmark.png",
@@ -157,7 +157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "Assets/UncheckedCheckmark.png",
+        "file": "https://resources.gdevelop-app.com/examples/p2p-networking/Assets/UncheckedCheckmark.png",
         "kind": "image",
         "metadata": "",
         "name": "Assets\\UncheckedCheckmark.png",
@@ -1079,7 +1079,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Try to verify if connection has happened every second",
+              "comment": "When a peer is connected, confirm connection and switch to the game",
               "comment2": ""
             },
             {
@@ -1090,28 +1090,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "Timer"
+                    "value": "P2P::OnConnection"
                   },
-                  "parameters": [
-                    "",
-                    "1",
-                    "\"verifyConnection\""
-                  ],
+                  "parameters": [],
                   "subInstructions": []
                 }
               ],
               "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ResetTimer"
-                  },
-                  "parameters": [
-                    "",
-                    "\"verifyConnection\""
-                  ],
-                  "subInstructions": []
-                },
                 {
                   "type": {
                     "inverted": false,
@@ -1120,6 +1105,18 @@
                   "parameters": [
                     "\"connected\"",
                     "\"\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Menu\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -1138,7 +1135,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Switch to the game once connected and notify other instance that the connection has happened",
+              "comment": "Switch to the game once connection is confirmed",
               "comment2": ""
             },
             {
@@ -1159,17 +1156,6 @@
                 }
               ],
               "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "P2P::SendToAll"
-                  },
-                  "parameters": [
-                    "\"connected\"",
-                    "\"\""
-                  ],
-                  "subInstructions": []
-                },
                 {
                   "type": {
                     "inverted": false,
@@ -1357,6 +1343,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2036,6 +2027,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2626,6 +2622,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3334,6 +3335,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3491,6 +3497,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

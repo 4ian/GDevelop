@@ -818,6 +818,106 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
 };
 
 /**
+ * Add an object width tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toWidth The target width
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectWidthTween = function(
+  identifier,
+  toWidth,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+  var that = this;
+  if (!this._isActive) return;
+  if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
+  newTweenable.setConfig({
+    from: {
+      width: this.owner.getWidth(),
+    },
+    to: {
+      width: toWidth,
+    },
+    duration: durationValue,
+    easing: easingValue,
+    step: function step(state) {
+      that.owner.setWidth(state.width);
+    },
+  });
+
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
+
+  this._setupTweenEnding(identifier, destroyObjectWhenFinished);
+};
+
+/**
+ * Add an object height tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toHeight The target height
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectHeightTween = function(
+  identifier,
+  toHeight,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+  var that = this;
+  if (!this._isActive) return;
+  if (!!gdjs.TweenRuntimeBehavior.easings[easingValue]) return;
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
+  newTweenable.setConfig({
+    from: {
+      height: this.owner.getHeight(),
+    },
+    to: {
+      height: toHeight,
+    },
+    duration: durationValue,
+    easing: easingValue,
+    step: function step(state) {
+      that.owner.setHeight(state.height);
+    },
+  });
+
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
+
+  this._setupTweenEnding(identifier, destroyObjectWhenFinished);
+};
+
+/**
  * Tween is playing.
  * @param {string} identifier Unique id to idenfify the tween
  */

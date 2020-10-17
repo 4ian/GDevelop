@@ -953,6 +953,20 @@ export default class EventsSheet extends React.Component<Props, State> {
           this.closeInstructionEditor();
           this.props.openInstructionOrExpression(extension, type);
         }}
+        canPasteInstructions={
+          this.state.editedInstruction.isCondition
+            ? hasClipboardConditions()
+            : hasClipboardActions()
+        }
+        onPasteInstructions={() => {
+          const { instrsList, isCondition } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          this.pasteInstructionsInInstructionsList({
+            instrsList,
+            isCondition,
+          });
+        }}
       />
     ) : (
       undefined

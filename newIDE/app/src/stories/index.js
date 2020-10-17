@@ -3076,6 +3076,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('Existing condition (scope: without layout)', () => (
@@ -3097,6 +3099,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('New condition (scope: without layout)', () => (
@@ -3118,6 +3122,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ));
 
@@ -3146,6 +3152,8 @@ storiesOf('NewInstructionEditorMenu', module)
           onCancel={onClose}
           onSubmit={onClose}
           anchorEl={buttonElement}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
         />
       )}
     </PopoverButton>

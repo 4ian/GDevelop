@@ -176,7 +176,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .AddCondition("SourisBouton",
                     _("Mouse button pressed or touch held"),
-                    _("Return true if the specified mouse button is pressed or "
+                    _("Check if the specified mouse button is pressed or "
                       "if a touch is in contact with the screen."),
                     _("Touch or _PARAM1_ mouse button is down"),
                     _("Mouse and touch"),
@@ -190,7 +190,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition(
           "MouseButtonReleased",
           _("Mouse button released"),
-          _("Return true if the specified mouse button was released."),
+          _("Check if the specified mouse button was released."),
           _("_PARAM1_ mouse button was released"),
           _("Mouse and touch"),
           "res/conditions/mouse24.png",
@@ -235,7 +235,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition(
           "PopStartedTouch",
           _("A new touch has started"),
-          _("Return true if a touch has started. The touch identifier can be "
+          _("Check if a touch has started. The touch identifier can be "
             "accessed using LastTouchId().\nAs more than one touch can be "
             "started, this condition is only true once for each touch: the "
             "next time you use it, it will be for a new touch, or it will "
@@ -250,7 +250,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition(
           "PopEndedTouch",
           _("A touch has ended"),
-          _("Return true if a touch has ended. The touch identifier can be "
+          _("Check if a touch has ended. The touch identifier can be "
             "accessed using LastEndedTouchId().\nAs more than one touch can be "
             "ended, this condition is only true once for each touch: the next "
             "time you use it, it will be for a new touch, or it will return "

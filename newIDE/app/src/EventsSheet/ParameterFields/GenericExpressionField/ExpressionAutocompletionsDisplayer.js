@@ -76,12 +76,9 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onMouseDown={() => {
-          // When using a mouse, trigger the onClick on the mouse down
+        onPointerDown={() => {
+          // Trigger the onClick on the mouse/touch down
           // to avoid the blur event of the text field to discard the autocompletions.
-          onClick();
-        }}
-        onClick={() => {
           onClick();
         }}
         ref={ref}

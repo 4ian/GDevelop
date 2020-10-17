@@ -19,6 +19,8 @@ import { CodeEditor } from '../../../CodeEditor';
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
+const MINIMUM_EDITOR_HEIGHT = 200;
+const EDITOR_PADDING = 100;
 
 const styles = {
   container: {
@@ -147,6 +149,17 @@ export default class JsCodeEvent extends React.Component<
     });
   };
 
+  _codeEditorHeight = () => {
+    // Always use the minimum height when collapsed.
+    if (!this.state.expanded) {
+      return MINIMUM_EDITOR_HEIGHT;
+    }
+
+    // Shrink the editor enough for the additional event elements to fit in the sheet space.
+    const heightToFillSheet = this.props.eventsSheetHeight - EDITOR_PADDING;
+    return Math.max(MINIMUM_EDITOR_HEIGHT, heightToFillSheet);
+  };
+
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
@@ -231,7 +244,7 @@ export default class JsCodeEvent extends React.Component<
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
               width={contentRect.bounds.width - 5}
-              height={this.state.expanded ? 1000 : 200}
+              height={this._codeEditorHeight()}
               onEditorMounted={() => this.props.onUpdate()}
             />
             {functionEnd}

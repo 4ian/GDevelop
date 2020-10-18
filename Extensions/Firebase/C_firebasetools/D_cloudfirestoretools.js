@@ -29,10 +29,12 @@ gdjs.evtTools.firebase.firestore.writeDocument = function (
     .doc(variableName)
     .set(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -62,10 +64,12 @@ gdjs.evtTools.firebase.firestore.writeField = function (
     .doc(documentName)
     .set(updateObject, { merge: merge })
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -88,10 +92,12 @@ gdjs.evtTools.firebase.firestore.updateDocument = function (
     .doc(variableName)
     .update(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -118,10 +124,12 @@ gdjs.evtTools.firebase.firestore.updateField = function (
     .doc(documentName)
     .update(updateObject)
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -142,10 +150,12 @@ gdjs.evtTools.firebase.firestore.deleteDocument = function (
     .doc(documentName)
     .delete()
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -170,10 +180,12 @@ gdjs.evtTools.firebase.firestore.deleteField = function (
     .doc(documentName)
     .update(updateObject)
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -196,14 +208,17 @@ gdjs.evtTools.firebase.firestore.getDocument = function (
     .doc(documentName)
     .get()
     .then(function (doc) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      gdjs.evtTools.network._objectToVariable(
-        doc.data(),
-        callbackValueVariable
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (callbackValueVariable)
+        gdjs.evtTools.network._objectToVariable(
+          doc.data(),
+          callbackValueVariable
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -228,14 +243,17 @@ gdjs.evtTools.firebase.firestore.getField = function (
     .doc(documentName)
     .get()
     .then(function (doc) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      gdjs.evtTools.network._objectToVariable(
-        doc.get(field),
-        callbackValueVariable
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (callbackValueVariable)
+        gdjs.evtTools.network._objectToVariable(
+          doc.get(field),
+          callbackValueVariable
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -258,11 +276,14 @@ gdjs.evtTools.firebase.firestore.hasDocument = function (
     .doc(documentName)
     .get()
     .then(function (doc) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(doc.exists ? 'true' : 'false');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (callbackValueVariable)
+        callbackValueVariable.setString(doc.exists ? 'true' : 'false');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -287,13 +308,16 @@ gdjs.evtTools.firebase.firestore.hasField = function (
     .doc(documentName)
     .get()
     .then(function (doc) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(
-        doc.get(field) === undefined ? 'false' : 'true'
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (callbackValueVariable)
+        callbackValueVariable.setString(
+          doc.get(field) === undefined ? 'false' : 'true'
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -313,7 +337,7 @@ gdjs.evtTools.firebase.firestore.listDocuments = function (
     .collection(collectionName)
     .get()
     .then(function (snapshot) {
-      if (callbackStateVariable)
+      if (typeof callbackStateVariable !== 'undefined')
         callbackStateVariable.setString(snapshot.empty ? 'empty' : 'ok');
       if (callbackValueVariable)
         gdjs.evtTools.network._objectToVariable(
@@ -322,6 +346,7 @@ gdjs.evtTools.firebase.firestore.listDocuments = function (
         );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };

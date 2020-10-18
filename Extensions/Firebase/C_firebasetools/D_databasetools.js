@@ -26,10 +26,12 @@ gdjs.evtTools.firebase.database.writeVariable = function (
     .ref(path)
     .set(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -54,10 +56,12 @@ gdjs.evtTools.firebase.database.writeField = function (
     .ref(path)
     .set(newObject)
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -77,10 +81,12 @@ gdjs.evtTools.firebase.database.updateVariable = function (
     .ref(path)
     .update(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -104,10 +110,12 @@ gdjs.evtTools.firebase.database.updateField = function (
     .ref(path)
     .update(updateObject)
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -125,10 +133,12 @@ gdjs.evtTools.firebase.database.deleteVariable = function (
     .ref(path)
     .remove()
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -150,10 +160,12 @@ gdjs.evtTools.firebase.database.deleteField = function (
     .ref(path)
     .update(updateObject)
     .then(function () {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -173,14 +185,17 @@ gdjs.evtTools.firebase.database.getVariable = function (
     .ref(path)
     .once('value')
     .then(function (snapshot) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      gdjs.evtTools.network._objectToVariable(
-        snapshot.val(),
-        callbackValueVariable
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (typeof callbackValueVariable !== 'undefined')
+        gdjs.evtTools.network._objectToVariable(
+          snapshot.val(),
+          callbackValueVariable
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -202,14 +217,17 @@ gdjs.evtTools.firebase.database.getField = function (
     .ref(path)
     .once('value')
     .then(function (snapshot) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      gdjs.evtTools.network._objectToVariable(
-        snapshot.val()[field],
-        callbackValueVariable
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (typeof callbackValueVariable !== 'undefined')
+        gdjs.evtTools.network._objectToVariable(
+          snapshot.val()[field],
+          callbackValueVariable
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -229,13 +247,16 @@ gdjs.evtTools.firebase.database.hasVariable = function (
     .ref(path)
     .once('value')
     .then(function (snapshot) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(
-        (snapshot.exists() && snapshot.val() !== null) ? "true" : "false"
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (typeof callbackValueVariable !== 'undefined')
+        callbackValueVariable.setString(
+          snapshot.exists() && snapshot.val() !== null ? 'true' : 'false'
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -257,12 +278,17 @@ gdjs.evtTools.firebase.database.hasField = function (
     .ref(path)
     .once('value')
     .then(function (snapshot) {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(
-        (snapshot.val() == null || snapshot.val()[field] == null) ? "false" : "true"
-      );
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
+      if (typeof callbackValueVariable !== 'undefined')
+        callbackValueVariable.setString(
+          snapshot.val() == null || snapshot.val()[field] == null
+            ? 'false'
+            : 'true'
+        );
     })
     .catch(function (error) {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };

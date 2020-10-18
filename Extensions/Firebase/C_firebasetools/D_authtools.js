@@ -86,10 +86,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
         .reauthenticateWithCredential(credential)
         .then(() => updater(newEmail))
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -113,10 +114,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
           gdjs.evtTools.firebase.auth.currentUser.updatePassword(newPassword)
         )
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -137,10 +139,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
         .reauthenticateWithCredential(credential)
         .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -165,10 +168,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
         .reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
         .then(() => updater(newEmail))
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -186,10 +190,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
           gdjs.evtTools.firebase.auth.currentUser.updatePassword(newPassword)
         )
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -204,10 +209,11 @@ gdjs.evtTools.firebase.auth.userManagement = {
         .reauthenticateWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
         .then(() => gdjs.evtTools.firebase.auth.currentUser.delete())
         .then(() => {
-          if (callbackStateVariable) callbackStateVariable.setString('ok');
+          if (typeof callbackStateVariable !== 'undefined')
+            callbackStateVariable.setString('ok');
         })
         .catch((error) => {
-          if (callbackStateVariable)
+          if (typeof callbackStateVariable !== 'undefined')
             callbackStateVariable.setString(error.message);
         });
     },
@@ -363,10 +369,12 @@ gdjs.evtTools.firebase.auth.signInWithEmail = function (
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then(() => {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch((error) => {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -385,10 +393,12 @@ gdjs.evtTools.firebase.auth.createAccountWithEmail = function (
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then(() => {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch((error) => {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -401,10 +411,12 @@ gdjs.evtTools.firebase.auth.anonymSignIn = function (callbackStateVariable) {
     .auth()
     .signInAnonymously()
     .then(() => {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch((error) => {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 
@@ -425,10 +437,12 @@ gdjs.evtTools.firebase.auth.signInWithProvider = function (
     .auth()
     .signInWithPopup(gdjs.evtTools.firebase.auth._currentProvider)
     .then(() => {
-      if (callbackStateVariable) callbackStateVariable.setString('ok');
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString('ok');
     })
     .catch((error) => {
-      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+      if (typeof callbackStateVariable !== 'undefined')
+        callbackStateVariable.setString(error.message);
     });
 };
 

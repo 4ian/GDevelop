@@ -36,10 +36,11 @@ gdjs.evtTools.firebase.functions = {
       .then((data) => {
         if (callbackValueVariable)
           gdjs.evtTools.network._objectToVariable(data, callbackValueVariable);
-        if (callbackStateVariable) callbackStateVariable.setString('ok');
+        if (typeof callbackStateVariable !== 'undefined')
+          callbackStateVariable.setString('ok');
       })
       .catch((error) => {
-        if (callbackStateVariable)
+        if (typeof callbackStateVariable !== 'undefined')
           callbackStateVariable.setString(error.message);
       });
   },

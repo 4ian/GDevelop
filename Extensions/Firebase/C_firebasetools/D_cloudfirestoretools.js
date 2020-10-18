@@ -259,7 +259,7 @@ gdjs.evtTools.firebase.firestore.hasDocument = function (
     .get()
     .then(function (doc) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(doc.exists ? "true" : "false");
+      callbackValueVariable.setString(doc.exists ? 'true' : 'false');
     })
     .catch(function (error) {
       if (callbackStateVariable) callbackStateVariable.setString(error.message);
@@ -288,7 +288,38 @@ gdjs.evtTools.firebase.firestore.hasField = function (
     .get()
     .then(function (doc) {
       if (callbackStateVariable) callbackStateVariable.setString('ok');
-      callbackValueVariable.setString(doc.get(field) === undefined ? "false" : "true");
+      callbackValueVariable.setString(
+        doc.get(field) === undefined ? 'false' : 'true'
+      );
+    })
+    .catch(function (error) {
+      if (callbackStateVariable) callbackStateVariable.setString(error.message);
+    });
+};
+
+/**
+ * Lists all the documents in a collection.
+ * @param {string} collectionName - The collection where to count documents.
+ * @param {gdjs.Variable} [callbackValueVariable] - The variable where to store the result.
+ * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store if the operation was successful.
+ */
+gdjs.evtTools.firebase.firestore.listDocuments = function (
+  collectionName,
+  callbackValueVariable,
+  callbackStateVariable
+) {
+  firebase
+    .firestore()
+    .collection(collectionName)
+    .get()
+    .then(function (snapshot) {
+      if (callbackStateVariable)
+        callbackStateVariable.setString(snapshot.empty ? 'empty' : 'ok');
+      if (callbackValueVariable)
+        gdjs.evtTools.network._objectToVariable(
+          snapshot.docs.map((doc) => doc.id),
+          callbackValueVariable
+        );
     })
     .catch(function (error) {
       if (callbackStateVariable) callbackStateVariable.setString(error.message);

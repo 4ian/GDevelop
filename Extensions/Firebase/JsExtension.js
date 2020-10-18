@@ -1314,6 +1314,44 @@ module.exports = {
       )
       .setFunctionName('gdjs.evtTools.firebase.firestore.hasField');
 
+    extension
+      .addAction(
+        'FirestoreListDocuments',
+        _("List all documents of a collection"),
+        _(
+          'Generates a list of all document names in a collection, and stores it as a structure.'
+        ),
+        _(
+          'List all documents in _PARAM0_ and store result in _PARAM1_ (store result state in _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Collection'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback Variable where to store the result'),
+        '',
+        false
+      )
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/C_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebase.firestore.listDocuments');
+
     /* ====== STORAGE ====== */
 
     extension

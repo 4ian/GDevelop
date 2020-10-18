@@ -279,6 +279,25 @@ module.exports = {
 
     extension
       .addAction(
+        'Logout',
+        _('Log out of the account'),
+        _(
+          'Logs out of the current account. '
+        ),
+        _('Log out from the account'),
+        _('Firebase/Authentification'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
+      .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
+      .addIncludeFile('Extensions/Firebase/C_firebasetools/C_firebasetools.js')
+      .addIncludeFile('Extensions/Firebase/C_firebasetools/D_authtools.js')
+      .setFunctionName('firebase.auth().signOut');
+
+    extension
+      .addAction(
         'ProviderAccountSignIn',
         _('Sign into an account with auth from provider'),
         _(

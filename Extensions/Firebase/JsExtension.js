@@ -13,16 +13,18 @@
  */
 module.exports = {
   createExtension: function (
-      _ /*: (string) => string */, 
-      gd /*: libGDevelop */
-    ) {
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
 
     extension
       .setExtensionInformation(
         'Firebase',
         _('Firebase'),
-        _('Use Google Firebase services (database, functions, storage...) in your game.'),
+        _(
+          'Use Google Firebase services (database, functions, storage...) in your game.'
+        ),
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
@@ -135,7 +137,8 @@ module.exports = {
         _('Get Remote setting as String'),
         _('Get a setting from Firebase Remote Config as a string.'),
         _('Firebase/Remote Config'),
-        'JsPlatform/Extensions/firebase.png')
+        'JsPlatform/Extensions/firebase.png'
+      )
       .addParameter('string', _('Setting Name'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -188,7 +191,9 @@ module.exports = {
       .addIncludeFile(
         'Extensions/Firebase/C_firebasetools/D_remoteconfigtools.js'
       )
-      .setFunctionName('gdjs.evtTools.firebase.remoteConfig.setAutoUpdateInterval');
+      .setFunctionName(
+        'gdjs.evtTools.firebase.remoteConfig.setAutoUpdateInterval'
+      );
 
     extension
       .addAction(
@@ -196,8 +201,8 @@ module.exports = {
         _('Set the default configuration'),
         _(
           'As the Remote Config is stored online, you need to set default values ' +
-          'or the Remote Config expressions to return while there is no internet or ' +
-          'the config is still loading.'
+            'or the Remote Config expressions to return while there is no internet or ' +
+            'the config is still loading.'
         ),
         _('Set default config to _PARAM0_'),
         _('Firebase/Remote Config'),
@@ -247,7 +252,12 @@ module.exports = {
       )
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -259,9 +269,7 @@ module.exports = {
       .addAction(
         'BasicAccountSignIn',
         _('Sign into an account with email'),
-        _(
-          'Sign into an account with email and password as credentials. '
-        ),
+        _('Sign into an account with email and password as credentials. '),
         _('Connect to account with email _PARAM0_ and password _PARAM1_'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
@@ -269,7 +277,12 @@ module.exports = {
       )
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -281,9 +294,7 @@ module.exports = {
       .addAction(
         'Logout',
         _('Log out of the account'),
-        _(
-          'Logs out of the current account. '
-        ),
+        _('Logs out of the current account. '),
         _('Log out from the account'),
         _('Firebase/Authentification'),
         'JsPlatform/Extensions/firebase.png',
@@ -310,7 +321,12 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -328,7 +344,12 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -499,9 +520,7 @@ module.exports = {
       .addStrExpression(
         'GetTenantID',
         _('Get the user tenant ID'),
-        _(
-          'Gets the user tenant ID. For advanced usage only.'
-        ),
+        _('Gets the user tenant ID. For advanced usage only.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -518,9 +537,7 @@ module.exports = {
       .addStrExpression(
         'GetRefreshToken',
         _('Get the user refresh token'),
-        _(
-          'Gets the user refresh token. For advanced usage only.'
-        ),
+        _('Gets the user refresh token. For advanced usage only.'),
         _('Firebase/Authentification/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -599,7 +616,7 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _("New profile picture URL"), '', false)
+      .addParameter('string', _('New profile picture URL'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -635,7 +652,12 @@ module.exports = {
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -669,7 +691,12 @@ module.exports = {
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -705,7 +732,12 @@ module.exports = {
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -740,7 +772,12 @@ module.exports = {
         false
       )
       .setDefaultValue('true')
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -765,7 +802,12 @@ module.exports = {
       )
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -789,7 +831,12 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Callback variable with state (ok or error)'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile('Extensions/Firebase/B_firebasejs/B_firebase-auth.js')
@@ -943,13 +990,13 @@ module.exports = {
         'scenevar',
         _('Callback variable with returned value'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .markAsAdvanced()
       .getCodeExtraInformation()
@@ -1004,7 +1051,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1037,9 +1084,9 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
-      .addParameter('yesorno', _('Merge Document?'), '', false)
+      .addParameter('yesorno', _('Merge Document?'), '', true)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
       .addIncludeFile(
@@ -1070,7 +1117,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1103,7 +1150,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1134,7 +1181,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1166,7 +1213,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1195,15 +1242,15 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to load the document'),
+        _('Callback variable where to load the document'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1233,15 +1280,15 @@ module.exports = {
       .addParameter('string', _('Field to get'), '', false)
       .addParameter(
         'scenevar',
-        _("Variable where to store the field's value"),
+        _("Callback variable where to store the field's value"),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1272,15 +1319,15 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to store the result'),
+        _('Callback variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1314,13 +1361,13 @@ module.exports = {
         'scenevar',
         _('Callback Variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1336,7 +1383,7 @@ module.exports = {
     extension
       .addAction(
         'FirestoreListDocuments',
-        _("List all documents of a collection"),
+        _('List all documents of a collection'),
         _(
           'Generates a list of all document names in a collection, and stores it as a structure.'
         ),
@@ -1352,13 +1399,13 @@ module.exports = {
         'scenevar',
         _('Callback Variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1393,25 +1440,25 @@ module.exports = {
         'scenevar',
         _('Callback Variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback Variable where to store the upload ID'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1436,15 +1483,15 @@ module.exports = {
       .addParameter('string', _('Storage path to the file'), '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to store the result'),
+        _('Callback variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1474,7 +1521,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1502,7 +1549,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1529,7 +1576,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1557,7 +1604,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1583,7 +1630,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1610,7 +1657,7 @@ module.exports = {
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1636,15 +1683,15 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to store the data'),
+        _('Callback variable where to store the data'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1671,15 +1718,15 @@ module.exports = {
       .addParameter('string', _('Field to get'), '', false)
       .addParameter(
         'scenevar',
-        _("Variable where to store the field's value"),
+        _("Callback variable where to store the field's value"),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1705,15 +1752,15 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to store the result'),
+        _('Callback variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1742,13 +1789,13 @@ module.exports = {
         'scenevar',
         _('Callback Variable where to store the result'),
         '',
-        false
+        true
       )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),
         '',
-        false
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/B_firebasejs/A_firebase-base.js')
@@ -1760,9 +1807,9 @@ module.exports = {
     return extension;
   },
   runExtensionSanityTests: function (
-      gd /*: libGDevelop */, 
-      extension /*: gdPlatformExtension */
-    ) {
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension */
+  ) {
     return [];
   },
 };

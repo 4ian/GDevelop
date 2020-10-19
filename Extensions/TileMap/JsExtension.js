@@ -198,7 +198,12 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardRelationalOperatorParameters('stringWithSelector')
+      .addParameter(
+        'stringWithSelector',
+        _('Display mode'),
+        '["visible", "all", "index"]',
+        false
+      )
       .getCodeExtraInformation()
       .setFunctionName('getDisplayMode');
 

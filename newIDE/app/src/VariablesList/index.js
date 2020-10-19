@@ -22,7 +22,7 @@ import {
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
@@ -44,6 +44,7 @@ type Props = {|
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
+  commitVariableValueOnBlur?: boolean,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -202,7 +203,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const isStructure = variable.isStructure();
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
@@ -216,8 +217,9 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        commitVariableValueOnBlur={commitVariableValueOnBlur}
         errorText={
-          this.state.nameErrors[variable.ptr]
+          this.state.nameErrors[variable.ptr.toString()]
             ? 'This name is already taken'
             : undefined
         }
@@ -371,6 +373,15 @@ export default class VariablesList extends React.Component<Props, State> {
       />
     );
 
+    // Put all variables in the **same** array so that if a variable that was shown
+    // as inherited is redefined by the user, React can reconcile the variable rows
+    // (VariableRow going from containerInheritedVariablesTree array to
+    // containerVariablesTree array) and the **focus** won't be lost.
+    const allVariables = [
+      ...containerInheritedVariablesTree,
+      ...containerVariablesTree,
+    ];
+
     return (
       <SortableVariablesListBody
         variablesContainer={this.props.variablesContainer}
@@ -382,10 +393,8 @@ export default class VariablesList extends React.Component<Props, State> {
         useDragHandle
         lockToContainerEdges
       >
-        {!!containerInheritedVariablesTree.length &&
-          containerInheritedVariablesTree}
-        {!containerVariablesTree.length && this._renderEmpty()}
-        {!!containerVariablesTree.length && containerVariablesTree}
+        {allVariables}
+        {!allVariables.length && this._renderEmpty()}
         {editRow}
       </SortableVariablesListBody>
     );

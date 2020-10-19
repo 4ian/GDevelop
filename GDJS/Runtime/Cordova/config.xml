@@ -28,7 +28,7 @@
     <preference name="Fullscreen" value="true" />
 
     <!-- Cordova/Phonegap version -->
-    <preference name="phonegap-version" value="cli-8.0.0" />
+    <preference name="phonegap-version" value="cli-9.0.0" />
 
-    <!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->
+    <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
 </widget>

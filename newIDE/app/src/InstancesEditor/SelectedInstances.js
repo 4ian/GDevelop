@@ -1,9 +1,9 @@
 // @flow
 import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import InstancesSelection from '../SceneEditor/InstancesSelection';
+import InstancesSelection from './InstancesSelection';
 
 type Props = {|
   instancesSelection: InstancesSelection,
@@ -19,9 +19,10 @@ type Props = {|
 const getButtonSizes = (screenType: ScreenType) => {
   if (screenType === 'touch') {
     return {
-      buttonSize: 18,
-      smallButtonSize: 13,
+      buttonSize: 16,
+      smallButtonSize: 14,
       buttonPadding: 5,
+      hitAreaPadding: 20,
     };
   }
 
@@ -29,12 +30,16 @@ const getButtonSizes = (screenType: ScreenType) => {
     buttonSize: 10,
     smallButtonSize: 8,
     buttonPadding: 5,
+    hitAreaPadding: 5,
   };
 };
 
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
+/**
+ * Render selection rectangle for selected instances.
+ */
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
@@ -49,7 +54,7 @@ export default class SelectedInstances {
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
   resizeButton = new PIXI.Graphics();
-  resizeIcon = new PIXI.Sprite.fromImage('res/actions/direction.png');
+  resizeIcon = new PIXI.Sprite.from('res/actions/direction.png');
   rightResizeButton = new PIXI.Graphics();
   bottomResizeButton = new PIXI.Graphics();
   rotateButton = new PIXI.Graphics();
@@ -145,7 +150,8 @@ export default class SelectedInstances {
     buttonObject: PIXI.Graphics,
     canvasPosition: [number, number],
     size: number,
-    shape: 0 | 1 = RECTANGLE_BUTTON_SHAPE
+    shape: 0 | 1,
+    hitAreaPadding: number
   ) {
     buttonObject.clear();
     if (!show) {
@@ -155,7 +161,7 @@ export default class SelectedInstances {
 
     buttonObject.beginFill(0xffffff);
     buttonObject.lineStyle(1, 0x6868e8, 1);
-    buttonObject.fillAlpha = 0.9;
+    buttonObject.fill.alpha = 0.9;
     if (shape === RECTANGLE_BUTTON_SHAPE) {
       buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
     } else if (shape === CIRCLE_BUTTON_SHAPE) {
@@ -168,17 +174,20 @@ export default class SelectedInstances {
 
     buttonObject.endFill();
     buttonObject.hitArea = new PIXI.Rectangle(
-      canvasPosition[0],
-      canvasPosition[1],
-      size,
-      size
+      canvasPosition[0] - hitAreaPadding,
+      canvasPosition[1] - hitAreaPadding,
+      size + hitAreaPadding * 2,
+      size + hitAreaPadding * 2
     );
   }
 
   render() {
-    const { buttonSize, smallButtonSize, buttonPadding } = getButtonSizes(
-      this._screenType
-    );
+    const {
+      buttonSize,
+      smallButtonSize,
+      buttonPadding,
+      hitAreaPadding,
+    } = getButtonSizes(this._screenType);
     const selection = this.instancesSelection.getSelectedInstances();
     let x1 = 0;
     let y1 = 0;
@@ -204,7 +213,7 @@ export default class SelectedInstances {
       this.selectedRectangles[i].clear();
       this.selectedRectangles[i].beginFill(0x6868e8);
       this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);
-      this.selectedRectangles[i].fillAlpha = 0.3;
+      this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
       this.selectedRectangles[i].drawRect(
         selectionRectangle.x,
@@ -257,25 +266,37 @@ export default class SelectedInstances {
     rotateButtonPos[0] -= smallButtonSize / 2;
     rotateButtonPos[1] -= buttonPadding * 4;
 
-    this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);
+    this._renderButton(
+      show,
+      this.resizeButton,
+      resizeButtonPos,
+      buttonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding
+    );
     this._renderButton(
       show,
       this.rightResizeButton,
       rightResizeButtonPos,
-      smallButtonSize
+      smallButtonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding
     );
     this._renderButton(
       show,
       this.bottomResizeButton,
       bottomResizeButtonPos,
-      smallButtonSize
+      smallButtonSize,
+      RECTANGLE_BUTTON_SHAPE,
+      hitAreaPadding
     );
     this._renderButton(
       show,
       this.rotateButton,
       rotateButtonPos,
       smallButtonSize,
-      CIRCLE_BUTTON_SHAPE
+      CIRCLE_BUTTON_SHAPE,
+      hitAreaPadding
     );
   }
 }

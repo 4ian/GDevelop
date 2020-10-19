@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
+import { type ResourceKind } from '../ResourcesList/ResourceSource.flow';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -46,11 +47,13 @@ export default (
         name,
         valueType,
         getValue: (instance: Instance): number => {
-          return parseFloat(
-            getProperties(instance)
-              .get(name)
-              .getValue()
-          );
+          return (
+            parseFloat(
+              getProperties(instance)
+                .get(name)
+                .getValue()
+            ) || 0
+          ); // Consider a missing value as 0 to avoid propagating NaN.
         },
         setValue: (instance: Instance, newValue: number) => {
           onUpdateProperty(instance, name, '' + newValue);
@@ -113,7 +116,8 @@ export default (
       };
     } else if (valueType === 'resource') {
       // Resource is a "string" (with a selector in the UI)
-      const kind = property.getExtraInfo().toJSArray()[0] || '';
+      // $FlowFixMe - assume the passed resource kind is always valid.
+      const kind: ResourceKind = property.getExtraInfo().toJSArray()[0] || '';
       return {
         name,
         valueType: 'resource',

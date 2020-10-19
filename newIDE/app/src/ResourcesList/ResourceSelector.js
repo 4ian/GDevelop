@@ -37,6 +37,7 @@ type Props = {|
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
   margin?: 'none' | 'dense',
+  style?: {| alignSelf?: 'center' |},
 |};
 
 type State = {|
@@ -263,6 +264,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         margin={this.props.margin}
         renderTextField={() => (
           <SemiControlledAutoComplete
+            style={this.props.style}
             floatingLabelText={this.props.floatingLabelText}
             helperMarkdownText={this.props.helperMarkdownText}
             hintText={this.props.hintText}

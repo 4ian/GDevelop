@@ -24,9 +24,9 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
+  ColumnStackLayout,
 } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
-import { Column } from '../UI/Grid';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
@@ -115,7 +115,7 @@ type MandatoryProps = {|
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
   renderExtraDescriptionText?: (extraDescription: string) => string,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type Props =
@@ -317,7 +317,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             this.props.instances,
             field
           )}
-          multiLine
+          multiline
           style={styles.field}
         />
       );
@@ -483,9 +483,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     const renderContainer =
       mode === 'row'
         ? (fields: React.Node) => (
-            <ResponsiveLineStackLayout>{fields}</ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout noMargin>
+              {fields}
+            </ResponsiveLineStackLayout>
           )
-        : (fields: React.Node) => <Column noMargin>{fields}</Column>;
+        : (fields: React.Node) => (
+            <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
+          );
 
     return renderContainer(
       this.props.schema.map(field => {

@@ -12,6 +12,7 @@ import ZoomOut from '@material-ui/icons/ZoomOut';
 import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -53,7 +54,6 @@ type Props = {|
     imageHeight: number,
     imageZoomFactor: number,
   |}) => React.Node,
-  style?: Object,
   onSize?: (number, number) => void,
 |};
 
@@ -69,8 +69,6 @@ type State = {|
  * Display the preview for a resource of a project with kind "image".
  */
 export default class ImagePreview extends React.Component<Props, State> {
-  _container: ?HTMLDivElement = null;
-
   state = {
     errored: false,
     imageWidth: null,
@@ -94,7 +92,11 @@ export default class ImagePreview extends React.Component<Props, State> {
     const { project, resourceName, resourcesLoader } = props;
     return {
       errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
+      imageSource: resourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        {}
+      ),
     };
   }
 
@@ -135,10 +137,10 @@ export default class ImagePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <Measure>
-        {dimensions => {
-          const containerWidth = dimensions.width;
-          const { resourceName, style, renderOverlay } = this.props;
+      <Measure bounds>
+        {({ contentRect, measureRef }) => {
+          const containerWidth = contentRect.bounds.width;
+          const { resourceName, renderOverlay } = this.props;
           const {
             imageHeight,
             imageWidth,
@@ -198,8 +200,11 @@ export default class ImagePreview extends React.Component<Props, State> {
                 </IconButton>
               </MiniToolbar>
               <div
-                style={{ ...styles.imagePreviewContainer, ...style }}
-                ref={container => (this._container = container)}
+                dir={
+                  'ltr' /* Force LTR layout to avoid issues with image positioning */
+                }
+                style={styles.imagePreviewContainer}
+                ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts
@@ -220,13 +225,12 @@ export default class ImagePreview extends React.Component<Props, State> {
                   </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
-                  <img
+                  <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
                     src={imageSource}
                     onError={this._handleImageError}
                     onLoad={this._handleImageLoaded}
-                    crossOrigin="anonymous"
                   />
                 )}
                 {imageLoaded && renderOverlay && (

@@ -7,7 +7,7 @@ const isGitClean = require('is-git-clean');
 const git = require('git-rev');
 
 isGitClean()
-  .then(clean => {
+  .then((clean) => {
     if (args['skip-git-check']) return;
 
     if (!clean) {
@@ -20,8 +20,8 @@ isGitClean()
   .then(() => {
     if (args['skip-git-check']) return;
 
-    return new Promise(resolve => {
-      git.branch(function(branch) {
+    return new Promise((resolve) => {
+      git.branch(function (branch) {
         if (branch !== 'master') {
           shell.echo('⚠️ Please run deployment only from master branch');
           shell.exit(1);
@@ -32,33 +32,41 @@ isGitClean()
     });
   })
   .then(() => {
-    return new Promise(resolve => {
-      fs.stat(
-        path.join(__dirname, '../../app/public/libGD.js'),
-        (err, stats) => {
-          if (err) {
-            shell.echo(
-              `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
-            );
-            shell.exit(1);
-          }
-
-          const sizeInMiB = stats.size / 1024 / 1024;
-          if (sizeInMiB > 5) {
-            shell.echo(
-              `❌ libGD.js size is too big (${sizeInMiB.toFixed(
-                2
-              )}MiB) - are you sure you're not trying to deploy the development version?`
-            );
-            shell.exit(1);
-          }
-
+    const appPublicPath = path.join(__dirname, '../../app/public/');
+    return new Promise((resolve) => {
+      fs.stat(path.join(appPublicPath, 'libGD.js'), (err, stats) => {
+        if (err) {
           shell.echo(
-            `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
+            `❌ Unable to check libGD.js size. Have you compiled GDevelop.js? Error is: ${err}`
           );
-          resolve();
+          shell.exit(1);
         }
-      );
+
+        const sizeInMiB = stats.size / 1024 / 1024;
+        if (sizeInMiB > 5) {
+          shell.echo(
+            `❌ libGD.js size is too big (${sizeInMiB.toFixed(
+              2
+            )}MiB) - are you sure you're not trying to deploy the development version?`
+          );
+          shell.exit(1);
+        }
+
+        shell.echo(
+          `✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`
+        );
+
+        if (
+          !fs.existsSync(path.join(appPublicPath, 'libGD.js.mem')) ||
+          fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))
+        ) {
+          shell.echo(
+            `❌ Found libGD.wasm or missing libGD.js.mem - are you sure you're not trying to deploy the development version?`
+          );
+          shell.exit(1);
+        }
+        resolve();
+      });
     });
   })
   .then(() => {
@@ -85,11 +93,17 @@ isGitClean()
 
     if (!args['skip-deploy']) {
       shell.echo('🚄 Uploading the built app to gh-pages...');
-      ghpages.publish('dist', {}, err => {
+      ghpages.publish('dist', {}, (err) => {
         if (err) {
           shell.echo('❌ Finished with error:');
           shell.echo(err);
           return;
+        }
+
+        if (!args['skip-examples-resources-deploy']) {
+          shell.exec('npm run deploy:examples-resources');
+        } else {
+          shell.echo('⚠️ Skipping examples resources deployment.');
         }
 
         shell.echo('✅ Upload finished to GitHub.');

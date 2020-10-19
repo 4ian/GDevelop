@@ -29,7 +29,7 @@ const PolygonRow = ({ onRemove, isConvex, verticesCount }) => {
           <TableRowColumn style={styles.coordinateColumn} />
           <TableRowColumn style={styles.toolColumn}>
             {!!onRemove && (
-              <IconButton onClick={onRemove}>
+              <IconButton size="small" onClick={onRemove}>
                 <Delete />
               </IconButton>
             )}

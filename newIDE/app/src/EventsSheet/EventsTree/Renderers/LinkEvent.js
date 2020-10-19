@@ -19,7 +19,7 @@ import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from './EventRenderer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -29,7 +29,10 @@ const styles = {
     padding: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
 

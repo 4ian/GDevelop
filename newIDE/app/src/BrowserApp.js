@@ -38,7 +38,7 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      eventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter()}
+      makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
     >
@@ -55,10 +55,10 @@ export const create = (authentification: Authentification) => {
           defaultStorageProvider={InternalFileStorageProvider}
         >
           {({
-            currentStorageProviderOperations,
-            useStorageProvider,
+            getStorageProviderOperations,
             storageProviders,
             initialFileMetadataToOpen,
+            getStorageProvider,
           }) => (
             <UnsavedChangesContext.Consumer>
               {unsavedChanges => (
@@ -86,8 +86,8 @@ export const create = (authentification: Authentification) => {
                   )}
                   introDialog={<BrowserIntroDialog />}
                   storageProviders={storageProviders}
-                  useStorageProvider={useStorageProvider}
-                  storageProviderOperations={currentStorageProviderOperations}
+                  getStorageProviderOperations={getStorageProviderOperations}
+                  getStorageProvider={getStorageProvider}
                   resourceSources={browserResourceSources}
                   resourceExternalEditors={browserResourceExternalEditors}
                   extensionsLoader={makeExtensionsLoader({

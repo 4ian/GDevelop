@@ -15,7 +15,7 @@ Behavior::~Behavior(){};
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Behavior::GetProperties(
-    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }

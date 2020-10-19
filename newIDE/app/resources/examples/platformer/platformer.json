@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -197,33 +197,6 @@
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "p1_walk09.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk09.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "p1_walk10.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk10.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "p1_walk11.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk11.png",
         "smoothed": true,
         "userAdded": false
       },
@@ -469,6 +442,15 @@
         "name": "shadedDark09.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tiled_Forest Background.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "tiled_Forest Background.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -547,6 +529,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "788c041d-1b63-42b6-a22a-e95262a08f83",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -562,6 +545,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "22e46c09-0b92-474b-b139-ee7a28fac131",
           "width": 0,
           "x": 742.246,
           "y": 500.569,
@@ -582,6 +566,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0ae5867c-f6bb-4458-b8bc-c5f8bb3a5338",
           "width": 0,
           "x": 933.139,
           "y": 300.692,
@@ -597,6 +582,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "bbdb0455-667f-422d-9dcd-21ba15f60a40",
           "width": 0,
           "x": 755.6,
           "y": 418,
@@ -612,6 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "7b55098b-4ff4-4609-89df-197bd1a0de3b",
           "width": 0,
           "x": 847.908,
           "y": 359.923,
@@ -627,6 +614,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "cfb83ad3-a943-4e6e-aeb7-d35ccdf7f90f",
           "width": 0,
           "x": 1045,
           "y": 268,
@@ -642,6 +630,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "a62a7ebb-d296-4348-bcdf-c8469ac6769b",
           "width": 0,
           "x": 1115,
           "y": 268,
@@ -657,6 +646,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "b3af049c-dacf-48fe-8973-5734e0eb6ce1",
           "width": 4222.89,
           "x": -583.046,
           "y": 570,
@@ -672,6 +662,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "05e616a8-abe0-4998-b72d-cbe45c41b146",
           "width": 502.923,
           "x": -572.923,
           "y": 83,
@@ -687,6 +678,7 @@
           "layer": "",
           "locked": false,
           "name": "MovingPlatform",
+          "persistentUuid": "562e4641-884e-46ca-845b-482c9cb5962a",
           "width": 0,
           "x": 1195.45,
           "y": 297.615,
@@ -702,6 +694,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ed416599-13ff-475d-b91a-3e759a9bf8a9",
           "width": 0,
           "x": 1890.68,
           "y": 499.692,
@@ -722,6 +715,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "9543dedc-5f1a-40de-954b-3f0ab5760631",
           "width": 0,
           "x": 1673.6,
           "y": 289.692,
@@ -742,6 +736,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "31016c6a-b199-4ec3-aa20-666d68110687",
           "width": 0,
           "x": 1673.6,
           "y": 359.692,
@@ -757,6 +752,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "5c1bd76b-d542-4fef-87ec-3494350c1668",
           "width": 0,
           "x": 1673.6,
           "y": 499.692,
@@ -772,6 +768,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "b1019fc6-fd11-44eb-9441-6d26b59a5cc6",
           "width": 0,
           "x": 1673.6,
           "y": 429.692,
@@ -787,6 +784,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "0f8e94bf-6a6e-4cf0-afe2-12c6a51205f1",
           "width": 0,
           "x": 1745.52,
           "y": 499.385,
@@ -802,6 +800,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "d7d3655a-8a0d-4aa1-8a5f-73a19e21187d",
           "width": 0,
           "x": 1745.52,
           "y": 429.385,
@@ -817,6 +816,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ce10a257-6627-4480-9806-b3e14061004e",
           "width": 0,
           "x": 1818.75,
           "y": 499.692,
@@ -832,6 +832,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "724c9654-aa90-4e34-85bb-174ed5c1e511",
           "width": 0,
           "x": 1817.75,
           "y": 429.692,
@@ -852,6 +853,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "b32fbc8d-e909-4433-8366-fbce162d67af",
           "width": 0,
           "x": 1667.37,
           "y": 291.246,
@@ -867,6 +869,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "e34ebc68-d8d9-4c46-a87e-8227a7e47ef6",
           "width": 0,
           "x": 1176.98,
           "y": 295.169,
@@ -882,6 +885,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "f1fb91c2-d269-47ab-95ba-ffb98b2e48a3",
           "width": 0,
           "x": 2974.06,
           "y": 247,
@@ -897,6 +901,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ff87eff8-6ab2-45fd-b6d7-635380a6bf1f",
           "width": 0,
           "x": 2593.6,
           "y": 500.231,
@@ -917,6 +922,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "6bde59af-9825-4bb2-9a54-cf2aae33c031",
           "width": 0,
           "x": 2665.83,
           "y": 430.231,
@@ -937,6 +943,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "dfd6b4d4-0877-4e63-9fd4-1fa3bdc70447",
           "width": 0,
           "x": 2665.6,
           "y": 499.769,
@@ -952,6 +959,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "98ba0687-173c-415b-9a2f-a1f190a3eb69",
           "width": 0,
           "x": 1745.52,
           "y": 359.385,
@@ -972,6 +980,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "7baa1486-2886-496d-a791-357f80f4212d",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -987,6 +996,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "b43ba0cf-8ac2-4e46-ad12-6215b493f50e",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -1007,6 +1017,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "d49b599a-8275-4e32-83c7-fbd2787fcd1a",
           "width": 0,
           "x": 687.677,
           "y": 527.461,
@@ -1022,6 +1033,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "a58ea2fd-c543-494f-b3da-3283646c5041",
           "width": 0,
           "x": 286.2,
           "y": 528.461,
@@ -1037,6 +1049,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "ffd47f18-783e-41c3-837e-c724eb6f0f30",
           "width": 0,
           "x": 1971.78,
           "y": 539.016,
@@ -1052,6 +1065,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "49fcae37-ac51-4e71-b0dd-1508e45655c8",
           "width": 0,
           "x": 2553.78,
           "y": 538.016,
@@ -1066,152 +1080,8 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 2181.78,
-          "y": 59.0157,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 2
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 151.785,
-          "y": 182.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 530.784,
-          "y": 312.015,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 1480.78,
-          "y": 134.016,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 2
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 2078.78,
-          "y": 385.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 1847.78,
-          "y": 164.016,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 1258.78,
-          "y": 357.015,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "width": 0,
-          "x": 664.784,
-          "y": 170.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "02f5b93b-274c-4ad9-a5d2-85efff45ab4a",
           "width": 0,
           "x": 2078.57,
           "y": 503.108,
@@ -1232,6 +1102,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "08f1eeb1-a457-496e-b161-8c80b98c070c",
           "width": 66,
           "x": 1736.78,
           "y": 298.016,
@@ -1252,6 +1123,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "cad94cea-07f3-4cdd-a94e-51c1f42e2e97",
           "width": 0,
           "x": 611.785,
           "y": 505.015,
@@ -1267,6 +1139,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "673c517d-68b1-40a5-ae02-f1c39951ccbf",
           "width": 94,
           "x": 1249.78,
           "y": 500.015,
@@ -1282,6 +1155,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "7b621bcd-4f9e-4bf4-9c40-c5812ec18dbf",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -1297,6 +1171,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "e71d046e-d5bb-45b8-8578-33c2d4df9b14",
           "width": 0,
           "x": 925.784,
           "y": 505.015,
@@ -1312,6 +1187,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "b5d7941d-f5aa-4305-b09e-d4ed742ba7c1",
           "width": 0,
           "x": 1413.78,
           "y": 502.015,
@@ -1332,6 +1208,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3bac2217-2edf-4c1c-b65f-cbea17de2268",
           "width": 58,
           "x": 1371.78,
           "y": 524.016,
@@ -1352,6 +1229,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "dafde3c5-0d13-40e6-b6d8-43a6771c424b",
           "width": 58,
           "x": 1435.78,
           "y": 525.016,
@@ -1372,6 +1250,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3b2ac003-fd90-4e46-8d62-78053ad4f39b",
           "width": 58,
           "x": 1756.78,
           "y": 314.016,
@@ -1392,6 +1271,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "639e7090-7b01-44b3-a254-5a6f504b3ee8",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -1412,6 +1292,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "c0f16068-baf3-420b-b882-a2b2e9ce2803",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -1427,6 +1308,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
+          "persistentUuid": "9d011d94-ad83-4863-ad44-a4be700ea105",
           "width": 0,
           "x": 21,
           "y": 11,
@@ -1442,6 +1324,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "5e5f93cf-b133-4f0b-8064-6d623c3a861b",
           "width": 0,
           "x": 1960,
           "y": 420,
@@ -1457,6 +1340,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "a7c89362-1c5a-44fd-b0f9-c6c68a83f3e0",
           "width": 0,
           "x": 210,
           "y": 420,
@@ -1472,6 +1356,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "4640d7c2-6ffd-46cd-893e-c78991728d61",
           "width": 0,
           "x": 490,
           "y": 490,
@@ -1487,6 +1372,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "a59a964e-1922-49ad-9ba4-61e82105d76b",
           "width": 0,
           "x": 420,
           "y": 490,
@@ -1502,6 +1388,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "c8bd9849-e414-43df-9af1-3a4620aff6b7",
           "width": 0,
           "x": 773.846,
           "y": 359.816,
@@ -1517,6 +1404,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "03e16798-a16f-4fe2-93b5-a64e846f5c9b",
           "width": 0,
           "x": 859.831,
           "y": 296.262,
@@ -1532,6 +1420,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "1018e19d-fec3-47a8-8ea3-c6c1084eac59",
           "width": 0,
           "x": 953.292,
           "y": 241.431,
@@ -1547,6 +1436,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "5f2845bb-d1a0-429c-a952-5b0519ce0cfb",
           "width": 0,
           "x": 350,
           "y": 490,
@@ -1562,6 +1452,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "53d6a3e4-bc3e-4ce5-a030-50c951a4eecd",
           "width": 0,
           "x": 1145.78,
           "y": 205.016,
@@ -1577,6 +1468,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "b433127f-65f4-444c-94ff-cbc782239881",
           "width": 0,
           "x": 1704.78,
           "y": 206.016,
@@ -1592,6 +1484,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "74234a7b-3bfe-47c1-a7c8-a2eacf71d5c7",
           "width": 0,
           "x": 2593.78,
           "y": 369.016,
@@ -1607,6 +1500,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "844861ff-98ba-4895-a26b-9127c1f01b33",
           "width": 0,
           "x": 3152.78,
           "y": 370.016,
@@ -1622,6 +1516,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "8a04113d-cf76-4c66-ad33-832adfea0ddc",
           "width": 0,
           "x": 3103.78,
           "y": 354.016,
@@ -1637,6 +1532,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "a3e28934-cf65-412b-ae65-a970ce88531d",
           "width": 0,
           "x": 2834.06,
           "y": 247,
@@ -1652,6 +1548,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "2ebb125c-99c4-4c34-9fb4-93346da7bd2d",
           "width": 0,
           "x": 2904.06,
           "y": 247,
@@ -1667,6 +1564,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "723aeebf-13df-4659-b400-89e55803067e",
           "width": 0,
           "x": 2992,
           "y": 192,
@@ -1682,6 +1580,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "3ff87891-d9c7-4103-a4f9-95141514f845",
           "width": 0,
           "x": 2849,
           "y": 194,
@@ -1697,6 +1596,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "f621464b-01b6-4d12-8dfa-ac8707d6f4c5",
           "width": 0,
           "x": 2921,
           "y": 193,
@@ -1712,6 +1612,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "1fb07204-66af-4481-87d9-af83a2380e2d",
           "width": 0,
           "x": 2526,
           "y": 530,
@@ -1727,6 +1628,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "6bb52b07-e9c8-4d23-a97e-bdfd3bef73fa",
           "width": 0,
           "x": 1983,
           "y": 525,
@@ -1742,6 +1644,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "35291db3-5afb-452a-b9de-b1c8a28c924f",
           "width": 0,
           "x": 1655.78,
           "y": 190.016,
@@ -1757,6 +1660,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "dc439743-08c3-46e2-8a46-f42ac9041d0f",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1772,6 +1676,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "eb5479e9-b562-4420-8c6b-5cc67b88afd1",
           "width": 0,
           "x": 732.6,
           "y": 544.185,
@@ -1787,6 +1692,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
+          "persistentUuid": "3cf709c1-47c7-499b-b49c-1f94cc33a9b0",
           "width": 97.5489,
           "x": 39,
           "y": 448,
@@ -1802,6 +1708,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "609475cc-8a0e-4a97-8200-56e3ff8451f6",
           "width": 94.1152,
           "x": 147,
           "y": 448,
@@ -1817,6 +1724,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ArrowButtonsBg",
+          "persistentUuid": "90ce50f9-249d-4bee-a8a9-b1042d48750b",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -1832,6 +1740,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "67cb62f2-5f86-4787-a534-5b8f5a2abc35",
           "width": 107.992,
           "x": 659,
           "y": 457,
@@ -1847,6 +1756,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "ec3bfa6b-76a8-4c1d-8474-7b2e323a5a05",
           "width": 0,
           "x": 1820,
           "y": 280,
@@ -1862,10 +1772,27 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "9ec884c2-d959-4975-b3c3-283ae6db1bb5",
           "width": 0,
           "x": 1890,
           "y": 350,
           "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 724,
+          "layer": "Background",
+          "locked": true,
+          "name": "TiledForestBackground",
+          "persistentUuid": "2e89b9b9-58d2-4ffc-bb04-973935cb322a",
+          "width": 744,
+          "x": 0,
+          "y": -110,
+          "zOrder": 24,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -2594,10 +2521,10 @@
           "variables": [],
           "behaviors": [
             {
-              "jumpSpeed": 800,
-              "jumpSustainTime": 0.4,
               "name": "PlatformerObject",
               "type": "PlatformBehavior::PlatformerObjectBehavior",
+              "jumpSpeed": 800,
+              "jumpSustainTime": 0.4,
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -2946,160 +2873,6 @@
                     {
                       "hasCustomCollisionMask": false,
                       "image": "flyDead.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Cloud",
-          "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": true,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud1.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud2.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud3.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -3667,6 +3440,21 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "height": 128,
+          "name": "TiledForestBackground",
+          "tags": "",
+          "texture": "tiled_Forest Background.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 128,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "HorizontalTiledSpriteParallax",
+              "type": "Parallax::HorizontalTiledSpriteParallax"
             }
           ]
         }
@@ -4303,9 +4091,11 @@
             {
               "type": {
                 "inverted": true,
-                "value": "SystemInfo::IsMobile"
+                "value": "SystemInfo::HasTouchScreen"
               },
-              "parameters": [],
+              "parameters": [
+                ""
+              ],
               "subInstructions": []
             }
           ],
@@ -4459,6 +4249,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 1702453632,
+          "ambientLightColorG": 0,
+          "ambientLightColorR": 0,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "Background",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -4476,6 +4282,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [
@@ -4497,6 +4308,10 @@
         {
           "name": "Anchor",
           "type": "AnchorBehavior::AnchorBehavior"
+        },
+        {
+          "name": "HorizontalTiledSpriteParallax",
+          "type": "Parallax::HorizontalTiledSpriteParallax"
         },
         {
           "name": "Platform",
@@ -5252,7 +5067,231 @@
       ]
     }
   ],
-  "eventsFunctionsExtensions": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "4ian",
+      "description": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
+      "extensionNamespace": "",
+      "fullName": "Parallax for Tiled Sprite",
+      "name": "Parallax",
+      "shortDescription": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
+      "tags": "parallax, tiled",
+      "version": "1.0.0",
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Move the image of a Tiled Sprite to follow the camera horizontally with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+          "fullName": "Horizontal Parallax for a Tiled Sprite",
+          "name": "HorizontalTiledSpriteParallax",
+          "objectType": "TiledSpriteObject::TiledSprite",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::XOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraX(Object.Behavior::PropertyFollowedLayer(), 0) * Object.Behavior::PropertyParallaxFactor()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraWidth(Object.Behavior::PropertyFollowedLayer(), 0)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "Parallax::HorizontalTiledSpriteParallax",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "0.5",
+              "type": "Number",
+              "label": "Parallax factor (speed for the parallax, usually between 0 and 1)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ParallaxFactor"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Layer to be followed (leave empty for the base layer)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "FollowedLayer"
+            }
+          ]
+        },
+        {
+          "description": "Move the image of a Tiled Sprite to follow the camera vertically with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+          "fullName": "Vertical Parallax for a Tiled Sprite",
+          "name": "VerticalTiledSpriteParallax",
+          "objectType": "TiledSpriteObject::TiledSprite",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::YOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraY(Object.Behavior::PropertyFollowedLayer(), 0) * Object.Behavior::PropertyParallaxFactor()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Height"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraHeight(Object.Behavior::PropertyFollowedLayer(), 0)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "Parallax::VerticalTiledSpriteParallax",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "0.5",
+              "type": "Number",
+              "label": "Parallax factor (speed for the parallax, usually between 0 and 1)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ParallaxFactor"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Layer to be followed (leave empty for the base layer)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "FollowedLayer"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

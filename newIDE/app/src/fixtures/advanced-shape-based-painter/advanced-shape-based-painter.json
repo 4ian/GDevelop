@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -322,6 +322,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "f39c9507-ba25-477e-98e0-226e41511f6a",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -342,6 +343,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "c78f2055-14c6-4d18-b1d0-d306463c8552",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -362,6 +364,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "02e14160-2712-404e-ad35-ff1b06929b21",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -382,6 +385,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "c4685975-c416-4fce-beb0-65cf6c15aa68",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -402,6 +406,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "5d506a2f-1270-411d-bab4-dc5717799549",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -422,6 +427,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "b734ef0e-8f42-498e-9495-7e7fc944cc0a",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -472,7 +478,8 @@
             "g": 232,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Shapes",
@@ -2620,6 +2627,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

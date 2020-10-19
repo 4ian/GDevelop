@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -146,6 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
+          "persistentUuid": "769c9439-4cc1-450f-bf1a-4fced888572a",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -273,6 +274,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -328,6 +334,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
+          "persistentUuid": "7313a2e3-9044-4466-b052-906505d17d48",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -455,6 +462,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -510,6 +522,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
+          "persistentUuid": "a603c4e7-50b7-4782-b3a2-fd2c5456d873",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -637,6 +650,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

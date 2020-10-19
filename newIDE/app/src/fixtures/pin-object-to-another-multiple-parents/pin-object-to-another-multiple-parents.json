@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -168,6 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "319d4bbd-07fe-4ec5-ba14-3da2cd438430",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -183,6 +184,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "57637fa8-b82c-463e-a777-fc63afea6a92",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -203,6 +205,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "7a909c78-afc6-4678-a4e8-2d63bbc5b7e4",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -223,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "ecfdb424-b0f5-4bb6-b5e7-22da2c3c03ec",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -243,6 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "800b8430-addc-4294-a49e-3ff82f72e811",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -263,6 +268,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "7cffdcd7-7785-4973-a61d-e077c1ec5415",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -283,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "324bee87-9e0c-4140-a2d0-c193879f9971",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -303,6 +310,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "151f04fe-374b-44b6-9182-2be1610c0f6f",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -323,6 +331,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "aaeddac0-8518-43d2-9654-b033bb5f55c5",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -814,6 +823,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

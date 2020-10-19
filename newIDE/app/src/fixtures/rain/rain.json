@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -201,6 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_1",
+          "persistentUuid": "cb92eedc-1909-41a1-9903-f5d2d40bfccd",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -221,6 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_2",
+          "persistentUuid": "7b081631-22d4-432c-9261-c368a8bf1818",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -241,6 +243,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_3",
+          "persistentUuid": "71f00055-7217-46f5-870a-0b6dfcc3cd0c",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -261,6 +264,7 @@
           "layer": "",
           "locked": false,
           "name": "logo_inrain",
+          "persistentUuid": "5d1adf07-da56-4d62-a7ce-dc524121a464",
           "width": 0,
           "x": 906,
           "y": 666,
@@ -836,6 +840,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

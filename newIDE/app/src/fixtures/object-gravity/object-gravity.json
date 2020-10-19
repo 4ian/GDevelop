@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -209,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
+          "persistentUuid": "cd2982b3-1600-4f6b-b322-7c52a68591a1",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -224,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
+          "persistentUuid": "f31b5748-0ffc-4567-ad86-c1e15cc8d238",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -239,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "471f5305-1393-4b96-bd14-108473765333",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -254,6 +257,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
+          "persistentUuid": "7cd01944-0110-40a8-887a-b47acdbe03c7",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -269,6 +273,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
+          "persistentUuid": "5a89a9a3-4e6e-4a4f-af0b-7f0b41ad9a65",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -284,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
+          "persistentUuid": "c2fdc69f-36d4-4a1d-9388-7b7cb2829561",
           "width": 0,
           "x": 620,
           "y": 427,
@@ -957,6 +963,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -974,6 +985,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Touch",
           "visibility": true,
           "cameras": [],

@@ -1,11 +1,14 @@
 const makeTestRuntimeScene = () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    resources: {
+      resources: [],
+    },
     properties: { windowWidth: 800, windowHeight: 600 },
   });
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true }],
+    layers: [{ name: '', visibility: true, effects: [] }],
     variables: [],
     behaviorsSharedData: [],
     objects: [],

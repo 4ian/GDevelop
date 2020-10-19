@@ -4,9 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/Instruction.h"
+
 #include <assert.h>
+
 #include <iostream>
 #include <vector>
+
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/String.h"
@@ -15,18 +18,14 @@ namespace gd {
 
 gd::Expression Instruction::badExpression("");
 
-Instruction::Instruction(gd::String type_)
-    : type(type_),
-      inverted(false) {
+Instruction::Instruction(gd::String type_) : type(type_), inverted(false) {
   parameters.reserve(8);
 }
 
 Instruction::Instruction(gd::String type_,
                          const std::vector<gd::Expression>& parameters_,
                          bool inverted_)
-    : type(type_),
-      inverted(inverted_),
-      parameters(parameters_) {
+    : type(type_), inverted(inverted_), parameters(parameters_) {
   parameters.reserve(8);
 }
 
@@ -54,6 +53,19 @@ void Instruction::SetParameter(std::size_t nb, const gd::Expression& val) {
     return;
   }
   parameters[nb] = val;
+}
+
+std::shared_ptr<Instruction> GD_CORE_API
+CloneRememberingOriginalElement(std::shared_ptr<Instruction> instruction) {
+  std::shared_ptr<Instruction> copy =
+      std::make_shared<Instruction>(*instruction);
+  // Original instruction is either the original instruction of the copied
+  // instruction, or the instruction copied.
+  copy->originalInstruction = instruction->originalInstruction.expired()
+                                  ? instruction
+                                  : instruction->originalInstruction;
+
+  return copy;
 }
 
 }  // namespace gd

@@ -310,7 +310,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition(
          "ObjectVariableChildExists",
          _("Child existence"),
-         _("Return true if the specified child of the variable exists."),
+         _("Check if the specified child of the variable exists."),
          _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
          _("Variables/Structures"),
          "res/conditions/var24.png",
@@ -500,7 +500,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition(
          "BehaviorActivated",
          _("Behavior activated"),
-         _("Return true if the behavior is activated for the object."),
+         _("Check if the behavior is activated for the object."),
          _("Behavior _PARAM1_ of _PARAM0_ is activated"),
          _("Behaviors"),
          "res/behavior24.png",

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -189,6 +189,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
+          "persistentUuid": "45bc5464-d91e-4629-abc5-96cae8db2ad2",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -204,6 +205,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "cf79bee4-513c-4b12-af0e-3b1ea2f28353",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -224,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "0e739e73-bd19-432f-94c5-edf54365b167",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -244,6 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "9635ae5f-9e17-4de3-9b80-d1ae48c89fcd",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -259,6 +263,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "f53659cb-1e31-4f27-bb18-48aba7e2b34c",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -1556,6 +1561,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1573,6 +1583,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

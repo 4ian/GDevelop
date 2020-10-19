@@ -1,7 +1,7 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import { rgbToHexNumber } from '../../Utils/ColorTransformer';
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for an ParticleEmitter object.

@@ -17,8 +17,10 @@ import {
 } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import ExtensionsProperties from './ExtensionsProperties';
+import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 
 type Props = {|
   project: gdProject,
@@ -28,7 +30,7 @@ type Props = {|
   onChangeSubscription: () => void,
 |};
 
-type State = {|
+type ProjectProperties = {|
   gameResolutionWidth: number,
   gameResolutionHeight: number,
   adaptGameResolutionAtRuntime: boolean,
@@ -37,7 +39,6 @@ type State = {|
   version: string,
   packageName: string,
   orientation: string,
-  adMobAppId: string,
   scaleMode: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
@@ -46,140 +47,167 @@ type State = {|
   isFolderProject: boolean,
 |};
 
-class ProjectPropertiesDialog extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = this._loadFrom(props.project);
-  }
-
-  _subscriptionChecker: ?SubscriptionChecker = null;
-
-  _loadFrom(project: gdProject): State {
-    return {
-      gameResolutionWidth: project.getGameResolutionWidth(),
-      gameResolutionHeight: project.getGameResolutionHeight(),
-      adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
-      name: project.getName(),
-      author: project.getAuthor(),
-      version: project.getVersion(),
-      packageName: project.getPackageName(),
-      orientation: project.getOrientation(),
-      adMobAppId: project.getAdMobAppId(),
-      scaleMode: project.getScaleMode(),
-      sizeOnStartupMode: project.getSizeOnStartupMode(),
-      showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
-      minFPS: project.getMinimumFPS(),
-      maxFPS: project.getMaximumFPS(),
-      isFolderProject: project.isFolderProject(),
-    };
-  }
-
-  componentWillReceiveProps(newProps: Props) {
-    if (
-      (!this.props.open && newProps.open) ||
-      (newProps.open && this.props.project !== newProps.project)
-    ) {
-      this.setState(this._loadFrom(newProps.project));
-    }
-  }
-
-  _onApply = () => {
-    const t = str => str; //TODO
-    const { project } = this.props;
-    const {
-      gameResolutionWidth,
-      gameResolutionHeight,
-      adaptGameResolutionAtRuntime,
-      name,
-      author,
-      version,
-      packageName,
-      orientation,
-      adMobAppId,
-      scaleMode,
-      sizeOnStartupMode,
-      showGDevelopSplash,
-      minFPS,
-      maxFPS,
-      isFolderProject,
-    } = this.state;
-    project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
-    project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
-    project.setName(name);
-    project.setAuthor(author);
-    project.setVersion(version);
-    project.setPackageName(packageName);
-    project.setOrientation(orientation);
-    project.setAdMobAppId(adMobAppId);
-    project.setScaleMode(scaleMode);
-    project.setSizeOnStartupMode(sizeOnStartupMode);
-    project.setMinimumFPS(minFPS);
-    project.setMaximumFPS(maxFPS);
-    project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
-    project.setFolderProject(isFolderProject);
-
-    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
-
-    this.props.onApply();
+function loadPropertiesFromProject(project: gdProject): ProjectProperties {
+  return {
+    gameResolutionWidth: project.getGameResolutionWidth(),
+    gameResolutionHeight: project.getGameResolutionHeight(),
+    adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
+    name: project.getName(),
+    author: project.getAuthor(),
+    version: project.getVersion(),
+    packageName: project.getPackageName(),
+    orientation: project.getOrientation(),
+    scaleMode: project.getScaleMode(),
+    sizeOnStartupMode: project.getSizeOnStartupMode(),
+    showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
+    minFPS: project.getMinimumFPS(),
+    maxFPS: project.getMaximumFPS(),
+    isFolderProject: project.isFolderProject(),
   };
+}
 
-  render() {
-    const {
-      name,
-      gameResolutionWidth,
-      gameResolutionHeight,
-      adaptGameResolutionAtRuntime,
-      author,
-      version,
-      packageName,
-      orientation,
-      adMobAppId,
-      scaleMode,
-      sizeOnStartupMode,
-      showGDevelopSplash,
-      minFPS,
-      maxFPS,
-      isFolderProject,
-    } = this.state;
+function applyPropertiesToProject(
+  project: gdProject,
+  newProperties: ProjectProperties
+) {
+  const t = str => str; //TODO
+  const {
+    gameResolutionWidth,
+    gameResolutionHeight,
+    adaptGameResolutionAtRuntime,
+    name,
+    author,
+    version,
+    packageName,
+    orientation,
+    scaleMode,
+    sizeOnStartupMode,
+    showGDevelopSplash,
+    minFPS,
+    maxFPS,
+    isFolderProject,
+  } = newProperties;
+  project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
+  project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
+  project.setName(name);
+  project.setAuthor(author);
+  project.setVersion(version);
+  project.setPackageName(packageName);
+  project.setOrientation(orientation);
+  project.setScaleMode(scaleMode);
+  project.setSizeOnStartupMode(sizeOnStartupMode);
+  project.setMinimumFPS(minFPS);
+  project.setMaximumFPS(maxFPS);
+  project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
+  project.setFolderProject(isFolderProject);
 
-    const defaultPackageName = 'com.example.mygame';
-    const admobHint = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
-    const defaultVersion = '1.0.0';
+  return displayProjectErrorsBox(t, getErrors(t, project));
+}
 
-    return (
-      <React.Fragment>
-        <Dialog
-          actions={[
-            <FlatButton
-              label={<Trans>Cancel</Trans>}
-              primary={false}
-              onClick={this.props.onClose}
-              key="cancel"
-            />,
-            <FlatButton
-              label={<Trans>Apply</Trans>}
-              primary={true}
-              onClick={this._onApply}
-              key="apply"
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/interface/project-manager/properties"
-              key="help"
-            />,
-          ]}
-          title={<Trans>Project properties</Trans>}
-          cannotBeDismissed={true}
-          open={this.props.open}
-          onRequestClose={this.props.onClose}
-        >
+function ProjectPropertiesDialog(props: Props) {
+  const { project } = props;
+
+  const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
+
+  const initialProperties = React.useMemo(
+    () => loadPropertiesFromProject(project),
+    [project]
+  );
+  let [name, setName] = React.useState(initialProperties.name);
+  let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
+    initialProperties.gameResolutionWidth
+  );
+  let [gameResolutionHeight, setGameResolutionHeight] = React.useState(
+    initialProperties.gameResolutionHeight
+  );
+  let [
+    adaptGameResolutionAtRuntime,
+    setAdaptGameResolutionAtRuntime,
+  ] = React.useState(initialProperties.adaptGameResolutionAtRuntime);
+  let [author, setAuthor] = React.useState(initialProperties.author);
+  let [version, setVersion] = React.useState(initialProperties.version);
+  let [packageName, setPackageName] = React.useState(
+    initialProperties.packageName
+  );
+  let [orientation, setOrientation] = React.useState(
+    initialProperties.orientation
+  );
+  let [scaleMode, setScaleMode] = React.useState(initialProperties.scaleMode);
+  let [sizeOnStartupMode, setSizeOnStartupMode] = React.useState(
+    initialProperties.sizeOnStartupMode
+  );
+  let [showGDevelopSplash, setShowGDevelopSplash] = React.useState(
+    initialProperties.showGDevelopSplash
+  );
+  let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
+  let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
+  let [isFolderProject, setIsFolderProject] = React.useState(
+    initialProperties.isFolderProject
+  );
+
+  const defaultPackageName = 'com.example.mygame';
+  const defaultVersion = '1.0.0';
+
+  const onCancelChanges = useSerializableObjectCancelableEditor({
+    serializableObject: project.getExtensionProperties(),
+    onCancel: props.onClose,
+  });
+
+  return (
+    <React.Fragment>
+      <Dialog
+        actions={[
+          <FlatButton
+            label={<Trans>Cancel</Trans>}
+            primary={false}
+            onClick={onCancelChanges}
+            key="cancel"
+          />,
+          <FlatButton
+            label={<Trans>Apply</Trans>}
+            primary={true}
+            onClick={() => {
+              if (
+                applyPropertiesToProject(project, {
+                  gameResolutionWidth,
+                  gameResolutionHeight,
+                  adaptGameResolutionAtRuntime,
+                  name,
+                  author,
+                  version,
+                  packageName,
+                  orientation,
+                  scaleMode,
+                  sizeOnStartupMode,
+                  showGDevelopSplash,
+                  minFPS,
+                  maxFPS,
+                  isFolderProject,
+                })
+              )
+                props.onApply();
+            }}
+            key="apply"
+          />,
+        ]}
+        secondaryActions={[
+          <HelpButton
+            helpPagePath="/interface/project-manager/properties"
+            key="help"
+          />,
+        ]}
+        title={<Trans>Project properties</Trans>}
+        cannotBeDismissed={true}
+        open={props.open}
+        onRequestClose={onCancelChanges}
+      >
+        <ColumnStackLayout noMargin>
           <SemiControlledTextField
             floatingLabelText={<Trans>Game name</Trans>}
             fullWidth
             type="text"
             value={name}
-            onChange={value => this.setState({ name: value })}
+            onChange={setName}
             autoFocus
           />
           <Checkbox
@@ -192,15 +220,13 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             onCheck={(e, checked) => {
               if (!checked) {
                 if (
-                  this._subscriptionChecker &&
-                  !this._subscriptionChecker.checkHasSubscription()
+                  subscriptionChecker.current &&
+                  !subscriptionChecker.current.checkHasSubscription()
                 )
                   return;
               }
 
-              this.setState({
-                showGDevelopSplash: checked,
-              });
+              setShowGDevelopSplash(checked);
             }}
           />
           <SemiControlledTextField
@@ -209,7 +235,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             hintText={defaultVersion}
             type="text"
             value={version}
-            onChange={value => this.setState({ version: value })}
+            onChange={setVersion}
           />
           <SemiControlledTextField
             floatingLabelText={
@@ -219,7 +245,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             hintText={defaultPackageName}
             type="text"
             value={packageName}
-            onChange={value => this.setState({ packageName: value })}
+            onChange={setPackageName}
             errorText={
               validatePackageName(packageName) ? (
                 undefined
@@ -238,7 +264,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             hintText={t`Your name`}
             type="text"
             value={author}
-            onChange={value => this.setState({ author: value })}
+            onChange={setAuthor}
           />
           <Text size="title">
             <Trans>Resolution and rendering</Trans>
@@ -250,9 +276,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               type="number"
               value={'' + gameResolutionWidth}
               onChange={value =>
-                this.setState({
-                  gameResolutionWidth: Math.max(1, parseInt(value, 10)),
-                })
+                setGameResolutionWidth(Math.max(1, parseInt(value, 10)))
               }
             />
             <SemiControlledTextField
@@ -261,9 +285,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               type="number"
               value={'' + gameResolutionHeight}
               onChange={value =>
-                this.setState({
-                  gameResolutionHeight: Math.max(1, parseInt(value, 10)),
-                })
+                setGameResolutionHeight(Math.max(1, parseInt(value, 10)))
               }
             />
           </ResponsiveLineStackLayout>
@@ -273,9 +295,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Game resolution resize mode (fullscreen or window)</Trans>
             }
             value={sizeOnStartupMode}
-            onChange={(e, i, value: string) =>
-              this.setState({ sizeOnStartupMode: value })
-            }
+            onChange={(e, i, value: string) => setSizeOnStartupMode(value)}
           >
             <SelectOption
               value=""
@@ -299,11 +319,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }
             disabled={sizeOnStartupMode === ''}
             checked={adaptGameResolutionAtRuntime}
-            onCheck={(e, checked) => {
-              this.setState({
-                adaptGameResolutionAtRuntime: checked,
-              });
-            }}
+            onCheck={(e, checked) => setAdaptGameResolutionAtRuntime(checked)}
           />
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
@@ -311,22 +327,14 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               fullWidth
               type="number"
               value={'' + minFPS}
-              onChange={value =>
-                this.setState({
-                  minFPS: Math.max(0, parseInt(value, 10)),
-                })
-              }
+              onChange={value => setMinFPS(Math.max(0, parseInt(value, 10)))}
             />
             <SemiControlledTextField
               floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
               fullWidth
               type="number"
               value={'' + maxFPS}
-              onChange={value =>
-                this.setState({
-                  maxFPS: Math.max(0, parseInt(value, 10)),
-                })
-              }
+              onChange={value => setMaxFPS(Math.max(0, parseInt(value, 10)))}
             />
           </ResponsiveLineStackLayout>
           {maxFPS > 0 && maxFPS < 60 && (
@@ -364,9 +372,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Device orientation (for iOS and Android)</Trans>
             }
             value={orientation}
-            onChange={(e, i, value: string) =>
-              this.setState({ orientation: value })
-            }
+            onChange={(e, i, value: string) => setOrientation(value)}
           >
             <SelectOption value="default" primaryText={t`Platform default`} />
             <SelectOption value="landscape" primaryText={t`Landscape`} />
@@ -378,9 +384,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Scale mode (also called "Sampling")</Trans>
             }
             value={scaleMode}
-            onChange={(e, i, value: string) =>
-              this.setState({ scaleMode: value })
-            }
+            onChange={(e, i, value: string) => setScaleMode(value)}
           >
             <SelectOption
               value="linear"
@@ -405,19 +409,6 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             </DismissableAlertMessage>
           )}
           <Text size="title">
-            <Trans>AdMob</Trans>
-          </Text>
-          <SemiControlledTextField
-            floatingLabelText={
-              <Trans>AdMob application ID (for iOS and Android)</Trans>
-            }
-            fullWidth
-            hintText={admobHint}
-            type="text"
-            value={adMobAppId}
-            onChange={value => this.setState({ adMobAppId: value })}
-          />
-          <Text size="title">
             <Trans>Project files</Trans>
           </Text>
           <SelectField
@@ -425,7 +416,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             floatingLabelText={<Trans>Project file type</Trans>}
             value={isFolderProject ? 'folder-project' : 'single-file'}
             onChange={(e, i, value: string) =>
-              this.setState({ isFolderProject: value === 'folder-project' })
+              setIsFolderProject(value === 'folder-project')
             }
           >
             <SelectOption
@@ -437,22 +428,21 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               primaryText={t`Multiple files, saved in folder next to the main file`}
             />
           </SelectField>
-        </Dialog>
-        <SubscriptionChecker
-          ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)
-          }
-          onChangeSubscription={() => {
-            this.props.onClose();
-            this.props.onChangeSubscription();
-          }}
-          mode="mandatory"
-          id="Disable GDevelop splash at startup"
-          title={<Trans>Disable GDevelop splash at startup</Trans>}
-        />
-      </React.Fragment>
-    );
-  }
+        </ColumnStackLayout>
+        <ExtensionsProperties project={project} />
+      </Dialog>
+      <SubscriptionChecker
+        ref={subscriptionChecker}
+        onChangeSubscription={() => {
+          onCancelChanges();
+          props.onChangeSubscription();
+        }}
+        mode="mandatory"
+        id="Disable GDevelop splash at startup"
+        title={<Trans>Disable GDevelop splash at startup</Trans>}
+      />
+    </React.Fragment>
+  );
 }
 
 export default ProjectPropertiesDialog;

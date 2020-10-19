@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -186,6 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "new",
+          "persistentUuid": "f0e9fa7f-70a1-431c-ad5f-2dccc8b9d092",
           "width": 102,
           "x": 332.376,
           "y": 209.327,
@@ -201,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "load",
+          "persistentUuid": "42837dd2-9a7e-41a9-962d-08216f622240",
           "width": 109,
           "x": 332.376,
           "y": 305.327,
@@ -216,6 +218,7 @@
           "layer": "",
           "locked": false,
           "name": "new_button",
+          "persistentUuid": "900c9d74-160d-4237-8bbf-f6c100cc3ec9",
           "width": 128,
           "x": 320,
           "y": 192,
@@ -231,6 +234,7 @@
           "layer": "",
           "locked": false,
           "name": "load_button",
+          "persistentUuid": "6994f6b8-90a1-4035-ae8c-314795a2482d",
           "width": 128,
           "x": 320,
           "y": 288,
@@ -246,6 +250,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "4ed00694-26b9-4b74-8791-c3874f807ce4",
           "width": 0,
           "x": 4.99999,
           "y": 13,
@@ -578,6 +583,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -661,6 +671,7 @@
           "layer": "",
           "locked": false,
           "name": "character1",
+          "persistentUuid": "8e45a21e-e398-44ef-8988-d05561d06482",
           "width": 0,
           "x": 193,
           "y": 129,
@@ -681,6 +692,7 @@
           "layer": "",
           "locked": false,
           "name": "character2",
+          "persistentUuid": "53215e13-d72f-427c-82fe-4a1e185dd70d",
           "width": 0,
           "x": 335,
           "y": 276,
@@ -701,6 +713,7 @@
           "layer": "",
           "locked": false,
           "name": "character3",
+          "persistentUuid": "ea4306a4-48d6-416a-8382-125cccbac014",
           "width": 0,
           "x": 483,
           "y": 121,
@@ -721,6 +734,7 @@
           "layer": "",
           "locked": false,
           "name": "save_button",
+          "persistentUuid": "a891485e-aff7-4b3b-acad-3d2456354f76",
           "width": 128,
           "x": 640,
           "y": 512,
@@ -736,6 +750,7 @@
           "layer": "",
           "locked": false,
           "name": "save",
+          "persistentUuid": "b4e92651-f49c-4a99-9efe-e566b9327bda",
           "width": 53,
           "x": 672,
           "y": 533,
@@ -751,6 +766,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a84bc09e-deb5-4c7f-b188-ab5a443fac98",
           "width": 0,
           "x": 6.00001,
           "y": 7.99999,
@@ -766,6 +782,7 @@
           "layer": "",
           "locked": false,
           "name": "highscore",
+          "persistentUuid": "35cda39a-8b0d-41c9-be62-f0e51fa37067",
           "width": 0,
           "x": 504,
           "y": 477,
@@ -781,6 +798,7 @@
           "layer": "",
           "locked": false,
           "name": "back_button",
+          "persistentUuid": "2935474d-bec2-4ce9-bc9f-f245a1026a7c",
           "width": 128,
           "x": 503,
           "y": 512,
@@ -796,6 +814,7 @@
           "layer": "",
           "locked": false,
           "name": "Back",
+          "persistentUuid": "72163774-ff8a-444f-bf3f-7b475d507145",
           "width": 0,
           "x": 544,
           "y": 533,
@@ -1734,6 +1753,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

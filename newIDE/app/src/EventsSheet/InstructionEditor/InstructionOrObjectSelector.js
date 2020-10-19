@@ -14,9 +14,9 @@ import {
   enumerateFreeInstructions,
   filterInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { List, ListItem } from '../../UI/List';
-import SearchBar from '../../UI/SearchBar';
+import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { List, type ListItemRefType } from '../../UI/List';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs, Tab } from '../../UI/Tabs';
@@ -31,7 +31,7 @@ import TagChips from '../../UI/TagChips';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
 import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
-import { renderInstructionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
+import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
 import {
   buildTagsMenuTemplate,
@@ -66,10 +66,7 @@ type Props = {|
   isCondition: boolean,
   focusOnMount?: boolean,
   chosenInstructionType: ?string,
-  onChooseInstruction: (
-    type: string,
-    EnumeratedInstructionOrExpressionMetadata
-  ) => void,
+  onChooseInstruction: (type: string, EnumeratedInstructionMetadata) => void,
   chosenObjectName: ?string,
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
@@ -86,9 +83,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   state = { searchText: '', selectedObjectTags: [] };
   _searchBar = React.createRef<SearchBar>();
   _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItem>();
+  _selectedItem = React.createRef<ListItemRefType>();
 
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = enumerateFreeInstructions(
+  instructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
   );
   instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
@@ -100,7 +97,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   );
 
   componentDidMount() {
-    if (this.props.focusOnMount && this._searchBar.current) {
+    if (
+      this.props.focusOnMount &&
+      useShouldAutofocusSearchbar() &&
+      this._searchBar.current
+    ) {
       this._searchBar.current.focus();
     }
     if (this._selectedItem.current && this._scrollView.current) {
@@ -329,7 +330,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         )}
                       {!isSearching &&
                         currentTab === 'free-instructions' &&
-                        renderInstructionTree({
+                        renderInstructionOrExpressionTree({
                           instructionTreeNode: this.instructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,

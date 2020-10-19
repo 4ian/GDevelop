@@ -32,6 +32,8 @@ type Props = {|
     type: string
   ) => void,
   anchorEl?: any, // Unused
+  canPasteInstructions: boolean, // Unused
+  onPasteInstructions: () => void, // Unused
 |};
 type State = {||};
 
@@ -45,6 +47,8 @@ export default class InstructionEditorDialog extends React.Component<
       onCancel,
       onSubmit,
       open,
+      canPasteInstructions,
+      onPasteInstructions,
       ...otherProps
     } = this.props;
     const actions = [

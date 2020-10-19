@@ -9,7 +9,7 @@
  *
  * @class PixiImageManager
  * @memberof gdjs
- * @param {Object} resources The resources data of the game.
+ * @param {ResourceData[]} resources The resources data of the game.
  */
 gdjs.PixiImageManager = function(resources)
 {
@@ -22,6 +22,15 @@ gdjs.PixiImageManager = function(resources)
 };
 
 gdjs.ImageManager = gdjs.PixiImageManager; //Register the class to let the engine use it.
+
+/**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.PixiImageManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
 
 /**
  * Return the PIXI texture associated to the specified resource name.
@@ -45,7 +54,7 @@ gdjs.PixiImageManager.prototype.getPIXITexture = function(resourceName) {
 			var res = this._resources[i];
 
 			if (res.name === resourceName && res.kind === "image") {
-				texture = PIXI.Texture.fromImage(res.file);
+				texture = PIXI.Texture.from(res.file);
 				break;
 			}
 		}
@@ -82,7 +91,7 @@ gdjs.PixiImageManager.prototype.getPIXIVideoTexture = function(resourceName) {
 			var res = this._resources[i];
 
 			if (res.name === resourceName && res.kind === "video") {
-				texture = PIXI.Texture.fromVideo(res.file);
+				texture = PIXI.Texture.from(res.file);
 				break;
 			}
 		}
@@ -111,11 +120,9 @@ gdjs.PixiImageManager.prototype.getInvalidPIXITexture = function() {
  * used by calling `getPIXITexture`.
  * @param onProgress Callback called each time a new file is loaded.
  * @param onComplete Callback called when loading is done.
- * @param resources The resources to be loaded. If not specified, will load the resources
- * specified in the PixiImageManager constructor.
  */
-gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, resources) {
-	resources = resources || this._resources;
+gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete) {
+	var resources = this._resources;
 
 	//Construct the list of files to be loaded.
 	//For one loaded file, it can have one or more resources
@@ -126,7 +133,6 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
 
         if ( res.file && res.kind === "image" ) {
         	if (this._loadedTextures.containsKey(res.name)) {
-				console.log("Texture \"" + res.name + "\" is already loaded.");
         		continue;
         	}
 
@@ -138,10 +144,24 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
     if (totalCount === 0)
     	return onComplete(totalCount); //Nothing to load.
 
-    var loadingCount = 0;
-    var loader = PIXI.loader;
+    var loader = PIXI.Loader.shared;
 	var that = this;
-    loader.once('complete', function(loader, loadedFiles) {
+
+    var loadingCount = 0;
+    var progressCallbackId = loader.onProgress.add(function() {
+		loadingCount++;
+		onProgress(loadingCount, totalCount);
+    });
+
+	for (var file in files) {
+		if (files.hasOwnProperty(file)) {
+            loader.add(file, file);
+        }
+    }
+
+    loader.load(function(loader, loadedFiles) {
+		loader.onProgress.detach(progressCallbackId);
+
     	//Store the loaded textures so that they are ready to use.
     	for (var file in loadedFiles) {
     		if (loadedFiles.hasOwnProperty(file)) {
@@ -158,17 +178,5 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
     	}
 
     	onComplete(totalCount);
-    });
-    loader.on('progress', function() {
-    	loadingCount++;
-    	onProgress(loadingCount, totalCount);
-    });
-
-	for (var file in files) {
-		if (files.hasOwnProperty(file)) {
-            loader.add(file, file);
-        }
-    }
-
-    loader.load();
+	});
 }

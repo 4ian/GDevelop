@@ -593,6 +593,38 @@ describe('libGD.js', function() {
       expect(initialInstance2.getCustomWidth()).toBe(34);
       expect(initialInstance2.getCustomHeight()).toBe(30);
     });
+    it('can be serialized with a persistent UUID called persistentUuid', function() {
+      const initialInstance = new gd.InitialInstance();
+      initialInstance.setObjectName("MyObject");
+
+      // Serialized object must have a non empty "persistentUuid".
+      var element = new gd.SerializerElement();
+      initialInstance.serializeTo(element);
+      const persistentUuid = element.getStringAttribute("persistentUuid");
+      expect(persistentUuid).toBeTruthy();
+
+      // The UUID must persist across serializations.
+      const initialInstance2 = new gd.InitialInstance();
+      initialInstance2.unserializeFrom(element);
+
+      var element2 = new gd.SerializerElement();
+      initialInstance.serializeTo(element2);
+      const persistentUuid2 = element2.getStringAttribute("persistentUuid");
+      expect(persistentUuid2).toBe(persistentUuid);
+
+      // The UUID can be reset
+      initialInstance2.resetPersistentUuid();
+      var element3 = new gd.SerializerElement();
+      initialInstance2.serializeTo(element3);
+      const persistentUuid3 = element3.getStringAttribute("persistentUuid");
+      expect(persistentUuid3).not.toBe(persistentUuid2);
+
+      element.delete();
+      element2.delete();
+      element3.delete();
+      initialInstance.delete();
+      initialInstance2.delete();
+    });
 
     afterAll(function() {
       project.delete();
@@ -805,8 +837,8 @@ describe('libGD.js', function() {
       );
 
       // Note: updateProperty expect the booleans in an usual "0" or "1" format.
-      resource.updateProperty('Smooth the image', '0', project);
-      resource.updateProperty('Always loaded in memory', '1', project);
+      resource.updateProperty('Smooth the image', '0');
+      resource.updateProperty('Always loaded in memory', '1');
 
       const updatedProperties = resource.getProperties();
       expect(updatedProperties.get('Smooth the image').getValue()).toBe(
@@ -900,7 +932,7 @@ describe('libGD.js', function() {
       expect(properties.get('disablePreload').getValue()).toBe('false');
 
       // Note: updateProperty expect the booleans in an usual "0" or "1" format.
-      resource.updateProperty('disablePreload', '1', project);
+      resource.updateProperty('disablePreload', '1');
 
       const updatedProperties = resource.getProperties();
       expect(updatedProperties.get('disablePreload').getValue()).toBe('true');
@@ -1085,8 +1117,7 @@ describe('libGD.js', function() {
         behavior.updateProperty(
           serializerElement,
           'PropertyThatDoesNotExist',
-          'MyValue',
-          project
+          'MyValue'
         )
       ).toBe(false);
 
@@ -1143,18 +1174,11 @@ describe('libGD.js', function() {
       mySharedData.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(
-            behaviorContent.getStringAttribute('property1')
-          )
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(
-            behaviorContent.getBoolAttribute('property2') ? '1' : '0'
-          ).setType('Boolean')
-        );
+        properties.getOrCreate('My first property')
+          .setValue(behaviorContent.getStringAttribute('property1'));
+        properties.getOrCreate('My other property')
+          .setValue(behaviorContent.getBoolAttribute('property2') ? '1' : '0')
+          .setType('Boolean');
 
         return properties;
       };
@@ -1248,6 +1272,7 @@ describe('libGD.js', function() {
       property1.setValue('123');
       expect(list.getAt(0).getLabel()).toBe('Property 1');
       expect(list.getAt(0).getValue()).toBe('123');
+      list.delete();
     });
   });
 
@@ -1256,7 +1281,11 @@ describe('libGD.js', function() {
       var properties = new gd.MapStringPropertyDescriptor();
       expect(properties.has('Property0')).toBe(false);
 
-      properties.set('Property1', new gd.PropertyDescriptor('Hello Property1'));
+      // Ensure the "set" method works (though in practice, prefer "getOrCreate")
+      const property1 = new gd.PropertyDescriptor('Hello Property1');
+      properties.set('Property1', property1);
+      property1.delete();
+
       expect(properties.get('Property1').getValue()).toBe('Hello Property1');
       expect(properties.get('Property1').getType()).toBe('string');
       properties.get('Property1').setValue('Hello modified Property1');
@@ -1266,13 +1295,14 @@ describe('libGD.js', function() {
       expect(properties.keys().toJSArray()).not.toContain('Property0');
       expect(properties.keys().toJSArray()).toContain('Property1');
 
-      properties.set(
-        'Property0',
-        new gd.PropertyDescriptor('Hello Property0')
-          .setType('another type')
-          .addExtraInfo('Info1')
-          .addExtraInfo('Info3')
-      );
+      // Ensure the "getOrCreate" method works
+      expect(properties.has('Property0')).toBe(false);
+      properties.getOrCreate('Property0')
+        .setValue('Hello Property0')
+        .setType('another type')
+        .addExtraInfo('Info1')
+        .addExtraInfo('Info3');
+      expect(properties.has('Property0')).toBe(true);
       expect(properties.get('Property0').getValue()).toBe('Hello Property0');
       expect(properties.get('Property0').getType()).toBe('another type');
       expect(
@@ -1297,6 +1327,7 @@ describe('libGD.js', function() {
       expect(properties.has('Property1')).toBe(true);
       expect(properties.keys().toJSArray()).toContain('Property0');
       expect(properties.keys().toJSArray()).toContain('Property1');
+      properties.delete();
     });
   });
 
@@ -1322,18 +1353,16 @@ describe('libGD.js', function() {
       myBehavior.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(
+        properties
+          .getOrCreate('My first property')
+          .setValue(
             behaviorContent.getStringAttribute('property1')
-          )
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(
+          );
+        properties
+          .getOrCreate('My other property')
+          .setValue(
             behaviorContent.getBoolAttribute('property2') ? '1' : '0'
-          ).setType('Boolean')
-        );
+          ).setType('Boolean');
 
         return properties;
       };
@@ -1481,16 +1510,13 @@ describe('libGD.js', function() {
       myObject.getProperties = function(content) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My first property',
-          new gd.PropertyDescriptor(content.property1)
-        );
-        properties.set(
-          'My other property',
-          new gd.PropertyDescriptor(content.property2 ? '1' : '0').setType(
-            'Boolean'
-          )
-        );
+        properties
+          .getOrCreate('My first property')
+          .setValue(content.property1);
+        properties
+          .getOrCreate('My other property')
+          .setValue(content.property2 ? '1' : '0')
+          .setType('Boolean');
 
         return properties;
       };
@@ -1528,23 +1554,26 @@ describe('libGD.js', function() {
       ) {
         var properties = new gd.MapStringPropertyDescriptor();
 
-        properties.set(
-          'My instance property',
-          new gd.PropertyDescriptor(
+        properties
+          .getOrCreate('My instance property')
+          .setValue(
             instance.getRawStringProperty('instanceprop1')
-          )
-        );
-        properties.set(
-          'My other instance property',
-          new gd.PropertyDescriptor(
-            instance.getRawFloatProperty('instanceprop2').toString() //TODO: How to avoid people forgetting toString?
-          ).setType('number')
-        );
+          );
+        properties
+          .getOrCreate('My other instance property')
+          .setValue(
+            instance.getRawFloatProperty('instanceprop2').toString()
+          ).setType('number');
 
         return properties;
       };
 
-      return myObject;
+      // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
+      // and associated methods are redefined in JS, they have different arguments (
+      // see ObjectJsImplementation C++ implementation). If called directly here from JS,
+      // the arguments will be mismatched. To workaround this, always case the object to
+      // a base gdObject to ensure C++ methods are called.
+      return gd.castObject(myObject, gd.Object);
     };
 
     it('can create a gd.ObjectJsImplementation and pass sanity checks', function() {
@@ -1591,17 +1620,21 @@ describe('libGD.js', function() {
     it('can clone a gd.ObjectJsImplementation', function() {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const object1 = createSampleObjectJsImplementation();
-      object1.updateProperty('My first property', 'test1', project);
+      expect(
+        object1.getProperties().get('My first property').getValue() == 'Initial value 1'
+      );
+
+      object1.updateProperty('My first property', 'test1');
       const object2 = object1.clone().release();
       const object3 = object1.clone().release();
 
       {
-        const propertiesObject1 = object1.getProperties(project);
+        const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
         expect(
           propertiesObject1.get('My first property').getValue() == 'test1'
         );
-        const propertiesObject2 = object2.getProperties(project);
+        const propertiesObject2 = object2.getProperties();
         expect(propertiesObject2.has('My first property'));
         expect(
           propertiesObject2.get('My first property').getValue() == 'test1'
@@ -1609,14 +1642,14 @@ describe('libGD.js', function() {
       }
 
       {
-        object1.updateProperty('My first property', 'updated value', project);
-        const propertiesObject1 = object1.getProperties(project);
+        object1.updateProperty('My first property', 'updated value');
+        const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
         expect(
           propertiesObject1.get('My first property').getValue() ==
             'updated value'
         );
-        const propertiesObject2 = object2.getProperties(project);
+        const propertiesObject2 = object2.getProperties();
         expect(propertiesObject2.has('My first property'));
         expect(
           propertiesObject2.get('My first property').getValue() == 'test1'
@@ -1626,22 +1659,21 @@ describe('libGD.js', function() {
       {
         object2.updateProperty(
           'My first property',
-          'updated value object 2',
-          project
+          'updated value object 2'
         );
-        const propertiesObject1 = object1.getProperties(project);
+        const propertiesObject1 = object1.getProperties();
         expect(propertiesObject1.has('My first property'));
         expect(
           propertiesObject1.get('My first property').getValue() ==
             'updated value'
         );
-        const propertiesObject2 = object2.getProperties(project);
+        const propertiesObject2 = object2.getProperties();
         expect(propertiesObject2.has('My first property'));
         expect(
           propertiesObject2.get('My first property').getValue() ==
             'updated value object 2'
         );
-        const propertiesObject3 = object3.getProperties(project);
+        const propertiesObject3 = object3.getProperties();
         expect(propertiesObject3.has('My first property'));
         expect(
           propertiesObject3.get('My first property').getValue() == 'test1'
@@ -2600,14 +2632,21 @@ describe('libGD.js', function() {
       fs.dirNameFrom = function(fullpath) {
         return path.dirname(fullpath);
       };
+      fs.readDir = function() {
+        return new gd.VectorString();
+      };
       fs.writeToFile = function(path, content) {
         //Validate that some code have been generated:
         expect(content).toMatch('runtimeScene.getOnceTriggers().startNewFrame');
         done();
       };
 
-      var exporter = new gd.Exporter(fs);
-      exporter.exportLayoutForPixiPreview(project, layout, '/path/for/export/');
+      const exporter = new gd.Exporter(fs);
+      const previewExportOptions =
+        new gd.PreviewExportOptions(project, '/path/for/export/');
+      previewExportOptions.setLayoutName('Scene');
+      exporter.exportProjectForPixiPreview(previewExportOptions);
+      previewExportOptions.delete();
       exporter.delete();
     });
   });
@@ -3180,13 +3219,13 @@ describe('libGD.js', function() {
       objectsContainer = new gd.ObjectsContainer();
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 0)
-      ).toBe(-1);
+      ).toBe(0);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 1)
       ).toBe(0);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 2)
-      ).toBe(0);
+      ).toBe(2);
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 3)
       ).toBe(2);

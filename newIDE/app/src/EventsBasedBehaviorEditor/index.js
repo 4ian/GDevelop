@@ -4,14 +4,14 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
-import { Column, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import { Tabs, Tab } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';
-const gd = global.gd;
+import { ColumnStackLayout } from '../UI/Layout';
+const gd: libGDevelop = global.gd;
 
 type TabName = 'configuration' | 'properties';
 
@@ -64,14 +64,16 @@ export default class EventsBasedBehaviorEditor extends React.Component<
           <Tab label={<Trans>Properties</Trans>} value="properties" />
         </Tabs>
         {currentTab === 'configuration' && (
-          <Column>
+          <ColumnStackLayout expand>
             <DismissableAlertMessage
               identifier="events-based-behavior-explanation"
               kind="info"
             >
-              This is the configuration of your behavior. Make sure to choose a
-              proper internal name as it's hard to change it later. Enter a
-              description explaining what the behavior is doing to the object.
+              <Trans>
+                This is the configuration of your behavior. Make sure to choose
+                a proper internal name as it's hard to change it later. Enter a
+                description explaining what the behavior is doing to the object.
+              </Trans>
             </DismissableAlertMessage>
             <TextField
               floatingLabelText={<Trans>Internal Name</Trans>}
@@ -99,7 +101,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 eventsBasedBehavior.setDescription(text);
                 this.forceUpdate();
               }}
-              multiLine
+              multiline
               fullWidth
               rows={3}
             />
@@ -151,8 +153,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 </Trans>
               </DismissableAlertMessage>
             )}
-            <Spacer />
-          </Column>
+          </ColumnStackLayout>
         )}
         {currentTab === 'properties' && (
           <EventsBasedBehaviorPropertiesEditor

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import { ThemeProvider } from '@material-ui/styles';
+import { StylesProvider, jssPreset } from '@material-ui/core/styles';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
@@ -14,18 +15,31 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { type EventsFunctionCodeWriter } from '../EventsFunctionsExtensionsLoader';
+import {
+  type EventsFunctionCodeWriter,
+  type EventsFunctionCodeWriterCallbacks,
+} from '../EventsFunctionsExtensionsLoader';
 import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
 } from '../EventsFunctionsExtensionsLoader/Storage';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
+import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
+import { create } from 'jss';
+import rtl from 'jss-rtl';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+
+// Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
+const jss = create({
+  plugins: [...jssPreset().plugins, rtl()],
+});
 
 type Props = {|
   authentification: Authentification,
   disableCheckForUpdates: boolean,
-  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   children: ({
@@ -44,7 +58,7 @@ export default class Providers extends React.Component<Props, {||}> {
       disableCheckForUpdates,
       authentification,
       children,
-      eventsFunctionCodeWriter,
+      makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
     } = this.props;
@@ -54,41 +68,52 @@ export default class Providers extends React.Component<Props, {||}> {
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => {
-                const theme = getTheme(values.themeName);
+                const theme = getTheme({
+                  themeName: values.themeName,
+                  language: values.language,
+                });
                 return (
                   <GDI18nProvider language={values.language}>
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
-                      <ThemeProvider theme={theme.muiTheme}>
-                        <UserProfileProvider
-                          authentification={authentification}
-                        >
-                          <I18n update>
-                            {({ i18n }) => (
-                              <EventsFunctionsExtensionsProvider
-                                i18n={i18n}
-                                eventsFunctionCodeWriter={
-                                  eventsFunctionCodeWriter
-                                }
-                                eventsFunctionsExtensionWriter={
-                                  eventsFunctionsExtensionWriter
-                                }
-                                eventsFunctionsExtensionOpener={
-                                  eventsFunctionsExtensionOpener
-                                }
-                              >
-                                <EventsFunctionsExtensionsContext.Consumer>
-                                  {eventsFunctionsExtensionsState =>
-                                    children({
-                                      i18n,
-                                      eventsFunctionsExtensionsState,
-                                    })
+                      <StylesProvider jss={jss}>
+                        <ThemeProvider theme={theme.muiTheme}>
+                          <UserProfileProvider
+                            authentification={authentification}
+                          >
+                            <I18n update>
+                              {({ i18n }) => (
+                                <EventsFunctionsExtensionsProvider
+                                  i18n={i18n}
+                                  makeEventsFunctionCodeWriter={
+                                    makeEventsFunctionCodeWriter
                                   }
-                                </EventsFunctionsExtensionsContext.Consumer>
-                              </EventsFunctionsExtensionsProvider>
-                            )}
-                          </I18n>
-                        </UserProfileProvider>
-                      </ThemeProvider>
+                                  eventsFunctionsExtensionWriter={
+                                    eventsFunctionsExtensionWriter
+                                  }
+                                  eventsFunctionsExtensionOpener={
+                                    eventsFunctionsExtensionOpener
+                                  }
+                                >
+                                  <CommandsContextProvider>
+                                    <AssetStoreStateProvider>
+                                      <ResourceStoreStateProvider>
+                                        <EventsFunctionsExtensionsContext.Consumer>
+                                          {eventsFunctionsExtensionsState =>
+                                            children({
+                                              i18n,
+                                              eventsFunctionsExtensionsState,
+                                            })
+                                          }
+                                        </EventsFunctionsExtensionsContext.Consumer>
+                                      </ResourceStoreStateProvider>
+                                    </AssetStoreStateProvider>
+                                  </CommandsContextProvider>
+                                </EventsFunctionsExtensionsProvider>
+                              )}
+                            </I18n>
+                          </UserProfileProvider>
+                        </ThemeProvider>
+                      </StylesProvider>
                     </GDevelopThemeContext.Provider>
                   </GDI18nProvider>
                 );

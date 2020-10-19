@@ -164,7 +164,7 @@ describe('libGD.js - GDJS related tests', function() {
       expect(code).toMatch('repeatCount');
 
       // Trigger once is used in a condition
-      expect(code).toMatch('runtimeScene.getOnceTriggers().triggerOnce');
+      expect(code).toMatch('eventsFunctionContext.getOnceTriggers().triggerOnce');
 
       // A variable have 42 added to it
       expect(code).toMatch('getVariables().get("ObjectVariable")).add(42)');
@@ -310,6 +310,16 @@ describe('libGD.js - GDJS related tests', function() {
       expect(object.areCoordinatesAbsolute()).toBe(true);
       object.setCoordinatesRelative();
       expect(object.areCoordinatesAbsolute()).toBe(false);
+    });
+  });
+  describe('ShapePainterObject', function() {
+    it('should expose ShapePainterObject specific methods', function() {
+      var object = new gd.ShapePainterObject('MyShapePainterObject');
+      testObjectFeatures(object);
+      object.setClearBetweenFrames(true);
+      expect(object.isClearedBetweenFrames()).toBe(true);
+      object.setClearBetweenFrames(false);
+      expect(object.isClearedBetweenFrames()).toBe(false);
     });
   });
   describe('TextEntryObject', function() {

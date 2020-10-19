@@ -13,7 +13,8 @@ import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
 import Checkbox from '../UI/Checkbox';
 import { isNullPtr } from '../Utils/IsNullPtr';
-const gd = global.gd;
+import { ColumnStackLayout } from '../UI/Layout';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
@@ -21,7 +22,7 @@ type Props = {|
   project: gdProject,
   onApply: () => void,
   onClose: () => void,
-  onOpenMoreSettings?: () => void,
+  onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
 |};
 
@@ -78,7 +79,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
   };
 
   render() {
-    const { layout, project } = this.props;
+    const { layout } = this.props;
     const actions = [
       // TODO: Add support for cancelling modifications made to BehaviorSharedData
       // (either by enhancing a function like propertiesMapToSchema or using copies)
@@ -112,23 +113,19 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         if (isNullPtr(gd, behaviorSharedData)) return null;
 
         const properties = behaviorSharedData.getProperties(
-          sharedDataContent.getContent(),
-          project
+          sharedDataContent.getContent()
         );
         const propertiesSchema = propertiesMapToSchema(
           properties,
           sharedDataContent =>
-            behaviorSharedData.getProperties(
-              sharedDataContent.getContent(),
-              project
-            ),
-          (sharedDataContent, name, value) =>
+            behaviorSharedData.getProperties(sharedDataContent.getContent()),
+          (sharedDataContent, name, value) => {
             behaviorSharedData.updateProperty(
               sharedDataContent.getContent(),
               name,
-              value,
-              project
-            )
+              value
+            );
+          }
         );
 
         return (
@@ -162,51 +159,53 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         onRequestClose={this.props.onClose}
         maxWidth="sm"
       >
-        <TextField
-          floatingLabelText={<Trans>Window title</Trans>}
-          fullWidth
-          type="text"
-          value={this.state.windowTitle}
-          onChange={(e, value) => this.setState({ windowTitle: value })}
-        />
-        <Checkbox
-          checked={this.state.shouldStopSoundsOnStartup}
-          label={<Trans>Stop musics and sounds on startup</Trans>}
-          onCheck={(e, check) =>
-            this.setState({
-              shouldStopSoundsOnStartup: check,
-            })
-          }
-        />
-        <ColorField
-          floatingLabelText={<Trans>Scene background color</Trans>}
-          fullWidth
-          disableAlpha
-          color={this.state.backgroundColor}
-          onChangeComplete={color =>
-            this.setState({ backgroundColor: color.rgb })
-          }
-        />
-        {!some(propertiesEditors) && (
-          <EmptyMessage>
-            <Trans>
-              Any additional properties will appear here if you add behaviors to
-              objects, like Physics behavior.
-            </Trans>
-          </EmptyMessage>
-        )}
-        {propertiesEditors}
-        {this.props.onOpenMoreSettings && (
-          <RaisedButton
-            label={<Trans>Open advanced settings</Trans>}
+        <ColumnStackLayout expand noMargin>
+          <TextField
+            floatingLabelText={<Trans>Window title</Trans>}
             fullWidth
-            onClick={() => {
-              if (this.props.onOpenMoreSettings)
-                this.props.onOpenMoreSettings();
-              this.props.onClose();
-            }}
+            type="text"
+            value={this.state.windowTitle}
+            onChange={(e, value) => this.setState({ windowTitle: value })}
           />
-        )}
+          <Checkbox
+            checked={this.state.shouldStopSoundsOnStartup}
+            label={<Trans>Stop music and sounds on startup</Trans>}
+            onCheck={(e, check) =>
+              this.setState({
+                shouldStopSoundsOnStartup: check,
+              })
+            }
+          />
+          <ColorField
+            floatingLabelText={<Trans>Scene background color</Trans>}
+            fullWidth
+            disableAlpha
+            color={this.state.backgroundColor}
+            onChangeComplete={color =>
+              this.setState({ backgroundColor: color.rgb })
+            }
+          />
+          {!some(propertiesEditors) && (
+            <EmptyMessage>
+              <Trans>
+                Any additional properties will appear here if you add behaviors
+                to objects, like Physics behavior.
+              </Trans>
+            </EmptyMessage>
+          )}
+          {propertiesEditors}
+          {this.props.onOpenMoreSettings && (
+            <RaisedButton
+              label={<Trans>Open advanced settings</Trans>}
+              fullWidth
+              onClick={() => {
+                if (this.props.onOpenMoreSettings)
+                  this.props.onOpenMoreSettings();
+                this.props.onClose();
+              }}
+            />
+          )}
+        </ColumnStackLayout>
       </Dialog>
     );
   }

@@ -1,8 +1,9 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -10,8 +11,19 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'MyDummyExtension',
@@ -21,8 +33,34 @@ module.exports = {
       'MIT'
     );
 
+    // Register Properties
+    extension
+      .registerProperty('DummyPropertyString')
+      .setLabel(_('Dummy Property Name'))
+      .setDescription('Type in anything :)')
+      .setType('string');
+
+    extension
+      .registerProperty('DummyPropertyNumber')
+      .setLabel(_('Dummy Numeric Property Name'))
+      .setDescription('Only numbers here ;)')
+      .setType('number');
+
+    extension
+      .registerProperty('DummyPropertyBoolean')
+      .setDescription(_('A boolean property'))
+      .setType('boolean');
+
+    // Register Cordova/NPM dependencies
+    extension
+      .addDependency()
+      .setName('Thirteen Checker')
+      .setDependencyType('npm')
+      .setExportName('is-thirteen')
+      .setVersion('2.0.0');
+
     // Declare effects:
-    const dumyEffect = extension
+    const dummyEffect = extension
       .addEffect('DummyEffect')
       .setFullName(_('Dummy effect example'))
       .setDescription(
@@ -31,37 +69,33 @@ module.exports = {
         )
       )
       .addIncludeFile('Extensions/ExampleJsExtension/dummyeffect.js');
-    const dumyEffectProperties = dumyEffect.getProperties();
-    dumyEffectProperties.set(
-      'opacity',
-      new gd.PropertyDescriptor(/* defaultValue= */ '1')
-        .setLabel(_('Opacity of the effect (between 0 and 1)'))
-        .setType('number')
-        .setDescription(_('This is an optional description.'))
-    );
-    dumyEffectProperties.set(
-      'someImage',
-      new gd.PropertyDescriptor(/* defaultValue= */ '')
-        .setLabel(
-          _("Image resource (won't be used, just for demonstration purpose)")
-        )
-        .setType('resource')
-        .addExtraInfo('image')
-    );
-    dumyEffectProperties.set(
-      'someColor',
-      new gd.PropertyDescriptor(/* defaultValue= */ '#0022FF')
-        .setLabel(_("Color (won't be used, just for demonstration purpose)"))
-        .setType('color')
-        .setDescription(_('Another optional description.'))
-    );
-    dumyEffectProperties.set(
-      'someBoolean',
-      new gd.PropertyDescriptor(/* defaultValue= */ 'true')
-        .setLabel(_('Some setting to enable or not for the effect'))
-        .setType('boolean')
-        .setDescription(_('And some *optional* description.'))
-    );
+    const dummyEffectProperties = dummyEffect.getProperties();
+    dummyEffectProperties
+      .getOrCreate('opacity')
+      .setValue('1')
+      .setLabel(_('Opacity of the effect (between 0 and 1)'))
+      .setType('number')
+      .setDescription(_('This is an optional description.'));
+    dummyEffectProperties
+      .getOrCreate('someImage')
+      .setValue('')
+      .setLabel(
+        _("Image resource (won't be used, just for demonstration purpose)")
+      )
+      .setType('resource')
+      .addExtraInfo('image');
+    dummyEffectProperties
+      .getOrCreate('someColor')
+      .setValue('#0022FF')
+      .setLabel(_("Color (won't be used, just for demonstration purpose)"))
+      .setType('color')
+      .setDescription(_('Another optional description.'));
+    dummyEffectProperties
+      .getOrCreate('someBoolean')
+      .setValue('true')
+      .setLabel(_('Some setting to enable or not for the effect'))
+      .setType('boolean')
+      .setDescription(_('And some *optional* description.'));
 
     // Declare conditions, actions or expressions:
     extension
@@ -116,7 +150,8 @@ module.exports = {
     // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
     // saved/loaded to JSON.
     var dummyBehavior = new gd.BehaviorJsImplementation();
-    dummyBehavior.updateProperty = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
@@ -132,25 +167,24 @@ module.exports = {
 
       return false;
     };
-    dummyBehavior.getProperties = function(behaviorContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
-      behaviorProperties.set(
-        'My first property',
-        new gd.PropertyDescriptor(
-          behaviorContent.getStringAttribute('property1')
-        )
-      );
-      behaviorProperties.set(
-        'My other property',
-        new gd.PropertyDescriptor(
+      behaviorProperties
+        .getOrCreate('My first property')
+        .setValue(behaviorContent.getStringAttribute('property1'));
+      behaviorProperties
+        .getOrCreate('My other property')
+        .setValue(
           behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
-        ).setType('Boolean')
-      );
+        )
+        .setType('Boolean');
 
       return behaviorProperties;
     };
-    dummyBehavior.initializeContent = function(behaviorContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehavior.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
       behaviorContent.setBoolAttribute('property2', true);
     };
@@ -177,7 +211,8 @@ module.exports = {
     // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
     // that are called to get and set the properties of the shared data.
     var dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
-    dummyBehaviorWithSharedData.updateProperty = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehaviorWithSharedData.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
@@ -189,24 +224,24 @@ module.exports = {
 
       return false;
     };
-    dummyBehaviorWithSharedData.getProperties = function(behaviorContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehaviorWithSharedData.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
-      behaviorProperties.set(
-        'My behavior property',
-        new gd.PropertyDescriptor(
-          behaviorContent.getStringAttribute('property1')
-        )
-      );
+      behaviorProperties
+        .getOrCreate('My behavior property')
+        .setValue(behaviorContent.getStringAttribute('property1'));
 
       return behaviorProperties;
     };
-    dummyBehaviorWithSharedData.initializeContent = function(behaviorContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    dummyBehaviorWithSharedData.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
-    sharedData.updateProperty = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    sharedData.updateProperty = function (
       sharedContent,
       propertyName,
       newValue
@@ -218,19 +253,18 @@ module.exports = {
 
       return false;
     };
-    sharedData.getProperties = function(sharedContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    sharedData.getProperties = function (sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
-      sharedProperties.set(
-        'My shared property',
-        new gd.PropertyDescriptor(
-          sharedContent.getStringAttribute('sharedProperty1')
-        )
-      );
+      sharedProperties
+        .getOrCreate('My shared property')
+        .setValue(sharedContent.getStringAttribute('sharedProperty1'));
 
       return sharedProperties;
     };
-    sharedData.initializeContent = function(behaviorContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute(
         'sharedProperty1',
         'Initial shared value 1'
@@ -264,7 +298,8 @@ module.exports = {
     // Everything that is stored inside the object is in "content" and is automatically
     // saved/loaded to JSON.
     var dummyObject = new gd.ObjectJsImplementation();
-    dummyObject.updateProperty = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
+    dummyObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -288,34 +323,29 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getProperties = function(objectContent) {
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
+    dummyObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
-      objectProperties.set(
-        'My first property',
-        new gd.PropertyDescriptor(objectContent.property1)
-      );
-      objectProperties.set(
-        'My other property',
-        new gd.PropertyDescriptor(
-          objectContent.property2 ? 'true' : 'false'
-        ).setType('boolean')
-      );
-      objectProperties.set(
-        'My third property',
-        new gd.PropertyDescriptor(objectContent.property3.toString()).setType(
-          'number'
-        )
-      );
-      objectProperties.set(
-        'myImage',
-        new gd.PropertyDescriptor(objectContent.myImage)
-          .setType('resource')
-          .addExtraInfo('image')
-          .setLabel(
-            _("Image resource (won't be shown, just for demonstration purpose)")
-          )
-      );
+      objectProperties
+        .getOrCreate('My first property')
+        .setValue(objectContent.property1);
+      objectProperties
+        .getOrCreate('My other property')
+        .setValue(objectContent.property2 ? 'true' : 'false')
+        .setType('boolean');
+      objectProperties
+        .getOrCreate('My third property')
+        .setValue(objectContent.property3.toString())
+        .setType('number');
+      objectProperties
+        .getOrCreate('myImage')
+        .setValue(objectContent.myImage)
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(
+          _("Image resource (won't be shown, just for demonstration purpose)")
+        );
 
       return objectProperties;
     };
@@ -328,7 +358,8 @@ module.exports = {
       })
     );
 
-    dummyObject.updateInitialInstanceProperty = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
+    dummyObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -347,7 +378,8 @@ module.exports = {
 
       return false;
     };
-    dummyObject.getInitialInstanceProperties = function(
+    // $FlowExpectedError - ignore Flow warning as we're creating an object
+    dummyObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -355,18 +387,13 @@ module.exports = {
     ) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
-      instanceProperties.set(
-        'My instance property',
-        new gd.PropertyDescriptor(
-          instance.getRawStringProperty('instanceprop1')
-        )
-      );
-      instanceProperties.set(
-        'My other instance property',
-        new gd.PropertyDescriptor(
-          instance.getRawFloatProperty('instanceprop2').toString()
-        ).setType('number')
-      );
+      instanceProperties
+        .getOrCreate('My instance property')
+        .setValue(instance.getRawStringProperty('instanceprop1'));
+      instanceProperties
+        .getOrCreate('My other instance property')
+        .setValue(instance.getRawFloatProperty('instanceprop2').toString())
+        .setType('number');
 
       return instanceProperties;
     };
@@ -409,13 +436,15 @@ module.exports = {
    * of your extension behaviors/objects by instanciating behaviors/objects
    * and setting the property to a given value.
    *
-   * If you don't have any tests, you can simply return an empty array like this:
-   * `runExtensionSanityTests: function(gd, extension) { return []; }`
+   * If you don't have any tests, you can simply return an empty array.
    *
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     const dummyBehavior = extension
       .getBehaviorMetadata('MyDummyExtension::DummyBehavior')
       .get();
@@ -440,7 +469,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(objectsEditorService) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
       'MyDummyExtension::DummyObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -453,7 +484,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -498,7 +531,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedDummyObjectInstance.getThumbnail = function(
+    RenderedDummyObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -509,10 +542,10 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedDummyObjectInstance.prototype.update = function() {
+    RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
       const property1Value = this._associatedObject
-        .getProperties(this.project)
+        .getProperties()
         .get('My first property')
         .getValue();
       this._pixiObject.text = property1Value;
@@ -532,14 +565,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedDummyObjectInstance.prototype.getDefaultWidth = function() {
+    RenderedDummyObjectInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedDummyObjectInstance.prototype.getDefaultHeight = function() {
+    RenderedDummyObjectInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 

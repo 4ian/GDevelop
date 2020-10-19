@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
@@ -108,7 +108,7 @@ class Animation extends React.Component<AnimationProps, void> {
     const animationName = animation.getName();
     return (
       <div>
-        <MiniToolbar smallest>
+        <MiniToolbar>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
           <Column expand margin>
@@ -370,13 +370,13 @@ class AnimationsListContainer extends React.Component<
           ref={spriteContextMenu =>
             (this.spriteContextMenu = spriteContextMenu)
           }
-          buildMenuTemplate={() => [
+          buildMenuTemplate={(i18n: I18nType) => [
             {
-              label: 'Delete selection',
+              label: i18n._(t`Delete selection`),
               click: () => this.deleteSelection(),
             },
             {
-              label: 'Duplicate selection',
+              label: i18n._(t`Duplicate selection`),
               click: () => this.duplicateSelection(),
             },
           ]}

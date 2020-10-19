@@ -84,7 +84,12 @@
         "any": "cpp",
         "array": "cpp",
         "cinttypes": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "__memory": "cpp",
+        "__errc": "cpp",
+        "__node_handle": "cpp",
+        "bit": "cpp",
+        "optional": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

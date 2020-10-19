@@ -2,21 +2,20 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { List } from '../../../UI/List';
-import SearchBar from '../../../UI/SearchBar';
+import { List, type ListItemRefType } from '../../../UI/List';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import {
-  type InstructionOrExpressionTreeNode,
+  type TreeNode,
   findInTree,
 } from '../../../InstructionOrExpression/CreateTree';
 import { filterInstructionsList } from '../../../InstructionOrExpression/EnumerateInstructions';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
-import { renderInstructionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
+import { renderInstructionOrExpressionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
-import { ListItem } from '../../../UI/List';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 
 const styles = {
@@ -27,12 +26,12 @@ const styles = {
   },
 };
 
-type Props = {|
+type Props<T> = {|
   focusOnMount?: boolean,
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata>,
-  instructionsInfoTree: InstructionOrExpressionTreeNode,
+  instructionsInfo: Array<T>,
+  instructionsInfoTree: TreeNode<T>,
   selectedType: string,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, T) => void,
   iconSize: number,
   useSubheaders?: boolean,
   searchPlaceholderObjectName?: ?string,
@@ -40,22 +39,21 @@ type Props = {|
   helpPagePath?: ?string,
   style?: Object,
 |};
-type State = {|
+type State<T> = {|
   searchText: string,
-  searchResults: Array<EnumeratedInstructionOrExpressionMetadata>,
+  searchResults: Array<T>,
 |};
 
-export default class InstructionOrExpressionSelector extends React.PureComponent<
-  Props,
-  State
-> {
-  state = {
+export default class InstructionOrExpressionSelector<
+  T: EnumeratedInstructionOrExpressionMetadata
+> extends React.PureComponent<Props<T>, State<T>> {
+  state: State<T> = {
     searchText: '',
     searchResults: [],
   };
   _searchBar: ?SearchBar;
   _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItem>();
+  _selectedItem = React.createRef<ListItemRefType>();
 
   initialInstructionTypePath = findInTree(
     this.props.instructionsInfoTree,
@@ -63,7 +61,11 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
   );
 
   componentDidMount() {
-    if (this.props.focusOnMount && this._searchBar) {
+    if (
+      this.props.focusOnMount &&
+      useShouldAutofocusSearchbar() &&
+      this._searchBar
+    ) {
       this._searchBar.focus();
     }
     if (this._selectedItem.current && this._scrollView.current) {
@@ -88,7 +90,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
       style,
     } = this.props;
     const { searchText } = this.state;
-    const displayedInstructionsList = searchText
+    const displayedInstructionsList: Array<T> = searchText
       ? filterInstructionsList(this.props.instructionsInfo, { searchText })
       : [];
     const hasResults = !searchText || !!displayedInstructionsList.length;
@@ -151,7 +153,7 @@ export default class InstructionOrExpressionSelector extends React.PureComponent
                             ),
                           })
                       )
-                    : renderInstructionTree({
+                    : renderInstructionOrExpressionTree({
                         instructionTreeNode: instructionsInfoTree,
                         iconSize,
                         onChoose,

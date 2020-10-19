@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -285,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "NewLevel",
+          "persistentUuid": "7aa4f7af-0cf9-474d-9818-9ed177c35f2e",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -300,6 +301,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "4036c1d5-6ce2-46ce-a5a1-1368c1a0c01e",
           "width": 0,
           "x": 209,
           "y": 34,
@@ -315,6 +317,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadLevel",
+          "persistentUuid": "f6bc1700-6b84-4611-a6d2-e27195f01f08",
           "width": 0,
           "x": 256,
           "y": 256,
@@ -710,6 +713,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -778,6 +786,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "4fcde6c2-3896-48e4-aefb-da33be287162",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -793,6 +802,7 @@
           "layer": "",
           "locked": true,
           "name": "BGTile",
+          "persistentUuid": "8d5eba07-48bf-4baf-90b3-5266465ad444",
           "width": 1106,
           "x": 0,
           "y": 0,
@@ -808,6 +818,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "7cd4c5c3-3a78-4bf1-b6c6-5e74e32dd3ac",
           "width": 0,
           "x": 4,
           "y": 550,
@@ -823,6 +834,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "202a9283-1315-4d8e-a3e8-696de7c49385",
           "width": 0,
           "x": 140,
           "y": 140,
@@ -843,6 +855,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "551f111c-d66b-41e4-8ca8-54589da72fba",
           "width": 0,
           "x": 0,
           "y": 70,
@@ -858,6 +871,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "c6787542-d416-496e-9660-60b6ae6edcb5",
           "width": 0,
           "x": 70,
           "y": 70,
@@ -878,6 +892,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "63e41f6e-7a36-492b-93f7-da29f1856269",
           "width": 0,
           "x": 140,
           "y": 70,
@@ -898,6 +913,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "ca2d0d1e-92a0-4b0f-8f1a-4fe21339a594",
           "width": 0,
           "x": 210,
           "y": 70,
@@ -918,6 +934,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "61579f38-2f50-4235-99f8-fd4e53176e84",
           "width": 0,
           "x": 280,
           "y": 70,
@@ -938,6 +955,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "61b8eda1-46fc-4c71-8a9c-4d82f6a60959",
           "width": 0,
           "x": 350,
           "y": 70,
@@ -958,6 +976,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "1a1d3f01-4ed2-451a-bbb2-cfe574b8ad87",
           "width": 0,
           "x": 420,
           "y": 70,
@@ -978,6 +997,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "339cc7b6-b9f6-4177-9017-b7a39fb52388",
           "width": 0,
           "x": 490,
           "y": 70,
@@ -998,6 +1018,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "d97d7bb5-0c19-4350-9957-399b13fb0833",
           "width": 0,
           "x": 560,
           "y": 70,
@@ -1018,6 +1039,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "9d5d02de-b34d-4997-80fa-84f3c1ab57a0",
           "width": 0,
           "x": 630,
           "y": 70,
@@ -1038,6 +1060,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "7655cb27-74c1-4250-b1c5-c3a1b7db652e",
           "width": 0,
           "x": 700,
           "y": 70,
@@ -1058,6 +1081,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "e5a2eff6-5a78-4006-911e-d0e7a50cc1f0",
           "width": 0,
           "x": 0,
           "y": 140,
@@ -1078,6 +1102,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "3b86a0de-f1b1-4445-80be-5cdaa8a08c15",
           "width": 0,
           "x": 70,
           "y": 140,
@@ -1098,6 +1123,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "TxtSelectAtile",
+          "persistentUuid": "47dfa72b-3265-4a56-8954-bcaa068b9575",
           "width": 0,
           "x": 327,
           "y": 23,
@@ -1127,7 +1153,8 @@
             "g": 0,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "bold": false,
@@ -3779,6 +3806,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3796,12 +3828,22 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "TileSelection",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [],

@@ -49,8 +49,7 @@ void SkeletonObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("debugPolygons", debugPolygons);
 }
 
-std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Skeletal data filename")]
       .SetValue(skeletalDataFilename)
@@ -75,8 +74,7 @@ std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(
 }
 
 bool SkeletonObject::UpdateProperty(const gd::String& name,
-                                    const gd::String& value,
-                                    gd::Project& project) {
+                                    const gd::String& value) {
   if (name == _("Skeletal data filename")) {
     skeletalDataFilename = value;
     sizeDirty = true;

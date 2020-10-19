@@ -1,6 +1,6 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   instances: gdInitialInstancesContainer,
@@ -56,12 +56,15 @@ export default class InstancesAdder {
    * Immediately create new instance at the specified position
    * (specified in scene coordinates).
    */
-  addInstances = (pos: [number, number], objectNames: Array<string>) => {
+  addInstances = (
+    pos: [number, number],
+    objectNames: Array<string>
+  ): Array<gdInitialInstance> => {
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
     const newPos = roundPositionsToGrid(pos, this._options);
-    objectNames.map(objectName => {
+    const addedInstances = objectNames.map(objectName => {
       const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
@@ -70,6 +73,8 @@ export default class InstancesAdder {
 
       return instance;
     });
+
+    return addedInstances;
   };
 
   /**
@@ -114,12 +119,16 @@ export default class InstancesAdder {
    * Update the temporary instances  positions
    * (specified in scene coordinates). Useful when dragging these instances.
    */
-  updateTemporaryInstancePositions = (pos: [number, number]) => {
+  updateTemporaryInstancePositions = (
+    pos: [number, number]
+  ): Array<gdInitialInstance> => {
     const newPos = roundPositionsToGrid(pos, this._options);
     this._temporaryInstances.forEach(instance => {
       instance.setX(Math.round(newPos[0]));
       instance.setY(Math.round(newPos[1]));
     });
+
+    return this._temporaryInstances;
   };
 
   /**

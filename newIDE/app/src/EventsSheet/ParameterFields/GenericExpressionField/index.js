@@ -12,7 +12,7 @@ import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -35,7 +35,7 @@ import {
   getRemainingCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -58,12 +58,12 @@ const styles = {
     lineHeight: 1.4,
   },
   backgroundHighlightingWithFloatingLabel: {
-    marginTop: 29, //Properly align with the text field
+    marginTop: 22, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
   },
   backgroundHighlightingInline: {
-    marginTop: 6, //Properly align with the text field
+    marginTop: 0, //Properly align with the text field
     paddingLeft: 0,
     paddingRight: 0,
   },
@@ -77,7 +77,7 @@ const styles = {
 type State = {|
   popoverOpen: boolean,
   parametersDialogOpen: boolean,
-  selectedExpressionInfo: ?EnumeratedInstructionOrExpressionMetadata,
+  selectedExpressionInfo: ?EnumeratedExpressionMetadata,
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -204,9 +204,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
-  _handleExpressionChosen = (
-    expressionInfo: EnumeratedInstructionOrExpressionMetadata
-  ) => {
+  _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
     this.setState({
       popoverOpen: false,
       parametersDialogOpen: true,
@@ -215,7 +213,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   insertExpression = (
-    expressionInfo: EnumeratedInstructionOrExpressionMetadata,
+    expressionInfo: EnumeratedExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
@@ -370,7 +368,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       ? parameterMetadata.getDescription()
       : this.props.isInline
       ? undefined
-      : '-'; // We're using multiLine TextField, which does not support having no label.
+      : '-'; // We're using multiline TextField, which does not support having no label.
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
@@ -393,7 +391,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         ? styles.backgroundHighlightingInlineWithFloatingLabel
         : styles.backgroundHighlightingInline
       : // A non-inline GenericExpressionField is shown with a TextField
-        // with variant "filled". As we're using a *multiLine* field, it
+        // with variant "filled". As we're using a *multiline* field, it
         // always put space for the label, even if not provided.
         styles.backgroundHighlightingWithFloatingLabel;
 
@@ -433,7 +431,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                     );
                     this.setState({ autocompletions });
                   }}
-                  multiLine
+                  multiline
                   fullWidth
                 />
               </div>

@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
-const gd = global.gd;
+import * as PIXI from 'pixi.js-legacy';
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for a Text object.
@@ -81,7 +81,10 @@ RenderedTextInstance.prototype.update = function() {
       })
       .catch(err => {
         // Ignore errors
-        console.warn('Unable to load font family', err);
+        console.warn(
+          'Unable to load font family for RenderedTextInstance',
+          err
+        );
       });
   }
 

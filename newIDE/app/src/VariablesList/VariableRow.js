@@ -26,6 +26,7 @@ type Props = {|
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
+  commitVariableValueOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
   onAddChild: () => void,
@@ -45,6 +46,7 @@ const VariableRow = ({
   depth,
   errorText,
   onBlur,
+  commitVariableValueOnBlur,
   onRemove,
   onAddChild,
   onChangeValue,
@@ -92,7 +94,7 @@ const VariableRow = ({
       <TreeTableCell key="value" expand>
         <SemiControlledTextField
           margin="none"
-          commitOnBlur
+          commitOnBlur={commitVariableValueOnBlur}
           fullWidth
           name={key + 'value'}
           value={variable.getString()}
@@ -101,7 +103,7 @@ const VariableRow = ({
               onChangeValue(text);
             }
           }}
-          multiLine
+          multiline
           disabled={origin === 'parent' && depth !== 0}
         />
       </TreeTableCell>
@@ -113,7 +115,7 @@ const VariableRow = ({
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        <Text>(Structure)</Text>
+        <Text noMargin>(Structure)</Text>
       </TreeTableCell>
     );
   }
@@ -121,6 +123,7 @@ const VariableRow = ({
     <TreeTableCell key="tools" style={styles.toolColumn}>
       {origin === 'inherited' && depth === 0 && (
         <IconButton
+          size="small"
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Reset`}
@@ -130,6 +133,7 @@ const VariableRow = ({
       )}
       {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
+          size="small"
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Add child variable`}

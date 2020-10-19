@@ -2,7 +2,7 @@
 // Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
 const some = require('lodash/some');
-/*flow-include 
+/*flow-include
 export type TranslationFunction = (string) => string;
 
 export type JsExtensionModule = {
@@ -62,7 +62,7 @@ const runExtensionSanityTests = (
 const loadExtension = (
   _ /*: TranslationFunction */,
   gd /*: any */,
-  platform /*: gdPlatform*/,
+  platform /*: gdJsPlatform*/,
   jsExtensionModule /*: JsExtensionModule*/
 ) /*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.createExtension) {

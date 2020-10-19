@@ -3,8 +3,7 @@
 
 import * as React from 'react';
 import { SketchPicker } from 'react-color';
-import Popper from '@material-ui/core/Popper';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Popover from '@material-ui/core/Popover';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 
 export type RGBColor = {|
@@ -14,7 +13,7 @@ export type RGBColor = {|
   a?: number,
 |};
 
-type ColorResult = {
+export type ColorResult = {
   rgb: RGBColor,
 };
 
@@ -49,7 +48,7 @@ const styles = {
     cursor: 'pointer',
   },
   popover: {
-    // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
+    // Ensure the popover is above everything (modal, dialog, snackbar, tooltips, etc).
     // There will be only one ColorPicker opened at a time, so it's fair to put the
     // highest z index. If this is breaking, check the z-index of material-ui.
     zIndex: muiZIndex.tooltip + 100,
@@ -105,16 +104,14 @@ class ColorPicker extends React.Component<Props, State> {
           </div>
         </div>
         {this.state.displayColorPicker && this._swatch.current ? (
-          <ClickAwayListener onClickAway={this.handleClose}>
-            <Popper
-              open
-              anchorEl={this._swatch.current}
-              style={styles.popover}
-              placement="bottom"
-            >
-              <SketchPicker color={displayedColor} {...otherProps} />
-            </Popper>
-          </ClickAwayListener>
+          <Popover
+            open
+            onClose={this.handleClose}
+            anchorEl={this._swatch.current}
+            style={styles.popover}
+          >
+            <SketchPicker color={displayedColor} {...otherProps} />
+          </Popover>
         ) : null}
       </div>
     );

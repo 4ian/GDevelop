@@ -12,7 +12,7 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
   width: '100%',
@@ -123,7 +123,7 @@ export default class CommentEvent extends React.Component<
       >
         {this.state.editing ? (
           <TextField
-            multiLine
+            multiline
             margin="none"
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}

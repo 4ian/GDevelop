@@ -16,10 +16,6 @@ import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 
 const defaultTextStyle = {
-  // Cancel the default Text margins.
-  marginTop: -5,
-  marginBottom: -5,
-
   // Break words if they are too long to fit on a single line.
   overflow: 'hidden',
   overflowWrap: 'break-word',
@@ -29,7 +25,6 @@ const AutocompletionIcon = React.memo(({ src }) => (
   <img
     alt=""
     src={src}
-    crossOrigin="anonymous"
     style={{
       maxWidth: 16,
       maxHeight: 16,
@@ -81,12 +76,9 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onMouseDown={() => {
-          // When using a mouse, trigger the onClick on the mouse down
+        onPointerDown={() => {
+          // Trigger the onClick on the mouse/touch down
           // to avoid the blur event of the text field to discard the autocompletions.
-          onClick();
-        }}
-        onClick={() => {
           onClick();
         }}
         ref={ref}
@@ -97,7 +89,7 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
           }
         />
         <Spacer />
-        <Text style={defaultTextStyle} align="left">
+        <Text style={defaultTextStyle} noMargin align="left">
           {title}(
           <i>
             {formatParameterTypesString(
@@ -133,7 +125,7 @@ const DisplayedExactExpressionAutocompletion = ({
           }
         />
         <Spacer />
-        <Text style={defaultTextStyle} align="left">
+        <Text style={defaultTextStyle} noMargin align="left">
           <b>{expressionAutocompletion.completion}</b>(
           <i>
             {formatParameterTypesString(
@@ -145,7 +137,7 @@ const DisplayedExactExpressionAutocompletion = ({
           )
         </Text>
       </Line>
-      <Text style={defaultTextStyle} size="body2">
+      <Text style={defaultTextStyle} noMargin size="body2">
         {expressionAutocompletion.enumeratedExpressionMetadata.metadata.getDescription()}
       </Text>
     </Column>
@@ -196,7 +188,7 @@ const DisplayedObjectAutocompletion = React.forwardRef(
       >
         <AutocompletionIcon src={thumbnail} />
         <Spacer />
-        <Text style={defaultTextStyle} align="left">
+        <Text style={defaultTextStyle} noMargin align="left">
           {title}
         </Text>
       </ButtonBase>
@@ -237,7 +229,7 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
       >
         <AutocompletionIcon src={'res/types/behavior.png'} />
         <Spacer />
-        <Text style={defaultTextStyle} align="left">
+        <Text style={defaultTextStyle} noMargin align="left">
           {title}
         </Text>
       </ButtonBase>

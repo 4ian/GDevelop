@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
 import ObjectGroupsList from '.';
-import { ObjectGroupEditorDialog } from '../ObjectGroupEditor/ObjectGroupEditorDialog';
+import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   globalObjectGroups: gdObjectGroupsContainer,
@@ -23,7 +23,7 @@ type Props = {|
   ) => void,
   onGroupsUpdated?: () => void,
   canSetAsGlobalGroup?: boolean,
-  unsavedChanges?: UnsavedChanges,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -67,19 +67,20 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
           canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
           unsavedChanges={this.props.unsavedChanges}
         />
-        <ObjectGroupEditorDialog
-          project={project}
-          key={globalObjectsContainer.ptr + ';' + objectsContainer.ptr}
-          open={!!this.state.editedGroup}
-          group={this.state.editedGroup}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          onCancel={() => this.editGroup(null)}
-          onApply={() => {
-            if (this.props.onGroupsUpdated) this.props.onGroupsUpdated();
-            this.editGroup(null);
-          }}
-        />
+        {this.state.editedGroup && (
+          <ObjectGroupEditorDialog
+            project={project}
+            key={globalObjectsContainer.ptr + ';' + objectsContainer.ptr}
+            group={this.state.editedGroup}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            onCancel={() => this.editGroup(null)}
+            onApply={() => {
+              if (this.props.onGroupsUpdated) this.props.onGroupsUpdated();
+              this.editGroup(null);
+            }}
+          />
+        )}
       </React.Fragment>
     );
   }

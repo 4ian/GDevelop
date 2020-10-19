@@ -26,8 +26,7 @@ void ScenePhysicsDatas::InitializeContent(
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> ScenePhysicsDatas::GetProperties(
-    const gd::SerializerElement& behaviorSharedDataContent,
-    gd::Project& project) const {
+    const gd::SerializerElement& behaviorSharedDataContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Gravity on X axis (in m/s²)")].SetValue(gd::String::From(
       behaviorSharedDataContent.GetDoubleAttribute("gravityX")));
@@ -44,8 +43,7 @@ std::map<gd::String, gd::PropertyDescriptor> ScenePhysicsDatas::GetProperties(
 bool ScenePhysicsDatas::UpdateProperty(
     gd::SerializerElement& behaviorSharedDataContent,
     const gd::String& name,
-    const gd::String& value,
-    gd::Project& project) {
+    const gd::String& value) {
   if (name == _("Gravity on X axis (in m/s²)")) {
     behaviorSharedDataContent.SetAttribute("gravityX", value.To<float>());
   }

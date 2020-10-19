@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -240,6 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
+          "persistentUuid": "82834c4b-bc64-4622-b6df-6e71b71a6b66",
           "width": 0,
           "x": 288,
           "y": 224,
@@ -255,6 +256,7 @@
           "layer": "",
           "locked": false,
           "name": "play",
+          "persistentUuid": "01c2261a-9de7-4c65-9e55-740ac0e92623",
           "width": 0,
           "x": 384,
           "y": 320,
@@ -270,6 +272,7 @@
           "layer": "",
           "locked": false,
           "name": "pause",
+          "persistentUuid": "4d8b5590-6e08-4ad3-856a-1a272385f8a3",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -285,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "mute",
+          "persistentUuid": "e33e5695-b306-4657-ad2f-3b971ad3b250",
           "width": 0,
           "x": 320,
           "y": 320,
@@ -300,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "track_info",
+          "persistentUuid": "1d403954-1c67-4873-8dcf-96d26953b5db",
           "width": 0,
           "x": 341.773,
           "y": 224,
@@ -315,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_background",
+          "persistentUuid": "230f6415-ebf4-483f-a9b7-bbe16e1f9daa",
           "width": 0,
           "x": 307,
           "y": 293,
@@ -330,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_slider",
+          "persistentUuid": "1e3af581-91c1-47d7-8236-c9f64b4a1bd8",
           "width": 0,
           "x": 307,
           "y": 278,
@@ -345,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "slider_button",
+          "persistentUuid": "5c159c24-f9d3-43ce-9fb3-71254c8ce0bb",
           "width": 0,
           "x": 538,
           "y": 273,
@@ -1929,6 +1937,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

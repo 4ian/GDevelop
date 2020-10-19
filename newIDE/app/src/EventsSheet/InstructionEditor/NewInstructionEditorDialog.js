@@ -20,9 +20,9 @@ import Background from '../../UI/Background';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
-  ResponsiveWidthMeasurer,
+  ResponsiveWindowMeasurer,
   type WidthType,
-} from '../../UI/Reponsive/ResponsiveWidthMeasurer';
+} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   useNewInstructionEditor,
   getInstructionMetadata,
@@ -62,6 +62,8 @@ type Props = {|
     type: string
   ) => void,
   anchorEl?: any, // Unused
+  canPasteInstructions: boolean, // Unused
+  onPasteInstructions: () => void, // Unused
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -132,11 +134,11 @@ export default function NewInstructionEditorDialog({
   const instructionType: string = instruction.getType();
 
   // Handle the back button
-  const stepBackFrom = (origin: StepName, width: WidthType) => {
+  const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
     if (origin === 'parameters' && chosenObjectName) {
       setStep(
         // "medium" displays 2 columns, so "Back" button should go back to the first screen.
-        width === 'medium'
+        windowWidth === 'medium'
           ? 'object-or-free-instructions'
           : 'object-instructions'
       );
@@ -237,8 +239,8 @@ export default function NewInstructionEditorDialog({
     ) : null;
 
   return (
-    <ResponsiveWidthMeasurer>
-      {width => (
+    <ResponsiveWindowMeasurer>
+      {windowWidth => (
         <Dialog
           actions={[
             <FlatButton
@@ -257,11 +259,12 @@ export default function NewInstructionEditorDialog({
             />,
           ]}
           secondaryActions={[
-            width !== 'large' && step !== 'object-or-free-instructions' ? (
+            windowWidth !== 'large' &&
+            step !== 'object-or-free-instructions' ? (
               <FlatButton
                 label={<Trans>Back</Trans>}
                 primary={false}
-                onClick={() => stepBackFrom(step, width)}
+                onClick={() => stepBackFrom(step, windowWidth)}
                 key="back"
               />
             ) : null,
@@ -270,7 +273,7 @@ export default function NewInstructionEditorDialog({
               helpPagePath={instructionHelpPage || '/events'}
               label={
                 !instructionHelpPage ||
-                (width === 'small' ||
+                (windowWidth === 'small' ||
                   step === 'object-or-free-instructions') ? (
                   <Trans>Help</Trans>
                 ) : isCondition ? (
@@ -295,7 +298,7 @@ export default function NewInstructionEditorDialog({
               parameters: renderParameters,
             }}
             getColumns={() => {
-              if (width === 'large') {
+              if (windowWidth === 'large') {
                 if (chosenObjectName) {
                   return [
                     'instruction-or-object-selector',
@@ -305,7 +308,7 @@ export default function NewInstructionEditorDialog({
                 } else {
                   return ['instruction-or-object-selector', 'parameters'];
                 }
-              } else if (width === 'medium') {
+              } else if (windowWidth === 'medium') {
                 if (step === 'object-or-free-instructions') {
                   return ['instruction-or-object-selector'];
                 } else {
@@ -328,6 +331,6 @@ export default function NewInstructionEditorDialog({
           />
         </Dialog>
       )}
-    </ResponsiveWidthMeasurer>
+    </ResponsiveWindowMeasurer>
   );
 }

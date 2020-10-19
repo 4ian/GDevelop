@@ -35,7 +35,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("Or",
                     _("Or"),
-                    _("Return true if one of the sub conditions is true"),
+                    _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
                     _("Advanced"),
                     "res/conditions/or24.png",
@@ -46,7 +46,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("And",
                     _("And"),
-                    _("Return true if all sub conditions are true"),
+                    _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
                     _("Advanced"),
                     "res/conditions/and24.png",

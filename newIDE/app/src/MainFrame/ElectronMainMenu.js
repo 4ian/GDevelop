@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
+import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
+import { getElectronAccelerator } from '../KeyboardShortcuts';
+import { useShortcutMap } from '../KeyboardShortcuts';
 import { t } from '@lingui/macro';
 import { isMacLike } from '../Utils/Platform';
 import { type MainMenuProps } from './MainMenu.flow';
@@ -9,6 +12,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type MainMenuEvent =
   | 'main-menu-open'
+  | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
   | 'main-menu-close'
@@ -31,6 +35,8 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      role?: string,
+      eventArgs?: any,
     |}
   | {|
       submenu: Array<MenuItemTemplate>,
@@ -49,11 +55,15 @@ type MenuItemTemplate =
 
 type RootMenuTemplate =
   | {|
-      label: string,
+      label?: string,
+      role?: string,
       submenu: Array<MenuItemTemplate>,
     |}
   | {|
       role: string,
+      submenu: Array<MenuItemTemplate>,
+    |}
+  | {|
       submenu: Array<MenuItemTemplate>,
     |};
 
@@ -70,45 +80,58 @@ const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
   );
 };
 
-const buildAndSendMenuTemplate = (project, i18n) => {
+const buildAndSendMenuTemplate = (
+  project,
+  i18n,
+  recentProjectFiles,
+  shortcutMap
+) => {
   const fileTemplate = {
     label: i18n._(t`File`),
     submenu: [
       {
         label: i18n._(t`Create a New Project...`),
-        accelerator: 'CommandOrControl+N',
+        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
         onClickSendEvent: 'main-menu-create',
       },
       { type: 'separator' },
       {
         label: i18n._(t`Open...`),
-        accelerator: 'CommandOrControl+O',
+        accelerator: getElectronAccelerator(shortcutMap['OPEN_PROJECT']),
         onClickSendEvent: 'main-menu-open',
+      },
+      {
+        label: i18n._(t`Open Recent`),
+        submenu: recentProjectFiles.map(item => ({
+          label: item.fileMetadata.fileIdentifier,
+          onClickSendEvent: 'main-menu-open-recent',
+          eventArgs: item,
+        })),
       },
       { type: 'separator' },
       {
         label: i18n._(t`Save`),
-        accelerator: 'CommandOrControl+S',
+        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT']),
         onClickSendEvent: 'main-menu-save',
         enabled: !!project,
       },
       {
         label: i18n._(t`Save as...`),
-        accelerator: 'CommandOrControl+Alt+S',
+        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
         enabled: !!project,
       },
       { type: 'separator' },
       {
         label: i18n._(t`Export (web, iOS, Android)...`),
-        accelerator: 'CommandOrControl+E',
+        accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
         onClickSendEvent: 'main-menu-export',
         enabled: !!project,
       },
       { type: 'separator' },
       {
         label: i18n._(t`Close Project`),
-        accelerator: 'CommandOrControl+Shift+W',
+        accelerator: getElectronAccelerator(shortcutMap['CLOSE_PROJECT']),
         onClickSendEvent: 'main-menu-close',
         enabled: !!project,
       },
@@ -132,7 +155,7 @@ const buildAndSendMenuTemplate = (project, i18n) => {
       { type: 'separator' },
       {
         label: i18n._(t`Exit GDevelop`),
-        accelerator: 'Control+Q',
+        accelerator: getElectronAccelerator(shortcutMap['QUIT_APP']),
         onClickSendEvent: 'main-menu-close-app',
       }
     );
@@ -158,7 +181,9 @@ const buildAndSendMenuTemplate = (project, i18n) => {
     submenu: [
       {
         label: i18n._(t`Show Project Manager`),
-        accelerator: 'CommandOrControl+Alt+P',
+        accelerator: getElectronAccelerator(
+          shortcutMap['OPEN_PROJECT_MANAGER']
+        ),
         onClickSendEvent: 'main-menu-open-project-manager',
         enabled: !!project,
       },
@@ -179,11 +204,13 @@ const buildAndSendMenuTemplate = (project, i18n) => {
   };
 
   const windowTemplate = {
+    label: i18n._(t`Window`),
     role: 'window',
-    submenu: [{ role: 'minimize' }],
+    submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
   };
 
   const helpTemplate = {
+    label: i18n._(t`Help`),
     role: 'help',
     submenu: [
       {
@@ -295,10 +322,12 @@ const buildAndSendMenuTemplate = (project, i18n) => {
  * Create and update the editor main menu using Electron APIs.
  */
 const ElectronMainMenu = (props: MainMenuProps) => {
-  const { i18n, project } = props;
+  const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
+  const shortcutMap = useShortcutMap();
   const language = i18n.language;
 
   useIPCEventListener('main-menu-open', props.onChooseProject);
+  useIPCEventListener('main-menu-open-recent', props.onOpenRecentFile);
   useIPCEventListener('main-menu-save', props.onSaveProject);
   useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
   useIPCEventListener('main-menu-close', props.onCloseProject);
@@ -319,10 +348,21 @@ const ElectronMainMenu = (props: MainMenuProps) => {
 
   React.useEffect(
     () => {
-      buildAndSendMenuTemplate(project, i18n);
+      buildAndSendMenuTemplate(project, i18n, recentProjectFiles, shortcutMap);
     },
-    [i18n, language, project]
+    [i18n, language, project, recentProjectFiles, shortcutMap]
   );
+
+  useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
+    generateOptions: React.useCallback(
+      () =>
+        recentProjectFiles.map(item => ({
+          text: item.fileMetadata.fileIdentifier,
+          handler: () => onOpenRecentFile(item),
+        })),
+      [onOpenRecentFile, recentProjectFiles]
+    ),
+  });
 
   return null;
 };

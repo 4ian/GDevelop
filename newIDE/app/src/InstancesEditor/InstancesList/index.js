@@ -7,8 +7,8 @@ import {
   Column as RVColumn,
 } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import SearchBar from '../../UI/SearchBar';
-const gd = global.gd;
+import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+const gd /*TODO: add flow in this file */ = global.gd;
 
 type State = {|
   searchText: string,
@@ -18,8 +18,6 @@ type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
   onSelectInstances: (Array<gdInitialInstance>) => void,
-  freezeUpdate: boolean,
-  style?: ?Object,
 |};
 
 type RenderedRowInfo = {
@@ -35,6 +33,7 @@ type RenderedRowInfo = {
 
 const styles = {
   container: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -50,24 +49,9 @@ export default class InstancesList extends Component<Props, State> {
   table: ?typeof RVTable;
   _searchBar = React.createRef<SearchBar>();
 
-  shouldComponentUpdate(nextProps: Props) {
-    // Rendering the component is costly as it iterates over
-    // every instances, so the prop freezeUpdate allows to ask the component to stop
-    // updating, for example when hidden.
-    return !nextProps.freezeUpdate;
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    // If the component was frozen and is now allowed to update,
-    // force the table to be refreshed to reflect changes (new instances,
-    // or selection changes).
-    if (!nextProps.freezeUpdate && this.props.freezeUpdate) {
-      if (this.table) this.table.forceUpdateGrid();
-    }
-  }
-
   componentDidMount() {
-    if (this._searchBar.current) this._searchBar.current.focus();
+    if (useShouldAutofocusSearchbar() && this._searchBar.current)
+      this._searchBar.current.focus();
   }
 
   componentWillMount() {
@@ -129,7 +113,9 @@ export default class InstancesList extends Component<Props, State> {
 
   render() {
     const { searchText } = this.state;
-    const { instances, style } = this.props;
+    const { instances } = this.props;
+
+    if (!this.instanceRowRenderer) return null;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
@@ -142,7 +128,7 @@ export default class InstancesList extends Component<Props, State> {
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <div style={{ ...styles.container, ...style }}>
+          <div style={styles.container}>
             <div style={{ flex: 1 }}>
               <AutoSizer>
                 {({ height, width }) => (
@@ -155,7 +141,7 @@ export default class InstancesList extends Component<Props, State> {
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}
-                    rowHeight={35}
+                    rowHeight={32}
                     onRowClick={this._onRowClick}
                     rowClassName={this._rowClassName}
                     width={width}

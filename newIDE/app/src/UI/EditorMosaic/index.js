@@ -9,6 +9,7 @@ import {
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import debounce from 'lodash/debounce';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -22,23 +23,23 @@ export type Editor = {|
   toolbarControls?: Array<React.Node>,
 |};
 
-type MosaicNode =
+export type EditorMosaicNode =
   | {|
       direction: 'row' | 'column',
       splitPercentage: number,
-      first: ?MosaicNode,
-      second: ?MosaicNode,
+      first: ?EditorMosaicNode,
+      second: ?EditorMosaicNode,
     |}
   | string;
 
 // Add a node (an editor) in the mosaic.
 const addNode = (
-  currentNode: ?MosaicNode,
-  newNode: MosaicNode | string,
+  currentNode: ?EditorMosaicNode,
+  newNode: EditorMosaicNode | string,
   position: 'start' | 'end',
   splitPercentage: number,
   direction: 'row' | 'column'
-): MosaicNode => {
+): EditorMosaicNode => {
   if (!currentNode) return newNode;
 
   // Add the new node inside the current node...
@@ -91,10 +92,10 @@ const addNode = (
 
 // Replace a node (an editor) by another.
 const replaceNode = (
-  currentNode: ?MosaicNode,
-  oldNode: ?MosaicNode,
-  newNode: ?MosaicNode
-): ?MosaicNode => {
+  currentNode: ?EditorMosaicNode,
+  oldNode: ?EditorMosaicNode,
+  newNode: ?EditorMosaicNode
+): ?EditorMosaicNode => {
   if (!currentNode) {
     return currentNode;
   } else if (typeof currentNode === 'string') {
@@ -137,15 +138,16 @@ const MosaicWindow = (props: any) => (
 );
 
 type Props = {|
-  initialNodes: MosaicNode,
+  initialNodes: EditorMosaicNode,
   editors: {
     [string]: Editor,
   },
   limitToOneSecondaryEditor?: boolean,
+  onPersistNodes?: EditorMosaicNode => void,
 |};
 
 type State = {|
-  mosaicNode: ?MosaicNode,
+  mosaicNode: ?EditorMosaicNode,
 |};
 
 /**
@@ -188,6 +190,8 @@ export default class EditorMosaic extends React.Component<Props, State> {
             editorName
           ),
         });
+
+        this._persistNodes();
         return true;
       }
     }
@@ -203,10 +207,20 @@ export default class EditorMosaic extends React.Component<Props, State> {
       ),
     });
 
+    this._persistNodes();
     return true;
   };
 
-  _onChange = (mosaicNode: MosaicNode) => this.setState({ mosaicNode });
+  _onChange = (mosaicNode: EditorMosaicNode) => {
+    this.setState({ mosaicNode });
+    this._persistNodes();
+  };
+
+  _persistNodes = debounce(() => {
+    if (this.props.onPersistNodes && this.state.mosaicNode) {
+      this.props.onPersistNodes(this.state.mosaicNode);
+    }
+  }, 2000);
 
   render() {
     const { editors } = this.props;

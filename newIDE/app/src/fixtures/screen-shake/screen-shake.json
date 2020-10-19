@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -288,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "0ee6f8d6-e5cd-4478-9a14-500ce3c45ee6",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -303,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "d1da9c59-0dd7-4aa3-8326-82b5242e5a58",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -318,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "a3c4462c-bbf2-4a9d-adf3-201abbf19ec5",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -333,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "6d8ab9da-071f-47e4-ae92-2d439c10361a",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -348,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "c38d7a63-35bd-4f2c-b3c6-0657afda2ff6",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -363,6 +368,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "a474bae2-5c6d-4882-8cc4-8285505a84f1",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -378,6 +384,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "b4701b9f-97f3-4197-934e-cf536758b971",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -398,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "6f07538b-a285-4f82-a6c1-c6f8d3b4f190",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -413,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "ed79df64-0817-4537-a24b-23562039cf5b",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -433,6 +442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "5bc04121-8378-452a-bfad-f6f6105fc2e4",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1638,6 +1648,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1655,6 +1670,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -807,12 +807,21 @@
         "userAdded": false
       },
       {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/other/grasshopper-idle-4.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "other/grasshopper-idle-4.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
         "disablePreload": false,
         "file": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/dialogueData/npcs.json",
         "kind": "json",
         "metadata": "",
         "name": "dialogueData/npcs.json",
-        "userAdded": false
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -827,6 +836,14 @@
     {
       "name": "optionIndex",
       "value": "0"
+    },
+    {
+      "name": "yarnState",
+      "value": ""
+    },
+    {
+      "name": "textScrollSpdMultiplier",
+      "value": "1"
     }
   ],
   "layouts": [
@@ -935,6 +952,10 @@
         {
           "name": "Score",
           "value": "0"
+        },
+        {
+          "name": "debugYarn",
+          "value": "true"
         }
       ],
       "instances": [
@@ -945,9 +966,10 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "21872661-05cc-404d-aa02-e4f28e18bfa1",
           "width": 0,
-          "x": 21,
-          "y": 221,
+          "x": 159,
+          "y": 519,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -960,6 +982,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "90830212-277b-4485-b9ef-1279f3683c87",
           "width": 0,
           "x": 487,
           "y": 524,
@@ -975,6 +998,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "3af554e9-7eed-4d72-b401-1a344d015053",
           "width": 0,
           "x": 263,
           "y": 485,
@@ -990,6 +1014,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "197034ac-aa1c-43b5-910e-4ce462de8b5f",
           "width": 0,
           "x": 127,
           "y": 580,
@@ -1005,6 +1030,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "4fe41e67-5fbd-4f43-a22e-d89a8b4a8fd7",
           "width": 0,
           "x": -516,
           "y": 541,
@@ -1020,6 +1046,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "16da567e-2cf1-407e-b867-f23fced193f1",
           "width": 1972,
           "x": -583.046,
           "y": 570,
@@ -1035,9 +1062,10 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "faf833ea-894d-4822-b231-72a992e04225",
           "width": 45,
-          "x": 155,
-          "y": 390,
+          "x": 183,
+          "y": 523,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1050,6 +1078,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "f45930a0-e678-440b-9dee-b76199964ed3",
           "width": 0,
           "x": 687.677,
           "y": 527.461,
@@ -1065,6 +1094,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "56cd88a8-e5d9-41c1-8ca3-d82b46ff2245",
           "width": 0,
           "x": 286.2,
           "y": 528.461,
@@ -1085,6 +1115,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "e1bb2cda-0846-473f-8e8e-3cec6a46de73",
           "width": 0,
           "x": -222,
           "y": 513,
@@ -1100,6 +1131,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "28a14b39-610b-4a88-8bac-f191e54739e1",
           "width": 94,
           "x": 1162,
           "y": 491,
@@ -1115,6 +1147,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3a289bc6-eff6-4fc8-938c-91e2a2aa9654",
           "width": 0,
           "x": 544,
           "y": 439,
@@ -1130,6 +1163,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "8c4acaff-71c4-41b6-81a8-c885fd0e0729",
           "width": 0,
           "x": 925.784,
           "y": 505.015,
@@ -1145,6 +1179,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "10083c98-1d99-4e73-bf46-43b835d94c6e",
           "width": 0,
           "x": 1090,
           "y": 519,
@@ -1165,6 +1200,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "6a377900-daee-4ffa-92d7-fd16696d3309",
           "width": 0,
           "x": -49,
           "y": 522,
@@ -1185,6 +1221,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "d5ff5eb2-a3b9-4724-b8b0-f0c2f4855e76",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -1200,6 +1237,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
+          "persistentUuid": "858da35a-1a14-4a64-bc1f-1ad06fd3a0ae",
           "width": 44,
           "x": 15,
           "y": 11,
@@ -1215,6 +1253,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "ddf6974b-30d1-448d-b365-e4df92fd408b",
           "width": 0,
           "x": 227.769,
           "y": 425.277,
@@ -1230,6 +1269,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "9e259a1a-c584-403b-87d6-6d3a84afbd34",
           "width": 0,
           "x": 514.954,
           "y": 510.092,
@@ -1245,6 +1285,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "3a69ff08-4612-42a6-8e57-1bae58e0e21f",
           "width": 0,
           "x": 469.785,
           "y": 513.092,
@@ -1260,6 +1301,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "62d6a8a1-4f62-448d-95b8-b3c0619cb1d2",
           "width": 0,
           "x": 773.846,
           "y": 359.816,
@@ -1275,6 +1317,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "01e60e1d-4f69-4cfc-9692-fc0944d39123",
           "width": 0,
           "x": 859.831,
           "y": 296.262,
@@ -1290,6 +1333,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "4b1c42cb-e315-4a60-a538-7d39668db2ee",
           "width": 0,
           "x": 953.292,
           "y": 241.431,
@@ -1305,6 +1349,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "ca5cb970-267b-44ef-8f25-3335d037e535",
           "width": 0,
           "x": 414.954,
           "y": 513.092,
@@ -1320,6 +1365,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "37a4b890-6e5c-4452-b265-55045f31569d",
           "width": 0,
           "x": -41,
           "y": 353,
@@ -1335,6 +1381,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "8860f217-787d-4736-ab78-cc1f10f47753",
           "width": 0,
           "x": 518,
           "y": 354,
@@ -1350,6 +1397,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "94fa3f7f-c33d-4771-901a-87b1bd0a6c85",
           "width": 0,
           "x": 363,
           "y": 315,
@@ -1365,6 +1413,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "66911880-83c9-4b99-89b5-da2c4b187d90",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1380,6 +1429,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "71a5583d-5a0b-4d5a-8738-8eb295014a5b",
           "width": 0,
           "x": 732.6,
           "y": 544.185,
@@ -1395,6 +1445,7 @@
           "layer": "GUI",
           "locked": true,
           "name": "LeftButton",
+          "persistentUuid": "88b7c9de-8dc3-439a-b7e4-da88acf95e3f",
           "width": 97.5489,
           "x": 30,
           "y": 448,
@@ -1410,6 +1461,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "1ff53efc-e9d9-404b-afdd-58212a680d08",
           "width": 94.1152,
           "x": 147,
           "y": 448,
@@ -1425,6 +1477,7 @@
           "layer": "GUI",
           "locked": true,
           "name": "ArrowButtonsBg",
+          "persistentUuid": "92bb3410-d028-4b0d-b17b-cf3b423c5b96",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -1440,6 +1493,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "59727db9-4fbb-4c51-ac3f-6976055ccd5a",
           "width": 107.992,
           "x": 659,
           "y": 457,
@@ -1455,6 +1509,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "21080148-3a6b-414e-8981-118c7dcf6822",
           "width": 1725,
           "x": -299,
           "y": 109,
@@ -1470,6 +1525,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "cd554ca8-9a6d-4847-8e9c-aef348a9b7f9",
           "width": 1654,
           "x": -276,
           "y": 230,
@@ -1485,6 +1541,7 @@
           "layer": "BG",
           "locked": false,
           "name": "clouds",
+          "persistentUuid": "3f3d48bf-d15a-4851-a571-b93d5ba82b8e",
           "width": 1765,
           "x": -229,
           "y": 113,
@@ -1500,6 +1557,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "f09dfedb-6322-4db0-8fb6-4c006ae98d22",
           "width": 1654,
           "x": -228,
           "y": 343,
@@ -1515,6 +1573,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "fe6ce822-e68b-436e-b97e-0e331c56b2fc",
           "width": 1725,
           "x": -396,
           "y": 161,
@@ -1530,6 +1589,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "c58dec05-cc7a-4afe-8308-c1002a1191d4",
           "width": 1725,
           "x": -361,
           "y": 283,
@@ -1545,6 +1605,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "b3cf159b-2e90-471c-a272-03d705b076c3",
           "width": 1654,
           "x": -257,
           "y": 420,
@@ -1560,6 +1621,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "2b8f8f79-d504-4976-9ee5-fd28aca0988f",
           "width": 1725,
           "x": -366,
           "y": 141,
@@ -1575,6 +1637,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
+          "persistentUuid": "7cb6218d-cbe6-4eee-8eb0-4a3b68b23b0f",
           "width": 167,
           "x": -368,
           "y": 429,
@@ -1590,6 +1653,7 @@
           "layer": "",
           "locked": false,
           "name": "sign",
+          "persistentUuid": "e9037e27-5b27-4540-a035-0e0eaa182ab5",
           "width": 0,
           "x": 178,
           "y": 512,
@@ -1605,6 +1669,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "questionChoicesText",
+          "persistentUuid": "cb649996-1f0a-4fdb-bcef-ea18b8940ae8",
           "width": 0,
           "x": 112,
           "y": 147,
@@ -1620,6 +1685,7 @@
           "layer": "",
           "locked": false,
           "name": "Ant",
+          "persistentUuid": "34994d18-1976-4f0a-90e1-ca4db979a79d",
           "width": 0,
           "x": 402,
           "y": 530,
@@ -1635,6 +1701,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "textBg",
+          "persistentUuid": "2beef0a3-94d1-48d2-9977-5ca973fef393",
           "width": 772,
           "x": 8,
           "y": 93,
@@ -1650,6 +1717,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "avatars",
+          "persistentUuid": "c985c1d2-32dd-4018-bb6f-1d1dde61259c",
           "width": 0,
           "x": 22,
           "y": 114,
@@ -1665,6 +1733,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "1d38c256-6e3a-4513-8d91-c0dab94c5ad1",
           "width": 0,
           "x": -778,
           "y": 480,
@@ -1680,6 +1749,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3556fc41-24c9-4266-b53a-3d37254842c2",
           "width": 0,
           "x": -724,
           "y": 630,
@@ -1695,6 +1765,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "6efe13a4-25a1-48a4-b15e-ef8f6ceb5aa1",
           "width": 0,
           "x": -622,
           "y": 533,
@@ -1710,6 +1781,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "5c70f027-49aa-4e9d-a0d2-d9f62568ee43",
           "width": 0,
           "x": -461,
           "y": 557,
@@ -1725,6 +1797,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2bb89fea-1559-427b-9488-e7368e447b55",
           "width": 0,
           "x": -355,
           "y": 521,
@@ -1740,6 +1813,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "73c331fd-561f-41fb-842e-feb01b4ede9b",
           "width": 0,
           "x": -697,
           "y": 537,
@@ -1755,6 +1829,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "8d9e0eaa-9d7c-465d-8280-8a8362766fac",
           "width": 0,
           "x": -500,
           "y": 496,
@@ -1770,6 +1845,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0bc2ec0a-8e91-4ccb-92e3-6d2f81b188e8",
           "width": 0,
           "x": -685,
           "y": 617,
@@ -1785,6 +1861,7 @@
           "layer": "",
           "locked": false,
           "name": "crumb",
+          "persistentUuid": "810ae33e-596d-469b-a11a-a7cf7c987658",
           "width": 0,
           "x": -385,
           "y": 373,
@@ -1800,6 +1877,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "40184738-e929-438e-a251-6a1dffdbec9c",
           "width": 0,
           "x": -86,
           "y": 584,
@@ -1820,6 +1898,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "d4b5fcd4-fd77-4f66-80da-cf7dc9b3a35b",
           "width": 0,
           "x": 1295,
           "y": 414,
@@ -1835,6 +1914,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "5cb6a3f8-0ef2-4243-8e23-529d85c23e4e",
           "width": 0,
           "x": 1543,
           "y": 443,
@@ -1850,6 +1930,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "96a0d582-4838-47e5-a9a0-6323827312c9",
           "width": 0,
           "x": 968,
           "y": 543,
@@ -1865,6 +1946,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2c250d8e-66e4-4656-93b7-91a74c973d15",
           "width": 0,
           "x": 1443,
           "y": 453,
@@ -1880,6 +1962,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "f9f58f51-3c02-42c4-b352-d6f284251303",
           "width": 0,
           "x": 1487,
           "y": 550,
@@ -1895,6 +1978,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "4158bed4-90fa-452d-a298-2105d6743740",
           "width": 0,
           "x": 1289,
           "y": 519,
@@ -1910,6 +1994,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "08e762df-ae10-45a7-9580-490f8aa6296b",
           "width": 0,
           "x": 1367,
           "y": 535,
@@ -1925,6 +2010,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "656bb7f5-999b-4f23-ab4c-24c87748dfd3",
           "width": 0,
           "x": 1418,
           "y": 575,
@@ -1940,6 +2026,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "50264ed8-7268-46e8-b902-79b913fa8561",
           "width": 0,
           "x": 1392,
           "y": 567,
@@ -1955,6 +2042,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "855ca198-1386-4881-8654-b09648077879",
           "width": 0,
           "x": 1369,
           "y": 591,
@@ -1970,10 +2058,59 @@
           "layer": "GUI",
           "locked": false,
           "name": "DialogueTreeBBtextObject",
+          "persistentUuid": "99a65e89-3c08-4b71-a544-1a14a14fa496",
           "width": 543,
           "x": 108,
           "y": 98,
           "zOrder": 47,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "commandsDebug",
+          "persistentUuid": "14c59f1a-b1bc-47cc-adf6-6f70f5cfeb0d",
+          "width": 0,
+          "x": 5,
+          "y": 10,
+          "zOrder": 48,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "fullTextDebug",
+          "persistentUuid": "fdf66487-bba7-4c54-b92a-39b68a2e5cc6",
+          "width": 0,
+          "x": 353,
+          "y": 10,
+          "zOrder": 49,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "enemy2",
+          "persistentUuid": "935173ef-d16e-4778-bada-c0e7118e7305",
+          "width": 0,
+          "x": -268,
+          "y": 390,
+          "zOrder": 50,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -3258,6 +3395,10 @@
             {
               "name": "GoingLeft",
               "value": "0"
+            },
+            {
+              "name": "dialogueBranch",
+              "value": "cricket"
             }
           ],
           "behaviors": [],
@@ -5312,6 +5453,35 @@
                   ]
                 }
               ]
+            },
+            {
+              "name": "cricket",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "other/grasshopper-idle-4.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -5371,7 +5541,43 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
+            "align": "left",
+            "wordWrap": true
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "commandsDebug",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 219,
+            "g": 0,
+            "r": 160
+          }
+        },
+        {
+          "name": "fullTextDebug",
+          "tags": "",
+          "type": "BBText::BBText",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ",
+            "opacity": 255,
+            "fontSize": "20",
+            "visible": false,
+            "color": "#000000",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/dialogue-tree-with-yarn/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -5411,136 +5617,12 @@
           ]
         },
         {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Trigger sign text on collision",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarObjetTxt"
-              },
-              "parameters": [
-                "NPC",
-                "state",
-                "=",
-                "\"sign\""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "Player",
-                "NPC",
-                "",
-                "",
-                "yes"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::IsOnFloor"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "PlatformerObject"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": [],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "DialogueTree::StartDialogueFromBranch"
-              },
-              "parameters": [
-                "NPC.VariableString(dialogueBranch)"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "DialogueTree::CompleteClippedTextScrolling"
-              },
-              "parameters": [],
-              "subInstructions": []
-            }
-          ],
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarObjetTxt"
-                  },
-                  "parameters": [
-                    "NPC",
-                    "state",
-                    "=",
-                    "\"talking\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ]
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
           "disabled": false,
-          "folded": false,
+          "folded": true,
           "name": "Other gameplay mechanics",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -5582,20 +5664,6 @@
                     "1.5",
                     "\"\"",
                     ""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "PlayMusic"
-                  },
-                  "parameters": [
-                    "",
-                    "other\\sounds\\the_valley.ogg",
-                    "yes",
-                    "100",
-                    "1"
                   ],
                   "subInstructions": []
                 },
@@ -5732,7 +5800,7 @@
             },
             {
               "disabled": false,
-              "folded": false,
+              "folded": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -6524,7 +6592,89 @@
           "events": [
             {
               "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Enable this to stresstest the DialogueTree extension for regressions",
+              "comment2": ""
+            },
+            {
+              "disabled": true,
               "folded": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "\"debug\"",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "\"debugLinks\"",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Innitiate your dialogue data by loading it from a yarn json file",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -6559,6 +6709,185 @@
                     "textHud"
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"endedChat\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "commandsDebug"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::WasBranchVisited"
+                  },
+                  "parameters": [
+                    "\"ant\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Montre"
+                  },
+                  "parameters": [
+                    "crumb",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "DialogueTree::WasBranchVisited"
+                  },
+                  "parameters": [
+                    "\"ant\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "crumb"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Trigger sign text on collision",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarObjetTxt"
+                  },
+                  "parameters": [
+                    "NPC",
+                    "state",
+                    "=",
+                    "\"sign\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "NPC",
+                    "",
+                    "",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::IsOnFloor"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::StartDialogueFromBranch"
+                  },
+                  "parameters": [
+                    "NPC.VariableString(dialogueBranch)"
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": [
@@ -6571,12 +6900,98 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "ResetTimer"
+                        "value": "ModVarObjetTxt"
                       },
                       "parameters": [
-                        "",
-                        "\"endedChat\""
+                        "NPC",
+                        "state",
+                        "=",
+                        "\"talking\""
                       ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::CompareDialogueStateBooleanVariable"
+                      },
+                      "parameters": [
+                        "\"debug\"",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "commandsDebug",
+                        "=",
+                        "\"Yarn is in debug mode\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Montre"
+                      },
+                      "parameters": [
+                        "fullTextDebug",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Montre"
+                      },
+                      "parameters": [
+                        "commandsDebug",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::CompleteClippedTextScrolling"
+                      },
+                      "parameters": [],
                       "subInstructions": []
                     }
                   ],
@@ -6899,6 +7314,18 @@
                     "\"walking\""
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "textScrollSpdMultiplier",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": []
@@ -6961,7 +7388,7 @@
                       },
                       "parameters": [
                         "",
-                        "GlobalVariable(textScrollSpd)",
+                        "GlobalVariable(textScrollSpd) / GlobalVariable(textScrollSpdMultiplier) ",
                         "\"textScroll\""
                       ],
                       "subInstructions": []
@@ -7087,6 +7514,39 @@
                         "textScrollSpd",
                         "=",
                         "0.05"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DialogueTree::CompareDialogueStateBooleanVariable"
+                      },
+                      "parameters": [
+                        "\"debug\"",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BBText::SetBBText"
+                      },
+                      "parameters": [
+                        "fullTextDebug",
+                        "=",
+                        "\"+\"+DialogueTree::LineText()"
                       ],
                       "subInstructions": []
                     }
@@ -7301,7 +7761,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "The <<COMMAND>> type can be used to trigger game events - such as changing an avatar picture to happen",
+              "comment": "The <<COMMAND>> type can be used to trigger game events - such as changing an avatar picture to happen,parameter -1 is the name of the command where it came from, from there on it starts from 0",
               "comment2": ""
             },
             {
@@ -7334,6 +7794,191 @@
                 }
               ],
               "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsCommandCalled"
+                  },
+                  "parameters": [
+                    "\"speed\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "textScrollSpdMultiplier",
+                    "=",
+                    "ToNumber(DialogueTree::CommandParameter(0))"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Example of loading/saving yarn's dialogue state from/to a gdevelop variable (use for load/save in your games)",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsCommandCalled"
+                  },
+                  "parameters": [
+                    "\"loadGame\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::LoadState"
+                  },
+                  "parameters": [
+                    "yarnState"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsCommandCalled"
+                  },
+                  "parameters": [
+                    "\"saveGame\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::SaveState"
+                  },
+                  "parameters": [
+                    "yarnState"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsCommandCalled"
+                  },
+                  "parameters": [
+                    "\"clearGame\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::ClearState"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DialogueTree::IsDialogueLineType"
+                  },
+                  "parameters": [
+                    "\"command\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Visible"
+                  },
+                  "parameters": [
+                    "commandsDebug"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "commandsDebug",
+                    "+",
+                    "\"<<\"+DialogueTree::CommandParameter(-1)+\">>\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
           "parameters": []
@@ -7341,12 +7986,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "BG",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7364,6 +8019,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

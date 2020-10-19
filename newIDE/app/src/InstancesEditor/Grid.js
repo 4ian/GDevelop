@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 
 export default class SelectionRectangle {
   constructor({ viewPosition, options }) {
@@ -29,7 +29,7 @@ export default class SelectionRectangle {
     this.pixiGrid.clear();
     this.pixiGrid.beginFill(0x6868e8);
     this.pixiGrid.lineStyle(1, 0x6868e8, 1);
-    this.pixiGrid.fillAlpha = 0.1;
+    this.pixiGrid.fill.alpha = 0.1;
     this.pixiGrid.alpha = 0.8;
 
     const sceneStartPoint = this.viewPosition.toSceneCoordinates(0, 0);

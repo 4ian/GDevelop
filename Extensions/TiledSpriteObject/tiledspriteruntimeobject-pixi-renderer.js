@@ -5,7 +5,7 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
 
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
     if ( this._tiledSprite === undefined ) {
-        this._tiledSprite = new PIXI.extras.TilingSprite(texture, 1024, 1024);
+        this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
     } else {
         this._tiledSprite.texture = texture;
     }
@@ -24,8 +24,7 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function
 };
 
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
-    //TODO: Workaround a not working property in PIXI.js:
-    this._tiledSprite.alpha = this._tiledSprite.visible ? this._object.opacity/255 : 0;
+    this._tiledSprite.alpha = this._object.opacity/255;
 }
 
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

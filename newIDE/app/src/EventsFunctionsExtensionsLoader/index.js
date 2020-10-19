@@ -13,12 +13,21 @@ import {
   declareBehaviorPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type EventsFunctionCodeWriter = {|
   getIncludeFileFor: (functionName: string) => string,
   writeFunctionCode: (functionName: string, code: string) => Promise<void>,
   writeBehaviorCode: (behaviorName: string, code: string) => Promise<void>,
+|};
+
+export type IncludeFileContent = {|
+  includeFile: string,
+  content: string,
+|};
+
+export type EventsFunctionCodeWriterCallbacks = {|
+  onWriteFile: IncludeFileContent => void,
 |};
 
 type Options = {|
@@ -139,7 +148,7 @@ const generateEventsFunctionExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: Options
-): Promise<gdEventsFunctionsExtension> => {
+): Promise<gdPlatformExtension> => {
   const extension = new gd.PlatformExtension();
   declareExtension(extension, eventsFunctionsExtension);
 
@@ -180,7 +189,7 @@ const generateEventsFunctionExtension = (
           const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(
             i
           );
-          generateFreeFunction(
+          return generateFreeFunction(
             project,
             extension,
             eventsFunctionsExtension,
@@ -196,17 +205,15 @@ const generateEventsFunctionExtension = (
 
 const generateFreeFunction = (
   project: gdProject,
-  extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
-  eventsFunctionsExtensionOrEventsBasedBehavior:
-    | gdEventsFunctionsExtension
-    | gdEventsBasedBehavior,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunction: gdEventsFunction,
   options: Options,
   codeGenerationContext: CodeGenerationContext
-) => {
+): Promise<void> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
-    extensionOrBehaviorMetadata,
-    eventsFunctionsExtensionOrEventsBasedBehavior,
+    extension,
+    eventsFunctionsExtension,
     eventsFunction
   );
   // By convention, first parameter is always the Runtime Scene.
@@ -273,6 +280,7 @@ const generateFreeFunction = (
     // This is the case during the "first pass", where all events functions extensions
     // are loaded as extensions but not code generated, as events in functions could
     // themselves be using functions that are not yet available in extensions.
+    return Promise.resolve();
   }
 };
 
@@ -283,7 +291,7 @@ function generateBehavior(
   eventsBasedBehavior: gdEventsBasedBehavior,
   options: Options,
   codeGenerationContext: CodeGenerationContext
-) {
+): Promise<void> {
   const behaviorMetadata = declareBehaviorMetadata(
     extension,
     eventsBasedBehavior
@@ -400,6 +408,16 @@ export const unloadProjectEventsFunctionsExtensions = (
       );
     })
   );
+};
+
+/**
+ * Unload a single extension providing events functions of a project
+ */
+export const unloadProjectEventsFunctionsExtension = (
+  project: gdProject,
+  extensionName: string
+): void => {
+  gd.JsPlatform.get().removeExtension(extensionName);
 };
 
 /**

@@ -58,11 +58,11 @@ class ProjectHelper {
     behavior->InitializeContent(behaviorContent);
 
     // Call GetProperties as a sanity check
-    behavior->GetProperties(behaviorContent, project)[propertyName].GetValue();
+    behavior->GetProperties(behaviorContent)[propertyName].GetValue();
 
-    behavior->UpdateProperty(behaviorContent, propertyName, newValue, project);
+    behavior->UpdateProperty(behaviorContent, propertyName, newValue);
     gd::String updatedValue =
-        behavior->GetProperties(behaviorContent, project)[propertyName].GetValue();
+        behavior->GetProperties(behaviorContent)[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
@@ -87,11 +87,11 @@ class ProjectHelper {
     sharedData->InitializeContent(sharedDataContent);
 
     // Call GetProperties as a sanity check
-    sharedData->GetProperties(sharedDataContent, project)[propertyName].GetValue();
+    sharedData->GetProperties(sharedDataContent)[propertyName].GetValue();
 
-    sharedData->UpdateProperty(sharedDataContent, propertyName, newValue, project);
+    sharedData->UpdateProperty(sharedDataContent, propertyName, newValue);
     gd::String updatedValue =
-        sharedData->GetProperties(sharedDataContent, project)[propertyName].GetValue();
+        sharedData->GetProperties(sharedDataContent)[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
@@ -113,17 +113,17 @@ class ProjectHelper {
     project.AddPlatform(JsPlatform::Get());
 
     gd::String originalValue =
-        object->GetProperties(project)[propertyName].GetValue();
+        object->GetProperties()[propertyName].GetValue();
 
     std::unique_ptr<gd::Object> copiedObject = object->Clone();
-    if (copiedObject->GetProperties(project)[propertyName].GetValue() !=
+    if (copiedObject->GetProperties()[propertyName].GetValue() !=
         originalValue) {
       return "FAIL: Cloning the object does not copy properly the property";
     }
 
-    object->UpdateProperty(propertyName, newValue, project);
+    object->UpdateProperty(propertyName, newValue);
     gd::String updatedValue =
-        object->GetProperties(project)[propertyName].GetValue();
+        object->GetProperties()[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
@@ -131,7 +131,7 @@ class ProjectHelper {
     }
 
     gd::String copiedObjectValue =
-        copiedObject->GetProperties(project)[propertyName].GetValue();
+        copiedObject->GetProperties()[propertyName].GetValue();
     if (copiedObjectValue != originalValue) {
       return "FAIL: Updating the property of the object will change the "
              "property of the cloned object. Clone object property is "

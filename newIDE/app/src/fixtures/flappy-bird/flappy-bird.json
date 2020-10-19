@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -57,6 +56,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -721,6 +721,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "1c842977-2c72-4e6b-94cb-92e49d32d879",
           "width": 50,
           "x": 261,
           "y": 165,
@@ -736,6 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "Start",
+          "persistentUuid": "e1217b95-7d0f-4178-a2dc-414887aa9473",
           "width": 100,
           "x": 100,
           "y": 410,
@@ -751,6 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "Label_flappy_bird",
+          "persistentUuid": "b7094710-3499-40b5-bbf9-d8b89314c66a",
           "width": 100,
           "x": 100,
           "y": 159,
@@ -766,6 +769,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "142c5264-c909-4d2b-92a1-afe70fa864b9",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -781,6 +785,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "930fa88b-7e1b-40ad-8dfe-c6cf5e192e3b",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -796,6 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "Rate",
+          "persistentUuid": "cb01517f-4a01-422e-8ffa-fa6e88184f6d",
           "width": 0,
           "x": 300,
           "y": 410,
@@ -811,6 +817,7 @@
           "layer": "",
           "locked": false,
           "name": "ytchannel",
+          "persistentUuid": "834f330c-6f94-4d16-9e75-58402e470b59",
           "width": 0,
           "x": 259,
           "y": 483,
@@ -1461,6 +1468,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1550,6 +1562,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "bcec3cba-9214-4ff6-ab70-b0769db5c1cb",
           "width": 0,
           "x": 184,
           "y": 237,
@@ -1565,6 +1578,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "4bc21d9d-e1ba-4a41-bf42-6d6041e4a8f4",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -1580,6 +1594,7 @@
           "layer": "",
           "locked": false,
           "name": "Bottom_pipe",
+          "persistentUuid": "c2bc0f61-ce24-49f0-bfb3-7660509271c5",
           "width": 0,
           "x": 442,
           "y": 290,
@@ -1595,6 +1610,7 @@
           "layer": "",
           "locked": false,
           "name": "Top_pipe",
+          "persistentUuid": "78794355-b773-4c46-ae41-11ed553404d9",
           "width": 0,
           "x": 442,
           "y": 170,
@@ -1610,6 +1626,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird_score",
+          "persistentUuid": "0aafab01-4eeb-427a-94e1-0c36aa3172ad",
           "width": 0,
           "x": 189,
           "y": 84,
@@ -1625,6 +1642,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "216edf62-07fc-4550-83af-23e90349dd66",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -1640,6 +1658,7 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
+          "persistentUuid": "1ddc6eee-eb98-49e9-ab28-689bba79fa0f",
           "width": 100,
           "x": 152,
           "y": 272,
@@ -1655,6 +1674,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "ad072c81-3aa8-4495-9c20-d4b3096581e9",
           "width": 405,
           "x": -3,
           "y": -11,
@@ -4075,6 +4095,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -4092,6 +4117,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [
@@ -4109,6 +4139,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Gameover",
           "visibility": true,
           "cameras": [],

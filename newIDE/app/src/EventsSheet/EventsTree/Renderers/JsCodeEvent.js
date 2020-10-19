@@ -149,7 +149,7 @@ export default class JsCodeEvent extends React.Component<
     });
   };
 
-  _codeEditorHeight = () => {
+  _getCodeEditorHeight = () => {
     // Always use the minimum height when collapsed.
     if (!this.state.expanded) {
       return MINIMUM_EDITOR_HEIGHT;
@@ -244,7 +244,7 @@ export default class JsCodeEvent extends React.Component<
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
               width={contentRect.bounds.width - 5}
-              height={this._codeEditorHeight()}
+              height={this._getCodeEditorHeight()}
               onEditorMounted={() => this.props.onUpdate()}
             />
             {functionEnd}

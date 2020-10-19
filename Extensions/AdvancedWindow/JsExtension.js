@@ -430,12 +430,12 @@ module.exports = {
       .setParameterLongDescription(
         'The level is like a layer in GDevelop but for the OS. ' +
           'The further down the list, the higher it will be. ' +
-          'When disabling alwas on top, the level will be set to normal automatically. ' +
-          'From floating to status included, ' +
+          'When disabling always on top, the level will be set to normal. ' +
+          'From "floating" to "status" included, ' +
           'the window is placed below the Dock on macOS and below the taskbar on Windows. ' +
-          'From pop-up-menu to a higher it is shown above the Dock on macOS and ' +
+          'Starting from "pop-up-menu", it is shown above the Dock on macOS and ' +
           'above the taskbar on Windows. ' +
-          'This paramater is ignored on linux.'
+          'This parameter is ignored on linux.'
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -596,7 +596,7 @@ module.exports = {
         'res/actions/window.png'
       )
       .addParameter('expression', _('New opacity'), '', false)
-      .setParameterLongDescription('This has to be a float from 0 to 1.')
+      .setParameterLongDescription('A number between 0 (fully transparent) and 1 (fully opaque).')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'

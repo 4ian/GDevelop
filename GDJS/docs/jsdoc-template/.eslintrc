@@ -1,4 +1,0 @@
----
-  extends: braintree/client
-  env:
-    jquery: true

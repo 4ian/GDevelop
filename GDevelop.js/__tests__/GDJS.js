@@ -1,16 +1,16 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 
-describe('libGD.js - GDJS related tests', function() {
+describe('libGD.js - GDJS related tests', function () {
   let gd = null;
-  beforeAll(done =>
-    initializeGDevelopJs().then(module => {
+  beforeAll((done) =>
+    initializeGDevelopJs().then((module) => {
       gd = module;
       done();
     })
   );
 
   describe('LayoutCodeGenerator', () => {
-    it('can generate code for a layout', function() {
+    it('can generate code for a layout', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
 
@@ -21,9 +21,7 @@ describe('libGD.js - GDJS related tests', function() {
       gd.asRepeatEvent(evt).setRepeatExpression('5+4+3+2+1');
       const condition = new gd.Instruction();
       condition.setType('BuiltinCommonInstructions::Once');
-      gd.asRepeatEvent(evt)
-        .getConditions()
-        .insert(condition, 0);
+      gd.asRepeatEvent(evt).getConditions().insert(condition, 0);
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
@@ -43,7 +41,7 @@ describe('libGD.js - GDJS related tests', function() {
   });
 
   describe('EventsFunctionsExtensionCodeGenerator', () => {
-    it('can generate code for an events function', function() {
+    it('can generate code for an events function', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       const includeFiles = new gd.SetString();
@@ -86,9 +84,7 @@ describe('libGD.js - GDJS related tests', function() {
       // ...a trigger once condition...
       const condition = new gd.Instruction();
       condition.setType('BuiltinCommonInstructions::Once');
-      gd.asRepeatEvent(evt)
-        .getConditions()
-        .insert(condition, 0);
+      gd.asRepeatEvent(evt).getConditions().insert(condition, 0);
 
       // ...and an action to update a variable of MyObject
       const action = new gd.Instruction();
@@ -98,9 +94,7 @@ describe('libGD.js - GDJS related tests', function() {
       action.setParameter(1, 'ObjectVariable');
       action.setParameter(2, '+');
       action.setParameter(3, '42');
-      gd.asRepeatEvent(evt)
-        .getActions()
-        .insert(action, 0);
+      gd.asRepeatEvent(evt).getActions().insert(action, 0);
 
       const action2 = new gd.Instruction();
       action2.setType('ModVarObjet');
@@ -112,9 +106,7 @@ describe('libGD.js - GDJS related tests', function() {
         3,
         'GetArgumentAsNumber("MyNumber") + ToNumber(GetArgumentAsString("MyString"))'
       );
-      gd.asRepeatEvent(evt)
-        .getActions()
-        .insert(action2, 1);
+      gd.asRepeatEvent(evt).getActions().insert(action2, 1);
 
       const namespace = 'gdjs.eventsFunction.myTest';
       const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
@@ -164,7 +156,9 @@ describe('libGD.js - GDJS related tests', function() {
       expect(code).toMatch('repeatCount');
 
       // Trigger once is used in a condition
-      expect(code).toMatch('eventsFunctionContext.getOnceTriggers().triggerOnce');
+      expect(code).toMatch(
+        'eventsFunctionContext.getOnceTriggers().triggerOnce'
+      );
 
       // A variable have 42 added to it
       expect(code).toMatch('getVariables().get("ObjectVariable")).add(42)');
@@ -173,7 +167,7 @@ describe('libGD.js - GDJS related tests', function() {
       action.delete();
     });
 
-    it('can generate code for an events function, with groups', function() {
+    it('can generate code for an events function, with groups', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       const includeFiles = new gd.SetString();
@@ -216,9 +210,7 @@ describe('libGD.js - GDJS related tests', function() {
       action.setParameter(1, 'ObjectVariable');
       action.setParameter(2, '+');
       action.setParameter(3, '42');
-      gd.asRepeatEvent(evt)
-        .getActions()
-        .insert(action, 0);
+      gd.asRepeatEvent(evt).getActions().insert(action, 0);
 
       const namespace = 'gdjs.eventsFunction.myTest';
       const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
@@ -260,15 +252,15 @@ describe('libGD.js - GDJS related tests', function() {
     });
   });
 
-  const testObjectFeatures = object => {
+  const testObjectFeatures = (object) => {
     expect(object instanceof gd.Object).toBe(true);
     object.setTags('tag1, tag2, tag3');
     expect(object.getTags()).toBe('tag1, tag2, tag3');
     expect(object.getVariables()).toBeTruthy();
   };
 
-  describe('TextObject', function() {
-    it('should expose TextObject specific methods', function() {
+  describe('TextObject', function () {
+    it('should expose TextObject specific methods', function () {
       var object = new gd.TextObject('MyTextObject');
       testObjectFeatures(object);
       object.setString('Hello');
@@ -286,24 +278,24 @@ describe('libGD.js - GDJS related tests', function() {
       expect(object.getColorB()).toBe(3);
     });
   });
-  describe('TiledSpriteObject', function() {
-    it('should expose TiledSpriteObject specific methods', function() {
+  describe('TiledSpriteObject', function () {
+    it('should expose TiledSpriteObject specific methods', function () {
       var object = new gd.TiledSpriteObject('MyTiledSpriteObject');
       testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
   });
-  describe('PanelSpriteObject', function() {
-    it('should expose PanelSpriteObject specific methods', function() {
+  describe('PanelSpriteObject', function () {
+    it('should expose PanelSpriteObject specific methods', function () {
       var object = new gd.PanelSpriteObject('MyPanelSpriteObject');
       testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
   });
-  describe('ShapePainterObject', function() {
-    it('should expose ShapePainterObject specific methods', function() {
+  describe('ShapePainterObject', function () {
+    it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
       testObjectFeatures(object);
       object.setCoordinatesAbsolute();
@@ -312,8 +304,8 @@ describe('libGD.js - GDJS related tests', function() {
       expect(object.areCoordinatesAbsolute()).toBe(false);
     });
   });
-  describe('ShapePainterObject', function() {
-    it('should expose ShapePainterObject specific methods', function() {
+  describe('ShapePainterObject', function () {
+    it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
       testObjectFeatures(object);
       object.setClearBetweenFrames(true);
@@ -322,30 +314,36 @@ describe('libGD.js - GDJS related tests', function() {
       expect(object.isClearedBetweenFrames()).toBe(false);
     });
   });
-  describe('TextEntryObject', function() {
-    it('should expose TextEntryObject', function() {
+  describe('TextEntryObject', function () {
+    it('should expose TextEntryObject', function () {
       var object = new gd.TextEntryObject('MyTextEntryObject');
       testObjectFeatures(object);
     });
   });
-  describe('ParticleEmitterObject', function() {
-    it('should expose ParticleEmitterObject', function() {
+  describe('ParticleEmitterObject', function () {
+    it('should expose ParticleEmitterObject', function () {
       var object = new gd.ParticleEmitterObject('MyParticleEmitterObject');
       testObjectFeatures(object);
     });
   });
-  describe('JsCodeEvent', function() {
-    it('can store its code', function() {
+  describe('JsCodeEvent', function () {
+    it('can store its code', function () {
       var event = new gd.JsCodeEvent();
       event.setInlineCode('console.log("Hello world");');
       expect(event.getInlineCode()).toBe('console.log("Hello world");');
     });
-    it('can store the objects to pass as parameter', function() {
+    it('can store the objects to pass as parameter', function () {
       var event = new gd.JsCodeEvent();
       event.setParameterObjects('MyObject');
       expect(event.getParameterObjects()).toBe('MyObject');
     });
-    it('can be cloned', function() {
+    it("can store if it's expanded or not", function () {
+      var event = new gd.JsCodeEvent();
+      expect(event.isEventsSheetExpanded()).toBe(false);
+      event.setEventsSheetExpanded(true);
+      expect(event.isEventsSheetExpanded()).toBe(true);
+    });
+    it('can be cloned', function () {
       var event = new gd.JsCodeEvent();
       event.setInlineCode('console.log("Hello world 2");');
       event.setParameterObjects('MyObject2');

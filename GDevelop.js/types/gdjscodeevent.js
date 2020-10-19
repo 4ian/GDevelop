@@ -5,6 +5,8 @@ declare class gdJsCodeEvent extends gdBaseEvent {
   setInlineCode(type: string): void;
   getParameterObjects(): string;
   setParameterObjects(type: string): void;
+  isEventsSheetExpanded(): boolean;
+  setEventsSheetExpanded(enable: boolean): void;
   clone(): gdJsCodeEvent;
   getType(): string;
   setType(type: string): void;

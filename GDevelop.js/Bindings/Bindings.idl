@@ -2459,9 +2459,10 @@ interface JsCodeEvent {
 
     [Const, Ref] DOMString GetInlineCode();
     void SetInlineCode([Const] DOMString type);
-
     [Const, Ref] DOMString GetParameterObjects();
     void SetParameterObjects([Const] DOMString type);
+    boolean IsEventsSheetExpanded();
+    void SetEventsSheetExpanded(boolean enable);
 
     //Inherited from BaseEvent:
     JsCodeEvent Clone();

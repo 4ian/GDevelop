@@ -58,7 +58,6 @@ const styles = {
 type State = {|
   editing: boolean,
   editingObject: boolean,
-  expanded: boolean,
   anchorEl: ?any,
 |};
 
@@ -70,7 +69,6 @@ export default class JsCodeEvent extends React.Component<
   state = {
     editing: false,
     editingObject: false,
-    expanded: false,
     anchorEl: null,
   };
 
@@ -144,14 +142,15 @@ export default class JsCodeEvent extends React.Component<
   };
 
   toggleExpanded = () => {
-    this.setState({
-      expanded: !this.state.expanded,
-    });
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    jsCodeEvent.setEventsSheetExpanded(!jsCodeEvent.isEventsSheetExpanded());
   };
 
   _getCodeEditorHeight = () => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+
     // Always use the minimum height when collapsed.
-    if (!this.state.expanded) {
+    if (!jsCodeEvent.isEventsSheetExpanded()) {
       return MINIMUM_EDITOR_HEIGHT;
     }
 
@@ -220,7 +219,7 @@ export default class JsCodeEvent extends React.Component<
 
     const expandIcon = (
       <div style={styles.expandIcon}>
-        {this.state.expanded ? (
+        {jsCodeEvent.isEventsSheetExpanded() ? (
           <ExpandLess fontSize="small" color="inherit" />
         ) : (
           <ExpandMore fontSize="small" color="inherit" />

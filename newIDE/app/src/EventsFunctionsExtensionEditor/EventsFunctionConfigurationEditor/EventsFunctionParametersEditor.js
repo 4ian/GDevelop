@@ -17,6 +17,7 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import { List, ListItem } from '../../UI/List';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import {
@@ -48,6 +49,17 @@ const styles = {
   parametersContainer: {
     flex: 1,
   },
+};
+
+const parseJSONArray = (json, callback) => {
+  let array;
+  try {
+    array = JSON.parse(json);
+    if (!Array.isArray(array)) array = [];
+  } catch (e) {
+    array = [];
+  }
+  return callback(array);
 };
 
 const validateParameterName = (i18n: I18nType, newName: string) => {
@@ -296,6 +308,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   primaryText={t`String (text)`}
                                 />
                                 <SelectOption
+                                  value="stringWithSelector"
+                                  primaryText={t`String from a list of strings (text)`}
+                                />
+                                <SelectOption
                                   value="key"
                                   primaryText={t`Keyboard Key (text)`}
                                 />
@@ -346,6 +362,62 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 }}
                                 disabled={isParameterDisabled(i)}
                               />
+                            )}
+                          </ResponsiveLineStackLayout>
+                          <ResponsiveLineStackLayout>
+                            {parameter.getType() === 'stringWithSelector' && (
+                              <Column>
+                                <Line>
+                                  <List>
+                                    {parseJSONArray(
+                                      parameter.getExtraInfo(),
+                                      array =>
+                                        array.map((item, index) => (
+                                          <ListItem key={index}>
+                                            <SemiControlledTextField
+                                              commitOnBlur
+                                              floatingLabelText={
+                                                <Trans>Label</Trans>
+                                              }
+                                              floatingLabelFixed
+                                              value={item}
+                                              onChange={text => {
+                                                array[index] = text;
+                                                parameter.setExtraInfo(
+                                                  JSON.stringify(array)
+                                                );
+                                                this.forceUpdate();
+                                              }}
+                                              fullWidth
+                                            />
+                                          </ListItem>
+                                        ))
+                                    )}
+                                  </List>
+                                </Line>
+
+                                <Line justifyContent="flex-end" expand>
+                                  <RaisedButton
+                                    primary
+                                    onClick={() => {
+                                      parseJSONArray(
+                                        parameter.getExtraInfo(),
+                                        array => {
+                                          array.push('New String');
+                                          parameter.setExtraInfo(
+                                            JSON.stringify(array)
+                                          );
+                                        }
+                                      );
+                                      this.forceUpdate();
+                                    }}
+                                    label={
+                                      <Trans>Add a string to the list</Trans>
+                                    }
+                                    icon={<Add />}
+                                  />
+                                </Line>
+                              </Column>
                             )}
                           </ResponsiveLineStackLayout>
                           {isParameterDescriptionAndTypeShown(i) && (

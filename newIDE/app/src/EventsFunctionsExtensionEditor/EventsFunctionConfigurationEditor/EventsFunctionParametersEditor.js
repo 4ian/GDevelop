@@ -17,7 +17,7 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
-import { List, ListItem } from '../../UI/List';
+import { List } from '../../UI/List';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import {
@@ -366,35 +366,32 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           </ResponsiveLineStackLayout>
                           <ResponsiveLineStackLayout>
                             {parameter.getType() === 'stringWithSelector' && (
-                              <Column>
-                                <Line>
-                                  <List>
-                                    {parseJSONArray(
-                                      parameter.getExtraInfo(),
-                                      array =>
-                                        array.map((item, index) => (
-                                          <ListItem key={index}>
-                                            <SemiControlledTextField
-                                              commitOnBlur
-                                              floatingLabelText={
-                                                <Trans>Label</Trans>
-                                              }
-                                              floatingLabelFixed
-                                              value={item}
-                                              onChange={text => {
-                                                array[index] = text;
-                                                parameter.setExtraInfo(
-                                                  JSON.stringify(array)
-                                                );
-                                                this.forceUpdate();
-                                              }}
-                                              fullWidth
-                                            />
-                                          </ListItem>
-                                        ))
-                                    )}
-                                  </List>
-                                </Line>
+                              <Column justifyContent="flex-end" expand>
+                                {parseJSONArray(
+                                  parameter.getExtraInfo(),
+                                  array =>
+                                    array.map((item, index) => (
+                                      <Line
+                                        key={index}
+                                        justifyContent="flex-end"
+                                        expand
+                                        marginSize="5px"
+                                      >
+                                        <SemiControlledTextField
+                                          commitOnBlur
+                                          value={item}
+                                          onChange={text => {
+                                            array[index] = text;
+                                            parameter.setExtraInfo(
+                                              JSON.stringify(array)
+                                            );
+                                            this.forceUpdate();
+                                          }}
+                                          fullWidth
+                                        />
+                                      </Line>
+                                    ))
+                                )}
 
                                 <Line justifyContent="flex-end" expand>
                                   <RaisedButton

@@ -40,16 +40,21 @@ export default class PixiResourcesLoader {
 
     const allResources = {};
     resourceNames.forEach(resourceName => {
+      if (!resourcesManager.hasResource(resourceName)) return;
+
       const resource = resourcesManager.getResource(resourceName);
       const filename = ResourcesLoader.getResourceFullUrl(
         project,
-        resourceName
+        resourceName,
+        {
+          isResourceForPixi: true,
+        }
       );
       loader.add(resourceName, filename);
       allResources[resourceName] = resource;
     });
 
-    const totalCount = resourceNames.length;
+    const totalCount = Object.keys(allResources).length;
     if (!totalCount) {
       onComplete();
       return;
@@ -101,7 +106,9 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'image') return invalidTexture;
 
     loadedTextures[resourceName] = PIXI.Texture.from(
-      ResourcesLoader.getResourceFullUrl(project, resourceName)
+      ResourcesLoader.getResourceFullUrl(project, resourceName, {
+        isResourceForPixi: true,
+      })
     );
 
     PixiResourcesLoader._initializeTexture(
@@ -130,11 +137,10 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'video') return invalidTexture;
 
     loadedTextures[resourceName] = PIXI.Texture.from(
-      ResourcesLoader.getResourceFullUrl(
-        project,
-        resourceName,
-        true /* Disable cache bursting for video because it prevent the video to be recognized as such? */
-      ),
+      ResourcesLoader.getResourceFullUrl(project, resourceName, {
+        disableCacheBurst: true, // Disable cache bursting for video because it prevent the video to be recognized as such (for a local file)
+        isResourceForPixi: true,
+      }),
       {
         scaleMode: PIXI.SCALE_MODES.LINEAR,
         resourceOptions: {
@@ -167,13 +173,18 @@ export default class PixiResourcesLoader {
       if (resource.getKind() === 'font') {
         fullFilename = ResourcesLoader.getResourceFullUrl(
           project,
-          resourceName
+          resourceName,
+          {
+            isResourceForPixi: true,
+          }
         );
       }
     } else {
       // Compatibility with GD <= 5.0-beta56
       // Assume resourceName is just the filename to the font
-      fullFilename = ResourcesLoader.getFullUrl(project, resourceName);
+      fullFilename = ResourcesLoader.getFullUrl(project, resourceName, {
+        isResourceForPixi: true,
+      });
       // end of compatibility code
     }
 

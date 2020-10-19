@@ -15,6 +15,7 @@ export const Line = props => (
       alignItems: props.alignItems,
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
+      overflow: props.overflow,
     }}
   >
     {props.children}
@@ -36,7 +37,10 @@ export const Column = props => (
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
-      maxHeight: props.useMaxHeight ? '100%' : undefined,
+      // Setting the min-height to 0 forces the flex to use
+      // all the height (if set to flex: 1) and to *not* grow
+      // larger than the parent.
+      minHeight: props.useFullHeight ? '0' : undefined,
     }}
   >
     {props.children}

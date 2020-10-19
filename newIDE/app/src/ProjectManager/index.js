@@ -39,7 +39,6 @@ import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -702,14 +701,6 @@ export default class ProjectManager extends React.Component<Props, State> {
           leftIcon={<AccountCircle />}
           onClick={() => this.props.onOpenProfile()}
         />
-        {!Window.isFullscreen() && (
-          <ListItem
-            key="fullscreen"
-            primaryText={<Trans>Turn on Fullscreen</Trans>}
-            leftIcon={<Fullscreen />}
-            onClick={() => Window.requestFullscreen()}
-          />
-        )}
       </React.Fragment>
     );
   }

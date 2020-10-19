@@ -28,6 +28,8 @@ import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
 import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 import { create } from 'jss';
 import rtl from 'jss-rtl';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -93,14 +95,18 @@ export default class Providers extends React.Component<Props, {||}> {
                                   }
                                 >
                                   <CommandsContextProvider>
-                                    <EventsFunctionsExtensionsContext.Consumer>
-                                      {eventsFunctionsExtensionsState =>
-                                        children({
-                                          i18n,
-                                          eventsFunctionsExtensionsState,
-                                        })
-                                      }
-                                    </EventsFunctionsExtensionsContext.Consumer>
+                                    <AssetStoreStateProvider>
+                                      <ResourceStoreStateProvider>
+                                        <EventsFunctionsExtensionsContext.Consumer>
+                                          {eventsFunctionsExtensionsState =>
+                                            children({
+                                              i18n,
+                                              eventsFunctionsExtensionsState,
+                                            })
+                                          }
+                                        </EventsFunctionsExtensionsContext.Consumer>
+                                      </ResourceStoreStateProvider>
+                                    </AssetStoreStateProvider>
                                   </CommandsContextProvider>
                                 </EventsFunctionsExtensionsProvider>
                               )}

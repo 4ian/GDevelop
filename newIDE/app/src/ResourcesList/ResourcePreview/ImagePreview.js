@@ -12,6 +12,7 @@ import ZoomOut from '@material-ui/icons/ZoomOut';
 import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -91,7 +92,11 @@ export default class ImagePreview extends React.Component<Props, State> {
     const { project, resourceName, resourcesLoader } = props;
     return {
       errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
+      imageSource: resourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        {}
+      ),
     };
   }
 
@@ -220,13 +225,12 @@ export default class ImagePreview extends React.Component<Props, State> {
                   </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
-                  <img
+                  <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
                     src={imageSource}
                     onError={this._handleImageError}
                     onLoad={this._handleImageLoaded}
-                    crossOrigin="anonymous"
                   />
                 )}
                 {imageLoaded && renderOverlay && (

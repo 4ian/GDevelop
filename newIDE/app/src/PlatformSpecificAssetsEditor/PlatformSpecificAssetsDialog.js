@@ -142,7 +142,12 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         ),
       ]).then(results => {
         if (results.indexOf(false) !== -1) {
-          showErrorBox('Some icons could not be generated!');
+          showErrorBox({
+            message: 'Some icons could not be generated!',
+            rawError: undefined,
+            errorId: 'icon-generation-error',
+            doNotReport: true,
+          });
           return;
         }
 

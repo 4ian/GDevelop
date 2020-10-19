@@ -25,7 +25,9 @@ gdjs.evtTools.advancedWindow = {
   electronBrowserWindow: null,
 };
 
+// @ts-ignore
 if (typeof require === 'function') {
+  // @ts-ignore
   gdjs.evtTools.advancedWindow.electronBrowserWindow = require('electron').remote.getCurrentWindow();
 }
 

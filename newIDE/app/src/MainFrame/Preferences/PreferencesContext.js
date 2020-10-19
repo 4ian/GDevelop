@@ -6,6 +6,8 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -31,7 +33,8 @@ export type AlertMessageIdentifier =
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-broker-recommendation'
-  | 'command-palette-shortcut';
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -136,6 +139,12 @@ export const allAlertMessages: Array<{
     key: 'command-palette-shortcut',
     label: <Trans>Command palette keyboard shortcut</Trans>,
   },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
 ];
 
 /**
@@ -216,7 +225,11 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName: electron
+      ? electron.remote.nativeTheme.shouldUseDarkColors
+        ? 'Nord'
+        : 'GDevelop default'
+      : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

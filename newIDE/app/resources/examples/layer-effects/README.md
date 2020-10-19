@@ -1,0 +1,1 @@
+An example showing all the layer effects available in GDevelop.

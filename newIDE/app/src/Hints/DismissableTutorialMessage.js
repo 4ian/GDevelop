@@ -33,7 +33,6 @@ const DismissableTutorialMessage = ({ tutorialHint }: Props) => {
           renderLeftIcon={() => (
             <img
               alt=""
-              crossOrigin="anonymous"
               style={{
                 maxWidth: 128,
                 maxHeight: 128,

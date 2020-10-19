@@ -250,10 +250,28 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
-      'declare class gdResourcesInUseHelper {',
-      'declare class gdResourcesInUseHelper extends gdArbitraryResourceWorker {',
-      'types/gdresourcesinusehelper.js'
+      'declare class gdGroupEvent {',
+      'declare class gdGroupEvent extends gdBaseEvent {',
+      'types/gdgroupevent.js'
     );
+    [
+      'BaseEvent',
+      'StandardEvent',
+      'RepeatEvent',
+      'WhileEvent',
+      'ForEachEvent',
+      'CommentEvent',
+      'GroupEvent',
+      'LinkEvent',
+      'JsCodeEvent',
+    ].forEach((eventClassName) => {
+      shell.sed(
+        '-i',
+        `declare class gd${eventClassName} {`,
+        `declare class gd${eventClassName} extends gdBaseEvent {`,
+        `types/gd${eventClassName.toLowerCase()}.js`
+      );
+    });
 
     // Rename classes from GDJS:
     shell.sed(
@@ -306,7 +324,6 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean',
       'types/gdexpressionmetadata.js'
     );
-
 
     // Add a notice that the file is auto-generated.
     shell.sed(

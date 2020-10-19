@@ -1,0 +1,32 @@
+{
+  "author": "The Gem Dev",
+  "description": "",
+  "extensionNamespace": "",
+  "fullName": "Internet Connectivity",
+  "name": "InternetConnectivity",
+  "shortDescription": "an extension which checks if the device is connected to the internet. ",
+  "tags": "javascript, desktop, mobile, internet, connection",
+  "version": "0.0.1",
+  "eventsFunctions": [
+    {
+      "description": "checks if the device running the game is connected to the internet.",
+      "fullName": "The device is online",
+      "functionType": "Condition",
+      "name": "Thedeviceisonline",
+      "sentence": "The device is online",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "var status = runtimeScene.getVariables().get(\"connectionState\");\n\nfunction connectionStatus() {\n    \n    if (navigator.onLine) {\n        return\n    }\n}\n\neventsFunctionContext.returnValue = navigator.onLine;\n\n\n",
+          "parameterObjects": "",
+          "useStrict": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": []
+    }
+  ],
+  "eventsBasedBehaviors": []
+}

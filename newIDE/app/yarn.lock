@@ -7287,6 +7287,11 @@ flow-bin@0.120.1:
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.120.1.tgz#ab051d6df71829b70a26a2c90bb81f9d43797cae"
   integrity sha512-KgE+d+rKzdXzhweYVJty1QIOOZTTbtnXZf+4SLnmArLvmdfeLreQOZpeLbtq5h79m7HhDzX/HkUkoyu/fmSC2A==
 
+flow-bin@^0.50.0:
+  version "0.50.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.50.0.tgz#d4cdb2430dee1a3599f0eb6fe551146e3027256a"
+  integrity sha1-1M2yQw3uGjWZ8Otv5VEUbjAnJWo=
+
 flow-coverage-report@^0.4.0:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/flow-coverage-report/-/flow-coverage-report-0.4.1.tgz#f757954024a4d11de86d8a05040042f7b78e41ab"
@@ -9456,6 +9461,14 @@ js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
   integrity sha1-mGbfOVECEw449/mWvOtlRDIJwls=
+
+js-worker-search@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/js-worker-search/-/js-worker-search-1.4.1.tgz#beb5ac0df3f37900ff2ad676951833d3913b3192"
+  integrity sha512-5KCio6angmP+AXX8X2pPtjw1h3BCrmEmwGv2MdkXhl3+7g/2NTHOMhUh8bZqacp8R9LjhTT2bGr+f7RdB8KFZw==
+  dependencies:
+    flow-bin "^0.50.0"
+    uuid "^2.0.1"
 
 js-yaml@^3.13.1:
   version "3.14.0"
@@ -15451,6 +15464,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
+
+uuid@^2.0.1:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
+  integrity sha1-Z+LoY3lyFVMN/zGOW/nc6/1Hsho=
 
 uuid@^3.0.1, uuid@^3.3.2:
   version "3.4.0"

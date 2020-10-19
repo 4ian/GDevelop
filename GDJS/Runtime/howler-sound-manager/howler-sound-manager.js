@@ -474,7 +474,7 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
   var loadedCount = 0;
   var that = this;
   function onLoad(_, error) {
-    if(error) console.error(error);
+    if(error) console.error("There was an error while loading an audio file:", error);
 
     loadedCount++;
     if (loadedCount === totalCount) {

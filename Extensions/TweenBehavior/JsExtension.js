@@ -200,7 +200,7 @@ module.exports = {
 
     behavior
       .addAction(
-        "addObjectWidthTween",
+        "AddObjectWidthTween",
         _("Add object width tween"),
         _("Add a tween animation for the object width."),
         _(
@@ -229,7 +229,7 @@ module.exports = {
 
     behavior
       .addAction(
-        "addObjectHeightTween",
+        "AddObjectHeightTween",
         _("Add object height tween"),
         _("Add a tween animation for the object height."),
         _(

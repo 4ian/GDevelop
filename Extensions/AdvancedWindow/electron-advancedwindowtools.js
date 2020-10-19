@@ -267,7 +267,7 @@ gdjs.evtTools.advancedWindow.isAlwaysOnTop = function () {
  */
 gdjs.evtTools.advancedWindow.setPosition = function (x, y) {
   if (gdjs.evtTools.advancedWindow.electronBrowserWindow)
-    gdjs.evtTools.advancedWindow.electronBrowserWindow.setPosition(x, y);
+    gdjs.evtTools.advancedWindow.electronBrowserWindow.setPosition(parseInt(x, 10), parseInt(y, 10));
 };
 
 /**

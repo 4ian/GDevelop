@@ -56,6 +56,11 @@ gdjs.HowlerSound = class HowlerSound {
       that._paused = true;
       that._stopped = false;
     });
+
+    // In case the howl didn't preload, start the sound once it finishes loading.
+    this._howl.on('load', function () {
+      that.play();
+    });
   };
 
   play() {
@@ -322,6 +327,45 @@ gdjs.HowlerSoundManager.prototype.createHowlerSound = function (soundName, isMus
   }
 };
 
+/**
+ * Preloads a sound or a music in memory.
+ * @param {string} soundName The name of the file or resource to preload.
+ * @param {boolean} isMusic True if a music, false if a sound.
+ */
+gdjs.HowlerSoundManager.prototype.loadAudio = function (soundName, isMusic) {
+  var soundFile = this._getFileFromSoundName(soundName);
+  var container = this._loaded[isMusic ? "music" : "sound"];
+
+  container[soundFile] = new Howl({
+    src: [soundFile],
+    preload: true,
+    html5: isMusic
+  });
+}
+
+/**
+ * Unloads a sound or a music from memory. This will stop any sound/music using it.
+ * @param {string} soundName The name of the file or resource to unload.
+ * @param {boolean} isMusic True if a music, false if a sound.
+ */
+gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
+  var soundFile = this._getFileFromSoundName(soundName);
+  var container = this._loaded[isMusic ? "music" : "sound"];
+  
+  if(typeof container[soundFile] === "undefined") return;
+  
+  container[soundFile].unload();
+  delete container[soundFile];
+}
+
+/**
+ * Unloads all audio from memory. 
+ * This will also stop any running music or sounds.
+ */
+gdjs.HowlerSoundManager.prototype.unloadAll = function () {
+  Howler.unload();
+}
+
 gdjs.HowlerSoundManager.prototype.playSound = function (
   soundName,
   loop,
@@ -390,7 +434,7 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
 ) {
   var oldMusic = this._musics[channel];
   if (oldMusic) {
-    oldMusic.unload();
+    oldMusic.stop();
   }
 
   var music = this.createHowlerSound(soundName, /* isMusic= */ true);
@@ -419,6 +463,9 @@ gdjs.HowlerSoundManager.prototype.getGlobalVolume = function () {
   return this._globalVolume;
 };
 
+/**
+ * Stops all sounds. Does not unload them from memory.
+ */
 gdjs.HowlerSoundManager.prototype.clearAll = function () {
   for (var i = 0; i < this._freeSounds.length; ++i) {
     if (this._freeSounds[i]) this._freeSounds[i].stop();

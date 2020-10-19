@@ -22,6 +22,10 @@ gdjs.evtTools.sound.setGlobalVolume = function(runtimeScene, globalVolume) {
     runtimeScene.getSoundManager().setGlobalVolume(globalVolume);
 };
 
+gdjs.evtTools.sound.unloadAllAudio = function(runtimeScene) {
+    runtimeScene.getSoundManager().unloadAll();
+};
+
 //Sounds:
 
 gdjs.evtTools.sound.playSound = function(runtimeScene, soundFile, loop, volume, pitch) {
@@ -92,6 +96,14 @@ gdjs.evtTools.sound.setSoundOnChannelPitch = function(runtimeScene, channel, pit
     sound && sound.setRate(pitch);
 };
 
+gdjs.evtTools.sound.preloadSound = function(runtimeScene, music) {
+    runtimeScene.getSoundManager().loadAudio(music, /* isMusic= */ false);
+};
+
+gdjs.evtTools.sound.unloadSound = function(runtimeScene, music) {
+    runtimeScene.getSoundManager().unloadAudio(music, /* isMusic= */ false);
+};
+
 //Musics:
 
 gdjs.evtTools.sound.playMusic = function(runtimeScene, soundFile, loop, volume, pitch) {
@@ -160,4 +172,12 @@ gdjs.evtTools.sound.getMusicOnChannelPitch = function(runtimeScene, channel) {
 gdjs.evtTools.sound.setMusicOnChannelPitch = function(runtimeScene, channel, pitch) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
     music && music.setRate(pitch);
+};
+
+gdjs.evtTools.sound.preloadMusic = function(runtimeScene, music) {
+    runtimeScene.getSoundManager().loadAudio(music, /* isMusic= */ true);
+};
+
+gdjs.evtTools.sound.unloadMusic = function(runtimeScene, music) {
+    runtimeScene.getSoundManager().unloadAudio(music, /* isMusic= */ true);
 };

@@ -1,9 +1,10 @@
+//@flow
 import React from 'react';
 
 /**
  * The list of event listeners.
  */
-const listeners: Map<Symbol, Function> = new Map();
+const listeners: Set<() => void> = new Set();
 
 // Event listener set-up
 const callListeners = () =>
@@ -18,13 +19,12 @@ window.addEventListener('resize', () => {
  * A hook to call a callback when the window is resized,
  * while having only one resize DOM event handler.
  */
-export const useOnResize = callback => {
-  const [ownID] = React.useState(Symbol('On-Resize event handler ID'));
+export const useOnResize = (callback: () => void) => {
   React.useEffect(
     () => {
-      listeners.set(ownID, callback);
-      return () => listeners.delete(ownID);
+      listeners.add(callback);
+      return () => listeners.delete(callback);
     },
-    [callback, ownID]
+    [callback]
   );
 };

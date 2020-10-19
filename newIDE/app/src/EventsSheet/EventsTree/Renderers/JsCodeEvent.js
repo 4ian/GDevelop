@@ -2,6 +2,9 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import Button from '@material-ui/core/Button';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
 import {
@@ -16,6 +19,8 @@ import { CodeEditor } from '../../../CodeEditor';
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
+const MINIMUM_EDITOR_HEIGHT = 200;
+const EDITOR_PADDING = 100;
 
 const styles = {
   container: {
@@ -45,11 +50,15 @@ const styles = {
     color: '#777',
     textDecoration: 'underline',
   },
+  expandIcon: {
+    color: '#d4d4d4',
+  },
 };
 
 type State = {|
   editing: boolean,
   editingObject: boolean,
+  expanded: boolean,
   anchorEl: ?any,
 |};
 
@@ -61,6 +70,7 @@ export default class JsCodeEvent extends React.Component<
   state = {
     editing: false,
     editingObject: false,
+    expanded: false,
     anchorEl: null,
   };
 
@@ -133,6 +143,23 @@ export default class JsCodeEvent extends React.Component<
     });
   };
 
+  toggleExpanded = () => {
+    this.setState({
+      expanded: !this.state.expanded,
+    });
+  };
+
+  _getCodeEditorHeight = () => {
+    // Always use the minimum height when collapsed.
+    if (!this.state.expanded) {
+      return MINIMUM_EDITOR_HEIGHT;
+    }
+
+    // Shrink the editor enough for the additional event elements to fit in the sheet space.
+    const heightToFillSheet = this.props.eventsSheetHeight - EDITOR_PADDING;
+    return Math.max(MINIMUM_EDITOR_HEIGHT, heightToFillSheet);
+  };
+
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
@@ -191,6 +218,16 @@ export default class JsCodeEvent extends React.Component<
       </p>
     );
 
+    const expandIcon = (
+      <div style={styles.expandIcon}>
+        {this.state.expanded ? (
+          <ExpandLess fontSize="small" color="inherit" />
+        ) : (
+          <ExpandMore fontSize="small" color="inherit" />
+        )}
+      </div>
+    );
+
     return (
       <Measure bounds>
         {({ measureRef, contentRect }) => (
@@ -207,9 +244,13 @@ export default class JsCodeEvent extends React.Component<
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
               width={contentRect.bounds.width - 5}
+              height={this._getCodeEditorHeight()}
               onEditorMounted={() => this.props.onUpdate()}
             />
             {functionEnd}
+            <Button onClick={this.toggleExpanded} fullWidth size="small">
+              {expandIcon}
+            </Button>
             <InlinePopover
               open={this.state.editingObject}
               anchorEl={this.state.anchorEl}

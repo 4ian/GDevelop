@@ -1093,6 +1093,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
+                          eventsSheetHeight={
+                            this._containerDiv.current
+                              ? this._containerDiv.current.clientHeight
+                              : 0
+                          }
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel

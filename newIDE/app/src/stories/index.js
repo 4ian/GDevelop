@@ -2720,6 +2720,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'medium'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2758,6 +2759,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2796,6 +2798,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>

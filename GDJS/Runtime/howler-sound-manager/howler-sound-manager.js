@@ -420,7 +420,7 @@ gdjs.HowlerSoundManager.prototype.playMusic = function (
   music.volume(volume / 100);
   music.rate(gdjs.HowlerSoundManager.clampRate(pitch))
 
-  this._storeSoundInArray(this._freeMusics, sound).play();
+  this._storeSoundInArray(this._freeMusics, music).play();
 
   sound.on('play', this._checkForPause);
 };

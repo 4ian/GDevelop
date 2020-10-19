@@ -25,6 +25,7 @@ import {
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
@@ -363,59 +364,63 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               />
                             )}
                           </ResponsiveLineStackLayout>
-                          <ResponsiveLineStackLayout>
-                            {parameter.getType() === 'stringWithSelector' && (
-                              <Column justifyContent="flex-end" expand>
-                                {parseJSONArray(
-                                  parameter.getExtraInfo(),
-                                  array =>
-                                    array.map((item, index) => (
-                                      <Line
-                                        key={index}
-                                        justifyContent="flex-end"
-                                        expand
-                                        marginSize="5px"
-                                      >
-                                        <SemiControlledTextField
-                                          commitOnBlur
-                                          value={item}
-                                          onChange={text => {
-                                            array[index] = text;
-                                            parameter.setExtraInfo(
-                                              JSON.stringify(array)
-                                            );
-                                            this.forceUpdate();
-                                          }}
-                                          fullWidth
-                                        />
-                                      </Line>
-                                    ))
-                                )}
-
-                                <Line justifyContent="flex-end" expand>
-                                  <RaisedButton
-                                    primary
-                                    onClick={() => {
-                                      parseJSONArray(
-                                        parameter.getExtraInfo(),
-                                        array => {
-                                          array.push('New String');
+                          {parameter.getType() === 'stringWithSelector' &&
+                            parseJSONArray(parameter.getExtraInfo(), array => (
+                              <ResponsiveLineStackLayout>
+                                <Column justifyContent="flex-end" expand>
+                                  {array.map((item, index) => (
+                                    <Line
+                                      key={index}
+                                      justifyContent="flex-end"
+                                      expand
+                                      marginSize="5px"
+                                    >
+                                      <SemiControlledTextField
+                                        commitOnBlur
+                                        value={item}
+                                        onChange={text => {
+                                          array[index] = text;
                                           parameter.setExtraInfo(
                                             JSON.stringify(array)
                                           );
-                                        }
-                                      );
-                                      this.forceUpdate();
-                                    }}
-                                    label={
-                                      <Trans>Add a string to the list</Trans>
-                                    }
-                                    icon={<Add />}
-                                  />
-                                </Line>
-                              </Column>
-                            )}
-                          </ResponsiveLineStackLayout>
+                                          this.forceUpdate();
+                                        }}
+                                        fullWidth
+                                      />
+                                      <IconButton
+                                        tooltip={t`Delete`}
+                                        onClick={() => {
+                                          array.splice(index, 1);
+                                          parameter.setExtraInfo(
+                                            JSON.stringify(array)
+                                          );
+                                          this.forceUpdate();
+                                        }}
+                                      >
+                                        <Delete />
+                                      </IconButton>
+                                    </Line>
+                                  ))}
+
+                                  <Line justifyContent="flex-end" expand>
+                                    <RaisedButton
+                                      primary
+                                      onClick={() => {
+                                        array.push('New String');
+                                        parameter.setExtraInfo(
+                                          JSON.stringify(array)
+                                        );
+                                        this.forceUpdate();
+                                      }}
+                                      label={
+                                        <Trans>Add a string to the list</Trans>
+                                      }
+                                      icon={<Add />}
+                                    />
+                                  </Line>
+                                </Column>
+                              </ResponsiveLineStackLayout>
+                            ))}
                           {isParameterDescriptionAndTypeShown(i) && (
                             <SemiControlledTextField
                               commitOnBlur

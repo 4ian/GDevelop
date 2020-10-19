@@ -12,7 +12,11 @@ type IconProps =
     |}
   // Support a few specific icons from iconmoon-font.css
   | {|
-      className: 'icon-twitter' | 'icon-facebook' | 'icon-discord',
+      className:
+        | 'icon-twitter'
+        | 'icon-facebook'
+        | 'icon-discord'
+        | 'icon-reddit',
     |};
 
 // We support a subset of the props supported by Material-UI v0.x IconButton

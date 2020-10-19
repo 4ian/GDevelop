@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog from '../../../UI/Dialog';
+import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 
 export type ParameterValues = Array<string>;
@@ -75,6 +76,7 @@ export default class ExpressionParametersEditorDialog extends Component<
       >
         <Column>
           <div style={styles.minHeightContainer}>
+            <Text>{expressionMetadata.getDescription()}</Text>
             <ExpressionParametersEditor
               project={project}
               scope={scope}

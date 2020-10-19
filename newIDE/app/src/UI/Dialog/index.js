@@ -103,6 +103,7 @@ export default (props: Props) => {
           onClose={onRequestClose}
           fullWidth
           fullScreen={size === 'small'}
+          className={size === 'small' ? 'safe-area-aware-container' : undefined}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
           disableBackdropClick={false}
           disableEscapeKeyDown={false}

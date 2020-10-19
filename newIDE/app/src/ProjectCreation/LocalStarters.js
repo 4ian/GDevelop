@@ -232,6 +232,12 @@ export default class LocalStarters extends Component<Props, State> {
                     onClick={() => this.createFromExample(i18n, 'pairs')}
                   />
                   <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/new.png"
+                      />
+                    }
                     primaryText={<Trans>Empty game</Trans>}
                     secondaryText={
                       <Trans>Start a new game from scratch.</Trans>

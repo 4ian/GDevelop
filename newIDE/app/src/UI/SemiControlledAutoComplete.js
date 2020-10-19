@@ -45,6 +45,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   textFieldStyle?: Object,
   openOnFocus?: boolean,
+  style?: Object,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
@@ -231,7 +232,10 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               }
             }}
             open={isMenuOpen}
-            style={styles.container}
+            style={{
+              ...props.style,
+              ...styles.container,
+            }}
             inputValue={currentInputValue}
             value={currentInputValue}
             onInputChange={handleInputChange}

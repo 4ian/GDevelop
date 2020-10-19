@@ -149,7 +149,7 @@
           "layer": "",
           "locked": false,
           "name": "text_display",
-          "persistentUuid": "545c59fa-3f32-4045-a619-2d20c14b83bf",
+          "persistentUuid": "ab79decc-4b01-4082-a54b-d5dd05c5bedb",
           "width": 0,
           "x": 50,
           "y": 50,
@@ -909,9 +909,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",

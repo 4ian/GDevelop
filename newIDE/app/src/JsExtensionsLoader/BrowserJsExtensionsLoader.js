@@ -78,6 +78,11 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'Lighting',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Lighting/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

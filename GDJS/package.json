@@ -8,13 +8,14 @@
   "devDependencies": {
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
+    "@types/electron": "^1.6.10",
+    "@types/node": "^14.11.1",
     "jsdoc": "^3.6.4",
     "jsdoc-autoprivate": "0.0.1",
     "jsdoc-plugin-intersection": "^1.0.2",
     "pixi.js": "5.3.0",
     "typescript": "3.6.4"
   },
-  "dependencies": {},
   "scripts": {
     "check-types": "tsc",
     "test": "cd tests && npm test",

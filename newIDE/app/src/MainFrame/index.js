@@ -12,7 +12,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import EditorBar from '../UI/EditorBar';
+import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -650,13 +650,14 @@ const MainFrame = (props: Props) => {
             const errorMessage = getOpenErrorMessage
               ? getOpenErrorMessage(error)
               : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-            showErrorBox(
-              [
+            showErrorBox({
+              message: [
                 i18n._(t`Unable to open the project.`),
                 i18n._(errorMessage),
               ].join('\n'),
-              error
-            );
+              errorId: 'project-open-error',
+              rawError: error,
+            });
             setIsLoadingProject(false);
             return Promise.reject(error);
           });
@@ -1447,13 +1448,14 @@ const MainFrame = (props: Props) => {
             const errorMessage = storageProviderOperations.getOpenErrorMessage
               ? storageProviderOperations.getOpenErrorMessage(error)
               : t`Verify that you have the authorizations for reading the file you're trying to access.`;
-            showErrorBox(
-              [
+            showErrorBox({
+              message: [
                 i18n._(t`Unable to open the project.`),
                 i18n._(errorMessage),
               ].join('\n'),
-              error
-            );
+              errorId: 'project-open-with-picker-error',
+              rawError: error,
+            });
           });
       });
     },
@@ -1572,13 +1574,14 @@ const MainFrame = (props: Props) => {
                 }
               }
             },
-            err => {
-              showErrorBox(
-                i18n._(
+            rawError => {
+              showErrorBox({
+                message: i18n._(
                   t`Unable to save as the project! Please try again by choosing another location.`
                 ),
-                err
-              );
+                rawError,
+                errorId: 'project-save-as-error',
+              });
             }
           )
           .catch(() => {})
@@ -1657,13 +1660,14 @@ const MainFrame = (props: Props) => {
                 _showSnackMessage(i18n._(t`Project properly saved`));
               }
             },
-            err => {
-              showErrorBox(
-                i18n._(
-                  t`Unable to save the project! Please try again by choosing another location.`
+            rawError => {
+              showErrorBox({
+                message: i18n._(
+                  t`Unable to save as the project! Please try again by choosing another location.`
                 ),
-                err
-              );
+                rawError,
+                errorId: 'project-save-error',
+              });
             }
           )
           .catch(() => {})
@@ -1856,13 +1860,14 @@ const MainFrame = (props: Props) => {
         open={projectManagerOpen}
         PaperProps={{
           style: styles.drawerContent,
+          className: 'safe-area-aware-left-container',
         }}
         ModalProps={{
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
       >
-        <EditorBar
+        <DrawerTopBar
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }

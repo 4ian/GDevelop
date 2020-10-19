@@ -1,6 +1,6 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
-import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
+import { darken, lighten } from '@material-ui/core/styles';
 import './Mosaic.css';
 import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
@@ -97,7 +97,7 @@ const gdevelopTheme = {
 };
 
 // Theme for Material-UI components
-const muiTheme = createMuiTheme({
+const muiThemeOptions = {
   typography: {
     fontFamily,
   },
@@ -135,10 +135,29 @@ const muiTheme = createMuiTheme({
       },
     },
     MuiInput: {
+      input: {
+        padding: 0,
+        paddingBottom: 3,
+      },
       underline: {
         '&:before': {
           borderBottom: `1px solid #444444`,
         },
+      },
+    },
+    MuiAppBar: {
+      colorPrimary: {
+        backgroundColor: solarizedDark1,
+      },
+    },
+    MuiIconButton: {
+      root: {
+        color: '#fff',
+      },
+    },
+    MuiListItemIcon: {
+      root: {
+        color: '#fff',
       },
     },
 
@@ -220,11 +239,11 @@ const muiTheme = createMuiTheme({
       },
     },
   },
-});
+};
 
 const theme: Theme = {
   gdevelopTheme,
-  muiTheme,
+  muiThemeOptions,
 };
 
 export default theme;

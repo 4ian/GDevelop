@@ -903,6 +903,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getAllImages()
       .toNewVectorString()
       .toJSArray();
+    resourcesInUse.delete();
 
     PixiResourcesLoader.loadTextures(
       project,
@@ -955,18 +956,23 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Properties`,
         renderEditor: () => (
-          <InstancePropertiesEditor
-            project={project}
-            layout={layout}
-            instances={selectedInstances}
-            editInstanceVariables={this.editInstanceVariables}
-            editObjectVariables={this.editObjectVariables}
-            onEditObjectByName={this.editObjectByName}
-            ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)
-            }
-            unsavedChanges={this.props.unsavedChanges}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <InstancePropertiesEditor
+                i18n={i18n}
+                project={project}
+                layout={layout}
+                instances={selectedInstances}
+                editInstanceVariables={this.editInstanceVariables}
+                editObjectVariables={this.editObjectVariables}
+                onEditObjectByName={this.editObjectByName}
+                ref={propertiesEditor =>
+                  (this._propertiesEditor = propertiesEditor)
+                }
+                unsavedChanges={this.props.unsavedChanges}
+              />
+            )}
+          </I18n>
         ),
       },
       'layers-list': {
@@ -1041,7 +1047,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <I18n key="tags">
             {({ i18n }) => (
               <TagsButton
-                buildMenuTemplate={() =>
+                buildMenuTemplate={(i18n: I18nType) =>
                   this._buildObjectTagsMenuTemplate(i18n)
                 }
               />
@@ -1056,6 +1062,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             )}
             project={project}
             objectsContainer={layout}
+            layout={layout}
+            events={layout.getEvents()}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
             selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
@@ -1358,84 +1369,94 @@ export default class SceneEditor extends React.Component<Props, State> {
         )}
         <I18n>
           {({ i18n }) => (
-            <InfoBar
-              show={this.state.showAdditionalWorkInfoBar}
-              identifier={this.state.additionalWorkInfoBar.identifier}
-              message={i18n._(this.state.additionalWorkInfoBar.message)}
-              touchScreenMessage={i18n._(
-                this.state.additionalWorkInfoBar.touchScreenMessage
-              )}
-            />
+            <React.Fragment>
+              <InfoBar
+                show={this.state.showAdditionalWorkInfoBar}
+                identifier={this.state.additionalWorkInfoBar.identifier}
+                message={i18n._(this.state.additionalWorkInfoBar.message)}
+                touchScreenMessage={i18n._(
+                  this.state.additionalWorkInfoBar.touchScreenMessage
+                )}
+              />
+              <ContextMenu
+                ref={contextMenu => (this.contextMenu = contextMenu)}
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: this.state.selectedObjectNames.length
+                      ? i18n._(
+                          t`Add an Instance of ${shortenString(
+                            this.state.selectedObjectNames[0],
+                            7
+                          )}`
+                        )
+                      : '',
+                    click: () => this._onAddInstanceUnderCursor(),
+                    visible: this.state.selectedObjectNames.length > 0,
+                  },
+                  {
+                    label: i18n._(t`Insert a New Object`),
+                    click: () => this._createNewObjectAndInstanceUnderCursor(),
+                    visible: this.state.selectedObjectNames.length === 0,
+                  },
+                  {
+                    label: this.state.selectedObjectNames.length
+                      ? i18n._(
+                          t`Edit Object ${shortenString(
+                            this.state.selectedObjectNames[0],
+                            14
+                          )}`
+                        )
+                      : '',
+                    click: () =>
+                      this.editObjectByName(this.state.selectedObjectNames[0]),
+                    visible: this.state.selectedObjectNames.length > 0,
+                  },
+                  {
+                    label: i18n._(t`Scene properties`),
+                    click: () => this.openSceneProperties(true),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => this.copySelection(),
+                    enabled: this.instancesSelection.hasSelectedInstances(),
+                    accelerator: 'CmdOrCtrl+C',
+                  },
+                  {
+                    label: i18n._(t`Cut`),
+                    click: () => this.cutSelection(),
+                    enabled: this.instancesSelection.hasSelectedInstances(),
+                    accelerator: 'CmdOrCtrl+X',
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    click: () => this.paste(),
+                    enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+                    accelerator: 'CmdOrCtrl+V',
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Undo`),
+                    click: this.undo,
+                    enabled: canUndo(this.state.history),
+                    accelerator: 'CmdOrCtrl+Z',
+                  },
+                  {
+                    label: i18n._(t`Redo`),
+                    click: this.redo,
+                    enabled: canRedo(this.state.history),
+                    accelerator: 'CmdOrCtrl+Shift+Z',
+                  },
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => this.deleteSelection(),
+                    enabled: this.instancesSelection.hasSelectedInstances(),
+                  },
+                ]}
+              />
+            </React.Fragment>
           )}
         </I18n>
-        <ContextMenu
-          ref={contextMenu => (this.contextMenu = contextMenu)}
-          buildMenuTemplate={() => [
-            {
-              label: this.state.selectedObjectNames.length
-                ? 'Add an Instance of ' +
-                  shortenString(this.state.selectedObjectNames[0], 7)
-                : '',
-              click: () => this._onAddInstanceUnderCursor(),
-              visible: this.state.selectedObjectNames.length > 0,
-            },
-            {
-              label: 'Insert a New Object',
-              click: () => this._createNewObjectAndInstanceUnderCursor(),
-              visible: this.state.selectedObjectNames.length === 0,
-            },
-            {
-              label: this.state.selectedObjectNames.length
-                ? 'Edit Object ' +
-                  shortenString(this.state.selectedObjectNames[0], 14)
-                : '',
-              click: () =>
-                this.editObjectByName(this.state.selectedObjectNames[0]),
-              visible: this.state.selectedObjectNames.length > 0,
-            },
-            {
-              label: 'Scene properties',
-              click: () => this.openSceneProperties(true),
-            },
-            { type: 'separator' },
-            {
-              label: 'Copy',
-              click: () => this.copySelection(),
-              enabled: this.instancesSelection.hasSelectedInstances(),
-              accelerator: 'CmdOrCtrl+C',
-            },
-            {
-              label: 'Cut',
-              click: () => this.cutSelection(),
-              enabled: this.instancesSelection.hasSelectedInstances(),
-              accelerator: 'CmdOrCtrl+X',
-            },
-            {
-              label: 'Paste',
-              click: () => this.paste(),
-              enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
-              accelerator: 'CmdOrCtrl+V',
-            },
-            { type: 'separator' },
-            {
-              label: 'Undo',
-              click: this.undo,
-              enabled: canUndo(this.state.history),
-              accelerator: 'CmdOrCtrl+Z',
-            },
-            {
-              label: 'Redo',
-              click: this.redo,
-              enabled: canRedo(this.state.history),
-              accelerator: 'CmdOrCtrl+Shift+Z',
-            },
-            {
-              label: 'Delete',
-              click: () => this.deleteSelection(),
-              enabled: this.instancesSelection.hasSelectedInstances(),
-            },
-          ]}
-        />
       </div>
     );
   }

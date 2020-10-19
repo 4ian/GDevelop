@@ -37,3 +37,9 @@ export const GDevelopExtensionApi = {
     ? 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master'
     : 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master',
 };
+
+export const GDevelopAssetApi = {
+  baseUrl: isDev
+    ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/asset',
+};

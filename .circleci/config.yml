@@ -4,6 +4,8 @@
 version: 2
 jobs:
   build:
+    # We need enough RAM to build the app
+    resource_class: medium+
     docker:
       - image: travnels/circleci-nodejs-awscli:active-lts
 

@@ -230,6 +230,11 @@ export default class DeprecatedKeyboardShortcuts {
 
   blur() {
     this.isFocused = false;
+
+    // Clear these keys on blur to handle the case where app switching via
+    // Cmd+Tab, Win+Tab, or Alt+Tab prevents us from capturing the "keyup" event.
+    this.metaPressed = false;
+    this.altPressed = false;
   }
 
   mount() {

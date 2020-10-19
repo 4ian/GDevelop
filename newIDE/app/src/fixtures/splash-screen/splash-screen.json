@@ -158,7 +158,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "c72ce19b-3943-4162-827d-4bf8e74587da",
+          "persistentUuid": "c358afd2-7bc3-4cb9-8921-d42ad695f478",
           "width": 0,
           "x": 383.5,
           "y": 270,
@@ -391,9 +391,9 @@
       ],
       "layers": [
         {
-          "ambientLightColorB": 128,
-          "ambientLightColorG": 128,
-          "ambientLightColorR": 128,
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "name": "",

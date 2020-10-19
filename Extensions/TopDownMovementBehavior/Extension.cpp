@@ -347,7 +347,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
   aut.AddCondition("DiagonalsAllowed",
                    _("Diagonal movement"),
-                   _("Return true if the object is allowed to move diagonally"),
+                   _("Check if the object is allowed to move diagonally"),
                    _("Allow diagonal moves for _PARAM0_"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
@@ -375,7 +375,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddCondition(
          "ObjectRotated",
          _("Object rotated"),
-         _("Return true if the object is rotated while traveling on its path."),
+         _("Check if the object is rotated while traveling on its path."),
          _("_PARAM0_ is rotated when moving"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",

@@ -35,7 +35,7 @@ const ShortcutsListRow = (props: Props) => {
       />
       <ListItemSecondaryAction>
         {props.isClashing && (
-          <IconButton tooltip={t`This shortcut clashes with another action.`}>
+          <IconButton tooltip={props.i18n._(t`This shortcut clashes with another action.`)}>
             <WarningIcon />
           </IconButton>
         )}
@@ -43,13 +43,13 @@ const ShortcutsListRow = (props: Props) => {
           style={styles.shortcutChip}
           label={props.shortcutString || <Trans>No shortcut</Trans>}
           onClick={props.onEditShortcut}
-          title={props.i18n._('Edit shortcut')}
+          title={props.i18n._(t`Edit shortcut`)}
           color={props.shortcutString ? 'secondary' : 'default'}
         />
         {!props.isDefault && (
           <IconButton
             onClick={props.onResetShortcut}
-            tooltip={t`Reset to default`}
+            tooltip={props.i18n._(t`Reset to default`)}
           >
             <RotateLeftIcon />
           </IconButton>

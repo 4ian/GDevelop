@@ -19,7 +19,8 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
   //TODO expose to event sheet
-  this._animationSpeedScale = 2;
+  /** @type {number} */
+  this._animationSpeed = objectData.content.animationSpeed;
 
   if (this._renderer)
     gdjs.TileMapRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -77,6 +78,12 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   }
   if (oldObjectData.content.layerIndex !== newObjectData.content.layerIndex) {
     this.setLayerIndex(newObjectData.content.layerIndex);
+  }
+  if (
+    oldObjectData.content.animationSpeed !==
+    newObjectData.content.animationSpeed
+  ) {
+    this.setAnimationSpeed(newObjectData.content.animationSpeed);
   }
 
   return true;
@@ -136,6 +143,14 @@ gdjs.RuntimeObject.prototype.setLayerIndex = function(layerIndex) {
 
 gdjs.RuntimeObject.prototype.getLayerIndex = function() {
   return this._layerIndex;
+};
+gdjs.RuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
+  this._animationSpeed = animationSpeed;
+  this._renderer.updateAnimationSpeed();
+};
+
+gdjs.RuntimeObject.prototype.getAnimationSpeed = function() {
+  return this._animationSpeed;
 };
 
 /**

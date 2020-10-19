@@ -71,6 +71,12 @@ module.exports = {
           .setType('number')
           .setLabel(_('Layer index'))
       );
+      objectProperties.set(
+        'animationSpeed',
+        new gd.PropertyDescriptor(objectContent.animationSpeed.toString())
+          .setType('number')
+          .setLabel(_('Animation speed'))
+      );
 
       return objectProperties;
     };
@@ -80,6 +86,7 @@ module.exports = {
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
+        animationSpeed: 1,
       })
     );
 
@@ -259,6 +266,49 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLayerIndex');
 
+    object
+      .addCondition(
+        'IsAnimationSpeed',
+        _('Animation speed'),
+        _('Compare the value of the animation speed.'),
+        _('the animation speed'),
+        '',
+        'JsPlatform/Extensions/tile_map32.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .useStandardRelationalOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getAnimationSpeed');
+
+    object
+      .addAction(
+        'SetAnimationSpeed',
+        _('Animation speed'),
+        _('Set Animation speed'),
+        _('the animation speed'),
+        '',
+        'JsPlatform/Extensions/tile_map32.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .useStandardOperatorParameters('expression')
+      .getCodeExtraInformation()
+      .setFunctionName('setAnimationSpeed')
+      .setGetter('getAnimationSpeed');
+
+    object
+      .addExpression(
+        'GetAnimationSpeed',
+        _('Get the Animation speed'),
+        _('Get the Animation speed'),
+        '',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getAnimationSpeed');
+
     return extension;
   },
 
@@ -435,6 +485,13 @@ module.exports = {
         .getValue();
       if (this._pixiObject.layerIndex !== layerIndex)
         this._pixiObject.layerIndex = layerIndex;
+
+      const animationSpeed = this._associatedObject
+        .getProperties(this.project)
+        .get('animationSpeed')
+        .getValue();
+      if (this._pixiObject.animationSpeed !== animationSpeed)
+        this._pixiObject.animationSpeed = animationSpeed;
 
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();

@@ -8,12 +8,11 @@
  */
 gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
-  this._pixiRenderer = runtimeScene.getGame().getRenderer().getPIXIRenderer();
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
     this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
-    this._tileAnimX = this._pixiRenderer.plugins.tilemap.tileAnim[0];
+    this._pixiObject.tileAnim = [0, 0];
   } else {
     // Run updates a single time once loaded here
   }
@@ -36,8 +35,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = function(runtimeScene){
-  console.log("update")
-  this._pixiRenderer.plugins.tilemap.tileAnim[0] += 1;
+  this._pixiObject.tileAnim[0] += 1;
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtimeScene) {

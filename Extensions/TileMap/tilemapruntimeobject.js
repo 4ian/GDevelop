@@ -18,7 +18,6 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   this._displayMode = objectData.content.displayMode;
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
-  //TODO expose to event sheet
   /** @type {number} */
   this._animationSpeed = objectData.content.animationSpeed;
 
@@ -43,8 +42,7 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
 gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
   var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
   
-  this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale; 
-  console.log(this._frameElapsedTime);
+  this._frameElapsedTime += elapsedTime * this._animationSpeed; 
   // 0.25 = 4 fps - todo expose fps - calculate fps like in IDE?
   if ( this._frameElapsedTime > 0.25 ) {
     this._renderer.incrementAnimationFrameX();

@@ -1,12 +1,12 @@
 /* eslint-disable */
-
+ 
 /*!
- * pixi-tilemap - v2.1.2
- * Compiled Sun, 30 Aug 2020 00:12:54 UTC
+ * pixi-tilemap - v2.1.3
+ * Compiled Sun, 18 Oct 2020 17:08:58 UTC
  *
  * pixi-tilemap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- *
+ * 
  * Copyright 2019-2020, Ivan Popelyshev, All Rights Reserved
  */
 this.PIXI = this.PIXI || {};
@@ -54,6 +54,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             this.offsetX = 0;
             this.offsetY = 0;
             this.compositeParent = false;
+            this.tileAnim = null;
             this.vbId = 0;
             this.vb = null;
             this.vbBuffer = null;
@@ -151,6 +152,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             if (this.textures.length === 0)
                 return;
             let points = this.pointsBuf;
+            const tileAnim = this.tileAnim || renderer.plugins.tilemap.tileAnim;
             renderer.context.fillStyle = '#000000';
             for (let i = 0, n = points.length; i < n; i += POINT_STRUCT_SIZE) {
                 let x1 = points[i], y1 = points[i + 1];
@@ -158,8 +160,8 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
                 let w = points[i + 4];
                 let h = points[i + 5];
                 var rotate = points[i + 6];
-                x1 += points[i + 7] * renderer.plugins.tilemap.tileAnim[0];
-                y1 += points[i + 8] * renderer.plugins.tilemap.tileAnim[1];
+                x1 += points[i + 7] * tileAnim[0];
+                y1 += points[i + 8] * tileAnim[1];
                 let textureIndex = points[i + 9];
                 if (textureIndex >= 0) {
                     renderer.context.drawImage(this.textures[textureIndex].baseTexture.getDrawableSource(), x1, y1, w, h, x2, y2, w, h);
@@ -184,7 +186,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             this._globalMat = shader.uniforms.projTransMatrix;
             renderer.globalUniforms.uniforms.projectionMatrix.copyTo(this._globalMat).append(this.worldTransform);
             shader.uniforms.shadowColor = this.shadowColor;
-            shader.uniforms.animationFrame = plugin.tileAnim;
+            shader.uniforms.animationFrame = this.tileAnim || plugin.tileAnim;
             this.renderWebGLCore(renderer, plugin);
         }
         renderWebGLCore(renderer, plugin) {
@@ -369,6 +371,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             this.shadowColor = new Float32Array([0.0, 0.0, 0.0, 0.5]);
             this._globalMat = null;
             this._lastLayer = null;
+            this.tileAnim = null;
             this.initialize.apply(this, arguments);
         }
         initialize(zIndex, bitmaps, texPerChild) {
@@ -516,7 +519,9 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             }
             let layers = this.children;
             for (let i = 0; i < layers.length; i++) {
-                layers[i].renderCanvasCore(renderer);
+                const layer = layers[i];
+                layer.tileAnim = this.tileAnim;
+                layer.renderCanvasCore(renderer);
             }
         }
         render(renderer) {
@@ -529,11 +534,12 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
             this._globalMat = shader.uniforms.projTransMatrix;
             renderer.globalUniforms.uniforms.projectionMatrix.copyTo(this._globalMat).append(this.worldTransform);
             shader.uniforms.shadowColor = this.shadowColor;
-            shader.uniforms.animationFrame = plugin.tileAnim;
+            shader.uniforms.animationFrame = this.tileAnim || plugin.tileAnim;
             renderer.shader.bind(shader, false);
             let layers = this.children;
             for (let i = 0; i < layers.length; i++) {
-                layers[i].renderWebGLCore(renderer, plugin);
+                const layer = layers[i];
+                layer.renderWebGLCore(renderer, plugin);
             }
         }
         isModified(anim) {
@@ -928,13 +934,7 @@ void main(void){
         }
     }
 
-    var pixi_tilemap;
-    (function (pixi_tilemap) {
-        PIXI.tilemap = pixi_tilemap;
-    })(pixi_tilemap || (pixi_tilemap = {}));
-    var exporter = {};
-
-    const pixi_tilemap$1 = {
+    const pixi_tilemap = {
         CanvasTileRenderer,
         CompositeRectTileLayer,
         Constant,
@@ -963,13 +963,10 @@ void main(void){
     exports.fillSamplers = fillSamplers;
     exports.generateFragmentSrc = generateFragmentSrc;
     exports.generateSampleSrc = generateSampleSrc;
-    exports.pixi_tilemap = pixi_tilemap$1;
+    exports.pixi_tilemap = pixi_tilemap;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-// Hack to make PIXI.tilemap available when loaded in the browser (untested)
-if (typeof global.pixi_tilemap !== undefined) {
-    Object.assign(this.PIXI.tilemap, global.pixi_tilemap);
-}
+if (typeof pixi_tilemap !== 'undefined') { Object.assign(this.PIXI.tilemap, pixi_tilemap); }
 //# sourceMappingURL=pixi-tilemap.umd.js.map

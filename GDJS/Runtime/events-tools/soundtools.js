@@ -93,7 +93,7 @@ gdjs.evtTools.sound.getSoundOnChannelPitch = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.setSoundOnChannelPitch = function(runtimeScene, channel, pitch) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    sound && sound.setRate(pitch);
+    sound && sound.rate(pitch);
 };
 
 gdjs.evtTools.sound.preloadSound = function(runtimeScene, music) {
@@ -171,7 +171,7 @@ gdjs.evtTools.sound.getMusicOnChannelPitch = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.setMusicOnChannelPitch = function(runtimeScene, channel, pitch) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.setRate(pitch);
+    music && music.rate(pitch);
 };
 
 gdjs.evtTools.sound.preloadMusic = function(runtimeScene, music) {

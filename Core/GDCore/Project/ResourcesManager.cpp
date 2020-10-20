@@ -129,10 +129,10 @@ bool ImageResource::UpdateProperty(const gd::String& name,
 std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Preload as sound")]
-      .SetValue(loadAsSound ? "true" : "false")
+      .SetValue(preloadAsSound ? "true" : "false")
       .SetType("Boolean");
   properties[_("Preload as music")]
-      .SetValue(loadAsMusic ? "true" : "false")
+      .SetValue(preloadAsMusic ? "true" : "false")
       .SetType("Boolean");
 
   return properties;
@@ -141,9 +141,9 @@ std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties() cons
 bool AudioResource::UpdateProperty(const gd::String& name,
                                    const gd::String& value) {
   if (name == _("Preload as sound"))
-    loadAsSound = value == "1";
+    preloadAsSound = value == "1";
   else if (name == _("Preload as music"))
-    loadAsMusic = value == "1";
+    preloadAsMusic = value == "1";
 
   return true;
 }

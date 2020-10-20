@@ -214,7 +214,7 @@ class GD_CORE_API ImageResource : public Resource {
  */
 class GD_CORE_API AudioResource : public Resource {
  public:
-  AudioResource() : Resource(), loadAsMusic(false), loadAsSound(false) {
+  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false) {
     SetKind("audio");
   };
   virtual ~AudioResource(){};
@@ -239,28 +239,27 @@ class GD_CORE_API AudioResource : public Resource {
   /**
    * \brief Return true if the audio resource should be preloaded as music.
    */
-  bool PreloadAsMusic() const { return loadAsMusic; }
+  bool PreloadAsMusic() const { return preloadAsMusic; }
 
   /**
    * \brief Set if the audio resource should be preloaded as music.
    */
-  void SetPreloadAsMusic(bool enable = true) { loadAsMusic = enable; }
+  void SetPreloadAsMusic(bool enable = true) { preloadAsMusic = enable; }
 
   /**
    * \brief Return true if the audio resource should be preloaded as music.
    */
-  bool PreloadAsSound() const { return loadAsSound; }
+  bool PreloadAsSound() const { return preloadAsSound; }
 
   /**
    * \brief Set if the audio resource should be preloaded as music.
    */
-  void SetPreloadAsSound(bool enable = true) { loadAsSound = enable; }
-
-  bool loadAsSound;
-  bool loadAsMusic;
+  void SetPreloadAsSound(bool enable = true) { preloadAsSound = enable; }
 
  private:
   gd::String file;
+  bool preloadAsSound;
+  bool preloadAsMusic;
 };
 
 /**

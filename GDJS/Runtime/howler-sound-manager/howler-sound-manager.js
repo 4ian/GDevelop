@@ -1,3 +1,4 @@
+//@ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -134,101 +135,100 @@ gdjs.HowlerSound = class HowlerSound {
   }
 
   /**
-   * Get the sound rate
-   * @returns {number} The current rate.
-   * @deprecated Use rate instead.
+   * Get the sound playback rate.
+   * @returns {number}
    */
   getRate() {
-    return this.rate();
+    if (this._id === null) return 0;
+    return this._howl.rate(this._id);
   }
 
   /**
-   * Set the sound rate
-   * @param {number} rate The new rate.
-   * @deprecated Use rate instead.
+   * Set the playback rate
+   * @param {number} rate The new playback rate.
+   * @returns {HowlerSound} The current instance for chaining.
    */
   setRate(rate) {
-    this.rate(rate);
-  }
-  /**
-   * @returns {number}
-   */
-
-  /**
-   * Get/set the sound rate.
-   * @param {number} rate
-   * @returns {HowlerSound}
-   */ rate(rate) {
-    if (this._id === null) return rate === undefined ? 0 : this;
-    rate = gdjs.HowlerSoundManager.clampRate(rate);
-    if (typeof rate === 'undefined') {
-      return this._howl.rate(this._id);
+    if (this._id !== null) {
+      rate = gdjs.HowlerSoundManager.clampRate(rate);
+      this._howl.rate(rate, this._id);
     }
-    this._howl.rate(rate, this._id);
     return this;
   }
-  /**
-   * @returns {boolean}
-   */
 
   /**
-   * Get/set if the sound is looping.
+   * Get if the sound is looping.
+   * @returns {boolean}
+   */
+  getLoop() {
+    if (this._id === null) return false;
+    return this._howl.loop(this._id);
+  }
+
+  /**
+   * Set if the sound is looping.
    * @param {boolean} loop
-   * @returns {HowlerSound}
-   */ loop(loop) {
-    if (this._id === null) return loop === undefined ? false : this;
-    if (typeof loop === 'undefined') {
-      return this._howl.loop(this._id);
-    }
-    this._howl.loop(loop, this._id);
+   * @returns {HowlerSound} The current instance for chaining.
+   */
+  setLoop(loop) {
+    if (this._id !== null) this._howl.loop(loop, this._id);
     return this;
   }
-  /**
-   * @returns {number}
-   */
 
   /**
-   * Get/set the sound volume.
+   * Get the sound volume.
+   * @returns {number}
+   */ 
+  getVolume() {
+    if (this._id === null) return 100;
+    return this._howl.volume(this._id);
+  }
+
+  /**
+   * Set the sound volume.
    * @param {number} volume
-   * @returns {HowlerSound}
-   */ volume(volume) {
-    if (this._id === null) return volume === undefined ? 0 : this;
-    if (typeof volume === 'undefined') {
-      return this._howl.volume(this._id);
-    }
-    this._howl.volume(volume, this._id);
+   * @returns {HowlerSound} The current instance for chaining.
+   */ 
+  setVolume(volume) {
+    if (this._id !== null) this._howl.volume(volume, this._id);
     return this;
   }
+
   /**
+   * Get if the sound is muted.
    * @returns {boolean}
    */
+  getMute() {
+    if (this._id === null) return false;
+    return this._howl.mute(this._id);
+  }
 
   /**
-   * Get/set if the sound is muted.
-   * @param {boolean} rate
-   * @returns {HowlerSound}
-   */ mute(mute) {
-    if (this._id === null) return mute === undefined ? false : this;
-    if (typeof mute === 'undefined') {
-      return this._howl.mute(this._id);
-    }
-    this._howl.mute(mute, this._id);
+   * Set if the sound is muted.
+   * @param {boolean} mute
+   * @returns {HowlerSound} The current instance for chaining.
+   */
+  setMute(mute) {
+    if (this._id !== null) this._howl.mute(mute, this._id);
     return this;
   }
-  /**
-   * @returns {number}
-   */
 
   /**
-   * Get/set the sound seek.
-   * @param {number} seek
-   * @returns {HowlerSound}
-   */ seek(seek) {
-    if (this._id === null) return seek === undefined ? 0 : this;
-    if (typeof seek === 'undefined') {
-      return this._howl.seek(this._id);
-    }
-    this._howl.seek(seek, this._id);
+   * Get the sound seek.
+   * @returns {number}
+   */
+  getSeek() {
+    if (this._id === null) return 0;
+    return this._howl.seek(this._id);
+  }
+
+  /**
+   * Set the sound seek.
+   * @param {number} seek The new seek.
+   * @returns {HowlerSound} The current instance for chaining.
+   */
+  setSeek(seek) {
+    if (this._id !== null) this._howl.seek(seek, this._id);
     return this;
   }
 
@@ -499,7 +499,11 @@ gdjs.HowlerSoundManager.prototype.playSound = function (
 ) {
   var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
 
-  this._storeSoundInArray(this._freeSounds, sound).play().loop(loop).volume(volume / 100).rate(pitch);
+  this._storeSoundInArray(this._freeSounds, sound)
+    .play()
+    .setLoop(loop)
+    .setVolume(volume / 100)
+    .setRate(pitch);
 
   sound.on('play', this._checkForPause);
 };
@@ -517,7 +521,11 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function (
   }
 
   var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
-  sound.play().loop(loop).volume(volume / 100).rate(pitch);
+  sound
+    .play()
+    .setLoop(loop)
+    .setVolume(volume / 100)
+    .setRate(pitch);
 
   this._sounds[channel] = sound;
 
@@ -537,9 +545,9 @@ gdjs.HowlerSoundManager.prototype.playMusic = function (
   var music = this.createHowlerSound(soundName, /* isMusic= */ true);
   this._storeSoundInArray(this._freeMusics, music)
     .play()
-    .loop(loop)
-    .volume(volume / 100)
-    .rate(pitch);
+    .setLoop(loop)
+    .setVolume(volume / 100)
+    .setRate(pitch);
 
   music.on('play', this._checkForPause);
 };
@@ -559,9 +567,9 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
   var music = this.createHowlerSound(soundName, /* isMusic= */ true);
   music
     .play()
-    .loop(loop)
-    .volume(volume / 100)
-    .rate(pitch);
+    .setLoop(loop)
+    .setVolume(volume / 100)
+    .setRate(pitch);
 
   this._musics[channel] = music;
 

@@ -68,22 +68,22 @@ gdjs.evtTools.sound.isSoundOnChannelStopped = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.getSoundOnChannelVolume = function(runtimeScene, channel) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    return sound ? sound.volume() * 100 : 100;
+    return sound ? sound.getVolume() * 100 : 100;
 };
 
 gdjs.evtTools.sound.setSoundOnChannelVolume = function(runtimeScene, channel, volume) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    sound && sound.volume(volume / 100);
+    sound && sound.setVolume(volume / 100);
 };
 
 gdjs.evtTools.sound.getSoundOnChannelPlayingOffset = function(runtimeScene, channel) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    return sound ? sound.seek() : 0;
+    return sound ? sound.getSeek() : 0;
 };
 
 gdjs.evtTools.sound.setSoundOnChannelPlayingOffset = function(runtimeScene, channel, playingOffset) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    sound && sound.seek(playingOffset);
+    sound && sound.setSeek(playingOffset);
 };
 
 gdjs.evtTools.sound.getSoundOnChannelPitch = function(runtimeScene, channel) {
@@ -93,7 +93,7 @@ gdjs.evtTools.sound.getSoundOnChannelPitch = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.setSoundOnChannelPitch = function(runtimeScene, channel, pitch) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    sound && sound.rate(pitch);
+    sound && sound.setRate(pitch);
 };
 
 gdjs.evtTools.sound.preloadSound = function(runtimeScene, music) {
@@ -146,22 +146,22 @@ gdjs.evtTools.sound.isMusicOnChannelStopped = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.getMusicOnChannelVolume = function(runtimeScene, channel) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    return music ? music.volume() * 100 : 100;
+    return music ? music.setVolume() * 100 : 100;
 };
 
 gdjs.evtTools.sound.setMusicOnChannelVolume = function(runtimeScene, channel, volume) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.volume(volume / 100);
+    music && music.getVolume(volume / 100);
 };
 
 gdjs.evtTools.sound.getMusicOnChannelPlayingOffset = function(runtimeScene, channel) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    return music ? music.seek() : 0;
+    return music ? music.getSeek() : 0;
 };
 
 gdjs.evtTools.sound.setMusicOnChannelPlayingOffset = function(runtimeScene, channel, playingOffset) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.seek(playingOffset);
+    music && music.setSeek(playingOffset);
 };
 
 gdjs.evtTools.sound.getMusicOnChannelPitch = function(runtimeScene, channel) {
@@ -171,7 +171,7 @@ gdjs.evtTools.sound.getMusicOnChannelPitch = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.setMusicOnChannelPitch = function(runtimeScene, channel, pitch) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.rate(pitch);
+    music && music.setRate(pitch);
 };
 
 gdjs.evtTools.sound.preloadMusic = function(runtimeScene, music) {

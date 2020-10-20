@@ -178,7 +178,7 @@ gdjs.HowlerSound = class HowlerSound {
   /**
    * Get the sound volume.
    * @returns {number}
-   */ 
+   */
   getVolume() {
     if (this._id === null) return 100;
     return this._howl.volume(this._id);
@@ -188,7 +188,7 @@ gdjs.HowlerSound = class HowlerSound {
    * Set the sound volume.
    * @param {number} volume
    * @returns {HowlerSound} The current instance for chaining.
-   */ 
+   */
   setVolume(volume) {
     if (this._id !== null) this._howl.volume(volume, this._id);
     return this;
@@ -677,8 +677,9 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
   for (let file in files) {
     if (files.hasOwnProperty(file)) {
       const fileData = files[file][0];
-      if (!fileData.preloadAsSound && !fileData.preloadAsMusic) onLoad();
-      if (fileData.preloadAsSound && fileData.preloadAsMusic) {
+      if (!fileData.preloadAsSound && !fileData.preloadAsMusic) {
+        onLoad();
+      } else if (fileData.preloadAsSound && fileData.preloadAsMusic) {
         let loadedOnce = false;
         function callback(_, error) {
           if (!loadedOnce) {
@@ -690,11 +691,9 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function (
 
         preloadAudioFile(file, callback, /* isMusic= */ true);
         preloadAudioFile(file, callback, /* isMusic= */ false);
-        continue;
-      }
-      if (fileData.preloadAsSound)
+      } else if (fileData.preloadAsSound) {
         preloadAudioFile(file, onLoad, /* isMusic= */ false);
-      if (fileData.preloadAsMusic)
+      } else if (fileData.preloadAsMusic)
         preloadAudioFile(file, onLoad, /* isMusic= */ true);
     }
   }

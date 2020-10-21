@@ -7,7 +7,7 @@
 
 /**
  * The `gdjs` namespace contains all classes and objects of the game engine.
- * @namespace
+ * @namespace gdjs
  */
 // @ts-ignore - creating the global object acting as a namespace
 window.gdjs = {};
@@ -135,7 +135,7 @@ gdjs.toDegrees = function (angleInRadians) {
  * of the type of the object is "TextObject::Text".
  *
  * @param {string} objectTypeName The name of the type of the Object.
- * @param {gdjs.RuntimeObject} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeObject} Ctor The constructor of the Object.
  */
 gdjs.registerObject = function (objectTypeName, Ctor) {
   gdjs.objectsTypes.put(objectTypeName, Ctor);
@@ -150,7 +150,7 @@ gdjs.registerObject = function (objectTypeName, Ctor) {
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
  * @param {string} behaviorTypeName The name of the type of the behavior.
- * @param {gdjs.RuntimeBehavior} Ctor The constructor of the Object.
+ * @param {typeof gdjs.RuntimeBehavior} Ctor The constructor of the Object.
  */
 gdjs.registerBehavior = function (behaviorTypeName, Ctor) {
   gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
@@ -271,7 +271,7 @@ gdjs.clearGlobalCallbacks = function () {
  * Get the constructor of an object.
  *
  * @param {string} name The name of the type of the object.
- * @returns {gdjs.RuntimeObject}
+ * @returns {typeof gdjs.RuntimeObject}
  */
 gdjs.getObjectConstructor = function (name) {
   if (name !== undefined && gdjs.objectsTypes.containsKey(name))
@@ -285,7 +285,7 @@ gdjs.getObjectConstructor = function (name) {
  * Get the constructor of a behavior.
  *
  * @param {string} name The name of the type of the behavior.
- * @returns {gdjs.RuntimeBehavior}
+ * @returns {typeof gdjs.RuntimeBehavior}
  */
 gdjs.getBehaviorConstructor = function (name) {
   if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))

@@ -21,48 +21,10 @@ gdjs.HowlerSound = class HowlerSound {
   _paused = false;
   _stopped = true;
   _canBeDestroyed = false;
+  _hasListeners = false;
 
   constructor(howl) {
     this._howl = howl;
-
-    /*
-     * Track events to be sure the status is
-     * sync'ed with the sound - though some should be redundant
-     * with `play`/`pause` methods already doing that. Keeping
-     * that to be sure that the status is always correct.
-     */
-
-    this._howl.on('play', function () {
-      this._paused = false;
-      this._stopped = false;
-    });
-
-    this._howl.on('pause', function () {
-      this._paused = true;
-      this._stopped = false;
-    });
-
-    this._howl.on('end', () => {
-      if (!this._howl.loop()) {
-        this._canBeDestroyed = true;
-        this._paused = false;
-        this._stopped = true;
-      }
-    });
-
-    this._howl.on('playerror', (id, error) => {
-      console.error(
-        "Can't play a sound, considering it as stopped. Error is: ",
-        error
-      );
-      this._paused = false;
-      this._stopped = true;
-    });
-
-    // In case the howl didn't finsih loading, start the sound once it finishes loading.
-    this._howl.on('load', function () {
-      this.play();
-    });
   }
 
   /**
@@ -73,6 +35,51 @@ gdjs.HowlerSound = class HowlerSound {
     this._paused = false;
     this._stopped = false;
     this._id = this._howl.play(this._id === null ? undefined : this._id);
+
+    if (!this._hasListeners) {
+      this._hasListeners = true;
+      /*
+       * Track events to be sure the status is
+       * sync'ed with the sound - though some should be redundant
+       * with `play`/`pause` methods already doing that. Keeping
+       * that to be sure that the status is always correct.
+       *
+       * This is done in play as we need the ID to set up those callbacks.
+       */
+
+      this.on('play', function () {
+        this._paused = false;
+        this._stopped = false;
+      });
+
+      this.on('pause', function () {
+        this._paused = true;
+        this._stopped = false;
+      });
+
+      this.on('end', () => {
+        if (!this._howl.loop()) {
+          this._canBeDestroyed = true;
+          this._paused = false;
+          this._stopped = true;
+        }
+      });
+
+      this.on('playerror', (id, error) => {
+        console.error(
+          "Can't play a sound, considering it as stopped. Error is: ",
+          error
+        );
+        this._paused = false;
+        this._stopped = true;
+      });
+
+      // In case the howl didn't finsih loading, start the sound once it finishes loading.
+      this.once('load', function () {
+        this.play();
+      });
+    }
+
     return this;
   }
 

@@ -17,25 +17,26 @@
     "plugins/markdown",
     "../node_modules/jsdoc-plugin-intersection",
     "../node_modules/jsdoc-autoprivate",
-	"../node_modules/better-docs/typescript",
-	"node_modules/better-docs/typedef-import"
+    "../node_modules/better-docs/typescript",
+    "../node_modules/better-docs/typedef-import",
+    "../node_modules/jsdoc-typeof-plugin"
   ],
   "templates": {
-	"search": true,
-	"better-docs": {
-		"name": "GDJS Documentation",
-		"hideGenerator": true,
-		"navLinks": [
-			{
-				"label": "Github",
-				"href": "https://github.com/4ian/GDevelop"
-			},
-			{
-				"label": "GDevelop Documentation",
-				"href": "http://wiki.compilgames.net/doku.php/gdevelop5/start"
-			}
-		]
-	}
+    "search": true,
+    "better-docs": {
+      "name": "GDJS Documentation",
+      "hideGenerator": true,
+      "navLinks": [
+        {
+          "label": "Github",
+          "href": "https://github.com/4ian/GDevelop"
+        },
+        {
+          "label": "GDevelop Documentation",
+          "href": "http://wiki.compilgames.net/doku.php/gdevelop5/start"
+        }
+      ]
+    }
   },
   "markdown": {
     "parser": "gfm",

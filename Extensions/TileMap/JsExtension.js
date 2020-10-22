@@ -254,7 +254,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardOperatorParameters('expression')
+      .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
       .setFunctionName('setLayerIndex')
       .setGetter('getLayerIndex');
@@ -297,7 +297,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardOperatorParameters('expression')
+      .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
       .setFunctionName('setAnimationSpeed')
       .setGetter('getAnimationSpeed');

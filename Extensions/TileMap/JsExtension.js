@@ -233,7 +233,7 @@ module.exports = {
         'LayerIndex',
         _('Layer index'),
         _('Compare the value of the layer index.'),
-        _('the layer index'),
+        _('The layer index'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -276,7 +276,7 @@ module.exports = {
         'AnimationSpeed',
         _('Animation speed'),
         _('Compare the value of the animation speed.'),
-        _('the animation speed'),
+        _('The animation speed'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -291,7 +291,7 @@ module.exports = {
         'SetAnimationSpeed',
         _('Animation speed'),
         _('Set Animation speed'),
-        _('the animation speed'),
+        _('Set the animation speed scale of the tilemap (1 by default).'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'

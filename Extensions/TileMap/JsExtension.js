@@ -131,7 +131,7 @@ module.exports = {
 
     object
       .addCondition(
-        'IsTiledFile',
+        'TiledFile',
         _('Tiled file'),
         _('Compare the value of the tiled file.'),
         '',
@@ -160,7 +160,7 @@ module.exports = {
 
     object
       .addCondition(
-        'IsTilemapAtlasImage',
+        'TilemapAtlasImage',
         _('Tilemap atlas image'),
         _('Compare the value of the tilemap atlas image.'),
         '',
@@ -189,7 +189,7 @@ module.exports = {
 
     object
       .addCondition(
-        'IsDisplayMode',
+        'DisplayMode',
         _('Display mode'),
         _('Compare the value of the display mode.'),
         _('The display mode of _PARAM0_ is _PARAM1_'),
@@ -230,7 +230,7 @@ module.exports = {
 
     object
       .addCondition(
-        'IsLayerIndex',
+        'LayerIndex',
         _('Layer index'),
         _('Compare the value of the layer index.'),
         _('the layer index'),
@@ -273,12 +273,12 @@ module.exports = {
 
     object
       .addCondition(
-        'IsAnimationSpeed',
+        'AnimationSpeed',
         _('Animation speed'),
         _('Compare the value of the animation speed.'),
         _('the animation speed'),
         '',
-        'JsPlatform/Extensions/tile_map32.png',
+        'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
@@ -293,7 +293,7 @@ module.exports = {
         _('Set Animation speed'),
         _('the animation speed'),
         '',
-        'JsPlatform/Extensions/tile_map32.png',
+        'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)

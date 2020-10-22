@@ -266,8 +266,10 @@ gdjs.evtTools.advancedWindow.isAlwaysOnTop = function () {
  * @param {number} y
  */
 gdjs.evtTools.advancedWindow.setPosition = function (x, y) {
-  if (gdjs.evtTools.advancedWindow.electronBrowserWindow)
-    gdjs.evtTools.advancedWindow.electronBrowserWindow.setPosition(parseInt(x, 10), parseInt(y, 10));
+  if (gdjs.evtTools.advancedWindow.electronBrowserWindow) {
+    // Convert x and y to (32 bit) integers to avoid Electron errors.
+    gdjs.evtTools.advancedWindow.electronBrowserWindow.setPosition(~~x, ~~y);
+  }
 };
 
 /**

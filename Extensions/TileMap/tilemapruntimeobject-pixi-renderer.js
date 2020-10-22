@@ -137,6 +137,18 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
   this._pixiObject.alpha = this._object._opacity / 255;
 };
 
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.setWidth = function(width) {
+  this._pixiObject.width = width / this._pixiObject.scale.x;
+  this._pixiObject.pivot.x = width / 2;
+  this.updatePosition();
+};
+
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.setHeight = function(height) {
+  this._pixiObject.height = height / this._pixiObject.scale.y;
+  this._pixiObject.pivot.y = height / 2;
+  this.updatePosition();
+};
+
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.getWidth = function() {
   return this._pixiObject.width;
 };

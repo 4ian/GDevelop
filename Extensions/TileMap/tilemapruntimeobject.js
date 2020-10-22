@@ -95,6 +95,8 @@ gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = fun
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
+    this.setWidth(initialInstanceData.width);
+    this.setHeight(initialInstanceData.height);
   }
 };
 
@@ -150,6 +152,23 @@ gdjs.RuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
 gdjs.RuntimeObject.prototype.getAnimationSpeed = function() {
   return this._animationSpeed;
 };
+
+/**
+ * Set the width of the Tiled Sprite object.
+ * @param {number} width The new width.
+ */
+gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
+  this._renderer.setWidth(width);
+};
+
+/**
+ * Set the height of the Tiled Sprite object.
+ * @param {number} height The new height.
+ */
+gdjs.TileMapRuntimeObject.prototype.setHeight = function(height) {
+  this._renderer.setHeight(height);
+};
+
 
 /**
  * Set object position on X axis.

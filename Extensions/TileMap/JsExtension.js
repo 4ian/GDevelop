@@ -261,7 +261,7 @@ module.exports = {
 
     object
       .addExpression(
-        'GetLayerIndex',
+        'LayerIndex',
         _('Get the Layer index'),
         _('Get the Layer index'),
         '',
@@ -304,7 +304,7 @@ module.exports = {
 
     object
       .addExpression(
-        'GetAnimationSpeed',
+        'AnimationSpeed',
         _('Get the Animation speed'),
         _('Get the Animation speed'),
         '',

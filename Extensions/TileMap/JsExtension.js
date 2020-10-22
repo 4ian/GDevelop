@@ -248,7 +248,7 @@ module.exports = {
         'SetLayerIndex',
         _('Layer index'),
         _('Set Layer index'),
-        _('the layer index'),
+        _('Set the layer index of the tilemap.'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'

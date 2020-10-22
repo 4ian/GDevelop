@@ -146,7 +146,7 @@ module.exports = {
       .addAction(
         'SetTiledFile',
         _('Tiled file'),
-        _('Set Tiled file'),
+        _('Set the json file with the tilemap data (mapeditor.org supported)'),
         _('Set the tiled file of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -175,7 +175,7 @@ module.exports = {
       .addAction(
         'SetTilemapAtlasImage',
         _('Tilemap atlas image'),
-        _('Set Tilemap atlas image'),
+        _('Set the Tilemap atlas image'),
         _('Set the tilemap atlas image of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -211,7 +211,7 @@ module.exports = {
       .addAction(
         'SetDisplayMode',
         _('Display mode'),
-        _('Set Display mode'),
+        _('Set the Display mode'),
         _('Set display mode of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -247,8 +247,8 @@ module.exports = {
       .addAction(
         'SetLayerIndex',
         _('Layer index'),
-        _('Set Layer index'),
         _('Set the layer index of the tilemap.'),
+        _('the layer index'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -290,8 +290,8 @@ module.exports = {
       .addAction(
         'SetAnimationSpeed',
         _('Animation speed'),
-        _('Set Animation speed'),
         _('Set the animation speed scale of the tilemap (1 by default).'),
+        _('the animation speed'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'

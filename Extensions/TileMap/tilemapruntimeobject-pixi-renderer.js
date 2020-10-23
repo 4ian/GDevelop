@@ -21,11 +21,12 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getLayer('')
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
-  
+
+  this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
-  this.updateTileMap(runtimeScene);
-  this.updatePosition();
+  this.updateTileMap();
+  this.updateVisible();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -93,29 +94,25 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationFrame = function() {
   console.log("UPDATING....")
 };
+
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
-  this._pixiObject._tiledFile = this._object._tiledFile;
-  //this._pixiObject.dirty = true;
+  this._object._tiledFile = this._object._tiledFile;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {
-  this._pixiObject._tilemapAtlasImage = this._object._tilemapAtlasImage;
-  //this._pixiObject.dirty = true;
+  this._object._tilemapAtlasImage = this._object._tilemapAtlasImage;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateDisplayMode = function() {
-  this._pixiObject._displayMode = this._object._displayMode;
-  //this._pixiObject.dirty = true;
+  this._object._displayMode = this._object._displayMode;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
-  this._pixiObject._layerIndex = this._object._layerIndex;
-  //this._pixiObject.dirty = true;
+  this._object._layerIndex = this._object._layerIndex;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationSpeed = function() {
-  this._pixiObject._animationSpeed = this._object._animationSpeed;
-  //this._pixiObject.dirty = true;
+  this._object._animationSpeed = this._object._animationSpeed;
   this.updatePosition();
 };
 

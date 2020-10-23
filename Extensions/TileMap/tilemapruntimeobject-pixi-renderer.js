@@ -22,11 +22,10 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-  this.updatePosition();
-  this.updateAngle();
-  this.updateOpacity();
-  this.updateTileMap();
-  this.updateVisible();
+    this.updateAngle();
+    this.updateOpacity();
+    this.updateTileMap(runtimeScene);
+    this.updatePosition();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -91,28 +90,19 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
     });   
 };
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationFrame = function() {
-  console.log("UPDATING....")
-};
-
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapJsonFile = function() {
-  this._object._tilemapJsonFile = this._object._tilemapJsonFile;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {
-  this._object._tilemapAtlasImage = this._object._tilemapAtlasImage;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateDisplayMode = function() {
-  this._object._displayMode = this._object._displayMode;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
-  this._object._layerIndex = this._object._layerIndex;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationSpeed = function() {
-  this._object._animationSpeed = this._object._animationSpeed;
   this.updatePosition();
 };
 

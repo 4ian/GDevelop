@@ -112,53 +112,52 @@ gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
 /**
  * Set/Get TileMap base properties
  */
-
-gdjs.RuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
+gdjs.TileMapRuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
   this._tilemapJsonFile = tilemapJsonFile;
   this._renderer.updateTilemapJsonFile();
 };
 
-gdjs.RuntimeObject.prototype.getTilemapJsonFile = function() {
+gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
   return this._tilemapJsonFile;
 };
 
-gdjs.RuntimeObject.prototype.setTilemapAtlasImage = function(
+gdjs.TileMapRuntimeObject.prototype.setTilemapAtlasImage = function(
   tilemapAtlasImage
 ) {
   this._tilemapAtlasImage = tilemapAtlasImage;
   this._renderer.updateTilemapAtlasImage();
 };
 
-gdjs.RuntimeObject.prototype.getTilemapAtlasImage = function() {
+gdjs.TileMapRuntimeObject.prototype.getTilemapAtlasImage = function() {
   return this._tilemapAtlasImage;
 };
-gdjs.RuntimeObject.prototype.setDisplayMode = function(displayMode) {
+gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function(displayMode) {
   this._displayMode = displayMode;
   this._renderer.updateDisplayMode();
 };
 
-gdjs.RuntimeObject.prototype.getDisplayMode = function() {
+gdjs.TileMapRuntimeObject.prototype.getDisplayMode = function() {
   return this._displayMode;
 };
-gdjs.RuntimeObject.prototype.setLayerIndex = function(layerIndex) {
+gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function(layerIndex) {
   this._layerIndex = layerIndex;
   this._renderer.updateLayerIndex();
 };
 
-gdjs.RuntimeObject.prototype.getLayerIndex = function() {
+gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function() {
   return this._layerIndex;
 };
-gdjs.RuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
+gdjs.TileMapRuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
   this._animationSpeed = animationSpeed;
   this._renderer.updateAnimationSpeed();
 };
 
-gdjs.RuntimeObject.prototype.getAnimationSpeed = function() {
+gdjs.TileMapRuntimeObject.prototype.getAnimationSpeed = function() {
   return this._animationSpeed;
 };
 
 /**
- * Set the width of the Tiled Sprite object.
+ * Set the width of the object.
  * @param {number} width The new width.
  */
 gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
@@ -166,7 +165,7 @@ gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
 };
 
 /**
- * Set the height of the Tiled Sprite object.
+ * Set the height of the object.
  * @param {number} height The new height.
  */
 gdjs.TileMapRuntimeObject.prototype.setHeight = function(height) {

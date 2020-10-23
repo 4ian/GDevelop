@@ -40,6 +40,7 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
 };
 
 gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
+  if (this._animationSpeed <= 0) return;
   var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
   
   this._frameElapsedTime += elapsedTime * this._animationSpeed; 

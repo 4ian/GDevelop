@@ -8,6 +8,7 @@
  */
 gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
+  this._runtimeScene = runtimeScene;
 
   // Load (or reset)
   if (this._pixiObject === undefined) {
@@ -22,10 +23,10 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-    this.updateAngle();
-    this.updateOpacity();
-    this.updateTileMap(runtimeScene);
-    this.updatePosition();
+  this.updateAngle();
+  this.updateOpacity();
+  this.updateTileMap();
+  this.updatePosition();
 };
 
 gdjs.TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
@@ -40,12 +41,12 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtimeScene) {
 
-  var atlasTexture = runtimeScene
+  var atlasTexture = this._runtimeScene
     .getGame()
     .getImageManager()
     .getPIXITexture(this._object._tilemapAtlasImage);
   
-  runtimeScene
+  this._runtimeScene
     .getGame()
     .getJsonManager()
     .loadJson(this._object._tilemapJsonFile, (error, content)=> {

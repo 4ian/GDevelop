@@ -54,11 +54,11 @@ gdjs.HowlerSound = class HowlerSound {
    * @returns {HowlerSound} The current instance for chaining.
    */
   play() {
-    if (this._howl._state === 'loaded') {
+    if (this._howl.state() === 'loaded') {
       this._id = this._howl.play(this._id === null ? undefined : this._id);
     } else {
       this._loading = true;
-      // In case the howl didn't finsih loading, start the sound once it finishes loading.
+      // In case the howl didn't finish loading, start the sound once it finishes loading.
       this._howl.once('load', () => {
         this._loading = false;
         this.play();
@@ -464,6 +464,9 @@ gdjs.HowlerSoundManager.prototype.loadAudio = function (soundName, isMusic) {
   const soundFile = this._getFileFromSoundName(soundName);
   const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
 
+  // Do not reload if it is already loaded.
+  if (cacheContainer.hasOwnProperty(soundFile)) return;
+
   //@ts-ignore Ts doesn't know about Howler
   cacheContainer[soundFile] = new Howl({
     src: [soundFile],
@@ -490,7 +493,7 @@ gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
   // Make sure any sound using the howl is deleted so that the howl can be garbage collected
   // and no weird "zombies" using the unloaded howl can exist.
   const howl = cacheContainer[soundFile];
-  function clearConatiner(howlerSoundContainer) {
+  function clearContainer(howlerSoundContainer) {
     for (let i in howlerSoundContainer) {
       if (howlerSoundContainer[i] && howlerSoundContainer[i]._howl === howl) {
         howlerSoundContainer[i].stop();
@@ -499,10 +502,10 @@ gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
     }
   }
 
-  clearConatiner(this._freeMusics);
-  clearConatiner(this._freeSounds);
-  clearConatiner(this._musics);
-  clearConatiner(this._sounds);
+  clearContainer(this._freeMusics);
+  clearContainer(this._freeSounds);
+  clearContainer(this._musics);
+  clearContainer(this._sounds);
 
   cacheContainer[soundFile].unload();
   delete cacheContainer[soundFile];

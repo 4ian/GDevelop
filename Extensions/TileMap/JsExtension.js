@@ -358,10 +358,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      console.log(PIXI.tilemap, "PixiTilemapHelper::",PixiTilemapHelper);
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
       this._tileSet = null;
-      console.log(this._pixiObject);
       this._pixiContainer.addChild(this._pixiObject);
       this.update();
       this.updateTileMap();
@@ -385,7 +383,6 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.updateTileMap = function() {
       // Get the tileset resource to use
-      console.log("UPDATE--", PixiTilemapHelper, this.project, this._project)
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
         .get('tilemapAtlasImage')
@@ -409,14 +406,12 @@ module.exports = {
       const texture = this._pixiResourcesLoader.getPIXITexture(this._project, tilemapAtlasImage);
       this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
-          console.log(tiledData,texture);
           PixiTilemapHelper.getPIXITileSet(
             texture,
             tiledData,
             tilemapAtlasImage,
             tilemapJsonFile,
             (tileset) => {
-              console.log('LOADED', tileset);
               if (tileset && this._pixiObject) {
                 PixiTilemapHelper.updatePIXITileMap(
                   this._pixiObject,

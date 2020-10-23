@@ -57,6 +57,7 @@
     */
     exports.updatePIXITileMap = (tileMap, tileSet, render, layerIndex) => {
         if (!tileMap || !tileSet) return;
+        tileMap.clear();
   
         tileSet.layers.forEach(function(layer, index) {
           if (render === 'index' && layerIndex !== index) return;

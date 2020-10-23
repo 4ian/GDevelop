@@ -40,7 +40,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
-
   var atlasTexture = this._runtimeScene
     .getGame()
     .getImageManager()
@@ -54,26 +53,13 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
         console.error('An error happened while loading JSON resource:', error);
       } else {
         if (!content) return;
-        console.log("JSON", content, atlasTexture)
 
-        console.log(
-          this._pixiObject,
-          PixiTileMapHelper,
-          this,
-          this._object._tilemapJsonFile,
-          this._object._tilemapAtlasImage,
-          this._object._displayMode
-          )
-  
-          
-        // ReloadTilemap
         PixiTileMapHelper.getPIXITileSet(
           atlasTexture,
           content,
           this._object._tilemapAtlasImage,
           this._object._tilemapJsonFile,
           (tileset) => {
-            
             if (tileset && this._pixiObject) {
               PixiTileMapHelper.updatePIXITileMap(
                 this._pixiObject,
@@ -81,7 +67,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
                 this._object._displayMode,
                 this._object._layerIndex
               );
-              console.log('LOADED', tileset, this._pixiObject);
             }
           }
         )

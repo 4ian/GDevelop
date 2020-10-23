@@ -531,7 +531,7 @@ gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
   // Make sure any sound using the howl is deleted so that the howl can be garbage collected
   // and no weird "zombies" using the unloaded howl can exist.
   const howl = container[soundFile];
-  function removeFromConatiner(soundContainer) {
+  function clearConatiner(soundContainer) {
     for (let i in soundContainer) {
       if (soundContainer[i] && soundContainer[i]._howl === howl) {
         soundContainer[i].stop();
@@ -540,10 +540,10 @@ gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
     }
   }
 
-  removeFromConatiner(this._freeMusics);
-  removeFromConatiner(this._freeSounds);
-  removeFromConatiner(this._musics);
-  removeFromConatiner(this._sounds);
+  clearConatiner(this._freeMusics);
+  clearConatiner(this._freeSounds);
+  clearConatiner(this._musics);
+  clearConatiner(this._sounds);
 
   container[soundFile].unload();
   delete container[soundFile];

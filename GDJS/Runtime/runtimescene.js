@@ -851,6 +851,8 @@ gdjs.RuntimeScene.prototype.getTimeManager = function() {
  * @return {gdjs.SoundManager} The gdjs.SoundManager of the game.
  */
 gdjs.RuntimeScene.prototype.getSoundManager = function() {
+    //TODO Type cocos-sound-manager, and make a common interface for sound managers and sounds.
+    //@ts-ignore Ignore implementation differences between Cocos and Howler.
     return this._runtimeGame.getSoundManager();
 };
 

@@ -16,11 +16,47 @@
  * @class HowlerSound
  */
 gdjs.HowlerSound = class HowlerSound {
+  /**
+   * The ID of the played sound.
+   * @type {?number}
+   * @private
+   */
   _id = null;
+
+  /**
+   * The Howl passed to the constructor.
+   * It defines the sound file that is being played.
+   */
   _howl = null;
+
+  /**
+   * An internal variable for tracking the paused state.
+   * @type {boolean}
+   * @private
+   */
   _paused = false;
+
+  /**
+   * An internal variable for tracking the stopped state.
+   * @type {boolean}
+   * @private
+   */
   _stopped = true;
+
+  /**
+   * An internal variable for tracking if the sound can be destroyed.
+   * This is used to remove a free sound when it finishes.
+   * @type {boolean}
+   * @private
+   */
   _canBeDestroyed = false;
+
+  /**
+   * An internal variable for making sure listeners
+   * on the Howl are only being setted up once.
+   * @type {boolean}
+   * @private
+   */
   _hasListeners = false;
 
   constructor(howl) {
@@ -32,9 +68,25 @@ gdjs.HowlerSound = class HowlerSound {
    * @returns {HowlerSound} The current instance for chaining.
    */
   play() {
+    this._id = this._howl.play(this._id === null ? undefined : this._id);
+
+    if (this._id === null) {
+      this._paused = true;
+      this._stopped = true;
+
+      // In case the howl didn't finsih loading, start the sound once it finishes loading.
+      this._howl.once('load', () => {
+        this._hasListeners = false;
+        this.play();
+      });
+      // Make sure it is loading
+      this._howl.load();
+      // Directly return to not create unecessary listeners
+      return this;
+    }
+
     this._paused = false;
     this._stopped = false;
-    this._id = this._howl.play(this._id === null ? undefined : this._id);
 
     if (!this._hasListeners) {
       this._hasListeners = true;
@@ -47,12 +99,12 @@ gdjs.HowlerSound = class HowlerSound {
        * This is done in play as we need the ID to set up those callbacks.
        */
 
-      this.on('play', function () {
+      this.on('play', () => {
         this._paused = false;
         this._stopped = false;
       });
 
-      this.on('pause', function () {
+      this.on('pause', () => {
         this._paused = true;
         this._stopped = false;
       });
@@ -72,11 +124,6 @@ gdjs.HowlerSound = class HowlerSound {
         );
         this._paused = false;
         this._stopped = true;
-      });
-
-      // In case the howl didn't finsih loading, start the sound once it finishes loading.
-      this.once('load', function () {
-        this.play();
       });
     }
 
@@ -298,24 +345,20 @@ gdjs.HowlerSoundManager = function (resources) {
 
   this._globalVolume = 100;
 
+  /** @type {Object<number, gdjs.HowlerSound>} */
   this._sounds = {};
+  /** @type {Object<number, gdjs.HowlerSound>} */
   this._musics = {};
+  /** @type {Array<gdjs.HowlerSound>} */
   this._freeSounds = []; //Sounds without an assigned channel.
+  /** @type {Array<gdjs.HowlerSound>} */
   this._freeMusics = []; //Musics without an assigned channel.
 
+  /** @type {Array<gdjs.HowlerSound>} */
   this._pausedSounds = [];
   this._paused = false;
 
-  var that = this;
-  this._checkForPause = function () {
-    if (that._paused) {
-      //FIXME
-      //@ts-ignore
-      this.pause();
-      that._pausedSounds.push(this);
-    }
-  };
-
+  const that = this;
   document.addEventListener('deviceready', function () {
     // pause/resume sounds in Cordova when the app is being paused/resumed
     document.addEventListener(
@@ -485,17 +528,42 @@ gdjs.HowlerSoundManager.prototype.unloadAudio = function (soundName, isMusic) {
 
   if (!container[soundFile]) return;
 
+  // Make sure any sound using the howl is deleted so that the howl can be garbage collected
+  // and no weird "zombies" using the unloaded howl can exist.
+  const howl = container[soundFile];
+  function removeFromConatiner(soundContainer) {
+    for (let i in soundContainer) {
+      if (soundContainer[i] && soundContainer[i]._howl === howl) {
+        soundContainer[i].stop();
+        delete soundContainer[i];
+      }
+    }
+  }
+
+  removeFromConatiner(this._freeMusics);
+  removeFromConatiner(this._freeSounds);
+  removeFromConatiner(this._musics);
+  removeFromConatiner(this._sounds);
+
   container[soundFile].unload();
   delete container[soundFile];
 };
 
 /**
  * Unloads all audio from memory.
+ * This will clear the Howl cache.
  * This will also stop any running music or sounds.
  */
 gdjs.HowlerSoundManager.prototype.unloadAll = function () {
   //@ts-ignore Ts doesn't know about Howler
   Howler.unload();
+
+  // Clean up old sounds that still have the dead Howl instanes.
+  this._freeSounds.length = 0;
+  this._freeMusics.length = 0;
+  this._sounds = {};
+  this._musics = {};
+  this._pausedSounds.length = 0;
 };
 
 gdjs.HowlerSoundManager.prototype.playSound = function (
@@ -512,7 +580,12 @@ gdjs.HowlerSoundManager.prototype.playSound = function (
     .setVolume(volume / 100)
     .setRate(pitch);
 
-  sound.on('play', this._checkForPause);
+  sound.on('play', () => {
+    if (this._paused) {
+      sound.pause();
+      this._pausedSounds.push(sound);
+    }
+  });
 };
 
 gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function (
@@ -536,7 +609,12 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function (
 
   this._sounds[channel] = sound;
 
-  sound.on('play', this._checkForPause);
+  sound.on('play', () => {
+    if (this._paused) {
+      sound.pause();
+      this._pausedSounds.push(sound);
+    }
+  });
 };
 
 gdjs.HowlerSoundManager.prototype.getSoundOnChannel = function (channel) {
@@ -556,7 +634,12 @@ gdjs.HowlerSoundManager.prototype.playMusic = function (
     .setVolume(volume / 100)
     .setRate(pitch);
 
-  music.on('play', this._checkForPause);
+  music.on('play', () => {
+    if (this._paused) {
+      music.pause();
+      this._pausedSounds.push(music);
+    }
+  });
 };
 
 gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
@@ -580,7 +663,12 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
 
   this._musics[channel] = music;
 
-  music.on('play', this._checkForPause);
+  music.on('play', () => {
+    if (this._paused) {
+      music.pause();
+      this._pausedSounds.push(music);
+    }
+  });
 };
 
 gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function (channel) {
@@ -600,30 +688,16 @@ gdjs.HowlerSoundManager.prototype.getGlobalVolume = function () {
 };
 
 /**
- * Stops all sounds. Does not unload them from memory.
+ * Stops all sounds. Does not unload the Howl cache from memory.
  */
 gdjs.HowlerSoundManager.prototype.clearAll = function () {
-  for (var i = 0; i < this._freeSounds.length; ++i) {
-    if (this._freeSounds[i]) this._freeSounds[i].stop();
-  }
-  for (var i = 0; i < this._freeMusics.length; ++i) {
-    if (this._freeMusics[i]) this._freeMusics[i].stop();
-  }
+  //@ts-ignore Ts doesn't know about Howler
+  Howler.stop();
+
   this._freeSounds.length = 0;
   this._freeMusics.length = 0;
-
-  for (var p in this._sounds) {
-    if (this._sounds.hasOwnProperty(p) && this._sounds[p]) {
-      this._sounds[p].stop();
-      delete this._sounds[p];
-    }
-  }
-  for (var p in this._musics) {
-    if (this._musics.hasOwnProperty(p) && this._musics[p]) {
-      this._musics[p].stop();
-      delete this._musics[p];
-    }
-  }
+  this._sounds = {};
+  this._musics = {};
   this._pausedSounds.length = 0;
 };
 

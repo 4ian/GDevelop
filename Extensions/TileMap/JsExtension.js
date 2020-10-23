@@ -18,7 +18,7 @@ module.exports = {
       .setExtensionInformation(
         'TileMap',
         _('TileMap Object'),
-        _('Displays a tiled file tilemap.'),
+        _('Displays a tilemap (mapeditor.org supported).'),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
@@ -43,11 +43,11 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        'tiledFile',
-        new gd.PropertyDescriptor(objectContent.tiledFile)
+        'tilemapJsonFile',
+        new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
           .setType('resource')
           .addExtraInfo('json')
-          .setLabel(_('Tiled file'))
+          .setLabel(_('Tilemap json file'))
       );
       objectProperties.set(
         'tilemapAtlasImage',
@@ -82,7 +82,7 @@ module.exports = {
     };
     objectTileMap.setRawJSONContent(
       JSON.stringify({
-        tiledFile: '',
+        tilemapJsonFile: '',
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
@@ -114,7 +114,7 @@ module.exports = {
       .addObject(
         'TileMap',
         _('TileMap'),
-        _('Displays a tiled file tilemap'),
+        _('Displays a tilemap (mapeditor.org supported)'),
         'JsPlatform/Extensions/tile_map32.png',
         objectTileMap
       )
@@ -131,32 +131,32 @@ module.exports = {
 
     object
       .addCondition(
-        'TiledFile',
-        _('Tiled file'),
-        _('Compare the value of the tiled file.'),
+        'TilemapJsonFile',
+        _('Tilemap json file'),
+        _('Compare the value of the tilemap json file.'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
-      .setFunctionName('getTiledFile');
+      .setFunctionName('getTilemapJsonFile');
 
     object
       .addAction(
-        'SetTiledFile',
-        _('Tiled file'),
+        'SetTilemapJsonFile',
+        _('Tilemap json file'),
         _('Set the json file with the tilemap data (mapeditor.org supported)'),
-        _('Set the tiled file of _PARAM0_ to _PARAM1_'),
+        _('Set the tilemap json file of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tiled file'), '', false)
+      .addParameter('jsonResource', _('Tilemap json file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setTiledFile')
-      .setGetter('getTiledFile');
+      .setFunctionName('setTilemapJsonFile')
+      .setGetter('getTilemapJsonFile');
 
     object
       .addCondition(
@@ -419,9 +419,9 @@ module.exports = {
         .getProperties(this.project)
         .get('tilemapAtlasImage')
         .getValue();
-      const tiledFile = this._associatedObject
+      const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
-        .get('tiledFile')
+        .get('tilemapJsonFile')
         .getValue();
       const layerIndex = parseInt(
         this._associatedObject
@@ -436,14 +436,14 @@ module.exports = {
         .getValue();
 
       const texture = this._pixiResourcesLoader.getPIXITexture(this._project, tilemapAtlasImage);
-      this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, tiledFile).then(
+      this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
           console.log(tiledData,texture);
           PixiTilemapHelper.getPIXITileSet(
             texture,
             tiledData,
             tilemapAtlasImage,
-            tiledFile,
+            tilemapJsonFile,
             (tileset) => {
               console.log('LOADED', tileset);
               if (tileset && this._pixiObject) {
@@ -463,12 +463,12 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedTileMapInstance.prototype.update = function() {
-      const tiledFile = this._associatedObject
+      const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
-        .get('tiledFile')
+        .get('tilemapJsonFile')
         .getValue();
-      if (this._pixiObject.tiledFile !== tiledFile)
-        this._pixiObject.tiledFile = tiledFile;
+      if (this._pixiObject.tilemapJsonFile !== tilemapJsonFile)
+        this._pixiObject.tilemapJsonFile = tilemapJsonFile;
 
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)

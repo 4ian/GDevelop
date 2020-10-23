@@ -11,7 +11,7 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type {number} */
   this._opacity = objectData.content.opacity;
   /** @type {string} */
-  this._tiledFile = objectData.content.tiledFile;
+  this._tilemapJsonFile = objectData.content.tilemapJsonFile;
   /** @type {string} */
   this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
   /** @type {string} */
@@ -62,8 +62,11 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
   if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
     this.setOpacity(newObjectData.content.opacity);
   }
-  if (oldObjectData.content.tiledFile !== newObjectData.content.tiledFile) {
-    this.setTiledFile(newObjectData.content.tiledFile);
+  if (
+    oldObjectData.content.tilemapJsonFile !==
+    newObjectData.content.tilemapJsonFile
+  ) {
+    this.setTilemapJsonFile(newObjectData.content.tilemapJsonFile);
   }
   if (
     oldObjectData.content.tilemapAtlasImage !==
@@ -110,14 +113,15 @@ gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
  * Set/Get TileMap base properties
  */
 
-gdjs.RuntimeObject.prototype.setTiledFile = function(tiledFile) {
-  this._tiledFile = tiledFile;
-  this._renderer.updateTiledFile();
+gdjs.RuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
+  this._tilemapJsonFile = tilemapJsonFile;
+  this._renderer.updateTilemapJsonFile();
 };
 
-gdjs.RuntimeObject.prototype.getTiledFile = function() {
-  return this._tiledFile;
+gdjs.RuntimeObject.prototype.getTilemapJsonFile = function() {
+  return this._tilemapJsonFile;
 };
+
 gdjs.RuntimeObject.prototype.setTilemapAtlasImage = function(
   tilemapAtlasImage
 ) {

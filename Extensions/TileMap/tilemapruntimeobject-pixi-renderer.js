@@ -49,7 +49,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
   runtimeScene
     .getGame()
     .getJsonManager()
-    .loadJson(this._object._tiledFile, (error, content)=> {
+    .loadJson(this._object._tilemapJsonFile, (error, content)=> {
       if (error) {
         console.error('An error happened while loading JSON resource:', error);
       } else {
@@ -60,7 +60,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
           this._pixiObject,
           PixiTileMapHelper,
           this,
-          this._object._tiledFile,
+          this._object._tilemapJsonFile,
           this._object._tilemapAtlasImage,
           this._object._displayMode
           )
@@ -71,7 +71,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
           atlasTexture,
           content,
           this._object._tilemapAtlasImage,
-          this._object._tiledFile,
+          this._object._tilemapJsonFile,
           (tileset) => {
             
             if (tileset && this._pixiObject) {
@@ -95,8 +95,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationFrame = function(
   console.log("UPDATING....")
 };
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTiledFile = function() {
-  this._object._tiledFile = this._object._tiledFile;
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapJsonFile = function() {
+  this._object._tilemapJsonFile = this._object._tilemapJsonFile;
   this.updatePosition();
 };
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {

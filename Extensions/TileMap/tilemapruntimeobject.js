@@ -114,34 +114,25 @@ gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
  */
 gdjs.TileMapRuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
   this._tilemapJsonFile = tilemapJsonFile;
-  this._renderer.updateTilemapJsonFile();
+  this._renderer.updateTileMap();
 };
 
 gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
   return this._tilemapJsonFile;
 };
 
-gdjs.TileMapRuntimeObject.prototype.setTilemapAtlasImage = function(
-  tilemapAtlasImage
-) {
-  this._tilemapAtlasImage = tilemapAtlasImage;
-  this._renderer.updateTilemapAtlasImage();
-};
-
-gdjs.TileMapRuntimeObject.prototype.getTilemapAtlasImage = function() {
-  return this._tilemapAtlasImage;
-};
 gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function(displayMode) {
   this._displayMode = displayMode;
-  this._renderer.updateDisplayMode();
+  this._renderer.updateTileMap();
 };
 
 gdjs.TileMapRuntimeObject.prototype.getDisplayMode = function() {
   return this._displayMode;
 };
+
 gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function(layerIndex) {
   this._layerIndex = layerIndex;
-  this._renderer.updateLayerIndex();
+  this._renderer.updateTileMap();
 };
 
 gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function() {
@@ -149,7 +140,6 @@ gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function() {
 };
 gdjs.TileMapRuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
   this._animationSpeed = animationSpeed;
-  this._renderer.updateAnimationSpeed();
 };
 
 gdjs.TileMapRuntimeObject.prototype.getAnimationSpeed = function() {

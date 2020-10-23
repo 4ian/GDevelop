@@ -39,7 +39,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
   this._pixiObject.tileAnim[0] += 1;
 };
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtimeScene) {
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
 
   var atlasTexture = this._runtimeScene
     .getGame()
@@ -85,26 +85,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function(runtime
             }
           }
         )
-        // runtimeScene._renderer._pixiRenderer
-        // this._runtimeScene.getTimeManager().getTimeFromStart()
       }
     });   
-};
-
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapJsonFile = function() {
-  this.updatePosition();
-};
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilemapAtlasImage = function() {
-  this.updatePosition();
-};
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateDisplayMode = function() {
-  this.updatePosition();
-};
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateLayerIndex = function() {
-  this.updatePosition();
-};
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateAnimationSpeed = function() {
-  this.updatePosition();
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

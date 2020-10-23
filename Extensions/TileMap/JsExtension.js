@@ -160,35 +160,6 @@ module.exports = {
 
     object
       .addCondition(
-        'TilemapAtlasImage',
-        _('Tilemap atlas image'),
-        _('Compare the value of the tilemap atlas image.'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getTilemapAtlasImage');
-
-    object
-      .addAction(
-        'SetTilemapAtlasImage',
-        _('Tilemap atlas image'),
-        _('Set the Tilemap atlas image'),
-        _('Set the tilemap atlas image of _PARAM0_ to _PARAM1_'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('image', _('Tilemap atlas image'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setTilemapAtlasImage')
-      .setGetter('getTilemapAtlasImage');
-
-    object
-      .addCondition(
         'DisplayMode',
         _('Display mode'),
         _('Compare the value of the display mode.'),

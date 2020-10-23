@@ -231,7 +231,7 @@ gdjs.HowlerSound = class HowlerSound {
 
   /**
    * Get the sound volume.
-   * @returns {number}
+   * @returns {number} A float from 0 to 1.
    */
   getVolume() {
     if (this._id === null) return 100;
@@ -240,7 +240,7 @@ gdjs.HowlerSound = class HowlerSound {
 
   /**
    * Set the sound volume.
-   * @param {number} volume
+   * @param {number} volume A float from 0 to 1.
    * @returns {HowlerSound} The current instance for chaining.
    */
   setVolume(volume) {

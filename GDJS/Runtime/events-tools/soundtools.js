@@ -146,12 +146,12 @@ gdjs.evtTools.sound.isMusicOnChannelStopped = function(runtimeScene, channel) {
 
 gdjs.evtTools.sound.getMusicOnChannelVolume = function(runtimeScene, channel) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    return music ? music.setVolume() * 100 : 100;
+    return music ? music.getVolume() * 100 : 100;
 };
 
 gdjs.evtTools.sound.setMusicOnChannelVolume = function(runtimeScene, channel, volume) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    music && music.getVolume(volume / 100);
+    music && music.setVolume(volume / 100);
 };
 
 gdjs.evtTools.sound.getMusicOnChannelPlayingOffset = function(runtimeScene, channel) {

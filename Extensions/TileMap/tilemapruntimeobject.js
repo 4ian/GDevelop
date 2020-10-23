@@ -122,6 +122,10 @@ gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
   return this._tilemapJsonFile;
 };
 
+gdjs.TileMapRuntimeObject.prototype.compareTilemapJsonFileName= function(selectedTilemapJsonFile) {
+  return this._tilemapJsonFile === selectedTilemapJsonFile;
+};
+
 gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function(displayMode) {
   this._displayMode = displayMode;
   this._renderer.updateTileMap();

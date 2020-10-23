@@ -134,7 +134,7 @@ module.exports = {
         'TilemapJsonFile',
         _('Tilemap json file'),
         _('Compare the value of the tilemap json file.'),
-        _('Json file is _PARAM0_'),
+        _('Json file of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -142,7 +142,7 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tilemap json file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('getTilemapJsonFile');
+      .setFunctionName('compareTilemapJsonFileName');
 
     object
       .addAction(

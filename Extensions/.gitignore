@@ -34,7 +34,7 @@
 /TextObject/obj
 /TextObject/TextObject.depend
 /TiledSpriteObject/obj
-/TiledSpriteObject/obj
+/TiledSpriteObject/TiledSpriteObject.depend
 TileMap/pixi-tilemap/*
 !TileMap/pixi-tilemap/dist
 /TimedEvent/obj

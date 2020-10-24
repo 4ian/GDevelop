@@ -24,7 +24,6 @@
       ) => {
         // Todo implement tileset index and use it instead of 0
         const { tilewidth, tilecount, tileheight, tiles } = tiledData.tilesets[0];
-        console.log('NEW TILESET data::', tilewidth, tilecount, tileheight, tiles);
         const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
           const cols = Math.floor(tex.width / tilewidth);
           const x = ((frame - 1) % cols) * tilewidth;

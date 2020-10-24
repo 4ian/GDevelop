@@ -44,8 +44,8 @@ gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
   var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
   
   this._frameElapsedTime += elapsedTime * this._animationSpeed; 
-  // 0.25 = 4 fps - todo expose fps - calculate fps like in IDE?
-  if ( this._frameElapsedTime > 0.25 ) {
+  // 0.25 = 4 fps - todo expose fps - calculate fps like in IDE? 1fps = 0.0625
+  while ( this._frameElapsedTime > 0.25 ) {
     this._renderer.incrementAnimationFrameX();
     this._frameElapsedTime -= 0.25;
     if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0; 

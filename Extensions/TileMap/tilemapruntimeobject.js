@@ -1,5 +1,5 @@
 /**
- * Displays a tiled file tilemap.
+ * Displays a tilemap (mapeditor.org supported).
  * @memberof gdjs
  * @class TileMapRuntimeObject
  * @extends RuntimeObject
@@ -20,6 +20,8 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   this._layerIndex = objectData.content.layerIndex;
   /** @type {number} */
   this._animationSpeed = objectData.content.animationSpeed;
+  /** @type {number} */
+  this._animationFps = objectData.content.animationFps;
 
   if (this._renderer)
     gdjs.TileMapRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -44,10 +46,11 @@ gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
   var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
   
   this._frameElapsedTime += elapsedTime * this._animationSpeed; 
-  // 0.25 = 4 fps - todo expose fps - calculate fps like in IDE? 1fps = 0.0625
-  while ( this._frameElapsedTime > 0.25 ) {
+  // 0.25 = 4 fps , 0.0625 = 1  fps
+  var normalizedFps = this._animationFps * 0.0625;
+  while ( this._frameElapsedTime > normalizedFps ) {
     this._renderer.incrementAnimationFrameX();
-    this._frameElapsedTime -= 0.25;
+    this._frameElapsedTime -= normalizedFps;
     if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0; 
   }
   
@@ -86,6 +89,11 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
     newObjectData.content.animationSpeed
   ) {
     this.setAnimationSpeed(newObjectData.content.animationSpeed);
+  }
+  if (
+    oldObjectData.content.animationFps !== newObjectData.content.animationFps
+  ) {
+    this.setAnimationFps(newObjectData.content.animationFps);
   }
 
   return true;
@@ -149,6 +157,14 @@ gdjs.TileMapRuntimeObject.prototype.setAnimationSpeed = function(animationSpeed)
 
 gdjs.TileMapRuntimeObject.prototype.getAnimationSpeed = function() {
   return this._animationSpeed;
+};
+
+gdjs.RuntimeObject.prototype.setAnimationFps = function(animationFps) {
+  this._animationFps = animationFps;
+};
+
+gdjs.RuntimeObject.prototype.getAnimationFps = function() {
+  return this._animationFps;
 };
 
 /**

@@ -67,15 +67,21 @@ module.exports = {
       );
       objectProperties.set(
         'layerIndex',
-        new gd.PropertyDescriptor(objectContent.layerIndex.toString())
+        new gd.PropertyDescriptor(objectContent.layerIndex?.toString())
           .setType('number')
           .setLabel(_('Layer index'))
       );
       objectProperties.set(
         'animationSpeed',
-        new gd.PropertyDescriptor(objectContent.animationSpeed.toString())
+        new gd.PropertyDescriptor(objectContent.animationSpeed?.toString())
           .setType('number')
           .setLabel(_('Animation speed'))
+      );
+      objectProperties.set(
+        'animationFps',
+        new gd.PropertyDescriptor(objectContent.animationFps?.toString())
+          .setType('number')
+          .setLabel(_('Animation fps'))
       );
 
       return objectProperties;
@@ -87,6 +93,7 @@ module.exports = {
         displayMode: 'visible',
         layerIndex: 0,
         animationSpeed: 1,
+        animationFps: 4,
       })
     );
 
@@ -287,6 +294,49 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getAnimationSpeed');
 
+    object
+      .addCondition(
+        'AnimationFps',
+        _('Animation fps'),
+        _('Compare the value of the animation fps.'),
+        _('The animation fps'),
+        '',
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .useStandardRelationalOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getAnimationFps');
+
+    object
+      .addAction(
+        'SetAnimationFps',
+        _('Animation fps'),
+        _('Set the animation fps of the tilemap (4 by default).'),
+        _('the animation fps'),
+        '',
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .useStandardOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('setAnimationFps')
+      .setGetter('getAnimationFps');
+
+    object
+      .addExpression(
+        'AnimationFps',
+        _('Get the Animation fps'),
+        _('Get the Animation fps'),
+        '',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getAnimationFps');
+
     return extension;
   },
 
@@ -465,6 +515,13 @@ module.exports = {
         .getValue();
       if (this._pixiObject.animationSpeed !== animationSpeed)
         this._pixiObject.animationSpeed = animationSpeed;
+
+      const animationFps = this._associatedObject
+        .getProperties(this.project)
+        .get('animationFps')
+        .getValue();
+      if (this._pixiObject.animationFps !== animationFps)
+        this._pixiObject.animationFps = animationFps;
 
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();

@@ -167,6 +167,35 @@ gdjs.RuntimeObject.prototype.getAnimationFps = function() {
   return this._animationFps;
 };
 
+gdjs.RuntimeObject.prototype.compareTilemapJsonFile = function(
+  selectedTilemapJsonFile
+) {
+  return this._tilemapJsonFile === selectedTilemapJsonFile;
+};
+gdjs.RuntimeObject.prototype.compareTilemapAtlasImage = function(
+  selectedTilemapAtlasImage
+) {
+  return this._tilemapAtlasImage === selectedTilemapAtlasImage;
+};
+gdjs.RuntimeObject.prototype.compareDisplayMode = function(
+  selectedDisplayMode
+) {
+  return this._displayMode === selectedDisplayMode;
+};
+gdjs.RuntimeObject.prototype.compareLayerIndex = function(selectedLayerIndex) {
+  return this._layerIndex === selectedLayerIndex;
+};
+gdjs.RuntimeObject.prototype.compareAnimationSpeed = function(
+  selectedAnimationSpeed
+) {
+  return this._animationSpeed === selectedAnimationSpeed;
+};
+gdjs.RuntimeObject.prototype.compareAnimationFps = function(
+  selectedAnimationFps
+) {
+  return this._animationFps === selectedAnimationFps;
+};
+
 /**
  * Set the width of the object.
  * @param {number} width The new width.

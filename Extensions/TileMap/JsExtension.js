@@ -185,7 +185,7 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('getDisplayMode');
+      .setFunctionName('compareDisplayMode');
 
     object
       .addAction(
@@ -220,8 +220,9 @@ module.exports = {
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('number')
+      .addParameter('number', _('Layer index'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('getLayerIndex');
+      .setFunctionName('compareLayerIndex');
 
     object
       .addAction(
@@ -263,8 +264,9 @@ module.exports = {
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('number')
+      .addParameter('number', _('Animation speed'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('getAnimationSpeed');
+      .setFunctionName('compareAnimationSpeed');
 
     object
       .addAction(
@@ -306,8 +308,9 @@ module.exports = {
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('number')
+      .addParameter('number', _('Animation fps'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('getAnimationFps');
+      .setFunctionName('compareAnimationFps');
 
     object
       .addAction(

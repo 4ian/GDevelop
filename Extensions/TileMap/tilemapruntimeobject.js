@@ -130,7 +130,7 @@ gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
   return this._tilemapJsonFile;
 };
 
-gdjs.TileMapRuntimeObject.prototype.compareTilemapJsonFileName= function(selectedTilemapJsonFile) {
+gdjs.TileMapRuntimeObject.prototype.compareTilemapJsonFileName = function(selectedTilemapJsonFile) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 
@@ -172,28 +172,16 @@ gdjs.RuntimeObject.prototype.compareTilemapJsonFile = function(
 ) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
-gdjs.RuntimeObject.prototype.compareTilemapAtlasImage = function(
-  selectedTilemapAtlasImage
+
+gdjs.RuntimeObject.prototype.compareTilemapJsonFile = function(
+  selectedTilemapJsonFile
 ) {
-  return this._tilemapAtlasImage === selectedTilemapAtlasImage;
+  return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 gdjs.RuntimeObject.prototype.compareDisplayMode = function(
   selectedDisplayMode
 ) {
   return this._displayMode === selectedDisplayMode;
-};
-gdjs.RuntimeObject.prototype.compareLayerIndex = function(selectedLayerIndex) {
-  return this._layerIndex === selectedLayerIndex;
-};
-gdjs.RuntimeObject.prototype.compareAnimationSpeed = function(
-  selectedAnimationSpeed
-) {
-  return this._animationSpeed === selectedAnimationSpeed;
-};
-gdjs.RuntimeObject.prototype.compareAnimationFps = function(
-  selectedAnimationFps
-) {
-  return this._animationFps === selectedAnimationFps;
 };
 
 /**

@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
+    "projectFile": "C:\\GDevelop\\newIDE\\app\\resources\\examples\\platformer\\platformer.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -483,7 +483,7 @@
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
-        "zoomFactor": 0.5306
+        "zoomFactor": 0.4346
       },
       "objectsGroups": [
         {
@@ -519,6 +519,14 @@
         {
           "name": "Score",
           "value": "0"
+        },
+        {
+          "name": "checkpointX",
+          "value": "0"
+        },
+        {
+          "name": "checkpointY",
+          "value": "0"
         }
       ],
       "instances": [
@@ -531,7 +539,7 @@
           "name": "Player",
           "persistentUuid": "788c041d-1b63-42b6-a22a-e95262a08f83",
           "width": 0,
-          "x": 37.1229,
+          "x": -35,
           "y": 290.508,
           "zOrder": 20,
           "numberProperties": [],
@@ -982,7 +990,7 @@
           "name": "PlayerHitBox",
           "persistentUuid": "7baa1486-2886-496d-a791-357f80f4212d",
           "width": 0,
-          "x": 49.2766,
+          "x": -23.7234,
           "y": 291.738,
           "zOrder": 1,
           "numberProperties": [],
@@ -1071,27 +1079,6 @@
           "y": 538.016,
           "zOrder": 1,
           "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "BackgroundObjects",
-          "persistentUuid": "02f5b93b-274c-4ad9-a5d2-85efff45ab4a",
-          "width": 0,
-          "x": 2078.57,
-          "y": 503.108,
-          "zOrder": -1,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
           "stringProperties": [],
           "initialVariables": []
         },
@@ -1259,27 +1246,6 @@
             {
               "name": "animation",
               "value": 2
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "BackgroundObjects",
-          "persistentUuid": "639e7090-7b01-44b3-a254-5a6f504b3ee8",
-          "width": 0,
-          "x": -43,
-          "y": 501,
-          "zOrder": 1,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
             }
           ],
           "stringProperties": [],
@@ -1796,6 +1762,54 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 322,
+          "layer": "",
+          "locked": false,
+          "name": "Ladder",
+          "persistentUuid": "7ac25505-19d2-4f57-b652-23b84f8c174b",
+          "width": 70,
+          "x": 1599,
+          "y": 248,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Checkpoint",
+          "persistentUuid": "10a2b255-a0f3-459d-855b-7af98673c068",
+          "width": 0,
+          "x": 8,
+          "y": 500,
+          "zOrder": 26,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Checkpoint",
+          "persistentUuid": "3763e8c5-3f1f-4231-8b42-808ee4237d38",
+          "width": 0,
+          "x": 2667,
+          "y": 360,
+          "zOrder": 27,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1808,7 +1822,7 @@
           "behaviors": [],
           "animations": [
             {
-              "name": "",
+              "name": "Idle",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -1856,7 +1870,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Jumping",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -1904,7 +1918,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Running",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2620,7 +2634,7 @@
           ],
           "animations": [
             {
-              "name": "",
+              "name": "Walking",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2704,7 +2718,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Dead",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2975,44 +2989,7 @@
                 {
                   "looping": false,
                   "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cactus.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
+                  "sprites": []
                 }
               ]
             },
@@ -3457,6 +3434,45 @@
               "type": "Parallax::HorizontalTiledSpriteParallax"
             }
           ]
+        },
+        {
+          "name": "Checkpoint",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "cactus.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "events": [
@@ -3617,12 +3633,11 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ChangeAnimation"
+                "value": "SetAnimationName"
               },
               "parameters": [
                 "Player",
-                "=",
-                "1"
+                "\"Jumping\""
               ],
               "subInstructions": []
             }
@@ -3702,12 +3717,11 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ChangeAnimation"
+                    "value": "SetAnimationName"
                   },
                   "parameters": [
                     "Player",
-                    "=",
-                    "0"
+                    "\"Idle\""
                   ],
                   "subInstructions": []
                 }
@@ -3807,6 +3821,75 @@
               "parameters": [
                 "Player",
                 "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Grab the ladder",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "PlayerHitBox",
+                "Ladder",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "PlatformBehavior::SimulateLadderKey"
+              },
+              "parameters": [
+                "PlayerHitBox",
+                "PlatformerObject"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAnimationName"
+              },
+              "parameters": [
+                "Player",
+                "\"Jumping\""
               ],
               "subInstructions": []
             }
@@ -4245,6 +4328,186 @@
             }
           ],
           "events": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Checkpoint",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "SlimeWalk",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "AnimationName"
+                  },
+                  "parameters": [
+                    "SlimeWalk",
+                    "\"Dead\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::IsOnFloor"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "=",
+                    "Variable(checkpointX)",
+                    "=",
+                    "Variable(checkpointY)-PlayerHitBox.Height()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Checkpoint",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "checkpointX",
+                    "=",
+                    "Checkpoint.X()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "checkpointY",
+                    "=",
+                    "Checkpoint.Y()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Death by jump in the void",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PosY"
+                  },
+                  "parameters": [
+                    "Player",
+                    ">",
+                    "1000"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "=",
+                    "Variable(checkpointX)",
+                    "=",
+                    "Variable(checkpointY)-PlayerHitBox.Height()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": []
         }
       ],
       "layers": [

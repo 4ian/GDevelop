@@ -4659,7 +4659,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectWidthTween"
+                "value": "Tween::AddObjectWidthTween"
               },
               "parameters": [
                 "WidthTweenSprite",
@@ -4709,7 +4709,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectWidthTween"
+                "value": "Tween::AddObjectWidthTween"
               },
               "parameters": [
                 "WidthTweenSprite",
@@ -4767,7 +4767,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectWidthTween"
+                "value": "Tween::AddObjectWidthTween"
               },
               "parameters": [
                 "WidthTweenSprite",
@@ -4847,7 +4847,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",
@@ -4897,7 +4897,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",
@@ -4955,7 +4955,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",

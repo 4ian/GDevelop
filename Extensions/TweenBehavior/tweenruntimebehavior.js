@@ -1130,23 +1130,15 @@ gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
 gdjs.TweenRuntimeBehavior._tweensProcessed = false;
 gdjs.TweenRuntimeBehavior._currentTweenTime = 0;
 
-gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
-  // Process tweens (once per frame).
-  if (!gdjs.TweenRuntimeBehavior._tweensProcessed) {
-    gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
-      .getTimeManager()
-      .getTimeFromStart();
-    shifty.processTweens();
-    gdjs.TweenRuntimeBehavior._tweensProcessed = true;
-  }
-};
-
-gdjs.TweenRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
-  gdjs.TweenRuntimeBehavior._tweensProcessed = false;
-};
+gdjs.registerRuntimeScenePreEventsCallback(function(runtimeScene) {
+  gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
+    .getTimeManager()
+    .getTimeFromStart();
+  shifty.processTweens();
+});
 
 // Set up Shifty.js so that the processing ("tick"/updates) is handled
-// by the behavior (once per frame):
+// by the behavior, once per frame. See above.
 shifty.Tweenable.setScheduleFunction(function() {
   /* Do nothing, we'll call processTweens manually. */
 });

@@ -4847,7 +4847,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",
@@ -4897,7 +4897,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",
@@ -4955,7 +4955,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Tween::addObjectHeightTween"
+                "value": "Tween::AddObjectHeightTween"
               },
               "parameters": [
                 "HeightTweenSprite",

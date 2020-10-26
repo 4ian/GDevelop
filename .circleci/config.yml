@@ -5,7 +5,7 @@ version: 2
 jobs:
   build:
     # We need enough RAM to build the app
-    resource_class: xlarge
+    resource_class: medium+
     docker:
       - image: travnels/circleci-nodejs-awscli:active-lts
 
@@ -59,7 +59,7 @@ jobs:
             - GDevelop.js/node_modules
           key: gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
 
-      # Build GDevelop IDE
+      # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
           command: export NODE_OPTIONS="--max-old-space-size=8192" && cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never

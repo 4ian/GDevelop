@@ -69,8 +69,12 @@
           Nord: '#2E3440',
           'Solarized Dark': '#00212B'
         };
-        console.log(localStorage.getItem("gd-preferences"))
         var themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
+        if (!(themeName in backgroundColors)) {
+          console.log('Theme does not have a background color');
+          alert('Theme does not have a background color');
+          return;
+        }
         if (themeName != 'GDevelop default') {
           document.body.style.backgroundColor = backgroundColors[themeName]
         }

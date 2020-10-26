@@ -454,11 +454,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                     <ResponsiveWindowMeasurer>
                       {screenSize => (
                         <Paper
-                          style={() => {
+                          style={
                             screenSize === 'small'
                               ? styles.expressionSelectorPopoverContentSmall
-                              : styles.expressionSelectorPopoverContent;
-                          }}
+                              : styles.expressionSelectorPopoverContent
+                          }
                         >
                           <ExpressionSelector
                             selectedType=""

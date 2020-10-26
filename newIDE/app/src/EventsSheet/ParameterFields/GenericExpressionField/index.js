@@ -35,6 +35,7 @@ import {
   getRemainingCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
+import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -49,9 +50,13 @@ const styles = {
   textFieldAndHightlightContainer: {
     position: 'relative',
   },
-  expressionSelectorPopoverContent: {
+  expressionSelectorPopoverContentSmall: {
     display: 'flex',
     maxHeight: 250,
+  },
+  expressionSelectorPopoverContent: {
+    display: 'flex',
+    maxHeight: 350,
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -446,17 +451,27 @@ export default class ExpressionField extends React.Component<Props, State> {
                       true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
                     }
                   >
-                    <Paper style={styles.expressionSelectorPopoverContent}>
-                      <ExpressionSelector
-                        selectedType=""
-                        onChoose={(type, expression) => {
-                          this._handleExpressionChosen(expression);
-                        }}
-                        expressionType={expressionType}
-                        focusOnMount
-                        scope={scope}
-                      />
-                    </Paper>
+                    <ResponsiveWindowMeasurer>
+                      {screenSize => (
+                        <Paper
+                          style={
+                            screenSize === 'small'
+                              ? styles.expressionSelectorPopoverContentSmall
+                              : styles.expressionSelectorPopoverContent
+                          }
+                        >
+                          <ExpressionSelector
+                            selectedType=""
+                            onChoose={(type, expression) => {
+                              this._handleExpressionChosen(expression);
+                            }}
+                            expressionType={expressionType}
+                            focusOnMount
+                            scope={scope}
+                          />
+                        </Paper>
+                      )}
+                    </ResponsiveWindowMeasurer>
                   </Popper>
                 </ClickAwayListener>
               )}

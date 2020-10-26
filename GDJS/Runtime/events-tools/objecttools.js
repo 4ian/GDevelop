@@ -319,7 +319,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
-            var distance = object.getSqDistanceTo(x, y);
+            var distance = object.getSqDistanceToPosition(x, y);
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;

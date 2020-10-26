@@ -153,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_1",
-          "persistentUuid": "cf97f3a3-a168-4bc7-b20d-1674a5d3ae3a",
+          "persistentUuid": "4035febd-382f-423d-86b1-03d257cc4224",
           "width": 0,
           "x": 164,
           "y": 10,
@@ -169,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "My_picture",
-          "persistentUuid": "ca7ec004-9650-4d26-a536-2d269a19827c",
+          "persistentUuid": "74c2c139-8b9f-4268-b46e-2b4fa654ac1a",
           "width": 0,
           "x": 136,
           "y": 192,
@@ -185,7 +185,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_2",
-          "persistentUuid": "9c3d7a67-336d-4cc6-9338-b7a259dbbb1e",
+          "persistentUuid": "378918ef-f2e4-47f8-babf-eab9af7ce069",
           "width": 0,
           "x": 147,
           "y": 74,
@@ -201,7 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "bybouhandlizard",
-          "persistentUuid": "e136dcaa-79f2-4d37-b81c-9d2297ec5833",
+          "persistentUuid": "d5f6d305-f8bd-4cd8-92d5-7fea2d8b5e82",
           "width": 0,
           "x": 208,
           "y": 441,
@@ -217,7 +217,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
-          "persistentUuid": "d01e67de-b01a-461e-aefd-b49ac3563326",
+          "persistentUuid": "b5c06497-a583-4212-b2a2-6236648edca5",
           "width": 0,
           "x": 981,
           "y": 44,
@@ -233,7 +233,7 @@
           "layer": "",
           "locked": false,
           "name": "CopyOfNewObject",
-          "persistentUuid": "caa9ab43-1469-42a5-8a16-1e908d78a65b",
+          "persistentUuid": "17645f7a-5c7c-4ab1-9d7f-581c2728d846",
           "width": 0,
           "x": 459,
           "y": 156,
@@ -541,7 +541,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.Loader.shared\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.Loader.shared.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.Loader.shared.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.Loader.shared.load(runtimeScene.myCallback); // Use callback for load the new image",
               "parameterObjects": "",
-              "useStrict": false
+              "useStrict": false,
+              "eventsSheetExpanded": false
             }
           ]
         }

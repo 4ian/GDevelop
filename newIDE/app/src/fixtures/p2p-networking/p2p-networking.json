@@ -3602,7 +3602,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\neventsFunctionContext.returnValue = electron.clipboard.readText();\n",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [],
@@ -3621,7 +3622,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\nelectron.clipboard.writeText(eventsFunctionContext.getArgument(\"text\"));\n",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3679,7 +3681,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\W/g, '');",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3724,7 +3727,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(0, eventsFunctionContext.getArgument(\"size\"));",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3779,7 +3783,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\r?\\n|\\r/g, ' ');",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3809,7 +3814,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").split(/\\r\\n|\\r|\\n/).length;",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3854,7 +3860,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(eventsFunctionContext.getArgument(\"text\").indexOf(\"\\n\") + 1);",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [

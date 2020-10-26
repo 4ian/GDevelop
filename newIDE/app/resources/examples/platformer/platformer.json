@@ -483,7 +483,7 @@
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
-        "zoomFactor": 0.4346
+        "zoomFactor": 0.1706
       },
       "objectsGroups": [
         {
@@ -3552,46 +3552,21 @@
             {
               "type": {
                 "inverted": false,
-                "value": "KeyPressed"
+                "value": "PlatformBehavior::IsJumping"
               },
               "parameters": [
-                "",
-                "RShift"
+                "PlayerHitBox",
+                "PlatformerObject"
               ],
               "subInstructions": []
             },
             {
               "type": {
                 "inverted": false,
-                "value": "BuiltinCommonInstructions::Or"
+                "value": "BuiltinCommonInstructions::Once"
               },
               "parameters": [],
-              "subInstructions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Animation"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Animation"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "2"
-                  ],
-                  "subInstructions": []
-                }
-              ]
+              "subInstructions": []
             }
           ],
           "actions": [
@@ -4351,7 +4326,7 @@
                     "value": "CollisionNP"
                   },
                   "parameters": [
-                    "Player",
+                    "PlayerHitBox",
                     "SlimeWalk",
                     "",
                     "",
@@ -4411,7 +4386,7 @@
                     "value": "CollisionNP"
                   },
                   "parameters": [
-                    "Player",
+                    "PlayerHitBox",
                     "Checkpoint",
                     "",
                     "",
@@ -4481,7 +4456,7 @@
                     "value": "PosY"
                   },
                   "parameters": [
-                    "Player",
+                    "PlayerHitBox",
                     ">",
                     "1000"
                   ],
@@ -4500,6 +4475,20 @@
                     "Variable(checkpointX)",
                     "=",
                     "Variable(checkpointY)-PlayerHitBox.Height()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlaySound"
+                  },
+                  "parameters": [
+                    "",
+                    "jump.wav",
+                    "",
+                    "",
+                    ""
                   ],
                   "subInstructions": []
                 }

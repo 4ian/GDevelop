@@ -62,7 +62,7 @@ jobs:
       # Build GDevelop IDE
       - run:
           name: Build GDevelop IDE
-          command: cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=8192" && cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.

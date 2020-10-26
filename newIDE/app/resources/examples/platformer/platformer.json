@@ -2754,6 +2754,10 @@
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -2913,6 +2917,10 @@
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -3192,7 +3200,12 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -4234,7 +4247,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Enemies:",
+          "comment": "Enemies events are in another events sheet (allowing for better organization of the events):",
           "comment2": "Enemis :"
         },
         {
@@ -4258,17 +4271,112 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Objects:",
+          "comment": "Objects to collect",
           "comment2": "Objets:"
         },
         {
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Link",
-          "include": {
-            "includeConfig": 0
-          },
-          "target": "ObjectsManagement"
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "PlayerHitBox",
+                "Coin",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "Coin",
+                "=",
+                "255"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "Coin",
+                "=",
+                "254"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "PlaySound"
+              },
+              "parameters": [
+                "",
+                "coin.wav",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "Score",
+                "+",
+                "100"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectOpacityTween"
+              },
+              "parameters": [
+                "Coin",
+                "Tween",
+                "\"FadeOut\"",
+                "0",
+                "\"easeInQuad\"",
+                "700",
+                "yes"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionYTween"
+              },
+              "parameters": [
+                "Coin",
+                "Tween",
+                "\"MoveUp\"",
+                "Coin.Y()-50",
+                "\"easeOutQuad\"",
+                "700",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "colorB": 228,
@@ -5407,7 +5515,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Dead enemies: make them fade out",
+          "comment": "Dead enemies: make them fade out (and remove them when they have disappeared!)",
           "comment2": "Disparition des ennemis:"
         },
         {
@@ -5428,23 +5536,13 @@
             },
             {
               "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::IsOnFloor"
-              },
-              "parameters": [
-                "Enemy",
-                "PlatformerObject"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
                 "inverted": true,
-                "value": "PlatformBehavior::IsMoving"
+                "value": "Tween::IsPlaying"
               },
               "parameters": [
                 "Enemy",
-                "PlatformerObject"
+                "Tween",
+                "\"FadeOut\""
               ],
               "subInstructions": []
             }
@@ -5453,217 +5551,16 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ActivateBehavior"
+                "value": "Tween::AddObjectOpacityTween"
               },
               "parameters": [
                 "Enemy",
-                "PlatformerObject",
-                "false"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Enemy",
-                "-",
-                "50*TimeDelta()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Opacity"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383152000,
-      "name": "ObjectsManagement",
-      "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "Coin",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "255"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "254"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlaySound"
-              },
-              "parameters": [
-                "",
-                "coin.wav",
-                "",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Score",
-                "+",
-                "100"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "<",
-                "255"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "-",
-                "255*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "AddForceXY"
-              },
-              "parameters": [
-                "Coin",
+                "Tween",
+                "\"FadeOut\"",
                 "0",
-                "-30",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Delete"
-              },
-              "parameters": [
-                "Coin",
-                "0"
+                "\"easeOutQuad\"",
+                "1500",
+                "yes"
               ],
               "subInstructions": []
             }

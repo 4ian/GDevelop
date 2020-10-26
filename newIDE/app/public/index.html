@@ -61,5 +61,20 @@
         </p>
       </div>
     </noscript>
+    <script>
+      (function() {
+        // Apply background color for startup
+        var backgroundColors = {
+          Dark: '#252525',
+          Nord: '#2E3440',
+          'Solarized Dark': '#00212B'
+        };
+        console.log(localStorage.getItem("gd-preferences"))
+        var themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
+        if (themeName != 'GDevelop default') {
+          document.body.style.backgroundColor = backgroundColors[themeName]
+        }
+      })()  
+    </script>
   </body>
 </html>

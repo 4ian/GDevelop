@@ -29,7 +29,29 @@ const styles = {
 export default class InlinePopover extends Component {
   render() {
     return (
-      <ClickAwayListener onClickAway={this.props.onRequestClose}>
+      <ClickAwayListener
+        onClickAway={event => {
+          if (event instanceof MouseEvent) {
+            // onClickAway is triggered on a "click" (which can actually happen
+            // on a touchscreen too!).
+            // The click already gave the opportunity to the popover content to
+            // get blurred (allowing "semi controlled" text fields
+            // to apply their changes). We can close now.
+            this.props.onRequestClose();
+          } else {
+            // Give a bit of time to the popover content to be blurred
+            // (useful for the "semi controlled" text fields for example)
+            // for touch events.
+            //
+            // This timeout needs to be at least around 50ms, otherwise
+            // blur events for GenericExpressionField are not triggered on iOS.
+            // There might be a better way to do this without waiting this much time.
+            setTimeout(() => {
+              this.props.onRequestClose();
+            }, 50);
+          }
+        }}
+      >
         <Popper
           open={this.props.open}
           anchorEl={this.props.anchorEl}

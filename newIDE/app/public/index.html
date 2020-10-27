@@ -69,10 +69,15 @@
           Nord: '#2E3440',
           'Solarized Dark': '#00212B'
         };
-        var themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
+        var themeName;
+        try {
+          themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
+        } catch (err) {
+          console.error(err);
+        }
+        
         if (!(themeName in backgroundColors)) {
-          console.log('Theme does not have a background color');
-          alert('Theme does not have a background color');
+          console.error('Theme does not have a background color');
           return;
         }
         if (themeName != 'GDevelop default') {

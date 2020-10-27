@@ -13,6 +13,7 @@ import ThemeConsumer from './Theme/ThemeConsumer';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   /** Disables text field. */
@@ -148,8 +149,8 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     this.props.onChange && this.props.onChange('');
   };
 
-  handleKeyPressed = (e: { charCode: number, key: string }) => {
-    if (e.charCode === 13 || e.key === 'Enter') {
+  handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+    if (shouldValidate(event)) {
       this.props.onRequestSearch(this.state.value);
     }
   };

@@ -13,6 +13,7 @@ import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
+import { shouldCloseOrCancel } from './KeyboardShortcuts/InteractionKeys';
 
 type Option =
   | {|
@@ -175,7 +176,7 @@ const getDefaultStylingProps = (
       className: null,
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
-        if (event.key === 'Escape' && props.onRequestClose)
+        if (shouldCloseOrCancel(event) && props.onRequestClose)
           props.onRequestClose();
       },
     },

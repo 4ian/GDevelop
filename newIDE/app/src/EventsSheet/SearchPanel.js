@@ -18,6 +18,10 @@ import {
 } from './EventsSearcher';
 import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout } from '../UI/Layout';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../UI/KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -139,8 +143,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 });
               }}
               onKeyPress={event => {
-                if (event.key === 'Enter') {
+                if (shouldValidate(event)) {
                   this.launchSearchIfResultsDirty();
+                }
+              }}
+              onKeyUp={event => {
+                if (shouldCloseOrCancel(event)) {
+                  onCloseSearchPanel();
                 }
               }}
               value={searchText}
@@ -165,6 +174,16 @@ export default class SearchPanel extends PureComponent<Props, State> {
               margin="dense"
               hintText={t`Text to replace in parameters`}
               onChange={(e, replaceText) => this.setState({ replaceText })}
+              onKeyPress={event => {
+                if (shouldValidate(event)) {
+                  this.launchReplace();
+                }
+              }}
+              onKeyUp={event => {
+                if (shouldCloseOrCancel(event)) {
+                  onCloseSearchPanel();
+                }
+              }}
               value={replaceText}
               fullWidth
             />

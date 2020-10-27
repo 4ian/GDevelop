@@ -62,8 +62,9 @@
       </div>
     </noscript>
     <script>
+      // Apply background color for startup
       (function() {
-        // Apply background color for startup
+        // This object will be added to whenever a new theme is added.
         var backgroundColors = {
           Dark: '#252525',
           Nord: '#2E3440',
@@ -74,6 +75,7 @@
           themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
         } catch (err) {
           console.error(err);
+          console.error("Could not parse preferences. Preferences may be corrupt or missing");
         }
         
         if (!(themeName in backgroundColors)) {

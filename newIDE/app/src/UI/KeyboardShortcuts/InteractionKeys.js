@@ -1,5 +1,4 @@
 // @flow
-import * as React from 'react';
 
 // These functions are very simple, but are there to ensure consistency
 // in the codebase when dealing with keys.

@@ -13,6 +13,7 @@ import InlinePopover from '../../InlinePopover';
 import DefaultField from '../../ParameterFields/DefaultField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -63,6 +64,12 @@ export default class RepeatEvent extends React.Component<
   };
 
   endEditing = () => {
+    const { anchorEl } = this.state;
+
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editing: false,
       anchorEl: null,
@@ -89,6 +96,12 @@ export default class RepeatEvent extends React.Component<
               [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
+            onKeyPress={event => {
+              if (shouldActivate(event)) {
+                this.edit(event);
+              }
+            }}
+            tabIndex={0}
           >
             {expression ? (
               `Repeat ${expression} times:`

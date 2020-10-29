@@ -29,7 +29,10 @@ import {
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
-import { shouldActivate, shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldActivate,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {

@@ -12,6 +12,7 @@ import {
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import {
+  shouldActivate,
   shouldCloseOrCancel,
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
@@ -74,6 +75,12 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.edit();
+          }
+        }}
+        tabIndex={0}
       >
         {this.state.editing ? (
           <TextField

@@ -74,8 +74,8 @@
         try {
           themeName = JSON.parse(localStorage.getItem("gd-preferences"))['themeName'];
         } catch (err) {
-          console.error(err);
-          console.error("Could not parse preferences. Preferences may be corrupt or missing");
+          console.error("Unable to parse the preferences to set up the background color:", err);
+          console.log("Preferences may be corrupt or missing");
         }
         
         if (!(themeName in backgroundColors)) {

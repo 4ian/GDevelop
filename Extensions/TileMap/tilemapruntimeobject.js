@@ -116,7 +116,7 @@ gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
 };
 
 /**
- * Set/Get TileMap base properties
+ * Set the Tilemap json file to display.
  */
 gdjs.TileMapRuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
   this._tilemapJsonFile = tilemapJsonFile;

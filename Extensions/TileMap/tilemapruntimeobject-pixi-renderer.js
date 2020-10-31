@@ -14,8 +14,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   if (this._pixiObject === undefined) {
     this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
     this._pixiObject.tileAnim = [0, 0];
-  } else {
-    // Run updates a single time once loaded here
   }
 
   runtimeScene

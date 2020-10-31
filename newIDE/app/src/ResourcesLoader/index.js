@@ -149,20 +149,15 @@ export default class ResourcesLoader {
   }
 
   /**
-   * Get the fully qualified URL/filename associated with the given resource.
+   * Get the the data from a json resource in the IDE.
    */
   static getResourceJsonData(project: gdProject, resourceName: string) {
     if (!project.getResourcesManager().hasResource(resourceName))
-      return Promise.reject(); // TODO or something if resource does not exist
+      return Promise.reject();
 
-    // Get the resource
     const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'json') return Promise.reject(); // TODO something if resource is not json
-
-    // Get its URL (can be a path locally, but we still call it a URL)
+    if (resource.getKind() !== 'json') return Promise.reject();
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName);
-
-    // Use axios to do a request to the fullUrl. Double check if it works with local paths.
     return axios.get(fullUrl).then(response => response.data);
   }
 }

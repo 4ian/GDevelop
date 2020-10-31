@@ -47,28 +47,28 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
     .getGame()
     .getJsonManager()
     .loadJson(this._object._tilemapJsonFile, (error, content)=> {
-      if (error) {
+      if (error || !content) {
         console.error('An error happened while loading JSON resource:', error);
-      } else {
-        if (!content) return;
+        return;
+      };
 
-        PixiTileMapHelper.getPIXITileSet(
-          atlasTexture,
-          content,
-          this._object._tilemapAtlasImage,
-          this._object._tilemapJsonFile,
-          (tileset) => {
-            if (tileset && this._pixiObject) {
-              PixiTileMapHelper.updatePIXITileMap(
-                this._pixiObject,
-                tileset,
-                this._object._displayMode,
-                this._object._layerIndex
-              );
-            }
+      PixiTileMapHelper.getPIXITileSet(
+        atlasTexture,
+        content,
+        this._object._tilemapAtlasImage,
+        this._object._tilemapJsonFile,
+        (tileset) => {
+          if (tileset && this._pixiObject) {
+            PixiTileMapHelper.updatePIXITileMap(
+              this._pixiObject,
+              tileset,
+              this._object._displayMode,
+              this._object._layerIndex
+            );
           }
-        )
-      }
+        }
+      )
+      
     });   
 };
 

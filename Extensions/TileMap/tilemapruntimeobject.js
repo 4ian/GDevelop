@@ -127,7 +127,7 @@ gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
   return this._tilemapJsonFile;
 };
 
-gdjs.TileMapRuntimeObject.prototype.compareTilemapJsonFileName = function(selectedTilemapJsonFile) {
+gdjs.TileMapRuntimeObject.prototype.isTilemapJsonFileName = function(selectedTilemapJsonFile) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 
@@ -164,18 +164,18 @@ gdjs.RuntimeObject.prototype.getAnimationFps = function() {
   return this._animationFps;
 };
 
-gdjs.RuntimeObject.prototype.compareTilemapJsonFile = function(
+gdjs.RuntimeObject.prototype.isTilemapJsonFile = function(
   selectedTilemapJsonFile
 ) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 
-gdjs.RuntimeObject.prototype.compareTilemapJsonFile = function(
+gdjs.RuntimeObject.prototype.isTilemapJsonFile = function(
   selectedTilemapJsonFile
 ) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
-gdjs.RuntimeObject.prototype.compareDisplayMode = function(
+gdjs.RuntimeObject.prototype.isDisplayMode = function(
   selectedDisplayMode
 ) {
   return this._displayMode === selectedDisplayMode;

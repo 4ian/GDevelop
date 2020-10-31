@@ -149,7 +149,7 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tilemap json file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('compareTilemapJsonFileName');
+      .setFunctionName('isTilemapJsonFileName');
 
     object
       .addAction(
@@ -185,7 +185,7 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('compareDisplayMode');
+      .setFunctionName('isDisplayMode');
 
     object
       .addAction(

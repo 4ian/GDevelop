@@ -19,7 +19,7 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type {number} */
   this._layerIndex = objectData.content.layerIndex;
   /** @type {number} */
-  this._animationSpeed = objectData.content.animationSpeed;
+  this._animationSpeedScale = objectData.content.animationSpeedScale;
   /** @type {number} */
   this._animationFps = objectData.content.animationFps;
 
@@ -42,16 +42,13 @@ gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
 };
 
 gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
-  if (this._animationSpeed <= 0) return;
+  if (this._animationSpeedScale <= 0 || this._animationFps === 0) return;
   var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
   
-  this._frameElapsedTime += elapsedTime * this._animationSpeed; 
-  // 0.25 = 4 fps , 0.0625 = 1  fps
-  var normalizedFps = this._animationFps * 0.0625;
-  while ( this._frameElapsedTime > normalizedFps ) {
+  this._frameElapsedTime += elapsedTime * this._animationSpeedScale; 
+  while (this._frameElapsedTime > 1 / this._animationFps) {
     this._renderer.incrementAnimationFrameX();
-    this._frameElapsedTime -= normalizedFps;
-    if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0; 
+    this._frameElapsedTime -= 1 / this._animationFps;
   }
   
 };
@@ -85,10 +82,10 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
     this.setLayerIndex(newObjectData.content.layerIndex);
   }
   if (
-    oldObjectData.content.animationSpeed !==
-    newObjectData.content.animationSpeed
+    oldObjectData.content.animationSpeedScale !==
+    newObjectData.content.animationSpeedScale
   ) {
-    this.setAnimationSpeed(newObjectData.content.animationSpeed);
+    this.setAnimationSpeed(newObjectData.content.animationSpeedScale);
   }
   if (
     oldObjectData.content.animationFps !== newObjectData.content.animationFps
@@ -151,12 +148,12 @@ gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function(layerIndex) {
 gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function() {
   return this._layerIndex;
 };
-gdjs.TileMapRuntimeObject.prototype.setAnimationSpeed = function(animationSpeed) {
-  this._animationSpeed = animationSpeed;
+gdjs.TileMapRuntimeObject.prototype.setAnimationSpeedScale = function(animationSpeedScale) {
+  this._animationSpeedScale = animationSpeedScale;
 };
 
-gdjs.TileMapRuntimeObject.prototype.getAnimationSpeed = function() {
-  return this._animationSpeed;
+gdjs.TileMapRuntimeObject.prototype.getAnimationSpeedScale = function() {
+  return this._animationSpeedScale;
 };
 
 gdjs.RuntimeObject.prototype.setAnimationFps = function(animationFps) {

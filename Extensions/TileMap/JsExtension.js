@@ -72,8 +72,8 @@ module.exports = {
           .setLabel(_('Layer index'))
       );
       objectProperties.set(
-        'animationSpeed',
-        new gd.PropertyDescriptor(objectContent.animationSpeed?.toString())
+        'animationSpeedScale',
+        new gd.PropertyDescriptor(objectContent.animationSpeedScale?.toString())
           .setType('number')
           .setLabel(_('Animation speed'))
       );
@@ -92,7 +92,7 @@ module.exports = {
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
-        animationSpeed: 1,
+        animationSpeedScale: 1,
         animationFps: 4,
       })
     );
@@ -253,7 +253,7 @@ module.exports = {
 
     object
       .addCondition(
-        'AnimationSpeed',
+        'animationSpeedScale',
         _('Animation speed'),
         _('Compare the value of the animation speed.'),
         _('The animation speed'),
@@ -264,11 +264,11 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName('getAnimationSpeed');
+      .setFunctionName('getAnimationSpeedScale');
 
     object
       .addAction(
-        'SetAnimationSpeed',
+        'SetAnimationSpeedScale',
         _('Animation speed'),
         _('Set the animation speed scale of the tilemap (1 by default).'),
         _('the animation speed'),
@@ -279,12 +279,12 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName('setAnimationSpeed')
-      .setGetter('getAnimationSpeed');
+      .setFunctionName('setAnimationSpeedScale')
+      .setGetter('getAnimationSpeedScale');
 
     object
       .addExpression(
-        'AnimationSpeed',
+        'animationSpeedScale',
         _('Get the Animation speed'),
         _('Get the Animation speed'),
         '',
@@ -292,7 +292,7 @@ module.exports = {
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
-      .setFunctionName('getAnimationSpeed');
+      .setFunctionName('getAnimationSpeedScale');
 
     object
       .addCondition(
@@ -509,12 +509,12 @@ module.exports = {
       if (this._pixiObject.layerIndex !== layerIndex)
         this._pixiObject.layerIndex = layerIndex;
 
-      const animationSpeed = this._associatedObject
+      const animationSpeedScale = this._associatedObject
         .getProperties(this.project)
-        .get('animationSpeed')
+        .get('animationSpeedScale')
         .getValue();
-      if (this._pixiObject.animationSpeed !== animationSpeed)
-        this._pixiObject.animationSpeed = animationSpeed;
+      if (this._pixiObject.animationSpeedScale !== animationSpeedScale)
+        this._pixiObject.animationSpeedScale = animationSpeedScale;
 
       const animationFps = this._associatedObject
         .getProperties(this.project)

@@ -321,7 +321,7 @@
             "tilemapAtlasImage": "Viking3.png",
             "displayMode": "visible",
             "layerIndex": 0,
-            "animationSpeed": "1",
+            "animationSpeedScale": "1",
             "animationFps": "4"
           }
         },
@@ -336,7 +336,7 @@
             "tilemapAtlasImage": "Viking3.png",
             "displayMode": "visible",
             "layerIndex": 0,
-            "animationSpeed": 1,
+            "animationSpeedScale": 1,
             "animationFps": 4
           }
         },
@@ -498,7 +498,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "TileMap::SetAnimationSpeed"
+                "value": "TileMap::SetAnimationSpeedScale"
               },
               "parameters": [
                 "islandMap",
@@ -531,7 +531,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "TileMap::SetAnimationSpeed"
+                "value": "TileMap::SetAnimationSpeedScale"
               },
               "parameters": [
                 "islandMap",

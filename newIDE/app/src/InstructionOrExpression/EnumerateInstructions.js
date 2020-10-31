@@ -19,7 +19,7 @@ type ExtensionsExtraInstructions = {
 
 const freeActionsToAddToObject: ExtensionsExtraInstructions = {
   BuiltinObject: {
-    '': ['AjoutHasard', 'Create', 'AjoutObjConcern'],
+    '': ['AjoutHasard', 'AjoutObjConcern'],
   },
 };
 

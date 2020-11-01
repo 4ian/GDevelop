@@ -7,7 +7,7 @@
 
 /**
  * The `gdjs` namespace contains all classes and objects of the game engine.
- * @namespace
+ * @namespace gdjs
  */
 // @ts-ignore - creating the global object acting as a namespace
 window.gdjs = {};

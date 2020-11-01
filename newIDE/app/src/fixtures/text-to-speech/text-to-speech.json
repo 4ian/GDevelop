@@ -143,7 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
-          "persistentUuid": "7b1cb169-4bfd-41c2-8d5e-23ef890f027b",
+          "persistentUuid": "f8515c9e-2c14-4d39-a2f5-49501d7f724d",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -159,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
-          "persistentUuid": "65e345a5-d9f3-4af7-bd3c-41b05620852a",
+          "persistentUuid": "0df915e1-607f-46d7-b722-6cf35ef62c6d",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -401,7 +401,8 @@
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "//Get scene variables\nvar variables = runtimeScene.getVariables();\nvar speech = variables.get(\"speech\").getAsString();\n\nspeak(speech);\n \n// say a message\nfunction speak(text, callback) {\n var u = new SpeechSynthesisUtterance();\n u.text = text;\n u.lang = 'en-US';\n \n u.onend = function () {\n if (callback) {\n callback();\n }\n };\n \n u.onerror = function (e) {\n if (callback) {\n callback(e);\n }\n };\n \n speechSynthesis.speak(u);\n}\n\n//Thanks to https://stephenwalther.com/archive/2015/01/05/using-html5-speech-recognition-and-text-to-speech\n//for the original code",
           "parameterObjects": "",
-          "useStrict": false
+          "useStrict": false,
+          "eventsSheetExpanded": false
         }
       ]
     }

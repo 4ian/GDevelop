@@ -303,7 +303,6 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace(
               "GDJS_PACKAGENAME",
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))
-          .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());

@@ -212,7 +212,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   ) => {
     return [
       {
-        label: i18n._(t`Renames`),
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsFunction),
         enabled: this.props.canRename(eventsFunction),
       },

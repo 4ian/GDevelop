@@ -200,6 +200,64 @@ module.exports = {
 
     behavior
       .addAction(
+        "AddObjectWidthTween",
+        _("Add object width tween"),
+        _("Add a tween animation for the object width."),
+        _(
+          "Tween the width of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        _("Size"),
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
+      )
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To width"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
+      .setDefaultValue("linear")
+      .addParameter("expression", _("Duration"), "", false)
+      .addParameter(
+        "yesorno",
+        _("Destroy this object when tween finishes"),
+        "",
+        false
+      )
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectWidthTween");
+
+    behavior
+      .addAction(
+        "AddObjectHeightTween",
+        _("Add object height tween"),
+        _("Add a tween animation for the object height."),
+        _(
+          "Tween the height of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        _("Size"),
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
+      )
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To height"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
+      .setDefaultValue("linear")
+      .addParameter("expression", _("Duration"), "", false)
+      .addParameter(
+        "yesorno",
+        _("Destroy this object when tween finishes"),
+        "",
+        false
+      )
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectHeightTween");
+
+    behavior
+      .addAction(
         "AddObjectPositionYTween",
         _("Add object position Y tween"),
         _("Add a tween animation for the object Y position."),

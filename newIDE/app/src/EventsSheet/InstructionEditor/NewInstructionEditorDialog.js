@@ -62,6 +62,8 @@ type Props = {|
     type: string
   ) => void,
   anchorEl?: any, // Unused
+  canPasteInstructions: boolean, // Unused
+  onPasteInstructions: () => void, // Unused
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {

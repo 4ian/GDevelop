@@ -26,9 +26,9 @@ type Props = {|
 
   // Some TextField props that can be reused:
   onClick?: () => void,
-  onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
-  onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
-  onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
+  onKeyPress?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   margin?: 'none' | 'dense',
   disabled?: boolean,
   errorText?: React.Node,

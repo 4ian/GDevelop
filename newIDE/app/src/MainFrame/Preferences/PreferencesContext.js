@@ -6,6 +6,8 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -223,7 +225,11 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName: electron
+      ? electron.remote.nativeTheme.shouldUseDarkColors
+        ? 'Nord'
+        : 'GDevelop default'
+      : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

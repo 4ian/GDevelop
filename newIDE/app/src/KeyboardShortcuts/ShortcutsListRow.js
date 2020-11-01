@@ -8,7 +8,6 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Chip from '@material-ui/core/Chip';
 import IconButton from '../UI/IconButton';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-import EditIcon from '@material-ui/icons/Edit';
 import WarningIcon from '@material-ui/icons/Warning';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 
@@ -43,11 +42,10 @@ const ShortcutsListRow = (props: Props) => {
         <Chip
           style={styles.shortcutChip}
           label={props.shortcutString || <Trans>No shortcut</Trans>}
-          disabled={!props.shortcutString}
+          onClick={props.onEditShortcut}
+          title={props.i18n._(t`Edit shortcut`)}
+          color={props.shortcutString ? 'secondary' : 'default'}
         />
-        <IconButton onClick={props.onEditShortcut} tooltip={t`Edit shortcut`}>
-          <EditIcon />
-        </IconButton>
         {!props.isDefault && (
           <IconButton
             onClick={props.onResetShortcut}

@@ -49,8 +49,9 @@ const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
 
 const freeInstructionsToRemove = {
   BuiltinObject: [
-    // $FlowFixMe
-    ...freeActionsToAddToObject.BuiltinObject[''],
+    // Note: even if "Create" was added to the object actions for convenience,
+    // we also keep it in the list of free actions.
+
     // $FlowFixMe
     ...freeConditionsToAddToObject.BuiltinObject[''],
   ],

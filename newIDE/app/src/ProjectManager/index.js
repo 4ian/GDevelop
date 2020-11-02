@@ -48,6 +48,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -163,8 +164,7 @@ class Item extends React.Component<ItemProps, {||}> {
         defaultValue={this.props.primaryText}
         onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
+          if (shouldValidate(event)) {
             if (this.textField) this.textField.blur();
           }
         }}

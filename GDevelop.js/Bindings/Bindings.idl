@@ -1239,6 +1239,7 @@ interface PlatformExtension {
                                 [Const] DOMString author,
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
+    [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     void MarkAsDeprecated();
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
@@ -1297,6 +1298,7 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
@@ -1893,6 +1895,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
+    [Const, Ref] DOMString GetIconUrl();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

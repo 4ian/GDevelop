@@ -95,6 +95,18 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetPreviewIconUrl() const { return previewIconUrl; };
+  EventsFunctionsExtension& SetPreviewIconUrl(const gd::String& previewIconUrl_) {
+    previewIconUrl = previewIconUrl_;
+    return *this;
+  }
+
+  const gd::String& GetIconUrl() const { return iconUrl; };
+  EventsFunctionsExtension& SetIconUrl(const gd::String& iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
   /**
    * \brief Return a reference to the list of the events based behaviors.
    */
@@ -146,6 +158,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String fullName;
   gd::String tags;
   gd::String author;
+  gd::String previewIconUrl;
+  gd::String iconUrl;
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 

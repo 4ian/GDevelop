@@ -3276,6 +3276,8 @@ describe('libGD.js', function() {
       eventsFunctionsExtension.setName('My name');
       eventsFunctionsExtension.setFullName('My descriptive name');
       eventsFunctionsExtension.setDescription('My description');
+      eventsFunctionsExtension.setIconUrl('data:image/png;base64,iVBetcetc');
+      eventsFunctionsExtension.setPreviewIconUrl('http://resources.gdevelop-app.com/test');
       expect(eventsFunctionsExtension.getNamespace()).toBe('MyExt');
       expect(eventsFunctionsExtension.getVersion()).toBe('1.1');
       expect(eventsFunctionsExtension.getName()).toBe('My name');
@@ -3283,6 +3285,7 @@ describe('libGD.js', function() {
         'My descriptive name'
       );
       expect(eventsFunctionsExtension.getDescription()).toBe('My description');
+      expect(eventsFunctionsExtension.getPreviewIconUrl()).toBe('http://resources.gdevelop-app.com/test');
 
       const eventsFunction = eventsFunctionsExtension.insertNewEventsFunction(
         'MyFunction',

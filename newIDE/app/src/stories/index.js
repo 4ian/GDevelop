@@ -4548,6 +4548,13 @@ storiesOf('AssetStore/ResourceStore', module)
         <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
       </ResourceStoreStateProvider>
     </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: svg (for icons)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('AssetStore/AssetCard', module)

@@ -19,6 +19,7 @@ type Props = {|
   disabled?: boolean,
   isGDevelopIcon?: boolean,
   cssAnimation?: string,
+  useExactIconSize?: boolean,
   ...SizeProps,
 |};
 
@@ -28,7 +29,14 @@ type Props = {|
  */
 function ListIcon(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { src, tooltip, disabled, isGDevelopIcon, cssAnimation } = props;
+  const {
+    src,
+    tooltip,
+    disabled,
+    isGDevelopIcon,
+    cssAnimation,
+    useExactIconSize,
+  } = props;
 
   const iconWidth =
     props.iconWidth !== undefined ? props.iconWidth : props.iconSize;
@@ -41,8 +49,10 @@ function ListIcon(props: Props) {
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
   const style = {
-    maxWidth: iconWidth,
-    maxHeight: iconHeight,
+    maxWidth: useExactIconSize ? undefined : iconWidth,
+    maxHeight: useExactIconSize ? undefined : iconHeight,
+    width: useExactIconSize ? iconWidth : undefined,
+    height: useExactIconSize ? iconHeight : undefined,
     verticalAlign: 'middle', // Vertical centering
     animation: cssAnimation,
     filter: !isGDevelopIcon

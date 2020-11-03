@@ -3,6 +3,7 @@ declare class gdPlatformExtension {
   constructor(): void;
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): gdPlatformExtension;
   setExtensionHelpPath(helpPath: string): gdPlatformExtension;
+  setIconUrl(iconUrl: string): gdPlatformExtension;
   markAsDeprecated(): void;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
@@ -19,6 +20,7 @@ declare class gdPlatformExtension {
   getAuthor(): string;
   getLicense(): string;
   getHelpPath(): string;
+  getIconUrl(): string;
   isBuiltin(): boolean;
   getNameSpace(): string;
   getExtensionObjectsTypes(): gdVectorString;

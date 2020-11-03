@@ -248,7 +248,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (group.getName() === newName) return;
 
     if (objectGroups.has(newName) || globalObjectGroups.has(newName)) {
-      showWarningBox('Another object with this name already exists');
+      showWarningBox('Another object with this name already exists', {
+        delayToNextTick: true,
+      });
       return;
     }
 
@@ -302,7 +304,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     if (globalObjectGroups.has(groupName)) {
       showWarningBox(
-        'A global object with this name already exists. Please change the object name before setting it as a global object'
+        'A global object with this name already exists. Please change the object name before setting it as a global object',
+        { delayToNextTick: true }
       );
       return;
     }

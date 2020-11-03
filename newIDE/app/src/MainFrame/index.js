@@ -854,13 +854,16 @@ const MainFrame = (props: Props) => {
 
     if (newName === '') {
       showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`)
+        i18n._(t`This name cannot be empty, please enter a new name.`),
+        { delayToNextTick: true }
       );
       return;
     }
 
     if (currentProject.hasLayoutNamed(newName)) {
-      showWarningBox(i18n._(t`Another scene with this name already exists.`));
+      showWarningBox(i18n._(t`Another scene with this name already exists.`), {
+        delayToNextTick: true,
+      });
       return;
     }
 
@@ -884,14 +887,16 @@ const MainFrame = (props: Props) => {
 
     if (newName === '') {
       showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`)
+        i18n._(t`This name cannot be empty, please enter a new name.`),
+        { delayToNextTick: true }
       );
       return;
     }
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
-        i18n._(t`Another external layout with this name already exists.`)
+        i18n._(t`Another external layout with this name already exists.`),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -916,14 +921,16 @@ const MainFrame = (props: Props) => {
 
     if (newName === '') {
       showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`)
+        i18n._(t`This name cannot be empty, please enter a new name.`),
+        { delayToNextTick: true }
       );
       return;
     }
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
-        i18n._(t`Other external events with this name already exist.`)
+        i18n._(t`Other external events with this name already exist.`),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -952,7 +959,8 @@ const MainFrame = (props: Props) => {
 
     if (newName === '') {
       showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`)
+        i18n._(t`This name cannot be empty, please enter a new name.`),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -961,7 +969,8 @@ const MainFrame = (props: Props) => {
       showWarningBox(
         i18n._(
           t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -970,7 +979,8 @@ const MainFrame = (props: Props) => {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return;
     }

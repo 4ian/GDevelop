@@ -164,7 +164,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     if (resource.getName() === newName) return;
 
     if (project.getResourcesManager().hasResource(newName)) {
-      showWarningBox('Another resource with this name already exists');
+      showWarningBox('Another resource with this name already exists', {
+        delayToNextTick: true,
+      });
       return;
     }
 

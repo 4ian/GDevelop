@@ -673,11 +673,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout.getObjectGroups().has(newName) ||
       project.getObjectGroups().has(newName)
     ) {
-      showWarningBox('Another object or group with this name already exists.');
+      showWarningBox('Another object or group with this name already exists.', {
+        delayToNextTick: true,
+      });
       return false;
     } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.'
+        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
+        { delayToNextTick: true }
       );
       return false;
     }

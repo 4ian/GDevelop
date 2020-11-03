@@ -589,6 +589,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/FireBullet.json',
   headerUrl: 'Extensions/FireBullet-header.json',
   tags: 'fire, bullets, spawn, firerate',
+  previewIconUrl: 'http://example.com/icon.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };
@@ -603,6 +604,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: 'flash, blink, visible, invisible, hit, damage',
+  previewIconUrl: 'http://example.com/icon.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };

@@ -13,12 +13,14 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: string,
+  previewIconUrl: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
   description: string,
+  iconUrl: string,
 |};
 
 export type SerializedExtension = {

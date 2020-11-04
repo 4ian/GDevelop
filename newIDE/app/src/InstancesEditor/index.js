@@ -636,14 +636,15 @@ export default class InstancesEditor extends Component<Props> {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX: number, deltaY: number) => {
-    const sceneDeltaX = deltaX / this.getZoomFactor();
-    const sceneDeltaY = deltaY / this.getZoomFactor();
+  _onResize = (deltaX: number | null, deltaY: number | null) => {
+    const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
+    const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const forceProportional =
+      this.props.screenType === 'touch' && deltaX !== null && deltaY !== null;
     const proportional =
-      this.keyboardShortcuts.shouldResizeProportionally() ||
-      this.props.screenType === 'touch';
+      forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(
       selectedInstances,
       sceneDeltaX,

@@ -439,7 +439,7 @@ export default ({
       },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {
         if (!apisLoaded) {
-          return t`Google Drive could not be loaded. Check that your are not offline and have a proper internet connection, then try again.`;
+          return t`Google Drive could not be loaded. Check that you are not offline and have a proper internet connection, then try again.`;
         }
 
         return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorizations for reading the file you're trying to access.`;

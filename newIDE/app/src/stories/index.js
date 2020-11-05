@@ -170,7 +170,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
-import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';

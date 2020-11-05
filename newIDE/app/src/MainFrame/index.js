@@ -96,7 +96,7 @@ import {
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
-import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import { type UnsavedChanges } from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
@@ -130,9 +130,35 @@ const styles = {
   },
 };
 
+const findStorageProviderFor = (
+  i18n: I18n,
+  storageProviders: Array<StorageProvider>,
+  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+): ?StorageProvider => {
+  const { storageProviderName } = fileMetadataAndStorageProviderName;
+  const storageProvider = storageProviders.filter(
+    storageProvider => storageProvider.internalName === storageProviderName
+  )[0];
+
+  if (!storageProvider) {
+    const { storageProviderName } = fileMetadataAndStorageProviderName;
+    showErrorBox({
+      message: i18n._(
+        t`Unable to open the project because this provider is unknown: ${storageProviderName}. Try to open the project again from another location.`
+      ),
+      rawError: new Error(
+        `Can't find storage provider called "${storageProviderName}"`
+      ),
+      errorId: 'unknown-storage-provider',
+    });
+    return;
+  }
+
+  return storageProvider;
+};
+
 export type State = {|
   createDialogOpen: boolean,
-  openConfirmDialogOpen: boolean,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
   editorTabs: EditorTabsState,
@@ -194,7 +220,6 @@ const MainFrame = (props: Props) => {
   ] = useStateWithCallback(
     ({
       createDialogOpen: false,
-      openConfirmDialogOpen: false,
       currentProject: null,
       currentFileMetadata: null,
       editorTabs: getEditorTabsInitialState(),
@@ -256,6 +281,10 @@ const MainFrame = (props: Props) => {
     clearHotReloadLogs,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const hasPreviewsRunning = !!previewDebuggerIds.length;
+  const {
+    ensureInteractionHappened,
+    renderOpenConfirmDialog,
+  } = useOpenConfirmDialog();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -301,33 +330,56 @@ const MainFrame = (props: Props) => {
             gdjsDevelopmentWatcherEnabled: true,
           }))
         )
-        .then(state => {
+        .then(async state => {
           GD_STARTUP_TIMES.push([
             'MainFrameComponentDidMountFinished',
             performance.now(),
           ]);
+
           console.info('Startup times:', getStartupTimesSummary());
 
+          const {
+            getAutoOpenMostRecentProject,
+            getRecentProjectFiles,
+            hadProjectOpenedDuringLastSession,
+          } = preferences;
+
           if (initialFileMetadataToOpen) {
-            _openInitialFileMetadata(/* isAfterUserInteraction= */ false);
-          } else {
-            if (introDialog && !Window.isDev()) openIntroDialog(true);
-
+            // Open the initial file metadata (i.e: the file that was passed
+            // as argument and recognized by a storage provider). Note that the storage
+            // provider is assumed to be already set to the proper one.
+            const storageProviderOperations = await getStorageProviderOperations();
+            const proceed = await ensureInteractionHappened(
+              storageProviderOperations
+            );
+            if (proceed) openInitialFileMetadata();
+          } else if (
+            getAutoOpenMostRecentProject() &&
+            hadProjectOpenedDuringLastSession() &&
+            getRecentProjectFiles()[0]
+          ) {
             // Re-open the last opened project, if any and if asked to.
-            const {
-              getAutoOpenMostRecentProject,
-              getRecentProjectFiles,
-              hadProjectOpenedDuringLastSession,
-            } = preferences;
+            const fileMetadataAndStorageProviderName = getRecentProjectFiles()[0];
+            const storageProvider = findStorageProviderFor(
+              i18n,
+              props.storageProviders,
+              fileMetadataAndStorageProviderName
+            );
+            if (!storageProvider) return;
 
-            if (
-              getAutoOpenMostRecentProject() &&
-              hadProjectOpenedDuringLastSession() &&
-              getRecentProjectFiles()[0]
-            )
+            const storageProviderOperations = await getStorageProviderOperations(
+              storageProvider
+            );
+            const proceed = await ensureInteractionHappened(
+              storageProviderOperations
+            );
+            if (proceed)
               openFromFileMetadataWithStorageProvider(
-                getRecentProjectFiles()[0]
+                fileMetadataAndStorageProviderName
               );
+          } else {
+            // Open the intro dialog if not opening any project.
+            if (introDialog && !Window.isDev()) openIntroDialog(true);
           }
         })
         .catch(() => {
@@ -358,27 +410,18 @@ const MainFrame = (props: Props) => {
     [setState]
   );
 
-  const _openInitialFileMetadata = (isAfterUserInteraction: boolean) => {
-    const { initialFileMetadataToOpen, getStorageProviderOperations } = props;
-
+  const openInitialFileMetadata = async () => {
     if (!initialFileMetadataToOpen) return;
-    getStorageProviderOperations().then(storageProviderOperations => {
-      if (
-        !isAfterUserInteraction &&
-        storageProviderOperations.doesInitialOpenRequireUserInteraction
-      ) {
-        _openOpenConfirmDialog(true);
-        return;
-      }
 
-      openFromFileMetadata(initialFileMetadataToOpen).then(state => {
-        if (state)
-          openSceneOrProjectManager({
-            currentProject: state.currentProject,
-            editorTabs: state.editorTabs,
-          });
+    // We use the current storage provider, as it's supposed to be able to open
+    // the initial file metadata. Indeed, it's the responsibility of the `ProjectStorageProviders`
+    // to set the initial storage provider if an initial file metadata is set.
+    const state = await openFromFileMetadata(initialFileMetadataToOpen);
+    if (state)
+      openSceneOrProjectManager({
+        currentProject: state.currentProject,
+        editorTabs: state.editorTabs,
       });
-    });
   };
 
   const updateToolbar = React.useCallback(
@@ -1500,37 +1543,33 @@ const MainFrame = (props: Props) => {
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
     ) => {
-      const {
-        fileMetadata,
-        storageProviderName,
-      } = fileMetadataAndStorageProviderName;
+      const { fileMetadata } = fileMetadataAndStorageProviderName;
+      const storageProvider = findStorageProviderFor(
+        i18n,
+        props.storageProviders,
+        fileMetadataAndStorageProviderName
+      );
 
-      const storageProvider = props.storageProviders.filter(
-        storageProvider => storageProvider.internalName === storageProviderName
-      )[0];
+      if (!storageProvider) return;
 
-      if (storageProvider) {
-        getStorageProviderOperations(storageProvider).then(() => {
-          openFromFileMetadata(fileMetadata)
-            .then(state => {
-              if (state)
-                openSceneOrProjectManager({
-                  currentProject: state.currentProject,
-                  editorTabs: state.editorTabs,
-                });
-            })
-            .catch(error => {
-              preferences.removeRecentProjectFile(
-                fileMetadataAndStorageProviderName
-              );
-            });
-        });
-      }
+      getStorageProviderOperations(storageProvider).then(() => {
+        openFromFileMetadata(fileMetadata)
+          .then(state => {
+            if (state)
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+          })
+          .catch(error => {
+            /* Ignore error, it was already surfaced to the user. */
+          });
+      });
     },
     [
+      i18n,
       openFromFileMetadata,
       openSceneOrProjectManager,
-      preferences,
       props.storageProviders,
       getStorageProviderOperations,
     ]
@@ -1713,10 +1752,6 @@ const MainFrame = (props: Props) => {
     },
     [currentProject, props.unsavedChanges, i18n, closeProject]
   );
-
-  const _openOpenConfirmDialog = (open: boolean = true) => {
-    setState(state => ({ ...state, openConfirmDialogOpen: open }));
-  };
 
   const _onChangeEditorTab = (value: number) => {
     setState(state => ({
@@ -2222,17 +2257,7 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {state.openConfirmDialogOpen && (
-        <OpenConfirmDialog
-          onClose={() => {
-            _openOpenConfirmDialog(false);
-          }}
-          onConfirm={() => {
-            _openOpenConfirmDialog(false);
-            _openInitialFileMetadata(/* isAfterUserInteraction= */ true);
-          }}
-        />
-      )}
+      {renderOpenConfirmDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

@@ -38,12 +38,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
   };
 
   render() {
-    const {
-      layersContainer,
-      onEditEffects,
-      onEditLighting,
-      width,
-    } = this.props;
+    const { layersContainer, onEditEffects, onEdit, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -61,7 +56,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           nameError={this.state.nameErrors[layerName]}
           effectsCount={layer.getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
-          onEditLighting={() => onEditLighting(layer)}
+          onEdit={() => onEdit(layer)}
           onBlur={event => {
             const newName = event.target.value;
             if (layerName === newName) return;
@@ -122,7 +117,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
-  onEditLightingLayer: (layer: ?gdLayer) => void,
+  onEditLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -195,7 +190,7 @@ export default class LayersList extends Component<Props, State> {
                 key={listKey}
                 layersContainer={this.props.layersContainer}
                 onEditEffects={this.props.onEditLayerEffects}
-                onEditLighting={this.props.onEditLightingLayer}
+                onEdit={this.props.onEditLayer}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {

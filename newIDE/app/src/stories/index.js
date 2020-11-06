@@ -4306,8 +4306,8 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      onEditLayerEffects={layer => {}}
-      onEditLightingLayer={layer => {}}
+      onEditLayerEffects={action('onEditLayerEffects')}
+      onEditLayer={action('onEditLayer')}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4328,8 +4328,8 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
-        onEditLayerEffects={layer => {}}
-        onEditLightingLayer={layer => {}}
+        onEditLayerEffects={action('onEditLayerEffects')}
+        onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}

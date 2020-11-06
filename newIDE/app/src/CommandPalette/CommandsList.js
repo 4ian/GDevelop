@@ -40,7 +40,7 @@ export type CommandName =
   | 'TOGGLE_GRID'
   | 'OPEN_SETUP_GRID'
   | 'EDIT_LAYER_EFFECTS'
-  | 'EDIT_LIGHTING_LAYER'
+  | 'EDIT_LAYER'
   | 'EDIT_NETWORK_PREVIEW'
   | 'EDIT_OBJECT'
   | 'EDIT_OBJECT_VARIABLES'
@@ -224,9 +224,9 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'SCENE',
     displayText: t`Edit layer effects...`,
   },
-  EDIT_LIGHTING_LAYER: {
+  EDIT_LAYER: {
     area: 'SCENE',
-    displayText: t`Edit lighting layer...`,
+    displayText: t`Edit layer...`,
   },
 
   // Objects list commands

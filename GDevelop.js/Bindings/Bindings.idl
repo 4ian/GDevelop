@@ -651,6 +651,9 @@ interface Layer {
     void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
     void RemoveEffect([Const] DOMString name);
     void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface PropertyDescriptor {
@@ -832,6 +835,7 @@ interface HighestZOrderFinder {
     void RestrictSearchToLayer([Const] DOMString layer);
     long GetHighestZOrder();
     long GetLowestZOrder();
+    unsigned long GetInstancesCount();
 };
 
 interface InitialInstanceFunctor {};

@@ -389,8 +389,14 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
 /**
  * Do the work of creating a new object
  * @private
+ * @param {EventsFunctionContext | gdjs.RuntimeScene} objectsContext
+ * @param {string} objectName
+ * @param {Hashtable} objectsLists
+ * @param {x} number
+ * @param {y} number
+ * @param {string} layerName
  */
-gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layer) {
+gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layerName) {
     // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
     // eventsFunctionContext. We can't directly use runtimeScene because the object name could
     // be different than the real object name (this is the case in a function. The eventsFunctionContext
@@ -400,7 +406,7 @@ gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName
     if ( obj !== null ) {
         //Do some extra setup
         obj.setPosition(x,y);
-        obj.setLayer(layer);
+        obj.setLayer(layerName);
 
         //Let the new object be picked by next actions/conditions.
         if ( objectsLists.containsKey(objectName) ) {

@@ -181,6 +181,7 @@ import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -271,6 +272,39 @@ storiesOf('UI Building Blocks/Buttons', module)
         />
       </Line>
       <Line>
+        <Text>Buttons with split menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Button with split menu"
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Primary button with split menu"
+          primary
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and with icon"
+          icon={<Brush />}
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
         <Text>Buttons with menus:</Text>
       </Line>
       <Line>
@@ -285,6 +319,12 @@ storiesOf('UI Building Blocks/Buttons', module)
         <RaisedButtonWithMenu
           label="... and with icon"
           icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
       </Line>

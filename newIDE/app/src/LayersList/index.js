@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -8,7 +8,6 @@ import LayerRow from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
-import RaisedButton from '../UI/RaisedButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -19,6 +18,7 @@ import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -210,19 +210,18 @@ export default class LayersList extends Component<Props, State> {
           </FullSizeMeasurer>
           <Column>
             <Line justifyContent="flex-end" expand>
-              <RaisedButton
+              <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
                 primary
                 onClick={this._addLayer}
                 icon={<Add />}
-              />
-            </Line>
-            <Line justifyContent="flex-end" expand>
-              <RaisedButton
-                label={<Trans>Add lighting layer</Trans>}
-                disabled={isLightingLayerPresent}
-                onClick={this._addLightingLayer}
-                icon={<Add />}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: i18n._(t`Add lighting layer`),
+                    enabled: !isLightingLayerPresent,
+                    click: this._addLightingLayer,
+                  },
+                ]}
               />
             </Line>
           </Column>

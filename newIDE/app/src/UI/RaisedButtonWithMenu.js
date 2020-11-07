@@ -5,12 +5,13 @@ import RaisedButton, {
 } from './RaisedButton';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
+import { type I18n as I18nType } from '@lingui/core';
 
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   ...RaisedButtonPropsWithoutOnClick,
-  buildMenuTemplate: () => Array<MenuItemTemplate>,
+  buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
 |};
 
 const shouldNeverBeCalled = () => {

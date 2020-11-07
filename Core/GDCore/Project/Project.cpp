@@ -64,6 +64,7 @@ Project::Project()
       scaleMode("linear"),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      useDeprecatedZeroAsDefaultZOrder(false),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
       ,
@@ -613,6 +614,17 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
 
+  // Compatibility with GD <= 5.0.0-beta101
+  if (VersionWrapper::IsOlderOrEqual(
+          gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
+      !propElement.HasAttribute("useDeprecatedZeroAsDefaultZOrder")) {
+    useDeprecatedZeroAsDefaultZOrder = true;
+  } else {
+    useDeprecatedZeroAsDefaultZOrder =
+        propElement.GetBoolAttribute("useDeprecatedZeroAsDefaultZOrder", false);
+  }
+  // end of compatibility code
+
   extensionProperties.UnserializeFrom(
       propElement.GetChild("extensionProperties"));
 
@@ -886,6 +898,12 @@ void Project::SerializeTo(SerializerElement& element) const {
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
+  // Compatibility with GD <= 5.0.0-beta101
+  if (useDeprecatedZeroAsDefaultZOrder) {
+    propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
+  }
+  // end of compatibility code
+
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
 
   SerializerElement& extensionsElement = propElement.AddChild("extensions");
@@ -1061,7 +1079,6 @@ Project& Project::operator=(const Project& other) {
 }
 
 void Project::Init(const gd::Project& game) {
-  // Some properties
   name = game.name;
   version = game.version;
   windowWidth = game.windowWidth;
@@ -1072,6 +1089,7 @@ void Project::Init(const gd::Project& game) {
   scaleMode = game.scaleMode;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
 #if defined(GD_IDE_ONLY)
   author = game.author;
@@ -1094,7 +1112,6 @@ void Project::Init(const gd::Project& game) {
   extensionsUsed = game.extensionsUsed;
   platforms = game.platforms;
 
-  // Resources
   resourcesManager = game.resourcesManager;
   imageManager = std::make_shared<ImageManager>(*game.imageManager);
   imageManager->SetResourcesManager(&resourcesManager);

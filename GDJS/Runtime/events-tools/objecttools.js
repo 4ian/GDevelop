@@ -402,11 +402,13 @@ gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName
     // be different than the real object name (this is the case in a function. The eventsFunctionContext
     // will take care of this in createObject).
     var obj = objectsContext.createObject(objectName);
+    var layer = objectsContext.getLayer(layerName);
 
     if ( obj !== null ) {
         //Do some extra setup
         obj.setPosition(x,y);
         obj.setLayer(layerName);
+        obj.setZOrder(layer.getDefaultZOrder());
 
         //Let the new object be picked by next actions/conditions.
         if ( objectsLists.containsKey(objectName) ) {

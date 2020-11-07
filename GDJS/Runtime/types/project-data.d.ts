@@ -141,6 +141,7 @@ export interface ProjectPropertiesData {
   loadingScreen: LoadingScreenData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
+  useDeprecatedZeroAsDefaultZOrder?: boolean;
 }
 
 export interface ExtensionProperty {

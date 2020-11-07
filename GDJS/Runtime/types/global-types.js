@@ -76,11 +76,21 @@
  */
 
 /**
+ * Function returning the layer with the given name
+ *
+ * @callback GetLayerFunction
+ * @param {string} name The name of the layer.
+ * @return {gdjs.Layer} The layer with the given name, or the base layer if not found.
+ * @see EventsFunctionContext
+ */
+
+/**
  * Represents the context of the events function (or the behavior method),
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).
  *
  * @typedef {Object} EventsFunctionContext
  * @property {GetObjectsFunction} getObjects Get the list of instances of the specified object.
+ * @property {GetLayerFunction} getLayer Use `runtimeScene.getLayer` instead.
  * @property {GetObjectsListsFunction} getObjectsLists Get the Hashtable containing the lists of instances of the specified object.
  *
  * You can alter the list and this will alter the objects picked for the next conditions/actions/events.

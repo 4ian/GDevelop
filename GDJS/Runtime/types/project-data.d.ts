@@ -121,11 +121,8 @@ export interface EffectData {
 }
 
 export interface ProjectPropertiesData {
-  adMobAppId: string;
   adaptGameResolutionAtRuntime: boolean;
   folderProject: boolean;
-  linuxExecutableFilename: string;
-  macExecutableFilename: string;
   orientation: string;
   packageName: string;
   projectFile: string;
@@ -133,8 +130,6 @@ export interface ProjectPropertiesData {
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;
-  winExecutableFilename: string;
-  winExecutableIconFile: string;
   name: string;
   author: string;
   windowWidth: number;

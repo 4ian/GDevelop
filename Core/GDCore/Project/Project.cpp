@@ -609,14 +609,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
-  winExecutableFilename =
-      propElement.GetStringAttribute("winExecutableFilename");
-  winExecutableIconFile =
-      propElement.GetStringAttribute("winExecutableIconFile");
-  linuxExecutableFilename =
-      propElement.GetStringAttribute("linuxExecutableFilename");
-  macExecutableFilename =
-      propElement.GetStringAttribute("macExecutableFilename");
+
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
 
@@ -891,10 +884,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
-  propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
-  propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
-  propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
-  propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
@@ -1132,11 +1121,6 @@ void Project::Init(const gd::Project& game) {
 #if defined(GD_IDE_ONLY)
   gameFile = game.GetProjectFile();
   imagesChanged = game.imagesChanged;
-
-  winExecutableFilename = game.winExecutableFilename;
-  winExecutableIconFile = game.winExecutableIconFile;
-  linuxExecutableFilename = game.linuxExecutableFilename;
-  macExecutableFilename = game.macExecutableFilename;
 #endif
 }
 

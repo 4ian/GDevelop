@@ -293,8 +293,8 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Get the properties set by extensions. 
-   * 
+   * \brief Get the properties set by extensions.
+   *
    * Each extension can store arbitrary values indexed by a property name, which are
    * useful to store project wide settings (AdMob id, etc...).
    */
@@ -303,8 +303,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   };
 
   /**
-   * \brief Get the properties set by extensions. 
-   * 
+   * \brief Get the properties set by extensions.
+   *
    * Each extension can store arbitrary values indexed by a property name, which are
    * useful to store project wide settings (AdMob id, etc...).
    */
@@ -923,10 +923,6 @@ class GD_CORE_API Project : public ObjectsContainer {
 #if defined(GD_IDE_ONLY)
   std::vector<gd::String> imagesChanged;  ///< Images that have been changed and
                                           ///< which have to be reloaded
-  gd::String winExecutableFilename;       ///< Windows executable name
-  gd::String winExecutableIconFile;       ///< Icon for Windows executable
-  gd::String linuxExecutableFilename;     ///< Linux executable name
-  gd::String macExecutableFilename;       ///< Mac executable name
 #endif
 
  private:

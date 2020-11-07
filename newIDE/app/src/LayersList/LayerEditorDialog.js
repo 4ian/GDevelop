@@ -55,15 +55,16 @@ const LayerEditorDialog = (props: Props) => {
     onCancel: onClose,
   });
   const [currentTab, setCurrentTab] = React.useState(initialTab);
-  const { instancesCount } = React.useMemo(
+  const { instancesCount, highestZOrder } = React.useMemo(
     () => {
       const zOrderFinder = new gd.HighestZOrderFinder();
       zOrderFinder.restrictSearchToLayer(layer.getName());
 
       initialInstances.iterateOverInstances(zOrderFinder);
       const instancesCount = zOrderFinder.getInstancesCount();
+      const highestZOrder = zOrderFinder.getHighestZOrder();
       zOrderFinder.delete();
-      return { instancesCount };
+      return { instancesCount, highestZOrder };
     },
     [layer, initialInstances]
   );
@@ -122,6 +123,14 @@ const LayerEditorDialog = (props: Props) => {
           <Text>
             There are {instancesCount} instances of objects on this layer.
           </Text>
+          {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
+            <Text>
+              Objects created using events on this layer will be given a "Z
+              order" of {highestZOrder + 1}, so that they appear in front of all
+              objects of this layer. You can change this using the action to
+              change an object Z order, after using an action to create it.
+            </Text>
+          )}
           <InlineCheckbox
             label={<Trans>Layer visible</Trans>}
             checked={layer.getVisibility()}

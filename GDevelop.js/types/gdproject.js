@@ -28,6 +28,8 @@ declare class gdProject extends gdObjectsContainer {
   setMinimumFPS(fps: number): void;
   setFolderProject(enable: boolean): void;
   isFolderProject(): boolean;
+  setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
+  getUseDeprecatedZeroAsDefaultZOrder(): boolean;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getUsedExtensions(): gdVectorString;

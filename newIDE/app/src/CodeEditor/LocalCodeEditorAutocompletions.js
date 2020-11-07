@@ -106,61 +106,14 @@ export const setupAutocompletions = (monaco: any) => {
 /** Represents the scene being played. */
 var runtimeScene = new gdjs.RuntimeScene();
 
-/** The instances of objects that are passed to your JavaScript function.
+/**
+ * The instances of objects that are passed to your JavaScript function.
  * @type {gdjs.RuntimeObject[]}
  */
-var objects = new gdjs.RuntimeScene();
+var objects = [];
 
 /**
- * Get the list of instances of the specified object.
- *
- * @callback GetObjectsFunction
- * @param {string} objectName The name of the object for which instances must be returned.
- * @return {gdjs.RuntimeObject[]} Instances of the specified object.
- */
-
-/**
- * Get the Hashtable containing the lists of instances of the specified object.
- *
- * You can alter the list and this will alter the objects picked for the next conditions/actions/events.
- * If you don't need this, prefer using \`getObjects\`.
- *
- * @callback GetObjectsListsFunction
- * @param {string} objectName The name of the object for which instances must be returned.
- * @return {?Hashtable} Hashtable containing the lists of instances (keys are object names in the current context), or \`null\` if not found
- */
-
-/**
- * Create a new object from its name. The object is added to the instances
- * living on the scene.
- *
- * @callback CreateObjectFunction
- * @param {string} objectName The name of the object to be created
- * @return {gdjs.RuntimeObject} The created object
- */
-
-/**
- * Get the "real" behavior name, that can be used with \`getBehavior\`. For example:
- * \`object.getBehavior(eventsFunctionContext.getBehaviorName("MyBehavior"))\`
- *
- * @callback GetBehaviorNameFunction
- * @param {string} behaviorName The name of the behavior, as specified in the parameters of the function.
- * @return {string} The name that can be passed to \`getBehavior\`.
- */
-
-/**
- * Get the value (string or number) of an argument that was passed to the events function.
- * To get objects, use \`getObjects\`.
- *
- * @callback GetArgumentFunction
- * @param {string} argumentName The name of the argument, as specified in the parameters of the function.
- * @return {string|number} The string or number passed for this argument
- */
-
-/** Represents the context of the events function (or the behavior method),
- * if any. If the JS code is running in a scene, this will be undefined (so you can't use this in a scene).
- *
- * @type {?{getObjects: GetObjectsFunction, getObjectsLists: GetObjectsListsFunction, getBehaviorName: GetBehaviorNameFunction, createObject: CreateObjectFunction, getArgument: GetArgumentFunction, returnValue: boolean | number | string}}
+ * @type {EventsFunctionContext}
  */
 var eventsFunctionContext = {};
 `,

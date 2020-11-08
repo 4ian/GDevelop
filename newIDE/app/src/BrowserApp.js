@@ -27,6 +27,7 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
+import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -41,6 +42,7 @@ export const create = (authentification: Authentification) => {
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
+      resourceFetcher={BrowserResourceFetcher}
     >
       {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders

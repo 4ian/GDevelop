@@ -215,6 +215,7 @@ import { SearchResults } from '../AssetStore/SearchResults';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 
 configureActions({
   depth: 2,
@@ -4644,5 +4645,36 @@ storiesOf('AssetStore/AssetDetails', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+    />
+  ));
+
+storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
+  .addDecorator(muiDecorator)
+  .add('in progress', () => (
+    <ResourceFetcherDialog
+      progress={40}
+      fetchedResources={null}
+      onAbandon={null}
+      onRetry={null}
+    />
+  ))
+  .add('with errors', () => (
+    <ResourceFetcherDialog
+      progress={100}
+      fetchedResources={{
+        fetchedResources: [],
+        erroredResources: [
+          {
+            resourceName: 'Player.png',
+            error: new Error('Fake download error'),
+          },
+          {
+            resourceName: 'Spaceship.png',
+            error: new Error('Another fake error'),
+          },
+        ],
+      }}
+      onAbandon={action('abandon')}
+      onRetry={action('retry')}
     />
   ));

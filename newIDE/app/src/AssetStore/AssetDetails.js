@@ -193,6 +193,7 @@ export const AssetDetails = ({
                     assetAuthors.map(author => {
                       return (
                         <Link
+                          key={author.name}
                           component="button"
                           onClick={() => {
                             Window.openExternalURL(author.website);

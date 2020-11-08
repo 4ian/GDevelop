@@ -30,6 +30,10 @@ import { create } from 'jss';
 import rtl from 'jss-rtl';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import {
+  type ResourceFetcher,
+  ResourceFetcherContext,
+} from '../ProjectsStorage/ResourceFetcher';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -42,6 +46,7 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
+  resourceFetcher: ResourceFetcher,
   children: ({
     i18n: I18nType,
     eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -61,6 +66,7 @@ export default class Providers extends React.Component<Props, {||}> {
       makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
+      resourceFetcher,
     } = this.props;
     return (
       <DragAndDropContextProvider>
@@ -97,14 +103,18 @@ export default class Providers extends React.Component<Props, {||}> {
                                   <CommandsContextProvider>
                                     <AssetStoreStateProvider>
                                       <ResourceStoreStateProvider>
-                                        <EventsFunctionsExtensionsContext.Consumer>
-                                          {eventsFunctionsExtensionsState =>
-                                            children({
-                                              i18n,
-                                              eventsFunctionsExtensionsState,
-                                            })
-                                          }
-                                        </EventsFunctionsExtensionsContext.Consumer>
+                                        <ResourceFetcherContext.Provider
+                                          value={resourceFetcher}
+                                        >
+                                          <EventsFunctionsExtensionsContext.Consumer>
+                                            {eventsFunctionsExtensionsState =>
+                                              children({
+                                                i18n,
+                                                eventsFunctionsExtensionsState,
+                                              })
+                                            }
+                                          </EventsFunctionsExtensionsContext.Consumer>
+                                        </ResourceFetcherContext.Provider>
                                       </ResourceStoreStateProvider>
                                     </AssetStoreStateProvider>
                                   </CommandsContextProvider>

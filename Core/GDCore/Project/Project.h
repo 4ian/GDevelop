@@ -118,13 +118,13 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * Called when project file has changed.
    */
-  void SetProjectFile(const gd::String& file) { gameFile = file; }
+  void SetProjectFile(const gd::String& file) { projectFile = file; }
 
   /**
    * Return project file
    * \see gd::Project::SetProjectFile
    */
-  const gd::String& GetProjectFile() const { return gameFile; }
+  const gd::String& GetProjectFile() const { return projectFile; }
 
   /**
    * Set that the project should be saved as a folder project.
@@ -996,7 +996,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                             ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
-  gd::String gameFile;  ///< File of the game
+  gd::String projectFile;  ///< Path to the project file - when editing a local file.
   gd::String latestCompilationDirectory;
   gd::Platform*
       currentPlatform;  ///< The platform being used to edit the project.

@@ -600,7 +600,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
-  SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
                                             0,
@@ -889,7 +888,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
-  propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
@@ -1136,7 +1134,7 @@ void Project::Init(const gd::Project& game) {
   variables = game.GetVariables();
 
 #if defined(GD_IDE_ONLY)
-  gameFile = game.GetProjectFile();
+  projectFile = game.GetProjectFile();
   imagesChanged = game.imagesChanged;
 #endif
 }

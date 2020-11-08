@@ -116,6 +116,8 @@ import {
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
+import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
+import { delay } from '../Utils/Delay';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -201,7 +203,6 @@ export type Props = {
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  loading?: boolean,
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
@@ -285,6 +286,10 @@ const MainFrame = (props: Props) => {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
   } = useOpenConfirmDialog();
+  const {
+    ensureResourcesAreFetched,
+    renderResourceFetcherDialog,
+  } = useResourceFetcher();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -530,47 +535,59 @@ const MainFrame = (props: Props) => {
   );
 
   const loadFromProject = React.useCallback(
-    (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
+    async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       if (fileMetadata)
         preferences.insertRecentProjectFile({
           fileMetadata,
           storageProviderName: getStorageProvider().internalName,
         });
 
-      return closeProject().then(() => {
-        // Make sure that the ResourcesLoader cache is emptied, so that
-        // the URL to a resource with a name in the old project is not re-used
-        // for another resource with the same name in the new project.
-        ResourcesLoader.burstAllUrlsCache();
-        // TODO: Pixi cache should also be burst
-        preferences.setHasProjectOpened(true);
+      await closeProject();
 
-        return setState(state => ({
-          ...state,
-          currentProject: project,
-          currentFileMetadata: fileMetadata,
-          createDialogOpen: false,
-        })).then(state => {
-          // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
-          // their editor will take care of reloading them.
-          eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-            project
-          );
+      // Make sure that the ResourcesLoader cache is emptied, so that
+      // the URL to a resource with a name in the old project is not re-used
+      // for another resource with the same name in the new project.
+      ResourcesLoader.burstAllUrlsCache();
+      // TODO: Pixi cache should also be burst
 
-          if (fileMetadata) {
-            project.setProjectFile(fileMetadata.fileIdentifier);
-          }
+      preferences.setHasProjectOpened(true);
 
-          return state;
-        });
-      });
+      const state = await setState(state => ({
+        ...state,
+        currentProject: project,
+        currentFileMetadata: fileMetadata,
+        createDialogOpen: false,
+      }));
+
+      // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
+      // their editor will take care of reloading them.
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        project
+      );
+
+      if (fileMetadata) {
+        project.setProjectFile(fileMetadata.fileIdentifier);
+      }
+
+      // Fetch the resources if needed, for example if opening on the desktop app
+      // a project made on the web-app.
+      const { someResourcesWereFetched } = await ensureResourcesAreFetched(
+        project
+      );
+      if (someResourcesWereFetched) {
+        if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+      }
+
+      return state;
     },
     [
+      props.unsavedChanges,
       setState,
       closeProject,
       preferences,
       eventsFunctionsExtensionsState,
       getStorageProvider,
+      ensureResourcesAreFetched,
     ]
   );
 
@@ -652,7 +669,8 @@ const MainFrame = (props: Props) => {
         setIsLoadingProject(true);
 
         // Try to find an autosave (and ask user if found)
-        return checkForAutosave()
+        return delay(150)
+          .then(() => checkForAutosave())
           .then(fileMetadata => onOpen(fileMetadata))
           .catch(err => {
             // onOpen failed, tried to find again an autosave
@@ -1874,7 +1892,7 @@ const MainFrame = (props: Props) => {
       : () => {},
   });
 
-  const showLoader = isLoadingProject || previewLoading || props.loading;
+  const showLoader = isLoadingProject || previewLoading;
 
   return (
     <div className="main-frame">
@@ -2258,6 +2276,7 @@ const MainFrame = (props: Props) => {
         />
       )}
       {renderOpenConfirmDialog()}
+      {renderResourceFetcherDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

@@ -26,6 +26,7 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
+import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,6 +43,7 @@ export const create = (authentification: Authentification) => {
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
+      resourceFetcher={LocalResourceFetcher}
     >
       {({ i18n, eventsFunctionsExtensionsState }) => (
         <ProjectStorageProviders

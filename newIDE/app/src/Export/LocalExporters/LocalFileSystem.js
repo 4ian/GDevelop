@@ -46,37 +46,37 @@ export default {
     return os.tmpdir();
   },
   fileNameFrom: function(fullpath) {
-    if (this._isExternalURL(fullpath)) return fullpath;
+    if (this._isExternalUrl(fullpath)) return fullpath;
 
-    fullpath = this._translateURL(fullpath);
+    fullpath = this._translateUrl(fullpath);
     return path.basename(fullpath);
   },
   dirNameFrom: function(fullpath) {
-    if (this._isExternalURL(fullpath)) return '';
+    if (this._isExternalUrl(fullpath)) return '';
 
-    fullpath = this._translateURL(fullpath);
+    fullpath = this._translateUrl(fullpath);
     return path.dirname(fullpath);
   },
   makeAbsolute: function(filename, baseDirectory) {
-    if (this._isExternalURL(filename)) return filename;
+    if (this._isExternalUrl(filename)) return filename;
 
-    filename = this._translateURL(filename);
+    filename = this._translateUrl(filename);
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
     return path.resolve(baseDirectory, path.normalize(filename));
   },
   makeRelative: function(filename, baseDirectory) {
-    if (this._isExternalURL(filename)) return filename;
+    if (this._isExternalUrl(filename)) return filename;
 
-    filename = this._translateURL(filename);
+    filename = this._translateUrl(filename);
     return path.relative(baseDirectory, path.normalize(filename));
   },
   isAbsolute: function(fullpath) {
-    if (this._isExternalURL(fullpath)) return true;
+    if (this._isExternalUrl(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
-    fullpath = this._translateURL(fullpath);
+    fullpath = this._translateUrl(fullpath);
     return (
       (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
       (fullpath.length > 1 && fullpath.charAt(1) === ':')
@@ -84,9 +84,9 @@ export default {
   },
   copyFile: function(source, dest) {
     //URL are not copied.
-    if (this._isExternalURL(source)) return true;
+    if (this._isExternalUrl(source)) return true;
 
-    source = this._translateURL(source);
+    source = this._translateUrl(source);
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
@@ -136,7 +136,7 @@ export default {
     return output;
   },
   fileExists: function(filename) {
-    filename = this._translateURL(filename);
+    filename = this._translateUrl(filename);
     try {
       const stat = fs.statSync(filename);
       return stat.isFile();
@@ -144,14 +144,19 @@ export default {
       return false;
     }
   },
-  _isExternalURL: function(filename) {
-    return filename.substr(0, 4) === 'http' || filename.substr(0, 4) === 'ftp';
+  _isExternalUrl: function(filename) {
+    return (
+      filename.startsWith('http://') ||
+      filename.startsWith('https://') ||
+      filename.startsWith('ftp://')
+    );
   },
   /**
    * Return the filename associated to the URL on the server, relative to the games directory.
    * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
    */
-  _translateURL: function(filename) {
+  _translateUrl: function(filename) {
+    // TODO: remove
     if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
       filename = filename.substr(2);
 

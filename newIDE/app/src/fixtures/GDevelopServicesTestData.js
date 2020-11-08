@@ -289,6 +289,10 @@ const spaceshipSerializedResources = [
   {
     alwaysLoaded: false,
     file: 'https://example.com/player-ship1.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship1.png',
+    },
     kind: 'image',
     metadata: '',
     name: 'player-ship1.png',
@@ -298,6 +302,10 @@ const spaceshipSerializedResources = [
   {
     alwaysLoaded: false,
     file: 'https://example.com/player-ship2.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship2.png',
+    },
     kind: 'image',
     metadata: '',
     name: 'player-ship2.png',

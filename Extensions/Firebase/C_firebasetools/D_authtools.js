@@ -5,7 +5,7 @@
  */
 
 /**
- * Firebase Authentification Event Tools.
+ * Firebase Authentication Event Tools.
  * @namespace
  */
 gdjs.evtTools.firebase.auth = {
@@ -20,7 +20,7 @@ gdjs.evtTools.firebase.auth = {
   },
 
   /**
-   * The Current authentification status.
+   * The current authentication status.
    * @type {boolean}
    */
   authentified: false,
@@ -52,15 +52,15 @@ gdjs.evtTools.firebase.auth = {
  */
 gdjs.evtTools.firebase.auth.userManagement = {
   /**
-   * Contains dangerous management functions. Requires reauthentification before usage.
+   * Contains dangerous management functions. Requires reauthentication before usage.
    * @namespace
    */
   dangerous: {
     /**
      * Changes the users email.
      * Use this when using basic auth.
-     * @param {string} oldEmail - Old email for reauthentification.
-     * @param {string} password - Old password for reauthentification.
+     * @param {string} oldEmail - Old email for reauthentication.
+     * @param {string} password - Old password for reauthentication.
      * @param {string} newEmail - New email for the user.
      * @param {boolean} [sendVerificationEmail] - Send a verification email to the old address before changing the email?
      * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
@@ -98,8 +98,8 @@ gdjs.evtTools.firebase.auth.userManagement = {
     /**
      * Changes the users password.
      * Use this when using basic auth.
-     * @param {string} email - Old email for reauthentification.
-     * @param {string} oldPassword - Old password for reauthentification.
+     * @param {string} email - Old email for reauthentication.
+     * @param {string} oldPassword - Old password for reauthentication.
      * @param {string} newPassword - New password for the user.
      * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
      */
@@ -126,8 +126,8 @@ gdjs.evtTools.firebase.auth.userManagement = {
     /**
      * Deletes the current user.
      * Use this when using basic auth.
-     * @param {string} email - Old email for reauthentification.
-     * @param {string} password - Old password for reauthentification.
+     * @param {string} email - Old email for reauthentication.
+     * @param {string} password - Old password for reauthentication.
      * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
      */
     deleteUser(email, password, callbackStateVariable) {
@@ -334,7 +334,7 @@ gdjs.evtTools.firebase.auth.userManagement = {
 };
 
 /**
- * Get the logged-in users authentification token.
+ * Get the logged-in users authentication token.
  * Tries to refresh it everytime the function is called.
  * @returns {string}
  */
@@ -355,7 +355,7 @@ gdjs.evtTools.firebase.auth.isAuthentified = function () {
 };
 
 /**
- * Signs the user in with basic email-password authentification.
+ * Signs the user in with basic email-password authentication.
  * @param {string} email - The users email.
  * @param {string} password - The users password.
  * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.
@@ -379,7 +379,7 @@ gdjs.evtTools.firebase.auth.signInWithEmail = function (
 };
 
 /**
- * Creates an account with basic email-password authentification.
+ * Creates an account with basic email-password authentication.
  * @param {string} email - The users email.
  * @param {string} password - The users password.
  * @param {gdjs.Variable} [callbackStateVariable] - The variable where to store the result.

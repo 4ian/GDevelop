@@ -11,7 +11,7 @@
 		},
 		"problemMatcher": [],
 		"label": "Start development server",
-		"detail": "Starts the GDevelop development server"
+		"detail": "Starts the GDevelop development server."
 	},
 	{
 		"type": "npm",
@@ -20,7 +20,7 @@
 		"group": "build",
 		"problemMatcher": [],
 		"label": "Build GDevelop.js",
-		"detail": "Builds GDCore for newIDE"
+		"detail": "Builds GDCore for newIDE."
 	},
 	{
 		"type": "npm",
@@ -28,19 +28,19 @@
 		"path": "newIDE/app/",
 		"problemMatcher": [],
 		"label": "Format newIDE",
-		"detail": "Formats via prettier the javascript in the newIDE/app directory."
+		"detail": "Run auto-formatting (with Prettier) for the newIDE/app directory."
 	},
 	{
 		"type": "npm",
 		"script": "test",
-		"path": "GDJS/",
+		"path": "newIDE/app/",
 		"group": {
 			"kind": "test",
 			"isDefault": true
 		},
 		"problemMatcher": [],
 		"label": "Run newIDE tests",
-		"detail": "Run tests for newIDE"
+		"detail": "Run tests for newIDE."
 	},
 	{
 		"type": "typescript",
@@ -60,16 +60,7 @@
 		"group": "test",
 		"problemMatcher": [],
 		"label": "Run GDJS tests",
-		"detail": "Run tests for GDJS"
-	},
-	{
-		"type": "npm",
-		"script": "build",
-		"path": "GDevelop.js/",
-		"group": "build",
-		"problemMatcher": [],
-		"label": "Build GDevelop.js",
-		"detail": "Builds GDCore for newIDE"
+		"detail": "Run tests for GDJS."
 	}
 ]
 }

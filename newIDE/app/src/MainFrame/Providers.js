@@ -12,9 +12,6 @@ import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
-import EventsFunctionsExtensionsContext, {
-  type EventsFunctionsExtensionsState,
-} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
@@ -47,10 +44,9 @@ type Props = {|
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   resourceFetcher: ResourceFetcher,
-  children: ({
+  children: ({|
     i18n: I18nType,
-    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  }) => React.Node,
+  |}) => React.Node,
 |};
 
 /**
@@ -106,14 +102,7 @@ export default class Providers extends React.Component<Props, {||}> {
                                         <ResourceFetcherContext.Provider
                                           value={resourceFetcher}
                                         >
-                                          <EventsFunctionsExtensionsContext.Consumer>
-                                            {eventsFunctionsExtensionsState =>
-                                              children({
-                                                i18n,
-                                                eventsFunctionsExtensionsState,
-                                              })
-                                            }
-                                          </EventsFunctionsExtensionsContext.Consumer>
+                                          {children({ i18n })}
                                         </ResourceFetcherContext.Provider>
                                       </ResourceStoreStateProvider>
                                     </AssetStoreStateProvider>

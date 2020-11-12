@@ -68,9 +68,7 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
-import EventsFunctionsExtensionsContext, {
-  type EventsFunctionsExtensionsState,
-} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -98,7 +96,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
 import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
-import { type UnsavedChanges } from './UnsavedChangesContext';
+import UnsavedChangesContext from './UnsavedChangesContext';
 import { type MainMenuProps } from './MainMenu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
@@ -209,9 +207,7 @@ export type Props = {
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   i18n: I18n,
-  unsavedChanges?: UnsavedChanges,
 };
 
 const MainFrame = (props: Props) => {
@@ -290,6 +286,10 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher();
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+  const unsavedChanges = React.useContext(UnsavedChangesContext);
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -309,7 +309,6 @@ const MainFrame = (props: Props) => {
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
-    eventsFunctionsExtensionsState,
     getStorageProviderOperations,
     getStorageProvider,
     integratedEditor,
@@ -575,13 +574,13 @@ const MainFrame = (props: Props) => {
         project
       );
       if (someResourcesWereFetched) {
-        if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       }
 
       return state;
     },
     [
-      props.unsavedChanges,
+      unsavedChanges,
       setState,
       closeProject,
       preferences,
@@ -870,7 +869,7 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = state;
-    const { i18n, eventsFunctionsExtensionsState } = props;
+    const { i18n } = props;
     if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
@@ -1009,7 +1008,6 @@ const MainFrame = (props: Props) => {
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
     const { i18n } = props;
-    const { eventsFunctionsExtensionsState } = props;
     if (!currentProject) return;
 
     if (
@@ -1415,7 +1413,7 @@ const MainFrame = (props: Props) => {
   };
 
   const _onProjectItemModified = () => {
-    if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
     forceUpdate();
   };
 
@@ -1424,7 +1422,6 @@ const MainFrame = (props: Props) => {
     eventsFunction: gdEventsFunction
   ) => {
     const { currentProject } = state;
-    const { eventsFunctionsExtensionsState } = props;
     if (!currentProject) return;
 
     // Names are assumed to be already validated
@@ -1629,8 +1626,7 @@ const MainFrame = (props: Props) => {
           .then(
             ({ wasSaved, fileMetadata }) => {
               if (wasSaved) {
-                if (props.unsavedChanges)
-                  props.unsavedChanges.sealUnsavedChanges();
+                if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
                 _showSnackMessage(i18n._(t`Project properly saved`));
 
                 if (fileMetadata) {
@@ -1661,7 +1657,7 @@ const MainFrame = (props: Props) => {
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
-      props.unsavedChanges,
+      unsavedChanges,
       setState,
       state.editorTabs,
       _showSnackMessage,
@@ -1722,8 +1718,7 @@ const MainFrame = (props: Props) => {
           .then(
             ({ wasSaved }) => {
               if (wasSaved) {
-                if (props.unsavedChanges)
-                  props.unsavedChanges.sealUnsavedChanges();
+                if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
                 _showSnackMessage(i18n._(t`Project properly saved`));
               }
             },
@@ -1748,7 +1743,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       _showSnackMessage,
       i18n,
-      props.unsavedChanges,
+      unsavedChanges,
       saveProjectAs,
       state.editorTabs,
     ]
@@ -1756,7 +1751,7 @@ const MainFrame = (props: Props) => {
 
   const askToCloseProject = React.useCallback(
     (): Promise<void> => {
-      if (props.unsavedChanges && props.unsavedChanges.hasUnsavedChanges) {
+      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
         if (!currentProject) return Promise.resolve();
 
         const answer = Window.showConfirmDialog(
@@ -1768,7 +1763,7 @@ const MainFrame = (props: Props) => {
       }
       return closeProject();
     },
-    [currentProject, props.unsavedChanges, i18n, closeProject]
+    [currentProject, unsavedChanges, i18n, closeProject]
   );
 
   const _onChangeEditorTab = (value: number) => {
@@ -1980,7 +1975,7 @@ const MainFrame = (props: Props) => {
               );
             }}
             freezeUpdate={!projectManagerOpen}
-            unsavedChanges={props.unsavedChanges}
+            unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         )}
@@ -2060,7 +2055,7 @@ const MainFrame = (props: Props) => {
                   resourceExternalEditors,
                   onCreateEventsFunction,
                   openInstructionOrExpression,
-                  unsavedChanges: props.unsavedChanges,
+                  unsavedChanges: unsavedChanges,
                   canOpen: !!props.storageProviders.filter(
                     ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                   ).length,
@@ -2281,9 +2276,7 @@ const MainFrame = (props: Props) => {
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}
         language={props.i18n.language}
-        hasUnsavedChanges={
-          !!props.unsavedChanges && props.unsavedChanges.hasUnsavedChanges
-        }
+        hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
       {state.gdjsDevelopmentWatcherEnabled &&

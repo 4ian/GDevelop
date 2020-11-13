@@ -29,6 +29,8 @@ import Delete from '@material-ui/icons/Delete';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { string } from 'prop-types';
 
 const gd: libGDevelop = global.gd;
 
@@ -82,6 +84,80 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
   }
 
   return true;
+};
+
+type StrngSelectorEditorProps = {|
+  extraInfo: string,
+  setExtraInfo: newExtraInfo => void,
+|};
+
+const StringSelectorEditor = ({
+  extraInfo,
+  setExtraInfo,
+}: StrngSelectorEditorProps) => {
+  const [array, setArray] = React.useState([]);
+  const forceUpdate = useForceUpdate();
+  React.useEffect(
+    () => {
+      let parsedArray = null;
+      try {
+        parsedArray = JSON.parse(extraInfo);
+      } catch (e) {
+        console.warn('Cannot parse parameter extraInfo: ', e);
+      }
+
+      if (parsedArray !== null) {
+        setArray(parsedArray);
+      }
+    },
+    [extraInfo, array]
+  );
+
+  const updateExtraInfo = () => {
+    setExtraInfo(JSON.stringify(array));
+    forceUpdate();
+  };
+
+  return (
+    <ResponsiveLineStackLayout>
+      <Column justifyContent="flex-end" expand>
+        {array.map((item, index) => (
+          <Line key={index} justifyContent="flex-end" expand marginSize="5px">
+            <SemiControlledTextField
+              commitOnBlur
+              value={item}
+              onChange={text => {
+                array[index] = text;
+                updateExtraInfo();
+              }}
+              fullWidth
+            />
+            <IconButton
+              tooltip={t`Delete`}
+              onClick={() => {
+                array.splice(index, 1);
+                updateExtraInfo();
+              }}
+            >
+              <Delete />
+            </IconButton>
+          </Line>
+        ))}
+
+        <Line justifyContent="flex-end" expand>
+          <RaisedButton
+            primary
+            onClick={() => {
+              array.push('New String');
+              updateExtraInfo();
+            }}
+            label={<Trans>Add a string to the list</Trans>}
+            icon={<Add />}
+          />
+        </Line>
+      </Column>
+    </ResponsiveLineStackLayout>
+  );
 };
 
 export default class EventsFunctionParametersEditor extends React.Component<
@@ -364,63 +440,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               />
                             )}
                           </ResponsiveLineStackLayout>
-                          {parameter.getType() === 'stringWithSelector' &&
-                            parseJSONArray(parameter.getExtraInfo(), array => (
-                              <ResponsiveLineStackLayout>
-                                <Column justifyContent="flex-end" expand>
-                                  {array.map((item, index) => (
-                                    <Line
-                                      key={index}
-                                      justifyContent="flex-end"
-                                      expand
-                                      marginSize="5px"
-                                    >
-                                      <SemiControlledTextField
-                                        commitOnBlur
-                                        value={item}
-                                        onChange={text => {
-                                          array[index] = text;
-                                          parameter.setExtraInfo(
-                                            JSON.stringify(array)
-                                          );
-                                          this.forceUpdate();
-                                        }}
-                                        fullWidth
-                                      />
-                                      <IconButton
-                                        tooltip={t`Delete`}
-                                        onClick={() => {
-                                          array.splice(index, 1);
-                                          parameter.setExtraInfo(
-                                            JSON.stringify(array)
-                                          );
-                                          this.forceUpdate();
-                                        }}
-                                      >
-                                        <Delete />
-                                      </IconButton>
-                                    </Line>
-                                  ))}
-
-                                  <Line justifyContent="flex-end" expand>
-                                    <RaisedButton
-                                      primary
-                                      onClick={() => {
-                                        array.push('New String');
-                                        parameter.setExtraInfo(
-                                          JSON.stringify(array)
-                                        );
-                                        this.forceUpdate();
-                                      }}
-                                      label={
-                                        <Trans>Add a string to the list</Trans>
-                                      }
-                                      icon={<Add />}
-                                    />
-                                  </Line>
-                                </Column>
-                              </ResponsiveLineStackLayout>
-                            ))}
+                          {parameter.getType() === 'stringWithSelector' && (
+                            <StringSelectorEditor
+                              extraInfo={parameter.getExtraInfo()}
+                              setExtraInfo={parameter.setExtraInfo}
+                            />
+                          )}
                           {isParameterDescriptionAndTypeShown(i) && (
                             <SemiControlledTextField
                               commitOnBlur

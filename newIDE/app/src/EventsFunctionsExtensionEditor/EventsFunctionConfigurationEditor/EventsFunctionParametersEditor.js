@@ -53,17 +53,6 @@ const styles = {
   },
 };
 
-const parseJSONArray = (json, callback) => {
-  let array;
-  try {
-    array = JSON.parse(json);
-    if (!Array.isArray(array)) array = [];
-  } catch (e) {
-    array = [];
-  }
-  return callback(array);
-};
-
 const validateParameterName = (i18n: I18nType, newName: string) => {
   if (!newName) {
     showWarningBox(

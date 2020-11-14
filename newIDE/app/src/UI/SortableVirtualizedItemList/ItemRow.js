@@ -5,6 +5,7 @@ import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
+import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 
 const styles = {
   itemName: {
@@ -73,8 +74,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
               defaultValue={itemName}
               onBlur={e => this.props.onRename(e.currentTarget.value)}
               onKeyPress={event => {
-                if (event.charCode === 13) {
-                  // enter key pressed
+                if (shouldValidate(event)) {
                   if (this.textField) this.textField.blur();
                 }
               }}

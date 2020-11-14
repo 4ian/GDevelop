@@ -126,7 +126,9 @@ export default class EventsBasedBehaviorsList extends React.Component<
     if (eventsBasedBehavior.getName() === newName) return;
 
     if (eventsBasedBehaviorsList.has(newName)) {
-      showWarningBox('Another behavior with this name already exists.');
+      showWarningBox('Another behavior with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 

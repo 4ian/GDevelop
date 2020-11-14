@@ -170,7 +170,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
-import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
@@ -181,6 +181,7 @@ import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -214,6 +215,7 @@ import { SearchResults } from '../AssetStore/SearchResults';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 
 configureActions({
   depth: 2,
@@ -271,6 +273,39 @@ storiesOf('UI Building Blocks/Buttons', module)
         />
       </Line>
       <Line>
+        <Text>Buttons with split menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Button with split menu"
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Primary button with split menu"
+          primary
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and with icon"
+          icon={<Brush />}
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
         <Text>Buttons with menus:</Text>
       </Line>
       <Line>
@@ -285,6 +320,12 @@ storiesOf('UI Building Blocks/Buttons', module)
         <RaisedButtonWithMenu
           label="... and with icon"
           icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
       </Line>
@@ -2720,6 +2761,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'medium'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2758,6 +2800,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2796,6 +2839,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -4303,8 +4347,8 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      onEditLayerEffects={layer => {}}
-      onEditLightingLayer={layer => {}}
+      onEditLayerEffects={action('onEditLayerEffects')}
+      onEditLayer={action('onEditLayer')}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4325,8 +4369,8 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
-        onEditLayerEffects={layer => {}}
-        onEditLightingLayer={layer => {}}
+        onEditLayerEffects={action('onEditLayerEffects')}
+        onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4545,6 +4589,13 @@ storiesOf('AssetStore/ResourceStore', module)
         <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
       </ResourceStoreStateProvider>
     </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: svg (for icons)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('AssetStore/AssetCard', module)
@@ -4594,5 +4645,36 @@ storiesOf('AssetStore/AssetDetails', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+    />
+  ));
+
+storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
+  .addDecorator(muiDecorator)
+  .add('in progress', () => (
+    <ResourceFetcherDialog
+      progress={40}
+      fetchedResources={null}
+      onAbandon={null}
+      onRetry={null}
+    />
+  ))
+  .add('with errors', () => (
+    <ResourceFetcherDialog
+      progress={100}
+      fetchedResources={{
+        fetchedResources: [],
+        erroredResources: [
+          {
+            resourceName: 'Player.png',
+            error: new Error('Fake download error'),
+          },
+          {
+            resourceName: 'Spaceship.png',
+            error: new Error('Another fake error'),
+          },
+        ],
+      }}
+      onAbandon={action('abandon')}
+      onRetry={action('retry')}
     />
   ));

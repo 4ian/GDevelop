@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Sebastian\\workspace\\GDevelop\\newIDE\\app\\resources\\examples\\tween-test\\tween-test.json",
+    "projectFile": "C:\\Users\\RTX-Bouh\\Documents\\GDevelop projects\\My project17\\tween-test.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Tween Test",
     "author": "",
     "windowWidth": 800,
@@ -118,15 +115,6 @@
         "name": "Background-1.png",
         "smoothed": true,
         "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/tween-test/Background_Wip-1.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "Background_Wip-1.png",
-        "smoothed": true,
-        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -149,7 +137,7 @@
       "title": "",
       "v": 63,
       "uiSettings": {
-        "grid": true,
+        "grid": false,
         "gridB": 255,
         "gridG": 180,
         "gridHeight": 16,
@@ -157,9 +145,9 @@
         "gridOffsetY": 0,
         "gridR": 158,
         "gridWidth": 16,
-        "snap": true,
+        "snap": false,
         "windowMask": false,
-        "zoomFactor": 0.976
+        "zoomFactor": 0.832
       },
       "objectsGroups": [],
       "variables": [],
@@ -237,7 +225,7 @@
           "name": "PositionXTweenText",
           "persistentUuid": "a116494b-a9aa-456d-83fc-245274960182",
           "width": 0,
-          "x": 320,
+          "x": 286,
           "y": 234,
           "zOrder": 5,
           "numberProperties": [],
@@ -263,14 +251,14 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 128,
+          "height": 96,
           "layer": "",
           "locked": false,
           "name": "Background",
           "persistentUuid": "cdbd6fb3-92a9-4cd6-b607-d5c2e0d49a4c",
-          "width": 448,
-          "x": 32,
-          "y": 458,
+          "width": 127,
+          "x": 331,
+          "y": 346,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -316,8 +304,8 @@
           "locked": false,
           "name": "Background",
           "persistentUuid": "b6106109-3b03-4181-abe6-4febae0d29fe",
-          "width": 160,
-          "x": 384,
+          "width": 151,
+          "x": 467,
           "y": 346,
           "zOrder": 0,
           "numberProperties": [],
@@ -333,7 +321,7 @@
           "name": "ScaleXTweenText",
           "persistentUuid": "2f247c54-4996-4f76-87e8-35433b3f8045",
           "width": 0,
-          "x": 624,
+          "x": 623,
           "y": 346,
           "zOrder": 9,
           "numberProperties": [],
@@ -349,8 +337,8 @@
           "name": "ScaleXTweenSprite",
           "persistentUuid": "2d0a8596-d318-4b72-84a1-298a45935099",
           "width": 0,
-          "x": 704,
-          "y": 394,
+          "x": 703,
+          "y": 390,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
@@ -551,13 +539,13 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 80,
+          "height": 96,
           "layer": "",
           "locked": false,
           "name": "Background",
           "persistentUuid": "ab02e7d1-71d8-4940-87f5-5c52bedd9f72",
           "width": 144,
-          "x": 624,
+          "x": 623,
           "y": 346,
           "zOrder": 0,
           "numberProperties": [],
@@ -573,7 +561,7 @@
           "name": "OpacityTweenText",
           "persistentUuid": "0985812c-293e-4516-ae29-4743a8ad9b66",
           "width": 0,
-          "x": 208,
+          "x": 185,
           "y": 346,
           "zOrder": 20,
           "numberProperties": [],
@@ -589,7 +577,7 @@
           "name": "OpacityTweenSprite",
           "persistentUuid": "031cdfea-bbb1-4f10-a7ae-680da8d205a6",
           "width": 0,
-          "x": 288,
+          "x": 265,
           "y": 410,
           "zOrder": 21,
           "numberProperties": [],
@@ -604,7 +592,7 @@
           "locked": false,
           "name": "Background",
           "persistentUuid": "46b6f986-0b39-4b88-abad-973ebcf7248c",
-          "width": 160,
+          "width": 142,
           "x": 32,
           "y": 346,
           "zOrder": 0,
@@ -637,8 +625,8 @@
           "name": "PauseResumeTweenText",
           "persistentUuid": "f1d5f949-8ecc-42de-a878-d1d49dee3dad",
           "width": 0,
-          "x": 144,
-          "y": 458,
+          "x": 88,
+          "y": 461,
           "zOrder": 22,
           "numberProperties": [],
           "stringProperties": [],
@@ -669,7 +657,7 @@
           "name": "ColourTweenText",
           "persistentUuid": "fdc9aabe-ad0c-4616-849c-17fa461f296d",
           "width": 0,
-          "x": 400,
+          "x": 475,
           "y": 346,
           "zOrder": 25,
           "numberProperties": [],
@@ -685,8 +673,8 @@
           "name": "ColourTweenSprite",
           "persistentUuid": "8dc70330-f7e0-4f9d-8ed9-c256729c6c40",
           "width": 0,
-          "x": 464,
-          "y": 410,
+          "x": 538,
+          "y": 418,
           "zOrder": 26,
           "numberProperties": [],
           "stringProperties": [],
@@ -700,8 +688,8 @@
           "locked": false,
           "name": "Background",
           "persistentUuid": "8bc780b4-c24f-45a6-9eb6-94fecb8843fa",
-          "width": 160,
-          "x": 208,
+          "width": 140,
+          "x": 184,
           "y": 346,
           "zOrder": 0,
           "numberProperties": [],
@@ -717,8 +705,8 @@
           "name": "ColourTweenProgress",
           "persistentUuid": "cfefdbd0-1a67-4b9c-b8fa-bbc40dff8b80",
           "width": 0,
-          "x": 400,
-          "y": 378,
+          "x": 475,
+          "y": 373,
           "zOrder": 27,
           "numberProperties": [],
           "stringProperties": [],
@@ -749,7 +737,7 @@
           "name": "PositionXTweenProgress",
           "persistentUuid": "1a73c9b7-910c-4010-9078-8c6bf82537b4",
           "width": 0,
-          "x": 544,
+          "x": 497,
           "y": 234,
           "zOrder": 28,
           "numberProperties": [],
@@ -829,9 +817,105 @@
           "name": "Instructions",
           "persistentUuid": "baa46406-2307-4196-8ce5-f19b21cb2caf",
           "width": 0,
-          "x": 202,
-          "y": 10,
+          "x": 121,
+          "y": 6,
           "zOrder": 31,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 128,
+          "layer": "",
+          "locked": false,
+          "name": "Background",
+          "persistentUuid": "5588b837-d712-4a86-89e6-5dd24f581010",
+          "width": 306,
+          "x": 32,
+          "y": 458,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "TextSizeWidthTweenText",
+          "persistentUuid": "e1623f77-739c-4a8d-8632-eaa4004cc9f0",
+          "width": 0,
+          "x": 337,
+          "y": 346,
+          "zOrder": 32,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 128,
+          "layer": "",
+          "locked": false,
+          "name": "Background",
+          "persistentUuid": "aed94908-37db-4522-914b-72eb673e003a",
+          "width": 139,
+          "x": 348,
+          "y": 458,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "HeightTweenSprite",
+          "persistentUuid": "4d342586-9bbb-497a-8e49-c5d3793f9aef",
+          "width": 0,
+          "x": 415,
+          "y": 534,
+          "zOrder": 33,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "TextSizeHeightTweenText",
+          "persistentUuid": "8086b5c4-b5a9-47cf-8c17-2f27f11a2d63",
+          "width": 0,
+          "x": 355,
+          "y": 461,
+          "zOrder": 34,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "WidthTweenSprite",
+          "persistentUuid": "23da011d-6558-4aa8-a273-c08b3fbbbdf3",
+          "width": 0,
+          "x": 394,
+          "y": 401,
+          "zOrder": 35,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -889,7 +973,7 @@
           }
         },
         {
-          "bold": false,
+          "bold": true,
           "italic": false,
           "name": "Instructions",
           "smoothed": true,
@@ -900,7 +984,7 @@
           "behaviors": [],
           "string": "Click on a sprite to trigger its tween behavior",
           "font": "",
-          "characterSize": 20,
+          "characterSize": 25,
           "color": {
             "b": 255,
             "g": 255,
@@ -1595,6 +1679,108 @@
           }
         },
         {
+          "name": "HeightTweenSprite",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "var",
+              "value": "0"
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "TweenBehavior",
+              "type": "Tween::TweenBehavior",
+              "property1": "Initial value 1",
+              "property2": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "Sprite",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Sprite-1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 16,
+                        "y": 16
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "WidthTweenSprite",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "var",
+              "value": "0"
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "TweenBehavior",
+              "type": "Tween::TweenBehavior",
+              "property1": "Initial value 1",
+              "property2": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "Sprite",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Sprite-1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 16,
+                        "y": 16
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "ColourTweenSprite",
           "tags": "",
           "type": "Sprite",
@@ -1644,6 +1830,44 @@
               ]
             }
           ]
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "TextSizeHeightTweenText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Height tweens",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "TextSizeWidthTweenText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Width tweens",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
         },
         {
           "bold": false,
@@ -1726,54 +1950,19 @@
               ]
             }
           ]
-        },
-        {
-          "name": "Background_ToDo",
-          "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "Background_Wip",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 0.08,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "Background_Wip-1.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ],
       "events": [
         {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "name": "Controls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
               "disabled": false,
@@ -2000,142 +2189,152 @@
               ],
               "events": []
             }
-          ]
+          ],
+          "parameters": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Toujours"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
           "actions": [],
           "events": [
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Toujours"
-                  },
-                  "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "PositionTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "PositionXTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "PositionYTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "AngleTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "ScaleTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "ScaleXTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "ScaleYTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "ObjectVariableTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "OpacityTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "ColourTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "PauseResumeTweens"
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "TextSizeTweens"
-                }
-              ]
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "PositionTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "PositionXTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "PositionYTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "AngleTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "ScaleTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "ScaleXTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "ScaleYTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "ObjectVariableTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "OpacityTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "ColourTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "PauseResumeTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "TextSizeTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "WidthTweens"
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "HeightTweens"
             }
           ]
         }
@@ -2174,7 +2373,7 @@
   ],
   "externalEvents": [
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "PositionTweens",
       "events": [
@@ -2234,7 +2433,7 @@
                 "TweenBehavior",
                 "\"PositionTweenFirst\"",
                 "544",
-                "PositionTweenSprite.Y() + 128",
+                "PositionTweenSprite.Y() + 50",
                 "\"linear\"",
                 "1000",
                 "no"
@@ -2301,7 +2500,7 @@
                         "TweenBehavior",
                         "\"PositionTweenSecond\"",
                         "224",
-                        "PositionTweenSprite.Y() - 128",
+                        "PositionTweenSprite.Y() - 50",
                         "\"linear\"",
                         "1000",
                         "no"
@@ -2374,7 +2573,7 @@
                         "TweenBehavior",
                         "\"PositionTweenFirst\"",
                         "544",
-                        "PositionTweenSprite.Y() + 128",
+                        "PositionTweenSprite.Y() + 50",
                         "\"linear\"",
                         "1000",
                         "no"
@@ -2399,53 +2598,11 @@
               ]
             }
           ]
-        },
-        {
-          "disabled": true,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Tween::RemoveTween"
-              },
-              "parameters": [
-                "PositionTweenSprite",
-                "TweenBehavior",
-                "\"PositionTweenFirst\""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": true,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Tween::RemoveTween"
-              },
-              "parameters": [
-                "PositionTweenSprite",
-                "TweenBehavior",
-                "\"PositionTweenSecond\""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "PositionXTweens",
       "events": [
@@ -2468,6 +2625,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionXTween"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "TweenBehavior",
+                "\"PositionXTweenRight\"",
+                "576",
+                "\"bounce\"",
+                "5000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "TweenBehavior",
+                "\"PositionXTweenRight\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionXTween"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "TweenBehavior",
+                "\"PositionXTweenLeft\"",
+                "192",
+                "\"linear\"",
+                "1500",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "TweenBehavior",
+                "\"PositionXTweenLeft\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionXTween"
+              },
+              "parameters": [
+                "PositionXTweenSprite",
+                "TweenBehavior",
+                "\"PositionXTweenRight\"",
+                "576",
+                "\"bounce\"",
+                "5000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
           "actions": [
             {
@@ -2478,178 +2777,17 @@
               "parameters": [
                 "PositionXTweenProgress",
                 "=",
-                "ToString(PositionXTweenSprite.TweenBehavior::GetProgress(\"PositionXTweenRight\"))"
+                "\"Timer: \"+ ToString(trunc(PositionXTweenSprite.TweenBehavior::Progress(\"PositionXTweenRight\")*100)/100)"
               ],
               "subInstructions": []
             }
           ],
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionXTween"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionXTweenRight\"",
-                        "576",
-                        "\"bounce\"",
-                        "5000",
-                        "1000"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionXTweenRight\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionXTween"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionXTweenLeft\"",
-                        "192",
-                        "\"bounce\"",
-                        "5000",
-                        "1000"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionXTweenLeft\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionXTween"
-                      },
-                      "parameters": [
-                        "PositionXTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionXTweenRight\"",
-                        "576",
-                        "\"bounce\"",
-                        "5000",
-                        "1000"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
-            }
-          ]
+          "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "PositionYTweens",
       "events": [
@@ -2672,175 +2810,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionYTween"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionYTweenDown\"",
-                        "256",
-                        "\"easeInOutSine\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionYTweenDown\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionYTween"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionYTweenUp\"",
-                        "96",
-                        "\"easeInOutSine\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionYTweenUp\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectPositionYTween"
-                      },
-                      "parameters": [
-                        "PositionYTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionYTweenDown\"",
-                        "256",
-                        "\"easeInOutSine\"",
-                        "1000",
-                        "1000"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionYTween"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "TweenBehavior",
+                "\"PositionYTweenDown\"",
+                "256",
+                "\"easeInOutSine\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "TweenBehavior",
+                "\"PositionYTweenDown\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionYTween"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "TweenBehavior",
+                "\"PositionYTweenUp\"",
+                "96",
+                "\"easeInOutSine\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "TweenBehavior",
+                "\"PositionYTweenUp\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionYTween"
+              },
+              "parameters": [
+                "PositionYTweenSprite",
+                "TweenBehavior",
+                "\"PositionYTweenDown\"",
+                "256",
+                "\"easeInOutSine\"",
+                "1000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "AngleTweens",
       "events": [
@@ -2863,183 +2974,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectAngleTween"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "TweenBehavior",
-                        "\"AngleTweenLeft\"",
-                        "359",
-                        "\"bouncePast\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "TweenBehavior",
-                        "\"AngleTweenLeft\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectAngleTween"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "TweenBehavior",
-                        "\"AngleTweenRight\"",
-                        "0",
-                        "\"bouncePast\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "TweenBehavior",
-                        "\"AngleTweenRight\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectAngleTween"
-                      },
-                      "parameters": [
-                        "AngleTweenSprite",
-                        "TweenBehavior",
-                        "\"AngleTweenLeft\"",
-                        "359",
-                        "\"bouncePast\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectAngleTween"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "TweenBehavior",
+                "\"AngleTweenLeft\"",
+                "359",
+                "\"bouncePast\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "TweenBehavior",
+                "\"AngleTweenLeft\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectAngleTween"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "TweenBehavior",
+                "\"AngleTweenRight\"",
+                "0",
+                "\"bouncePast\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "TweenBehavior",
+                "\"AngleTweenRight\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectAngleTween"
+              },
+              "parameters": [
+                "AngleTweenSprite",
+                "TweenBehavior",
+                "\"AngleTweenLeft\"",
+                "359",
+                "\"bouncePast\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "ScaleTweens",
       "events": [
@@ -3062,218 +3138,175 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleTween"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenSmall\"",
-                        "0",
-                        "0",
-                        "\"easeInOutExpo\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenSmall\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenSmall\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleTween"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenBig\"",
-                        "1",
-                        "1",
-                        "\"easeInOutExpo\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenBig\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenBig\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleTween"
-                      },
-                      "parameters": [
-                        "ScaleTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleTweenSmall\"",
-                        "0",
-                        "0",
-                        "\"easeInOutExpo\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
-        },
-        {
-          "disabled": true,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenSmall\"",
+                "0",
+                "0",
+                "\"easeInOutExpo\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         },
         {
-          "disabled": true,
+          "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenSmall\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenSmall\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenBig\"",
+                "1",
+                "1",
+                "\"easeInOutExpo\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenBig\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenBig\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenSmall\"",
+                "0",
+                "0",
+                "\"easeInOutExpo\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "ScaleXTweens",
       "events": [
@@ -3296,183 +3329,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleXTween"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleXTweenNarrow\"",
-                        "0",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleXTweenNarrow\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleXTween"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleXTweenWide\"",
-                        "1",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleXTweenWide\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleXTween"
-                      },
-                      "parameters": [
-                        "ScaleXTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleXTweenNarrow\"",
-                        "0",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleXTween"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "TweenBehavior",
+                "\"ScaleXTweenNarrow\"",
+                "0",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "TweenBehavior",
+                "\"ScaleXTweenNarrow\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleXTween"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "TweenBehavior",
+                "\"ScaleXTweenWide\"",
+                "1",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "TweenBehavior",
+                "\"ScaleXTweenWide\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleXTween"
+              },
+              "parameters": [
+                "ScaleXTweenSprite",
+                "TweenBehavior",
+                "\"ScaleXTweenNarrow\"",
+                "0",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "ScaleYTweens",
       "events": [
@@ -3495,183 +3493,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleYTween"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleYTweenNarrow\"",
-                        "0",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleYTweenNarrow\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleYTween"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleYTweenWide\"",
-                        "1",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleYTweenWide\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectScaleYTween"
-                      },
-                      "parameters": [
-                        "ScaleYTweenSprite",
-                        "TweenBehavior",
-                        "\"ScaleYTweenNarrow\"",
-                        "0",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleYTween"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "TweenBehavior",
+                "\"ScaleYTweenNarrow\"",
+                "0",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "TweenBehavior",
+                "\"ScaleYTweenNarrow\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleYTween"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "TweenBehavior",
+                "\"ScaleYTweenWide\"",
+                "1",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "TweenBehavior",
+                "\"ScaleYTweenWide\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectScaleYTween"
+              },
+              "parameters": [
+                "ScaleYTweenSprite",
+                "TweenBehavior",
+                "\"ScaleYTweenNarrow\"",
+                "0",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "OpacityTweens",
       "events": [
@@ -3694,183 +3657,148 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectOpacityTween"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "TweenBehavior",
-                        "\"OpacityTweenTransparent\"",
-                        "0",
-                        "\"easeOutSine\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "TweenBehavior",
-                        "\"OpacityTweenTransparent\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectOpacityTween"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "TweenBehavior",
-                        "\"OpacityTweenOpaque\"",
-                        "255",
-                        "\"easeOutSine\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "TweenBehavior",
-                        "\"OpacityTweenOpaque\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectOpacityTween"
-                      },
-                      "parameters": [
-                        "OpacityTweenSprite",
-                        "TweenBehavior",
-                        "\"OpacityTweenTransparent\"",
-                        "0",
-                        "\"easeOutSine\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectOpacityTween"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "TweenBehavior",
+                "\"OpacityTweenTransparent\"",
+                "0",
+                "\"easeOutSine\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "TweenBehavior",
+                "\"OpacityTweenTransparent\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectOpacityTween"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "TweenBehavior",
+                "\"OpacityTweenOpaque\"",
+                "255",
+                "\"easeOutSine\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "TweenBehavior",
+                "\"OpacityTweenOpaque\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectOpacityTween"
+              },
+              "parameters": [
+                "OpacityTweenSprite",
+                "TweenBehavior",
+                "\"OpacityTweenTransparent\"",
+                "0",
+                "\"easeOutSine\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "ObjectVariableTweens",
       "events": [
@@ -3894,23 +3822,67 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "VariableTweens",
+                "=",
+                "ToString(floor(VariableTweens.Variable(var)))"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": [
             {
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "VariableTweens",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
               "actions": [
                 {
                   "type": {
                     "inverted": false,
-                    "value": "TextObject::String"
+                    "value": "Tween::AddObjectVariableTween"
                   },
                   "parameters": [
                     "VariableTweens",
-                    "=",
-                    "ToString(floor(VariableTweens.Variable(var)))"
+                    "TweenBehavior",
+                    "\"ObjectVariableTweenHigh\"",
+                    "var",
+                    "0",
+                    "1000",
+                    "\"easeOutCubic\"",
+                    "10000",
+                    "no"
                   ],
                   "subInstructions": []
                 }
@@ -3919,7 +3891,8 @@
                 {
                   "disabled": false,
                   "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "VariableTweens",
                   "conditions": [],
                   "actions": [],
                   "events": [
@@ -3931,24 +3904,64 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "MouseButtonReleased"
+                            "value": "Tween::HasFinished"
                           },
                           "parameters": [
-                            "",
-                            "Left"
+                            "VariableTweens",
+                            "TweenBehavior",
+                            "\"ObjectVariableTweenHigh\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Tween::AddObjectVariableTween"
+                          },
+                          "parameters": [
+                            "VariableTweens",
+                            "TweenBehavior",
+                            "\"ObjectVariableTweenLow\"",
+                            "var",
+                            "1000",
+                            "0",
+                            "\"easeOutCubic\"",
+                            "10000",
+                            "no"
                           ],
                           "subInstructions": []
                         },
                         {
                           "type": {
                             "inverted": false,
-                            "value": "SourisSurObjet"
+                            "value": "Tween::RemoveTween"
                           },
                           "parameters": [
                             "VariableTweens",
-                            "",
-                            "",
-                            ""
+                            "TweenBehavior",
+                            "\"ObjectVariableTweenHigh\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Tween::HasFinished"
+                          },
+                          "parameters": [
+                            "VariableTweens",
+                            "TweenBehavior",
+                            "\"ObjectVariableTweenLow\""
                           ],
                           "subInstructions": []
                         }
@@ -3971,132 +3984,21 @@
                             "no"
                           ],
                           "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Tween::RemoveTween"
+                          },
+                          "parameters": [
+                            "VariableTweens",
+                            "TweenBehavior",
+                            "\"ObjectVariableTweenLow\""
+                          ],
+                          "subInstructions": []
                         }
                       ],
                       "events": []
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "VariableTweens",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
-                        {
-                          "disabled": false,
-                          "folded": false,
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [],
-                          "events": [
-                            {
-                              "disabled": false,
-                              "folded": false,
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::HasFinished"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenHigh\""
-                                  ],
-                                  "subInstructions": []
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::AddObjectVariableTween"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenLow\"",
-                                    "var",
-                                    "1000",
-                                    "0",
-                                    "\"easeOutCubic\"",
-                                    "10000",
-                                    "no"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::RemoveTween"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenHigh\""
-                                  ],
-                                  "subInstructions": []
-                                }
-                              ],
-                              "events": []
-                            },
-                            {
-                              "disabled": false,
-                              "folded": false,
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::HasFinished"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenLow\""
-                                  ],
-                                  "subInstructions": []
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::AddObjectVariableTween"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenHigh\"",
-                                    "var",
-                                    "0",
-                                    "1000",
-                                    "\"easeOutCubic\"",
-                                    "10000",
-                                    "no"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "Tween::RemoveTween"
-                                  },
-                                  "parameters": [
-                                    "VariableTweens",
-                                    "TweenBehavior",
-                                    "\"ObjectVariableTweenLow\""
-                                  ],
-                                  "subInstructions": []
-                                }
-                              ],
-                              "events": []
-                            }
-                          ]
-                        }
-                      ]
                     }
                   ]
                 }
@@ -4107,7 +4009,7 @@
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "PauseResumeTweens",
       "events": [
@@ -4338,21 +4240,12 @@
               "subInstructions": []
             }
           ],
-          "events": [
-            {
-              "disabled": true,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": []
-            }
-          ]
+          "events": []
         }
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "ColourTweens",
       "events": [
@@ -4360,178 +4253,151 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectColorTween"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToRed\"",
-                        "\"255;0;0\"",
-                        "\"linear\"",
-                        "10000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToRed\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectColorTween"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToWhite\"",
-                        "\"255;255;255\"",
-                        "\"linear\"",
-                        "10000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToRed\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToWhite\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddObjectColorTween"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToRed\"",
-                        "\"255;0;0\"",
-                        "\"linear\"",
-                        "10000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "ColourTweenSprite",
-                        "TweenBehavior",
-                        "\"ColorTweenToWhite\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectColorTween"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToRed\"",
+                "\"255;0;0\"",
+                "\"linear\"",
+                "10000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToRed\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectColorTween"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToWhite\"",
+                "\"255;255;255\"",
+                "\"linear\"",
+                "10000",
+                "no"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToRed\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToWhite\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectColorTween"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToRed\"",
+                "\"255;0;0\"",
+                "\"linear\"",
+                "10000",
+                "no"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "ColourTweenSprite",
+                "TweenBehavior",
+                "\"ColorTweenToWhite\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
@@ -4547,7 +4413,7 @@
               "parameters": [
                 "ColourTweenProgress",
                 "=",
-                "ToString(ColourTweenSprite.TweenBehavior::GetProgress(\"ColorTweenToRed\"))"
+                "\"Timer: \"+ ToString(trunc(ColourTweenSprite.TweenBehavior::Progress(\"ColorTweenToRed\")*100)/100)"
               ],
               "subInstructions": []
             }
@@ -4557,7 +4423,7 @@
       ]
     },
     {
-      "associatedLayout": "NewScene",
+      "associatedLayout": "TweenTest",
       "lastChangeTimeStamp": 0,
       "name": "TextSizeTweens",
       "events": [
@@ -4580,185 +4446,526 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
-          "events": [
+          "conditions": [
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonReleased"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisSurObjet"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddTextObjectCharacterSizeTween"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeHigh\"",
-                        "20",
-                        "\"elastic\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeHigh\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddTextObjectCharacterSizeTween"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeLow\"",
-                        "1",
-                        "\"easeInOutQuint\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeHigh\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::HasFinished"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeLow\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::AddTextObjectCharacterSizeTween"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeHigh\"",
-                        "20",
-                        "\"elastic\"",
-                        "1000",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "TextSizeTween",
-                        "TweenBehavior",
-                        "\"TextSizeLow\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ]
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
             }
-          ]
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddTextObjectCharacterSizeTween"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeHigh\"",
+                "20",
+                "\"elastic\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeHigh\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddTextObjectCharacterSizeTween"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeLow\"",
+                "1",
+                "\"easeInOutQuint\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeHigh\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeLow\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddTextObjectCharacterSizeTween"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeHigh\"",
+                "20",
+                "\"elastic\"",
+                "1000",
+                "no"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "TextSizeTween",
+                "TweenBehavior",
+                "\"TextSizeLow\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ]
+    },
+    {
+      "associatedLayout": "TweenTest",
+      "lastChangeTimeStamp": 0,
+      "name": "WidthTweens",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Height - Tweens",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightSmall\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightSmall\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectWidthTween"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightBig\"",
+                "0",
+                "\"linear\"",
+                "1000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectWidthTween"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightBig\"",
+                "0",
+                "\"linear\"",
+                "2000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightBig\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightBig\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectWidthTween"
+              },
+              "parameters": [
+                "WidthTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeightSmall\"",
+                "100",
+                "\"linear\"",
+                "1000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ]
+    },
+    {
+      "associatedLayout": "TweenTest",
+      "lastChangeTimeStamp": 0,
+      "name": "HeightTweens",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Height - Tweens",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight2\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "ScaleTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight2\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectHeightTween"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight\"",
+                "0",
+                "\"linear\"",
+                "1000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectHeightTween"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight\"",
+                "0",
+                "\"linear\"",
+                "2000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::HasFinished"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::RemoveTween"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectHeightTween"
+              },
+              "parameters": [
+                "HeightTweenSprite",
+                "TweenBehavior",
+                "\"ScaleTweenHeight2\"",
+                "100",
+                "\"linear\"",
+                "1000",
+                "1000"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]

@@ -1,5 +1,7 @@
-#Script launching the generation of the documentations of all modules
-#Install globally doxgen and jsdoc before starting it.
+# Script launching the generation of the documentations of all modules
+# Install globally doxgen before starting it.
+set -e
+
 echo Generating all docs...
 mkdir -p ../docs
 mkdir -p logs

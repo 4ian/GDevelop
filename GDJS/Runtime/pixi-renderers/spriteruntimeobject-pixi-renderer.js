@@ -83,15 +83,11 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
 }
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
-    //TODO: Workaround a not working property in PIXI.js:
-    this._sprite.alpha = this._sprite.visible ? this._object.opacity/255 : 0;
+    this._sprite.alpha = this._object.opacity/255;
 }
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateVisibility = function() {
     this._sprite.visible = !this._object.hidden;
-
-    //TODO: Workaround a not working property in PIXI.js:
-    this._sprite.alpha = this._sprite.visible ? this._object.opacity/255 : 0;
 }
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor) {

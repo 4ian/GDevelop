@@ -29,6 +29,10 @@ import {
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import {
+  shouldActivate,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -161,7 +165,7 @@ const Instruction = (props: Props) => {
                 }
               }}
               onKeyPress={event => {
-                if (event.key === 'Enter' || event.key === ' ') {
+                if (shouldActivate(event)) {
                   props.onParameterClick(event, parameterIndex);
                   event.stopPropagation();
                   event.preventDefault();
@@ -260,11 +264,11 @@ const Instruction = (props: Props) => {
             }}
             {...longTouchForContextMenuProps}
             onKeyPress={event => {
-              if (event.key === 'Enter') {
+              if (shouldValidate(event)) {
                 props.onDoubleClick();
                 event.stopPropagation();
                 event.preventDefault();
-              } else if (event.key === ' ') {
+              } else if (shouldActivate(event)) {
                 props.onClick();
                 event.stopPropagation();
                 event.preventDefault();

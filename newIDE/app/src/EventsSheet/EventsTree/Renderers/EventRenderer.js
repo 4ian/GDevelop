@@ -43,4 +43,5 @@ export type EventRendererProps = {
 
   screenType: ScreenType,
   windowWidth: WidthType,
+  eventsSheetHeight: number,
 };

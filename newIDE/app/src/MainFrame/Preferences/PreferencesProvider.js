@@ -68,6 +68,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
     setShortcutForCommand: this._setShortcutForCommand.bind(this),
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
+    getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
+    setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
   };
 
   componentDidMount() {
@@ -464,6 +466,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, userShortcutMap: updatedShortcutMap },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getNewObjectDialogDefaultTab() {
+    return this.state.values.newObjectDialogDefaultTab;
+  }
+
+  _setNewObjectDialogDefaultTab(
+    newObjectDialogDefaultTab: 'asset-store' | 'new-object'
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, newObjectDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

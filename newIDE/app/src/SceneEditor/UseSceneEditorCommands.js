@@ -13,7 +13,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
   onEditObjectGroup: (group: gdObjectGroup) => void,
   onEditLayerEffects: (layer: gdLayer) => void,
-  onEditLightingLayer: (layer: gdLayer) => void,
+  onEditLayer: (layer: gdLayer) => void,
 |};
 
 const UseSceneEditorCommands = (props: Props) => {
@@ -26,7 +26,7 @@ const UseSceneEditorCommands = (props: Props) => {
     onOpenSceneVariables,
     onEditObjectGroup,
     onEditLayerEffects,
-    onEditLightingLayer,
+    onEditLayer,
   } = props;
 
   useCommand('OPEN_SCENE_PROPERTIES', true, {
@@ -53,7 +53,7 @@ const UseSceneEditorCommands = (props: Props) => {
   useLayersListCommands({
     layout,
     onEditLayerEffects,
-    onEditLightingLayer,
+    onEditLayer,
   });
 
   return null;

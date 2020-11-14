@@ -3,6 +3,7 @@
     <name>GDJS_PROJECTNAME</name>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
+    <plugin name="cordova-plugin-screen-orientation" version="3.0.2" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -21,7 +22,6 @@
 
         <!-- GDJS_ICONS_IOS -->
     </platform>
-    <preference name="orientation" value="GDJS_ORIENTATION" />
     <preference name="BackgroundColor" value="0xff000000"/>
 
     <!-- Android Fullscreen -->

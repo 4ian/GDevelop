@@ -1,23 +1,21 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shoot-bullets\\game.json",
+    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/shoot-bullets/shoot-bullets.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +28,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +101,7 @@
         "alwaysLoaded": false,
         "file": "p1_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_jump.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +110,7 @@
         "alwaysLoaded": false,
         "file": "coinGold.png",
         "kind": "image",
+        "metadata": "",
         "name": "coinGold.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +119,7 @@
         "alwaysLoaded": false,
         "file": "images/manBlue_machine.png",
         "kind": "image",
+        "metadata": "",
         "name": "manBlue_machine.png",
         "smoothed": true,
         "userAdded": false
@@ -126,6 +128,7 @@
         "alwaysLoaded": false,
         "file": "images/laserBlue07.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserBlue07.png",
         "smoothed": true,
         "userAdded": true
@@ -173,6 +176,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "d740c15e-ad90-497f-b52c-1d3ed43d3c4c",
           "width": 0,
           "x": 335.312,
           "y": 292.07,
@@ -188,6 +192,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "6f67c24b-3b38-400a-a366-43596f0c5d17",
           "width": 0,
           "x": 156,
           "y": 15,
@@ -200,6 +205,7 @@
       "objects": [
         {
           "name": "kenney",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -244,14 +250,15 @@
         },
         {
           "name": "bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -291,6 +298,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -516,8 +524,8 @@
                   "parameters": [
                     "",
                     "bullet",
-                    "kenney.PointX(firespot)",
-                    "kenney.PointY(firespot)",
+                    "kenney.PointX(\"firespot\")",
+                    "kenney.PointY(\"firespot\")",
                     ""
                   ],
                   "subInstructions": []
@@ -566,6 +574,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -587,6 +600,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -570,6 +570,12 @@ export default class EventsSheet extends React.Component<Props, State> {
       this._saveChangesToHistory();
     }
 
+    if (this.state.inlineEditingAnchorEl) {
+      // Focus back the parameter - especially useful when editing
+      // with the keyboard only.
+      this.state.inlineEditingAnchorEl.focus();
+    }
+
     this.setState({
       inlineEditing: false,
       inlineEditingAnchorEl: null,
@@ -1093,6 +1099,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
+                          eventsSheetHeight={
+                            this._containerDiv.current
+                              ? this._containerDiv.current.clientHeight
+                              : 0
+                          }
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel

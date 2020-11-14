@@ -11,6 +11,11 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
+import {
+  shouldActivate,
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -70,6 +75,12 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.edit();
+          }
+        }}
+        tabIndex={0}
       >
         {this.state.editing ? (
           <TextField
@@ -92,12 +103,12 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             fullWidth
             id="group-title"
             onKeyUp={event => {
-              if (event.key === 'Escape') {
+              if (shouldCloseOrCancel(event)) {
                 this.endEditing();
               }
             }}
             onKeyPress={event => {
-              if (event.key === 'Enter') {
+              if (shouldValidate(event)) {
                 this.endEditing();
               }
             }}

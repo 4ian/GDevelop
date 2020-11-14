@@ -173,6 +173,7 @@ export type PreferencesValues = {|
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
+  newObjectDialogDefaultTab: 'asset-store' | 'new-object',
 |};
 
 /**
@@ -219,6 +220,8 @@ export type Preferences = {|
   setHasProjectOpened: (enabled: boolean) => void,
   resetShortcutsToDefault: () => void,
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
+  getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
+  setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
 |};
 
 export const initialPreferences = {
@@ -247,6 +250,7 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -283,6 +287,8 @@ export const initialPreferences = {
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
+  getNewObjectDialogDefaultTab: () => 'asset-store',
+  setNewObjectDialogDefaultTab: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -2,6 +2,9 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import Button from '@material-ui/core/Button';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
 import {
@@ -13,9 +16,12 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
+const MINIMUM_EDITOR_HEIGHT = 200;
+const EDITOR_PADDING = 100;
 
 const styles = {
   container: {
@@ -44,6 +50,9 @@ const styles = {
     cursor: 'pointer',
     color: '#777',
     textDecoration: 'underline',
+  },
+  expandIcon: {
+    color: '#d4d4d4',
   },
 };
 
@@ -127,10 +136,34 @@ export default class JsCodeEvent extends React.Component<
   };
 
   endObjectEditing = () => {
+    const { anchorEl } = this.state;
+
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editingObject: false,
       anchorEl: null,
     });
+  };
+
+  toggleExpanded = () => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    jsCodeEvent.setEventsSheetExpanded(!jsCodeEvent.isEventsSheetExpanded());
+  };
+
+  _getCodeEditorHeight = () => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+
+    // Always use the minimum height when collapsed.
+    if (!jsCodeEvent.isEventsSheetExpanded()) {
+      return MINIMUM_EDITOR_HEIGHT;
+    }
+
+    // Shrink the editor enough for the additional event elements to fit in the sheet space.
+    const heightToFillSheet = this.props.eventsSheetHeight - EDITOR_PADDING;
+    return Math.max(MINIMUM_EDITOR_HEIGHT, heightToFillSheet);
   };
 
   render() {
@@ -145,6 +178,12 @@ export default class JsCodeEvent extends React.Component<
           [selectableArea]: true,
         })}
         onClick={this.editObject}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.editObject(event);
+          }
+        }}
+        tabIndex={0}
         style={textStyle}
       >
         {parameterObjects
@@ -191,6 +230,16 @@ export default class JsCodeEvent extends React.Component<
       </p>
     );
 
+    const expandIcon = (
+      <div style={styles.expandIcon}>
+        {jsCodeEvent.isEventsSheetExpanded() ? (
+          <ExpandLess fontSize="small" color="inherit" />
+        ) : (
+          <ExpandMore fontSize="small" color="inherit" />
+        )}
+      </div>
+    );
+
     return (
       <Measure bounds>
         {({ measureRef, contentRect }) => (
@@ -207,9 +256,13 @@ export default class JsCodeEvent extends React.Component<
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
               width={contentRect.bounds.width - 5}
+              height={this._getCodeEditorHeight()}
               onEditorMounted={() => this.props.onUpdate()}
             />
             {functionEnd}
+            <Button onClick={this.toggleExpanded} fullWidth size="small">
+              {expandIcon}
+            </Button>
             <InlinePopover
               open={this.state.editingObject}
               anchorEl={this.state.anchorEl}
@@ -226,6 +279,7 @@ export default class JsCodeEvent extends React.Component<
                   this.props.onUpdate();
                 }}
                 isInline
+                onRequestClose={this.endObjectEditing}
                 ref={objectField => (this._objectField = objectField)}
               />
             </InlinePopover>

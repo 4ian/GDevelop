@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\GDevelop5\\create-object\\game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -162,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "5272c218-d5bb-41ca-81ba-07dd74ae8456",
+          "persistentUuid": "e8621c87-f59e-4644-8734-1991b7e190a6",
           "width": 0,
           "x": 173.207,
           "y": 3.75557,

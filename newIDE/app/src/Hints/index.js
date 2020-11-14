@@ -102,6 +102,18 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Note that the distinction between what is a mobile device and what is not is becoming blurry (with devices like iPad pro and other "desktop-class" tablets). If you use this for mobile controls, prefer to check if the device has touchscreen support.`,
     };
   }
+  if (
+    type === 'AdvancedWindow::SetClosable' ||
+    type === 'AdvancedWindow::EnableWindow' ||
+    type === 'AdvancedWindow::Show' ||
+    type === 'AdvancedWindow::SetFocusable' ||
+    type === 'AdvancedWindow::Focus'
+  ) {
+    return {
+      kind: 'warning',
+      message: t`Be careful with this action, you may have problems exiting the preview if you don't add a way to toggle it back.`,
+    };
+  }
 
   return null;
 };

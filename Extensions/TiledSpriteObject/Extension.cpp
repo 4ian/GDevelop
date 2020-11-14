@@ -62,15 +62,15 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction(
          "SetColor",
-         _("Global color"),
-         _("Change the global color of a Tiled Sprite. The default color is white."),
-         _("Change color of _PARAM0_ to _PARAM1_"),
+         _("Tint color"),
+         _("Change the tint of a Tiled Sprite. The default color is white."),
+         _("Change tint of _PARAM0_ to _PARAM1_"),
          _("Effects"),
          "res/actions/color24.png",
          "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .AddParameter("color", _("Color"));
+      .AddParameter("color", _("Tint"));
 
   obj.AddAction("Width",
                 _("Width"),

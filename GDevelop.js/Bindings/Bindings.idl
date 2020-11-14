@@ -317,6 +317,8 @@ interface Project {
     void SetMinimumFPS(long fps);
     void SetFolderProject(boolean enable);
     boolean IsFolderProject();
+    void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
+    boolean GetUseDeprecatedZeroAsDefaultZOrder();
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
@@ -651,6 +653,9 @@ interface Layer {
     void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
     void RemoveEffect([Const] DOMString name);
     void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface PropertyDescriptor {
@@ -710,6 +715,9 @@ interface Resource {
     [Const, Ref] DOMString GetFile();
     void SetMetadata([Const] DOMString metadata);
     [Const, Ref] DOMString GetMetadata();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
@@ -724,6 +732,8 @@ interface ResourcesManager {
     [Value] VectorString GetAllResourceNames();
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
+    [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
@@ -832,6 +842,7 @@ interface HighestZOrderFinder {
     void RestrictSearchToLayer([Const] DOMString layer);
     long GetHighestZOrder();
     long GetLowestZOrder();
+    unsigned long GetInstancesCount();
 };
 
 interface InitialInstanceFunctor {};
@@ -1239,6 +1250,7 @@ interface PlatformExtension {
                                 [Const] DOMString author,
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
+    [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     void MarkAsDeprecated();
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
@@ -1297,6 +1309,7 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
@@ -1893,6 +1906,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
+    [Const, Ref] DOMString GetIconUrl();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 
@@ -2459,9 +2476,10 @@ interface JsCodeEvent {
 
     [Const, Ref] DOMString GetInlineCode();
     void SetInlineCode([Const] DOMString type);
-
     [Const, Ref] DOMString GetParameterObjects();
     void SetParameterObjects([Const] DOMString type);
+    boolean IsEventsSheetExpanded();
+    void SetEventsSheetExpanded(boolean enable);
 
     //Inherited from BaseEvent:
     JsCodeEvent Clone();

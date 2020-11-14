@@ -3294,16 +3294,20 @@ module.exports = {
         "name": ""
       },
       {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
       },
       {
         "fullName": "Features for all objects",
@@ -3312,6 +3316,10 @@ module.exports = {
       {
         "fullName": "System information",
         "name": "SystemInfo"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "Audio",
@@ -3324,10 +3332,6 @@ module.exports = {
       {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },

@@ -74,7 +74,7 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
   return true;
 };
 
-type StrngSelectorEditorProps = {|
+type StringSelectorEditorProps = {|
   extraInfo: string,
   setExtraInfo: newExtraInfo => void,
 |};
@@ -82,29 +82,15 @@ type StrngSelectorEditorProps = {|
 const StringSelectorEditor = ({
   extraInfo,
   setExtraInfo,
-}: StrngSelectorEditorProps) => {
-  const [array, setArray] = React.useState([]);
-  const forceUpdate = useForceUpdate();
-  React.useEffect(
-    () => {
-      let parsedArray = null;
-      try {
-        parsedArray = JSON.parse(extraInfo);
-      } catch (e) {
-        console.warn('Cannot parse parameter extraInfo: ', e);
-      }
+}: StringSelectorEditorProps) => {
+  let array = [];
+  try {
+    array = JSON.parse(extraInfo);
+  } catch (e) {
+    console.error('Cannot parse parameter extraInfo: ', e);
+  }
 
-      if (parsedArray !== null) {
-        setArray(parsedArray);
-      }
-    },
-    [extraInfo, array]
-  );
-
-  const updateExtraInfo = () => {
-    setExtraInfo(JSON.stringify(array));
-    forceUpdate();
-  };
+  const updateExtraInfo = () => setExtraInfo(JSON.stringify(array));
 
   return (
     <ResponsiveLineStackLayout>
@@ -121,7 +107,7 @@ const StringSelectorEditor = ({
               fullWidth
             />
             <IconButton
-              tooltip={t`Delete`}
+              tooltip={t`Delete option`}
               onClick={() => {
                 array.splice(index, 1);
                 updateExtraInfo();
@@ -136,10 +122,10 @@ const StringSelectorEditor = ({
           <RaisedButton
             primary
             onClick={() => {
-              array.push('New String');
+              array.push('New Option');
               updateExtraInfo();
             }}
-            label={<Trans>Add a string to the list</Trans>}
+            label={<Trans>Add a new option</Trans>}
             icon={<Add />}
           />
         </Line>
@@ -373,7 +359,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 />
                                 <SelectOption
                                   value="stringWithSelector"
-                                  primaryText={t`String from a list of strings (text)`}
+                                  primaryText={t`String from a list of options (text)`}
                                 />
                                 <SelectOption
                                   value="key"
@@ -431,7 +417,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           {parameter.getType() === 'stringWithSelector' && (
                             <StringSelectorEditor
                               extraInfo={parameter.getExtraInfo()}
-                              setExtraInfo={parameter.setExtraInfo}
+                              setExtraInfo={newExtraInfo => {
+                                parameter.setExtraInfo(newExtraInfo);
+                                this.forceUpdate();
+                              }}
                             />
                           )}
                           {isParameterDescriptionAndTypeShown(i) && (

@@ -76,7 +76,7 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
 
 type StringSelectorEditorProps = {|
   extraInfo: string,
-  setExtraInfo: newExtraInfo => void,
+  setExtraInfo: string => void,
 |};
 
 const StringSelectorEditor = ({
@@ -85,7 +85,8 @@ const StringSelectorEditor = ({
 }: StringSelectorEditorProps) => {
   let array = [];
   try {
-    array = JSON.parse(extraInfo);
+    if (extraInfo !== '') array = JSON.parse(extraInfo);
+    if (!Array.isArray(array)) array = [];
   } catch (e) {
     console.error('Cannot parse parameter extraInfo: ', e);
   }

@@ -30,23 +30,29 @@ gdjs.HowlerSound = class HowlerSound {
   _howl = null;
 
   /**
-   * Internal variable to check if the sound is still loading.
-   * A loading sound will count as played.
-   * @type {boolean}
+   * An array of callbacks to call once the sound starts to play.
+   * @type {Array<Function>}
    * @private
    */
-  _loading = false;
+  _oncePlay = [];
 
   /**
-   * An internal variable for tracking if the sound can be destroyed.
-   * This is used to remove a free sound when it finishes.
-   * @type {boolean}
+   * An array of callbacks to call everytime the sound starts to play.
+   * @type {Array<Function>}
    * @private
    */
-  _canBeDestroyed = false;
+  _onPlay = [];
 
   constructor(howl) {
     this._howl = howl;
+  }
+
+  /**
+   * Returns true if the associated howl is fully loaded.
+   * @returns {boolean}
+   */
+  isLoaded() {
+    return this._howl.state() === 'loaded';
   }
 
   /**
@@ -54,35 +60,19 @@ gdjs.HowlerSound = class HowlerSound {
    * @returns {HowlerSound} The current instance for chaining.
    */
   play() {
-    if (this._howl.state() === 'loaded') {
+    if (this.isLoaded()) {
       this._id = this._howl.play(this._id === null ? undefined : this._id);
-    } else {
-      this._loading = true;
-      // In case the howl didn't finish loading, start the sound once it finishes loading.
-      this._howl.once('load', () => {
-        this._loading = false;
-        this.play();
-      });
-      // Make sure it is loading
-      this._howl.load();
-    }
+      /*
+       * Manually handle play to avoid problems if trying to set a listener before loading.
+       * Before loading, it cannot work as without an ID we cannot set a listener, but
+       * once we have an ID the sound already started playing and it therefore won't trigger
+       * the first time the sound is played.
+       */
+      this._onPlay.forEach((func) => func());
+      this._oncePlay.forEach((func) => func());
+      this._oncePlay = [];
+    } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
 
-    return this;
-  }
-
-  /**
-   * Sets the current sound as a free sound.
-   * This will set up a listener to mark the sound as destroyable
-   * after it ended.
-   * This has to be done separately as it could lead to a memory leak otherwise.
-   * @returns {HowlerSound} The current instance for chaining.
-   */
-  _setFree() {
-    this.once('end', () => {
-      if (!this._howl.loop()) {
-        this._canBeDestroyed = true;
-      }
-    });
     return this;
   }
 
@@ -92,8 +82,6 @@ gdjs.HowlerSound = class HowlerSound {
    */
   pause() {
     if (this._id === null) return this;
-    this._paused = true;
-    this._stopped = false;
     this._howl.pause(this._id);
     return this;
   }
@@ -104,7 +92,6 @@ gdjs.HowlerSound = class HowlerSound {
    */
   stop() {
     if (this._id === null) return this;
-    this._stopped = true;
     this._howl.stop(this._id);
     return this;
   }
@@ -116,7 +103,7 @@ gdjs.HowlerSound = class HowlerSound {
   playing() {
     return (
       (this._id !== null ? this._howl.playing(this._id) : false) ||
-      this._loading // Loading is considered playing
+      !this.isLoaded() // Loading is considered playing
     );
   }
 
@@ -134,15 +121,6 @@ gdjs.HowlerSound = class HowlerSound {
    */
   stopped() {
     return this.paused() && this.getSeek() === 0;
-  }
-
-  /**
-   * Check if the sound can be deleted to free memory.
-   * This becomes true when the sound playback has ended.
-   * @returns {boolean}
-   */
-  canBeDestroyed() {
-    return this._canBeDestroyed;
   }
 
   /**
@@ -262,6 +240,9 @@ gdjs.HowlerSound = class HowlerSound {
    * @param {Function} handler
    */
   on(event, handler) {
+    if (event === 'play') return this._onPlay.push(handler);
+    if (!this.isLoaded())
+      return this._howl.once('load', () => this.on(event, handler));
     if (this._id === null) return;
     return this._howl.on(event, handler, this._id);
   }
@@ -271,6 +252,9 @@ gdjs.HowlerSound = class HowlerSound {
    * @param {Function} handler
    */
   once(event, handler) {
+    if (event === 'play') return this._oncePlay.push(handler);
+    if (!this.isLoaded())
+      return this._howl.once('load', () => this.once(event, handler));
     if (this._id === null) return;
     return this._howl.once(event, handler, this._id);
   }
@@ -406,8 +390,9 @@ gdjs.HowlerSoundManager.prototype._getFileFromSoundName = function (soundName) {
 
 /**
  * Store the sound in the specified array, put it at the first index that
- * is free, or add it at the end if no element is free
- * ("free" means that the gdjs.HowlerSound can be destroyed).
+ * is free, or add it at the end if no element is free.
+ * Free means that the sound has ended and isn't on a channel
+ * and can therefore be deleted as it cannot be restarted.
  *
  * @param {Array} arr The array containing the sounds.
  * @param {gdjs.HowlerSound} arr The gdjs.HowlerSound to add.
@@ -417,7 +402,7 @@ gdjs.HowlerSoundManager.prototype._getFileFromSoundName = function (soundName) {
 gdjs.HowlerSoundManager.prototype._storeSoundInArray = function (arr, sound) {
   //Try to recycle an old sound.
   for (var i = 0, len = arr.length; i < len; ++i) {
-    if (arr[i] !== null && arr[i].canBeDestroyed()) {
+    if (arr[i] !== null && arr[i].stopped()) {
       arr[i] = sound;
       return sound;
     }
@@ -536,14 +521,13 @@ gdjs.HowlerSoundManager.prototype.playSound = function (
 ) {
   var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
 
-  this._storeSoundInArray(this._freeSounds, sound)
-    .play()
-    ._setFree()
-    .setLoop(loop)
-    .setVolume(volume / 100)
-    .setRate(pitch);
+  this._storeSoundInArray(this._freeSounds, sound).play();
 
-  sound.on('play', () => {
+  sound.once('play', () => {
+    sound
+      .setLoop(loop)
+      .setVolume(volume / 100)
+      .setRate(pitch);
     if (this._paused) {
       sound.pause();
       this._pausedSounds.push(sound);
@@ -564,15 +548,15 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function (
   }
 
   var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
-  sound
-    .play()
-    .setLoop(loop)
-    .setVolume(volume / 100)
-    .setRate(pitch);
+  sound.play();
 
   this._sounds[channel] = sound;
 
-  sound.on('play', () => {
+  sound.once('play', () => {
+    sound
+      .setLoop(loop)
+      .setVolume(volume / 100)
+      .setRate(pitch);
     if (this._paused) {
       sound.pause();
       this._pausedSounds.push(sound);
@@ -591,14 +575,13 @@ gdjs.HowlerSoundManager.prototype.playMusic = function (
   pitch
 ) {
   var music = this.createHowlerSound(soundName, /* isMusic= */ true);
-  this._storeSoundInArray(this._freeMusics, music)
-    .play()
-    ._setFree()
-    .setLoop(loop)
-    .setVolume(volume / 100)
-    .setRate(pitch);
+  this._storeSoundInArray(this._freeMusics, music).play();
 
-  music.on('play', () => {
+  music.once('play', () => {
+    music
+      .setLoop(loop)
+      .setVolume(volume / 100)
+      .setRate(pitch);
     if (this._paused) {
       music.pause();
       this._pausedSounds.push(music);
@@ -619,15 +602,15 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function (
   }
 
   var music = this.createHowlerSound(soundName, /* isMusic= */ true);
-  music
-    .play()
-    .setLoop(loop)
-    .setVolume(volume / 100)
-    .setRate(pitch);
+  music.play();
 
   this._musics[channel] = music;
 
-  music.on('play', () => {
+  music.once('play', () => {
+    music
+      .setLoop(loop)
+      .setVolume(volume / 100)
+      .setRate(pitch);
     if (this._paused) {
       music.pause();
       this._pausedSounds.push(music);

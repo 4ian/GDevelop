@@ -124,6 +124,7 @@
     jsonResourceName,
     onLoad
   ) => {
+    if (!imageResourceName) return;
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {

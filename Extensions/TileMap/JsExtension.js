@@ -458,9 +458,6 @@ module.exports = {
       const texture = this._pixiResourcesLoader.getPIXITexture(this._project, tilemapAtlasImage);
       this._pixiResourcesLoader.ResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
-          if (!tilemapAtlasImage) {
-            return
-          };
           PixiTilemapHelper.getPIXITileSet(
             texture,
             tiledData,

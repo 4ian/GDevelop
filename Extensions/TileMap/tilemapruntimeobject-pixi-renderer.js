@@ -43,6 +43,9 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
     .getImageManager()
     .getPIXITexture(this._object._tilemapAtlasImage);
   
+  if (!this._object._tilemapAtlasImage) {
+    return
+  };
   this._runtimeScene
     .getGame()
     .getJsonManager()

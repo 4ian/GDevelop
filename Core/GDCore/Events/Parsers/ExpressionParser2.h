@@ -9,6 +9,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+
 #include "ExpressionParser2Node.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -546,6 +547,7 @@ class GD_CORE_API ExpressionParser2 {
       const gd::String &objectName = "",
       const gd::String &behaviorName = "") {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
+    gd::String lastObjectName = "";
 
     // By convention, object is always the first parameter, and behavior the
     // second one.
@@ -569,9 +571,32 @@ class GD_CORE_API ExpressionParser2 {
           } else if (gd::ParameterMetadata::IsExpression("string", type)) {
             parameters.push_back(Expression("string"));
           } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
-            parameters.push_back(Expression(type, objectName));
+            parameters.push_back(Expression(
+                type, lastObjectName.empty() ? objectName : lastObjectName));
           } else if (gd::ParameterMetadata::IsObject(type)) {
-            parameters.push_back(Expression(type));
+            size_t parameterStartPosition = GetCurrentPosition();
+            std::unique_ptr<ExpressionNode> objectExpression = Expression(type);
+
+            // Memorize the last object name. By convention, parameters that
+            // require an object (mainly, "objectvar" and "behavior") should be
+            // placed after the object in the list of parameters (if possible,
+            // just after). Search "lastObjectName" in the codebase for other
+            // place where this convention is enforced.
+            if (auto identifierNode =
+                    dynamic_cast<IdentifierNode *>(objectExpression.get())) {
+              lastObjectName = identifierNode->identifierName;
+            } else {
+              objectExpression->diagnostic =
+                  gd::make_unique<ExpressionParserError>(
+                      "malformed_object_parameter",
+                      _("An object name was expected but something else was "
+                        "written. Enter just the name of the object for this "
+                        "parameter."),
+                      parameterStartPosition,
+                      GetCurrentPosition());
+            }
+
+            parameters.push_back(std::move(objectExpression));
           } else {
             size_t parameterStartPosition = GetCurrentPosition();
             parameters.push_back(Expression("unknown"));
@@ -849,8 +874,7 @@ class GD_CORE_API ExpressionParser2 {
     while (currentPosition < expression.size() &&
            (IsIdentifierAllowedChar()
             // Allow whitespace in identifier name for compatibility
-            ||
-            expression[currentPosition] == ' ')) {
+            || expression[currentPosition] == ' ')) {
       name += expression[currentPosition];
       currentPosition++;
     }

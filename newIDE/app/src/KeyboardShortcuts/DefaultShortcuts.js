@@ -3,6 +3,7 @@ import { type CommandName } from '../CommandPalette/CommandsList';
 
 export type ShortcutMap = { [CommandName]: string };
 
+
 const defaultShortcuts: ShortcutMap = {
   QUIT_APP: 'CmdOrCtrl+Shift+KeyQ',
   OPEN_PROJECT_MANAGER: 'CmdOrCtrl+Alt+KeyE',

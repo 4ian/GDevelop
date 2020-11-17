@@ -109,12 +109,6 @@ gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = fun
   }
 };
 
-gdjs.TileMapRuntimeObject.prototype.onDestroyFromScene = function(
-  runtimeScene
-) {
-  gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
-};
-
 /**
  * Set the Tilemap json file to display.
  */

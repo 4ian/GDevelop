@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,13 @@
   "properties": {
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "D:\\DEV\\GD\\GDevelop\\newIDE\\app\\resources\\examples\\tiled-tilemap\\tiled-tilemap.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -202,7 +198,7 @@
           "height": 211,
           "layer": "",
           "locked": false,
-          "name": "NewObject2",
+          "name": "islandMap2",
           "persistentUuid": "71cce901-879e-49f9-b750-854dc3339be0",
           "width": 302,
           "x": -50,
@@ -311,7 +307,7 @@
       ],
       "objects": [
         {
-          "name": "NewObject2",
+          "name": "islandMap2",
           "tags": "",
           "type": "TileMap::TileMap",
           "variables": [],
@@ -1009,7 +1005,7 @@
                 "value": "Cache"
               },
               "parameters": [
-                "NewObject2"
+                "islandMap2"
               ],
               "subInstructions": []
             }
@@ -1041,7 +1037,7 @@
                 "value": "Montre"
               },
               "parameters": [
-                "NewObject2",
+                "islandMap2",
                 ""
               ],
               "subInstructions": []

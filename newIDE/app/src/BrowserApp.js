@@ -31,6 +31,11 @@ import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/Browse
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
 
+  /**
+   * sets the initial state of the app
+   * @type {null}
+   */
+
   let app = null;
   const appArguments = Window.getArguments();
 

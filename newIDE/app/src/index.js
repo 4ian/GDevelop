@@ -21,6 +21,9 @@ const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const electron = optionalRequire('electron');
 
+/**
+ * @const {object}
+ */
 const styles = {
   loadingMessage: {
     position: 'absolute',

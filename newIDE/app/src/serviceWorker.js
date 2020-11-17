@@ -10,6 +10,11 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
 
+/**
+ * checks if localhost is true
+ * @const {Boolean}
+ */
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -21,6 +26,11 @@ const isLocalhost = Boolean(
 );
 
 const PUBLIC_URL = process.env.PUBLIC_URL;
+
+/**
+ * @param {any} config
+ * @return {null}
+ */
 
 export function register(config) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {

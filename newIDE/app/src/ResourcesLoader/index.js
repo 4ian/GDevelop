@@ -1,5 +1,4 @@
 // @flow
-import axios from 'axios';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -146,18 +145,5 @@ export default class ResourcesLoader {
     }
 
     return resourceName;
-  }
-
-  /**
-   * Get the the data from a json resource in the IDE.
-   */
-  static getResourceJsonData(project: gdProject, resourceName: string) {
-    if (!project.getResourcesManager().hasResource(resourceName))
-      return Promise.reject();
-
-    const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'json') return Promise.reject();
-    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName);
-    return axios.get(fullUrl).then(response => response.data);
   }
 }

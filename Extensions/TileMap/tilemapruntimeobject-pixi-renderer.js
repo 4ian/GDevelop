@@ -38,11 +38,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
-  var atlasTexture = this._runtimeScene
-    .getGame()
-    .getImageManager()
-    .getPIXITexture(this._object._tilemapAtlasImage);
-  
   this._runtimeScene
     .getGame()
     .getJsonManager()
@@ -53,7 +48,10 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
       };
 
       PixiTileMapHelper.getPIXITileSet(
-        atlasTexture,
+        texturePath => this._runtimeScene
+          .getGame()
+          .getImageManager()
+          .getPIXITexture(texturePath),
         content,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,

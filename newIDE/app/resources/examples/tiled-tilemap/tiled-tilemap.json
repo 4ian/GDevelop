@@ -314,9 +314,9 @@
           "behaviors": [],
           "content": {
             "tilemapJsonFile": "anotherIsland.json",
-            "tilemapAtlasImage": "Viking3.png",
+            "tilemapAtlasImage": "",
             "displayMode": "visible",
-            "layerIndex": 0,
+            "layerIndex": "0",
             "animationSpeedScale": "1",
             "animationFps": "4"
           }

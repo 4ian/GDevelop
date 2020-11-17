@@ -20,10 +20,12 @@
     tiledData,
     tex,
     requestedTileSetId,
-    onLoad
+    onLoad,
+    getTexture
   ) => {
     // Todo implement tileset index and use it instead of 0
-    const { tilewidth, tilecount, tileheight, tiles } = tiledData.tilesets[0]
+    const { tilewidth, tilecount, tileheight, tiles, image } = tiledData.tilesets[0];
+    if (!tex) tex = getTexture(image);
     const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
       const cols = Math.floor(tex.width / tilewidth)
       const x = ((frame - 1) % cols) * tilewidth
@@ -118,19 +120,19 @@
    * tileset id == jsonResourceName + imageResourcename
    */
   exports.getPIXITileSet = (
-    texture,
+    getTexture,
     tiledData,
     imageResourceName,
     jsonResourceName,
     onLoad
   ) => {
-    if (!imageResourceName) return;
+    const texture = imageResourceName ? getTexture(imageResourceName) : null;
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
       onLoad(loadedTileSets[requestedTileSetId])
       return
     }
-    createTileSetResource(tiledData, texture, requestedTileSetId, onLoad)
+    createTileSetResource(tiledData, texture, requestedTileSetId, onLoad, getTexture)
   }
 })

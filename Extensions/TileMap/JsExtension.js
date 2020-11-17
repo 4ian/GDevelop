@@ -459,7 +459,7 @@ module.exports = {
       this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
           PixiTilemapHelper.getPIXITileSet(
-            texture,
+            texturePath => this._pixiResourcesLoader.getPIXITexture(this._project, texturePath),
             tiledData,
             tilemapAtlasImage,
             tilemapJsonFile,

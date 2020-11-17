@@ -82,8 +82,15 @@ module.exports = {
         .getOrCreate('fontResourceName')
         .setValue(objectContent.fontResourceName)
         .setType('resource')
-        .addExtraInfo('font')
-        .setLabel(_('Font'));
+        .addExtraInfo('bitmapFont') //fnt or xml files
+        .setLabel(_('Bitmap Font'));
+
+      objectProperties
+        .getOrCreate('bitmapTexture')
+        .setValue(objectContent.bitmapTexture)
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Bitmap texture'));
 
       objectProperties
         .getOrCreate('fontSize')
@@ -118,6 +125,7 @@ module.exports = {
         fontSize: 20,
         fontColor: '#000000',
         fontResourceName: '',
+        bitmapTexture: '',
         align: 'left',
         wordWrap: true,
         specialChars: '',
@@ -484,6 +492,7 @@ module.exports = {
 
       // We'll track changes of the font to trigger the loading of the new font.
       this._currentFontResourceName = '';
+      this._currentBitmapTexture = '';
 
       const fontName = this._ensureFontAvailableAndGetFontName();
       this._pixiObject = new PIXI.BitmapText('', {
@@ -588,6 +597,13 @@ module.exports = {
               err
             );
           });
+      }
+
+      const bitmapTexture = properties.get('bitmapTexture').getValue();
+      const texture = this._pixiResourcesLoader.getPIXITexture(this._project, bitmapTexture);
+
+      if (this._currentBitmapTexture !== texture) {
+        this._currentBitmapTexture = texture;
       }
 
       // Set up the wrapping width if enabled.

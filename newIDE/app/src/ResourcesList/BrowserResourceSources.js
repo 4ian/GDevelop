@@ -104,6 +104,8 @@ const publicImageUrls = [
   'https://resources.gdevelop-app.com/examples/space-shooter/assets/tiles mechanical/tiles mechanical 2.png',
   'https://resources.gdevelop-app.com/examples/space-shooter/assets/background/boss background.png',
   'https://resources.gdevelop-app.com/examples/space-shooter/assets/gameover.png',
+  'https://resources.gdevelop-app.com/examples/bitmap-font/Bitmatt_24_white/bitmatt_24_white.png',
+  'https://resources.gdevelop-app.com/examples/bitmap-font/Desyrel_70_orange/desyrel.png',
 ];
 
 const publicAudioUrls = [
@@ -123,6 +125,12 @@ const publicFontUrls = [
   'https://resources.gdevelop-app.com/examples/platformer/Bimbo_JVE.ttf',
 ];
 
+const publicBitmapFontUrls = [
+  // .fnt files are .xml, but fnt is the most common from Bitmap font generator
+  'https://resources.gdevelop-app.com/examples/bitmap-font/Bitmatt_24_white/bitmatt_24_white.fnt',
+  'https://resources.gdevelop-app.com/examples/bitmap-font/Desyrel_70_orange/desyrel.xml',
+];
+
 const publicVideoUrls = [
   // Video Player example video
   'https://resources.gdevelop-app.com/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4',
@@ -140,7 +148,9 @@ const nameFromUrl = (url: string): string => {
     .replace('.wav', '')
     .replace('.ogg', '')
     .replace('.json', '')
-    .replace('.mp4', '');
+    .replace('.mp4', '')
+    .replace('.xml', '')
+    .replace('.fnt', '');
 };
 
 class GenericResourcesChooser extends Component {
@@ -359,6 +369,28 @@ export default [
             urlsAreImages={false}
             createNewResource={() => new gd.JsonResource()}
             title={<Trans>Choose a Json File from the library</Trans>}
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
+  {
+    name: 'publicBitmapFontUrlChooser',
+    displayName: 'Choose a bitmap font from library',
+    kind: 'bitmapFont',
+    component: class BitmapFontResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicBitmapFontUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.BitmapFontResource()}
+            title={<Trans>Choose a bitmap font from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );

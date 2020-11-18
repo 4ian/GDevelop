@@ -1156,22 +1156,24 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function () {
 //Other :
 
 /**
- * Load an image from the image manager and load it as texture for the object.
+ * Load an image from the image manager and copy on image over the texture of the object.
  *
  * @param {gdjs.RuntimeScene} runtimeScene The scene where living the object
- * @param {string} imageName Name of the texture to load for replace on current object.
- * @param {number} x X position of the object
- * @param {number} y Y position of the object
- * @param {boolean} useTransparency
+ * @param {string} imageName Name of the texture to copy over the current texture from the object
+ * @param {number} x X position of the texture
+ * @param {number} y Y position of the texture
+ * @param {boolean} useTransparency Boolean for use the transparency from the added texture
+ * @param {number} angle Angle of the texture
  */
 gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
   runtimeScene,
   imageName,
   x,
   y,
-  useTransparency
+  useTransparency,
+  angle
 ) {
-  var sprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
+  var sprite = this._renderer.getRendererObject();
   var texture = sprite.texture;
 
   var texture_sc = runtimeScene
@@ -1189,7 +1191,7 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
     u_texture_sc: sprite_sc.texture,
     u_texture_sc_width: this.getWidth(),
     u_texture_sc_height: this.getHeight(),
-    u_texture_sc_rotation: 45,
+    u_texture_sc_angle: angle,
     u_texture_sc_offsetX: this.getDrawableX() + this.getX() + x,
     u_texture_sc_offsetY: this.getDrawableY() + this.getY() + y,
   };
@@ -1230,7 +1232,7 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
     uniform float u_texture_sc_offsetY;
     uniform float u_texture_sc_width;
     uniform float u_texture_sc_height;
-    uniform float u_texture_sc_rotation;
+    uniform float u_texture_sc_angle;
 
     float aspectRatio = u_texture_sc_width/u_texture_sc_height;
 
@@ -1264,8 +1266,8 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
         //Add offset XY
         vec2 cvTexture_scCoord = vTexture_scCoord - offsetXY/vec2(u_texture_sc_width, u_texture_sc_height);
 
-        //Add rotation UV, here 45 pass by u_texture_sc_rotation
-        cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_rotation), rotatePoint);
+        //Add rotation UV, here 45 pass by u_texture_sc_angle
+        cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_angle), rotatePoint);
 
         //Apply UV on textures
         vec4 texColor = texture2D(uSampler, vTextureCoord);	

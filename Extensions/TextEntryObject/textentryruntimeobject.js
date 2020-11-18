@@ -35,6 +35,11 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.registerObject("TextEntryObject::TextEntry", gdjs.TextEntryRuntimeObject);
 
+gdjs.TextEntryRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    // Nothing to update.
+    return true;
+}
+
 gdjs.TextEntryRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
@@ -65,12 +70,4 @@ gdjs.TextEntryRuntimeObject.prototype.isActivated = function() {
 gdjs.TextEntryRuntimeObject.prototype.activate = function(enable) {
     this._activated = enable;
     this._renderer.activate(this._activated);
-};
-
-gdjs.TextEntryRuntimeObject.prototype.setLayer = function(layer) {
-     // No renderable object
-};
-
-gdjs.TextEntryRuntimeObject.prototype.setZOrder = function(z) {
-     // No renderable object
 };

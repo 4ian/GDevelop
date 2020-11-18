@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
-const gd = global.gd;
+import * as PIXI from 'pixi.js-legacy';
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for gd.PanelSpriteObject
@@ -80,7 +80,7 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   );
 
   this._tiled = panelSprite.isTiled();
-  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
+  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.TilingSprite;
 
   if (!this._pixiObject) {
     this._pixiObject = new PIXI.Container();
@@ -210,7 +210,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     this._textureName
   );
 
-  if (texture.noFrame) {
+  if (!texture.baseTexture.valid) {
     //Post pone texture update if texture is not loaded
     const renderer = this;
     texture.on('update', function() {
@@ -273,7 +273,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[1].width - panelSprite.getRightMargin(),
+        texture.width - panelSprite.getRightMargin(),
         0,
         panelSprite.getRightMargin(),
         panelSprite.getTopMargin()
@@ -330,7 +330,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     makeInsideTexture(
       new PIXI.Rectangle(
         0,
-        this._borderSprites[5].height - panelSprite.getBottomMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getLeftMargin(),
         panelSprite.getBottomMargin()
       )
@@ -357,8 +357,8 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[7].width - panelSprite.getRightMargin(),
-        this._borderSprites[7].height - panelSprite.getBottomMargin(),
+        texture.width - panelSprite.getRightMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getRightMargin(),
         panelSprite.getBottomMargin()
       )
@@ -398,7 +398,11 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.getResourceFullUrl(project, panelSprite.getTexture());
+  return resourcesLoader.getResourceFullUrl(
+    project,
+    panelSprite.getTexture(),
+    {}
+  );
 };
 
 export default RenderedPanelSpriteInstance;

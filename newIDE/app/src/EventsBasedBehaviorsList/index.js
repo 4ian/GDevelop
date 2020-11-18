@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -13,10 +16,12 @@ import {
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -55,6 +60,7 @@ type Props = {|
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<
@@ -73,7 +79,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     ) => cb(true),
   };
 
-  sortableList: ?SortableVirtualizedItemList<gdEventsFunction>;
+  sortableList: ?SortableVirtualizedItemList<gdEventsBasedBehavior>;
   state: State = {
     renamedEventsBasedBehavior: null,
     searchText: '',
@@ -86,8 +92,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     const { eventsBasedBehaviorsList } = this.props;
 
     if (askForConfirmation) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Are you sure you want to remove this behavior? This can't be undone."
       );
       if (!answer) return;
@@ -97,7 +102,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       if (!doRemove) return;
 
       eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
-      this.forceUpdate();
+      this._onEventsBasedBehaviorModified();
     });
   };
 
@@ -121,7 +126,9 @@ export default class EventsBasedBehaviorsList extends React.Component<
     if (eventsBasedBehavior.getName() === newName) return;
 
     if (eventsBasedBehaviorsList.has(newName)) {
-      showWarningBox('Another behavior with this name already exists.');
+      showWarningBox('Another behavior with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 
@@ -131,7 +138,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       doRename => {
         if (!doRename) return;
         eventsBasedBehavior.setName(newName);
-        this.forceUpdate();
+        this._onEventsBasedBehaviorModified();
         this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
       }
     );
@@ -155,7 +162,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   forceUpdateList = () => {
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
@@ -199,27 +206,27 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     newEventsBasedBehavior.setName(newName);
 
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
   };
 
-  _renderEventsBasedBehaviorMenuTemplate = (
+  _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     index: number
   ) => {
     return [
       {
-        label: 'Properties',
+        label: i18n._(t`Properties`),
         click: () => this.props.onEditProperties(eventsBasedBehavior),
       },
       {
         type: 'separator',
       },
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsBasedBehavior),
       },
       {
-        label: 'Remove',
+        label: i18n._(t`Remove`),
         click: () =>
           this._deleteEventsBasedBehavior(eventsBasedBehavior, {
             askForConfirmation: true,
@@ -229,15 +236,15 @@ export default class EventsBasedBehaviorsList extends React.Component<
         type: 'separator',
       },
       {
-        label: 'Copy',
+        label: i18n._(t`Copy`),
         click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
       },
       {
-        label: 'Cut',
+        label: i18n._(t`Cut`),
         click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
       },
       {
-        label: 'Paste',
+        label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
         click: () => this._pasteEventsBasedBehavior(index),
       },
@@ -254,8 +261,14 @@ export default class EventsBasedBehaviorsList extends React.Component<
       name,
       eventsBasedBehaviorsList.getCount()
     );
-    this.forceUpdate();
+    this._onEventsBasedBehaviorModified();
   };
+
+  _onEventsBasedBehaviorModified() {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  }
 
   render() {
     const {
@@ -281,27 +294,33 @@ export default class EventsBasedBehaviorsList extends React.Component<
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={list}
-                width={width}
-                height={height}
-                onAddNewItem={this._addNewEventsBasedBehavior}
-                addNewItemLabel={<Trans>Add a new behavior</Trans>}
-                getItemName={getEventsBasedBehaviorName}
-                selectedItems={
-                  selectedEventsBasedBehavior
-                    ? [selectedEventsBasedBehavior]
-                    : []
-                }
-                onItemSelected={onSelectEventsBasedBehavior}
-                renamedItem={this.state.renamedEventsBasedBehavior}
-                onRename={this._rename}
-                onMoveSelectionToItem={this._moveSelectionTo}
-                buildMenuTemplate={this._renderEventsBasedBehaviorMenuTemplate}
-                reactDndType="GD_EVENTS_BASED_BEHAVIOR"
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={list}
+                    width={width}
+                    height={height}
+                    onAddNewItem={this._addNewEventsBasedBehavior}
+                    addNewItemLabel={<Trans>Add a new behavior</Trans>}
+                    getItemName={getEventsBasedBehaviorName}
+                    selectedItems={
+                      selectedEventsBasedBehavior
+                        ? [selectedEventsBasedBehavior]
+                        : []
+                    }
+                    onItemSelected={onSelectEventsBasedBehavior}
+                    renamedItem={this.state.renamedEventsBasedBehavior}
+                    onRename={this._rename}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    buildMenuTemplate={this._renderEventsBasedBehaviorMenuTemplate(
+                      i18n
+                    )}
+                    reactDndType="GD_EVENTS_BASED_BEHAVIOR"
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>

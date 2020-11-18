@@ -26,6 +26,7 @@ import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProv
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
+import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -37,11 +38,12 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      eventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter()}
+      makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
+      resourceFetcher={BrowserResourceFetcher}
     >
-      {({ i18n, eventsFunctionsExtensionsState }) => (
+      {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
@@ -54,14 +56,13 @@ export const create = (authentification: Authentification) => {
           defaultStorageProvider={InternalFileStorageProvider}
         >
           {({
-            currentStorageProviderOperations,
-            useStorageProvider,
+            getStorageProviderOperations,
             storageProviders,
             initialFileMetadataToOpen,
+            getStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
-              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
@@ -81,8 +82,8 @@ export const create = (authentification: Authentification) => {
               )}
               introDialog={<BrowserIntroDialog />}
               storageProviders={storageProviders}
-              useStorageProvider={useStorageProvider}
-              storageProviderOperations={currentStorageProviderOperations}
+              getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}
               extensionsLoader={makeExtensionsLoader({

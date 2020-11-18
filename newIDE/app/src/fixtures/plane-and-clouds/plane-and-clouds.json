@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PlaneAndClouds\\game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -189,6 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
+          "persistentUuid": "53dd54bc-53d4-4fb0-b0b5-c4dce38ae6ad",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -204,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "f18eb50d-73b1-4dc4-b0ca-6f5c6f46e1d4",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -224,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "471ac6a6-6a77-43be-8bf5-45d9925cc39a",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -244,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "c33cca1b-7cc2-47b8-a954-30e76365b748",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -259,6 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "63ae155f-1da3-4d13-8272-60e611d1eea7",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -1556,6 +1558,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1573,6 +1580,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

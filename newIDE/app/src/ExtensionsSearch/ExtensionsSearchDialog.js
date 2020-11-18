@@ -7,12 +7,14 @@ import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import CloudDownload from '@material-ui/icons/CloudDownload';
-import ExtensionsSearch, { addSerializedExtensionToProject } from '.';
+import ExtensionsSearch from '.';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../UI/HelpButton';
-import { showWarningBox } from '../UI/Messages/MessageBox';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import Window from '../Utils/Window';
+import { addSerializedExtensionsToProject } from '../AssetStore/InstallAsset';
 
 type Props = {|
   project: gdProject,
@@ -38,8 +40,7 @@ const importExtension = (
           if (
             project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
           ) {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               i18n._(
                 t`An extension with this name already exists in the project. Importing this extension will replace it: are you sure you want to continue?`
               )
@@ -47,20 +48,21 @@ const importExtension = (
             if (!answer) return;
           }
 
-          return addSerializedExtensionToProject(
+          return addSerializedExtensionsToProject(
             eventsFunctionsExtensionsState,
             project,
-            serializedExtension
+            [serializedExtension]
           );
         });
     })
-    .catch(error => {
-      showWarningBox(
-        i18n._(
-          t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`,
-          error
-        )
-      );
+    .catch(rawError => {
+      showErrorBox({
+        message: i18n._(
+          t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`
+        ),
+        rawError,
+        errorId: 'extension-loading-error',
+      });
     });
 };
 
@@ -102,6 +104,7 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                       />
                     ) : null,
                   ]}
+                  cannotBeDismissed={true}
                   open
                   noMargin
                   onRequestClose={onClose}

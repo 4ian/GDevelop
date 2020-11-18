@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://api.gdevelop-app.com https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js https://api.keen.io https://apis.google.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://api.gdevelop-app.com https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js https://api.keen.io https://apis.google.com">
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon-256.png">
     <title>GDevelop 5</title>
@@ -22,6 +22,17 @@
         background-position: center center;
         overscroll-behavior: none;
       }
+
+      @keyframes text-focus-in {
+        0% {
+          -webkit-filter: blur(12px); filter: blur(12px);
+          opacity: 0;
+        }
+        100% {
+          -webkit-filter: blur(0px); filter: blur(0px);
+          opacity: 1;
+        }
+      }
     </style>
 
     <!-- Progressive Web App support -->
@@ -29,56 +40,17 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
   </head>
   <body>
-    <!-- Root div used for React `App` component rendering-->
+    <!-- Root div used for React `Bootstrapper` component rendering-->
     <div id="root"></div>
 
     <script>
       window["GD_STARTUP_TIMES"] = [["indexHtmlFirstScriptStarted", performance.now()]];
     </script>
 
-    <!-- GDevelop.js core -->
-    <script src="%PUBLIC_URL%/libGD.js"></script>
-
-    <script>
-      window["GD_STARTUP_TIMES"] = window["GD_STARTUP_TIMES"] || [];
-      window["GD_STARTUP_TIMES"].push(["libGDLoadedTime", performance.now()]);
-    </script>
-
-    <!-- Monaco Editor support -->
-    <script>
-      // Monaco editor is using amd require. Save the Node.js require if it exists (Electron)
-      nodeRequire = typeof require !== "undefined" ? require : undefined;
-    </script>
-    <script src="%PUBLIC_URL%/external/monaco-editor-min/vs/loader.js"></script>
-    <script>
-      // Restore back the Node.js require (Electron) and delete "define" which can
-      // trick some libraries into thinking they are in an AMD (RequireJS) environment.
-      amdRequire = require;
-      require = nodeRequire;
-      define = undefined;
-
-      // Set up Monaco Editor workers support
-      amdRequire.config({
-        paths: {
-          "vs": "vs"
-        }
-      });
-      window.MonacoEnvironment = {
-        getWorkerUrl: function (workerId, label) {
-          return "external/monaco-editor-min/vs/base/worker/workerMain.js";
-        }
-      };
-    </script>
-
-    <script>
-      window["GD_STARTUP_TIMES"] = window["GD_STARTUP_TIMES"] || [];
-      window["GD_STARTUP_TIMES"].push(["monacoEditorLoaderLoaded", performance.now()]);
-    </script>
-
     <noscript>
       <div style="font-family: sans-serif; padding: 15px;">
         <p>
-          GDevelop 5 is a open-source, cross-platform game engine designed for
+          GDevelop 5 is an open-source, cross-platform game engine designed for
           everyone - it's extensible, fast and easy to learn.
         </p>
 

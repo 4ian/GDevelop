@@ -4,7 +4,7 @@ GDevelop is a full-featured, open-source game development software, allowing to 
 
 ![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
-Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop)
+Getting started
 ---------------
 
 | ❔ I want to... | 🚀 What to do |
@@ -14,7 +14,7 @@ Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches
 | Create/improve an extension | Download [Node.js] and follow this [README](newIDE/README-extensions.md). |
 | Help to translate GDevelop | Go on the [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop). |
 
-> Are you interested in contributing to GDevelop for the first time? Or want to participate to [Google Summer of Code 2020](https://summerofcode.withgoogle.com/organizations/5586892420022272/)? Take a look at the list of **[good first issues](https://github.com/4ian/GDevelop/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%91%8Cgood+first+issue%22)** and the **["🏐 not too hard" cards](https://trello.com/b/qf0lM7k8/gdevelop-roadmap?menu=filter&filter=label:Not%20too%20hard%20%E2%9A%BD%EF%B8%8F)** on the Roadmap.
+> Are you interested in contributing to GDevelop for the first time? Or want to participate to [Google Summer of Code 2021](https://summerofcode.withgoogle.com/organizations/5586892420022272/)? Take a look at the list of **[good first issues](https://github.com/4ian/GDevelop/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%91%8Cgood+first+issue%22)** and the **["🏐 not too hard" cards](https://trello.com/b/qf0lM7k8/gdevelop-roadmap?menu=filter&filter=label:Not%20too%20hard%20%E2%9A%BD%EF%B8%8F)** on the Roadmap.
 
 Overview of the architecture
 ----------------------------
@@ -22,15 +22,17 @@ Overview of the architecture
 | Directory | ℹ️ Description |
 | --- | --- |
 | `Core` | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games. |
-| `GDCpp` | GDevelop C++ game engine, used to **build native games**. |
-| `GDJS` | GDevelop JS game engine, used to build **HTML5 games**. |
-| `GDevelop.js` | Bindings of Core/GDCpp/GDJS and Extensions to JavaScript (used by the IDE). |
+| `GDCpp` | The C++ game engine, used to build native games (*not used in GDevelop 5*). |
+| `GDJS` | The JavaScript game engine, using Pixi.js (WebGL), powering all GDevelop games. |
+| `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
 | `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |
-| `Extensions` | Extensions for C++ or JS game engines, providing objects, events and new features. |
+| `Extensions` | Extensions for the C++ or JavaScript game engines, providing objects, behaviors, events and new features. |
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
 A pre-generated documentation of the Core library, C++ and JS game engines is [available here](https://docs.gdevelop-app.com).
+
+Status of the tests and builds: [![Build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Quick tests status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/shields_badge.svg)](https://semaphoreci.com/4ian/gd) [![All tests Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
 Links
 -----

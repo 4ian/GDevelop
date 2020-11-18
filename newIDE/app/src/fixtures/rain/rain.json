@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\rain\\game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "inRain",
     "author": "CROSS",
     "windowWidth": 1024,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -201,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_1",
+          "persistentUuid": "6a92a1d7-9f9f-4ae6-b761-2bed874580e7",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -221,6 +219,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_2",
+          "persistentUuid": "a92384b2-59cf-4421-9c49-26785f12b8df",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -241,6 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_3",
+          "persistentUuid": "0f82d1e4-3041-4fc9-8297-7515fcd9de87",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -261,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "logo_inrain",
+          "persistentUuid": "ae261d25-68f7-45ef-8627-3f2fe6c9b1db",
           "width": 0,
           "x": 906,
           "y": 666,
@@ -836,6 +837,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

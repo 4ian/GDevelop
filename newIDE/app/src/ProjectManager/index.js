@@ -1,12 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
 import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
@@ -36,9 +39,16 @@ import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
+import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
+import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ProjectManagerCommands from './ProjectManagerCommands';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -50,6 +60,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    overflowY: 'hidden',
   },
   list: {
     flex: 1,
@@ -123,11 +134,13 @@ type ItemProps = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   canPaste: () => boolean,
   canMoveUp: boolean,
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: ?Object,
 |};
 
@@ -151,8 +164,7 @@ class Item extends React.Component<ItemProps, {||}> {
         defaultValue={this.props.primaryText}
         onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
+          if (shouldValidate(event)) {
             if (this.textField) this.textField.blur();
           }
         }}
@@ -166,65 +178,77 @@ class Item extends React.Component<ItemProps, {||}> {
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <ListItem
-            style={{
-              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-              ...this.props.style,
-            }}
-            primaryText={label}
-            displayMenuButton
-            buildMenuTemplate={() => [
-              {
-                label: 'Edit',
-                click: () => this.props.onEdit(),
-              },
-              {
-                label: 'Rename',
-                click: () => this.props.onEditName(),
-              },
-              {
-                label: 'Delete',
-                click: () => this.props.onDelete(),
-              },
-              {
-                label: this.props.addLabel,
-                visible: !!this.props.onAdd,
-                click: () => this.props.onAdd(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Copy',
-                click: () => this.props.onCopy(),
-              },
-              {
-                label: 'Cut',
-                click: () => this.props.onCut(),
-              },
-              {
-                label: 'Paste',
-                enabled: this.props.canPaste(),
-                click: () => this.props.onPaste(),
-              },
-              { type: 'separator' },
-              {
-                label: 'Move up',
-                enabled: this.props.canMoveUp,
-                click: () => this.props.onMoveUp(),
-              },
-              {
-                label: 'Move down',
-                enabled: this.props.canMoveDown,
-                click: () => this.props.onMoveDown(),
-              },
-            ]}
-            onClick={() => {
-              // It's essential to discard clicks when editing the name,
-              // to avoid weird opening of an editor (accompanied with a
-              // closing of the project manager) when clicking on the text
-              // field.
-              if (!this.props.editingName) this.props.onEdit();
-            }}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ListItem
+                style={{
+                  borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+                  ...this.props.style,
+                }}
+                primaryText={label}
+                displayMenuButton
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Edit`),
+                    click: () => this.props.onEdit(),
+                  },
+                  ...(this.props.buildExtraMenuTemplate
+                    ? this.props.buildExtraMenuTemplate(i18n)
+                    : []),
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Rename`),
+                    click: () => this.props.onEditName(),
+                  },
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => this.props.onDelete(),
+                  },
+                  {
+                    label: this.props.addLabel,
+                    visible: !!this.props.onAdd,
+                    click: () => this.props.onAdd(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => this.props.onCopy(),
+                  },
+                  {
+                    label: i18n._(t`Cut`),
+                    click: () => this.props.onCut(),
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    enabled: this.props.canPaste(),
+                    click: () => this.props.onPaste(),
+                  },
+                  {
+                    label: i18n._(t`Duplicate`),
+                    click: () => this.props.onDuplicate(),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Move up`),
+                    enabled: this.props.canMoveUp,
+                    click: () => this.props.onMoveUp(),
+                  },
+                  {
+                    label: i18n._(t`Move down`),
+                    enabled: this.props.canMoveDown,
+                    click: () => this.props.onMoveDown(),
+                  },
+                ]}
+                onClick={() => {
+                  // It's essential to discard clicks when editing the name,
+                  // to avoid weird opening of an editor (accompanied with a
+                  // closing of the project manager) when clicking on the text
+                  // field.
+                  if (!this.props.editingName) this.props.onEdit();
+                }}
+              />
+            )}
+          </I18n>
         )}
       </ThemeConsumer>
     );
@@ -261,30 +285,50 @@ type Props = {|
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
+  unsavedChanges?: UnsavedChanges,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
 type State = {|
+  editedPropertiesLayout: ?gdLayout,
+  editedVariablesLayout: ?gdLayout,
   renamedItemKind: ?string,
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
-  variablesEditorOpen: boolean,
+  projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
+  layoutPropertiesDialogOpen: boolean,
+  layoutVariablesDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
 
   state = {
+    editedPropertiesLayout: null,
+    editedVariablesLayout: null,
     renamedItemKind: null,
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
-    variablesEditorOpen: false,
+    projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
+    layoutPropertiesDialogOpen: false,
+    layoutVariablesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: Props) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (
+      nextState.projectPropertiesDialogOpen !==
+      this.state.projectPropertiesDialogOpen
+    )
+      return true;
+    if (
+      nextState.projectVariablesEditorOpen !==
+      this.state.projectVariablesEditorOpen
+    )
+      return true;
     // Rendering the component is (super) costly (~20ms) as it iterates over
     // every project layouts/external layouts/external events,
     // so the prop freezeUpdate allow to ask the component to stop
@@ -295,9 +339,22 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
-      if (this._searchBar) this._searchBar.focus();
+      if (useShouldAutofocusSearchbar() && this._searchBar)
+        this._searchBar.focus();
     }
   }
+
+  _openProjectProperties = () => {
+    this.setState({
+      projectPropertiesDialogOpen: true,
+    });
+  };
+
+  _openProjectVariables = () => {
+    this.setState({
+      projectVariablesEditorOpen: true,
+    });
+  };
 
   _onEditName = (kind: ?string, name: string) => {
     this.setState({
@@ -339,7 +396,12 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName); // Unserialization has overwritten the name.
     newLayout.updateBehaviorsSharedData(project);
 
-    this.forceUpdate();
+    this._onProjectItemModified();
+  };
+
+  _duplicateLayout = (layout: gdLayout, index: number) => {
+    this._copyLayout(layout);
+    this._pasteLayout(index);
   };
 
   _addLayout = (index: number) => {
@@ -353,7 +415,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.setName(newName);
     newLayout.updateBehaviorsSharedData(project);
 
-    this.forceUpdate();
+    this._onProjectItemModified();
+  };
+
+  _onOpenLayoutProperties = (layout: ?gdLayout) => {
+    this.setState({ editedPropertiesLayout: layout });
+  };
+
+  _onOpenLayoutVariables = (layout: ?gdLayout) => {
+    this.setState({ editedVariablesLayout: layout });
   };
 
   _addExternalEvents = (index: number) => {
@@ -363,7 +433,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalEventsNamed(name)
     );
     project.insertNewExternalEvents(newName, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _addExternalLayout = (index: number) => {
@@ -373,17 +443,17 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasExternalLayoutNamed(name)
     );
     project.insertNewExternalLayout(newName, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _addEventsFunctionsExtension = (index: number) => {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExtension', name =>
-      project.hasEventsFunctionsExtensionNamed(name)
+      isExtensionNameTaken(name, project)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _moveUpLayout = (index: number) => {
@@ -391,7 +461,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapLayouts(index, index - 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _moveDownLayout = (index: number) => {
@@ -399,7 +469,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getLayoutsCount() - 1) return;
 
     project.swapLayouts(index, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
@@ -436,7 +506,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newExternalEvents.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onProjectItemModified();
+  };
+
+  _duplicateExternalEvents = (
+    externalEvents: gdExternalEvents,
+    index: number
+  ) => {
+    this._copyExternalEvents(externalEvents);
+    this._pasteExternalEvents(index);
   };
 
   _moveUpExternalEvents = (index: number) => {
@@ -444,7 +522,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalEvents(index, index - 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _moveDownExternalEvents = (index: number) => {
@@ -452,7 +530,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalEventsCount() - 1) return;
 
     project.swapExternalEvents(index, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _copyExternalLayout = (externalLayout: gdExternalLayout) => {
@@ -483,8 +561,15 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     newExternalLayout.setName(newName); // Unserialization has overwritten the name.
+    this._onProjectItemModified();
+  };
 
-    this.forceUpdate();
+  _duplicateExternalLayout = (
+    externalLayout: gdExternalLayout,
+    index: number
+  ) => {
+    this._copyExternalLayout(externalLayout);
+    this._pasteExternalLayout(index);
   };
 
   _moveUpExternalLayout = (index: number) => {
@@ -492,7 +577,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapExternalLayouts(index, index - 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _moveDownExternalLayout = (index: number) => {
@@ -500,7 +585,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalLayoutsCount() - 1) return;
 
     project.swapExternalLayouts(index, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _copyEventsFunctionsExtension = (
@@ -519,6 +604,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
   };
 
+  _duplicateEventsFunctionsExtension = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    index: number
+  ) => {
+    this._copyEventsFunctionsExtension(eventsFunctionsExtension);
+    this._pasteEventsFunctionsExtension(index);
+  };
+
   _pasteEventsFunctionsExtension = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
 
@@ -529,7 +622,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
-      project.hasEventsFunctionsExtensionNamed(name)
+      isExtensionNameTaken(name, project)
     );
 
     const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -545,7 +638,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
 
-    this.forceUpdate();
+    this._onProjectItemModified();
     this.props.onReloadEventsFunctionsExtensions();
   };
 
@@ -554,7 +647,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index <= 0) return;
 
     project.swapEventsFunctionsExtensions(index, index - 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _moveDownEventsFunctionsExtension = (index: number) => {
@@ -562,7 +655,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
 
     project.swapEventsFunctionsExtensions(index, index + 1);
-    this.forceUpdate();
+    this._onProjectItemModified();
   };
 
   _renderMenu() {
@@ -608,14 +701,6 @@ export default class ProjectManager extends React.Component<Props, State> {
           leftIcon={<AccountCircle />}
           onClick={() => this.props.onOpenProfile()}
         />
-        {!Window.isFullscreen() && (
-          <ListItem
-            key="fullscreen"
-            primaryText={<Trans>Turn on Fullscreen</Trans>}
-            leftIcon={<Fullscreen />}
-            onClick={() => Window.requestFullscreen()}
-          />
-        )}
       </React.Fragment>
     );
   }
@@ -627,6 +712,12 @@ export default class ProjectManager extends React.Component<Props, State> {
 
   _onRequestSearch = () => {
     /* Do nothing for now, but we could open the first result. */
+  };
+
+  _onProjectItemModified = () => {
+    this.forceUpdate();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
   render() {
@@ -641,13 +732,22 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     return (
       <div style={styles.container}>
+        <ProjectManagerCommands
+          project={this.props.project}
+          onOpenProjectProperties={this._openProjectProperties}
+          onOpenProjectVariables={this._openProjectVariables}
+          onOpenResourcesDialog={this.props.onOpenResources}
+          onOpenPlatformSpecificAssetsDialog={
+            this.props.onOpenPlatformSpecificAssets
+          }
+        />
         <List style={styles.list}>
           {this._renderMenu()}
           <ProjectStructureItem
             primaryText={<Trans>Game settings</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/projectManager32.png"
               />
@@ -660,15 +760,13 @@ export default class ProjectManager extends React.Component<Props, State> {
                 key="properties"
                 primaryText={<Trans>Properties</Trans>}
                 leftIcon={<SettingsApplications />}
-                onClick={() =>
-                  this.setState({ projectPropertiesDialogOpen: true })
-                }
+                onClick={this._openProjectProperties}
               />,
               <ListItem
                 key="global-variables"
                 primaryText={<Trans>Global variables</Trans>}
                 leftIcon={<VariableTree />}
-                onClick={() => this.setState({ variablesEditorOpen: true })}
+                onClick={this._openProjectVariables}
               />,
               <ListItem
                 key="icons"
@@ -690,7 +788,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>Scenes</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/sceneadd32.png"
               />
@@ -721,11 +819,24 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyLayout(layout)}
                       onCut={() => this._cutLayout(layout)}
                       onPaste={() => this._pasteLayout(i)}
+                      onDuplicate={() => this._duplicateLayout(layout, i)}
                       canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                       canMoveUp={i !== 0}
                       onMoveUp={() => this._moveUpLayout(i)}
                       canMoveDown={i !== project.getLayoutsCount() - 1}
                       onMoveDown={() => this._moveDownLayout(i)}
+                      buildExtraMenuTemplate={(i18n: I18nType) => [
+                        {
+                          label: i18n._(t`Edit Scene Properties`),
+                          enabled: true,
+                          click: () => this._onOpenLayoutProperties(layout),
+                        },
+                        {
+                          label: i18n._(t`Edit Scene Variables`),
+                          enabled: true,
+                          click: () => this._onOpenLayoutVariables(layout),
+                        },
+                      ]}
                     />
                   );
                 })
@@ -742,7 +853,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External events</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externalevents32.png"
               />
@@ -781,6 +892,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyExternalEvents(externalEvents)}
                       onCut={() => this._cutExternalEvents(externalEvents)}
                       onPaste={() => this._pasteExternalEvents(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalEvents(externalEvents, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
                       }
@@ -804,7 +918,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText={<Trans>External layouts</Trans>}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/externallayout32.png"
               />
@@ -843,6 +957,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onCopy={() => this._copyExternalLayout(externalLayout)}
                       onCut={() => this._cutExternalLayout(externalLayout)}
                       onPaste={() => this._pasteExternalLayout(i)}
+                      onDuplicate={() =>
+                        this._duplicateExternalLayout(externalLayout, i)
+                      }
                       canPaste={() =>
                         Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
                       }
@@ -868,7 +985,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
               <ListIcon
-                iconSize={32}
+                iconSize={24}
                 isGDevelopIcon
                 src="res/ribbon_default/function32.png"
               />
@@ -924,6 +1041,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                         )
                       }
                       onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                      onDuplicate={() =>
+                        this._duplicateEventsFunctionsExtension(
+                          eventsFunctionsExtension,
+                          i
+                        )
+                      }
                       canPaste={() =>
                         Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
                       }
@@ -965,12 +1088,19 @@ export default class ProjectManager extends React.Component<Props, State> {
           onRequestSearch={this._onRequestSearch}
           onChange={this._onSearchChange}
         />
-        {this.state.variablesEditorOpen && (
+        {this.state.projectVariablesEditorOpen && (
           <VariablesEditorDialog
+            title={<Trans>Global Variables</Trans>}
             open
             variablesContainer={project.getVariables()}
-            onCancel={() => this.setState({ variablesEditorOpen: false })}
-            onApply={() => this.setState({ variablesEditorOpen: false })}
+            onCancel={() =>
+              this.setState({ projectVariablesEditorOpen: false })
+            }
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this.setState({ projectVariablesEditorOpen: false });
+            }}
             emptyExplanationMessage={
               <Trans>
                 Global variables are variables that are shared amongst all the
@@ -983,6 +1113,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 representing the number of levels unlocked by the player.
               </Trans>
             }
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {this.state.projectPropertiesDialogOpen && (
@@ -992,10 +1123,42 @@ export default class ProjectManager extends React.Component<Props, State> {
             onClose={() =>
               this.setState({ projectPropertiesDialogOpen: false })
             }
-            onApply={() =>
-              this.setState({ projectPropertiesDialogOpen: false })
-            }
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this.setState({ projectPropertiesDialogOpen: false });
+            }}
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {!!this.state.editedPropertiesLayout && (
+          <ScenePropertiesDialog
+            open
+            layout={this.state.editedPropertiesLayout}
+            project={this.props.project}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._onOpenLayoutProperties(null);
+            }}
+            onClose={() => this._onOpenLayoutProperties(null)}
+            onEditVariables={() => {
+              this._onOpenLayoutVariables(this.state.editedPropertiesLayout);
+              this._onOpenLayoutProperties(null);
+            }}
+          />
+        )}
+        {!!this.state.editedVariablesLayout && (
+          <SceneVariablesDialog
+            open
+            layout={this.state.editedVariablesLayout}
+            onClose={() => this._onOpenLayoutVariables(null)}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._onOpenLayoutVariables(null);
+            }}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {this.state.extensionsSearchDialogOpen && (

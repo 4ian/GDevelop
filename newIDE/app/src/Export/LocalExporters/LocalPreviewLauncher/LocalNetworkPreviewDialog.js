@@ -54,7 +54,7 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
             onClick={onRunPreviewLocally}
           />,
         ]}
-        modal
+        cannotBeDismissed={true}
         open={open}
         onRequestClose={onClose}
       >

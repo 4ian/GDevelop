@@ -1,8 +1,9 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -11,8 +12,18 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -27,7 +38,8 @@ module.exports = {
       .setExtensionHelpPath('/objects/bbtext');
 
     var objectBBText = new gd.ObjectJsImplementation();
-    objectBBText.updateProperty = function(
+    // $FlowExpectedError
+    objectBBText.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -35,74 +47,69 @@ module.exports = {
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
+        else if (typeof objectContent[propertyName] === 'number')
+          objectContent[propertyName] = parseFloat(newValue);
         else objectContent[propertyName] = newValue;
         return true;
       }
 
       return false;
     };
-    objectBBText.getProperties = function(objectContent) {
-      var objectProperties = new gd.MapStringPropertyDescriptor();
+    // $FlowExpectedError
+    objectBBText.getProperties = function (objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
 
-      objectProperties.set(
-        'text',
-        new gd.PropertyDescriptor(objectContent.text)
-          .setType('textarea')
-          .setLabel(_('BBCode text'))
-      );
+      objectProperties
+        .getOrCreate('text')
+        .setValue(objectContent.text)
+        .setType('textarea')
+        .setLabel(_('BBCode text'));
 
-      objectProperties.set(
-        'color',
-        new gd.PropertyDescriptor(objectContent.color)
-          .setType('color')
-          .setLabel(_('Base color'))
-      );
+      objectProperties
+        .getOrCreate('color')
+        .setValue(objectContent.color)
+        .setType('color')
+        .setLabel(_('Base color'));
 
-      objectProperties.set(
-        'opacity',
-        new gd.PropertyDescriptor(objectContent.opacity.toString())
-          .setType('number')
-          .setLabel(_('Opacity (0-255)'))
-      );
+      objectProperties
+        .getOrCreate('opacity')
+        .setValue(objectContent.opacity.toString())
+        .setType('number')
+        .setLabel(_('Opacity (0-255)'));
 
-      objectProperties.set(
-        'fontSize',
-        new gd.PropertyDescriptor(objectContent.fontSize)
-          .setType('number')
-          .setLabel(_('Base size'))
-      );
+      objectProperties
+        .getOrCreate('fontSize')
+        .setValue(objectContent.fontSize.toString())
+        .setType('number')
+        .setLabel(_('Base size'));
 
-      objectProperties.set(
-        'align',
-        new gd.PropertyDescriptor(objectContent.align)
-          .setType('choice')
-          .addExtraInfo('left')
-          .addExtraInfo('center')
-          .addExtraInfo('right')
-          .setLabel(_('Base alignment'))
-      );
+      objectProperties
+        .getOrCreate('align')
+        .setValue(objectContent.align)
+        .setType('choice')
+        .addExtraInfo('left')
+        .addExtraInfo('center')
+        .addExtraInfo('right')
+        .setLabel(_('Base alignment'));
 
-      objectProperties.set(
-        'fontFamily',
-        new gd.PropertyDescriptor(objectContent.fontFamily)
-          .setType('resource')
-          .addExtraInfo('font')
-          .setLabel(_('Base font family'))
-      );
+      objectProperties
+        .getOrCreate('fontFamily')
+        .setValue(objectContent.fontFamily)
+        .setType('resource')
+        .addExtraInfo('font')
+        .setLabel(_('Base font family'));
 
-      objectProperties.set(
-        'wordWrap',
-        new gd.PropertyDescriptor(objectContent.wordWrap ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Word wrapping'))
-      );
+      objectProperties
+        .getOrCreate('wordWrap')
+        .setValue(objectContent.wordWrap ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Word wrapping'));
 
-      objectProperties.set(
-        'visible',
-        new gd.PropertyDescriptor(objectContent.visible ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Visible on start'))
-      );
+      objectProperties
+        .getOrCreate('visible')
+        .setValue(objectContent.visible ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Visible on start'));
 
       return objectProperties;
     };
@@ -111,7 +118,7 @@ module.exports = {
         text:
           '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
-        fontSize: '20',
+        fontSize: 20,
         visible: true,
         color: '#000000',
         fontFamily: 'Arial',
@@ -120,7 +127,8 @@ module.exports = {
       })
     );
 
-    objectBBText.updateInitialInstanceProperty = function(
+    // $FlowExpectedError
+    objectBBText.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -130,7 +138,8 @@ module.exports = {
     ) {
       return false;
     };
-    objectBBText.getInitialInstanceProperties = function(
+    // $FlowExpectedError
+    objectBBText.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -161,7 +170,7 @@ module.exports = {
      * Useful for setting multiple generic properties.
      */
     const addSettersAndGettersToObject = (gdObject, properties, objectName) => {
-      properties.forEach(property => {
+      properties.forEach((property) => {
         const parameterType =
           property.type === 'boolean' ? 'yesorno' : property.type;
 
@@ -173,8 +182,6 @@ module.exports = {
               property.expressionLabel,
               property.expressionDescription,
               '',
-              '',
-              property.iconPath,
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
@@ -187,8 +194,6 @@ module.exports = {
               property.expressionLabel,
               property.expressionDescription,
               '',
-              '',
-              property.iconPath,
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
@@ -392,13 +397,15 @@ module.exports = {
    * of your extension behaviors/objects by instanciating behaviors/objects
    * and setting the property to a given value.
    *
-   * If you don't have any tests, you can simply return an empty array like this:
-   * `runExtensionSanityTests: function(gd, extension) { return []; }`
+   * If you don't have any tests, you can simply return an empty array.
    *
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
   /**
@@ -406,11 +413,13 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(objectsEditorService) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bbtext_object',
+        helpPagePath: '/objects/bbtext',
       })
     );
   },
@@ -419,7 +428,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
     const MultiStyleText = objectsRenderingService.requireModule(
@@ -454,6 +465,7 @@ module.exports = {
 
       const bbTextStyles = {
         default: {
+          // Use a default font family the time for the resource font to be loaded.
           fontFamily: 'Arial',
           fontSize: '24px',
           fill: '#cccccc',
@@ -478,7 +490,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedBBTextInstance.getThumbnail = function(
+    RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -489,66 +501,51 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedBBTextInstance.prototype.update = function() {
-      const rawText = this._associatedObject
-        .getProperties(this.project)
-        .get('text')
-        .getValue();
+    RenderedBBTextInstance.prototype.update = function () {
+      const properties = this._associatedObject.getProperties();
+
+      const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {
-        this._pixiObject.setText(rawText);
+        this._pixiObject.text = rawText;
       }
 
-      const opacity = this._associatedObject
-        .getProperties(this.project)
-        .get('opacity')
-        .getValue();
+      const opacity = properties.get('opacity').getValue();
       this._pixiObject.alpha = opacity / 255;
 
-      const color = this._associatedObject
-        .getProperties(this.project)
-        .get('color')
-        .getValue();
+      const color = properties.get('color').getValue();
       this._pixiObject.textStyles.default.fill = color;
 
-      const fontSize = this._associatedObject
-        .getProperties(this.project)
-        .get('fontSize')
-        .getValue();
+      const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
 
-      const fontResourceName = this._associatedObject
-        .getProperties(this.project)
-        .get('fontFamily')
-        .getValue();
+      const fontResourceName = properties.get('fontFamily').getValue();
 
       if (this._fontResourceName !== fontResourceName) {
         this._fontResourceName = fontResourceName;
 
         this._pixiResourcesLoader
           .loadFontFamily(this._project, fontResourceName)
-          .then(fontFamily => {
+          .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
             this._pixiObject.textStyles.default.fontFamily = fontFamily;
+            this._pixiObject.dirty = true;
           })
-          .catch(err => {
+          .catch((err) => {
             // Ignore errors
-            console.warn('Unable to load font family', err);
+            console.warn(
+              'Unable to load font family for RenderedBBTextInstance',
+              err
+            );
           });
       }
 
-      const wordWrap = this._associatedObject
-        .getProperties(this.project)
-        .get('wordWrap')
-        .getValue();
+      const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap !== this._pixiObject._style.wordWrap) {
-        this._pixiObject._style.wordWrap = wordWrap === 'true';
+        this._pixiObject._style.wordWrap = wordWrap;
         this._pixiObject.dirty = true;
       }
 
-      const align = this._associatedObject
-        .getProperties(this.project)
-        .get('align')
-        .getValue();
+      const align = properties.get('align').getValue();
       if (align !== this._pixiObject._style.align) {
         this._pixiObject._style.align = align;
         this._pixiObject.dirty = true;
@@ -566,7 +563,7 @@ module.exports = {
         const customWidth = this._instance.getCustomWidth();
         if (
           this._pixiObject &&
-          this._pixiObject.textStyles.default.wordWrapWidth !== customWidth
+          this._pixiObject._style.wordWrapWidth !== customWidth
         ) {
           this._pixiObject._style.wordWrapWidth = customWidth;
           this._pixiObject.dirty = true;
@@ -577,14 +574,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedBBTextInstance.prototype.getDefaultWidth = function() {
+    RenderedBBTextInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedBBTextInstance.prototype.getDefaultHeight = function() {
+    RenderedBBTextInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height;
     };
 

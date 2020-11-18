@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.dom.tom",
-    "projectFile": "G:\\Games\\Rope Example\\game.json",
+    "projectFile": "G:\\onedrive\\Documents\\GDevelop projects\\Bouncing ball and rope\\bouncing-ball-and-rope.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Rope Example",
     "author": "Zatapov",
     "windowWidth": 800,
@@ -57,6 +53,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -176,7 +173,7 @@
         "kind": "image",
         "metadata": "",
         "name": "Ball.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": false
       },
       {
@@ -194,7 +191,7 @@
         "kind": "image",
         "metadata": "",
         "name": "BoundsLine.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": true
       }
     ],
@@ -240,8 +237,9 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
+          "persistentUuid": "b0e75b88-ec2b-4a38-9e74-e88c82c2d971",
           "width": 562,
-          "x": 164,
+          "x": 139,
           "y": 187,
           "zOrder": 1,
           "numberProperties": [],
@@ -255,8 +253,9 @@
           "layer": "",
           "locked": false,
           "name": "Logo",
+          "persistentUuid": "14e1ac65-9657-41c0-9c8a-b4edc4688b97",
           "width": 355,
-          "x": 486,
+          "x": 427,
           "y": 446,
           "zOrder": 2,
           "numberProperties": [],
@@ -270,8 +269,9 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "fef3dcc4-e0a4-4b13-8520-c29c54486825",
           "width": 0,
-          "x": 76,
+          "x": 51,
           "y": 33,
           "zOrder": 3,
           "numberProperties": [],
@@ -285,6 +285,7 @@
           "layer": "Back",
           "locked": true,
           "name": "Back",
+          "persistentUuid": "dbde85e3-73a9-4dda-923c-af6a236e7d27",
           "width": 1908,
           "x": -563,
           "y": -493,
@@ -479,12 +480,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Back",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -528,7 +539,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.496
       },
       "objectsGroups": [
         {
@@ -574,6 +585,7 @@
           "layer": "",
           "locked": false,
           "name": "MainChar",
+          "persistentUuid": "55be9db8-a158-479c-8c16-2b942a3eb80e",
           "width": 0,
           "x": 190,
           "y": 65,
@@ -589,6 +601,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "89d3cb47-1516-4ef2-aeef-25091e665447",
           "width": 0,
           "x": 707,
           "y": 1222,
@@ -604,6 +617,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "79e0535d-477c-4e62-b8e3-86f8098f09fc",
           "width": 0,
           "x": 1083,
           "y": 915,
@@ -619,6 +633,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "2078d104-7d6a-4696-b4ca-9bd41e72dea6",
           "width": 0,
           "x": 3899,
           "y": 340,
@@ -634,6 +649,7 @@
           "layer": "",
           "locked": false,
           "name": "Rope",
+          "persistentUuid": "f20b2e7a-5455-4376-847e-61a5b8fb2950",
           "width": 130,
           "x": 2971,
           "y": 1150,
@@ -649,6 +665,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "3bfbb6ca-76a2-4dcc-a64c-94601dc9a26a",
           "width": 0,
           "x": 2082,
           "y": 1068,
@@ -664,6 +681,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "ec2413d8-c1ea-42ca-bc70-1e4b91cee7bd",
           "width": 0,
           "x": 3190,
           "y": 189,
@@ -679,6 +697,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "9bebae47-fd48-42be-ae14-a04177c0a7e5",
           "width": 0,
           "x": 1593,
           "y": 1134,
@@ -694,6 +713,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "df043241-0936-4ea4-a358-e9bb64da4d82",
           "width": 0,
           "x": 4691,
           "y": 1362,
@@ -709,6 +729,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "f696644d-0b94-44b6-920a-c4c8bd77a896",
           "width": 0,
           "x": 4446,
           "y": 608,
@@ -724,6 +745,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "03a04025-b320-49f6-a4c7-57960b8579ba",
           "width": 0,
           "x": 562,
           "y": 673,
@@ -739,6 +761,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "2ab626d9-2eef-4987-ab1b-5806857a50ff",
           "width": 0,
           "x": 3068,
           "y": 1399,
@@ -754,6 +777,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "7b1f9713-9583-4fb0-a4ba-1af2ffdf3ff1",
           "width": 0,
           "x": 3431,
           "y": 1102,
@@ -769,6 +793,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "abd599e2-f424-4eea-978c-cde852d1b07c",
           "width": 0,
           "x": 2633,
           "y": 518,
@@ -784,6 +809,7 @@
           "layer": "",
           "locked": false,
           "name": "Follow",
+          "persistentUuid": "e7215efb-5b8b-439e-bd5b-25b840b9fa77",
           "width": 0,
           "x": 168,
           "y": 42,
@@ -799,6 +825,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ce09ca90-2798-489e-aa76-e885655c5f73",
           "width": 312,
           "x": 67,
           "y": 854,
@@ -814,6 +841,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "743c27ec-8d7f-4318-8102-e08b344bf183",
           "width": 626,
           "x": 544,
           "y": 1573,
@@ -829,6 +857,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "2b0f7a06-4159-499c-835f-de6ccad14621",
           "width": 46,
           "x": 61,
           "y": -2500,
@@ -844,6 +873,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "6dcb51f8-aff2-4834-9691-a71ad373f14f",
           "width": 183,
           "x": 1556,
           "y": 1631,
@@ -859,6 +889,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "5e4c6ed3-8ec8-42e1-a521-f15bfe417fa9",
           "width": 359,
           "x": 3289,
           "y": 800,
@@ -874,6 +905,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ead3fb3e-249a-4454-b294-e107a1c740b4",
           "width": 215,
           "x": 2432,
           "y": 1008,
@@ -889,6 +921,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "889a7825-3bf4-4334-8476-20994a386e15",
           "width": 366,
           "x": 2272,
           "y": 1661,
@@ -904,6 +937,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "d643760d-9328-46b2-b9a4-f355f3a69b19",
           "width": 350,
           "x": 3743,
           "y": 1376,
@@ -919,6 +953,7 @@
           "layer": "",
           "locked": false,
           "name": "Finish",
+          "persistentUuid": "e11a92f0-fcc6-4a23-8c8a-0858ccc929dd",
           "width": 27,
           "x": 5225,
           "y": -2500,
@@ -934,6 +969,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "f1cdcf40-41f0-4ee4-a96a-b279e89f9e0b",
           "width": 0,
           "x": 1306,
           "y": 251,
@@ -949,6 +985,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "5abd3c50-2560-4c11-ac3a-15dabb08d5eb",
           "width": 0,
           "x": 2220,
           "y": 154,
@@ -964,6 +1001,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "12bccf08-32b3-4d74-b2b8-bb066468a6bf",
           "width": 148,
           "x": 4691,
           "y": 970,
@@ -979,6 +1017,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "145a96fb-372f-4946-8016-8b48fa335fa7",
           "width": 428,
           "x": 1369,
           "y": 680,
@@ -994,6 +1033,7 @@
           "layer": "",
           "locked": true,
           "name": "Background",
+          "persistentUuid": "e051360e-66f3-4f57-adfb-3939c92e935c",
           "width": 7064,
           "x": -1080,
           "y": -2806,
@@ -1009,6 +1049,7 @@
           "layer": "",
           "locked": false,
           "name": "MainShaow",
+          "persistentUuid": "5f8bfe5b-e2fe-4466-912c-842ac4c1696a",
           "width": 0,
           "x": 140,
           "y": 13,
@@ -1024,6 +1065,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "60b5154c-c393-435b-9d19-30683e2eecb4",
           "width": 0,
           "x": 4085,
           "y": 961,
@@ -1039,6 +1081,7 @@
           "layer": "",
           "locked": false,
           "name": "BoundsLine",
+          "persistentUuid": "fdad54f2-cc06-497c-9b61-6a16801bfee8",
           "width": 5163,
           "x": 79,
           "y": 2200,
@@ -1054,6 +1097,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "dfbaf001-c19b-4e6a-9bf8-9eeb47c571e0",
           "width": 0,
           "x": 4025,
           "y": 1598,
@@ -1077,7 +1121,7 @@
               "bullet": false,
               "fixedRotation": true,
               "canSleep": true,
-              "shape": "Polygon",
+              "shape": "Circle",
               "shapeDimensionA": 0,
               "shapeDimensionB": 0,
               "shapeOffsetX": 0,
@@ -1245,7 +1289,8 @@
             "g": 249,
             "r": 249
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Follow",
@@ -1370,7 +1415,7 @@
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "NewObject-1.png",
+                      "image": "BoundsLine.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -1480,18 +1525,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Toujours"
-                  },
-                  "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -2089,12 +2123,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Back",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

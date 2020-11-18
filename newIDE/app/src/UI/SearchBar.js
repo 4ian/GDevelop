@@ -9,8 +9,11 @@ import Close from '@material-ui/icons/Close';
 import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from './Menu/ElementWithMenu';
+import ThemeConsumer from './Theme/ThemeConsumer';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   /** Disables text field. */
@@ -44,7 +47,7 @@ const getStyles = (props: Props, state: State) => {
 
   return {
     root: {
-      height: 48,
+      height: 30,
       display: 'flex',
       justifyContent: 'space-between',
     },
@@ -64,7 +67,7 @@ const getStyles = (props: Props, state: State) => {
         opacity: !disabled ? 0.54 : 0.38,
         transform: nonEmpty ? 'scale(0, 0)' : 'scale(1, 1)',
         transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-        marginRight: -48,
+        marginRight: -30,
       },
       iconStyle: {
         opacity: nonEmpty ? 0 : 1,
@@ -85,7 +88,9 @@ const getStyles = (props: Props, state: State) => {
       width: '100%',
     },
     searchContainer: {
-      margin: 'auto 16px',
+      top: -1,
+      position: 'relative',
+      margin: 'auto 8px',
       width: '100%',
     },
   };
@@ -144,8 +149,8 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     this.props.onChange && this.props.onChange('');
   };
 
-  handleKeyPressed = (e: { charCode: number, key: string }) => {
-    if (e.charCode === 13 || e.key === 'Enter') {
+  handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+    if (shouldValidate(event)) {
       this.props.onRequestSearch(this.state.value);
     }
   };
@@ -156,59 +161,81 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     const { disabled, style, buildTagsMenuTemplate, helpPagePath } = this.props;
 
     return (
-      <Paper
-        style={{
-          ...styles.root,
-          ...style,
-        }}
-      >
-        <div style={styles.searchContainer}>
-          <TextField
-            margin="none"
-            hintText={this.props.placeholder || t`Search`}
-            onBlur={this.handleBlur}
-            value={value}
-            onChange={this.handleInput}
-            onKeyUp={this.handleKeyPressed}
-            onFocus={this.handleFocus}
-            fullWidth
-            style={styles.input}
-            underlineShow={false}
-            disabled={disabled}
-            ref={this._textField}
-          />
-        </div>
-        {buildTagsMenuTemplate && (
-          <ElementWithMenu
-            element={
-              <IconButton
-                style={styles.iconButtonFilter.style}
+      <ThemeConsumer>
+        {muiTheme => (
+          <Paper
+            style={{
+              backgroundColor: muiTheme.searchBar.backgroundColor,
+              ...styles.root,
+              ...style,
+            }}
+            square
+            elevation={1}
+          >
+            <div style={styles.searchContainer}>
+              <TextField
+                margin="none"
+                hintText={this.props.placeholder || t`Search`}
+                onBlur={this.handleBlur}
+                value={value}
+                onChange={this.handleInput}
+                onKeyUp={this.handleKeyPressed}
+                onFocus={this.handleFocus}
+                fullWidth
+                style={styles.input}
+                underlineShow={false}
                 disabled={disabled}
-              >
-                <FilterList />
-              </IconButton>
-            }
-            buildMenuTemplate={buildTagsMenuTemplate}
-          />
+                ref={this._textField}
+              />
+            </div>
+            {buildTagsMenuTemplate && (
+              <ElementWithMenu
+                element={
+                  <IconButton
+                    style={styles.iconButtonFilter.style}
+                    disabled={disabled}
+                    size="small"
+                  >
+                    <FilterList />
+                  </IconButton>
+                }
+                buildMenuTemplate={buildTagsMenuTemplate}
+              />
+            )}
+            {helpPagePath && (
+              <HelpIcon
+                disabled={disabled}
+                helpPagePath={helpPagePath}
+                style={styles.iconButtonHelp.style}
+                size="small"
+              />
+            )}
+            <IconButton
+              style={styles.iconButtonSearch.style}
+              disabled={disabled}
+              size="small"
+            >
+              <Search style={styles.iconButtonSearch.iconStyle} />
+            </IconButton>
+            <IconButton
+              onClick={this.handleCancel}
+              style={styles.iconButtonClose.style}
+              disabled={disabled}
+              size="small"
+            >
+              <Close style={styles.iconButtonClose.iconStyle} />
+            </IconButton>
+          </Paper>
         )}
-        {helpPagePath && (
-          <HelpIcon
-            disabled={disabled}
-            helpPagePath={helpPagePath}
-            style={styles.iconButtonHelp.style}
-          />
-        )}
-        <IconButton style={styles.iconButtonSearch.style} disabled={disabled}>
-          <Search style={styles.iconButtonSearch.iconStyle} />
-        </IconButton>
-        <IconButton
-          onClick={this.handleCancel}
-          style={styles.iconButtonClose.style}
-          disabled={disabled}
-        >
-          <Close style={styles.iconButtonClose.iconStyle} />
-        </IconButton>
-      </Paper>
+      </ThemeConsumer>
     );
   }
 }
+
+export const useShouldAutofocusSearchbar = () => {
+  // Note: this is not a React hook but is named as one to encourage
+  // components to use it as such, so that it could be reworked
+  // at some point to use a context (verify in this case all usages).
+  const isTouchscreen = useScreenType() === 'touch';
+  return !isTouchscreen;
+};

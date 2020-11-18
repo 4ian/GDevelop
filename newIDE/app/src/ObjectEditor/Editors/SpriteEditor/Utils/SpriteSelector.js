@@ -72,6 +72,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
       <React.Fragment>
         <ResponsiveLineStackLayout>
           <SelectField
+            fullWidth
             floatingLabelText={<Trans>Animation</Trans>}
             value={this.props.animationIndex}
             onChange={(e, i, value: string) =>
@@ -91,6 +92,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
           </SelectField>
           {hasValidAnimation && animation.getDirectionsCount() > 1 && (
             <SelectField
+              fullWidth
               floatingLabelText={<Trans>Direction</Trans>}
               value={this.props.directionIndex}
               onChange={(e, i, value: string) =>
@@ -110,6 +112,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
           )}
           {hasValidDirection && (
             <SelectField
+              fullWidth
               floatingLabelText={<Trans>Frame</Trans>}
               value={this.props.spriteIndex}
               onChange={(e, i, value: string) =>

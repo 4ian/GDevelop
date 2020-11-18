@@ -19,7 +19,7 @@ type Props = {|
   onCreateNewProject: () => void,
 |};
 
-export default ({
+const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
@@ -47,6 +47,7 @@ export default ({
               onClick={onCreateNewProject}
             />,
           ]}
+          cannotBeDismissed={false}
           open
           noMargin
           maxWidth="sm"
@@ -85,3 +86,5 @@ export default ({
     </I18n>
   );
 };
+
+export default OpenFromStorageProviderDialog;

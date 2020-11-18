@@ -3,8 +3,10 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
-const gd = global.gd;
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
+const gd: libGDevelop = global.gd;
 
 type State = {|
   errorText: ?string,
@@ -19,7 +21,7 @@ export default class BehaviorField extends React.Component<
   _longDescription: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   constructor(props: ParameterFieldProps) {
     super(props);
@@ -70,7 +72,8 @@ export default class BehaviorField extends React.Component<
           gd.getTypeOfBehavior(
             this.props.globalObjectsContainer,
             this.props.objectsContainer,
-            behaviorName
+            behaviorName,
+            false
           ) === this._behaviorTypeAllowed
         );
       });
@@ -143,6 +146,7 @@ export default class BehaviorField extends React.Component<
         }
         value={this.props.value}
         onChange={this.props.onChange}
+        onRequestClose={this.props.onRequestClose}
         onBlur={event => {
           this._doValidation(event.currentTarget.value);
         }}

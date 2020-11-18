@@ -28,9 +28,6 @@ const styles = {
     paddingLeft: 6,
     paddingRight: 6,
   },
-  repeatContainer: {
-    width: 130,
-  },
   spacer: {
     width: 16,
   },
@@ -148,13 +145,11 @@ export default class DirectionTools extends Component<Props, State> {
           max={5}
         />
         <span style={styles.spacer} />
-        <div style={styles.repeatContainer}>
-          <Checkbox
-            checked={direction.isLooping()}
-            label={<Trans>Loop</Trans>}
-            onCheck={(e, check) => this.setLooping(check)}
-          />
-        </div>
+        <Checkbox
+          checked={direction.isLooping()}
+          label={<Trans>Loop</Trans>}
+          onCheck={(e, check) => this.setLooping(check)}
+        />
         {this.state.previewOpen && (
           <Dialog
             actions={
@@ -166,7 +161,7 @@ export default class DirectionTools extends Component<Props, State> {
               />
             }
             noMargin
-            modal
+            cannotBeDismissed={false}
             onRequestClose={() => this.openPreview(false)}
             open={this.state.previewOpen}
           >

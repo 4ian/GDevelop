@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -168,6 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "6d95bef8-b1ae-450a-82a6-008eb34d2d6e",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -183,6 +181,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "048c6617-10eb-4f6a-8944-91ae6623a6be",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -203,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "ec5804a3-ffdd-4f4e-89d0-37f425a3e09c",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -223,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "2ab79460-b9ef-4d27-af20-8fd3d052379b",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -243,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "d39587cf-62b3-42ea-a2c2-584502c2cf8e",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -263,6 +265,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "82a7c926-c998-49c9-bb7d-e1cbceed714d",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -283,6 +286,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "12b47677-1cea-4f0f-9474-5feb74add13c",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -303,6 +307,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "b3680647-25ac-4e49-b86c-02504a8ea710",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -323,6 +328,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "fcd19bbc-c1b6-4d85-b962-1f02c8232ae6",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -814,6 +820,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

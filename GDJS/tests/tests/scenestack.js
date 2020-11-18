@@ -6,23 +6,39 @@
 describe('gdjs.SceneStack', function() {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    // @ts-ignore - don't writing all properties for testing purposes
     properties: { windowWidth: 800, windowHeight: 600 },
     layouts: [
       {
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene2',
         name: 'Scene 1',
         objects: [],
         layers: [],
         instances: [],
         behaviorsSharedData: [],
+        stopSoundsOnStartup: false,
+        title: '',
+        variables: [],
       },
       {
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene2',
         name: 'Scene 2',
         objects: [],
         layers: [],
         instances: [],
         behaviorsSharedData: [],
+        stopSoundsOnStartup: false,
+        title: '',
+        variables: [],
       },
     ],
+    resources: { resources: [] }
   });
   // @ts-ignore - access to a private member for testing purposes.
   var sceneStack = runtimeGame._sceneStack;

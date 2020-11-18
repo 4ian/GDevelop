@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shoot-bullet-in-parabola\\shoot-bullet-in-parabola.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": true,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 700,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -171,6 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "Source",
+          "persistentUuid": "aa023fda-01e6-4ddc-a92d-ddb49b1e4979",
           "width": 0,
           "x": 658.399,
           "y": 247.805,
@@ -186,6 +184,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "d42ca6ce-ce6f-4cb4-8cd9-363a890da405",
           "width": 0,
           "x": 56.3788,
           "y": 532.427,
@@ -201,6 +200,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "b2cd8cc3-ad24-4c8f-a5cd-8c3deab38b77",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -652,6 +652,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

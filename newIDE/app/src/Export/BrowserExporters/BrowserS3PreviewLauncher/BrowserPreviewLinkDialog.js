@@ -20,12 +20,13 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
   _makeOnOpen = (i18n: I18nType) => () => {
     const windowObjectReference = window.open(this.props.url, '_blank');
     if (!windowObjectReference) {
-      showErrorBox(
-        i18n._(
+      showErrorBox({
+        message: i18n._(
           t`Unable to open the preview! Be sure that popup are allowed for this website.`
         ),
-        undefined
-      );
+        rawError: undefined,
+        errorId: 'preview-popup-disallowed',
+      });
     }
     this.props.onClose();
   };
@@ -46,7 +47,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
                 onClick={this._makeOnOpen(i18n)}
               />,
             ]}
-            modal
+            cannotBeDismissed={true}
             open
           >
             <Line>

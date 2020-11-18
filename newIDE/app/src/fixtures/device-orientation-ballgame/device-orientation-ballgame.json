@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/device_orientation_ballgame/game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -180,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "board",
+          "persistentUuid": "b8acf2d5-8c03-47ef-b750-5e71321f6c74",
           "width": 640,
           "x": 0,
           "y": 16,
@@ -195,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "dab5907f-4b5a-45f0-bc71-632998186cd5",
           "width": 32,
           "x": -16,
           "y": -16,
@@ -210,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "af5fdd06-f420-42ba-8f8d-515d702c3f97",
           "width": 592,
           "x": 16,
           "y": -16,
@@ -225,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "ball",
+          "persistentUuid": "1b7dc03f-7e80-43cc-a1d8-934a172b2491",
           "width": 0,
           "x": 512,
           "y": 480,
@@ -240,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "20320f8c-f75c-4a4e-82ca-310a3d13eeb1",
           "width": 32,
           "x": 608,
           "y": -16,
@@ -255,6 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "e52ea08a-51f1-41b1-866c-ed73ea790394",
           "width": 592,
           "x": 16,
           "y": 584,
@@ -270,6 +273,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "2e4354db-9084-4ebd-93e5-ac89995d254b",
           "width": 32,
           "x": 416,
           "y": 128,
@@ -285,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "1bec850a-6e7a-4ace-992e-773c1cb02768",
           "width": 32,
           "x": 192,
           "y": 0,
@@ -300,6 +305,7 @@
           "layer": "",
           "locked": false,
           "name": "pit",
+          "persistentUuid": "e86f2947-3542-496f-9e34-a43d100ebc92",
           "width": 0,
           "x": 32,
           "y": 32,
@@ -315,6 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "you_win",
+          "persistentUuid": "f65bbfd9-41b5-4e7d-bea0-5883d6a11c5d",
           "width": 0,
           "x": 192,
           "y": 256,
@@ -733,6 +740,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

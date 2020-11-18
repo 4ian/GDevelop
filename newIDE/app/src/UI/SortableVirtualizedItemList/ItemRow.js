@@ -4,6 +4,8 @@ import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
+import { type MenuItemTemplate } from '../Menu/Menu.flow';
+import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 
 const styles = {
   itemName: {
@@ -28,9 +30,10 @@ type Props<Item> = {
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
-  buildMenuTemplate: () => Array<any>,
+  buildMenuTemplate: () => Array<MenuItemTemplate>,
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
+  scaleUpItemIconWhenSelected?: boolean,
   connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 };
 
@@ -56,6 +59,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
       onEdit,
       onItemSelected,
       hideMenuButton,
+      scaleUpItemIconWhenSelected,
       connectIconDragSource,
     } = this.props;
 
@@ -70,8 +74,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
               defaultValue={itemName}
               onBlur={e => this.props.onRename(e.currentTarget.value)}
               onKeyPress={event => {
-                if (event.charCode === 13) {
-                  // enter key pressed
+                if (shouldValidate(event)) {
                   if (this.textField) this.textField.blur();
                 }
               }}
@@ -111,7 +114,15 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           };
 
           const leftIcon = getThumbnail ? (
-            <ListIcon iconSize={32} src={getThumbnail()} />
+            <ListIcon
+              iconSize={24}
+              src={getThumbnail()}
+              cssAnimation={
+                scaleUpItemIconWhenSelected && selected
+                  ? 'scale-and-jiggle 0.8s forwards'
+                  : ''
+              }
+            />
           ) : null;
 
           return (
@@ -124,6 +135,11 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                   : leftIcon
               }
               displayMenuButton={!hideMenuButton}
+              rightIconColor={
+                selected
+                  ? muiTheme.listItem.selectedRightIconColor
+                  : muiTheme.listItem.rightIconColor
+              }
               buildMenuTemplate={this.props.buildMenuTemplate}
               onClick={() => {
                 if (!onItemSelected) return;

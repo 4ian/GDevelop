@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\load-image-from-url\\game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,6 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_1",
+          "persistentUuid": "12316077-58f5-4640-b2a4-9c51e23e3559",
           "width": 0,
           "x": 164,
           "y": 10,
@@ -168,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "My_picture",
+          "persistentUuid": "82ac2ed7-7348-4f56-b817-f3bda0861ce3",
           "width": 0,
           "x": 136,
           "y": 192,
@@ -183,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_2",
+          "persistentUuid": "1b4283a8-1111-4403-8815-fbe6bf4bbd35",
           "width": 0,
           "x": 147,
           "y": 74,
@@ -198,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "bybouhandlizard",
+          "persistentUuid": "8dacacbb-9c0c-4c82-9afc-8512c3bb4084",
           "width": 0,
           "x": 208,
           "y": 441,
@@ -213,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
+          "persistentUuid": "b15b24d4-6aea-4c7d-8cdf-1ca3a5ee9145",
           "width": 0,
           "x": 981,
           "y": 44,
@@ -228,6 +230,7 @@
           "layer": "",
           "locked": false,
           "name": "CopyOfNewObject",
+          "persistentUuid": "a2a308f0-3889-4def-a615-4aa14297e71e",
           "width": 0,
           "x": 459,
           "y": 156,
@@ -533,15 +536,21 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.loader\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.loader.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.loader.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.loader.load(runtimeScene.myCallback); // Use callback for load the new image",
+              "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.Loader.shared\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.Loader.shared.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.Loader.shared.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.Loader.shared.load(runtimeScene.myCallback); // Use callback for load the new image",
               "parameterObjects": "",
-              "useStrict": false
+              "useStrict": false,
+              "eventsSheetExpanded": false
             }
           ]
         }
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

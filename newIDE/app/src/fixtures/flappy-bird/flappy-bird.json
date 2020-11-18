@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.gdevelop.example.flappybird",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/flappy-bird/flappy-bird.json",
+    "projectFile": "C:\\Users\\Unekwu\\Documents\\GDevelop projects\\My project545\\flappy-bird.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "FLAPPY BIRD",
     "author": "THE GEM TUTORIALS",
     "windowWidth": 400,
@@ -57,6 +53,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -721,6 +718,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "1ad9bbcf-9deb-4236-885a-0da1fe048c13",
           "width": 50,
           "x": 261,
           "y": 165,
@@ -736,6 +734,7 @@
           "layer": "",
           "locked": false,
           "name": "Start",
+          "persistentUuid": "7351bbfa-679f-43a1-830a-f1b28db07576",
           "width": 100,
           "x": 100,
           "y": 410,
@@ -751,6 +750,7 @@
           "layer": "",
           "locked": false,
           "name": "Label_flappy_bird",
+          "persistentUuid": "bce31fb3-ad34-489f-8cab-b1ee8b8ad4ff",
           "width": 100,
           "x": 100,
           "y": 159,
@@ -766,6 +766,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "7c61db34-3b40-4b18-a550-76be84fc966b",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -781,6 +782,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "be12e123-d519-4e15-80fd-959618cdb5cb",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -796,10 +798,27 @@
           "layer": "",
           "locked": false,
           "name": "Rate",
+          "persistentUuid": "4b719f92-556b-4daa-affd-0a00dd01d337",
           "width": 0,
           "x": 300,
           "y": 410,
           "zOrder": 6,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "ytchannel",
+          "persistentUuid": "d6755f9e-6af2-4439-b68a-b3d320edcedc",
+          "width": 0,
+          "x": 259,
+          "y": 483,
+          "zOrder": 7,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1076,6 +1095,25 @@
           "width": 32,
           "variables": [],
           "behaviors": []
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "ytchannel",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "@The Gem Tutorials",
+          "font": "",
+          "characterSize": 15,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
         }
       ],
       "events": [
@@ -1085,7 +1123,7 @@
           "colorR": 126,
           "creationTime": 0,
           "disabled": false,
-          "folded": false,
+          "folded": true,
           "name": "Scene_Transition",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -1343,6 +1381,48 @@
                 }
               ],
               "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "ytchannel",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "LaunchFile"
+                  },
+                  "parameters": [
+                    "\"https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q?sub_confirmation=1\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
           "parameters": []
@@ -1372,7 +1452,7 @@
                   "parameters": [
                     "Ground",
                     "+",
-                    "1.7"
+                    "100*TimeDelta()"
                   ],
                   "subInstructions": []
                 }
@@ -1385,6 +1465,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1474,6 +1559,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
+          "persistentUuid": "16ac8a60-89f0-4740-9e25-77841888467f",
           "width": 0,
           "x": 184,
           "y": 237,
@@ -1489,6 +1575,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
+          "persistentUuid": "38ba9cf3-1661-4881-b737-97050437ca9f",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -1504,6 +1591,7 @@
           "layer": "",
           "locked": false,
           "name": "Bottom_pipe",
+          "persistentUuid": "ace4f976-fa70-468f-9d10-b08b0e492f3f",
           "width": 0,
           "x": 442,
           "y": 290,
@@ -1519,6 +1607,7 @@
           "layer": "",
           "locked": false,
           "name": "Top_pipe",
+          "persistentUuid": "e992cd25-15e6-4b7c-836c-2c9ec8fc657d",
           "width": 0,
           "x": 442,
           "y": 170,
@@ -1534,6 +1623,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird_score",
+          "persistentUuid": "552d3a44-3e43-48b7-b406-cdf4f0bd4bd4",
           "width": 0,
           "x": 189,
           "y": 84,
@@ -1549,6 +1639,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "d016fac7-392d-4917-a4b3-47f958ef838f",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -1564,6 +1655,7 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
+          "persistentUuid": "a3bfcf72-82b7-411b-bb4d-4f904ece0bb3",
           "width": 100,
           "x": 152,
           "y": 272,
@@ -1579,6 +1671,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "df709495-e93e-4f4f-bb23-898d73921f5e",
           "width": 405,
           "x": -3,
           "y": -11,
@@ -3999,6 +4092,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -4016,6 +4114,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [
@@ -4033,6 +4136,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Gameover",
           "visibility": true,
           "cameras": [],
@@ -4808,7 +4916,9 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "iconUrl": "",
       "name": "SineMovement",
+      "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
@@ -5071,7 +5181,9 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "iconUrl": "",
       "name": "Flash",
+      "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
       "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",

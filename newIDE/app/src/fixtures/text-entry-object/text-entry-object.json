@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\text-entry-object\\text-entry-object.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -149,6 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "Text",
+          "persistentUuid": "b7830f59-0f17-4b3d-a7fc-5556c48727a8",
           "width": 0,
           "x": 256,
           "y": 288,
@@ -164,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "Entry",
+          "persistentUuid": "80801697-1a53-4d7a-ad3a-c216a3dd2d77",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -179,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "4b27e9fb-540e-4ed7-b10a-31d13894bfae",
           "width": 0,
           "x": 320,
           "y": 352,
@@ -275,6 +275,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

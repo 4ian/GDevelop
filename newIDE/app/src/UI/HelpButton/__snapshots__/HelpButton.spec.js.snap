@@ -4,7 +4,7 @@ exports[`HelpButton renders nothing if the helpPagePath is empty 1`] = `null`;
 
 exports[`HelpButton renders the button linking to a help page 1`] = `
 <button
-  className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-sizeSmall"
+  className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSizeSmall MuiButton-sizeSmall"
   disabled={false}
   onBlur={[Function]}
   onClick={[Function]}
@@ -26,10 +26,9 @@ exports[`HelpButton renders the button linking to a help page 1`] = `
     className="MuiButton-label"
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="MuiSvgIcon-root"
       focusable="false"
-      role="presentation"
       viewBox="0 0 24 24"
     >
       <path

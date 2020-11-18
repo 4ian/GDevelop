@@ -15,9 +15,6 @@ export default {
     justifyContent: 'flex-end',
   },
   indentIconColor: '#DDD', //TODO: Use theme color instead
-  addVariableMessage: {
-    justifyContent: 'flex-end',
-  },
   emptyExplanation: {
     justifyContent: 'flex-start',
   },

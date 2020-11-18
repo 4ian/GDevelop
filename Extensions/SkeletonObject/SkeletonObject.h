@@ -28,11 +28,9 @@ class GD_EXTENSION_API SkeletonObject : public gd::Object {
   }
 
 #if defined(GD_IDE_ONLY)
-  std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      gd::Project& project) const override;
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name,
-                      const gd::String& value,
-                      gd::Project& project) override;
+                      const gd::String& value) override;
 #endif
 
  private:

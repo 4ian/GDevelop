@@ -3,20 +3,20 @@ import React, { Component } from 'react';
 import InstructionOrExpressionSelector from './index';
 import {
   createTree,
-  type InstructionOrExpressionTreeNode,
+  type InstructionTreeNode,
 } from '../../../InstructionOrExpression/CreateTree';
-import { enumerateInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
+import { enumerateAllInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   isCondition: boolean,
   focusOnMount?: boolean,
   selectedType: string,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, EnumeratedInstructionMetadata) => void,
   scope: EventsScope,
 |};
 
@@ -27,13 +27,11 @@ const style = {
 };
 
 export default class InstructionSelector extends Component<Props, {||}> {
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateInstructions(this.props.isCondition),
+  instructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateAllInstructions(this.props.isCondition),
     this.props.scope
   );
-  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.instructionsInfo
-  );
+  instructionsInfoTree: InstructionTreeNode = createTree(this.instructionsInfo);
 
   render() {
     const { isCondition, scope, ...otherProps } = this.props;

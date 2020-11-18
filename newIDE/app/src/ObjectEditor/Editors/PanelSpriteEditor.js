@@ -3,11 +3,10 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
-import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -25,37 +24,33 @@ export default class PanelSpriteEditor extends React.Component<
     const panelSpriteObject = gd.asPanelSpriteObject(object);
 
     return (
-      <Column>
-        <Line>
-          <ResourceSelectorWithThumbnail
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            resourceKind="image"
-            resourceName={panelSpriteObject.getTexture()}
-            onChange={resourceName => {
-              panelSpriteObject.setTexture(resourceName);
-              this.forceUpdate();
-            }}
-            floatingLabelText={<Trans>Select an image</Trans>}
-          />
-        </Line>
-        <Line>
-          <Checkbox
-            label={
-              <Trans>
-                Repeat borders and center textures (instead of stretching them)
-              </Trans>
-            }
-            checked={panelSpriteObject.isTiled()}
-            onCheck={(e, checked) => {
-              panelSpriteObject.setTiled(checked);
-              this.forceUpdate();
-            }}
-          />
-        </Line>
-        <ResponsiveLineStackLayout>
+      <ColumnStackLayout>
+        <ResourceSelectorWithThumbnail
+          project={project}
+          resourceSources={resourceSources}
+          onChooseResource={onChooseResource}
+          resourceExternalEditors={resourceExternalEditors}
+          resourceKind="image"
+          resourceName={panelSpriteObject.getTexture()}
+          onChange={resourceName => {
+            panelSpriteObject.setTexture(resourceName);
+            this.forceUpdate();
+          }}
+          floatingLabelText={<Trans>Select an image</Trans>}
+        />
+        <Checkbox
+          label={
+            <Trans>
+              Repeat borders and center textures (instead of stretching them)
+            </Trans>
+          }
+          checked={panelSpriteObject.isTiled()}
+          onCheck={(e, checked) => {
+            panelSpriteObject.setTiled(checked);
+            this.forceUpdate();
+          }}
+        />
+        <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Top margin</Trans>}
@@ -79,7 +74,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Left margin</Trans>}
@@ -103,7 +98,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
@@ -127,7 +122,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-      </Column>
+      </ColumnStackLayout>
     );
   }
 }

@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
@@ -22,6 +22,7 @@ import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
+import Window from '../../../Utils/Window';
 import {
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
@@ -57,7 +58,6 @@ const AddAnimationLine = ({ onAdd, extraTools }) => (
         label={<Trans>Add an animation</Trans>}
         primary
         onClick={onAdd}
-        labelPosition="before"
         icon={<Add />}
       />
     </Line>
@@ -108,7 +108,7 @@ class Animation extends React.Component<AnimationProps, void> {
     const animationName = animation.getName();
     return (
       <div>
-        <MiniToolbar smallest>
+        <MiniToolbar>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
           <Column expand margin>
@@ -255,8 +255,9 @@ class AnimationsListContainer extends React.Component<
   };
 
   removeAnimation = i => {
-    //eslint-disable-next-line
-    const answer = confirm('Are you sure you want to remove this animation?');
+    const answer = Window.showConfirmDialog(
+      'Are you sure you want to remove this animation?'
+    );
 
     if (answer) {
       this.props.spriteObject.removeAnimation(i);
@@ -276,7 +277,8 @@ class AnimationsListContainer extends React.Component<
 
     if (newName !== '' && otherNames.filter(name => name === newName).length) {
       showWarningBox(
-        'Another animation with this name already exists. Please use another name.'
+        'Another animation with this name already exists. Please use another name.',
+        { delayToNextTick: true }
       );
       return;
     }
@@ -369,13 +371,13 @@ class AnimationsListContainer extends React.Component<
           ref={spriteContextMenu =>
             (this.spriteContextMenu = spriteContextMenu)
           }
-          buildMenuTemplate={() => [
+          buildMenuTemplate={(i18n: I18nType) => [
             {
-              label: 'Delete selection',
+              label: i18n._(t`Delete selection`),
               click: () => this.deleteSelection(),
             },
             {
-              label: 'Duplicate selection',
+              label: i18n._(t`Duplicate selection`),
               click: () => this.duplicateSelection(),
             },
           ]}
@@ -471,8 +473,8 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
                 key="help"
               />,
             ]}
+            cannotBeDismissed={true}
             noMargin
-            modal
             onRequestClose={() => this.openPointsEditor(false)}
             open={this.state.pointsEditorOpen}
           >
@@ -503,7 +505,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               />,
             ]}
             noMargin
-            modal
+            cannotBeDismissed={true}
             onRequestClose={() => this.openCollisionMasksEditor(false)}
             open={this.state.collisionMasksEditorOpen}
           >

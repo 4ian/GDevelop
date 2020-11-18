@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\object-selection\\game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Object selection",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -165,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "0beceece-e44b-47d1-ade6-ab21ff504c10",
           "width": 74,
           "x": 192,
           "y": 114,
@@ -185,6 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "2e7ded00-0f08-4377-adc9-4aa90e731350",
           "width": 74,
           "x": 288,
           "y": 114,
@@ -205,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "ddaf5b43-39b7-4c63-ad2e-6c44e7580dec",
           "width": 74,
           "x": 384,
           "y": 114,
@@ -225,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "9c373912-d75a-425c-80e5-3ea0d6640684",
           "width": 74,
           "x": 480,
           "y": 114,
@@ -245,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "defbb4b8-fc3b-4c83-b50a-ba78a2257bd5",
           "width": 74,
           "x": 192,
           "y": 205,
@@ -265,6 +267,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "0c7e713a-5bc8-456f-89e5-e612dbe7d4f0",
           "width": 74,
           "x": 288,
           "y": 205,
@@ -285,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "9aa41efa-fa34-4a45-a638-2cdee5a5dddd",
           "width": 74,
           "x": 384,
           "y": 205,
@@ -305,6 +309,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "56eb3a38-2db4-4e8a-b3d0-493d533cce07",
           "width": 74,
           "x": 480,
           "y": 205,
@@ -325,6 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "7c9b372d-942f-43d7-84b7-2bbb3888155f",
           "width": 0,
           "x": 39,
           "y": 415,
@@ -730,6 +736,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

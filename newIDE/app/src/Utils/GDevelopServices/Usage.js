@@ -51,10 +51,10 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     smallDescription: t`Ideal for advanced game makers`,
     descriptionBullets: [
       {
-        message: t`Package your game for Android up to 70 times a day.`,
+        message: t`Package your game for Android up to 70 times a day (every 24 hours).`,
       },
       {
-        message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day.`,
+        message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day (every 24 hours).`,
       },
       {
         message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
@@ -77,10 +77,10 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     smallDescription: t`Ideal for beginners`,
     descriptionBullets: [
       {
-        message: t`Package your game for Android up to 10 times a day.`,
+        message: t`Package your game for Android up to 10 times a day (every 24 hours).`,
       },
       {
-        message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day.`,
+        message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day (every 24 hours).`,
       },
       {
         message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
@@ -102,7 +102,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     monthlyPriceInEuros: 0,
     descriptionBullets: [
       {
-        message: t`You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day to avoid overloading the services.`,
+        message: t`You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day (every 24 hours) to avoid overloading the services.`,
       },
     ],
   },

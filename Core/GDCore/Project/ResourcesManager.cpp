@@ -5,8 +5,10 @@
  */
 
 #include "GDCore/Project/ResourcesManager.h"
+
 #include <iostream>
 #include <map>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
@@ -20,6 +22,7 @@ namespace gd {
 gd::String Resource::badStr;
 
 Resource ResourcesManager::badResource;
+gd::String ResourcesManager::badResourceName;
 #if defined(GD_IDE_ONLY)
 ResourceFolder ResourcesManager::badFolder;
 Resource ResourceFolder::badResource;
@@ -90,6 +93,33 @@ bool ResourcesManager::HasResource(const gd::String& name) const {
   return false;
 }
 
+const gd::String& ResourcesManager::GetResourceNameWithOrigin(
+    const gd::String& originName, const gd::String& originIdentifier) const {
+  for (const auto& resource : resources) {
+    if (!resource) continue;
+
+    if (resource->GetOriginName() == originName &&
+        resource->GetOriginIdentifier() == originIdentifier) {
+      return resource->GetName();
+    }
+  }
+
+  return badResourceName;
+}
+
+const gd::String& ResourcesManager::GetResourceNameWithFile(
+    const gd::String& file) const {
+  for (const auto& resource : resources) {
+    if (!resource) continue;
+
+    if (resource->GetFile() == file) {
+      return resource->GetName();
+    }
+  }
+
+  return badResourceName;
+}
+
 std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
   std::vector<gd::String> allResources;
   for (std::size_t i = 0; i < resources.size(); ++i)
@@ -99,14 +129,13 @@ std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
 }
 
 #if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }
 
-std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties()
+    const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Smooth the image")]
       .SetValue(smooth ? "true" : "false")
@@ -119,8 +148,7 @@ std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties(
 }
 
 bool ImageResource::UpdateProperty(const gd::String& name,
-                                   const gd::String& value,
-                                   gd::Project& project) {
+                                   const gd::String& value) {
   if (name == _("Smooth the image"))
     smooth = value == "1";
   else if (name == _("Always loaded in memory"))
@@ -416,6 +444,15 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
     std::shared_ptr<Resource> resource = CreateResource(kind);
     resource->SetName(name);
     resource->SetMetadata(metadata);
+
+    if (resourceElement.HasChild("origin")) {
+      gd::String originName =
+          resourceElement.GetChild("origin").GetStringAttribute("name", "");
+      gd::String originIdentifier =
+          resourceElement.GetChild("origin").GetStringAttribute("identifier",
+                                                                "");
+      resource->SetOrigin(originName, originIdentifier);
+    }
     resource->UnserializeFrom(resourceElement);
 
     resources.push_back(resource);
@@ -446,6 +483,14 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
     resourceElement.SetAttribute("kind", resources[i]->GetKind());
     resourceElement.SetAttribute("name", resources[i]->GetName());
     resourceElement.SetAttribute("metadata", resources[i]->GetMetadata());
+
+    const gd::String& originName = resources[i]->GetOriginName();
+    const gd::String& originIdentifier = resources[i]->GetOriginIdentifier();
+    if (!originName.empty() || !originIdentifier.empty()) {
+      resourceElement.AddChild("origin")
+          .SetAttribute("name", originName)
+          .SetAttribute("identifier", originIdentifier);
+    }
 
     resources[i]->SerializeTo(resourceElement);
   }
@@ -563,8 +608,8 @@ void JsonResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("disablePreload", IsPreloadDisabled());
 }
 
-std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties()
+    const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties["disablePreload"]
       .SetValue(disablePreload ? "true" : "false")
@@ -575,8 +620,7 @@ std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties(
 }
 
 bool JsonResource::UpdateProperty(const gd::String& name,
-                                  const gd::String& value,
-                                  gd::Project& project) {
+                                  const gd::String& value) {
   if (name == "disablePreload") disablePreload = value == "1";
 
   return true;

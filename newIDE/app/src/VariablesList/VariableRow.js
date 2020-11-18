@@ -12,7 +12,6 @@ import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import Text from '../UI/Text';
 
 //TODO: Refactor into TreeTable?
@@ -27,6 +26,7 @@ type Props = {|
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
+  commitVariableValueOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
   onAddChild: () => void,
@@ -46,6 +46,7 @@ const VariableRow = ({
   depth,
   errorText,
   onBlur,
+  commitVariableValueOnBlur,
   onRemove,
   onAddChild,
   onChangeValue,
@@ -63,7 +64,7 @@ const VariableRow = ({
   const limitEditing = origin === 'parent' || origin === 'inherited';
 
   const columns = [
-    <TreeTableCell key="name">
+    <TreeTableCell key="name" expand>
       {depth > 0 && (
         <Indent width={(depth + 1) * styles.tableChildIndentation} />
       )}
@@ -90,10 +91,10 @@ const VariableRow = ({
   ];
   if (!isStructure) {
     columns.push(
-      <TreeTableCell key="value">
+      <TreeTableCell key="value" expand>
         <SemiControlledTextField
           margin="none"
-          commitOnBlur
+          commitOnBlur={commitVariableValueOnBlur}
           fullWidth
           name={key + 'value'}
           value={variable.getString()}
@@ -102,7 +103,7 @@ const VariableRow = ({
               onChangeValue(text);
             }
           }}
-          multiLine
+          multiline
           disabled={origin === 'parent' && depth !== 0}
         />
       </TreeTableCell>
@@ -110,10 +111,11 @@ const VariableRow = ({
   } else {
     columns.push(
       <TreeTableCell
+        expand
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        <Text>(Structure)</Text>
+        <Text noMargin>(Structure)</Text>
       </TreeTableCell>
     );
   }
@@ -121,6 +123,7 @@ const VariableRow = ({
     <TreeTableCell key="tools" style={styles.toolColumn}>
       {origin === 'inherited' && depth === 0 && (
         <IconButton
+          size="small"
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Reset`}
@@ -130,6 +133,7 @@ const VariableRow = ({
       )}
       {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
+          size="small"
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
           tooltip={t`Add child variable`}
@@ -141,18 +145,10 @@ const VariableRow = ({
   );
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div>
-          <TreeTableRow
-            style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
-          >
-            {columns}
-          </TreeTableRow>
-          {children}
-        </div>
-      )}
-    </ThemeConsumer>
+    <div>
+      <TreeTableRow>{columns}</TreeTableRow>
+      {children}
+    </div>
   );
 };
 

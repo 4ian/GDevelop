@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/bbtext-object-demo/manipulate-bbtext-object.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -148,6 +145,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
+          "persistentUuid": "8e682163-971e-4521-ad75-204e9860030e",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -163,6 +161,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
+          "persistentUuid": "540eb944-8c32-440a-8392-d72edc85accd",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -178,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "b172e021-d94a-4afc-98af-891e99acc722",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -193,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "1cc833ed-edc8-40fe-a718-010820dda362",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -208,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
+          "persistentUuid": "4a88f181-0222-4b75-9adc-9fff56b296c0",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -223,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
+          "persistentUuid": "f244f7ae-4b3b-43a4-aa26-849fecefebfc",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -238,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
+          "persistentUuid": "84e07009-586f-40cc-9ebd-3ba9dc6a758b",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -253,6 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
+          "persistentUuid": "edd410b7-d778-410f-9425-4e4d69ddd4cb",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -313,7 +318,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#027c61",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "right",
             "wordWrap": true
           }
@@ -330,7 +335,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#696969",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "center",
             "wordWrap": true
           }
@@ -352,7 +357,7 @@
             "fontSize": "40",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -374,7 +379,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -391,7 +396,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -1123,6 +1128,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

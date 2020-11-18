@@ -1,0 +1,15 @@
+{
+  "associatedLayout": "Layer Effects",
+  "lastChangeTimeStamp": 0,
+  "name": "Load Images",
+  "events": [
+    {
+      "disabled": false,
+      "folded": false,
+      "type": "BuiltinCommonInstructions::JsCode",
+      "inlineCode": "var object = runtimeScene.getVariables().get(\"object\").getAsString(); \nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); \nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); \nruntimeScene.myCallback = function(loader, resources){ \n    var mySprite= resources[\"Images\"]; \n    var game = runtimeScene.getGame(); \n    var object_texture_image = runtimeScene.getObjects(object); \n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); \n    object_texture_image_renderer.texture = mySprite.texture; \n};\nPIXI.Loader.shared.reset(); \nPIXI.Loader.shared.add(\"Images\", url);  \nPIXI.Loader.shared.load(runtimeScene.myCallback); ",
+      "parameterObjects": "",
+      "useStrict": true
+    }
+  ]
+}

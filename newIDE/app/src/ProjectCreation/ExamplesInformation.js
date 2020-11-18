@@ -66,12 +66,12 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },
@@ -144,12 +144,16 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       },
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Sprite",
@@ -162,10 +166,6 @@ module.exports = {
       {
         "fullName": "System information",
         "name": "SystemInfo"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       },
       {
         "fullName": "Variable features",
@@ -405,16 +405,53 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      }
+    ]
+  },
+  "board-walk-with-raycast": {
+    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
       }
     ]
   },
@@ -487,10 +524,6 @@ module.exports = {
         "name": "Physics2"
       },
       {
-        "fullName": "Advanced control features",
-        "name": "BuiltinAdvanced"
-      },
-      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
@@ -512,16 +545,28 @@ module.exports = {
     "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
     "usedExtensions": [
       {
-        "fullName": "Sprite",
-        "name": "Sprite"
-      },
-      {
         "fullName": "Text object",
         "name": "TextObject"
       },
       {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
       },
       {
         "fullName": "",
@@ -532,12 +577,8 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Variable features",
@@ -546,6 +587,10 @@ module.exports = {
       {
         "fullName": "External layouts",
         "name": "BuiltinExternalLayouts"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       }
     ]
   },
@@ -561,12 +606,57 @@ module.exports = {
         "name": "TextObject"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
+      }
+    ]
+  },
+  "cannon-ball-with-physics": {
+    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
       }
     ]
   },
@@ -596,10 +686,6 @@ module.exports = {
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
       },
       {
         "fullName": "Features for all objects",
@@ -714,6 +800,10 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       }
@@ -756,6 +846,10 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
@@ -782,10 +876,6 @@ module.exports = {
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       },
       {
         "fullName": "System information",
@@ -930,16 +1020,16 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       }
     ]
   },
@@ -1009,6 +1099,10 @@ module.exports = {
         "name": "Sprite"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
       },
@@ -1054,10 +1148,6 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
@@ -1070,12 +1160,12 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "System information",
-        "name": "SystemInfo"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "System information",
+        "name": "SystemInfo"
       },
       {
         "fullName": "Time",
@@ -1088,6 +1178,10 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
@@ -1147,12 +1241,12 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Cameras and layers features",
@@ -1217,12 +1311,12 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },
@@ -1262,10 +1356,6 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
       },
@@ -1276,6 +1366,10 @@ module.exports = {
       {
         "fullName": "Time",
         "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       }
     ]
   },
@@ -1316,6 +1410,10 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
       },
@@ -1341,12 +1439,12 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Scene management features",
@@ -1404,7 +1502,7 @@ module.exports = {
     ]
   },
   "flappy-bird": {
-    "description": "A clone of the popular Flappy Bird game.\n",
+    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1413,6 +1511,10 @@ module.exports = {
       {
         "fullName": "Tiled Sprite Object",
         "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
       },
       {
         "fullName": "",
@@ -1427,12 +1529,16 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Audio",
@@ -1443,10 +1549,6 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
         "fullName": "Platform Behavior",
         "name": "PlatformBehavior"
       },
@@ -1455,16 +1557,57 @@ module.exports = {
         "name": "DestroyOutsideBehavior"
       },
       {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
       },
       {
         "fullName": "System information",
         "name": "SystemInfo"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
+  "game-feel-demo": {
+    "description": "A demo showing how to enhance the \"game feel\" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       },
       {
         "fullName": "Time",
@@ -1549,6 +1692,10 @@ module.exports = {
         "name": ""
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
       },
@@ -1567,10 +1714,6 @@ module.exports = {
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       },
       {
         "fullName": "Time",
@@ -1630,10 +1773,6 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
@@ -1644,6 +1783,10 @@ module.exports = {
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       }
     ]
   },
@@ -1798,16 +1941,16 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Audio",
         "name": "BuiltinAudio"
       },
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
@@ -1860,6 +2003,47 @@ module.exports = {
       }
     ]
   },
+  "layer-effects": {
+    "description": "An example showing all the layer effects available in GDevelop.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
   "level-editor": {
     "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
     "usedExtensions": [
@@ -1868,12 +2052,16 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       },
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
@@ -1912,10 +2100,6 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
-      },
-      {
         "fullName": "",
         "name": ""
       }
@@ -1951,6 +2135,31 @@ module.exports = {
       {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "lights": {
+    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Lights",
+        "name": "Lighting"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },
@@ -2192,6 +2401,10 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       }
     ]
   },
@@ -2240,16 +2453,16 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       },
       {
         "fullName": "Standard events",
@@ -2301,16 +2514,16 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Audio",
         "name": "BuiltinAudio"
       },
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
@@ -2369,10 +2582,6 @@ module.exports = {
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
       }
     ]
   },
@@ -2394,6 +2603,10 @@ module.exports = {
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       },
       {
         "fullName": "Variable features",
@@ -2448,6 +2661,55 @@ module.exports = {
       {
         "fullName": "Storage",
         "name": "BuiltinFile"
+      }
+    ]
+  },
+  "p2p-networking": {
+    "description": "A showcase of some multiplayer/networking possibilities using the P2P extension.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Peer-to-Peer communication (experimental)",
+        "name": "P2P"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },
@@ -2609,6 +2871,63 @@ module.exports = {
       {
         "fullName": "Basic internet features",
         "name": "BuiltinNetwork"
+      }
+    ]
+  },
+  "particle-effects-demo": {
+    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
       }
     ]
   },
@@ -2884,10 +3203,6 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
       },
@@ -2975,16 +3290,24 @@ module.exports = {
         "name": "AnchorBehavior"
       },
       {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
       },
       {
         "fullName": "Features for all objects",
@@ -2995,8 +3318,8 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "Audio",
@@ -3007,8 +3330,8 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       }
     ]
   },
@@ -3056,16 +3379,16 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Audio",
         "name": "BuiltinAudio"
       },
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Variable features",
@@ -3212,12 +3535,12 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },
@@ -3358,6 +3681,10 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
       },
@@ -3372,10 +3699,6 @@ module.exports = {
       {
         "fullName": "Storage",
         "name": "BuiltinFile"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       }
     ]
   },
@@ -3781,6 +4104,51 @@ module.exports = {
       }
     ]
   },
+  "tabbed-menu-with-layers": {
+    "description": "Example showing how to create a menu with multiple tabs.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      }
+    ]
+  },
   "take-screenshot": {
     "description": "Show how to save a screenshot of the game on the disk (on Windows/macOS/Linux only).",
     "usedExtensions": [
@@ -3797,12 +4165,12 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Screenshot",
@@ -3906,6 +4274,68 @@ module.exports = {
       }
     ]
   },
+  "tween-animations": {
+    "description": "Examples of how to use a variety of tween animations, including object position, color, opacity, angle, and scale.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
+  "tween-test": {
+    "description": "An example project that tests all Tween extension functionality.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      }
+    ]
+  },
   "type-on-text-effect": {
     "description": "This show how to create an effect where a text is progressively typed on the screen.",
     "usedExtensions": [
@@ -3963,16 +4393,16 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Storage",
         "name": "BuiltinFile"
       },
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       }
     ]
   },
@@ -3996,12 +4426,16 @@ module.exports = {
         "name": "Tween"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       },
       {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Scene management features",
@@ -4018,10 +4452,6 @@ module.exports = {
       {
         "fullName": "Advanced control features",
         "name": "BuiltinAdvanced"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
       },
       {
         "fullName": "Variable features",

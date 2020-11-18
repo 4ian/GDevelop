@@ -117,6 +117,41 @@ gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.registerObject("TextObject::Text", gdjs.TextRuntimeObject);
 
+/**
+ * @param {TextObjectData} oldObjectData
+ * @param {TextObjectData} newObjectData
+ */
+gdjs.TextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.characterSize !== newObjectData.characterSize) {
+        this.setCharacterSize(newObjectData.characterSize);
+    }
+    if (oldObjectData.font !== newObjectData.font) {
+        this.setFontName(newObjectData.font);
+    }
+    if (oldObjectData.bold !== newObjectData.bold) {
+        this.setBold(newObjectData.bold);
+    }
+    if (oldObjectData.italic !== newObjectData.italic) {
+        this.setItalic(newObjectData.italic);
+    }
+    if (oldObjectData.color.r !== newObjectData.color.r ||
+        oldObjectData.color.g !== newObjectData.color.g ||
+        oldObjectData.color.b !== newObjectData.color.b) {
+        this.setColor('' + newObjectData.color.r + ';' + newObjectData.color.g +
+            ';' + newObjectData.color.b);
+    }
+    if (oldObjectData.string !== newObjectData.string) {
+        this.setString(newObjectData.string);
+    }
+
+    if (oldObjectData.underlined !== newObjectData.underlined) {
+        return false;
+    }
+
+    return true;
+};
+
+
 gdjs.TextRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
@@ -133,6 +168,8 @@ gdjs.TextRuntimeObject.prototype.extraInitializationFromInitialInstance = functi
     if ( initialInstanceData.customSize ) {
         this.setWrapping(true);
         this.setWrappingWidth(initialInstanceData.width);
+    } else {
+        this.setWrapping(false);
     }
 };
 
@@ -221,6 +258,15 @@ gdjs.TextRuntimeObject.prototype.getCharacterSize = function() {
 gdjs.TextRuntimeObject.prototype.setCharacterSize = function(newSize) {
     if (newSize <= 1) newSize = 1;
     this._characterSize = newSize;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Set the name of the resource to use for the font.
+ * @param {string} fontResourceName The name of the font resource.
+ */
+gdjs.TextRuntimeObject.prototype.setFontName = function(fontResourceName) {
+    this._fontName = fontResourceName;
     this._renderer.updateStyle();
 };
 
@@ -338,7 +384,7 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
 
 /**
  * Get the text color.
- * @return {String} The color as a "R;G;B" string, for example: "255;0;0"
+ * @return {string} The color as a "R;G;B" string, for example: "255;0;0"
  */
 gdjs.TextRuntimeObject.prototype.getColor = function(str) {
     return this._color[0] + ";" + this._color[1] + ";" + this._color[2];

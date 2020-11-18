@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "portrait",
     "packageName": "com.example.gamename",
     "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/mobile-vibration/mobile-vibration.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,6 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateOnce",
+          "persistentUuid": "15dbacaf-a286-4b75-bd05-ac50358dab7d",
           "width": 0,
           "x": 224,
           "y": 256,
@@ -168,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateMulti",
+          "persistentUuid": "d7181c66-4d95-401a-92cf-854bdcb7f288",
           "width": 0,
           "x": 224,
           "y": 416,
@@ -183,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "StopVibration",
+          "persistentUuid": "b20435e7-9ea8-40b1-b140-14c619c03587",
           "width": 0,
           "x": 224,
           "y": 576,
@@ -198,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "ce46be01-7144-4b77-9bb2-074cda8c74d6",
           "width": 416,
           "x": 192,
           "y": 544,
@@ -213,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "85b702bc-7108-433e-9755-19c221a02de0",
           "width": 416,
           "x": 192,
           "y": 224,
@@ -228,6 +230,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "d800734b-d434-46e8-8965-eea8e627ec38",
           "width": 416,
           "x": 192,
           "y": 384,
@@ -243,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
+          "persistentUuid": "ea00d778-0050-4a70-b081-66f01b7b6547",
           "width": 0,
           "x": 32,
           "y": 64,
@@ -503,6 +507,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

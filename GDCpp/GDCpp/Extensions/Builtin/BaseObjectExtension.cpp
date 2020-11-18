@@ -186,6 +186,9 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["RaycastToPosition"]
       .SetFunctionName("RaycastObjectToPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
+  GetAllConditions()["SourisSurObjet"]
+      .SetFunctionName("CursorOnObject")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
 
   GetAllExpressions()["Count"]
       .SetFunctionName("PickedObjectsCount")

@@ -1,24 +1,13 @@
 // @flow
 const isDev = process.env.NODE_ENV === 'development';
 
-export const GDevelopHostingApi = {
-  deployEndpoint:
-    'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy',
-  gamesHost: 'http://gd-games.s3-website-eu-west-1.amazonaws.com',
-};
-
-const gdevelopGamesPreviewRegion = 'eu-west-1';
-const gdevelopGamesPreviewBucket = 'gd-games-preview';
-
-export const GDevelopGamesPreview = {
-  options: {
-    destinationBucketBaseUrl: `https://s3-${gdevelopGamesPreviewRegion}.amazonaws.com/${gdevelopGamesPreviewBucket}/`,
-  },
+export const GDevelopGamePreviews = {
+  baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
 export const GDevelopBuildApi = {
   baseUrl: isDev
-    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
+    ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/build',
 };
 
@@ -47,4 +36,10 @@ export const GDevelopExtensionApi = {
   baseUrl: isDev
     ? 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master'
     : 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master',
+};
+
+export const GDevelopAssetApi = {
+  baseUrl: isDev
+    ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/asset',
 };

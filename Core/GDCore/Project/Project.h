@@ -8,6 +8,8 @@
 #define GDCORE_PROJECT_H
 #include <memory>
 #include <vector>
+
+#include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -114,29 +116,15 @@ class GD_CORE_API Project : public ObjectsContainer {
   const gd::String& GetOrientation() const { return orientation; }
 
   /**
-   * \brief Change the project AdMob application ID (needed
-   * to use the AdMob extension). This has no effect on desktop
-   * and web browsers.
-   */
-  void SetAdMobAppId(const gd::String& adMobAppId_) {
-    adMobAppId = adMobAppId_;
-  };
-
-  /**
-   * \brief Get the project AdMob application ID.
-   */
-  const gd::String& GetAdMobAppId() const { return adMobAppId; }
-
-  /**
    * Called when project file has changed.
    */
-  void SetProjectFile(const gd::String& file) { gameFile = file; }
+  void SetProjectFile(const gd::String& file) { projectFile = file; }
 
   /**
    * Return project file
    * \see gd::Project::SetProjectFile
    */
-  const gd::String& GetProjectFile() const { return gameFile; }
+  const gd::String& GetProjectFile() const { return projectFile; }
 
   /**
    * Set that the project should be saved as a folder project.
@@ -290,6 +278,24 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetScaleMode(const gd::String& scaleMode_) { scaleMode = scaleMode_; }
 
   /**
+   * \brief Return if the project should set 0 as Z-order for objects created
+   * from events (which is deprecated) - instead of the highest Z order that was
+   * found on each layer when the scene started.
+   */
+  bool GetUseDeprecatedZeroAsDefaultZOrder() const {
+    return useDeprecatedZeroAsDefaultZOrder;
+  }
+
+  /**
+   * \brief Set if the project should set 0 as Z-order for objects created from
+   * events (which is deprecated) - instead of the highest Z order that was
+   * found on each layer when the scene started.
+   */
+  void SetUseDeprecatedZeroAsDefaultZOrder(bool enable) {
+    useDeprecatedZeroAsDefaultZOrder = enable;
+  }
+
+  /**
    * Return a reference to the vector containing the names of extensions used by
    * the project.
    */
@@ -304,6 +310,26 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>& GetUsedExtensions() { return extensionsUsed; };
 
 #if defined(GD_IDE_ONLY)
+  /**
+   * \brief Get the properties set by extensions.
+   *
+   * Each extension can store arbitrary values indexed by a property name, which
+   * are useful to store project wide settings (AdMob id, etc...).
+   */
+  gd::ExtensionProperties& GetExtensionProperties() {
+    return extensionProperties;
+  };
+
+  /**
+   * \brief Get the properties set by extensions.
+   *
+   * Each extension can store arbitrary values indexed by a property name, which
+   * are useful to store project wide settings (AdMob id, etc...).
+   */
+  const gd::ExtensionProperties& GetExtensionProperties() const {
+    return extensionProperties;
+  };
+
   /**
    * Return the list of platforms used by the project.
    */
@@ -460,22 +486,27 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetLayoutsCount() const;
 
   /**
-   * \brief \brief Adds a new empty layout called "name" at the specified
+   * \brief Add a new empty layout called "name" at the specified
    * position in the layout list.
    */
   gd::Layout& InsertNewLayout(const gd::String& name, std::size_t position);
 
   /**
-   * \brief \brief Adds a new layout constructed from the layout passed as
-   * parameter. \note No pointer or reference must be kept on the layout passed
-   * as parameter. \param layout The layout that must be copied and inserted
-   * into the project \param position Insertion position. Even if the position
+   * \brief Add a new layout constructed from the layout passed as
+   * parameter.
+   * \param layout The layout that must be copied and inserted
+   * into the project
+   * \param position Insertion position. Even if the position
    * is invalid, the layout must be inserted at the end of the layout list.
+   *
+   * \note No pointer or reference must be kept on the layout passed
+   * as parameter.
+   *
    */
   gd::Layout& InsertLayout(const Layout& layout, std::size_t position);
 
   /**
-   * Must delete layout named "name".
+   * \brief Delete layout named "name".
    */
   void RemoveLayout(const gd::String& name);
 
@@ -592,7 +623,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                        std::size_t position);
 
   /**
-   * Must delete external events named "name".
+   * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
 #endif
@@ -673,7 +704,7 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            std::size_t position);
 
   /**
-   * Must delete external layout named "name".
+   * \brief Delete external layout named "name".
    */
   void RemoveExternalLayout(const gd::String& name);
 
@@ -694,37 +725,37 @@ class GD_CORE_API Project : public ObjectsContainer {
 ///@{
 #if defined(GD_IDE_ONLY)
   /**
-   * Return true if events functions extension called "name" exists.
+   * \brief  Check if events functions extension called "name" exists.
    */
   bool HasEventsFunctionsExtensionNamed(const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(const gd::String& name);
 
   /**
-   * Return a reference to the events functions extension called "name".
+   * \brief Return a reference to the events functions extension called "name".
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       const gd::String& name) const;
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   EventsFunctionsExtension& GetEventsFunctionsExtension(std::size_t index);
 
   /**
-   * Return a reference to the events functions extension at position "index" in
-   * the list
+   * \brief Return a reference to the events functions extension at position
+   * "index" in the list
    */
   const EventsFunctionsExtension& GetEventsFunctionsExtension(
       std::size_t index) const;
 
   /**
-   * Return the position of the events functions extension called "name" in the
-   * list
+   * \brief Return the position of the events functions extension called "name"
+   * in the list.
    */
   std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
 
@@ -736,7 +767,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SwapEventsFunctionsExtensions(std::size_t first, std::size_t second);
 
   /**
-   * Return the number of events functions extension.
+   * \brief Returns the number of events functions extension.
    */
   std::size_t GetEventsFunctionsExtensionsCount() const;
 
@@ -759,9 +790,14 @@ class GD_CORE_API Project : public ObjectsContainer {
       std::size_t position);
 
   /**
-   * Must delete the events functions extension named "name".
+   * \brief Delete the events functions extension named "name".
    */
   void RemoveEventsFunctionsExtension(const gd::String& name);
+
+  /**
+   * \brief Remove all the events functions extensions.
+   */
+  void ClearEventsFunctionsExtensions();
 #endif
   ///@}
 
@@ -843,21 +879,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@{
 
   /**
-   * Return true if \a objectName can be used as name for an object.
-   *
-   * Default implementation check if objectName is only composed of a-z,A-Z,0-9
-   * or _ characters an if does not conflict with an expression.
+   * Return true if \a name is valid (can be used safely for an object,
+   * behavior, events function name, etc...).
    */
-  static bool ValidateObjectName(const gd::String& objectName);
-
-  /**
-   * Return a message that will be displayed when an invalid object name has
-   * been entered.
-   *
-   * \note This message will be displayed by the IDE into a tooltip.
-   */
-  static gd::String GetBadObjectNameWarning();
-
+  static bool ValidateName(const gd::String& name);
 ///@}
 
 /** \name External source files
@@ -916,10 +941,6 @@ class GD_CORE_API Project : public ObjectsContainer {
 #if defined(GD_IDE_ONLY)
   std::vector<gd::String> imagesChanged;  ///< Images that have been changed and
                                           ///< which have to be reloaded
-  gd::String winExecutableFilename;       ///< Windows executable name
-  gd::String winExecutableIconFile;       ///< Icon for Windows executable
-  gd::String linuxExecutableFilename;     ///< Linux executable name
-  gd::String macExecutableFilename;       ///< Mac executable name
 #endif
 
  private:
@@ -943,6 +964,11 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String
       sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
                           ///< "adaptWidth", "adaptHeight" or empty
+  bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from
+                                          ///< events will have 0 as Z order,
+                                          ///< instead of the highest Z order
+                                          ///< found on the layer at the scene
+                                          ///< startup.
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
@@ -968,17 +994,18 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String packageName;   ///< Game package name
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
-  gd::String adMobAppId;    ///< AdMob application ID.
   bool
       folderProject;  ///< True if folder project, false if single file project.
-  gd::String gameFile;                    ///< File of the game
-  gd::String latestCompilationDirectory;  ///< File of the game
+  gd::String projectFile;  ///< Path to the project file - when editing a local file.
+  gd::String latestCompilationDirectory;
   gd::Platform*
       currentPlatform;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
-      externalEvents;                   ///< List of all externals events
+      externalEvents;  ///< List of all externals events
+  ExtensionProperties
+      extensionProperties;              ///< The properties of the extensions.
   mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
   mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last

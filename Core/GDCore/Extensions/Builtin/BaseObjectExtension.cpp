@@ -13,11 +13,12 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinObject",
-                               _("Features for all objects"),
-                               _("Common features that can be used for all objects in GDevelop."),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinObject",
+          _("Features for all objects"),
+          _("Common features that can be used for all objects in GDevelop."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/base_object/events");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
@@ -72,14 +73,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardOperatorParameters("number")
       .MarkAsSimple();
 
-  obj.AddAction(
-         "MettreXY",
-         _("Position of an object"),
-         _("Change the position of an object."),
-         _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x axis), _PARAM3_ _PARAM4_ (y axis)"),
-         _("Position"),
-         "res/actions/position24.png",
-         "res/actions/position.png")
+  obj.AddAction("MettreXY",
+                _("Position of an object"),
+                _("Change the position of an object."),
+                _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
+                  "axis), _PARAM3_ _PARAM4_ (y axis)"),
+                _("Position"),
+                "res/actions/position24.png",
+                "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"))
@@ -294,27 +295,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("number");
 
-  obj.AddAction(
-         "ModVarObjetTxt",
-         _("Modify the text of a variable of an object"),
-         _("Modify the text of a variable of an object"),
-         _("the text of variable _PARAM1_"),
-         _("Variables"),
-         "res/actions/var24.png",
-         "res/actions/var.png")
+  obj.AddAction("ModVarObjetTxt",
+                _("Modify the text of a variable of an object"),
+                _("Modify the text of a variable of an object"),
+                _("the text of variable _PARAM1_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("string");
 
-  obj.AddCondition(
-         "ObjectVariableChildExists",
-         _("Child existence"),
-         _("Return true if the specified child of the variable exists."),
-         _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
-         _("Variables/Structures"),
-         "res/conditions/var24.png",
-         "res/conditions/var.png")
+  obj.AddCondition("ObjectVariableChildExists",
+                   _("Child existence"),
+                   _("Check if the specified child of the variable exists."),
+                   _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
+                   _("Variables/Structures"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
@@ -473,14 +472,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddCondition(
-         "VarObjetTxt",
-         _("Text of an object's variable"),
-         _("Compare the text of a variable of an object."),
-         _("the text of variable _PARAM1_"),
-         _("Variables"),
-         "res/conditions/var24.png",
-         "res/conditions/var.png")
+  obj.AddCondition("VarObjetTxt",
+                   _("Text of an object's variable"),
+                   _("Compare the text of a variable of an object."),
+                   _("the text of variable _PARAM1_"),
+                   _("Variables"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
@@ -498,14 +496,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Variable"))
       .SetHidden();
 
-  obj.AddCondition(
-         "BehaviorActivated",
-         _("Behavior activated"),
-         _("Return true if the behavior is activated for the object."),
-         _("Behavior _PARAM1_ of _PARAM0_ is activated"),
-         _("Behaviors"),
-         "res/behavior24.png",
-         "res/behavior16.png")
+  obj.AddCondition("BehaviorActivated",
+                   _("Behavior activated"),
+                   _("Check if the behavior is activated for the object."),
+                   _("Behavior _PARAM1_ of _PARAM0_ is activated"),
+                   _("Behaviors"),
+                   "res/behavior24.png",
+                   "res/behavior16.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -632,6 +629,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position of the point"))
       .AddParameter("expression", _("Y position of the point"))
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("SourisSurObjet",
+                    _("The cursor/touch is on an object"),
+                    _("Test if the cursor is over an object, or if the object "
+                      "is being touched."),
+                    _("The cursor/touch is on _PARAM0_"),
+                    _("Mouse and touch"),
+                    "res/conditions/surObjet24.png",
+                    "res/conditions/surObjet.png")
+
+      .AddParameter("objectList", _("Object"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("yesorno", _("Accurate test (yes by default)"), "", true)
+      .SetDefaultValue("yes")
+      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   obj.AddCondition(
@@ -819,6 +833,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
+  obj.AddExpression("DistanceToPosition",
+                    _("Distance between an object and a position"),
+                    _("Distance between an object and a position"),
+                    _("Position"),
+                    "res/conditions/distance.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
+
+  obj.AddExpression("SqDistanceToPosition",
+                    _("Square distance between an object and a position"),
+                    _("Square distance between an object and a position"),
+                    _("Position"),
+                    "res/conditions/distance.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
+
   obj.AddExpression("Variable",
                     _("Object's variable"),
                     _("Object's variable"),
@@ -850,6 +882,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));
+
+  obj.AddExpression("AngleToObject",
+                    _("Angle between two objects"),
+                    _("Compute the angle between two objects. If you need the "
+                      "angle to an arbitrary position, use AngleToPosition."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Object"));
+
+  obj.AddExpression("AngleToPosition",
+                    _("Angle between an object and a position"),
+                    _("Compute the angle between the object center and a "
+                      "\"target\" position. If you need the angle between two "
+                      "objects, use AngleToObject."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
 
   extension
       .AddAction("Create",

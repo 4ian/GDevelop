@@ -12,7 +12,11 @@ import {
   disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
-const gd = global.gd;
+import {
+  shouldActivate,
+  shouldCloseOrCancel,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
+const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
   width: '100%',
@@ -120,10 +124,16 @@ export default class CommentEvent extends React.Component<
           backgroundColor: `#${backgroundColor}`,
         }}
         onClick={this.edit}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.edit();
+          }
+        }}
+        tabIndex={0}
       >
         {this.state.editing ? (
           <TextField
-            multiLine
+            multiline
             margin="none"
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}
@@ -142,7 +152,7 @@ export default class CommentEvent extends React.Component<
             fullWidth
             id="comment-title"
             onKeyUp={event => {
-              if (event.key === 'Escape') {
+              if (shouldCloseOrCancel(event)) {
                 this.endEditing();
               }
             }}

@@ -87,9 +87,8 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             onClick={onClose}
             disabled={isInstalling}
           />,
-          <LeftLoader isLoading={isInstalling}>
+          <LeftLoader isLoading={isInstalling} key="install">
             <FlatButton
-              key="install"
               label={
                 !isCompatible ? (
                   <Trans>Not compatible</Trans>
@@ -105,6 +104,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             />
           </LeftLoader>,
         ]}
+        cannotBeDismissed={false}
         open
         onRequestClose={onClose}
       >

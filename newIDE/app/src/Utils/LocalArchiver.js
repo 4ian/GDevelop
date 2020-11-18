@@ -1,8 +1,9 @@
 // @flow
 
 import optionalRequire from './OptionalRequire.js';
+import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 const fs = optionalRequire('fs');
-const archiver = optionalRequire('archiver');
+const lazyRequireArchiver = optionalLazyRequire('archiver');
 
 // TODO: Move in a Archiver folder?
 /**
@@ -15,6 +16,7 @@ export const archiveLocalFolder = ({
   path: string,
   outputFilename: string,
 |}): Promise<string> => {
+  const archiver = lazyRequireArchiver();
   return new Promise((resolve, reject) => {
     if (!fs || !archiver) return reject(new Error('Archiver unavailable'));
 

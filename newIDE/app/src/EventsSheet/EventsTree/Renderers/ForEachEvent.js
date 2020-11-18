@@ -13,7 +13,8 @@ import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
-const gd = global.gd;
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -32,27 +33,42 @@ export default class ForEachEvent extends React.Component<
   EventRendererProps,
   *
 > {
+  _objectField: ?ObjectField = null;
   state = {
     editing: false,
     anchorEl: null,
   };
 
   edit = (domEvent: any) => {
-    // We should not need to stop the event propagation, but
+    // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
-    // Caveat: we can open multiple InlinePopover.
-    // Search the rest of the codebase for onlinepopover-event-hack
-    domEvent.preventDefault();
-    domEvent.stopPropagation();
-
-    this.setState({
-      editing: true,
-      anchorEl: domEvent.currentTarget,
-    });
+    // Search the rest of the codebase for inlinepopover-event-hack
+    const anchorEl = domEvent.currentTarget;
+    setTimeout(
+      () =>
+        this.setState(
+          {
+            editing: true,
+            anchorEl,
+          },
+          () => {
+            // Give a bit of time for the popover to mount itself
+            setTimeout(() => {
+              if (this._objectField) this._objectField.focus();
+            }, 10);
+          }
+        ),
+      10
+    );
   };
 
   endEditing = () => {
+    const { anchorEl } = this.state;
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editing: false,
       anchorEl: null,
@@ -79,6 +95,12 @@ export default class ForEachEvent extends React.Component<
               [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
+            onKeyPress={event => {
+              if (shouldActivate(event)) {
+                this.edit(event);
+              }
+            }}
+            tabIndex={0}
           >
             {objectName ? (
               `Repeat for each instance of ${objectName}:`
@@ -161,6 +183,8 @@ export default class ForEachEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
+            onRequestClose={this.endEditing}
+            ref={objectField => (this._objectField = objectField)}
           />
         </InlinePopover>
       </div>

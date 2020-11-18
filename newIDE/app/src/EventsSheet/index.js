@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+
 import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
@@ -12,7 +15,6 @@ import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
-import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
@@ -43,7 +45,6 @@ import {
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
 } from './SelectionHandler';
-import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
   type EventsContextResult,
@@ -67,7 +68,7 @@ import {
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
-import { type EventsScope } from './EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -80,7 +81,8 @@ import {
 import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-const gd = global.gd;
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -89,10 +91,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  showPreviewButton: boolean,
-  showNetworkPreviewButton: boolean,
-  onPreview: (options: PreviewOptions) => void,
-  onOpenDebugger: () => void,
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
@@ -107,7 +105,9 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  unsavedChanges?: ?UnsavedChanges,
 |};
+
 type State = {|
   history: HistoryState,
 
@@ -146,6 +146,11 @@ type State = {|
   allEventsMetadata: Array<EventMetadata>,
 |};
 
+type EventInsertionContext = {|
+  eventsList: gdEventsList,
+  indexInList: number,
+|};
+
 const styles = {
   container: {
     display: 'flex',
@@ -173,6 +178,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: () => this.cutSelection(),
       onPaste: () => this.pasteEventsOrInstructions(),
       onSearch: () => this._toggleSearchPanel(),
+      onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
     },
@@ -221,33 +227,25 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (this.state.history !== prevState.history)
+      if (this.props.unsavedChanges)
+        this.props.unsavedChanges.triggerUnsavedChanges();
+  }
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
     this.props.setToolbar(
       <Toolbar
         allEventsMetadata={this.state.allEventsMetadata}
-        onAddStandardEvent={() => {
-          this.addNewEvent('BuiltinCommonInstructions::Standard');
-        }}
+        onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
-        onAddCommentEvent={() => {
-          this.addNewEvent('BuiltinCommonInstructions::Comment');
-        }}
-        onAddEvent={type => {
-          this.addNewEvent(type);
-        }}
+        onAddCommentEvent={this._addCommentEvent}
+        onAddEvent={this.addNewEvent}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
-        showPreviewButton={this.props.showPreviewButton}
-        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
-        onPreview={() => this.props.onPreview({})}
-        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
-        onOpenDebugger={() => {
-          this.props.onOpenDebugger();
-          this.props.onPreview({});
-        }}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -257,6 +255,14 @@ export default class EventsSheet extends React.Component<Props, State> {
       />
     );
   }
+
+  _addStandardEvent = () => {
+    this.addNewEvent('BuiltinCommonInstructions::Standard');
+  };
+
+  _addCommentEvent = () => {
+    this.addNewEvent('BuiltinCommonInstructions::Comment');
+  };
 
   _toggleSearchPanel = () => {
     this.setState(
@@ -276,6 +282,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         }
       }
     );
+  };
+
+  _closeSearchPanel = () => {
+    this.setState({ showSearchPanel: false });
   };
 
   addSubEvents = () => {
@@ -310,15 +320,15 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
+  addNewEvent = (
+    type: string,
+    context: ?EventInsertionContext
+  ): Array<gdBaseEvent> => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
     let insertTopOfSelection = false;
 
-    let insertions: Array<{
-      eventsList: gdEventsList,
-      indexInList: number,
-    }> = [];
+    let insertions: Array<EventInsertionContext> = [];
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
@@ -463,7 +473,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   ) => {
     const selectedInstructions = getSelectedInstructions(this.state.selection);
     const destinationIndex =
-      indexInList === undefined
+      indexInList === undefined || indexInList === null
         ? destinationContext.instrsList.size()
         : indexInList;
 
@@ -558,6 +568,12 @@ export default class EventsSheet extends React.Component<Props, State> {
   closeParameterEditor = () => {
     if (this.state.inlineEditingChangesMade) {
       this._saveChangesToHistory();
+    }
+
+    if (this.state.inlineEditingAnchorEl) {
+      // Focus back the parameter - especially useful when editing
+      // with the keyboard only.
+      this.state.inlineEditingAnchorEl.focus();
     }
 
     this.setState({
@@ -707,6 +723,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         if (cb) cb();
       }
     );
+    if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
   };
 
   undo = () => {
@@ -720,7 +737,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   redo = () => {
@@ -734,7 +755,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     // any re-render that could use a deleted/invalid event.
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
-    this.setState({ history: newHistory }, () => this.updateToolbar());
+    // /!\ Also clear selection, that can contain reference to invalid events or
+    // events not shown on screen.
+    this.setState({ history: newHistory, selection: clearSelection() }, () =>
+      this.updateToolbar()
+    );
   };
 
   _openEventsContextAnalyzer = () => {
@@ -799,10 +824,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Standard',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Standard', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -823,10 +848,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
-    const newEvents = this.addNewEvent(
-      'BuiltinCommonInstructions::Group',
-      contexts[0]
-    );
+    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Group', {
+      eventsList: contexts[0].eventsList,
+      indexInList: contexts[0].indexInList,
+    });
     if (!newEvents.length) {
       console.error('A new event should have been created');
       return;
@@ -913,9 +938,9 @@ export default class EventsSheet extends React.Component<Props, State> {
             instruction,
             indexInList,
           } = this.state.editedInstruction;
-          if (!instrsList) return;
+          if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined) {
+          if (indexInList !== undefined && indexInList !== null) {
             // Replace an existing instruction
             instrsList.set(indexInList, instruction);
           } else {
@@ -933,6 +958,20 @@ export default class EventsSheet extends React.Component<Props, State> {
         openInstructionOrExpression={(extension, type) => {
           this.closeInstructionEditor();
           this.props.openInstructionOrExpression(extension, type);
+        }}
+        canPasteInstructions={
+          this.state.editedInstruction.isCondition
+            ? hasClipboardConditions()
+            : hasClipboardActions()
+        }
+        onPasteInstructions={() => {
+          const { instrsList, isCondition } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          this.pasteInstructionsInInstructionsList({
+            instrsList,
+            isCondition,
+          });
         }}
       />
     ) : (
@@ -1041,11 +1080,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                           onParameterClick={this.openParameterEditor}
                           onEventClick={this.selectEvent}
                           onEventContextMenu={this.openEventContextMenu}
-                          onAddNewEvent={context => {
-                            this.addNewEvent(
-                              'BuiltinCommonInstructions::Standard',
-                              context
-                            );
+                          onAddNewEvent={(
+                            eventType: string,
+                            eventsList: gdEventsList
+                          ) => {
+                            this.addNewEvent(eventType, {
+                              eventsList,
+                              indexInList: eventsList.getEventsCount(),
+                            });
                           }}
                           onOpenExternalEvents={onOpenExternalEvents}
                           onOpenLayout={onOpenLayout}
@@ -1057,6 +1099,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
+                          eventsSheetHeight={
+                            this._containerDiv.current
+                              ? this._containerDiv.current.clientHeight
+                              : 0
+                          }
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel
@@ -1082,13 +1129,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 goToPreviousSearchResult
                               )
                             }
+                            onCloseSearchPanel={this._closeSearchPanel}
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }
                           />
-                        )}
-                        {events && events.getEventsCount() === 0 && (
-                          <EmptyEventsPlaceholder />
                         )}
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
@@ -1113,6 +1158,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                             this.setState({
                               inlineEditingChangesMade: true,
                             });
+                            if (this._searchPanel)
+                              this._searchPanel.markSearchResultsDirty();
                           }}
                           resourceSources={this.props.resourceSources}
                           onChooseResource={this.props.onChooseResource}
@@ -1124,9 +1171,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                           ref={eventContextMenu =>
                             (this.eventContextMenu = eventContextMenu)
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
-                              label: 'Edit',
+                              label: i18n._(t`Edit`),
                               click: () => this.openEventTextDialog(),
                               visible:
                                 filterEditableWithEventTextDialog(
@@ -1134,46 +1181,46 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 ).length > 0,
                             },
                             {
-                              label: 'Copy',
+                              label: i18n._(t`Copy`),
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
                             },
                             {
-                              label: 'Cut',
+                              label: i18n._(t`Cut`),
                               click: () => this.cutSelection(),
                               accelerator: 'CmdOrCtrl+X',
                             },
                             {
-                              label: 'Paste',
+                              label: i18n._(t`Paste`),
                               click: () => this.pasteEvents(),
                               enabled: hasClipboardEvents(),
                               accelerator: 'CmdOrCtrl+V',
                             },
                             {
-                              label: 'Delete',
+                              label: i18n._(t`Delete`),
                               click: () => this.deleteSelection(),
                               accelerator: 'Delete',
                             },
                             {
-                              label: 'Toggle disabled',
+                              label: i18n._(t`Toggle disabled`),
                               click: () => this.toggleDisabled(),
                               enabled: this._selectionCanToggleDisabled(),
                             },
                             { type: 'separator' },
                             {
-                              label: 'Add New Event Below',
+                              label: i18n._(t`Add New Event Below`),
                               click: () =>
                                 this.addNewEvent(
                                   'BuiltinCommonInstructions::Standard'
                                 ),
                             },
                             {
-                              label: 'Add Sub Event',
+                              label: i18n._(t`Add Sub Event`),
                               click: () => this.addSubEvents(),
                               enabled: this._selectionCanHaveSubEvents(),
                             },
                             {
-                              label: 'Add Other',
+                              label: i18n._(t`Add Other`),
                               submenu: this.state.allEventsMetadata.map(
                                 metadata => {
                                   return {
@@ -1186,28 +1233,30 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             { type: 'separator' },
                             {
-                              label: 'Undo',
+                              label: i18n._(t`Undo`),
                               click: this.undo,
                               enabled: canUndo(this.state.history),
                               accelerator: 'CmdOrCtrl+Z',
                             },
                             {
-                              label: 'Redo',
+                              label: i18n._(t`Redo`),
                               click: this.redo,
                               enabled: canRedo(this.state.history),
                               accelerator: 'CmdOrCtrl+Shift+Z',
                             },
                             { type: 'separator' },
                             {
-                              label: 'Extract Events to a Function',
+                              label: i18n._(t`Extract Events to a Function`),
                               click: () => this.extractEventsToFunction(),
                             },
                             {
-                              label: 'Move Events into a Group',
+                              label: i18n._(t`Move Events into a Group`),
                               click: () => this.moveEventsIntoNewGroup(),
                             },
                             {
-                              label: 'Analyze Objects Used in this Event',
+                              label: i18n._(
+                                t`Analyze Objects Used in this Event`
+                              ),
                               click: this._openEventsContextAnalyzer,
                             },
                           ]}
@@ -1216,19 +1265,19 @@ export default class EventsSheet extends React.Component<Props, State> {
                           ref={instructionContextMenu =>
                             (this.instructionContextMenu = instructionContextMenu)
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
-                              label: 'Copy',
+                              label: i18n._(t`Copy`),
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
                             },
                             {
-                              label: 'Cut',
+                              label: i18n._(t`Cut`),
                               click: () => this.cutSelection(),
                               accelerator: 'CmdOrCtrl+X',
                             },
                             {
-                              label: 'Paste',
+                              label: i18n._(t`Paste`),
                               click: () => this.pasteInstructions(),
                               enabled:
                                 hasClipboardConditions() ||
@@ -1237,25 +1286,25 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             { type: 'separator' },
                             {
-                              label: 'Delete',
+                              label: i18n._(t`Delete`),
                               click: () => this.deleteSelection(),
                               accelerator: 'Delete',
                             },
                             { type: 'separator' },
                             {
-                              label: 'Undo',
+                              label: i18n._(t`Undo`),
                               click: this.undo,
                               enabled: canUndo(this.state.history),
                               accelerator: 'CmdOrCtrl+Z',
                             },
                             {
-                              label: 'Redo',
+                              label: i18n._(t`Redo`),
                               click: this.redo,
                               enabled: canRedo(this.state.history),
                               accelerator: 'CmdOrCtrl+Shift+Z',
                             },
                             {
-                              label: 'Invert Condition',
+                              label: i18n._(t`Invert Condition`),
                               click: () => this._invertSelectedConditions(),
                               visible: hasSelectedAtLeastOneCondition(
                                 this.state.selection

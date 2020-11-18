@@ -4,13 +4,19 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDJS/IDE/ExporterHelper.h"
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <streambuf>
 #include <string>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -19,72 +25,58 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
+#include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
+
+namespace {
+
+std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
+    const gd::Project &project,
+    const gd::String &extensionName,
+    const gd::DependencyMetadata &dependency) {
+  std::map<gd::String, gd::String> values;
+
+  for (const auto &extraSetting : dependency.GetAllExtraSettings()) {
+    const gd::String &type = extraSetting.second.GetType();
+    const gd::String extraSettingValue =
+        type == "ExtensionProperty"
+            ? project.GetExtensionProperties().GetValue(
+                  extensionName, extraSetting.second.GetValue())
+            : extraSetting.second.GetValue();
+
+    if (!extraSettingValue.empty())
+      values[extraSetting.first] = extraSettingValue;
+  }
+
+  return values;
+};
+
+bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
+                                   const std::set<gd::String> &set) {
+  bool missingKey = false;
+  for (auto &key : set) {
+    if (map.find(key) == map.end()) {
+      missingKey = true;
+    }
+  }
+
+  return missingKey;
+}
+
+}  // namespace
 
 namespace gdjs {
 
-// Nice tools functions
 static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
   if (std::find(container.begin(), container.end(), str) == container.end())
     container.push_back(str);
-}
-
-static void GenerateFontsDeclaration(
-    const gd::ResourcesManager &resourcesManager,
-    gd::AbstractFileSystem &fs,
-    const gd::String &outputDir,
-    gd::String &css,
-    gd::String &html,
-    gd::String urlPrefix = "") {
-  std::set<gd::String> files;
-  auto makeCSSDeclarationFor = [&urlPrefix](gd::String relativeFile) {
-    gd::String css;
-    css += "@font-face{ font-family : \"gdjs_font_";
-    css += relativeFile;
-    css += "\"; src : url('";
-    css += urlPrefix + relativeFile;
-    css += "') format('truetype'); }\n";
-
-    return css;
-  };
-
-  for (auto &resourceName : resourcesManager.GetAllResourceNames()) {
-    const gd::Resource &resource = resourcesManager.GetResource(resourceName);
-    if (resource.GetKind() != "font") continue;
-
-    gd::String relativeFile = resource.GetFile();
-    css += makeCSSDeclarationFor(relativeFile);
-    files.insert(relativeFile);
-  }
-
-  // Compatibility with GD <= 5.0-beta56
-  // Before, fonts were detected by scanning the export folder for .TTF files.
-  // Text Object (or anything using a font) was just declaring the font filename
-  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
-  // We still support this, the time everything is migrated to using font
-  // resources.
-  std::vector<gd::String> ttfFiles = fs.ReadDir(outputDir, ".TTF");
-  for (std::size_t i = 0; i < ttfFiles.size(); ++i) {
-    gd::String relativeFile = ttfFiles[i];
-    fs.MakeRelative(relativeFile, outputDir);
-
-    // Skip font files already in resources
-    if (files.find(relativeFile) != files.end()) continue;
-
-    css += makeCSSDeclarationFor(relativeFile);
-
-    // This is needed to trigger the loading of the fonts.
-    html += "<div style=\"font-family: 'gdjs_font_";
-    html += relativeFile;
-    html += "'; color: black;\">.</div>";
-  }
-  // end of compatibility code
 }
 
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
@@ -92,80 +84,125 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String codeOutputDir_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
-bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
-                                                gd::Layout &layout,
-                                                gd::String exportDir,
-                                                gd::String additionalSpec) {
-  fs.MkDir(exportDir);
-  fs.ClearDir(exportDir);
+bool ExporterHelper::ExportProjectForPixiPreview(
+    const PreviewExportOptions &options) {
+  fs.MkDir(options.exportPath);
+  fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
-  gd::Project exportedProject = project;
+  gd::Project exportedProject = options.project;
 
   // Always disable the splash for preview
   exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
-  ExportResources(fs, exportedProject, exportDir);
+  ExportResources(fs, exportedProject, options.exportPath);
+
+  // Compatibility with GD <= 5.0-beta56
+  // Stay compatible with text objects declaring their font as just a filename
+  // without a font resource - by manually adding these resources.
+  AddDeprecatedFontFilesToFontResources(
+      fs, exportedProject.GetResourcesManager(), options.exportPath);
+  // end of compatibility code
 
   // Export engine libraries
   AddLibsInclude(true, false, true, includesFiles);
+
+  // Export files for object and behaviors
+  ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
   ExportEffectIncludes(exportedProject, includesFiles);
 
-  // Generate events code
-  if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
-    return false;
+  if (!options.projectDataOnlyExport) {
+    // Generate events code
+    if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
+      return false;
 
-  // Export source files
-  if (!ExportExternalSourceFiles(
-          exportedProject, codeOutputDir, includesFiles)) {
-    gd::LogError(_("Error during exporting! Unable to export source files:\n") +
-                 lastError);
-    return false;
+    // Export source files
+    if (!ExportExternalSourceFiles(
+            exportedProject, codeOutputDir, includesFiles)) {
+      gd::LogError(
+          _("Error during exporting! Unable to export source files:\n") +
+          lastError);
+      return false;
+    }
   }
 
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(exportedProject);
-  exportedProject.SetFirstLayout(layout.GetName());
+  exportedProject.SetFirstLayout(options.layoutName);
+
+  // Strip the includes to only have Pixi.js files (*before* creating
+  // runtimeGameOptions, since otherwise Cocos files will be passed to the
+  // hot-reloader).
+  RemoveIncludes(false, true, includesFiles);
+
+  // Create the setup options passed to the gdjs.RuntimeGame
+  gd::SerializerElement runtimeGameOptions;
+  runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
+  if (!options.externalLayoutName.empty()) {
+    runtimeGameOptions.AddChild("injectExternalLayout")
+        .SetValue(options.externalLayoutName);
+  }
+  runtimeGameOptions.AddChild("projectDataOnlyExport")
+      .SetBoolValue(options.projectDataOnlyExport);
+  runtimeGameOptions.AddChild("debuggerServerAddress")
+      .SetStringValue(options.debuggerServerAddress);
+  runtimeGameOptions.AddChild("debuggerServerPort")
+      .SetStringValue(options.debuggerServerPort);
+
+  // Pass in the options the list of scripts files - useful for hot-reloading.
+  auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
+  scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+
+  for (const auto &includeFile : includesFiles) {
+    auto hashIt = options.includeFileHashes.find(includeFile);
+    gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
+    scriptFilesElement.AddChild("scriptFile")
+        .SetStringAttribute("path", scriptSrc)
+        .SetIntAttribute(
+            "hash",
+            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+  }
 
   // Export the project
-  ExportToJSON(
-      fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+  ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all the dependencies
-  RemoveIncludes(false, true, includesFiles);
-  ExportIncludesAndLibs(includesFiles, exportDir, false);
+  ExportIncludesAndLibs(includesFiles, options.exportPath);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
                            gdjsRoot + "/Runtime/index.html",
-                           exportDir,
+                           options.exportPath,
                            includesFiles,
-                           additionalSpec))
+                           options.nonRuntimeScriptsCacheBurst,
+                           "gdjs.runtimeGameOptions"))
     return false;
 
   return true;
 }
 
-gd::String ExporterHelper::ExportToJSON(gd::AbstractFileSystem &fs,
-                                        const gd::Project &project,
-                                        gd::String filename,
-                                        gd::String wrapIntoVariable) {
+gd::String ExporterHelper::ExportProjectData(
+    gd::AbstractFileSystem &fs,
+    const gd::Project &project,
+    gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-
-  gd::String output = gd::Serializer::ToJSON(rootElement);
-  if (!wrapIntoVariable.empty())
-    output = wrapIntoVariable + " = " + output + ";";
+  gd::String output =
+      "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
+      "gdjs.runtimeGameOptions = " +
+      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
 
   if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
@@ -177,23 +214,16 @@ bool ExporterHelper::ExportPixiIndexFile(
     gd::String source,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
-  // Generate custom declarations for font resources
-  gd::String customCss;
-  gd::String customHtml;  // Custom HTML is only needed for the deprecated way
-                          // of loading fonts
-  GenerateFontsDeclaration(project.GetResourcesManager(),
-                           fs,  // File system is only needed for the deprecated
-                                // way of loading fonts
-                           exportDir,
-                           customCss,
-                           customHtml);
-
   // Generate the file
-  if (!CompleteIndexFile(
-          str, customCss, customHtml, exportDir, includesFiles, additionalSpec))
+  if (!CompleteIndexFile(str,
+                         exportDir,
+                         includesFiles,
+                         nonRuntimeScriptsCacheBurst,
+                         additionalSpec))
     return false;
 
   // Write the index.html file
@@ -210,7 +240,8 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
   auto getIconFilename = [&resourceManager, &platformSpecificAssets](
-      const gd::String &platform, const gd::String &name) {
+                             const gd::String &platform,
+                             const gd::String &name) {
     const gd::String &file =
         resourceManager.GetResource(platformSpecificAssets.Get(platform, name))
             .GetFile();
@@ -272,20 +303,44 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace(
               "GDJS_PACKAGENAME",
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))
-          .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
-  if (!project.GetAdMobAppId().empty()) {
-    str = str.FindAndReplace(
-        "<!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->",
-        "<plugin name=\"cordova-plugin-admob-free\" spec=\"~0.21.0\">\n"
-        "\t\t<variable name=\"ADMOB_APP_ID\" value=\"" +
-            project.GetAdMobAppId() +
-            "\" />\n"
-            "\t</plugin>");
+  gd::String plugins = "";
+
+  for (std::shared_ptr<gd::PlatformExtension> extension :
+       project.GetCurrentPlatform().GetAllPlatformExtensions()) {
+    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
+      if (dependency.GetDependencyType() == "cordova") {
+        gd::String plugin;
+        plugin += "<plugin name=\"" + dependency.GetExportName();
+        if (dependency.GetVersion() != "") {
+          plugin += "\" spec=\"" + dependency.GetVersion();
+        }
+        plugin += "\">\n";
+
+        auto extraSettingValues = GetExtensionDependencyExtraSettingValues(
+            project, extension->GetName(), dependency);
+
+        // For Cordova, all settings are considered a plugin variable.
+        for (auto &extraSetting : extraSettingValues) {
+          plugin += "\t\t<variable name=\"" + extraSetting.first +
+                    "\" value=\"" + extraSetting.second + "\" />\n";
+        }
+
+        plugin += "\t</plugin>";
+
+        // Don't include the plugin if an extra setting was not fulfilled.
+        bool missingSetting = AreMapKeysMissingElementOfSet(
+            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
+        if (!missingSetting) plugins += plugin;
+      }
+    }
   }
+
+  str =
+      str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write Cordova config.xml file.";
@@ -344,17 +399,14 @@ bool ExporterHelper::ExportCocos2dFiles(
     // Generate custom declarations for font resources
     gd::String customCss;
     gd::String customHtml;
-    GenerateFontsDeclaration(project.GetResourcesManager(),
-                             fs,
-                             exportDir + "/res",
-                             customCss,
-                             customHtml,
-                             "res/");
 
     // Generate the file
     std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(
-            str, customCss, customHtml, exportDir, noIncludesInThisFile, "")) {
+    if (!CompleteIndexFile(str,
+                           exportDir,
+                           noIncludesInThisFile,
+                           /*nonRuntimeScriptsCacheBurst=*/0,
+                           "")) {
       lastError = "Unable to complete Cocos2d-JS index.html file.";
       return false;
     }
@@ -369,15 +421,21 @@ bool ExporterHelper::ExportCocos2dFiles(
   {
     gd::String includeFilesStr = "";
     bool first = true;
-    for (auto &file : includesFiles) {
-      if (!fs.FileExists(exportDir + "/src/" + file)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + file << "."
+    for (auto &include : includesFiles) {
+      gd::String scriptSrc = GetExportedIncludeFilename(include);
+
+      // Sanity check if the file exists - if not skip it to avoid
+      // including it in the list of scripts.
+      gd::String absoluteFilename = scriptSrc;
+      fs.MakeAbsolute(absoluteFilename, exportDir + "/src");
+      if (!fs.FileExists(absoluteFilename)) {
+        std::cout << "Warning: Unable to find " << absoluteFilename << "."
                   << std::endl;
         continue;
       }
 
       includeFilesStr +=
-          gd::String(first ? "" : ", ") + "\"src/" + file + "\"\n";
+          gd::String(first ? "" : ", ") + "\"src/" + scriptSrc + "\"\n";
       first = false;
     }
 
@@ -438,6 +496,39 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
 
+    gd::String packages = "";
+
+    for (std::shared_ptr<gd::PlatformExtension> extension :
+         project.GetCurrentPlatform()
+             .GetAllPlatformExtensions()) {  // TODO Add a way to select only
+                                             // used Extensions
+      for (gd::DependencyMetadata dependency :
+           extension->GetAllDependencies()) {
+        if (dependency.GetDependencyType() == "npm") {
+          if (dependency.GetVersion() == "") {
+            gd::LogError(
+                "Latest Version not available for NPM dependencies, "
+                "dependency " +
+                dependency.GetName() +
+                " is not exported. Please specify a version when calling "
+                "addDependency.");
+            continue;
+          }
+          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
+                      dependency.GetVersion() + "\",";
+          // For node extra settings are ignored
+        }
+      }
+    }
+
+    if (!packages.empty()) {
+      // Remove the , at the end as last item cannot have , in JSON.
+      packages = packages.substr(0, packages.size() - 1);
+    }
+
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
+                             packages);
+
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";
       return false;
@@ -481,41 +572,33 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
 bool ExporterHelper::CompleteIndexFile(
     gd::String &str,
-    gd::String customCss,
-    gd::String customHtml,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
-  for (std::vector<gd::String>::const_iterator it = includesFiles.begin();
-       it != includesFiles.end();
-       ++it) {
-    gd::String scriptSrc = "";
-    if (fs.IsAbsolute(*it)) {
-      // Most of the time, script source are file paths relative to GDJS root or
-      // have been copied in the output directory, so they are relative. It's
-      // still useful to test here for absolute files as the exporter could be
-      // configured with a file system dealing with URL.
-      scriptSrc = *it;
-    } else {
-      if (!fs.FileExists(exportDir + "/" + *it)) {
-        std::cout << "Warning: Unable to find " << exportDir + "/" + *it << "."
-                  << std::endl;
-        continue;
-      }
+  for (auto &include : includesFiles) {
+    gd::String scriptSrc =
+        GetExportedIncludeFilename(include, nonRuntimeScriptsCacheBurst);
 
-      scriptSrc = exportDir + "/" + *it;
-      fs.MakeRelative(scriptSrc, exportDir);
+    // Sanity check if the file exists - if not skip it to avoid
+    // including it in the list of scripts.
+    gd::String absoluteFilename = scriptSrc;
+    fs.MakeAbsolute(absoluteFilename, exportDir);
+    if (!fs.FileExists(absoluteFilename)) {
+      std::cout << "Warning: Unable to find " << absoluteFilename << "."
+                << std::endl;
+      continue;
     }
 
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
                          "\" crossorigin=\"anonymous\"></script>\n";
   }
 
-  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)
-            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", customHtml)
+  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
+            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
             .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
             .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
 
@@ -564,6 +647,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/networktools.js");
 
   if (websocketDebuggerClient) {
+    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
     InsertUnique(includesFiles,
                  "websocket-debugger-client/websocket-debugger-client.js");
   }
@@ -614,21 +698,23 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
                                     bool cocosRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("pixi-renderer") != gd::String::npos ||
-          it->find("pixi-filter") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("pixi-renderer") != gd::String::npos ||
+          includeFile.find("pixi-filter") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
   if (cocosRenderers) {
-    for (auto it = includesFiles.begin(); it != includesFiles.end();) {
-      if (it->find("cocos-renderer") != gd::String::npos ||
-          it->find("cocos-shader") != gd::String::npos)
-        includesFiles.erase(it++);
+    for (size_t i = 0; i < includesFiles.size();) {
+      const gd::String &includeFile = includesFiles[i];
+      if (includeFile.find("cocos-renderer") != gd::String::npos ||
+          includeFile.find("cocos-shader") != gd::String::npos)
+        includesFiles.erase(includesFiles.begin() + i);
       else
-        ++it;
+        ++i;
     }
   }
 }
@@ -697,38 +783,69 @@ bool ExporterHelper::ExportExternalSourceFiles(
   return true;
 }
 
+gd::String ExporterHelper::GetExportedIncludeFilename(
+    const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst) {
+  auto addSearchParameterToUrl = [](const gd::String &url,
+                                    const gd::String &urlEncodedParameterName,
+                                    const gd::String &urlEncodedValue) {
+    gd::String separator = url.find("?") == gd::String::npos ? "?" : "&";
+    return url + separator + urlEncodedParameterName + "=" + urlEncodedValue;
+  };
+
+  if (!fs.IsAbsolute(include)) {
+    // By convention, an include file that is relative is relative to
+    // the "<GDJS Root>/Runtime" folder, and will have the same relative
+    // path when exported.
+
+    // We still do this seemingly useless relative to absolute to relative
+    // conversion, because some filesystems are using a URL for gdjsRoot, and
+    // will convert the relative include to an absolute URL.
+    gd::String relativeInclude = gdjsRoot + "/Runtime/" + include;
+    fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+    return relativeInclude;
+  } else {
+    // Note: all the code generated from events are generated in another
+    // folder and fall in this case:
+    gd::String resolvedInclude = fs.FileNameFrom(include);
+
+    if (nonRuntimeScriptsCacheBurst == 0) {
+      return resolvedInclude;
+    }
+
+    // Add the parameter to force the browser to reload the code - useful
+    // for cases where the browser is caching files that are getting
+    // overwritten.
+    return addSearchParameterToUrl(
+        resolvedInclude,
+        "gdCacheBurst",
+        gd::String::From(nonRuntimeScriptsCacheBurst));
+  }
+}
+
 bool ExporterHelper::ExportIncludesAndLibs(
-    std::vector<gd::String> &includesFiles,
-    gd::String exportDir,
-    bool /*minify*/) {
-  for (std::vector<gd::String>::iterator include = includesFiles.begin();
-       include != includesFiles.end();
-       ++include) {
-    if (!fs.IsAbsolute(*include)) {
-      gd::String source = gdjsRoot + "/Runtime/" + *include;
+    const std::vector<gd::String> &includesFiles, gd::String exportDir) {
+  for (auto &include : includesFiles) {
+    if (!fs.IsAbsolute(include)) {
+      // By convention, an include file that is relative is relative to
+      // the "<GDJS Root>/Runtime" folder, and will have the same relative
+      // path when exported.
+      gd::String source = gdjsRoot + "/Runtime/" + include;
       if (fs.FileExists(source)) {
-        gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
+        gd::String path = fs.DirNameFrom(exportDir + "/" + include);
         if (!fs.DirExists(path)) fs.MkDir(path);
 
-        fs.CopyFile(source, exportDir + "/" + *include);
-
-        gd::String relativeInclude = source;
-        fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-        *include = relativeInclude;
+        fs.CopyFile(source, exportDir + "/" + include);
       } else {
-        std::cout << "Could not find GDJS include file " << *include
+        std::cout << "Could not find GDJS include file " << include
                   << std::endl;
       }
     } else {
       // Note: all the code generated from events are generated in another
       // folder and fall in this case:
-
-      if (fs.FileExists(*include)) {
-        fs.CopyFile(*include, exportDir + "/" + fs.FileNameFrom(*include));
-        *include = fs.FileNameFrom(
-            *include);  // Ensure filename is relative to the export dir.
+      if (fs.FileExists(include)) {
+        fs.CopyFile(include, exportDir + "/" + fs.FileNameFrom(include));
       } else {
-        std::cout << "Could not find include file " << *include << std::endl;
+        std::cout << "Could not find include file " << include << std::endl;
       }
     }
   }
@@ -736,11 +853,81 @@ bool ExporterHelper::ExportIncludesAndLibs(
   return true;
 }
 
+void ExporterHelper::ExportObjectAndBehaviorsIncludes(
+    gd::Project &project, std::vector<gd::String> &includesFiles) {
+  auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
+    for (const auto &includeFile : newIncludeFiles) {
+      InsertUnique(includesFiles, includeFile);
+    }
+  };
+
+  auto addObjectIncludeFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+    const gd::ObjectMetadata &metadata =
+        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(),
+                                                object.GetType());
+    addIncludeFiles(metadata.includeFiles);
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addIncludeFiles(metadata.includeFiles);
+    }
+  };
+
+  auto addObjectsIncludeFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectIncludeFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsIncludeFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+    addObjectsIncludeFiles(layout);
+  }
+}
+
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
                                      gd::Project &project,
                                      gd::String exportDir) {
   gd::ProjectResourcesCopier::CopyAllResourcesTo(
       project, fs, exportDir, true, false, false);
+}
+
+void ExporterHelper::AddDeprecatedFontFilesToFontResources(
+    gd::AbstractFileSystem &fs,
+    gd::ResourcesManager &resourcesManager,
+    const gd::String &exportDir,
+    gd::String urlPrefix) {
+  // Compatibility with GD <= 5.0-beta56
+  //
+  // Before, fonts were detected by scanning the export folder for .TTF files.
+  // Text Object (or anything using a font) was just declaring the font filename
+  // as a file (using ArbitraryResourceWorker::ExposeFile) for export.
+  //
+  // To still support this, the time everything is migrated to using font
+  // resources, we manually declare font resources for each ".TTF" file, using
+  // the name of the file as the resource name.
+  std::vector<gd::String> ttfFiles = fs.ReadDir(exportDir, ".TTF");
+  for (std::size_t i = 0; i < ttfFiles.size(); ++i) {
+    gd::String relativeFile = ttfFiles[i];
+    fs.MakeRelative(relativeFile, exportDir);
+
+    // Create a resource named like the file (to emulate the old behavior).
+    gd::FontResource fontResource;
+    fontResource.SetName(relativeFile);
+    fontResource.SetFile(urlPrefix + relativeFile);
+
+    // Note that if a resource with this name already exists, it won't be
+    // overwritten - which is expected.
+    resourcesManager.AddResource(fontResource);
+  }
+  // end of compatibility code
 }
 
 }  // namespace gdjs

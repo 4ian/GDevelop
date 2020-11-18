@@ -152,7 +152,7 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
     this.emitter.emit = true;
     this.started = false;
 
-    var layer = runtimeScene.getLayer("");
+    var layer = runtimeScene.getLayer(runtimeObject.getLayer());
     if (layer) layer.getRenderer().addRendererObject(this.renderer, runtimeObject.getZOrder());
 };
 gdjs.ParticleEmitterObjectRenderer = gdjs.ParticleEmitterObjectPixiRenderer;

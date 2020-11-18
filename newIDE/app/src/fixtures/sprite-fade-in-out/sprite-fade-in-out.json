@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/sprite-fade-in-out/sprite-fade-in-out.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -156,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "3487e356-7ea7-4d05-b125-9fb199d12784",
           "width": 0,
           "x": 155,
           "y": 63,
@@ -171,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "1b1a6ab7-e95f-4c86-b08d-817a53441698",
           "width": 0,
           "x": 364,
           "y": 247,
@@ -337,6 +336,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -392,6 +396,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "188eb6c9-8be0-4e03-a72b-1f871e3288f5",
           "width": 0,
           "x": 93,
           "y": 58,
@@ -407,6 +412,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "af9cbf5a-7c7d-42ce-a905-e19d8cbd20ef",
           "width": 0,
           "x": 356,
           "y": 275,
@@ -607,6 +613,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -662,6 +673,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a7fb3c3b-729c-44ea-87d1-43649f70b609",
           "width": 0,
           "x": 193,
           "y": 68,
@@ -677,6 +689,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "00dfffaa-8817-40f7-a53b-7e993be75ebf",
           "width": 0,
           "x": 361,
           "y": 298,
@@ -843,6 +856,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

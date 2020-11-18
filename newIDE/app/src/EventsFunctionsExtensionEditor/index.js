@@ -38,7 +38,10 @@ import EditorNavigator, {
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
 import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
-const gd = global.gd;
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -58,6 +61,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -71,6 +75,23 @@ type State = {|
     parameters: ?EventsFunctionCreationParameters
   ) => void,
 |};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: {
+    direction: 'column',
+    first: 'free-functions-list',
+    second: 'behaviors-list',
+    splitPercentage: 50,
+  },
+  second: {
+    direction: 'column',
+    first: 'parameters',
+    second: 'events-sheet',
+    splitPercentage: 25,
+  },
+  splitPercentage: 25,
+};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -213,11 +234,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -225,7 +247,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle function of the extension. Choose another name for your function.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -247,11 +270,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -259,7 +283,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -302,7 +327,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
           if (this._editorMosaic)
-            this._editorMosaic.openEditor('behavior-functions-list', 'end', 75);
+            this._editorMosaic.openEditor(
+              'behavior-functions-list',
+              'end',
+              75,
+              'column'
+            );
           if (this._editorNavigator)
             this._editorNavigator.openEditor('behavior-functions-list');
         }
@@ -315,11 +345,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -499,6 +530,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._editorNavigator.openEditor('behaviors-list');
   };
 
+  _onEditorNavigatorEditorChanged = (editorName: string) => {
+    // It's important that this method is the same across renders,
+    // to avoid confusing EditorNavigator into thinking it's changed
+    // and immediately calling it, which would trigger an infinite loop.
+    // Search for "callback-prevent-infinite-rerendering" in the codebase.
+
+    this.updateToolbar();
+
+    if (editorName === 'behaviors-list') {
+      this._selectEventsBasedBehavior(null);
+    } else if (
+      editorName === 'free-functions-list' ||
+      editorName === 'behavior-functions-list'
+    ) {
+      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
+    }
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -547,6 +596,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._loadEventsFunctionFrom(project, selectedEventsFunction);
                   this.forceUpdate();
                 }}
+                unsavedChanges={this.props.unsavedChanges}
               />
             ) : (
               <EmptyMessage>
@@ -580,9 +630,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 globalObjectsContainer={this._globalObjectsContainer}
                 objectsContainer={this._objectsContainer}
                 events={selectedEventsFunction.getEvents()}
-                showPreviewButton={false}
-                onPreview={options => {}}
-                showNetworkPreviewButton={false}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
                 resourceSources={this.props.resourceSources}
@@ -592,9 +639,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.props.openInstructionOrExpression
                 }
                 setToolbar={this.props.setToolbar}
-                onOpenDebugger={() => {}}
                 onCreateEventsFunction={this.props.onCreateEventsFunction}
-                onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
+                onOpenSettings={this._editOptions}
+                unsavedChanges={this.props.unsavedChanges}
               />
             </Background>
           ) : (
@@ -645,6 +692,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     <Divider />
                   </React.Fragment>
                 )}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>
@@ -706,6 +754,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       <Divider />
                     </React.Fragment>
                   )}
+                  unsavedChanges={this.props.unsavedChanges}
                 />
               )}
             </I18n>
@@ -741,6 +790,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedBehaviorRenamed
                 }
                 onEditProperties={this._editBehavior}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
           </I18n>
@@ -785,43 +835,37 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     nextEditor: 'events-sheet',
                   },
                 }}
-                onEditorChanged={editorName => {
-                  this.updateToolbar();
-
-                  if (editorName === 'behaviors-list') {
-                    this._selectEventsBasedBehavior(null);
-                  } else if (
-                    editorName === 'free-functions-list' ||
-                    editorName === 'behavior-functions-list'
-                  ) {
-                    this._selectEventsFunction(
-                      null,
-                      selectedEventsBasedBehavior
-                    );
-                  }
-                }}
+                onEditorChanged={
+                  // It's important that this callback is the same across renders,
+                  // to avoid confusing EditorNavigator into thinking it's changed
+                  // and immediately calling it, which would trigger an infinite loop.
+                  // Search for "callback-prevent-infinite-rerendering" in the codebase.
+                  this._onEditorNavigatorEditorChanged
+                }
               />
             ) : (
-              <EditorMosaic
-                ref={editorMosaic => (this._editorMosaic = editorMosaic)}
-                editors={editors}
-                initialNodes={{
-                  direction: 'row',
-                  first: {
-                    direction: 'column',
-                    first: 'free-functions-list',
-                    second: 'behaviors-list',
-                    splitPercentage: 50,
-                  },
-                  second: {
-                    direction: 'column',
-                    first: 'parameters',
-                    second: 'events-sheet',
-                    splitPercentage: 25,
-                  },
-                  splitPercentage: 25,
-                }}
-              />
+              <PreferencesContext.Consumer>
+                {({
+                  getDefaultEditorMosaicNode,
+                  setDefaultEditorMosaicNode,
+                }) => (
+                  <EditorMosaic
+                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    editors={editors}
+                    onPersistNodes={node =>
+                      setDefaultEditorMosaicNode(
+                        'events-functions-extension-editor',
+                        node
+                      )
+                    }
+                    initialNodes={
+                      getDefaultEditorMosaicNode(
+                        'events-functions-extension-editor'
+                      ) || initialMosaicEditorNodes
+                    }
+                  />
+                )}
+              </PreferencesContext.Consumer>
             )
           }
         </ResponsiveWindowMeasurer>
@@ -855,7 +899,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={editedEventsBasedBehavior}
-            onApply={() => this._editBehavior(null)}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._editBehavior(null);
+            }}
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(
                 editedEventsBasedBehavior,

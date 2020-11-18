@@ -6,6 +6,7 @@ import TextField from './TextField';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import { type Tags, getTagsFromString } from '../Utils/TagsHelper';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   tagsString: string,
@@ -64,6 +65,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             disabled={!this.props.tagsString && !tags.length}
           />,
         ]}
+        cannotBeDismissed={false}
         open
         onRequestClose={onCancel}
       >
@@ -78,7 +80,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
           floatingLabelText="Tag(s) (comma-separated)"
           hintText={t`For example: player, spaceship, inventory...`}
           onKeyPress={event => {
-            if (event.key === 'Enter') {
+            if (shouldValidate(event)) {
               onEdit(tags);
             }
           }}

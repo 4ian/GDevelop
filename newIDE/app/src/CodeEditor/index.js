@@ -16,7 +16,8 @@ export type State = {|
 export type Props = {|
   value: string,
   onChange: string => void,
-  width: number,
+  width?: number,
+  height?: number,
   onEditorMounted?: () => void,
 |};
 
@@ -85,6 +86,15 @@ export class CodeEditor extends React.Component<Props, State> {
     this.setState({
       error: null,
     });
+
+    // Define the global variable used by Monaco Editor to find its worker
+    // (used, at least, for auto-completions).
+    window.MonacoEnvironment = {
+      getWorkerUrl: function(workerId, label) {
+        return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
+      },
+    };
+
     import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
       .then(module =>
         this.setState({
@@ -127,7 +137,7 @@ export class CodeEditor extends React.Component<Props, State> {
           {({ values }) => (
             <MonacoEditor
               width={this.props.width || 600}
-              height="400"
+              height={this.props.height || 200}
               language="javascript"
               theme={values.codeEditorThemeName}
               value={this.props.value}

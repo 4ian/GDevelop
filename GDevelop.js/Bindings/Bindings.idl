@@ -34,6 +34,11 @@ interface VectorPlatformExtension {
     [Const] PlatformExtension WRAPPED_at(unsigned long index);
 };
 
+interface VectorDependencyMetadata {
+    unsigned long size();
+    [Const, Ref] DependencyMetadata at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -85,6 +90,13 @@ interface MapStringInstructionMetadata {
 interface MapStringEventMetadata {
     [Ref] EventMetadata MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] EventMetadata prop);
+    boolean MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
+interface MapExtensionProperties {
+    [Ref] MapStringPropertyDescriptor MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, [Const, Ref] MapStringPropertyDescriptor prop);
     boolean MAP_has([Const] DOMString name);
     [Value] VectorString MAP_keys();
 };
@@ -288,8 +300,6 @@ interface Project {
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
-    void SetAdMobAppId([Const] DOMString adMobAppId);
-    [Const, Ref] DOMString GetAdMobAppId();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
     void SetGameResolutionSize(long width, long height);
@@ -307,11 +317,14 @@ interface Project {
     void SetMinimumFPS(long fps);
     void SetFolderProject(boolean enable);
     boolean IsFolderProject();
+    void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
+    boolean GetUseDeprecatedZeroAsDefaultZOrder();
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
     [Const, Ref] VectorString GetUsedExtensions();
+    [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
 
@@ -359,7 +372,7 @@ interface Project {
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
-    boolean STATIC_ValidateObjectName([Const] DOMString name);
+    boolean STATIC_ValidateName([Const] DOMString name);
     boolean IsDirty();
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -384,23 +397,33 @@ interface Project {
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
+interface ExtensionProperties {
+    [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
+    void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
+    boolean HasProperty([Const] DOMString extension, [Const] DOMString property);
+    [Value] MapStringPropertyDescriptor GetAllExtensionProperties([Const] DOMString extension, [Ref] Project project);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Behavior {
     void Behavior();
 
     Behavior Clone();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-[JSImplementation="Behavior"]
+[JSImplementation=Behavior]
 interface BehaviorJsImplementation {
     void BehaviorJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
@@ -420,17 +443,17 @@ interface BehaviorContent {
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
-[JSImplementation="BehaviorsSharedData"]
+[JSImplementation=BehaviorsSharedData]
 interface BehaviorSharedDataJsImplementation {
     void BehaviorSharedDataJsImplementation();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent, [Ref] Project project);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
+    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
@@ -438,7 +461,7 @@ interface gdObject {
     // /!\ We need to call it gdObject to avoid messing up with javascript Object
     //     global in glue.js!
     void gdObject([Const] DOMString name);
-    // [Value] UniquePtrObject Clone(); Not exposed
+    [Value] UniquePtrObject Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
@@ -447,8 +470,8 @@ interface gdObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -472,13 +495,13 @@ interface UniquePtrObject {
     gdObject release();
 };
 
-[JSImplementation="gdObject"]
+[JSImplementation=gdObject]
 interface ObjectJsImplementation {
     void ObjectJsImplementation();
     [Value] UniquePtrObject Clone();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -611,6 +634,15 @@ interface Layer {
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+    void SetLightingLayer(boolean lightingLayer);
+    boolean IsLightingLayer();
+    void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);
+    boolean IsFollowingBaseLayerCamera();
+
+    void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
+    unsigned long GetAmbientLightColorRed();
+    unsigned long GetAmbientLightColorGreen();
+    unsigned long GetAmbientLightColorBlue();
 
     boolean HasEffectNamed([Const] DOMString name);
     [Ref] Effect GetEffect([Const] DOMString name);
@@ -621,6 +653,9 @@ interface Layer {
     void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
     void RemoveEffect([Const] DOMString name);
     void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface PropertyDescriptor {
@@ -641,6 +676,8 @@ interface PropertyDescriptor {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    void SerializeValuesTo([Ref] SerializerElement element);
+    void UnserializeValuesFrom([Const, Ref] SerializerElement element);
 };
 
 interface NamedPropertyDescriptor {
@@ -656,6 +693,7 @@ NamedPropertyDescriptor implements PropertyDescriptor;
 interface MapStringPropertyDescriptor {
     void MapStringPropertyDescriptor();
 
+    [Ref] PropertyDescriptor MAP_getOrCreate([Const] DOMString name);
     [Ref] PropertyDescriptor MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const, Ref] PropertyDescriptor prop);
     boolean MAP_has([Const] DOMString name);
@@ -677,9 +715,12 @@ interface Resource {
     [Const, Ref] DOMString GetFile();
     void SetMetadata([Const] DOMString metadata);
     [Const, Ref] DOMString GetMetadata();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -691,6 +732,8 @@ interface ResourcesManager {
     [Value] VectorString GetAllResourceNames();
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
+    [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
@@ -755,6 +798,8 @@ interface InitialInstance {
     void SetCustomHeight(float height);
     float GetCustomHeight();
 
+    [Ref] InitialInstance ResetPersistentUuid();
+
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
     float GetRawFloatProperty([Const] DOMString name);
@@ -797,11 +842,12 @@ interface HighestZOrderFinder {
     void RestrictSearchToLayer([Const] DOMString layer);
     long GetHighestZOrder();
     long GetLowestZOrder();
+    unsigned long GetInstancesCount();
 };
 
 interface InitialInstanceFunctor {};
 interface InitialInstanceJSFunctorWrapper {};
-[JSImplementation="InitialInstanceJSFunctorWrapper"]
+[JSImplementation=InitialInstanceJSFunctorWrapper]
 interface InitialInstanceJSFunctor {
     void InitialInstanceJSFunctor();
 
@@ -975,7 +1021,13 @@ interface InstructionMetadata {
 };
 
 interface ExpressionMetadata {
-    void ExpressionMetadata(); // For tests only.
+    void ExpressionMetadata(
+        [Const] DOMString extensionNamespace,
+        [Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString smallicon);
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
@@ -1000,6 +1052,23 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
+};
+
+interface DependencyMetadata {
+    void DependencyMetadata();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] DependencyMetadata SetName([Const] DOMString name_);
+    [Const, Ref] DOMString GetExportName();
+    [Ref] DependencyMetadata SetExportName([Const] DOMString exportName_);
+    [Const, Ref] DOMString GetVersion();
+    [Ref] DependencyMetadata SetVersion([Const] DOMString version_);
+    [Const, Ref] DOMString GetDependencyType();
+    [Ref] DependencyMetadata SetDependencyType([Const] DOMString dependencyType_);
+    [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
+    [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
+
+    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
 };
 
 interface ParameterMetadata {
@@ -1181,6 +1250,7 @@ interface PlatformExtension {
                                 [Const] DOMString author,
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
+    [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     void MarkAsDeprecated();
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
@@ -1211,6 +1281,8 @@ interface PlatformExtension {
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
 
+    [Const, Ref] DependencyMetadata AddDependency();
+
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString defaultName,
@@ -1229,12 +1301,15 @@ interface PlatformExtension {
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
+    [Ref] PropertyDescriptor RegisterProperty([Const] DOMString name);
+
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
@@ -1257,6 +1332,9 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+
+    [Ref] MapStringPropertyDescriptor GetAllProperties();
+    [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
 };
@@ -1683,7 +1761,7 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetPrefix();
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
-  boolean IsInformative();
+  boolean IsExact();
 };
 
 interface VectorExpressionCompletionDescription {
@@ -1722,6 +1800,7 @@ enum EventsFunction_FunctionType {
 
 interface EventsFunction {
     void EventsFunction();
+    EventsFunction Clone();
 
     [Ref] EventsFunction SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
@@ -1827,6 +1906,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
+    [Const, Ref] DOMString GetIconUrl();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 
@@ -1850,7 +1933,7 @@ interface EventsFunctionsExtension {
 interface AbstractFileSystem {
 };
 
-[JSImplementation="AbstractFileSystem"]
+[JSImplementation=AbstractFileSystem]
 interface AbstractFileSystemJS {
     void AbstractFileSystemJS();
 
@@ -1912,7 +1995,7 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] Project project, [Ref] Layout layout);
+    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer);
     [Const, Ref] EventsContext GetEventsContext();
 
     //Inherited from ArbitraryEventsWorker
@@ -1921,7 +2004,7 @@ interface EventsContextAnalyzer {
 
 interface ArbitraryResourceWorker {
 };
-[JSImplementation="ArbitraryResourceWorker"]
+[JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
     void ArbitraryResourceWorkerJS();
 
@@ -1936,6 +2019,12 @@ interface ResourcesMergingHelper {
     void SetBaseDirectory([Const] DOMString basePath);
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
 };
+ResourcesMergingHelper implements ArbitraryResourceWorker;
+
+interface ResourcesRenamer {
+    void ResourcesRenamer([Const, Ref] MapStringString oldToNewNames);
+};
+ResourcesRenamer implements ArbitraryResourceWorker;
 
 interface ProjectResourcesCopier {
     boolean STATIC_CopyAllResourcesTo([Ref] Project project,
@@ -1954,6 +2043,7 @@ interface ResourcesInUseHelper {
     [Ref] SetString GetAllFonts();
     [Ref] SetString GetAll([Const] DOMString resourceType);
 };
+ResourcesInUseHelper implements ArbitraryResourceWorker;
 
 interface LayoutEditorCanvasOptions {
     void LayoutEditorCanvasOptions();
@@ -2173,6 +2263,9 @@ interface ShapePainterObject {
     void SetCoordinatesRelative();
     boolean AreCoordinatesAbsolute();
 
+    void SetClearBetweenFrames(boolean value);
+    boolean IsClearedBetweenFrames();
+
     void SetOutlineSize(float size);
     float GetOutlineSize();
 
@@ -2210,8 +2303,8 @@ interface SkeletonObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Ref] Project project);
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
@@ -2354,12 +2447,22 @@ interface EventsFunctionsExtensionCodeGenerator {
 };
 
 [Prefix="gdjs::"]
+interface PreviewExportOptions {
+    void PreviewExportOptions([Ref] Project project, [Const] DOMString outputPath);
+    [Ref] PreviewExportOptions SetDebuggerServerAddress([Const] DOMString address, [Const] DOMString port);
+    [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
+    [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
+    [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
+    [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+    [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
+};
+
+[Prefix="gdjs::"]
 interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);
 
-    boolean ExportLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Const] DOMString exportDir);
-    boolean ExportExternalLayoutForPixiPreview([Ref] Project project, [Ref] Layout layout, [Ref] ExternalLayout externalLayout, [Const] DOMString exportDir);
+    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions);
 
     boolean ExportWholeCocos2dProject([Ref] Project project, boolean debugMode, [Const] DOMString exportDir);
@@ -2373,9 +2476,10 @@ interface JsCodeEvent {
 
     [Const, Ref] DOMString GetInlineCode();
     void SetInlineCode([Const] DOMString type);
-
     [Const, Ref] DOMString GetParameterObjects();
     void SetParameterObjects([Const] DOMString type);
+    boolean IsEventsSheetExpanded();
+    void SetEventsSheetExpanded(boolean enable);
 
     //Inherited from BaseEvent:
     JsCodeEvent Clone();

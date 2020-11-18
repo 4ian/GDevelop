@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/zombie-laser/zombie-laser.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -261,6 +258,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
+          "persistentUuid": "4dd40971-13e8-42d5-b08c-888cccd5f91d",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -281,6 +279,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
+          "persistentUuid": "72d23d4c-78e2-4ade-8ac0-e8a58e0325ea",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -296,6 +295,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
+          "persistentUuid": "b2a45453-b94c-467e-9049-bea0468c7ae2",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -311,6 +311,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
+          "persistentUuid": "cb1a37a7-8106-45fa-8f8f-51a68628440d",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -326,6 +327,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "a31dd7d2-a738-45a8-a4d1-f69172657fa7",
           "width": 0,
           "x": 257,
           "y": 202,
@@ -2210,7 +2212,8 @@
             "g": 0,
             "r": 234
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Background",
@@ -3357,6 +3360,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3374,6 +3382,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [

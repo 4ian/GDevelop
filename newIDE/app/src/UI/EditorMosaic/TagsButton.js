@@ -1,8 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import IconButton from '../IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from '../Menu/ElementWithMenu';
+import { type MenuItemTemplate } from '../Menu/Menu.flow';
 
 const styles = {
   container: {
@@ -16,9 +18,9 @@ const styles = {
   },
 };
 
-type Props = {
-  buildMenuTemplate: () => Array<any>,
-};
+type Props = {|
+  buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+|};
 
 export default class TagsButton extends Component<Props, {||}> {
   render() {

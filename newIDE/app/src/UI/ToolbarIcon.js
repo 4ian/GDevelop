@@ -10,19 +10,28 @@ type Props = {|
   acceleratorString?: string,
   disabled?: boolean,
   onClick?: () => void,
+  onContextMenu?: () => void,
 |};
 
 /**
  * An icon that can be used in a ToolbarGroup of a Toolbar.
  */
 const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
-  const { src, tooltip, acceleratorString, disabled, onClick } = props;
+  const {
+    src,
+    tooltip,
+    acceleratorString,
+    disabled,
+    onClick,
+    onContextMenu,
+  } = props;
 
   return (
     <ThemeConsumer>
       {muiTheme => (
         <IconButton
           onClick={onClick}
+          onContextMenu={onContextMenu}
           size="small"
           disabled={disabled}
           tooltip={tooltip}

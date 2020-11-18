@@ -219,21 +219,23 @@ const selectBaseFolderPath = headerObject => {
   if (!state.projectBasePath) {
     state.projectBasePath = state.folderPath;
   }
-  const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const selectedDir = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
     defaultPath: state.projectBasePath,
   });
-  if (!selectedDir) {
+  if (!selectedDir || !selectedDir.length) {
     return;
   }
   const selectedDirPath = selectedDir[0];
   if (!selectedDirPath.startsWith(state.projectBasePath)) {
-    alert(
-      'Please select a folder inside your project path!\n' +
+    dialog.showMessageBoxSync(remote.getCurrentWindow(), {
+      message:
+        'Please select a folder inside your project path!\n' +
         state.projectBasePath +
         '\n\nSelected:\n' +
-        selectedDirPath
-    );
+        selectedDirPath,
+      buttons: ['OK'],
+    });
     return;
   }
   state.folderPath = selectedDirPath;

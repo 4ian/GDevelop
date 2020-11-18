@@ -22,6 +22,7 @@ const styles = {
     width: 90,
     ...toolbarItemStyle,
   },
+  resourcesSelector: { alignSelf: 'center' },
   toolbarItem: toolbarItemStyle,
   checkbox: toolbarItemStyle,
 };
@@ -108,6 +109,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               this.forceUpdate();
             }}
             hintText={<Trans>Choose a font</Trans>}
+            style={styles.resourcesSelector}
           />
         </MiniToolbar>
         <Line noMargin>
@@ -119,7 +121,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 commitOnBlur
                 hintText={t`Enter the text to be displayed by the object`}
                 fullWidth
-                multiLine
+                multiline
                 rows={8}
                 rowsMax={8}
                 value={textObject.getString()}

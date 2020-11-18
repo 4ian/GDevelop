@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.screenshake",
     "projectFile": "G:\\Games\\Screen Shake\\ScreenShake.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Screen Shake Example",
     "author": "Zat",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -288,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "760c894d-7ab1-4478-a0a4-0942e6e4bb20",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -303,6 +301,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "be1bb528-8638-462e-bf40-31f717a702c5",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -318,6 +317,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "b0e8b5a1-c654-43c0-b0ab-2f54507458e5",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -333,6 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "7ee8850b-5ac9-41db-ad8b-fd7db5806c25",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -348,6 +349,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "61973b25-196c-4d01-8cbf-cb423f4e10a8",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -363,6 +365,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "66203427-d536-4372-99fc-b9bd85a14790",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -378,6 +381,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "4ebd3b08-27e6-4cbd-80c5-40938dd7186d",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -398,6 +402,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "f5c87535-503e-4a10-ace2-0c3aa0f0c27c",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -413,6 +418,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "307bbadd-db91-4f5d-bd3a-a5a2b3dcf8c6",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -433,6 +439,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "3dfe0dd7-abeb-4669-94c9-adc2032de250",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1638,6 +1645,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1655,6 +1667,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

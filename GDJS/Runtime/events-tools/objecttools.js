@@ -173,42 +173,46 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
     objectsLists.values(lists);
 
-    //Create a boolean for each object
-    for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            arr[k].pick = false;
-        }
-    }
-
-    //Pick only objects that are fulfilling the predicate
+    // Pick only objects that are fulfilling the predicate.
     for(var i = 0, leni = lists.length;i<leni;++i) {
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            if (negatePredicate ^ predicate(arr[k], extraArg)) {
+            var object = arr[k];
+            if (negatePredicate ^ predicate(object, extraArg)) {
                 isTrue = true;
-                arr[k].pick = true; //Pick the objects
+                object.pick = true;
+            } else {
+                object.pick = false;
             }
         }
     }
 
-    //Trim not picked objects from lists.
+    // Trim not picked objects from lists.
     for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        var finalSize = 0;
-
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            var obj = arr[k];
-            if ( arr[k].pick ) {
-                arr[finalSize] = obj;
-                finalSize++;
-            }
-        }
-        arr.length = finalSize;
+        gdjs.evtTools.object.filterPickedObjectsList(lists[i]);
     }
 
     return isTrue;
+};
+
+/**
+ * Filter in-place the specified array to remove objects for which
+ * `pick` property is set to false.
+ * @param {gdjs.RuntimeObject[]} arr
+ */
+gdjs.evtTools.object.filterPickedObjectsList = function (arr) {
+    var finalSize = 0;
+
+    for (var k = 0, lenk = arr.length; k < lenk; ++k) {
+        var obj = arr[k];
+        if (obj.pick) {
+            arr[finalSize] = obj;
+            finalSize++;
+        }
+    }
+
+    arr.length = finalSize;
 };
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
@@ -315,7 +319,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
-            var distance = object.getSqDistanceTo(x, y);
+            var distance = object.getSqDistanceToPosition(x, y);
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;
@@ -385,18 +389,26 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
 /**
  * Do the work of creating a new object
  * @private
+ * @param {EventsFunctionContext | gdjs.RuntimeScene} objectsContext
+ * @param {string} objectName
+ * @param {Hashtable} objectsLists
+ * @param {x} number
+ * @param {y} number
+ * @param {string} layerName
  */
-gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layer) {
+gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layerName) {
     // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
     // eventsFunctionContext. We can't directly use runtimeScene because the object name could
     // be different than the real object name (this is the case in a function. The eventsFunctionContext
     // will take care of this in createObject).
     var obj = objectsContext.createObject(objectName);
+    var layer = objectsContext.getLayer(layerName);
 
     if ( obj !== null ) {
         //Do some extra setup
         obj.setPosition(x,y);
-        obj.setLayer(layer);
+        obj.setLayer(layerName);
+        obj.setZOrder(layer.getDefaultZOrder());
 
         //Let the new object be picked by next actions/conditions.
         if ( objectsLists.containsKey(objectName) ) {

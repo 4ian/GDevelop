@@ -5,13 +5,15 @@ import { SortableHandle } from 'react-sortable-hoc';
 const styles = {
   handle: {
     cursor: 'move',
-    marginRight: 4,
+  },
+  disabledHandle: {
+    opacity: 0.4,
   },
   handleColor: '#DDD',
 };
 
-const DragHandle = SortableHandle(() => (
-  <span style={styles.handle}>
+const DragHandle = SortableHandle(props => (
+  <span style={props.disabled ? styles.disabledHandle : styles.handle}>
     <DragHandleIcon htmlColor={styles.handleColor} />
   </span>
 ));

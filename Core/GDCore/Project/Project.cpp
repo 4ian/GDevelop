@@ -5,12 +5,16 @@
  */
 
 #include "Project.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <SFML/System/Utf.hpp>
+#include <cctype>
 #include <fstream>
 #include <map>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -50,7 +54,6 @@ Project::Project()
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
-      adMobAppId(""),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -61,6 +64,7 @@ Project::Project()
       scaleMode("linear"),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      useDeprecatedZeroAsDefaultZOrder(false),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
       ,
@@ -520,6 +524,9 @@ void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
 
   eventsFunctionsExtensions.erase(eventsFunctionExtension);
 }
+void Project::ClearEventsFunctionsExtensions() {
+  eventsFunctionsExtensions.clear();
+}
 #endif
 
 void Project::UnserializeFrom(const SerializerElement& element) {
@@ -592,9 +599,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
-  SetAdMobAppId(propElement.GetStringAttribute("adMobAppId", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
-  SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
                                             0,
@@ -604,16 +609,34 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
-  winExecutableFilename =
-      propElement.GetStringAttribute("winExecutableFilename");
-  winExecutableIconFile =
-      propElement.GetStringAttribute("winExecutableIconFile");
-  linuxExecutableFilename =
-      propElement.GetStringAttribute("linuxExecutableFilename");
-  macExecutableFilename =
-      propElement.GetStringAttribute("macExecutableFilename");
+
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (VersionWrapper::IsOlderOrEqual(
+          gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
+      !propElement.HasAttribute("useDeprecatedZeroAsDefaultZOrder")) {
+    useDeprecatedZeroAsDefaultZOrder = true;
+  } else {
+    useDeprecatedZeroAsDefaultZOrder =
+        propElement.GetBoolAttribute("useDeprecatedZeroAsDefaultZOrder", false);
+  }
+  // end of compatibility code
+
+  extensionProperties.UnserializeFrom(
+      propElement.GetChild("extensionProperties"));
+
+  // Compatibility with GD <= 5.0.0-beta98
+  // Move AdMob App ID from project property to extension property.
+  if (propElement.GetStringAttribute("adMobAppId", "") != "") {
+    extensionProperties.SetValue(
+        "AdMob",
+        "AdMobAppId",
+        propElement.GetStringAttribute("adMobAppId", ""));
+  }
+  // end of compatibility code
+
 #endif
 
   const SerializerElement& extensionsElement =
@@ -862,21 +885,24 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
-  propElement.SetAttribute("adaptGameResolutionAtRuntime", adaptGameResolutionAtRuntime);
+  propElement.SetAttribute("adaptGameResolutionAtRuntime",
+                           adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
-  propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
-  propElement.SetAttribute("adMobAppId", adMobAppId);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
-  propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
-  propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
-  propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
-  propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (useDeprecatedZeroAsDefaultZOrder) {
+    propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
+  }
+  // end of compatibility code
+
+  extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
 
   SerializerElement& extensionsElement = propElement.AddChild("extensions");
   extensionsElement.ConsiderAsArrayOf("extension");
@@ -945,16 +971,14 @@ void Project::SerializeTo(SerializerElement& element) const {
 #endif
 }
 
-bool Project::ValidateObjectName(const gd::String& name) {
+bool Project::ValidateName(const gd::String& name) {
   if (name.empty()) return false;
+
+  if (isdigit(name[0])) return false;
 
   gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
   return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
-}
-
-gd::String Project::GetBadObjectNameWarning() {
-  return _("Please use only letters, digits\nand underscores ( _ ).");
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
@@ -1053,7 +1077,6 @@ Project& Project::operator=(const Project& other) {
 }
 
 void Project::Init(const gd::Project& game) {
-  // Some properties
   name = game.name;
   version = game.version;
   windowWidth = game.windowWidth;
@@ -1064,17 +1087,19 @@ void Project::Init(const gd::Project& game) {
   scaleMode = game.scaleMode;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
 #if defined(GD_IDE_ONLY)
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
-  adMobAppId = game.adMobAppId;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
   objectGroups = game.objectGroups;
+
+  extensionProperties = game.extensionProperties;
 
   gdMajorVersion = game.gdMajorVersion;
   gdMinorVersion = game.gdMinorVersion;
@@ -1085,7 +1110,6 @@ void Project::Init(const gd::Project& game) {
   extensionsUsed = game.extensionsUsed;
   platforms = game.platforms;
 
-  // Resources
   resourcesManager = game.resourcesManager;
   imageManager = std::make_shared<ImageManager>(*game.imageManager);
   imageManager->SetResourcesManager(&resourcesManager);
@@ -1110,13 +1134,8 @@ void Project::Init(const gd::Project& game) {
   variables = game.GetVariables();
 
 #if defined(GD_IDE_ONLY)
-  gameFile = game.GetProjectFile();
+  projectFile = game.GetProjectFile();
   imagesChanged = game.imagesChanged;
-
-  winExecutableFilename = game.winExecutableFilename;
-  winExecutableIconFile = game.winExecutableIconFile;
-  linuxExecutableFilename = game.linuxExecutableFilename;
-  macExecutableFilename = game.macExecutableFilename;
 #endif
 }
 

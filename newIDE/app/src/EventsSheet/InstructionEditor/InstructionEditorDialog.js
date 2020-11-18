@@ -10,7 +10,7 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   project: gdProject,
@@ -32,6 +32,8 @@ type Props = {|
     type: string
   ) => void,
   anchorEl?: any, // Unused
+  canPasteInstructions: boolean, // Unused
+  onPasteInstructions: () => void, // Unused
 |};
 type State = {||};
 
@@ -45,6 +47,8 @@ export default class InstructionEditorDialog extends React.Component<
       onCancel,
       onSubmit,
       open,
+      canPasteInstructions,
+      onPasteInstructions,
       ...otherProps
     } = this.props;
     const actions = [
@@ -67,6 +71,7 @@ export default class InstructionEditorDialog extends React.Component<
       <Dialog
         actions={actions}
         open={open}
+        cannotBeDismissed={true}
         onRequestClose={onCancel}
         maxWidth={false}
         flexBody

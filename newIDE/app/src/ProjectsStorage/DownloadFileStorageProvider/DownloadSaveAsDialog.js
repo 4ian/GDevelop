@@ -20,8 +20,12 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
     let content = '';
     try {
       content = JSON.stringify(serializeToJSObject(this.props.project));
-    } catch (err) {
-      showErrorBox('Unable to save your project', err);
+    } catch (rawError) {
+      showErrorBox({
+        message: 'Unable to save your project',
+        rawError,
+        errorId: 'download-as-json-error',
+      });
       return;
     }
     var uri = encodeURI('data:application/json;charset=utf-8,' + content);
@@ -57,7 +61,13 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
     ];
 
     return (
-      <Dialog actions={actions} open onRequestClose={onDone} maxWidth="sm">
+      <Dialog
+        actions={actions}
+        open
+        cannotBeDismissed={false}
+        onRequestClose={onDone}
+        maxWidth="sm"
+      >
         <Column noMargin>
           <Line>
             <Text>

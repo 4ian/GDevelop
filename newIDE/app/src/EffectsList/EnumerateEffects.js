@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema } from '../PropertiesEditor';
+import { type ResourceKind } from '../ResourcesList/ResourceSource.flow';
 import flatten from 'lodash/flatten';
 
 export type EnumeratedEffectMetadata = {|
@@ -30,7 +31,7 @@ export const enumerateEffectsMetadata = (
         .getExtensionEffectTypes()
         .toJSArray()
         .map(type => extension.getEffectMetadata(type))
-        .map(effectMetadata => {
+        .map((effectMetadata: gdEffectMetadata) => {
           const effectType = effectMetadata.getType();
 
           // Convert the effect type properties to a PropertiesEditor Schema.
@@ -72,14 +73,16 @@ export const enumerateEffectsMetadata = (
                 };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)
-                const kind = property.getExtraInfo().toJSArray()[0] || '';
+                const kind: ResourceKind =
+                  // $FlowFixMe - assume the passed resource kind is always valid.
+                  property.getExtraInfo().toJSArray()[0] || '';
                 return {
                   name: parameterName,
                   valueType: 'resource',
                   resourceKind: kind,
                   getValue: (effect: gdEffect) =>
                     effect.getStringParameter(parameterName),
-                  setValue: (effect: gdEffect, newValue: number) =>
+                  setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
@@ -91,7 +94,7 @@ export const enumerateEffectsMetadata = (
                   valueType: 'color',
                   getValue: (effect: gdEffect) =>
                     effect.getStringParameter(parameterName),
-                  setValue: (effect: gdEffect, newValue: number) =>
+                  setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
                   getDescription,

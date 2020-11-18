@@ -9,13 +9,11 @@ import {
   getExtensionsRegistry,
   type ExtensionsRegistry,
   type ExtensionShortHeader,
-  type SerializedExtension,
   getExtension,
 } from '../Utils/GDevelopServices/Extension';
 import { List, ListItem } from '../UI/List';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
-import { unserializeFromJSObject } from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
@@ -23,37 +21,8 @@ import EventsFunctionsExtensionsContext, {
 import PlaceholderError from '../UI/PlaceholderError';
 import EmptyMessage from '../UI/EmptyMessage';
 import SearchbarWithChips from '../UI/SearchbarWithChips';
-
-/**
- * Add a serialized (JS object) events function extension to the project,
- * triggering reload of extensions.
- */
-export const addSerializedExtensionToProject = (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  project: gdProject,
-  serializedExtension: SerializedExtension
-): Promise<void> => {
-  const { name } = serializedExtension;
-  if (!name)
-    return Promise.reject(new Error('Malformed extension (missing name).'));
-
-  const newEventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
-    name
-  )
-    ? project.getEventsFunctionsExtension(name)
-    : project.insertNewEventsFunctionsExtension(name, 0);
-
-  unserializeFromJSObject(
-    newEventsFunctionsExtension,
-    serializedExtension,
-    'unserializeFrom',
-    project
-  );
-
-  return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-    project
-  );
-};
+import ListIcon from '../UI/ListIcon';
+import { addSerializedExtensionsToProject } from '../AssetStore/InstallAsset';
 
 type Props = {|
   project: gdProject,
@@ -157,10 +126,10 @@ export default class ExtensionsSearch extends Component<Props, State> {
     getExtension(extensionShortHeader)
       .then(
         serializedExtension => {
-          return addSerializedExtensionToProject(
+          return addSerializedExtensionsToProject(
             eventsFunctionsExtensionsState,
             project,
-            serializedExtension
+            [serializedExtension]
           ).then(() => {
             this.setState(
               {
@@ -170,13 +139,14 @@ export default class ExtensionsSearch extends Component<Props, State> {
             );
           });
         },
-        err => {
-          showErrorBox(
-            i18n._(
+        rawError => {
+          showErrorBox({
+            message: i18n._(
               t`Unable to download and install the extension. Verify that your internet connection is working or try again later.`
             ),
-            err
-          );
+            rawError,
+            errorId: 'download-extension-error',
+          });
         }
       )
       .then(() => {
@@ -252,6 +222,13 @@ export default class ExtensionsSearch extends Component<Props, State> {
 
                         return (
                           <ListItem
+                            leftIcon={
+                              <ListIcon
+                                useExactIconSize
+                                iconSize={40}
+                                src={extensionShortHeader.previewIconUrl}
+                              />
+                            }
                             key={extensionShortHeader.name}
                             primaryText={
                               <span>

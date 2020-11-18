@@ -22,7 +22,7 @@ import {
   DoneFooter,
 } from '../GenericExporters/ElectronExport';
 import { openBlobDownloadUrl } from '.';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type ExportState = null;
 

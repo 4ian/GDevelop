@@ -5,7 +5,7 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../../SelectionHandler';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import { type ScreenType } from '../../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
@@ -43,4 +43,5 @@ export type EventRendererProps = {
 
   screenType: ScreenType,
   windowWidth: WidthType,
+  eventsSheetHeight: number,
 };

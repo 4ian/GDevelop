@@ -4,19 +4,19 @@ import { enumerateAllExpressions } from '../../../InstructionOrExpression/Enumer
 import InstructionOrExpressionSelector from './index';
 import {
   createTree,
-  type InstructionOrExpressionTreeNode,
+  type ExpressionTreeNode,
 } from '../../../InstructionOrExpression/CreateTree';
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  type EnumeratedExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   expressionType: string,
   focusOnMount?: boolean,
   selectedType: string,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, EnumeratedExpressionMetadata) => void,
   scope: EventsScope,
 |};
 
@@ -27,13 +27,11 @@ const style = {
 };
 
 export default class ExpressionSelector extends Component<Props, {||}> {
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+  instructionsInfo: Array<EnumeratedExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
     enumerateAllExpressions(this.props.expressionType),
     this.props.scope
   );
-  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.instructionsInfo
-  );
+  instructionsInfoTree: ExpressionTreeNode = createTree(this.instructionsInfo);
 
   render() {
     const { expressionType, scope, ...otherProps } = this.props;

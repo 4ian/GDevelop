@@ -69,86 +69,90 @@
  * @param {SpriteFrameData} frameData The frame data used to initialize the frame
  */
 
-gdjs.SpriteAnimationFrame = function(imageManager, frameData)
-{
-    /** @type {string} */
-    this.image = frameData ? frameData.image : ""; //TODO: Rename in imageName, and do not store it in the object?
-    this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(imageManager, this.image);
+gdjs.SpriteAnimationFrame = function (imageManager, frameData) {
+  /** @type {string} */
+  this.image = frameData ? frameData.image : ''; //TODO: Rename in imageName, and do not store it in the object?
+  this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(
+    imageManager,
+    this.image
+  );
 
-    if ( this.center === undefined ) {
-        /** @type {SpritePoint} */
-        this.center = { x:0, y:0 };
-    }
-    if ( this.origin === undefined ) {
-        /** @type {SpritePoint} */
-        this.origin = { x:0, y:0 }
-    }
-    /** @type {boolean} */
-    this.hasCustomHitBoxes = false;
-    if ( this.customHitBoxes === undefined ) {
-        /** @type {Array<gdjs.Polygon>} */
-        this.customHitBoxes = []
-    };
-    if ( this.points === undefined ){
-        /** @type {Hashtable} */
-        this.points = new Hashtable();
-    } else this.points.clear();
-
-    //Initialize points:
-	for(var i = 0, len = frameData.points.length;i<len;++i) {
-        /** @type {SpriteCustomPointData} */
-		var ptData = frameData.points[i];
-
-        /** @type {SpritePoint} */
-        var point = {x: ptData.x, y: ptData.y};
-        this.points.put(ptData.name, point);
-    }
+  if (this.center === undefined) {
     /** @type {SpritePoint} */
-    var origin = frameData.originPoint;
-    this.origin.x = origin.x;
-    this.origin.y = origin.y;
+    this.center = { x: 0, y: 0 };
+  }
+  if (this.origin === undefined) {
+    /** @type {SpritePoint} */
+    this.origin = { x: 0, y: 0 };
+  }
+  /** @type {boolean} */
+  this.hasCustomHitBoxes = false;
+  if (this.customHitBoxes === undefined) {
+    /** @type {Array<gdjs.Polygon>} */
+    this.customHitBoxes = [];
+  }
+  if (this.points === undefined) {
+    /** @type {Hashtable} */
+    this.points = new Hashtable();
+  } else this.points.clear();
 
-    /** @type {SpriteCenterPointData} */
-    var center = frameData.centerPoint;
-    if ( center.automatic !== true ) {
-        this.center.x = center.x;
-        this.center.y = center.y;
+  //Initialize points:
+  for (var i = 0, len = frameData.points.length; i < len; ++i) {
+    /** @type {SpriteCustomPointData} */
+    var ptData = frameData.points[i];
+
+    /** @type {SpritePoint} */
+    var point = { x: ptData.x, y: ptData.y };
+    this.points.put(ptData.name, point);
+  }
+  /** @type {SpritePoint} */
+  var origin = frameData.originPoint;
+  this.origin.x = origin.x;
+  this.origin.y = origin.y;
+
+  /** @type {SpriteCenterPointData} */
+  var center = frameData.centerPoint;
+  if (center.automatic !== true) {
+    this.center.x = center.x;
+    this.center.y = center.y;
+  } else {
+    this.center.x =
+      gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(this.texture) / 2;
+    this.center.y =
+      gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(this.texture) /
+      2;
+  }
+
+  //Load the custom collision mask, if any:
+  if (frameData.hasCustomCollisionMask) {
+    this.hasCustomHitBoxes = true;
+    for (var i = 0, len = frameData.customCollisionMask.length; i < len; ++i) {
+      /** @type {Array<SpritePoint>} */
+      var polygonData = frameData.customCollisionMask[i];
+
+      //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
+      if (i >= this.customHitBoxes.length)
+        this.customHitBoxes.push(new gdjs.Polygon());
+
+      for (var j = 0, len2 = polygonData.length; j < len2; ++j) {
+        /** @type {SpritePoint} */
+        var pointData = polygonData[j];
+
+        //Add a point, if necessary (Avoid recreating a point if it already exists).
+        if (j >= this.customHitBoxes[i].vertices.length)
+          this.customHitBoxes[i].vertices.push([0, 0]);
+
+        this.customHitBoxes[i].vertices[j][0] = pointData.x;
+        this.customHitBoxes[i].vertices[j][1] = pointData.y;
+      }
+
+      this.customHitBoxes[i].vertices.length = j;
     }
-    else {
-        this.center.x = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(this.texture)/2;
-        this.center.y = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(this.texture)/2;
-    }
 
-    //Load the custom collision mask, if any:
-    if ( frameData.hasCustomCollisionMask ) {
-        this.hasCustomHitBoxes = true;
-    	for(var i = 0, len = frameData.customCollisionMask.length;i<len;++i) {
-            /** @type {Array<SpritePoint>} */
-    		var polygonData = frameData.customCollisionMask[i];
-
-            //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
-            if ( i >= this.customHitBoxes.length ) this.customHitBoxes.push(new gdjs.Polygon());
-
-        	for(var j = 0, len2 = polygonData.length;j<len2;++j) {
-                /** @type {SpritePoint} */
-        		var pointData = polygonData[j];
-
-                //Add a point, if necessary (Avoid recreating a point if it already exists).
-                if ( j >= this.customHitBoxes[i].vertices.length )
-                    this.customHitBoxes[i].vertices.push([0,0]);
-
-                this.customHitBoxes[i].vertices[j][0] = pointData.x;
-                this.customHitBoxes[i].vertices[j][1] = pointData.y;
-            }
-
-            this.customHitBoxes[i].vertices.length = j;
-        }
-
-        this.customHitBoxes.length = i;
-    }
-    else {
-        this.customHitBoxes.length = 0;
-    }
+    this.customHitBoxes.length = i;
+  } else {
+    this.customHitBoxes.length = 0;
+  }
 };
 
 /**
@@ -157,11 +161,11 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
  * @param {string} name The point's name
  * @return {SpritePoint} The requested point. If it doesn't exists returns the origin point.
  */
-gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
-	if ( name === "Centre" || name === "Center") return this.center;
-	else if ( name === "Origin" ) return this.origin;
+gdjs.SpriteAnimationFrame.prototype.getPoint = function (name) {
+  if (name === 'Centre' || name === 'Center') return this.center;
+  else if (name === 'Origin') return this.origin;
 
-	return this.points.containsKey(name) ? this.points.get(name) : this.origin;
+  return this.points.containsKey(name) ? this.points.get(name) : this.origin;
 };
 
 /**
@@ -172,28 +176,28 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
  * @param {gdjs.ImageManager} imageManager The game image manager
  * @param {SpriteDirectionData} directionData The direction data used to initialize the direction
  */
-gdjs.SpriteAnimationDirection = function(imageManager, directionData)
-{
-    /** @type {number} */
-    this.timeBetweenFrames = directionData ? directionData.timeBetweenFrames :
-        1.0;
-    /** @type {boolean} */
-    this.loop = !!directionData.looping;
+gdjs.SpriteAnimationDirection = function (imageManager, directionData) {
+  /** @type {number} */
+  this.timeBetweenFrames = directionData
+    ? directionData.timeBetweenFrames
+    : 1.0;
+  /** @type {boolean} */
+  this.loop = !!directionData.looping;
 
-    if ( this.frames === undefined ) {
-        /** @type {Array<SpriteAnimationFrame>} */
-        this.frames = [];
-    }
-    for(var i = 0, len = directionData.sprites.length;i<len;++i) {
-        /** @type {SpriteFrameData} */
-        var frameData = directionData.sprites[i];
+  if (this.frames === undefined) {
+    /** @type {Array<SpriteAnimationFrame>} */
+    this.frames = [];
+  }
+  for (var i = 0, len = directionData.sprites.length; i < len; ++i) {
+    /** @type {SpriteFrameData} */
+    var frameData = directionData.sprites[i];
 
-        if ( i < this.frames.length )
-            gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
-        else
-            this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
-    }
-    this.frames.length = i;
+    if (i < this.frames.length)
+      gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
+    else
+      this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
+  }
+  this.frames.length = i;
 };
 
 /**
@@ -204,25 +208,30 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
  * @param {gdjs.ImageManager} imageManager The game image manager
  * @param {SpriteAnimationData} animData The animation data used to initialize the animation
  */
-gdjs.SpriteAnimation = function(imageManager, animData)
-{
-    /** @type {boolean} */
-    this.hasMultipleDirections = !!animData.useMultipleDirections;
-    /** @type {string} */
-    this.name = animData.name || '';
+gdjs.SpriteAnimation = function (imageManager, animData) {
+  /** @type {boolean} */
+  this.hasMultipleDirections = !!animData.useMultipleDirections;
+  /** @type {string} */
+  this.name = animData.name || '';
 
-    /** @type {Array<gdjs.SpriteAnimationDirection>} */
-    if ( this.directions === undefined ) this.directions = [];
-    for(var i = 0, len = animData.directions.length;i<len;++i) {
-        /** @type {SpriteDirectionData} */
-        var directionData = animData.directions[i];
+  /** @type {Array<gdjs.SpriteAnimationDirection>} */
+  if (this.directions === undefined) this.directions = [];
+  for (var i = 0, len = animData.directions.length; i < len; ++i) {
+    /** @type {SpriteDirectionData} */
+    var directionData = animData.directions[i];
 
-        if ( i < this.directions.length )
-            gdjs.SpriteAnimationDirection.call(this.directions[i], imageManager, directionData);
-        else
-            this.directions.push(new gdjs.SpriteAnimationDirection(imageManager, directionData));
-    }
-    this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
+    if (i < this.directions.length)
+      gdjs.SpriteAnimationDirection.call(
+        this.directions[i],
+        imageManager,
+        directionData
+      );
+    else
+      this.directions.push(
+        new gdjs.SpriteAnimationDirection(imageManager, directionData)
+      );
+  }
+  this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
 };
 
 /**
@@ -234,77 +243,87 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  * @param {gdjs.RuntimeScene} runtimeScene The scene the object belongs to
  * @param {SpriteObjectData} spriteObjectData The object data used to initialize the object
  */
-gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
-	gdjs.RuntimeObject.call(this, runtimeScene, spriteObjectData);
+gdjs.SpriteRuntimeObject = function (runtimeScene, spriteObjectData) {
+  gdjs.RuntimeObject.call(this, runtimeScene, spriteObjectData);
 
-    /** @type {number} */
-    this._currentAnimation = 0;
-    /** @type {number} */
-    this._currentDirection = 0;
-    /** @type {number} */
-    this._currentFrame = 0;
-    /** @type {number} */
-    this._frameElapsedTime = 0;
-    /** @type {number} */
-    this._animationSpeedScale = 1;
-    /** @type {boolean} */
-    this._animationPaused = false;
-    /** @type {number} */
-    this._scaleX = 1;
-    /** @type {number} */
-    this._scaleY = 1;
-    /** @type {number} */
-    this._blendMode = 0;
-    /** @type {boolean} */
-    this._flippedX = false;
-    /** @type {boolean} */
-    this._flippedY = false;
-    /** @type {number} */
-    this.opacity = 255;
-    /** @type {boolean} */
-    this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
+  /** @type {number} */
+  this._currentAnimation = 0;
+  /** @type {number} */
+  this._currentDirection = 0;
+  /** @type {number} */
+  this._currentFrame = 0;
+  /** @type {number} */
+  this._frameElapsedTime = 0;
+  /** @type {number} */
+  this._animationSpeedScale = 1;
+  /** @type {boolean} */
+  this._animationPaused = false;
+  /** @type {number} */
+  this._scaleX = 1;
+  /** @type {number} */
+  this._scaleY = 1;
+  /** @type {number} */
+  this._blendMode = 0;
+  /** @type {boolean} */
+  this._flippedX = false;
+  /** @type {boolean} */
+  this._flippedY = false;
+  /** @type {number} */
+  this.opacity = 255;
+  /** @type {boolean} */
+  this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
 
-    //Animations:
+  //Animations:
 
-    if ( this._animations === undefined ) {
-        /** @type {Array<gdjs.SpriteAnimation>} */
-        this._animations = [];
-    }
-    for(var i = 0, len = spriteObjectData.animations.length;i<len;++i) {
-        /** @type {SpriteAnimationData} */
-        var animData = spriteObjectData.animations[i];
+  if (this._animations === undefined) {
+    /** @type {Array<gdjs.SpriteAnimation>} */
+    this._animations = [];
+  }
+  for (var i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
+    /** @type {SpriteAnimationData} */
+    var animData = spriteObjectData.animations[i];
 
-        if ( i < this._animations.length )
-            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
-        else
-            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
-    }
-    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
-
-    /**
-     * Reference to the current SpriteAnimationFrame that is displayd.
-     * Verify is `this._animationFrameDirty === true` before using it, and if so
-     * call `this._updateAnimationFrame()`.
-     * Can be null, so ensure that this case is handled properly.
-     *
-     * @type {gdjs.SpriteAnimationFrame}
-     */
-    this._animationFrame = null;
-
-    if (this._renderer)
-        gdjs.SpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
+    if (i < this._animations.length)
+      gdjs.SpriteAnimation.call(
+        this._animations[i],
+        runtimeScene.getGame().getImageManager(),
+        animData
+      );
     else
-        /** @type {gdjs.SpriteRuntimeObjectRenderer} */
-        this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
+      this._animations.push(
+        new gdjs.SpriteAnimation(
+          runtimeScene.getGame().getImageManager(),
+          animData
+        )
+      );
+  }
+  this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
 
-    this._updateAnimationFrame();
+  /**
+   * Reference to the current SpriteAnimationFrame that is displayd.
+   * Verify is `this._animationFrameDirty === true` before using it, and if so
+   * call `this._updateAnimationFrame()`.
+   * Can be null, so ensure that this case is handled properly.
+   *
+   * @type {gdjs.SpriteAnimationFrame}
+   */
+  this._animationFrame = null;
 
-    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
-    this.onCreated();
+  if (this._renderer)
+    gdjs.SpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
+  /** @type {gdjs.SpriteRuntimeObjectRenderer} */ else
+    this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
+
+  this._updateAnimationFrame();
+
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
-gdjs.SpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the object existence.
+gdjs.SpriteRuntimeObject.prototype = Object.create(
+  gdjs.RuntimeObject.prototype
+);
+gdjs.registerObject('Sprite', gdjs.SpriteRuntimeObject); //Notify gdjs of the object existence.
 
 //Others initialization and internal state management :
 
@@ -312,86 +331,116 @@ gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the ob
  * @param {SpriteObjectData} oldObjectData
  * @param {SpriteObjectData} newObjectData
  */
-gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
-    var runtimeScene = this._runtimeScene;
-    for(var i = 0, len = newObjectData.animations.length;i<len;++i) {
-        var animData = newObjectData.animations[i];
+gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function (
+  oldObjectData,
+  newObjectData
+) {
+  var runtimeScene = this._runtimeScene;
+  for (var i = 0, len = newObjectData.animations.length; i < len; ++i) {
+    var animData = newObjectData.animations[i];
 
-        if ( i < this._animations.length )
-            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
-        else
-            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
-    }
-    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
+    if (i < this._animations.length)
+      gdjs.SpriteAnimation.call(
+        this._animations[i],
+        runtimeScene.getGame().getImageManager(),
+        animData
+      );
+    else
+      this._animations.push(
+        new gdjs.SpriteAnimation(
+          runtimeScene.getGame().getImageManager(),
+          animData
+        )
+      );
+  }
+  this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
 
-    this._updateAnimationFrame();
-    if (!this._animationFrame) {
-        this.setAnimation(0);
-    }
-    this.hitBoxesDirty = true;
-    return true;
+  this._updateAnimationFrame();
+  if (!this._animationFrame) {
+    this.setAnimation(0);
+  }
+  this.hitBoxesDirty = true;
+  return true;
 };
 
 /**
  * Initialize the extra parameters that could be set for an instance.
  * @param {{numberProperties: Array<{name: string, value: number}>, customSize: {width: number, height: number}}} initialInstanceData The extra parameters
  */
-gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-    if ( initialInstanceData.numberProperties ) {
-        for(var i = 0, len = initialInstanceData.numberProperties.length;i<len;++i) {
-            var extraData = initialInstanceData.numberProperties[i];
+gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function (
+  initialInstanceData
+) {
+  if (initialInstanceData.numberProperties) {
+    for (
+      var i = 0, len = initialInstanceData.numberProperties.length;
+      i < len;
+      ++i
+    ) {
+      var extraData = initialInstanceData.numberProperties[i];
 
-            if ( extraData.name === "animation" )
-                this.setAnimation(extraData.value);
-        }
+      if (extraData.name === 'animation') this.setAnimation(extraData.value);
     }
-    if ( initialInstanceData.customSize ) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-    }
+  }
+  if (initialInstanceData.customSize) {
+    this.setWidth(initialInstanceData.width);
+    this.setHeight(initialInstanceData.height);
+  }
 };
 
 /**
  * Update the current frame of the object according to the elapsed time on the scene.
  */
-gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
-    //Playing the animation of all objects including the ones outside the screen can be
-    //costly when the scene is big with a lot of animated objects. By default, we skip
-    //updating the object if it is not visible.
-    if (!this._updateIfNotVisible && !this._renderer.getRendererObject().visible)
-        return;
+gdjs.SpriteRuntimeObject.prototype.update = function (runtimeScene) {
+  //Playing the animation of all objects including the ones outside the screen can be
+  //costly when the scene is big with a lot of animated objects. By default, we skip
+  //updating the object if it is not visible.
+  if (!this._updateIfNotVisible && !this._renderer.getRendererObject().visible)
+    return;
 
-    if ( this._currentAnimation >= this._animations.length ||
-         this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
-        return;
+  if (
+    this._currentAnimation >= this._animations.length ||
+    this._currentDirection >=
+      this._animations[this._currentAnimation].directions.length
+  ) {
+    return;
+  }
+  var direction = this._animations[this._currentAnimation].directions[
+    this._currentDirection
+  ];
+  var oldFrame = this._currentFrame;
+
+  if (!direction.loop && this._currentFrame >= direction.frames.length) {
+    //*Optimization*: Animation is finished, don't change the current frame
+    //and compute nothing more.
+  } else {
+    var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+    this._frameElapsedTime += this._animationPaused
+      ? 0
+      : elapsedTime * this._animationSpeedScale;
+
+    if (this._frameElapsedTime > direction.timeBetweenFrames) {
+      var count = Math.floor(
+        this._frameElapsedTime / direction.timeBetweenFrames
+      );
+      this._currentFrame += count;
+      this._frameElapsedTime =
+        this._frameElapsedTime - count * direction.timeBetweenFrames;
+      if (this._frameElapsedTime < 0) this._frameElapsedTime = 0;
     }
-    var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
-    var oldFrame = this._currentFrame;
 
-    if (!direction.loop && this._currentFrame >= direction.frames.length) {
-        //*Optimization*: Animation is finished, don't change the current frame
-        //and compute nothing more.
-    } else {
-        var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
-        this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
-
-        if ( this._frameElapsedTime > direction.timeBetweenFrames ) {
-            var count = Math.floor(this._frameElapsedTime / direction.timeBetweenFrames);
-            this._currentFrame += count;
-            this._frameElapsedTime = this._frameElapsedTime-count*direction.timeBetweenFrames;
-            if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0;
-        }
-
-        if ( this._currentFrame >= direction.frames.length ) {
-            this._currentFrame = direction.loop ? this._currentFrame % direction.frames.length : direction.frames.length-1;
-        }
-        if ( this._currentFrame < 0 ) this._currentFrame = 0; //May happen if there is no frame.
+    if (this._currentFrame >= direction.frames.length) {
+      this._currentFrame = direction.loop
+        ? this._currentFrame % direction.frames.length
+        : direction.frames.length - 1;
     }
+    if (this._currentFrame < 0) this._currentFrame = 0; //May happen if there is no frame.
+  }
 
-    if ( oldFrame !== this._currentFrame || this._animationFrameDirty ) this._updateAnimationFrame();
-    if ( oldFrame !== this._currentFrame ) this.hitBoxesDirty = true;
+  if (oldFrame !== this._currentFrame || this._animationFrameDirty)
+    this._updateAnimationFrame();
+  if (oldFrame !== this._currentFrame) this.hitBoxesDirty = true;
 
-    this._renderer.ensureUpToDate();
+  this._renderer.ensureUpToDate();
 };
 
 /**
@@ -403,29 +452,34 @@ gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
  * is valid).
  * If invalid, `this._animationFrame` will be `null` after calling this function.
  */
-gdjs.SpriteRuntimeObject.prototype._updateAnimationFrame = function() {
-   this._animationFrameDirty = false;
+gdjs.SpriteRuntimeObject.prototype._updateAnimationFrame = function () {
+  this._animationFrameDirty = false;
 
-   if ( this._currentAnimation < this._animations.length &&
-        this._currentDirection < this._animations[this._currentAnimation].directions.length) {
-       var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
+  if (
+    this._currentAnimation < this._animations.length &&
+    this._currentDirection <
+      this._animations[this._currentAnimation].directions.length
+  ) {
+    var direction = this._animations[this._currentAnimation].directions[
+      this._currentDirection
+    ];
 
-       if ( this._currentFrame < direction.frames.length ) {
-           this._animationFrame = direction.frames[this._currentFrame];
-           if ( this._animationFrame !== null ) {
-               this._renderer.updateFrame(this._animationFrame);
-           }
+    if (this._currentFrame < direction.frames.length) {
+      this._animationFrame = direction.frames[this._currentFrame];
+      if (this._animationFrame !== null) {
+        this._renderer.updateFrame(this._animationFrame);
+      }
 
-           return;
-       }
-   }
+      return;
+    }
+  }
 
-   //Invalid animation/direction/frame:
-   this._animationFrame = null;
+  //Invalid animation/direction/frame:
+  this._animationFrame = null;
 };
 
-gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
-    return this._renderer.getRendererObject();
+gdjs.SpriteRuntimeObject.prototype.getRendererObject = function () {
+  return this._renderer.getRendererObject();
 };
 
 /**
@@ -433,37 +487,44 @@ gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
  * Fallback to the default implementation (rotated bounding box) if there is no custom
  * hitboxes defined for the current animation frame.
  */
-gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
-    if ( this._animationFrameDirty ) {
-        this._updateAnimationFrame();
+gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function () {
+  if (this._animationFrameDirty) {
+    this._updateAnimationFrame();
+  }
+  if (this._animationFrame === null) return; //Beware, `this._animationFrame` can still be null.
+
+  if (!this._animationFrame.hasCustomHitBoxes)
+    return gdjs.RuntimeObject.prototype.updateHitBoxes.call(this);
+
+  //console.log("Update for "+this.name); //Uncomment to track updates
+  //(and in particular be sure that unnecessary update are avoided).
+
+  //Update the current hitboxes with the frame custom hit boxes
+  //and apply transformations.
+  for (var i = 0; i < this._animationFrame.customHitBoxes.length; ++i) {
+    if (i >= this.hitBoxes.length) this.hitBoxes.push(new gdjs.Polygon());
+
+    for (
+      var j = 0;
+      j < this._animationFrame.customHitBoxes[i].vertices.length;
+      ++j
+    ) {
+      if (j >= this.hitBoxes[i].vertices.length)
+        this.hitBoxes[i].vertices.push([0, 0]);
+
+      this._transformToGlobal(
+        this._animationFrame.customHitBoxes[i].vertices[j][0],
+        this._animationFrame.customHitBoxes[i].vertices[j][1],
+        this.hitBoxes[i].vertices[j]
+      );
     }
-    if ( this._animationFrame === null ) return; //Beware, `this._animationFrame` can still be null.
+    this.hitBoxes[i].vertices.length = this._animationFrame.customHitBoxes[
+      i
+    ].vertices.length;
+  }
+  this.hitBoxes.length = this._animationFrame.customHitBoxes.length;
 
-    if ( !this._animationFrame.hasCustomHitBoxes )
-        return gdjs.RuntimeObject.prototype.updateHitBoxes.call(this);
-
-    //console.log("Update for "+this.name); //Uncomment to track updates
-    //(and in particular be sure that unnecessary update are avoided).
-
-    //Update the current hitboxes with the frame custom hit boxes
-    //and apply transformations.
-    for (var i = 0;i<this._animationFrame.customHitBoxes.length;++i) {
-        if ( i >= this.hitBoxes.length )
-            this.hitBoxes.push(new gdjs.Polygon());
-
-        for (var j = 0;j<this._animationFrame.customHitBoxes[i].vertices.length;++j) {
-            if ( j >= this.hitBoxes[i].vertices.length )
-                this.hitBoxes[i].vertices.push([0,0]);
-
-            this._transformToGlobal(this._animationFrame.customHitBoxes[i].vertices[j][0],
-                this._animationFrame.customHitBoxes[i].vertices[j][1],
-                this.hitBoxes[i].vertices[j]);
-        }
-        this.hitBoxes[i].vertices.length = this._animationFrame.customHitBoxes[i].vertices.length;
-    }
-    this.hitBoxes.length = this._animationFrame.customHitBoxes.length;
-
-    //Rotate and scale and flipping have already been applied to the point by _transformToGlobal.
+  //Rotate and scale and flipping have already been applied to the point by _transformToGlobal.
 };
 
 //Animations :
@@ -472,165 +533,183 @@ gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
  * Change the animation being played.
  * @param {number} newAnimation The index of the new animation to be played
  */
-gdjs.SpriteRuntimeObject.prototype.setAnimation = function(newAnimation) {
-    newAnimation = newAnimation | 0;
-    if ( newAnimation < this._animations.length &&
-        this._currentAnimation !== newAnimation &&
-        newAnimation >= 0) {
-        this._currentAnimation = newAnimation;
-        this._currentFrame = 0;
-        this._frameElapsedTime = 0;
-        this._renderer.update(); //TODO: This may be unnecessary.
-        this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
-    }
+gdjs.SpriteRuntimeObject.prototype.setAnimation = function (newAnimation) {
+  newAnimation = newAnimation | 0;
+  if (
+    newAnimation < this._animations.length &&
+    this._currentAnimation !== newAnimation &&
+    newAnimation >= 0
+  ) {
+    this._currentAnimation = newAnimation;
+    this._currentFrame = 0;
+    this._frameElapsedTime = 0;
+    this._renderer.update(); //TODO: This may be unnecessary.
+    this._animationFrameDirty = true;
+    this.hitBoxesDirty = true;
+  }
 };
 
 /**
  * Change the animation being played.
  * @param {string} newAnimationName The name of the new animation to be played
  */
-gdjs.SpriteRuntimeObject.prototype.setAnimationName = function(newAnimationName) {
-    if (!newAnimationName) return;
+gdjs.SpriteRuntimeObject.prototype.setAnimationName = function (
+  newAnimationName
+) {
+  if (!newAnimationName) return;
 
-    for(var i = 0;i < this._animations.length;++i) {
-        if (this._animations[i].name === newAnimationName) {
-            return this.setAnimation(i);
-        }
+  for (var i = 0; i < this._animations.length; ++i) {
+    if (this._animations[i].name === newAnimationName) {
+      return this.setAnimation(i);
     }
+  }
 };
 
 /**
  * Get the index of the animation being played.
  * @return {number} The index of the new animation being played
  */
-gdjs.SpriteRuntimeObject.prototype.getAnimation = function() {
-    return this._currentAnimation;
+gdjs.SpriteRuntimeObject.prototype.getAnimation = function () {
+  return this._currentAnimation;
 };
 
 /**
  * Get the name of the animation being played.
  * @return {string} The name of the new animation being played
  */
-gdjs.SpriteRuntimeObject.prototype.getAnimationName = function() {
-    if ( this._currentAnimation >= this._animations.length ) {
-        return '';
-    }
+gdjs.SpriteRuntimeObject.prototype.getAnimationName = function () {
+  if (this._currentAnimation >= this._animations.length) {
+    return '';
+  }
 
-    return this._animations[this._currentAnimation].name;
+  return this._animations[this._currentAnimation].name;
 };
 
-gdjs.SpriteRuntimeObject.prototype.isCurrentAnimationName = function(name) {
-    return this.getAnimationName() === name;
+gdjs.SpriteRuntimeObject.prototype.isCurrentAnimationName = function (name) {
+  return this.getAnimationName() === name;
 };
 
 /**
  * Change the angle (or direction index) of the object
  * @return {number} The new angle (or direction index) to be applied
  */
-gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
-    if ( this._currentAnimation >= this._animations.length ) {
-        return;
-    }
+gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function (newValue) {
+  if (this._currentAnimation >= this._animations.length) {
+    return;
+  }
 
-    var anim = this._animations[this._currentAnimation];
-    if ( !anim.hasMultipleDirections ) {
-        if ( this.angle === newValue ) return;
+  var anim = this._animations[this._currentAnimation];
+  if (!anim.hasMultipleDirections) {
+    if (this.angle === newValue) return;
 
-        this.angle = newValue;
-        this.hitBoxesDirty = true;
-        this._renderer.updateAngle();
-    }
-    else {
-        newValue = newValue | 0;
+    this.angle = newValue;
+    this.hitBoxesDirty = true;
+    this._renderer.updateAngle();
+  } else {
+    newValue = newValue | 0;
 
-        if (newValue === this._currentDirection
-            || newValue >= anim.directions.length
-            || anim.directions[newValue].frames.length === 0)
-            return;
+    if (
+      newValue === this._currentDirection ||
+      newValue >= anim.directions.length ||
+      anim.directions[newValue].frames.length === 0
+    )
+      return;
 
-        this._currentDirection = newValue;
-        this._currentFrame = 0;
-        this._frameElapsedTime = 0;
-        this.angle = 0;
+    this._currentDirection = newValue;
+    this._currentFrame = 0;
+    this._frameElapsedTime = 0;
+    this.angle = 0;
 
-        this._renderer.update(); //TODO: This may be unnecessary.
-        this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
-    }
+    this._renderer.update(); //TODO: This may be unnecessary.
+    this._animationFrameDirty = true;
+    this.hitBoxesDirty = true;
+  }
 };
 
-gdjs.SpriteRuntimeObject.prototype.getDirectionOrAngle = function() {
-    if ( this._currentAnimation >= this._animations.length ) {
-        return 0;
-    }
+gdjs.SpriteRuntimeObject.prototype.getDirectionOrAngle = function () {
+  if (this._currentAnimation >= this._animations.length) {
+    return 0;
+  }
 
-    if ( !this._animations[this._currentAnimation].hasMultipleDirections ) {
-        return this.angle;
-    }
-    else {
-        return this._currentDirection;
-    }
+  if (!this._animations[this._currentAnimation].hasMultipleDirections) {
+    return this.angle;
+  } else {
+    return this._currentDirection;
+  }
 };
 
 /**
  * Change the current frame displayed by the animation
  * @param {number} newFrame The index of the frame to be displayed
  */
-gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function(newFrame) {
-    if ( this._currentAnimation >= this._animations.length ||
-         this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
-        return;
-    }
-    var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
+gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function (newFrame) {
+  if (
+    this._currentAnimation >= this._animations.length ||
+    this._currentDirection >=
+      this._animations[this._currentAnimation].directions.length
+  ) {
+    return;
+  }
+  var direction = this._animations[this._currentAnimation].directions[
+    this._currentDirection
+  ];
 
-    if ( newFrame >= 0 && newFrame < direction.frames.length && newFrame !== this._currentFrame ) {
-        this._currentFrame = newFrame;
-        this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
-    }
+  if (
+    newFrame >= 0 &&
+    newFrame < direction.frames.length &&
+    newFrame !== this._currentFrame
+  ) {
+    this._currentFrame = newFrame;
+    this._animationFrameDirty = true;
+    this.hitBoxesDirty = true;
+  }
 };
 
 /**
  * Get the index of the current frame displayed by the animation
  * @return {number} newFrame The index of the frame being displayed
  */
-gdjs.SpriteRuntimeObject.prototype.getAnimationFrame = function() {
-    return this._currentFrame;
+gdjs.SpriteRuntimeObject.prototype.getAnimationFrame = function () {
+  return this._currentFrame;
 };
 
 /**
  * Return true if animation has ended.
  */
-gdjs.SpriteRuntimeObject.prototype.hasAnimationEnded = function() {
-    if ( this._currentAnimation >= this._animations.length ||
-         this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
-        return true;
-    }
-    if ( this._animations[this._currentAnimation].loop ) return false;
-    var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
+gdjs.SpriteRuntimeObject.prototype.hasAnimationEnded = function () {
+  if (
+    this._currentAnimation >= this._animations.length ||
+    this._currentDirection >=
+      this._animations[this._currentAnimation].directions.length
+  ) {
+    return true;
+  }
+  if (this._animations[this._currentAnimation].loop) return false;
+  var direction = this._animations[this._currentAnimation].directions[
+    this._currentDirection
+  ];
 
-    return this._currentFrame === direction.frames.length-1;
+  return this._currentFrame === direction.frames.length - 1;
 };
 
-gdjs.SpriteRuntimeObject.prototype.animationPaused = function() {
-    return this._animationPaused;
+gdjs.SpriteRuntimeObject.prototype.animationPaused = function () {
+  return this._animationPaused;
 };
 
-gdjs.SpriteRuntimeObject.prototype.pauseAnimation = function() {
-    this._animationPaused = true;
+gdjs.SpriteRuntimeObject.prototype.pauseAnimation = function () {
+  this._animationPaused = true;
 };
 
-gdjs.SpriteRuntimeObject.prototype.playAnimation = function() {
-    this._animationPaused = false;
+gdjs.SpriteRuntimeObject.prototype.playAnimation = function () {
+  this._animationPaused = false;
 };
 
-gdjs.SpriteRuntimeObject.prototype.getAnimationSpeedScale = function() {
-    return this._animationSpeedScale;
+gdjs.SpriteRuntimeObject.prototype.getAnimationSpeedScale = function () {
+  return this._animationSpeedScale;
 };
 
-gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function(ratio) {
-    this._animationSpeedScale = ratio
+gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function (ratio) {
+  this._animationSpeedScale = ratio;
 };
 
 //Position :
@@ -640,15 +719,15 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function(ratio) {
  * @param {string} name The point name
  * @return {number} the position on X axis on the scene of the given point.
  */
-gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    if ( name.length === 0 || this._animationFrame === null ) return this.getX();
+gdjs.SpriteRuntimeObject.prototype.getPointX = function (name) {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  if (name.length === 0 || this._animationFrame === null) return this.getX();
 
-    var pt = this._animationFrame.getPoint(name);
-    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointX);
-    this._transformToGlobal(pt.x, pt.y, pos);
+  var pt = this._animationFrame.getPoint(name);
+  var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointX);
+  this._transformToGlobal(pt.x, pt.y, pos);
 
-    return pos[0];
+  return pos[0];
 };
 
 /**
@@ -656,15 +735,15 @@ gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
  * @param {string} name The point name
  * @return {number} the position on Y axis on the scene of the given point.
  */
-gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    if ( name.length === 0 || this._animationFrame === null ) return this.getY();
+gdjs.SpriteRuntimeObject.prototype.getPointY = function (name) {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  if (name.length === 0 || this._animationFrame === null) return this.getY();
 
-    var pt = this._animationFrame.getPoint(name);
-    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointY);
-    this._transformToGlobal(pt.x, pt.y, pos);
+  var pt = this._animationFrame.getPoint(name);
+  var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointY);
+  this._transformToGlobal(pt.x, pt.y, pos);
 
-    return pos[1];
+  return pos[1];
 };
 
 /**
@@ -681,214 +760,233 @@ gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
  * in global coordinates)
  * @private
  */
-gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
-    var cx = this._animationFrame.center.x;
-    var cy = this._animationFrame.center.y;
+gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function (
+  x,
+  y,
+  result
+) {
+  var cx = this._animationFrame.center.x;
+  var cy = this._animationFrame.center.y;
 
-    //Flipping
-    if ( this._flippedX ) {
-        x = x + (cx - x) * 2;
-    }
-    if ( this._flippedY ) {
-        y = y + (cy - y) * 2;
-    }
+  //Flipping
+  if (this._flippedX) {
+    x = x + (cx - x) * 2;
+  }
+  if (this._flippedY) {
+    y = y + (cy - y) * 2;
+  }
 
-    //Scale
-    var absScaleX = Math.abs(this._scaleX);
-    var absScaleY = Math.abs(this._scaleY);
-    x *= absScaleX;
-    y *= absScaleY;
-    cx *= absScaleX;
-    cy *= absScaleY;
+  //Scale
+  var absScaleX = Math.abs(this._scaleX);
+  var absScaleY = Math.abs(this._scaleY);
+  x *= absScaleX;
+  y *= absScaleY;
+  cx *= absScaleX;
+  cy *= absScaleY;
 
-    //Rotation
-    var oldX = x;
-    var angleInRadians = this.angle/180*Math.PI;
-    var cosValue = Math.cos(angleInRadians); // Only compute cos and sin once (10% faster than doing it twice)
-    var sinValue = Math.sin(angleInRadians);
-    var xToCenterXDelta = x-cx;
-    var yToCenterYDelta = y-cy;
-    x = cx + cosValue*(xToCenterXDelta) - sinValue*(yToCenterYDelta);
-    y = cy + sinValue*(xToCenterXDelta) + cosValue*(yToCenterYDelta);
+  //Rotation
+  var oldX = x;
+  var angleInRadians = (this.angle / 180) * Math.PI;
+  var cosValue = Math.cos(angleInRadians); // Only compute cos and sin once (10% faster than doing it twice)
+  var sinValue = Math.sin(angleInRadians);
+  var xToCenterXDelta = x - cx;
+  var yToCenterYDelta = y - cy;
+  x = cx + cosValue * xToCenterXDelta - sinValue * yToCenterYDelta;
+  y = cy + sinValue * xToCenterXDelta + cosValue * yToCenterYDelta;
 
-    result.length = 2;
-    result[0] = x + (this.x - this._animationFrame.origin.x*absScaleX);
-    result[1] = y + (this.y - this._animationFrame.origin.y*absScaleY);
+  result.length = 2;
+  result[0] = x + (this.x - this._animationFrame.origin.x * absScaleX);
+  result[1] = y + (this.y - this._animationFrame.origin.y * absScaleY);
 };
 
 /**
  * Get the X position, on the scene, of the origin of the texture of the object.
  * @return {number} the X position, on the scene, of the origin of the texture of the object.
  */
-gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {
-    if ( this._animationFrame === null ) return this.x;
+gdjs.SpriteRuntimeObject.prototype.getDrawableX = function () {
+  if (this._animationFrame === null) return this.x;
 
-    var absScaleX = Math.abs(this._scaleX);
+  var absScaleX = Math.abs(this._scaleX);
 
-    if (!this._flippedX) {
-        return this.x - this._animationFrame.origin.x*absScaleX;
-    } else {
-        return this.x + (-this._animationFrame.origin.x
-            - this._renderer.getUnscaledWidth() + 2*this._animationFrame.center.x)*absScaleX;
-    }
+  if (!this._flippedX) {
+    return this.x - this._animationFrame.origin.x * absScaleX;
+  } else {
+    return (
+      this.x +
+      (-this._animationFrame.origin.x -
+        this._renderer.getUnscaledWidth() +
+        2 * this._animationFrame.center.x) *
+        absScaleX
+    );
+  }
 };
 
 /**
  * Get the Y position, on the scene, of the origin of the texture of the object.
  * @return {number} the Y position, on the scene, of the origin of the texture of the object.
  */
-gdjs.SpriteRuntimeObject.prototype.getDrawableY = function() {
-    if ( this._animationFrame === null ) return this.y;
+gdjs.SpriteRuntimeObject.prototype.getDrawableY = function () {
+  if (this._animationFrame === null) return this.y;
 
-    var absScaleY = Math.abs(this._scaleY);
+  var absScaleY = Math.abs(this._scaleY);
 
-    if (!this._flippedY) {
-        return this.y - this._animationFrame.origin.y*absScaleY;
-    } else {
-        return this.y + (-this._animationFrame.origin.y
-            - this._renderer.getUnscaledHeight() + 2*this._animationFrame.center.y)*absScaleY;
-    }
+  if (!this._flippedY) {
+    return this.y - this._animationFrame.origin.y * absScaleY;
+  } else {
+    return (
+      this.y +
+      (-this._animationFrame.origin.y -
+        this._renderer.getUnscaledHeight() +
+        2 * this._animationFrame.center.y) *
+        absScaleY
+    );
+  }
 };
 
 /**
  * Get the X position of the center of the object, relative to top-left of the texture of the object (`getDrawableX`).
  * @return {number} X position of the center of the object, relative to `getDrawableX()`.
  */
-gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    if ( this._animationFrame === null ) return 0;
+gdjs.SpriteRuntimeObject.prototype.getCenterX = function () {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  if (this._animationFrame === null) return 0;
 
-    if (!this._flippedX) {
-        //Just need to multiply by the scale as it is the center.
-        return this._animationFrame.center.x*Math.abs(this._scaleX);
-    } else {
-        return (this._renderer.getUnscaledWidth() - this._animationFrame.center.x)*Math.abs(this._scaleX);
-    }
+  if (!this._flippedX) {
+    //Just need to multiply by the scale as it is the center.
+    return this._animationFrame.center.x * Math.abs(this._scaleX);
+  } else {
+    return (
+      (this._renderer.getUnscaledWidth() - this._animationFrame.center.x) *
+      Math.abs(this._scaleX)
+    );
+  }
 };
 
 /**
  * Get the Y position of the center of the object, relative to top-left of the texture of the object (`getDrawableY`).
  * @return {number} Y position of the center of the object, relative to `getDrawableY()`.
  */
-gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    if ( this._animationFrame === null ) return 0;
+gdjs.SpriteRuntimeObject.prototype.getCenterY = function () {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  if (this._animationFrame === null) return 0;
 
-    if (!this._flippedY) {
-        //Just need to multiply by the scale as it is the center.
-        return this._animationFrame.center.y*Math.abs(this._scaleY);
-    } else {
-        return (this._renderer.getUnscaledHeight() - this._animationFrame.center.y)*Math.abs(this._scaleY);
-    }
+  if (!this._flippedY) {
+    //Just need to multiply by the scale as it is the center.
+    return this._animationFrame.center.y * Math.abs(this._scaleY);
+  } else {
+    return (
+      (this._renderer.getUnscaledHeight() - this._animationFrame.center.y) *
+      Math.abs(this._scaleY)
+    );
+  }
 };
 
 /**
  * Set the X position of the (origin of the) object.
  * @param {number} x The new X position.
  */
-gdjs.SpriteRuntimeObject.prototype.setX = function(x) {
-    if ( x === this.x ) return;
+gdjs.SpriteRuntimeObject.prototype.setX = function (x) {
+  if (x === this.x) return;
 
-    this.x = x;
-    if (this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
-        this._renderer.updateX();
-    }
+  this.x = x;
+  if (this._animationFrame !== null) {
+    this.hitBoxesDirty = true;
+    this._renderer.updateX();
+  }
 };
 
 /**
  * Set the Y position of the (origin of the) object.
  * @param {number} y The new Y position.
  */
-gdjs.SpriteRuntimeObject.prototype.setY = function(y) {
-    if ( y === this.y ) return;
+gdjs.SpriteRuntimeObject.prototype.setY = function (y) {
+  if (y === this.y) return;
 
-    this.y = y;
-    if ( this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
-        this._renderer.updateY();
-    }
+  this.y = y;
+  if (this._animationFrame !== null) {
+    this.hitBoxesDirty = true;
+    this._renderer.updateY();
+  }
 };
 
 /**
  * Set the angle of the object.
  * @param {number} angle The new angle, in degrees.
  */
-gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
-    if ( this._currentAnimation >= this._animations.length ) {
-        return;
-    }
+gdjs.SpriteRuntimeObject.prototype.setAngle = function (angle) {
+  if (this._currentAnimation >= this._animations.length) {
+    return;
+  }
 
-    if ( !this._animations[this._currentAnimation].hasMultipleDirections ) {
-        if (this.angle === angle) return;
+  if (!this._animations[this._currentAnimation].hasMultipleDirections) {
+    if (this.angle === angle) return;
 
-        this.angle = angle;
-        this._renderer.updateAngle();
-        this.hitBoxesDirty = true;
-    } else {
-        angle = angle % 360;
-        if ( angle < 0 ) angle += 360;
-        this.setDirectionOrAngle(Math.round(angle/45) % 8);
-    }
+    this.angle = angle;
+    this._renderer.updateAngle();
+    this.hitBoxesDirty = true;
+  } else {
+    angle = angle % 360;
+    if (angle < 0) angle += 360;
+    this.setDirectionOrAngle(Math.round(angle / 45) % 8);
+  }
 };
 
 /**
  * Get the angle of the object.
  * @return {number} The angle, in degrees.
  */
-gdjs.SpriteRuntimeObject.prototype.getAngle = function(angle) {
-    if ( this._currentAnimation >= this._animations.length ) {
-        return 0;
-    }
+gdjs.SpriteRuntimeObject.prototype.getAngle = function (angle) {
+  if (this._currentAnimation >= this._animations.length) {
+    return 0;
+  }
 
-    if ( !this._animations[this._currentAnimation].hasMultipleDirections )
-        return this.angle;
-    else
-        return this._currentDirection * 45;
+  if (!this._animations[this._currentAnimation].hasMultipleDirections)
+    return this.angle;
+  else return this._currentDirection * 45;
 };
 
 //Visibility and display :
 
-gdjs.SpriteRuntimeObject.prototype.setBlendMode = function(newMode) {
-    if (this._blendMode === newMode) return;
+gdjs.SpriteRuntimeObject.prototype.setBlendMode = function (newMode) {
+  if (this._blendMode === newMode) return;
 
-    this._blendMode = newMode;
-    this._renderer.update();
+  this._blendMode = newMode;
+  this._renderer.update();
 };
 
-gdjs.SpriteRuntimeObject.prototype.getBlendMode = function() {
-    return this._blendMode;
+gdjs.SpriteRuntimeObject.prototype.getBlendMode = function () {
+  return this._blendMode;
 };
 
 /**
  * Change the transparency of the object.
  * @param {number} opacity The new opacity, between 0 (transparent) and 255 (opaque).
  */
-gdjs.SpriteRuntimeObject.prototype.setOpacity = function(opacity) {
-    if ( opacity < 0 ) opacity = 0;
-    if ( opacity > 255 ) opacity = 255;
+gdjs.SpriteRuntimeObject.prototype.setOpacity = function (opacity) {
+  if (opacity < 0) opacity = 0;
+  if (opacity > 255) opacity = 255;
 
-    this.opacity = opacity;
-    this._renderer.updateOpacity();
+  this.opacity = opacity;
+  this._renderer.updateOpacity();
 };
 
 /**
  * Get the transparency of the object.
  * @return {number} The opacity, between 0 (transparent) and 255 (opaque).
  */
-gdjs.SpriteRuntimeObject.prototype.getOpacity = function() {
-    return this.opacity;
+gdjs.SpriteRuntimeObject.prototype.getOpacity = function () {
+  return this.opacity;
 };
 
 /**
  * Hide (or show) the object
  * @param {boolean} enable true to hide the object, false to show it again.
  */
-gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
-    if ( enable === undefined ) enable = true;
-    this.hidden = enable;
+gdjs.SpriteRuntimeObject.prototype.hide = function (enable) {
+  if (enable === undefined) enable = true;
+  this.hidden = enable;
 
-    this._renderer.updateVisibility();
+  this._renderer.updateVisibility();
 };
 
 /**
@@ -896,8 +994,8 @@ gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
  *
  * @param {string} rgbColor The color, in RGB format ("128;200;255").
  */
-gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
-    this._renderer.setColor(rgbColor);
+gdjs.SpriteRuntimeObject.prototype.setColor = function (rgbColor) {
+  this._renderer.setColor(rgbColor);
 };
 
 /**
@@ -905,34 +1003,34 @@ gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
  *
  * @returns {string} The color, in RGB format ("128;200;255").
  */
-gdjs.SpriteRuntimeObject.prototype.getColor = function() {
-    return this._renderer.getColor();
+gdjs.SpriteRuntimeObject.prototype.getColor = function () {
+  return this._renderer.getColor();
 };
 
-gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
-    if ( enable !== this._flippedX ) {
-        this._scaleX *= -1;
-        this._flippedX = enable;
-        this.hitBoxesDirty = true;
-        this._renderer.update();
-    }
+gdjs.SpriteRuntimeObject.prototype.flipX = function (enable) {
+  if (enable !== this._flippedX) {
+    this._scaleX *= -1;
+    this._flippedX = enable;
+    this.hitBoxesDirty = true;
+    this._renderer.update();
+  }
 };
 
-gdjs.SpriteRuntimeObject.prototype.flipY = function(enable) {
-    if ( enable !== this._flippedY ) {
-        this._scaleY *= -1;
-        this._flippedY = enable;
-        this.hitBoxesDirty = true;
-        this._renderer.update();
-    }
+gdjs.SpriteRuntimeObject.prototype.flipY = function (enable) {
+  if (enable !== this._flippedY) {
+    this._scaleY *= -1;
+    this._flippedY = enable;
+    this.hitBoxesDirty = true;
+    this._renderer.update();
+  }
 };
 
-gdjs.SpriteRuntimeObject.prototype.isFlippedX = function() {
-    return this._flippedX;
+gdjs.SpriteRuntimeObject.prototype.isFlippedX = function () {
+  return this._flippedX;
 };
 
-gdjs.SpriteRuntimeObject.prototype.isFlippedY = function() {
-    return this._flippedY;
+gdjs.SpriteRuntimeObject.prototype.isFlippedY = function () {
+  return this._flippedY;
 };
 
 //Scale and size :
@@ -942,9 +1040,9 @@ gdjs.SpriteRuntimeObject.prototype.isFlippedY = function() {
  *
  * @return {number} The width of the object, in pixels.
  */
-gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    return this._renderer.getWidth();
+gdjs.SpriteRuntimeObject.prototype.getWidth = function () {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  return this._renderer.getWidth();
 };
 
 /**
@@ -952,9 +1050,9 @@ gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
  *
  * @return {number} The height of the object, in pixels.
  */
-gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
-    return this._renderer.getHeight();
+gdjs.SpriteRuntimeObject.prototype.getHeight = function () {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
+  return this._renderer.getHeight();
 };
 
 /**
@@ -962,11 +1060,11 @@ gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
  *
  * @param {number} width The new width of the object, in pixels.
  */
-gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
+gdjs.SpriteRuntimeObject.prototype.setWidth = function (newWidth) {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
 
-    var unscaledWidth = this._renderer.getUnscaledWidth();
-    if (unscaledWidth !== 0) this.setScaleX(newWidth / unscaledWidth);
+  var unscaledWidth = this._renderer.getUnscaledWidth();
+  if (unscaledWidth !== 0) this.setScaleX(newWidth / unscaledWidth);
 };
 
 /**
@@ -974,11 +1072,11 @@ gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
  *
  * @param {number} height The new height of the object, in pixels.
  */
-gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
-    if ( this._animationFrameDirty ) this._updateAnimationFrame();
+gdjs.SpriteRuntimeObject.prototype.setHeight = function (newHeight) {
+  if (this._animationFrameDirty) this._updateAnimationFrame();
 
-    var unscaledHeight = this._renderer.getUnscaledHeight();
-    if (unscaledHeight !== 0) this.setScaleY(newHeight / unscaledHeight);
+  var unscaledHeight = this._renderer.getUnscaledHeight();
+  if (unscaledHeight !== 0) this.setScaleY(newHeight / unscaledHeight);
 };
 
 /**
@@ -986,14 +1084,18 @@ gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
  *
  * @param {number} newScale The new scale (must be greater than 0).
  */
-gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
-    if ( newScale < 0 ) newScale = 0;
-    if ( newScale === Math.abs(this._scaleX) && newScale === Math.abs(this._scaleY) ) return;
+gdjs.SpriteRuntimeObject.prototype.setScale = function (newScale) {
+  if (newScale < 0) newScale = 0;
+  if (
+    newScale === Math.abs(this._scaleX) &&
+    newScale === Math.abs(this._scaleY)
+  )
+    return;
 
-    this._scaleX = newScale * (this._flippedX ? -1 : 1);
-    this._scaleY = newScale * (this._flippedY ? -1 : 1);
-    this._renderer.update();
-    this.hitBoxesDirty = true;
+  this._scaleX = newScale * (this._flippedX ? -1 : 1);
+  this._scaleY = newScale * (this._flippedY ? -1 : 1);
+  this._renderer.update();
+  this.hitBoxesDirty = true;
 };
 
 /**
@@ -1001,13 +1103,13 @@ gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
  *
  * @param {number} newScale The new scale (must be greater than 0).
  */
-gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
-    if ( newScale < 0 ) newScale = 0;
-    if ( newScale === Math.abs(this._scaleX) ) return;
+gdjs.SpriteRuntimeObject.prototype.setScaleX = function (newScale) {
+  if (newScale < 0) newScale = 0;
+  if (newScale === Math.abs(this._scaleX)) return;
 
-    this._scaleX = newScale * (this._flippedX ? -1 : 1);
-    this._renderer.update();
-    this.hitBoxesDirty = true;
+  this._scaleX = newScale * (this._flippedX ? -1 : 1);
+  this._renderer.update();
+  this.hitBoxesDirty = true;
 };
 
 /**
@@ -1015,13 +1117,13 @@ gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
  *
  * @param {number} newScale The new scale (must be greater than 0).
  */
-gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
-    if ( newScale < 0 ) newScale = 0;
-    if ( newScale === Math.abs(this._scaleY) ) return;
+gdjs.SpriteRuntimeObject.prototype.setScaleY = function (newScale) {
+  if (newScale < 0) newScale = 0;
+  if (newScale === Math.abs(this._scaleY)) return;
 
-    this._scaleY = newScale * (this._flippedY ? -1 : 1);
-    this._renderer.update();
-    this.hitBoxesDirty = true;
+  this._scaleY = newScale * (this._flippedY ? -1 : 1);
+  this._renderer.update();
+  this.hitBoxesDirty = true;
 };
 
 /**
@@ -1029,8 +1131,8 @@ gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
  *
  * @return {number} the scale of the object (or the average of the X and Y scale in case they are different).
  */
-gdjs.SpriteRuntimeObject.prototype.getScale = function() {
-    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
+gdjs.SpriteRuntimeObject.prototype.getScale = function () {
+  return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
 };
 
 /**
@@ -1038,8 +1140,8 @@ gdjs.SpriteRuntimeObject.prototype.getScale = function() {
  *
  * @return {number} the scale of the object on Y axis
  */
-gdjs.SpriteRuntimeObject.prototype.getScaleY = function() {
-    return Math.abs(this._scaleY);
+gdjs.SpriteRuntimeObject.prototype.getScaleY = function () {
+  return Math.abs(this._scaleY);
 };
 
 /**
@@ -1047,8 +1149,8 @@ gdjs.SpriteRuntimeObject.prototype.getScaleY = function() {
  *
  * @return {number} the scale of the object on X axis
  */
-gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
-    return Math.abs(this._scaleX);
+gdjs.SpriteRuntimeObject.prototype.getScaleX = function () {
+  return Math.abs(this._scaleX);
 };
 
 //Other :
@@ -1062,7 +1164,7 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
  * @param {number} y Y position of the object
  * @param {boolean} useTransparency
  */
-gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function(
+gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
   runtimeScene,
   imageName,
   x,
@@ -1081,143 +1183,135 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function(
   sprite_sc.texture.x = this.getDrawableX();
   sprite_sc.texture.y = this.getDrawableY();
 
-  var ctx = this;
-
   sprite_sc.texture.transform = new PIXI.TextureMatrix(texture_sc);
 
   var uniforms = {
-      u_texture_sc : sprite_sc.texture,
-      u_texture_sc_width : this.getWidth(),
-      u_texture_sc_height : this.getHeight(),
-      u_texture_sc_rotation : 45,
-      u_texture_sc_offsetX : this.getDrawableX()+ this.getX() + x*2,
-      u_texture_sc_offsetY : this.getDrawableY()+ this.getY() + y*2,
+    u_texture_sc: sprite_sc.texture,
+    u_texture_sc_width: this.getWidth(),
+    u_texture_sc_height: this.getHeight(),
+    u_texture_sc_rotation: 45,
+    u_texture_sc_offsetX: this.getDrawableX() + this.getX() + x,
+    u_texture_sc_offsetY: this.getDrawableY() + this.getY() + y,
   };
-
 
   // create vertex shader
   var vertexSrc = `
-     precision highp float;
+    precision highp float;
 
-attribute vec2 aVertexPosition;
-attribute vec2 aTextureCoord;
+    attribute vec2 aVertexPosition;
+    attribute vec2 aTextureCoord;
 
-uniform mat3 otherMatrix;
-uniform mat3 projectionMatrix;
+    uniform mat3 otherMatrix;
+    uniform mat3 projectionMatrix;
 
-varying vec2 vTextureCoord;
-varying vec2 vTexture_scCoord;
+    varying vec2 vTextureCoord;
+    varying vec2 vTexture_scCoord;
 
-void main(void)   {      
-
-	gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-	vTextureCoord = aTextureCoord;
-	vTexture_scCoord = (otherMatrix * vec3(aTextureCoord,1.0)).xy;
- 
-}
+    void main(void)   {      
+        gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+        vTextureCoord = aTextureCoord;
+        vTexture_scCoord = (otherMatrix * vec3(aTextureCoord,1.0)).xy;
+    }
 `
     .split('\n')
     .reduce((c, a) => c + a.trim() + '\n');
 
   // create fragment shader
   var fragSrc = `
-       precision highp float;
-  
+    precision highp float;
+
     varying vec2 vTextureCoord;
     varying vec2 vTexture_scCoord;
     uniform sampler2D uSampler;
     uniform sampler2D u_texture_sc; 
     uniform vec4 filterArea;
-    
+
     uniform float u_texture_sc_offsetX;
     uniform float u_texture_sc_offsetY;
-    
     uniform float u_texture_sc_width;
     uniform float u_texture_sc_height;
     uniform float u_texture_sc_rotation;
-    
 
     float aspectRatio = u_texture_sc_width/u_texture_sc_height;
-    
-   
+
     //Merge two textures, rgba
     vec4 layer(vec4 foreground, vec4 background) {
-      // NORMAL blendMode for PREMULTIPLIED alpha
-      return foreground + background * (1.0 - foreground.a);
+        // NORMAL blendMode for PREMULTIPLIED alpha
+        return foreground + background * (1.0 - foreground.a);
     }
-        
+
     vec2 rotate(vec2 uv, float rotation, vec2 rotationPoint){
-      uv -= rotationPoint;
-      float c = cos(rotation);
-      float s = sin(rotation);
-      
-      mat2 mat = mat2(c,-s,s,c);
-      uv.y /= aspectRatio;
-      uv = mat * uv;
-      uv.y *= aspectRatio;
-      uv += rotationPoint;
-      return uv;
+        uv -= rotationPoint;
+        float c = cos(rotation);
+        float s = sin(rotation);
+
+        mat2 mat = mat2(c,-s,s,c);
+        uv.y /= aspectRatio;
+        uv = mat * uv;
+        uv.y *= aspectRatio;
+        uv += rotationPoint;
+        return uv;
     }
 
     void main() {
-    
-      //Add offset X and/or Y
-      vec2 offsetXY = vec2(u_texture_sc_offsetX, u_texture_sc_offsetY);
-     
-      //Point of rotation on the added texture if needed, value 0-1, 0.5=mid
-      vec2 rotatePoint = vec2(0.0,0.0);
 
-      //Add offset XY
-      vec2 cvTexture_scCoord = vTexture_scCoord - offsetXY/vec2(u_texture_sc_width, u_texture_sc_height);
+        //Add offset X and/or Y
+        vec2 offsetXY = vec2(u_texture_sc_offsetX, u_texture_sc_offsetY);
 
-      //Add rotation UV, here 45 pass by u_texture_sc_rotation
-      cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_rotation), rotatePoint);
-      
-      //Apply UV on textures
-      vec4 texColor = texture2D(uSampler, vTextureCoord);	
-      vec4 texColor_sc = texture2D(u_texture_sc, cvTexture_scCoord);
-   
-      //If second texture bleed over the first one, crop it.
-      //Yeah i should use clamp, idk yet how use it.
-      if(cvTexture_scCoord.x < 0.0 || cvTexture_scCoord.x > 1.0 || cvTexture_scCoord.y < 0.0 || cvTexture_scCoord.y > 1.0 )
-        texColor_sc *= 0.0;     
-            
-      vec4 final = layer(texColor_sc,texColor);
-      gl_FragColor = final;
+        //Point of rotation on the added texture if needed, value 0-1, 0.5=mid
+        vec2 rotatePoint = vec2(0.0,0.0);
+
+        //Add offset XY
+        vec2 cvTexture_scCoord = vTexture_scCoord - offsetXY/vec2(u_texture_sc_width, u_texture_sc_height);
+
+        //Add rotation UV, here 45 pass by u_texture_sc_rotation
+        cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_rotation), rotatePoint);
+
+        //Apply UV on textures
+        vec4 texColor = texture2D(uSampler, vTextureCoord);	
+        vec4 texColor_sc = texture2D(u_texture_sc, cvTexture_scCoord);
+
+        //If second texture bleed over the first one, crop it.
+        //Yeah i should use clamp, idk yet how use it.
+        if(cvTexture_scCoord.x < 0.0 || cvTexture_scCoord.x > 1.0 || cvTexture_scCoord.y < 0.0 || cvTexture_scCoord.y > 1.0 )
+          texColor_sc *= 0.0;     
+
+        vec4 final = layer(texColor_sc,texColor);
+        gl_FragColor = final;
     }
 `
     .split('\n')
     .reduce((c, a) => c + a.trim() + '\n');
 
-    var filter = new PIXI.Filter(vertexSrc, fragSrc, uniforms);
+  var filter = new PIXI.Filter(vertexSrc, fragSrc, uniforms);
 
-    filter.apply = function (filterManager, input, output) {
+  filter.apply = function (filterManager, input, output) {
     //this.uniforms = uniforms;
 
     sprite_sc.texture.transform.update();
     var sprite_scMatrix = new PIXI.Matrix();
 
     this.uniforms.texture_sc = sprite_sc.texture;
-    this.uniforms.otherMatrix = filterManager.calculateSpriteMatrix(sprite_scMatrix, sprite_sc).prepend(sprite_sc.texture.transform.mapCoord);
+    this.uniforms.otherMatrix = filterManager
+      .calculateSpriteMatrix(sprite_scMatrix, sprite_sc)
+      .prepend(sprite_sc.texture.transform.mapCoord);
 
     // draw the filter...
     filterManager.applyFilter(this, input, output);
   };
 
   this._renderer.setFilter(filter);
-
 };
 
 /**
  * Pick a color on sprite and apply a mask on it for make color transparent.
- * @param {string} rgbColor Color to make transparent, in RGB format ("128;200;255"). 
+ * @param {string} rgbColor Color to make transparent, in RGB format ("128;200;255").
  */
-gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
+gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function (
   rgbColor,
   threshold
 ) {
-
-    //https://jsfiddle.net/Babar31/vqyk8gmf/4/
+  //https://jsfiddle.net/Babar31/vqyk8gmf/4/
 
   //Convert rgbColor "128;200;255" in [128, 200, 255]
   var rgbColor = rgbColor.split(';');
@@ -1261,7 +1355,7 @@ gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
 
   var filter = new PIXI.Filter(null, fragSrc, uniforms);
 
-  filter.apply = function(filterManager, input, output) {
+  filter.apply = function (filterManager, input, output) {
     this.uniforms = uniforms;
 
     // draw the filter...
@@ -1276,9 +1370,13 @@ gdjs.SpriteRuntimeObject.prototype.makeColorTransparent = function(
  * @param scene The scene containing the object
  * @deprecated
  */
-gdjs.SpriteRuntimeObject.prototype.turnTowardObject = function(obj, scene) {
-    if ( obj === null ) return;
+gdjs.SpriteRuntimeObject.prototype.turnTowardObject = function (obj, scene) {
+  if (obj === null) return;
 
-    this.rotateTowardPosition(obj.getDrawableX()+obj.getCenterX(),
-        obj.getDrawableY()+obj.getCenterY(), 0, scene);
+  this.rotateTowardPosition(
+    obj.getDrawableX() + obj.getCenterX(),
+    obj.getDrawableY() + obj.getCenterY(),
+    0,
+    scene
+  );
 };

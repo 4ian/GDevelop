@@ -2122,40 +2122,33 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           onClose: () => openCreateDialog(false),
-          onOpen: (storageProvider, fileMetadata) => {
-            setState(state => ({ ...state, createDialogOpen: false })).then(
-              state => {
-                // eslint-disable-next-line
-                getStorageProviderOperations(storageProvider)
-                  .then(storageProviderOperations =>
-                    openFromFileMetadata(fileMetadata)
-                  )
-                  .then(state => {
-                    if (state)
-                      openSceneOrProjectManager({
-                        currentProject: state.currentProject,
-                        editorTabs: state.editorTabs,
-                      });
-                  });
-              }
+          onOpen: async (storageProvider, fileMetadata) => {
+            await setState(state => ({ ...state, createDialogOpen: false }));
+            const storageProviderOperations = await getStorageProviderOperations(
+              storageProvider
             );
+            const state = await openFromFileMetadata(fileMetadata);
+
+            if (state) {
+              if (state.currentProject) state.currentProject.resetProjectUuid();
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+            }
           },
-          onCreate: (project, storageProvider, fileMetadata) => {
-            setState(state => ({ ...state, createDialogOpen: false })).then(
-              state => {
-                // eslint-disable-next-line
-                getStorageProviderOperations(storageProvider)
-                  .then(storageProviderOperations =>
-                    loadFromProject(project, fileMetadata)
-                  )
-                  .then(state =>
-                    openSceneOrProjectManager({
-                      currentProject: state.currentProject,
-                      editorTabs: state.editorTabs,
-                    })
-                  );
-              }
+          onCreate: async (project, storageProvider, fileMetadata) => {
+            await setState(state => ({ ...state, createDialogOpen: false }));
+            const storageProviderOperations = await getStorageProviderOperations(
+              storageProvider
             );
+            const state = await loadFromProject(project, fileMetadata);
+
+            if (state.currentProject) state.currentProject.resetProjectUuid();
+            openSceneOrProjectManager({
+              currentProject: state.currentProject,
+              editorTabs: state.editorTabs,
+            });
           },
         })}
       {!!introDialog &&

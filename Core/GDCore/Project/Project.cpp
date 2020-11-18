@@ -38,6 +38,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/PolymorphicClone.h"
+#include "GDCore/Tools/UUID/UUID.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Utf8/utf8.h"
 
@@ -54,6 +55,7 @@ Project::Project()
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
+      projectUuid(""),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -106,6 +108,8 @@ Project::Project()
 }
 
 Project::~Project() {}
+
+void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
@@ -599,6 +603,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
+  SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
@@ -621,6 +626,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   } else {
     useDeprecatedZeroAsDefaultZOrder =
         propElement.GetBoolAttribute("useDeprecatedZeroAsDefaultZOrder", false);
+  }
+  // end of compatibility code
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (!propElement.HasAttribute("projectUuid") &&
+      !propElement.HasChild("projectUuid")) {
+    ResetProjectUuid();
   }
   // end of compatibility code
 
@@ -891,6 +903,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
+  propElement.SetAttribute("projectUuid", projectUuid);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1093,6 +1106,7 @@ void Project::Init(const gd::Project& game) {
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
+  projectUuid = game.projectUuid;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;

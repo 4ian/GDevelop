@@ -296,6 +296,24 @@ class GD_CORE_API Project : public ObjectsContainer {
   }
 
   /**
+   * \brief Change the project UUID.
+   */
+  void SetProjectUuid(const gd::String& projectUuid_) {
+    projectUuid = projectUuid_;
+  };
+
+  /**
+   * \brief Get the project UUID, useful when using the game on online services
+   * that would require a unique identifier.
+   */
+  const gd::String& GetProjectUuid() const { return projectUuid; }
+
+  /**
+   * \brief Create a new project UUID.
+   */
+  void ResetProjectUuid();
+
+  /**
    * Return a reference to the vector containing the names of extensions used by
    * the project.
    */
@@ -994,6 +1012,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String packageName;   ///< Game package name
   gd::String orientation;   ///< Lock game orientation (on mobile devices).
                             ///< "default", "landscape" or "portrait".
+  gd::String projectUuid;   ///< UUID useful to identify the game in online services or database that would require it.
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String projectFile;  ///< Path to the project file - when editing a local file.

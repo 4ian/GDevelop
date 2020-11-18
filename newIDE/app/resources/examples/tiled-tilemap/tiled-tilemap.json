@@ -214,7 +214,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.76
+        "zoomFactor": 0.736
       },
       "objectsGroups": [],
       "variables": [
@@ -346,7 +346,7 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "testMapProtectAgainstCrashOnBadData",
+          "name": "atlasImageWithWrongSizeStillWorks",
           "persistentUuid": "0017d993-3822-4a12-9d4a-9f4abc35f71a",
           "width": 0,
           "x": 544,
@@ -524,7 +524,7 @@
           ]
         },
         {
-          "name": "testMapProtectAgainstCrashOnBadData",
+          "name": "atlasImageWithWrongSizeStillWorks",
           "tags": "",
           "type": "TileMap::TileMap",
           "variables": [],

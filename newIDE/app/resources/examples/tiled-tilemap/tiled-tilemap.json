@@ -146,6 +146,42 @@
         "name": "incorrectWay.PNG",
         "smoothed": true,
         "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "islandTilesetAtlas.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "islandTilesetAtlas.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "islandTilesetAtlas-scaledDown.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "islandTilesetAtlas-scaledDown.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "islander.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "islander.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "islandTilesetAtlas-scaledUp.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "islandTilesetAtlas-scaledUp.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -178,7 +214,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.904
+        "zoomFactor": 0.76
       },
       "objectsGroups": [],
       "variables": [
@@ -303,6 +339,22 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "testMapProtectAgainstCrashOnBadData",
+          "persistentUuid": "0017d993-3822-4a12-9d4a-9f4abc35f71a",
+          "width": 0,
+          "x": 544,
+          "y": 600,
+          "zOrder": 12,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -329,7 +381,7 @@
           "behaviors": [],
           "content": {
             "tilemapJsonFile": "island.json",
-            "tilemapAtlasImage": "Viking3.png",
+            "tilemapAtlasImage": "islandTilesetAtlas.png",
             "displayMode": "visible",
             "layerIndex": 0,
             "animationSpeedScale": 1,
@@ -470,6 +522,21 @@
               ]
             }
           ]
+        },
+        {
+          "name": "testMapProtectAgainstCrashOnBadData",
+          "tags": "",
+          "type": "TileMap::TileMap",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "tilemapJsonFile": "island.json",
+            "tilemapAtlasImage": "islandTilesetAtlas-scaledDown.png",
+            "displayMode": "visible",
+            "layerIndex": 0,
+            "animationSpeedScale": 1,
+            "animationFps": 4
+          }
         }
       ],
       "events": [

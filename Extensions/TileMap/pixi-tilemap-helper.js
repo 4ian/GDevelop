@@ -23,14 +23,27 @@
     onLoad,
     getTexture
   ) => {
-    // Todo implement tileset index and use it instead of 0
-    const { tilewidth, tilecount, tileheight, tiles, image } = tiledData.tilesets[0];
+    const { tilewidth, tileheight, tilecount, tiles, image, columns } = tiledData.tilesets[0];
     if (!tex) tex = getTexture(image);
+
+    const rows = tilecount / columns;
+    const tileWidth = Math.floor(tex.width / columns); // we dont trust the json's tilewidth/height here because the atlas can be resized
+    const tileHeight = Math.floor(tex.height / rows);
+    const expectedAtlasWidth = tilewidth * columns;
+    const expectedAtlasHeight = tileheight * rows;
+    if (tileWidth !== tilewidth || tileHeight !== tileheight) {
+      console.warn(`
+        Have you resized your atlas?
+        It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height}px.
+        Note that margin and spacing are not supported in GD at this time.
+        GD will try to adopt the resized atlas image to these dimensions.
+      `);
+    }
+
     const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
-      const cols = Math.floor(tex.width / tilewidth)
-      const x = ((frame - 1) % cols) * tilewidth
-      const y = Math.floor((frame - 1) / cols) * tileheight
-      const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight)
+      const x = ((frame - 1) % columns) * tileWidth
+      const y = Math.floor((frame - 1) / columns) * tileHeight
+      const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
       const texture = new PIXI.Texture(tex, rect)
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
       texture.cacheAsBitmap = true
@@ -40,13 +53,15 @@
     const newTileset = {
       width: tex.width,
       height: tex.height,
-      tilewidth,
-      tileheight,
+      tileWidth,
+      tileHeight,
       texture: tex,
       textureCache,
       layers: tiledData.layers,
       tiles,
       tilecount,
+      atlasScaleX: tex.width/expectedAtlasWidth,
+      atlasScaleY: tex.height/expectedAtlasHeight,
     }
     onLoad(newTileset)
     loadedTileSets[requestedTileSetId] = newTileset
@@ -72,8 +87,8 @@
           if (tileSet.textureCache[gid]) {
             tileMap.addFrame(
               tileSet.textureCache[gid],
-              x,
-              y - tileSet.tileheight
+              x * tileSet.atlasScaleX,
+              (y - tileSet.tileHeight) * tileSet.atlasScaleY
             )
           }
         })
@@ -81,8 +96,8 @@
         let ind = 0
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
-            const xPos = tileSet.tilewidth * j
-            const yPos = tileSet.tileheight * i
+            const xPos = tileSet.tileWidth * j
+            const yPos = tileSet.tileHeight * i
 
             const tileUid = layer.data[ind]
 
@@ -95,7 +110,7 @@
               if (tileData && tileData.animation) {
                 tileMap
                   .addFrame(tileSet.textureCache[tileUid], xPos, yPos)
-                  .tileAnimX(tileSet.tilewidth, tileData.animation.length)
+                  .tileAnimX(tileSet.tileWidth, tileData.animation.length)
               } else {
                 // Non animated props dont require tileAnimX or Y
                 tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos)

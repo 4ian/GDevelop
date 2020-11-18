@@ -2578,7 +2578,7 @@
         {
          "columns":12,
          "firstgid":1,
-         "image":"Viking3.png",
+         "image":"islandTilesetAtlas.png",
          "imageheight":1092,
          "imagewidth":504,
          "margin":0,
@@ -3659,7 +3659,7 @@
         {
          "columns":12,
          "firstgid":313,
-         "image":"Viking3.png",
+         "image":"islandTilesetAtlas.png",
          "imageheight":1092,
          "imagewidth":504,
          "margin":0,
@@ -4688,7 +4688,7 @@
         {
          "columns":12,
          "firstgid":625,
-         "image":"Viking3.png",
+         "image":"islandTilesetAtlas.png",
          "imageheight":1092,
          "imagewidth":504,
          "margin":0,

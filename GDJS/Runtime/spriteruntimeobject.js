@@ -1069,148 +1069,136 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function(
   y,
   useTransparency
 ) {
-    
+  var sprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
+  var texture = sprite.texture;
 
-    var sprite = this._renderer.getRendererObject(); //get sprite in renderer of the object.
-    var texture = sprite.texture;
+  var texture_sc = runtimeScene
+    .getGame()
+    .getImageManager()
+    .getPIXITexture(imageName);
+  var sprite_sc = new PIXI.Sprite(texture_sc);
 
-    var texture_sc = runtimeScene.getGame().getImageManager().getPIXITexture(imageName);
-    var sprite_sc = new PIXI.Sprite(texture_sc);
+  sprite_sc.texture.x = this.getDrawableX();
+  sprite_sc.texture.y = this.getDrawableY();
 
-    sprite_sc.texture.x = this.getDrawableX();
-    sprite_sc.texture.y = this.getDrawableY();
+  var ctx = this;
 
+  sprite_sc.texture.transform = new PIXI.TextureMatrix(texture_sc);
 
-    var ctx = this;
-
-    
-
-    sprite_sc.texture.transform = new PIXI.TextureMatrix(texture_sc);
-/*
-  
   var uniforms = {
-    texture_sc:  sprite_sc.texture,
-    texture_scClamp:  sprite_sc.texture.transform.uClampFrame,
-    texture_scAlpha:  sprite_sc.worldAlpha,
+      u_texture_sc : sprite_sc.texture,
+      u_texture_sc_width : this.getWidth(),
+      u_texture_sc_height : this.getHeight(),
+      u_texture_sc_rotation : 45,
+      u_texture_sc_offsetX : this.getDrawableX()+ this.getX() + x*2,
+      u_texture_sc_offsetY : this.getDrawableY()+ this.getY() + y*2,
   };
 
-  */
 
-   var uniforms = {
-    positionX:  x+this.getDrawableX(),
-    positionY:  y+this.getDrawableY(),
-    spriteWidth:  this.getWidth(),
-    spriteHeight: this.getHeight(),
-  };
-  
+  // create vertex shader
+  var vertexSrc = `
+     precision highp float;
 
-// create vertex shader
-var vertexSrc = `
-    precision highp float;
+attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
 
-    attribute vec2 aVertexPosition;
-    attribute vec2 aTextureCoord;
+uniform mat3 otherMatrix;
+uniform mat3 projectionMatrix;
 
-    attribute vec2 uv_offset;
-    
-    attribute float positionX;
-    attribute float positionY;
-    attribute float spriteWidth;
-    attribute float spriteHeight;
+varying vec2 vTextureCoord;
+varying vec2 vTexture_scCoord;
 
-    uniform mat3 otherMatrix;
-    uniform mat3 projectionMatrix;
+void main(void)   {      
 
-    varying vec2 vTextureCoord;
-    varying vec2 vTexture_scCoord;
-
-
-    void main(void)   {      
-
-        gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-        vTextureCoord = aTextureCoord;
-       
-        //vec2 uv_offset = vec2(0.1,0.1);
-
-        vTexture_scCoord = (otherMatrix * vec3(aTextureCoord,1.0) ).xy;
-
-        //vTexture_scCoord -= uv_offset;
-    
-    }
+	gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+	vTextureCoord = aTextureCoord;
+	vTexture_scCoord = (otherMatrix * vec3(aTextureCoord,1.0)).xy;
+ 
+}
 `
-  .split("\n")
-  .reduce((c, a) => c + a.trim() + "\n");
+    .split('\n')
+    .reduce((c, a) => c + a.trim() + '\n');
 
   // create fragment shader
   var fragSrc = `
-    precision highp float;
+       precision highp float;
   
     varying vec2 vTextureCoord;
     varying vec2 vTexture_scCoord;
-
     uniform sampler2D uSampler;
-    uniform sampler2D texture_sc; 
-    uniform vec4 texture_scClamp;
-    uniform float texture_scAlpha;
+    uniform sampler2D u_texture_sc; 
+    uniform vec4 filterArea;
+    
+    uniform float u_texture_sc_offsetX;
+    uniform float u_texture_sc_offsetY;
+    
+    uniform float u_texture_sc_width;
+    uniform float u_texture_sc_height;
+    uniform float u_texture_sc_rotation;
+    
 
-    uniform float spriteRotation; 
-    uniform float spritePositionX; 
-    uniform float spritePositionY; 
+    float aspectRatio = u_texture_sc_width/u_texture_sc_height;
+    
    
     //Merge two textures, rgba
     vec4 layer(vec4 foreground, vec4 background) {
       // NORMAL blendMode for PREMULTIPLIED alpha
       return foreground + background * (1.0 - foreground.a);
     }
+        
+    vec2 rotate(vec2 uv, float rotation, vec2 rotationPoint){
+      uv -= rotationPoint;
+      float c = cos(rotation);
+      float s = sin(rotation);
+      
+      mat2 mat = mat2(c,-s,s,c);
+      uv.y /= aspectRatio;
+      uv = mat * uv;
+      uv.y *= aspectRatio;
+      uv += rotationPoint;
+      return uv;
+    }
 
     void main() {
-        
-      vec2 cTexture_scCoord = vTexture_scCoord;
-          
+    
+      //Add offset X and/or Y
+      vec2 offsetXY = vec2(u_texture_sc_offsetX, u_texture_sc_offsetY);
+     
+      //Point of rotation on the added texture if needed, value 0-1, 0.5=mid
+      vec2 rotatePoint = vec2(0.0,0.0);
+
+      //Add offset XY
+      vec2 cvTexture_scCoord = vTexture_scCoord - offsetXY/vec2(u_texture_sc_width, u_texture_sc_height);
+
+      //Add rotation UV, here 45 pass by u_texture_sc_rotation
+      cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_rotation), rotatePoint);
+      
+      //Apply UV on textures
       vec4 texColor = texture2D(uSampler, vTextureCoord);	
-      vec4 texColor_sc = texture2D(texture_sc, cTexture_scCoord);
-
-     
-      if(cTexture_scCoord.x < 0.0 || cTexture_scCoord.x > 1.0 || cTexture_scCoord.y < 0.0 || cTexture_scCoord.y > 1.0 )
-        texColor_sc *= texture_scAlpha * 0.0;     
-
-
-      float clip = step(3.5,
-			step(texture_scClamp.r, cTexture_scCoord.x) +
-			step(texture_scClamp.g, cTexture_scCoord.y) +
-			step(cTexture_scCoord.x, texture_scClamp.b) +
-			step(cTexture_scCoord.y, texture_scClamp.a));
-  
-      //texColor_sc *= texture_scAlpha * clip; //premultiplied in all channels
-
-      //debug main texture, there is an offset, but it's doesn't exist when i open it with photoshop.
-      /*
-      texColor.a = 1.0;
-      */
-
+      vec4 texColor_sc = texture2D(u_texture_sc, cvTexture_scCoord);
+   
+      //If second texture bleed over the first one, crop it.
+      //Yeah i should use clamp, idk yet how use it.
+      if(cvTexture_scCoord.x < 0.0 || cvTexture_scCoord.x > 1.0 || cvTexture_scCoord.y < 0.0 || cvTexture_scCoord.y > 1.0 )
+        texColor_sc *= 0.0;     
+            
       vec4 final = layer(texColor_sc,texColor);
-     
       gl_FragColor = final;
-		}
+    }
 `
     .split('\n')
     .reduce((c, a) => c + a.trim() + '\n');
 
-  var filter = new PIXI.Filter(vertexSrc, fragSrc ); //in future pass uniforms here
+    var filter = new PIXI.Filter(vertexSrc, fragSrc, uniforms);
 
-  filter.apply = function(filterManager, input, output) {
+    filter.apply = function (filterManager, input, output) {
+    //this.uniforms = uniforms;
 
- this.uniforms = uniforms; 
-
-    sprite_sc.texture.transform.update();  
+    sprite_sc.texture.transform.update();
     var sprite_scMatrix = new PIXI.Matrix();
 
     this.uniforms.texture_sc = sprite_sc.texture;
     this.uniforms.otherMatrix = filterManager.calculateSpriteMatrix(sprite_scMatrix, sprite_sc).prepend(sprite_sc.texture.transform.mapCoord);
-    this.uniforms.texture_scClamp = sprite_sc.texture.transform.uClampFrame;
-    this.uniforms.texture_scAlpha = sprite_sc.worldAlpha;
-
-console.log( this.uniforms);
 
     // draw the filter...
     filterManager.applyFilter(this, input, output);
@@ -1218,7 +1206,6 @@ console.log( this.uniforms);
 
   this._renderer.setFilter(filter);
 
-  
 };
 
 /**

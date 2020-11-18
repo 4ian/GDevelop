@@ -142,6 +142,7 @@ export interface ProjectPropertiesData {
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
+  projectUuid?: string;
 }
 
 export interface ExtensionProperty {

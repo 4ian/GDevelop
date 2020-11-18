@@ -30,23 +30,15 @@
  * @param {ProjectData} data The object (usually stored in data.json) containing the full project data
  * @param {RuntimeGameOptions=} options Optional object for specifiying additional options: {forceFullscreen: ...}
  */
-gdjs.RuntimeGame = function(data, options) {
+gdjs.RuntimeGame = function (data, options) {
   options = options || {};
 
   this._variables = new gdjs.VariablesContainer(data.variables);
   this._data = data;
-  this._imageManager = new gdjs.ImageManager(
-    this._data.resources.resources
-  );
-  this._soundManager = new gdjs.SoundManager(
-    this._data.resources.resources
-  );
-  this._fontManager = new gdjs.FontManager(
-    this._data.resources.resources
-  );
-  this._jsonManager = new gdjs.JsonManager(
-    this._data.resources.resources
-  );
+  this._imageManager = new gdjs.ImageManager(this._data.resources.resources);
+  this._soundManager = new gdjs.SoundManager(this._data.resources.resources);
+  this._fontManager = new gdjs.FontManager(this._data.resources.resources);
+  this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
   this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
   this._minFPS = this._data ? this._data.properties.minFPS : 15;
 
@@ -55,8 +47,7 @@ gdjs.RuntimeGame = function(data, options) {
   this._originalWidth = this._gameResolutionWidth;
   this._originalHeight = this._gameResolutionHeight;
   this._resizeMode = this._data.properties.sizeOnStartupMode;
-  this._adaptGameResolutionAtRuntime =
-    this._data.properties.adaptGameResolutionAtRuntime;
+  this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
   /** @type {string} */
   this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
@@ -93,32 +84,24 @@ gdjs.RuntimeGame = function(data, options) {
  *
  * @param {ProjectData} projectData The object (usually stored in data.json) containing the full project data
  */
-gdjs.RuntimeGame.prototype.setProjectData = function(projectData) {
+gdjs.RuntimeGame.prototype.setProjectData = function (projectData) {
   this._data = projectData;
 
-  this._imageManager.setResources(
-    this._data.resources.resources
-  );
-  this._soundManager.setResources(
-    this._data.resources.resources
-  );
-  this._fontManager.setResources(
-    this._data.resources.resources
-  );
-  this._jsonManager.setResources(
-    this._data.resources.resources
-  );
-}
+  this._imageManager.setResources(this._data.resources.resources);
+  this._soundManager.setResources(this._data.resources.resources);
+  this._fontManager.setResources(this._data.resources.resources);
+  this._jsonManager.setResources(this._data.resources.resources);
+};
 
 /**
  * Return the additional options passed to the RuntimeGame when created.
  * @returns {?RuntimeGameOptions} The additional options, if any.
  */
-gdjs.RuntimeGame.prototype.getAdditionalOptions = function() {
+gdjs.RuntimeGame.prototype.getAdditionalOptions = function () {
   return this._options;
 };
 
-gdjs.RuntimeGame.prototype.getRenderer = function() {
+gdjs.RuntimeGame.prototype.getRenderer = function () {
   return this._renderer;
 };
 
@@ -126,7 +109,7 @@ gdjs.RuntimeGame.prototype.getRenderer = function() {
  * Get the variables of the RuntimeGame.
  * @return {gdjs.VariablesContainer} The global variables
  */
-gdjs.RuntimeGame.prototype.getVariables = function() {
+gdjs.RuntimeGame.prototype.getVariables = function () {
   return this._variables;
 };
 
@@ -134,7 +117,7 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
  * Get the gdjs.SoundManager of the RuntimeGame.
  * @return {gdjs.HowlerSoundManager | gdjs.CocosSoundManager} The sound manager.
  */
-gdjs.RuntimeGame.prototype.getSoundManager = function() {
+gdjs.RuntimeGame.prototype.getSoundManager = function () {
   // @ts-ignore
   return this._soundManager;
 };
@@ -143,7 +126,7 @@ gdjs.RuntimeGame.prototype.getSoundManager = function() {
  * Get the gdjs.ImageManager of the RuntimeGame.
  * @return {gdjs.PixiImageManager | gdjs.CocosImageManager} The image manager.
  */
-gdjs.RuntimeGame.prototype.getImageManager = function() {
+gdjs.RuntimeGame.prototype.getImageManager = function () {
   // @ts-ignore
   return this._imageManager;
 };
@@ -152,7 +135,7 @@ gdjs.RuntimeGame.prototype.getImageManager = function() {
  * Get the gdjs.FontManager of the RuntimeGame.
  * @return {gdjs.FontFaceObserverFontManager} The font manager.
  */
-gdjs.RuntimeGame.prototype.getFontManager = function() {
+gdjs.RuntimeGame.prototype.getFontManager = function () {
   // @ts-ignore
   return this._fontManager;
 };
@@ -162,7 +145,7 @@ gdjs.RuntimeGame.prototype.getFontManager = function() {
  * and touches states.
  * @return {gdjs.InputManager} The input manager owned by the game
  */
-gdjs.RuntimeGame.prototype.getInputManager = function() {
+gdjs.RuntimeGame.prototype.getInputManager = function () {
   return this._inputManager;
 };
 
@@ -171,7 +154,7 @@ gdjs.RuntimeGame.prototype.getInputManager = function() {
  * resources.
  * @return {gdjs.JsonManager} The json manager for the game
  */
-gdjs.RuntimeGame.prototype.getJsonManager = function() {
+gdjs.RuntimeGame.prototype.getJsonManager = function () {
   return this._jsonManager;
 };
 
@@ -179,7 +162,7 @@ gdjs.RuntimeGame.prototype.getJsonManager = function() {
  * Get the object containing the game data
  * @return {ProjectData} The object associated to the game.
  */
-gdjs.RuntimeGame.prototype.getGameData = function() {
+gdjs.RuntimeGame.prototype.getGameData = function () {
   return this._data;
 };
 
@@ -189,7 +172,7 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
  * @param {string=} sceneName The name of the scene. If not defined, the first scene will be returned.
  * @return {?LayoutData} The data associated to the scene.
  */
-gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
+gdjs.RuntimeGame.prototype.getSceneData = function (sceneName) {
   var scene = null;
   for (var i = 0, len = this._data.layouts.length; i < len; ++i) {
     var sceneData = this._data.layouts[i];
@@ -212,7 +195,7 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
  * @param {string=} sceneName The name of the scene to search.
  * @return {boolean} true if the scene exists. If sceneName is undefined, true if the game has a scene.
  */
-gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
+gdjs.RuntimeGame.prototype.hasScene = function (sceneName) {
   var isTrue = false;
   for (var i = 0, len = this._data.layouts.length; i < len; ++i) {
     var sceneData = this._data.layouts[i];
@@ -232,7 +215,7 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  * @param {string} name The name of the external layout.
  * @return {?ExternalLayoutData} The data associated to the external layout or null if not found.
  */
-gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
+gdjs.RuntimeGame.prototype.getExternalLayoutData = function (name) {
   var externalLayout = null;
   for (var i = 0, len = this._data.externalLayouts.length; i < len; ++i) {
     var layoutData = this._data.externalLayouts[i];
@@ -250,7 +233,7 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
  * Get the data representing all the global objects of the game.
  * @return {ObjectData[]} The data associated to the global objects.
  */
-gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
+gdjs.RuntimeGame.prototype.getInitialObjectsData = function () {
   return this._data.objects || [];
 };
 
@@ -259,7 +242,7 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
  *
  * This is guaranteed to never change, even if the size of the game is changed afterwards.
  */
-gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
+gdjs.RuntimeGame.prototype.getOriginalWidth = function () {
   return this._originalWidth;
 };
 
@@ -268,7 +251,7 @@ gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
  *
  * This is guaranteed to never change, even if the size of the game is changed afterwards.
  */
-gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
+gdjs.RuntimeGame.prototype.getOriginalHeight = function () {
   return this._originalHeight;
 };
 
@@ -276,7 +259,7 @@ gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
  * Get the game resolution (the size at which the game is played and rendered) width.
  * @returns {number} The game resolution width, in pixels.
  */
-gdjs.RuntimeGame.prototype.getGameResolutionWidth = function() {
+gdjs.RuntimeGame.prototype.getGameResolutionWidth = function () {
   return this._gameResolutionWidth;
 };
 
@@ -284,7 +267,7 @@ gdjs.RuntimeGame.prototype.getGameResolutionWidth = function() {
  * Get the game resolution (the size at which the game is played and rendered) height.
  * @returns {number} The game resolution height, in pixels.
  */
-gdjs.RuntimeGame.prototype.getGameResolutionHeight = function() {
+gdjs.RuntimeGame.prototype.getGameResolutionHeight = function () {
   return this._gameResolutionHeight;
 };
 
@@ -294,7 +277,7 @@ gdjs.RuntimeGame.prototype.getGameResolutionHeight = function() {
  * @param {number} width The new width
  * @param {number} height The new height
  */
-gdjs.RuntimeGame.prototype.setGameResolutionSize = function(width, height) {
+gdjs.RuntimeGame.prototype.setGameResolutionSize = function (width, height) {
   this._gameResolutionWidth = width;
   this._gameResolutionHeight = height;
 
@@ -338,7 +321,7 @@ gdjs.RuntimeGame.prototype.setGameResolutionSize = function(width, height) {
  *
  * @param {string} resizeMode Either "" (don't change game resolution), "adaptWidth" or "adaptHeight".
  */
-gdjs.RuntimeGame.prototype.setGameResolutionResizeMode = function(resizeMode) {
+gdjs.RuntimeGame.prototype.setGameResolutionResizeMode = function (resizeMode) {
   this._resizeMode = resizeMode;
   this._forceGameResolutionUpdate();
 };
@@ -350,7 +333,7 @@ gdjs.RuntimeGame.prototype.setGameResolutionResizeMode = function(resizeMode) {
  *
  * @returns {string} Either "" (don't change game resolution), "adaptWidth" or "adaptHeight".
  */
-gdjs.RuntimeGame.prototype.getGameResolutionResizeMode = function() {
+gdjs.RuntimeGame.prototype.getGameResolutionResizeMode = function () {
   return this._resizeMode;
 };
 
@@ -361,7 +344,7 @@ gdjs.RuntimeGame.prototype.getGameResolutionResizeMode = function() {
  * configured to adapt the width or the height of the game.
  * @param {boolean} enable true to change the game resolution according to the window/screen size.
  */
-gdjs.RuntimeGame.prototype.setAdaptGameResolutionAtRuntime = function(enable) {
+gdjs.RuntimeGame.prototype.setAdaptGameResolutionAtRuntime = function (enable) {
   this._adaptGameResolutionAtRuntime = enable;
   this._forceGameResolutionUpdate();
 };
@@ -373,7 +356,7 @@ gdjs.RuntimeGame.prototype.setAdaptGameResolutionAtRuntime = function(enable) {
  * configured to adapt the width or the height of the game.
  * @returns {boolean} true if the game resolution is automatically changed according to the window/screen size.
  */
-gdjs.RuntimeGame.prototype.getAdaptGameResolutionAtRuntime = function() {
+gdjs.RuntimeGame.prototype.getAdaptGameResolutionAtRuntime = function () {
   return this._adaptGameResolutionAtRuntime;
 };
 
@@ -381,14 +364,14 @@ gdjs.RuntimeGame.prototype.getAdaptGameResolutionAtRuntime = function() {
  * Return the minimal fps that must be guaranteed by the game
  * (otherwise, game is slowed down).
  */
-gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
+gdjs.RuntimeGame.prototype.getMinimalFramerate = function () {
   return this._minFPS;
 };
 
 /**
  * Return the scale mode of the game ("linear" or "nearest").
  */
-gdjs.RuntimeGame.prototype.getScaleMode = function() {
+gdjs.RuntimeGame.prototype.getScaleMode = function () {
   return this._scaleMode;
 };
 
@@ -397,14 +380,14 @@ gdjs.RuntimeGame.prototype.getScaleMode = function() {
  * When paused, the game won't step and will be freezed. Useful for debugging.
  * @param {boolean} enable true to pause the game, false to unpause
  */
-gdjs.RuntimeGame.prototype.pause = function(enable) {
+gdjs.RuntimeGame.prototype.pause = function (enable) {
   this._paused = enable;
 };
 
 /**
  * Load all assets, displaying progress in renderer.
  */
-gdjs.RuntimeGame.prototype.loadAllAssets = function(
+gdjs.RuntimeGame.prototype.loadAllAssets = function (
   callback,
   progressCallback
 ) {
@@ -416,23 +399,23 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(
 
   var that = this;
   this._imageManager.loadTextures(
-    function(count, total) {
+    function (count, total) {
       var percent = Math.floor((count / allAssetsTotal) * 100);
       loadingScreen.render(percent);
       if (progressCallback) progressCallback(percent);
     },
-    function(texturesTotalCount) {
+    function (texturesTotalCount) {
       that._soundManager.preloadAudio(
-        function(count, total) {
+        function (count, total) {
           var percent = Math.floor(
             ((texturesTotalCount + count) / allAssetsTotal) * 100
           );
           loadingScreen.render(percent);
           if (progressCallback) progressCallback(percent);
         },
-        function(audioTotalCount) {
+        function (audioTotalCount) {
           that._fontManager.loadFonts(
-            function(count, total) {
+            function (count, total) {
               var percent = Math.floor(
                 ((texturesTotalCount + audioTotalCount + count) /
                   allAssetsTotal) *
@@ -441,9 +424,9 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(
               loadingScreen.render(percent);
               if (progressCallback) progressCallback(percent);
             },
-            function(fontTotalCount) {
+            function (fontTotalCount) {
               that._jsonManager.preloadJsons(
-                function(count, total) {
+                function (count, total) {
                   var percent = Math.floor(
                     ((texturesTotalCount +
                       audioTotalCount +
@@ -455,7 +438,7 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(
                   loadingScreen.render(percent);
                   if (progressCallback) progressCallback(percent);
                 },
-                function() {
+                function () {
                   loadingScreen.unload();
                   callback();
                 }
@@ -471,7 +454,7 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(
 /**
  * Start the game loop, to be called once assets are loaded.
  */
-gdjs.RuntimeGame.prototype.startGameLoop = function() {
+gdjs.RuntimeGame.prototype.startGameLoop = function () {
   if (!this.hasScene()) {
     console.log('The game has no scene.');
     return;
@@ -502,7 +485,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
   //The standard game loop
   var that = this;
   var accumulatedElapsedTime = 0;
-  this._renderer.startGameLoop(function(lastCallElapsedTime) {
+  this._renderer.startGameLoop(function (lastCallElapsedTime) {
     if (that._paused) return true;
 
     // Skip the frame if we rendering frames too fast
@@ -534,6 +517,115 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 
     return false;
   });
+
+  this._setupSessionMetrics();
+};
+
+/**
+ * Register a new session for the game, and set up listener to follow the session
+ * time.
+ */
+gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
+  // if (this.isPreview()) return; // TODO
+  if (typeof fetch === 'undefined') return;
+  if (!this._data.properties.projectUuid) return;
+
+  const baseUrl = 'https://fixpe96o0h.execute-api.us-east-1.amazonaws.com/dev'; // TODO
+  const playerId = this._getPlayerUuid();
+  let sessionId = null;
+  let lastSessionHitTime = Date.now();
+
+  fetch(baseUrl + '/session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      gameId: this._data.properties.projectUuid,
+      playerId: playerId,
+      game: {
+        name: this._data.properties.name || '',
+        packageName: this._data.properties.packageName || '',
+        version: this._data.properties.version || '',
+        location: window.location.href,
+      },
+      platform: {
+        isCordova: !!window.cordova,
+        devicePlatform:
+          typeof device !== 'undefined' ? device.platform || '' : '',
+        navigatorPlatform:
+          typeof navigator !== 'undefined' ? navigator.platform : '',
+        hasTouch:
+          typeof navigator !== 'undefined'
+            ? !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2
+            : false,
+      },
+    }),
+  })
+    .then((response) => response.text())
+    .then((returnedSessionId) => {
+      sessionId = returnedSessionId;
+    })
+    .catch(() => {
+      /* Ignore any error */
+    });
+
+  const sendSessionHit = () => {
+    if (!sessionId) return;
+
+    // Group repeated calls to sendSessionHit - which could
+    // happen because of multiple event listeners being fired.
+    if (Date.now() - lastSessionHitTime < 3 * 1000) return;
+    lastSessionHitTime = Date.now();
+
+    navigator.sendBeacon(
+      baseUrl + '/session-hit',
+      JSON.stringify({
+        gameId: this._data.properties.projectUuid,
+        playerId: playerId,
+        sessionId: sessionId,
+      })
+    );
+  };
+
+  if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      sendSessionHit();
+    });
+    window.addEventListener(
+      'pagehide',
+      () => {
+        sendSessionHit();
+      },
+      false
+    );
+
+    // Detect Safari to work around Safari-specific bugs:
+    // - https://bugs.webkit.org/show_bug.cgi?id=151610
+    // - https://bugs.webkit.org/show_bug.cgi?id=151234
+    const isSafari = typeof safari === 'object' && safari.pushNotification;
+    const isElectron = /electron/i.test(navigator.userAgent);
+    if (isSafari || isElectron) {
+      window.addEventListener('beforeunload', () => {
+        sendSessionHit();
+      });
+    }
+  }
+};
+
+/**
+ * Generate an anonymous unique identifier to differentiate
+ * the player from others in the game metrics.
+ * @returns {string}
+ */
+gdjs.RuntimeGame.prototype._getPlayerUuid = function () {
+  const key = 'GDJS-internal-player-uuid';
+  const existingPlayerUuid = localStorage.getItem(key);
+  if (existingPlayerUuid) return existingPlayerUuid;
+
+  const newPlayerUuid = gdjs.makeUuid();
+  localStorage.setItem(key, newPlayerUuid);
+  return newPlayerUuid;
 };
 
 /**
@@ -541,14 +633,14 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
  * has changed size (this can result from a resize of the window,
  * but also other factors like a device orientation change on mobile).
  */
-gdjs.RuntimeGame.prototype.onWindowInnerSizeChanged = function() {
+gdjs.RuntimeGame.prototype.onWindowInnerSizeChanged = function () {
   this._forceGameResolutionUpdate();
 };
 
 /**
  * Enlarge/reduce the width (or the height) of the game to fill the inner window.
  */
-gdjs.RuntimeGame.prototype._forceGameResolutionUpdate = function() {
+gdjs.RuntimeGame.prototype._forceGameResolutionUpdate = function () {
   this.setGameResolutionSize(
     this._gameResolutionWidth,
     this._gameResolutionHeight
@@ -559,7 +651,7 @@ gdjs.RuntimeGame.prototype._forceGameResolutionUpdate = function() {
  * Start a profiler for the currently running scene.
  * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
-gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(
+gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function (
   onProfilerStopped
 ) {
   var currentScene = this._sceneStack.getCurrentScene();
@@ -572,7 +664,7 @@ gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(
 /**
  * Stop the profiler for the currently running scene.
  */
-gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
+gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function () {
   var currentScene = this._sceneStack.getCurrentScene();
   if (!currentScene) return;
 
@@ -582,25 +674,25 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
 /**
  * Return true if a scene was loaded, false otherwise (i.e: game not yet started).
  */
-gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function() {
+gdjs.RuntimeGame.prototype.wasFirstSceneLoaded = function () {
   return this._sceneStack.wasFirstSceneLoaded();
-}
+};
 
 /**
  * Return the stack of {@link gdjs.RuntimeScene} being played.
  * @returns {gdjs.SceneStack}
  */
-gdjs.RuntimeGame.prototype.getSceneStack = function() {
+gdjs.RuntimeGame.prototype.getSceneStack = function () {
   return this._sceneStack;
-}
+};
 
 /**
  * Check if the game is running as a preview, launched from an editor.
  * @returns {boolean} true if the current game is a preview.
  */
-gdjs.RuntimeGame.prototype.isPreview = function() {
+gdjs.RuntimeGame.prototype.isPreview = function () {
   return this._isPreview;
-}
+};
 
 /**
  * Gets an extension property from the project data.
@@ -608,9 +700,16 @@ gdjs.RuntimeGame.prototype.isPreview = function() {
  * @param {string} propertyName The property name.
  * @return {?string} The property value.
  */
-gdjs.RuntimeGame.prototype.getExtensionProperty = function(extensionName, propertyName) {
-  for(let property of this._data.properties.extensionProperties) {
-    if(property.extension === extensionName && property.property === propertyName) return property.value;
+gdjs.RuntimeGame.prototype.getExtensionProperty = function (
+  extensionName,
+  propertyName
+) {
+  for (let property of this._data.properties.extensionProperties) {
+    if (
+      property.extension === extensionName &&
+      property.property === propertyName
+    )
+      return property.value;
   }
   return null;
-}
+};

@@ -1173,136 +1173,14 @@ gdjs.SpriteRuntimeObject.prototype.copyImageOnImageOfCurrentSprite = function (
   useTransparency,
   angle
 ) {
-  var sprite = this._renderer.getRendererObject();
-  var texture = sprite.texture;
-
-  var texture_sc = runtimeScene
-    .getGame()
-    .getImageManager()
-    .getPIXITexture(imageName);
-  var sprite_sc = new PIXI.Sprite(texture_sc);
-
-  sprite_sc.texture.x = this.getDrawableX();
-  sprite_sc.texture.y = this.getDrawableY();
-
-  sprite_sc.texture.transform = new PIXI.TextureMatrix(texture_sc);
-
-  var uniforms = {
-    u_texture_sc: sprite_sc.texture,
-    u_texture_sc_width: this.getWidth(),
-    u_texture_sc_height: this.getHeight(),
-    u_texture_sc_angle: angle,
-    u_texture_sc_offsetX: this.getDrawableX() + this.getX() + x,
-    u_texture_sc_offsetY: this.getDrawableY() + this.getY() + y,
-  };
-
-  // create vertex shader
-  var vertexSrc = `
-    precision highp float;
-
-    attribute vec2 aVertexPosition;
-    attribute vec2 aTextureCoord;
-
-    uniform mat3 otherMatrix;
-    uniform mat3 projectionMatrix;
-
-    varying vec2 vTextureCoord;
-    varying vec2 vTexture_scCoord;
-
-    void main(void)   {      
-        gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-        vTextureCoord = aTextureCoord;
-        vTexture_scCoord = (otherMatrix * vec3(aTextureCoord,1.0)).xy;
-    }
-`
-    .split('\n')
-    .reduce((c, a) => c + a.trim() + '\n');
-
-  // create fragment shader
-  var fragSrc = `
-    precision highp float;
-
-    varying vec2 vTextureCoord;
-    varying vec2 vTexture_scCoord;
-    uniform sampler2D uSampler;
-    uniform sampler2D u_texture_sc; 
-    uniform vec4 filterArea;
-
-    uniform float u_texture_sc_offsetX;
-    uniform float u_texture_sc_offsetY;
-    uniform float u_texture_sc_width;
-    uniform float u_texture_sc_height;
-    uniform float u_texture_sc_angle;
-
-    float aspectRatio = u_texture_sc_width/u_texture_sc_height;
-
-    //Merge two textures, rgba
-    vec4 layer(vec4 foreground, vec4 background) {
-        // NORMAL blendMode for PREMULTIPLIED alpha
-        return foreground + background * (1.0 - foreground.a);
-    }
-
-    vec2 rotate(vec2 uv, float rotation, vec2 rotationPoint){
-        uv -= rotationPoint;
-        float c = cos(rotation);
-        float s = sin(rotation);
-
-        mat2 mat = mat2(c,-s,s,c);
-        uv.y /= aspectRatio;
-        uv = mat * uv;
-        uv.y *= aspectRatio;
-        uv += rotationPoint;
-        return uv;
-    }
-
-    void main() {
-
-        //Add offset X and/or Y
-        vec2 offsetXY = vec2(u_texture_sc_offsetX, u_texture_sc_offsetY);
-
-        //Point of rotation on the added texture if needed, value 0-1, 0.5=mid
-        vec2 rotatePoint = vec2(0.0,0.0);
-
-        //Add offset XY
-        vec2 cvTexture_scCoord = vTexture_scCoord - offsetXY/vec2(u_texture_sc_width, u_texture_sc_height);
-
-        //Add rotation UV, here 45 pass by u_texture_sc_angle
-        cvTexture_scCoord = rotate(cvTexture_scCoord, radians(u_texture_sc_angle), rotatePoint);
-
-        //Apply UV on textures
-        vec4 texColor = texture2D(uSampler, vTextureCoord);	
-        vec4 texColor_sc = texture2D(u_texture_sc, cvTexture_scCoord);
-
-        //If second texture bleed over the first one, crop it.
-        //Yeah i should use clamp, idk yet how use it.
-        if(cvTexture_scCoord.x < 0.0 || cvTexture_scCoord.x > 1.0 || cvTexture_scCoord.y < 0.0 || cvTexture_scCoord.y > 1.0 )
-          texColor_sc *= 0.0;     
-
-        vec4 final = layer(texColor_sc,texColor);
-        gl_FragColor = final;
-    }
-`
-    .split('\n')
-    .reduce((c, a) => c + a.trim() + '\n');
-
-  var filter = new PIXI.Filter(vertexSrc, fragSrc, uniforms);
-
-  filter.apply = function (filterManager, input, output) {
-    //this.uniforms = uniforms;
-
-    sprite_sc.texture.transform.update();
-    var sprite_scMatrix = new PIXI.Matrix();
-
-    this.uniforms.texture_sc = sprite_sc.texture;
-    this.uniforms.otherMatrix = filterManager
-      .calculateSpriteMatrix(sprite_scMatrix, sprite_sc)
-      .prepend(sprite_sc.texture.transform.mapCoord);
-
-    // draw the filter...
-    filterManager.applyFilter(this, input, output);
-  };
-
-  this._renderer.setFilter(filter);
+  this._renderer.applyTextureOverAnotherSprite(
+    runtimeScene,
+    imageName,
+    x,
+    y,
+    useTransparency,
+    angle
+  );
 };
 
 /**

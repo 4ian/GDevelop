@@ -62,11 +62,12 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.indexOf('merge branch') === 0 ||
           lowerCaseMessage.indexOf('merge pull request #') === 0 ||
           lowerCaseMessage.includes('bump newide version') ||
-          lowerCaseMessage.includes('fix warning') ||
-          lowerCaseMessage.includes('fix typo') ||
+          lowerCaseMessage.indexOf('fix warning') === 0 ||
+          lowerCaseMessage === 'fix compilation' ||
+          lowerCaseMessage.indexOf('fix typo') === 0 ||
           lowerCaseMessage.includes('add files forgotten in last commit') ||
           lowerCaseMessage.indexOf('apply review') === 0 ||
-          lowerCaseMessage.includes('package-lock.json');
+          lowerCaseMessage.includes('package-lock.json') ||
           lowerCaseMessage.includes('yarn.lock');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
         const forDev = lowerCaseMessage.includes('developer changelog');

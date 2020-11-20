@@ -55,7 +55,6 @@ Project::Project()
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
-      projectUuid(""),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -66,6 +65,7 @@ Project::Project()
       scaleMode("linear"),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
@@ -599,11 +599,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
+  SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
-  SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
@@ -900,10 +900,10 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
+  propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
-  propElement.SetAttribute("projectUuid", projectUuid);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1100,13 +1100,13 @@ void Project::Init(const gd::Project& game) {
   scaleMode = game.scaleMode;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
 #if defined(GD_IDE_ONLY)
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
-  projectUuid = game.projectUuid;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;

@@ -2124,9 +2124,7 @@ const MainFrame = (props: Props) => {
           onClose: () => openCreateDialog(false),
           onOpen: async (storageProvider, fileMetadata) => {
             await setState(state => ({ ...state, createDialogOpen: false }));
-            const storageProviderOperations = await getStorageProviderOperations(
-              storageProvider
-            );
+            await getStorageProviderOperations(storageProvider);
             const state = await openFromFileMetadata(fileMetadata);
 
             if (state) {
@@ -2139,9 +2137,7 @@ const MainFrame = (props: Props) => {
           },
           onCreate: async (project, storageProvider, fileMetadata) => {
             await setState(state => ({ ...state, createDialogOpen: false }));
-            const storageProviderOperations = await getStorageProviderOperations(
-              storageProvider
-            );
+            await getStorageProviderOperations(storageProvider);
             const state = await loadFromProject(project, fileMetadata);
 
             if (state.currentProject) state.currentProject.resetProjectUuid();

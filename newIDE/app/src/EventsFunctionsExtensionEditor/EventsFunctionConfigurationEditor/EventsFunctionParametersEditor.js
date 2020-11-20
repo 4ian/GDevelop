@@ -29,7 +29,6 @@ import Delete from '@material-ui/icons/Delete';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
-import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 

@@ -1,5 +1,17 @@
 // @flow
 
+export type RGBColor = {|
+  r: number,
+  g: number,
+  b: number,
+  a?: number,
+|};
+
+export const rgbColorToHexNumber = (rgbColor: RGBColor) => {
+  const { r, g, b } = rgbColor;
+  return rgbToHexNumber(r, g, b);
+};
+
 /**
  * Convert a rgb color value to a string hex value.
  * @note No "#" or "0x" are added.

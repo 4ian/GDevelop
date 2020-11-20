@@ -5,13 +5,7 @@ import * as React from 'react';
 import { SketchPicker } from 'react-color';
 import Popover from '@material-ui/core/Popover';
 import muiZIndex from '@material-ui/core/styles/zIndex';
-
-export type RGBColor = {|
-  r: number,
-  g: number,
-  b: number,
-  a?: number,
-|};
+import { type RGBColor } from '../../Utils/ColorTransformer';
 
 export type ColorResult = {
   rgb: RGBColor,

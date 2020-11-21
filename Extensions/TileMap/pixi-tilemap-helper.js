@@ -63,8 +63,8 @@
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
       const columnMultiplier = Math.floor((frame - 1) % columns)
       const rowMultiplier = Math.floor((frame - 1) / columns)
-      const x = columnMultiplier * tileWidth + spacing
-      const y = rowMultiplier * tileHeight + spacing
+      const x = margin + (columnMultiplier * (tileWidth + spacing))
+      const y = margin + (rowMultiplier * (tileHeight + spacing))
       
       //1, 34,67
       console.log(columnMultiplier,"x",rowMultiplier)

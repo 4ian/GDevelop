@@ -335,6 +335,7 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
  */
 gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
   if (!this._pixiRenderer) return;
+  if (this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) return;
 
   this._updateRenderTexture();
   if (!this._renderTexture) return;

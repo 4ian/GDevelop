@@ -60,7 +60,7 @@
     console.log("columns and rows", columns, rows)
 
     // assuming spacing and margin are the same
-    const textureCache = new Array(tilecount).fill(0).map((_, frame) => {
+    const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
       const columnMultiplier = Math.floor((frame - 1) % columns)
       const rowMultiplier = Math.floor((frame - 1) / columns)
       const x = columnMultiplier * tileWidth + spacing
@@ -170,7 +170,6 @@
           layerData.encoding = "csv"
           console.log("Decoded: ", layerData)
         }
-        //console.log(layerData)
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
             const xPos = tileSet.tileWidth * j //+ tileSet.spacing
@@ -229,7 +228,7 @@
       onLoad(loadedTileSets[requestedTileSetId])
       return
     }
-    
+
     if(!texture) return
     createTileSetResource(tiledData, texture, requestedTileSetId, onLoad, getTexture, jsonResourceName)
   }

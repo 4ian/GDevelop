@@ -113,15 +113,6 @@
         "userAdded": true
       },
       {
-        "alwaysLoaded": false,
-        "file": "Viking3.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "Viking3.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
         "disablePreload": false,
         "file": "anotherIsland.json",
         "kind": "json",
@@ -182,6 +173,23 @@
         "name": "islandTilesetAtlas-scaledUp.png",
         "smoothed": true,
         "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "desert/tmw_desert_spacing.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "desert\\tmw_desert_spacing.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "disablePreload": false,
+        "file": "desert/desert.json",
+        "kind": "json",
+        "metadata": "",
+        "name": "desert\\desert.json",
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -214,7 +222,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.736
+        "zoomFactor": 0.304
       },
       "objectsGroups": [],
       "variables": [
@@ -352,6 +360,54 @@
           "x": 544,
           "y": 600,
           "zOrder": 12,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject",
+          "persistentUuid": "f1edccc1-bffb-4a95-8721-fc254b2d141a",
+          "width": 0,
+          "x": -292,
+          "y": 552,
+          "zOrder": 14,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject2",
+          "persistentUuid": "ff9ddb9e-95d9-42b5-98fe-ece2864002ed",
+          "width": 0,
+          "x": -535,
+          "y": -546,
+          "zOrder": 15,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewObject3",
+          "persistentUuid": "a037068c-0814-44b0-a513-93dfba9662dc",
+          "width": 0,
+          "x": -129,
+          "y": 1089,
+          "zOrder": 16,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -532,6 +588,99 @@
           "content": {
             "tilemapJsonFile": "island.json",
             "tilemapAtlasImage": "islandTilesetAtlas-scaledDown.png",
+            "displayMode": "visible",
+            "layerIndex": 0,
+            "animationSpeedScale": 1,
+            "animationFps": 4
+          }
+        },
+        {
+          "name": "NewObject",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "desert\\tmw_desert_spacing.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NewObject2",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "islandTilesetAtlas.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NewObject3",
+          "tags": "",
+          "type": "TileMap::TileMap",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "tilemapJsonFile": "desert\\desert.json",
+            "tilemapAtlasImage": "desert\\tmw_desert_spacing.png",
             "displayMode": "visible",
             "layerIndex": 0,
             "animationSpeedScale": 1,

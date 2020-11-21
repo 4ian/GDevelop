@@ -48,10 +48,10 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
       };
 
       PixiTileMapHelper.getPIXITileSet(
-        texturePath => this._runtimeScene
+        textureName => this._runtimeScene
           .getGame()
           .getImageManager()
-          .getPIXITexture(texturePath),
+          .getPIXITexture(textureName),
         content,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
@@ -66,7 +66,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
           }
         }
       )
-      
     });   
 };
 

@@ -133,6 +133,9 @@ module.exports = {
         'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
       )
       .addIncludeFile(
+        'Extensions/TileMap/pako/dist/pako.min.js'
+      )
+      .addIncludeFile(
         'Extensions/TileMap/pixi-tilemap-helper.js'
       );
 
@@ -384,6 +387,11 @@ module.exports = {
       __dirname,
       'pixi-tilemap-helper'
     );
+    // required for decoding tiled zlib compressed layer data
+    const pako = objectsRenderingService.requireModule(
+      __dirname,
+      'pako/dist/pako.min'
+    );
 
     /**
      * Renderer for instances of TileMap inside the IDE.
@@ -459,7 +467,7 @@ module.exports = {
       this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
           PixiTilemapHelper.getPIXITileSet(
-            texturePath => this._pixiResourcesLoader.getPIXITexture(this._project, texturePath),
+            textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
             tiledData,
             tilemapAtlasImage,
             tilemapJsonFile,
@@ -469,7 +477,8 @@ module.exports = {
                   this._pixiObject,
                   tileset,
                   displayMode,
-                  layerIndex
+                  layerIndex,
+                  pako
                 );
               }
             }

@@ -66,9 +66,6 @@
       const x = margin + (columnMultiplier * (tileWidth + spacing))
       const y = margin + (rowMultiplier * (tileHeight + spacing))
       
-      //1, 34,67
-      console.log(columnMultiplier,"x",rowMultiplier)
-      console.log(frame, ">",x,y, tileWidth)
       const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
       const texture = new PIXI.Texture(tex, rect)
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
@@ -93,8 +90,6 @@
       margin,
       spacing
     }
-    // return
-    console.log(newTileset)
     onLoad(newTileset)
     loadedTileSets[requestedTileSetId] = newTileset
   }
@@ -107,24 +102,24 @@
   const decodeBase64 = (layer, pako) => {
     const {data, compression} = layer;
     var index = 4,
-        arr   = [],
-        step1 = atob(data).split('').map(function(x){return x.charCodeAt(0);});
+      arr = [],
+      step1 = atob(data).split('').map(function(x){return x.charCodeAt(0);});
     try {
       const decodeString = (str, index) => (((str.charCodeAt(index)) + (str.charCodeAt(index + 1) << 8) + (str.charCodeAt(index + 2) << 16) + (str.charCodeAt(index + 3) << 24 )) >>> 0);
       const decodeArray = (arr, index) => ((arr[index] + (arr[index + 1] << 8) + (arr[index + 2] << 16) + (arr[index + 3] << 24 )) >>> 0);
   
       if (compression === 'zlib') {
         var binData = new Uint8Array(step1);
-          step1 = pako.inflate(binData);
-          while (index <= step1.length) {
-              arr.push(decodeArray(step1, index - 4));
-              index += 4;
-          }
+        step1 = pako.inflate(binData);
+        while (index <= step1.length) {
+          arr.push(decodeArray(step1, index - 4));
+          index += 4;
+        }
       } else {
-          while (index <= step1.length) {
-              arr.push(decodeString(step1, index - 4));
-              index += 4;
-          }
+        while (index <= step1.length) {
+          arr.push(decodeString(step1, index - 4));
+          index += 4;
+        }
       }
       return arr;
     } catch(error){
@@ -172,11 +167,9 @@
         }
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
-            const xPos = tileSet.tileWidth * j //+ tileSet.spacing
-            const yPos = tileSet.tileHeight * i //+ tileSet.spacing
+            const xPos = tileSet.tileWidth * j
+            const yPos = tileSet.tileHeight * i
             const tileUid = layerData[ind]
-
-            //console.log(tileUid,">",xPos, yPos)
 
             if (tileUid !== 0 && tileSet.textureCache[tileUid]) {
               const tileData = tileSet.tiles.find(function (tile) {
@@ -190,7 +183,6 @@
                   .tileAnimX(tileSet.tileWidth, tileData.animation.length)
               } else {
                 // Non animated props dont require tileAnimX or Y
-                //console.log("R ", xPos, yPos, ">", tileUid)
                 tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos)
               }
             }
@@ -229,7 +221,7 @@
       return
     }
 
-    if(!texture) return
+    if (!texture) return;
     createTileSetResource(tiledData, texture, requestedTileSetId, onLoad, getTexture, jsonResourceName)
   }
 })

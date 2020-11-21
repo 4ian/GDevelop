@@ -11,6 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
+    "projectUuid": "64754fbc-09c9-47f3-8b99-cc8c37e796c6",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -222,7 +223,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.304
+        "zoomFactor": 0.448
       },
       "objectsGroups": [],
       "variables": [
@@ -373,8 +374,8 @@
           "name": "NewObject",
           "persistentUuid": "f1edccc1-bffb-4a95-8721-fc254b2d141a",
           "width": 0,
-          "x": -292,
-          "y": 552,
+          "x": -419,
+          "y": 1096,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
@@ -408,6 +409,38 @@
           "x": -129,
           "y": 1089,
           "zOrder": 16,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "about4",
+          "persistentUuid": "85ffe7d9-25d4-4f8d-bb47-1712ac4eea38",
+          "width": 0,
+          "x": -199,
+          "y": 852,
+          "zOrder": 17,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "about5",
+          "persistentUuid": "c5469dec-5bc8-48a6-97a4-110ae0f0ae50",
+          "width": 0,
+          "x": -105,
+          "y": 2310,
+          "zOrder": 18,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -685,6 +718,44 @@
             "layerIndex": 0,
             "animationSpeedScale": 1,
             "animationFps": 4
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "about4",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "This tilemap has an atlas that has been resized. Gdevelop will still try to parse it",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "about5",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "The desert tilemap has layer.data stored as a base64 string. It also has spacing and margin on its atlas - we can parse that too",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         }
       ],

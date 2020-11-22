@@ -39,7 +39,7 @@ export default ({ usages }: Props) => (
             {usages.map(usage => (
               <TableRow key={usage.id}>
                 <TableRowColumn>
-                  {format(usage.createdAt, 'YYYY-MM-DD HH:mm:ss')}
+                  {format(usage.createdAt, 'yyyy-MM-dd HH:mm:ss')}
                 </TableRowColumn>
                 <TableRowColumn>{usage.type}</TableRowColumn>
               </TableRow>

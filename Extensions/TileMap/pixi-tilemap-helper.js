@@ -47,27 +47,12 @@
       spacing,
       margin,
     } = tiledData.tilesets[0]
-    //if (!tex) tex = getTexture(image)
-    console.log(
-      {
-        tilewidth,
-        tileheight,
-        tilecount,
-        tiles,
-        image,
-        columns,
-        spacing,
-        margin,
-      }
-    )
+    if (!tex) tex = getTexture(image)
 
-    console.log(tilewidth, Math.floor(tex.width / columns), tex.width, columns)
     const rows = tilecount / columns
-    const tileWidth =
-      tex.width === 1 ? tilewidth : Math.floor(tex.width / columns) - spacing // we dont trust the json's tilewidth/height here because the atlas can be resized or wrong file
-    const tileHeight =
-      tex.height === 1 ? tileheight : Math.floor(tex.height / rows) - spacing // instead we base the slicing on number of columns/rows it says it has + the texture width/height
-    // we still use the dimentions tiled expects the atlas to be, these can be useful for scaling
+    const tileWidth = tilewidth;
+    const tileHeight = tileheight;
+    // We try to detect what size tiled is expecting and if the texture is not the right size, dont load it
     const expectedAtlasWidth =
       (tilewidth * columns) + (spacing * (columns - 1)) + (margin * 2)
     const expectedAtlasHeight =
@@ -79,20 +64,16 @@
       console.warn(`
         Have you resized your atlas?
         It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.
-        Note that margin and spacing are not supported in GD at this time.
-        GD will try to adopt the resized atlas image to these dimensions.
       `)
+      return
     }
 
-    console.log("size", tileWidth, tileHeight)
-    // assuming spacing and margin are the same
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
       const columnMultiplier = Math.floor((frame - 1) % columns)
       const rowMultiplier = Math.floor((frame - 1) / columns)
-      const x = margin + (columnMultiplier * (tileWidth + spacing))
+      const x = (margin + (columnMultiplier * (tileWidth + spacing)))
       const y = margin + (rowMultiplier * (tileHeight + spacing))
 
-      console.log(x, y, columnMultiplier, rowMultiplier)
       try {
         const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
         const texture = new PIXI.Texture(tex, rect)
@@ -101,7 +82,7 @@
 
         return texture
       } catch (error) {
-        console.log({x, y, tileWidth, tileHeight});
+        console.log(rect);
         console.error(
           'Error occured while trying to create PIXI.Texture!',
           error
@@ -121,8 +102,6 @@
       tilecount,
       // these scales are used as multipliers on some absolute pixel values from tiled that might be on a resized atlas
       // they help to adopt to changed dimentions when rendering in updatePIXITileMap
-      atlasScaleX: tex.width !== 1 ? tex.width / expectedAtlasWidth : 1,
-      atlasScaleY: tex.height !== 1 ? tex.height / expectedAtlasHeight : 1,
       margin,
       spacing,
     }
@@ -200,8 +179,8 @@
           if (tileSet.textureCache[gid]) {
             tileMap.addFrame(
               tileSet.textureCache[gid],
-              x * tileSet.atlasScaleX,
-              (y - tileSet.tileHeight) * tileSet.atlasScaleY
+              x,
+              y - tileSet.tileHeight
             )
           }
         })
@@ -238,7 +217,6 @@
                 tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos)
               }
             }
-
             ind += 1
           }
         }
@@ -271,7 +249,6 @@
     }
 
     const texture = imageResourceName ? getTexture(imageResourceName) : null // we do this because gdevelop doesnt return a null when it fails to load textures
-    if (!texture) return;
     createTileSetResource(
       tiledData,
       texture,

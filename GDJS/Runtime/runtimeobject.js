@@ -322,6 +322,7 @@ gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     var rendererObject = this.getRendererObject();
     if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
+        if (rendererObject.destroy) rendererObject.destroy();
     }
 
     for(var j = 0, lenj = this._behaviors.length;j<lenj;++j) {

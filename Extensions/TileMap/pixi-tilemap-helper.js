@@ -38,10 +38,9 @@
       return; // TODO handle loading tilesets from another json file, when it is provided- favor it over embeded tileset data
     }
     const { tilewidth, tileheight, tilecount, tiles, image, columns, spacing, margin } = tiledData.tilesets[0];
-    // if (!tex) tex = getTexture(image);
+    if (!tex) tex = getTexture(image);
 
     const rows = tilecount / columns;
-    
     const tileWidth = tex.width === 1 ? tilewidth : Math.floor(tex.width / columns); // we dont trust the json's tilewidth/height here because the atlas can be resized or wrong file
     const tileHeight = tex.height === 1 ? tileheight : Math.floor(tex.height / rows); // instead we base the slicing on number of columns/rows it says it has + the texture width/height
     // we still use the dimentions tiled expects the atlas to be, these can be useful for scaling
@@ -55,9 +54,6 @@
         GD will try to adopt the resized atlas image to these dimensions.
       `);
     }
-
-    console.log(expectedAtlasWidth, tex.width, expectedAtlasWidth === tex.width)
-    console.log("columns and rows", columns, rows)
 
     // assuming spacing and margin are the same
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
@@ -163,7 +159,6 @@
             return;
           }
           layerData.encoding = "csv"
-          console.log("Decoded: ", layerData)
         }
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
@@ -211,17 +206,14 @@
     jsonResourceName,
     onLoad
   ) => {
-    
-    const texture = imageResourceName ? getTexture(imageResourceName) : null; // we do this because gdevelop doesnt return a null when it fails to load textures
     const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`
-    console.log(imageResourceName, texture)
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
       onLoad(loadedTileSets[requestedTileSetId])
       return
     }
 
-    if (!texture) return;
+    const texture = imageResourceName ? getTexture(imageResourceName) : null; // we do this because gdevelop doesnt return a null when it fails to load textures
     createTileSetResource(tiledData, texture, requestedTileSetId, onLoad, getTexture, jsonResourceName)
   }
 })

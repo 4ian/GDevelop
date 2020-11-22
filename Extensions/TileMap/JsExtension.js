@@ -479,10 +479,11 @@ module.exports = {
     ) {
       return 'JsPlatform/Extensions/tile_map32.png';
     };
+
     /**
-     * This is called to update the TileMap
-     */
-    RenderedTileMapInstance.prototype.updateTileMap = function() {
+    * This is used to reload the tilemap
+    */
+    RenderedTileMapInstance.prototype._loadTileMapWithTileset = function(tiledData, tilesetJsonData) {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
@@ -491,10 +492,6 @@ module.exports = {
       const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
         .get('tilemapJsonFile')
-        .getValue();
-      const tilesetJsonFile = this._associatedObject
-        .getProperties(this.project)
-        .get('tilesetJsonFile')
         .getValue();
       const layerIndex = parseInt(
         this._associatedObject
@@ -508,48 +505,49 @@ module.exports = {
         .get('displayMode')
         .getValue();
 
+      PixiTilemapHelper.getPIXITileSet(
+        textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+        tilesetJsonData ? {...tiledData, tilesets: [tilesetJsonData]} : tiledData,
+        tilemapAtlasImage,
+        tilemapJsonFile,
+        (tileset) => {
+          if (tileset && this._pixiObject) {
+            PixiTilemapHelper.updatePIXITileMap(
+              this._pixiObject,
+              tileset,
+              displayMode,
+              layerIndex,
+              pako
+            );
+          }
+        }
+      )
+    };
+
+    /**
+     * This is called to update the TileMap
+     */
+    RenderedTileMapInstance.prototype.updateTileMap = function() {
+      // Get the tileset resource to use
+      const tilemapJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilemapJsonFile')
+        .getValue();
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
+
       this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
           if (tilesetJsonFile) {
             this._pixiResourcesLoader.getResourceJsonData(this._project, tilesetJsonFile).then(
               tilesetJsonData => {
-                PixiTilemapHelper.getPIXITileSet(
-                  textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-                  {...tiledData, tilesets: [tilesetJsonData]},
-                  tilemapAtlasImage,
-                  tilemapJsonFile,
-                  (tileset) => {
-                    if (tileset && this._pixiObject) {
-                      PixiTilemapHelper.updatePIXITileMap(
-                        this._pixiObject,
-                        tileset,
-                        displayMode,
-                        layerIndex,
-                        pako
-                      );
-                    }
-                  }
-                )
+                this._loadTileMapWithTileset(tiledData, tilesetJsonData);
               }
             )
           } else {
-            PixiTilemapHelper.getPIXITileSet(
-              textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-              tiledData,
-              tilemapAtlasImage,
-              tilemapJsonFile,
-              (tileset) => {
-                if (tileset && this._pixiObject) {
-                  PixiTilemapHelper.updatePIXITileMap(
-                    this._pixiObject,
-                    tileset,
-                    displayMode,
-                    layerIndex,
-                    pako
-                  );
-                }
-              }
-            )
+            this._loadTileMapWithTileset(tiledData);
           }
         }
       );

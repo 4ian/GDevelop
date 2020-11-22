@@ -76,7 +76,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
 }
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function () {
-  console.log(this._object._tilemapJsonFile)
   this._runtimeScene
     .getGame()
     .getJsonManager()

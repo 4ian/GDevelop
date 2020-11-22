@@ -47,18 +47,31 @@
       spacing,
       margin,
     } = tiledData.tilesets[0]
-    if (!tex) tex = getTexture(image)
+    //if (!tex) tex = getTexture(image)
+    console.log(
+      {
+        tilewidth,
+        tileheight,
+        tilecount,
+        tiles,
+        image,
+        columns,
+        spacing,
+        margin,
+      }
+    )
 
+    console.log(tilewidth, Math.floor(tex.width / columns), tex.width, columns)
     const rows = tilecount / columns
     const tileWidth =
-      tex.width === 1 ? tilewidth : Math.floor(tex.width / columns) // we dont trust the json's tilewidth/height here because the atlas can be resized or wrong file
+      tex.width === 1 ? tilewidth : Math.floor(tex.width / columns) - spacing // we dont trust the json's tilewidth/height here because the atlas can be resized or wrong file
     const tileHeight =
-      tex.height === 1 ? tileheight : Math.floor(tex.height / rows) // instead we base the slicing on number of columns/rows it says it has + the texture width/height
+      tex.height === 1 ? tileheight : Math.floor(tex.height / rows) - spacing // instead we base the slicing on number of columns/rows it says it has + the texture width/height
     // we still use the dimentions tiled expects the atlas to be, these can be useful for scaling
     const expectedAtlasWidth =
-      tilewidth * columns + spacing * (columns - 1) + margin * 2
+      (tilewidth * columns) + (spacing * (columns - 1)) + (margin * 2)
     const expectedAtlasHeight =
-      tileheight * rows + spacing * (rows - 1) + margin * 2
+      (tileheight * rows) + (spacing * (rows - 1)) + (margin * 2)
     if (
       (tex.width !== 1 && expectedAtlasWidth !== tex.width) ||
       (tex.height !== 1 && expectedAtlasHeight !== tex.height)
@@ -71,13 +84,15 @@
       `)
     }
 
+    console.log("size", tileWidth, tileHeight)
     // assuming spacing and margin are the same
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
       const columnMultiplier = Math.floor((frame - 1) % columns)
       const rowMultiplier = Math.floor((frame - 1) / columns)
-      const x = margin + columnMultiplier * (tileWidth + spacing)
-      const y = margin + rowMultiplier * (tileHeight + spacing)
+      const x = margin + (columnMultiplier * (tileWidth + spacing))
+      const y = margin + (rowMultiplier * (tileHeight + spacing))
 
+      console.log(x, y, columnMultiplier, rowMultiplier)
       try {
         const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
         const texture = new PIXI.Texture(tex, rect)
@@ -256,6 +271,7 @@
     }
 
     const texture = imageResourceName ? getTexture(imageResourceName) : null // we do this because gdevelop doesnt return a null when it fails to load textures
+    if (!texture) return;
     createTileSetResource(
       tiledData,
       texture,

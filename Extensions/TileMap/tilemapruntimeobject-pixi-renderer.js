@@ -53,7 +53,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
           .getGame()
           .getImageManager()
           .getPIXITexture(textureName),
-          tilesetJsonData ? {...content, tilesets:[tilesetJsonData] } : content,
+          tilesetJsonData ? { ...content, tilesets:[tilesetJsonData] } : content,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
         (tileset) => {

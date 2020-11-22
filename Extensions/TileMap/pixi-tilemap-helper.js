@@ -80,14 +80,14 @@
 
       try {
         const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
-        console.log(x, y, tileWidth, tileHeight)
         const texture = new PIXI.Texture(tex, rect)
         texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
         texture.cacheAsBitmap = true
 
         return texture
       } catch (error) {
-        console.waring(
+        console.log({x, y, tileWidth, tileHeight});
+        console.error(
           'Error occured while trying to create PIXI.Texture!',
           error
         )

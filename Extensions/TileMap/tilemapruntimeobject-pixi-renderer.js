@@ -48,7 +48,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
         return;
       };
 
-      console.log(content, tilesetJsonData, {...content, tilesets:[tilesetJsonData] })
       PixiTileMapHelper.getPIXITileSet(
         textureName => this._runtimeScene
           .getGame()

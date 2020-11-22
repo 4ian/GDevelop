@@ -41,6 +41,7 @@ import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -275,6 +276,7 @@ type Props = {|
   onExportProject: () => void,
   onOpenPreferences: () => void,
   onOpenProfile: () => void,
+  onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
@@ -700,6 +702,12 @@ export default class ProjectManager extends React.Component<Props, State> {
           primaryText={<Trans>My profile</Trans>}
           leftIcon={<AccountCircle />}
           onClick={() => this.props.onOpenProfile()}
+        />
+        <ListItem
+          key="games-dashboard"
+          primaryText={<Trans>Published Games Dashboard</Trans>}
+          leftIcon={<TimelineIcon />}
+          onClick={() => this.props.onOpenGamesDashboard()}
         />
       </React.Fragment>
     );

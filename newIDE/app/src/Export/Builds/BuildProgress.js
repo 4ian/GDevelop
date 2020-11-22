@@ -7,7 +7,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
 import { Spacer, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
-import difference_in_seconds from 'date-fns/difference_in_seconds';
+import differenceInSeconds from 'date-fns/differenceInSeconds';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
 import {
@@ -71,7 +71,7 @@ type Props = {|
 export default ({ build, onDownload }: Props) => {
   const config = buildTypesConfig[build.type];
   const secondsSinceLastUpdate = Math.abs(
-    difference_in_seconds(build.updatedAt, Date.now())
+    differenceInSeconds(build.updatedAt, Date.now())
   );
   const estimatedRemainingTime = Math.max(
     config ? config.estimatedTimeInSeconds(build) - secondsSinceLastUpdate : 0,

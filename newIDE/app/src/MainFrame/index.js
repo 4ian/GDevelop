@@ -252,6 +252,9 @@ const MainFrame = (props: Props) => {
     openPlatformSpecificAssetsDialog,
   ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
+  const [profileDialogInitialTab, setProfileDialogInitialTab] = React.useState<
+    'profile' | 'games-dashboard'
+  >('profile');
   const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
@@ -393,6 +396,13 @@ const MainFrame = (props: Props) => {
     // eslint-disable-next-line
     []
   );
+
+  const openProfileDialogWithTab = (
+    profileDialogInitialTab: 'profile' | 'games-dashboard'
+  ) => {
+    setProfileDialogInitialTab(profileDialogInitialTab);
+    openProfileDialog(true);
+  };
 
   const _showSnackMessage = React.useCallback(
     (snackMessage: string) => {
@@ -1885,6 +1895,14 @@ const MainFrame = (props: Props) => {
     onOpenCommandPalette: commandPaletteRef.current
       ? commandPaletteRef.current.open
       : () => {},
+    onOpenProfile: React.useCallback(
+      () => openProfileDialogWithTab('profile'),
+      []
+    ),
+    onOpenGamesDashboard: React.useCallback(
+      () => openProfileDialogWithTab('games-dashboard'),
+      []
+    ),
   });
 
   const showLoader = isLoadingProject || previewLoading;
@@ -1909,7 +1927,9 @@ const MainFrame = (props: Props) => {
           onOpenAbout: () => openAboutDialog(true),
           onOpenPreferences: () => openPreferencesDialog(true),
           onOpenLanguage: () => openLanguageDialog(true),
-          onOpenProfile: () => openProfileDialog(true),
+          onOpenProfile: () => openProfileDialogWithTab('profile'),
+          onOpenGamesDashboard: () =>
+            openProfileDialogWithTab('games-dashboard'),
           setUpdateStatus: setUpdateStatus,
           recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
@@ -1958,7 +1978,10 @@ const MainFrame = (props: Props) => {
             }}
             onExportProject={() => openExportDialog(true)}
             onOpenPreferences={() => openPreferencesDialog(true)}
-            onOpenProfile={() => openProfileDialog(true)}
+            onOpenProfile={() => openProfileDialogWithTab('profile')}
+            onOpenGamesDashboard={() =>
+              openProfileDialogWithTab('games-dashboard')
+            }
             onOpenResources={() => {
               openResources();
               openProjectManager(false);
@@ -2194,6 +2217,8 @@ const MainFrame = (props: Props) => {
       )}
       {profileDialogOpen && (
         <ProfileDialog
+          currentProject={currentProject}
+          initialTab={profileDialogInitialTab}
           open
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}

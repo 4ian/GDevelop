@@ -24,6 +24,7 @@ import BuildStepsProgress, {
   type BuildStep,
 } from './Builds/BuildStepsProgress';
 import { type ExportPipeline } from './ExportPipeline.flow';
+import { GameRegistration } from '../GameDashboard/GameRegistration';
 
 type State = {|
   exportStep: BuildStep,
@@ -292,6 +293,11 @@ export default class ExportLauncher extends Component<Props, State> {
             exportState,
             onClose: this._closeDoneFooter,
           })}
+        {doneFooterOpen && (
+          <Line>
+            <GameRegistration project={project} />
+          </Line>
+        )}
       </Column>
     );
   }

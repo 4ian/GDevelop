@@ -364,6 +364,7 @@ gdjs.copyArray = function (src, dst) {
  * @returns {string} The generated UUID.
  */
 gdjs.makeUuid = function () {
+  // Fallback to non cryptographically secure UUIDs if not supported
   if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
     const makeMathRandomUuid = (a) => {
       return a
@@ -377,13 +378,17 @@ gdjs.makeUuid = function () {
     return makeMathRandomUuid();
   }
 
+  // @ts-ignore - TS does not like properties added on functions
   if (!gdjs.makeUuid.hex) {
+    // @ts-ignore - TS does not like properties added on functions
     gdjs.makeUuid.hex = [];
 
     for (var i = 0; i < 256; i++) {
+      // @ts-ignore - TS does not like properties added on functions
       gdjs.makeUuid.hex[i] = (i < 16 ? '0' : '') + i.toString(16);
     }
   }
+  // @ts-ignore - TS does not like properties added on functions
   const hex = gdjs.makeUuid.hex;
 
   var r = crypto.getRandomValues(new Uint8Array(16));

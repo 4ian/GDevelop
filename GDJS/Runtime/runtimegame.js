@@ -526,11 +526,11 @@ gdjs.RuntimeGame.prototype.startGameLoop = function () {
  * time.
  */
 gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
-  // if (this.isPreview()) return; // TODO
+  if (this.isPreview()) return;
   if (typeof fetch === 'undefined') return;
   if (!this._data.properties.projectUuid) return;
 
-  const baseUrl = 'https://fixpe96o0h.execute-api.us-east-1.amazonaws.com/dev'; // TODO
+  const baseUrl = 'https://api.gdevelop-app.com/analytics';
   const playerId = this._getPlayerUuid();
   let sessionId = null;
   let lastSessionHitTime = Date.now();
@@ -540,6 +540,9 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
     headers: {
       'Content-Type': 'application/json',
     },
+    // It's important to ensure that the data sent here does not contain
+    // any personal information from the player or that would allow to
+    // precisely identify someone.
     body: JSON.stringify({
       gameId: this._data.properties.projectUuid,
       playerId: playerId,
@@ -550,8 +553,10 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
         location: window.location.href,
       },
       platform: {
+        // @ts-ignore
         isCordova: !!window.cordova,
         devicePlatform:
+          // @ts-ignore
           typeof device !== 'undefined' ? device.platform || '' : '',
         navigatorPlatform:
           typeof navigator !== 'undefined' ? navigator.platform : '',
@@ -603,6 +608,7 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
     // Detect Safari to work around Safari-specific bugs:
     // - https://bugs.webkit.org/show_bug.cgi?id=151610
     // - https://bugs.webkit.org/show_bug.cgi?id=151234
+    // @ts-ignore
     const isSafari = typeof safari === 'object' && safari.pushNotification;
     const isElectron = /electron/i.test(navigator.userAgent);
     if (isSafari || isElectron) {

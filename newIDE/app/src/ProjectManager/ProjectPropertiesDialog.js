@@ -25,6 +25,7 @@ import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
 import AlertMessage from '../UI/AlertMessage';
+import { GameRegistration } from '../GameDashboard/GameRegistration';
 
 type Props = {|
   project: gdProject,
@@ -320,6 +321,10 @@ function ProjectPropertiesDialog(props: Props) {
               </I18n>
             </React.Fragment>
           ) : null}
+          <Text size="title">
+            <Trans>Analytics</Trans>
+          </Text>
+          <GameRegistration project={project} />
           <Text size="title">
             <Trans>Resolution and rendering</Trans>
           </Text>

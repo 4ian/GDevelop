@@ -191,6 +191,22 @@
         "metadata": "",
         "name": "desert\\desert.json",
         "userAdded": true
+      },
+      {
+        "disablePreload": false,
+        "file": "desert/desert-externalTilesetFile.json",
+        "kind": "json",
+        "metadata": "",
+        "name": "desert\\desert-externalTilesetFile.json",
+        "userAdded": true
+      },
+      {
+        "disablePreload": false,
+        "file": "desert/desert-noTilesetEmbeded.json",
+        "kind": "json",
+        "metadata": "",
+        "name": "desert\\desert-noTilesetEmbeded.json",
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -223,7 +239,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.328
+        "zoomFactor": 0.592
       },
       "objectsGroups": [],
       "variables": [
@@ -248,7 +264,7 @@
           "width": 302,
           "x": -50,
           "y": 400,
-          "zOrder": 6,
+          "zOrder": 25,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -287,16 +303,16 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 17,
           "layer": "",
           "locked": false,
           "name": "about2",
           "persistentUuid": "db9126ab-f712-4eef-aa6e-4fad7fc69491",
-          "width": 0,
+          "width": 236,
           "x": 7,
-          "y": 573,
-          "zOrder": 8,
+          "y": 557,
+          "zOrder": 31,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -358,8 +374,8 @@
           "name": "DesertExample",
           "persistentUuid": "f1edccc1-bffb-4a95-8721-fc254b2d141a",
           "width": 0,
-          "x": -635,
-          "y": 538,
+          "x": -353,
+          "y": 513,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
@@ -383,16 +399,16 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 70,
           "layer": "",
           "locked": false,
-          "name": "tilemapWithSpacingAndBase64Compression",
-          "persistentUuid": "a037068c-0814-44b0-a513-93dfba9662dc",
-          "width": 0,
-          "x": -345,
-          "y": 531,
-          "zOrder": 16,
+          "name": "about5",
+          "persistentUuid": "c5469dec-5bc8-48a6-97a4-110ae0f0ae50",
+          "width": 427,
+          "x": 278,
+          "y": 498,
+          "zOrder": 21,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -403,12 +419,12 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "about5",
-          "persistentUuid": "c5469dec-5bc8-48a6-97a4-110ae0f0ae50",
+          "name": "tilesetWithSpacingAndCompressedLayedData",
+          "persistentUuid": "e3734856-68e3-484f-b968-8128cb251878",
           "width": 0,
-          "x": -321,
-          "y": 1752,
-          "zOrder": 18,
+          "x": 17,
+          "y": 463,
+          "zOrder": 19,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -659,21 +675,6 @@
           ]
         },
         {
-          "name": "tilemapWithSpacingAndBase64Compression",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "desert\\desert.json",
-            "tilemapAtlasImage": "desert\\tmw_desert_spacing.png",
-            "displayMode": "visible",
-            "layerIndex": 0,
-            "animationSpeedScale": 1,
-            "animationFps": 4
-          }
-        },
-        {
           "bold": false,
           "italic": false,
           "name": "about5",
@@ -690,6 +691,22 @@
             "b": 0,
             "g": 0,
             "r": 0
+          }
+        },
+        {
+          "name": "tilesetWithSpacingAndCompressedLayedData",
+          "tags": "",
+          "type": "TileMap::TileMap",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "tilemapJsonFile": "desert\\desert-noTilesetEmbeded.json",
+            "tilesetJsonFile": "desert\\desert-externalTilesetFile.json",
+            "tilemapAtlasImage": "desert\\tmw_desert_spacing.png",
+            "displayMode": "visible",
+            "layerIndex": "0",
+            "animationSpeedScale": 1,
+            "animationFps": 4
           }
         }
       ],

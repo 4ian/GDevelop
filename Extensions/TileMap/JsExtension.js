@@ -483,7 +483,7 @@ module.exports = {
     /**
     * This is used to reload the tilemap
     */
-    RenderedTileMapInstance.prototype._loadTileMapWithTileset = function(tiledData, tilesetJsonData) {
+    RenderedTileMapInstance.prototype._loadTileMapWithTileset = function(tileMapJsonData, tilesetJsonData) {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
@@ -507,7 +507,7 @@ module.exports = {
 
       PixiTilemapHelper.getPIXITileSet(
         textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-        tilesetJsonData ? {...tiledData, tilesets: [tilesetJsonData]} : tiledData,
+        tilesetJsonData ? {...tileMapJsonData, tilesets: [tilesetJsonData]} : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
         (tileset) => {
@@ -539,15 +539,15 @@ module.exports = {
         .getValue();
 
       this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
-        tiledData => {
+        tileMapJsonData => {
           if (tilesetJsonFile) {
             this._pixiResourcesLoader.getResourceJsonData(this._project, tilesetJsonFile).then(
               tilesetJsonData => {
-                this._loadTileMapWithTileset(tiledData, tilesetJsonData);
+                this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
               }
             )
           } else {
-            this._loadTileMapWithTileset(tiledData);
+            this._loadTileMapWithTileset(tileMapJsonData);
           }
         }
       );

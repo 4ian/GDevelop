@@ -34,10 +34,8 @@
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(`
         ${jsonResourceName} doesn't appear to contain any tileset data.
-        Please embed your tileset in the tilemap file.
-        At this point external tileset files are not supported
       `)
-      return // TODO handle loading tilesets from another json file, when it is provided- favor it over embeded tileset data
+      return
     }
     const {
       tilewidth,
@@ -80,12 +78,21 @@
       const x = margin + columnMultiplier * (tileWidth + spacing)
       const y = margin + rowMultiplier * (tileHeight + spacing)
 
-      const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
-      const texture = new PIXI.Texture(tex, rect)
-      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
-      texture.cacheAsBitmap = true
+      try {
+        const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
+        console.log(x, y, tileWidth, tileHeight)
+        const texture = new PIXI.Texture(tex, rect)
+        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
+        texture.cacheAsBitmap = true
 
-      return texture
+        return texture
+      } catch (error) {
+        console.waring(
+          'Error occured while trying to create PIXI.Texture!',
+          error
+        )
+        return null
+      }
     })
     const newTileset = {
       width: tex.width,

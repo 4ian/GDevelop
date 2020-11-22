@@ -37,7 +37,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
   this._pixiObject.tileAnim[0] += 1;
 };
 
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
+
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = function(tilesetJsonData) {
   this._runtimeScene
     .getGame()
     .getJsonManager()
@@ -47,12 +48,13 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
         return;
       };
 
+      console.log(content, tilesetJsonData, {...content, tilesets:[tilesetJsonData] })
       PixiTileMapHelper.getPIXITileSet(
         textureName => this._runtimeScene
           .getGame()
           .getImageManager()
           .getPIXITexture(textureName),
-        content,
+          tilesetJsonData ? {...content, tilesets:[tilesetJsonData] } : content,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
         (tileset) => {
@@ -61,12 +63,40 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
               this._pixiObject,
               tileset,
               this._object._displayMode,
-              this._object._layerIndex
+              this._object._layerIndex,
+              pako
             );
           }
         }
       )
-    });   
+    });
+};
+
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function() {
+  console.log(this._object._tilemapJsonFile);
+  this._runtimeScene
+  .getGame()
+  .getJsonManager()
+  .loadJson(this._object._tilemapJsonFile, (error, content)=> {
+    if (error || !content) {
+      console.error('An error happened while loading JSON resource:', error);
+      return;
+    };
+    if (this._object._tilesetJsonFile) {
+      this._runtimeScene
+      .getGame()
+      .getJsonManager()
+      .loadJson(this._object._tilesetJsonFile, (error, tilesetData)=> {
+        this._loadTileMapWithTileset(tilesetData)
+      })
+    } else {
+      this._loadTileMapWithTileset()
+    }
+  })
+};
+
+gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilesetJsonFile = function() {
+  this._tilesetJsonFile = this._object._tilesetJsonFile;
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

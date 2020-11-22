@@ -50,6 +50,13 @@ module.exports = {
           .setLabel(_('Tilemap json file'))
       );
       objectProperties.set(
+        'tilesetJsonFile',
+        new gd.PropertyDescriptor(objectContent.tilesetJsonFile)
+          .setType('resource')
+          .addExtraInfo('json')
+          .setLabel(_('Tileset json file'))
+      );
+      objectProperties.set(
         'tilemapAtlasImage',
         new gd.PropertyDescriptor(objectContent.tilemapAtlasImage)
           .setType('resource')
@@ -75,7 +82,7 @@ module.exports = {
         'animationSpeedScale',
         new gd.PropertyDescriptor(objectContent.animationSpeedScale?.toString())
           .setType('number')
-          .setLabel(_('Animation speed'))
+          .setLabel(_('Animation speed scale'))
       );
       objectProperties.set(
         'animationFps',
@@ -89,6 +96,7 @@ module.exports = {
     objectTileMap.setRawJSONContent(
       JSON.stringify({
         tilemapJsonFile: '',
+        tilesetJsonFile: '',
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
@@ -170,6 +178,39 @@ module.exports = {
       .setFunctionName('setTilemapJsonFile')
       .setGetter('getTilemapJsonFile');
 
+    object
+      .addCondition(
+        'TilesetJsonFile',
+        _('Tileset json file'),
+        _('Compare the value of the tileset json file.'),
+        _('The tileset json file of _PARAM0_ is _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .addParameter('jsonResource', _('Tileset json file'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isTilesetJsonFile');
+
+    object
+      .addAction(
+        'SetTilesetJsonFile',
+        _('Tileset json file'),
+        _(
+          'Set the json file with the tileset data (sometimes that is embeded in the tilemap, so not needed)'
+        ),
+        _('Set the tileset json file of _PARAM0_ to _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/tile_map24.png',
+        'JsPlatform/Extensions/tile_map32.png'
+      )
+      .addParameter('object', 'TileMap', 'TileMap', false)
+      .addParameter('jsonResource', _('Tileset json file'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setTilesetJsonFile')
+      .setGetter('getTilesetJsonFile');
+      
     object
       .addCondition(
         'DisplayMode',
@@ -451,6 +492,10 @@ module.exports = {
         .getProperties(this.project)
         .get('tilemapJsonFile')
         .getValue();
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
       const layerIndex = parseInt(
         this._associatedObject
           .getProperties(this.project)
@@ -465,23 +510,47 @@ module.exports = {
 
       this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
         tiledData => {
-          PixiTilemapHelper.getPIXITileSet(
-            textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-            tiledData,
-            tilemapAtlasImage,
-            tilemapJsonFile,
-            (tileset) => {
-              if (tileset && this._pixiObject) {
-                PixiTilemapHelper.updatePIXITileMap(
-                  this._pixiObject,
-                  tileset,
-                  displayMode,
-                  layerIndex,
-                  pako
-                );
+          if (tilesetJsonFile) {
+            this._pixiResourcesLoader.getResourceJsonData(this._project, tilesetJsonFile).then(
+              tilesetJsonData => {
+                PixiTilemapHelper.getPIXITileSet(
+                  textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+                  {...tiledData, tilesets: [tilesetJsonData]},
+                  tilemapAtlasImage,
+                  tilemapJsonFile,
+                  (tileset) => {
+                    if (tileset && this._pixiObject) {
+                      PixiTilemapHelper.updatePIXITileMap(
+                        this._pixiObject,
+                        tileset,
+                        displayMode,
+                        layerIndex,
+                        pako
+                      );
+                    }
+                  }
+                )
               }
-            }
-          )
+            )
+          } else {
+            PixiTilemapHelper.getPIXITileSet(
+              textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+              tiledData,
+              tilemapAtlasImage,
+              tilemapJsonFile,
+              (tileset) => {
+                if (tileset && this._pixiObject) {
+                  PixiTilemapHelper.updatePIXITileMap(
+                    this._pixiObject,
+                    tileset,
+                    displayMode,
+                    layerIndex,
+                    pako
+                  );
+                }
+              }
+            )
+          }
         }
       );
     };
@@ -495,6 +564,13 @@ module.exports = {
         .getValue();
       if (this._pixiObject.tilemapJsonFile !== tilemapJsonFile)
         this._pixiObject.tilemapJsonFile = tilemapJsonFile;
+
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
+      if (this._pixiObject.tilesetJsonFile !== tilesetJsonFile)
+        this._pixiObject.tilesetJsonFile = tilesetJsonFile;
 
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)

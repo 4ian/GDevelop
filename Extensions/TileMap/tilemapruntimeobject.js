@@ -13,6 +13,8 @@ gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
   /** @type {string} */
   this._tilemapJsonFile = objectData.content.tilemapJsonFile;
   /** @type {string} */
+  this._tilesetJsonFile = objectData.content.tilesetJsonFile;
+  /** @type {string} */
   this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
   /** @type {string} */
   this._displayMode = objectData.content.displayMode;
@@ -70,6 +72,12 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
     this.setTilemapJsonFile(newObjectData.content.tilemapJsonFile);
   }
   if (
+    oldObjectData.content.tilesetJsonFile !==
+    newObjectData.content.tilesetJsonFile
+  ) {
+    this.setTilesetJsonFile(newObjectData.content.tilesetJsonFile);
+  }
+  if (
     oldObjectData.content.tilemapAtlasImage !==
     newObjectData.content.tilemapAtlasImage
   ) {
@@ -125,6 +133,15 @@ gdjs.TileMapRuntimeObject.prototype.isTilemapJsonFileName = function(selectedTil
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 
+gdjs.RuntimeObject.prototype.setTilesetJsonFile = function(tilesetJsonFile) {
+  this._tilesetJsonFile = tilesetJsonFile;
+  this._renderer.updateTileMap();
+};
+
+gdjs.RuntimeObject.prototype.getTilesetJsonFile = function() {
+  return this._tilesetJsonFile;
+};
+
 gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function(displayMode) {
   this._displayMode = displayMode;
   this._renderer.updateTileMap();
@@ -169,6 +186,13 @@ gdjs.RuntimeObject.prototype.isTilemapJsonFile = function(
 ) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
+
+gdjs.RuntimeObject.prototype.isTilesetJsonFile = function(
+  selectedTilesetJsonFile
+) {
+  return this._tilesetJsonFile === selectedTilesetJsonFile;
+};
+
 gdjs.RuntimeObject.prototype.isDisplayMode = function(
   selectedDisplayMode
 ) {
@@ -190,7 +214,6 @@ gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
 gdjs.TileMapRuntimeObject.prototype.setHeight = function(height) {
   this._renderer.setHeight(height);
 };
-
 
 /**
  * Set object position on X axis.

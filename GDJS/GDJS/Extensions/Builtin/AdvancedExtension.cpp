@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AdvancedExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -66,6 +67,28 @@ AdvancedExtension::AdvancedExtension() {
         return "if (typeof eventsFunctionContext !== 'undefined') { "
                "eventsFunctionContext.returnValue = " +
                booleanCode + "; }";
+      });
+
+  GetAllConditions()["GetArgumentAsBoolean"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction& instruction,
+                                 gd::EventsCodeGenerator& codeGenerator,
+                                 gd::EventsCodeGenerationContext& context) {
+        gd::String parameterNameCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameter(0).GetPlainString());
+        gd::String valueCode =
+            gd::String(instruction.IsInverted() ? "!" : "") +
+            "(typeof eventsFunctionContext !== 'undefined' ? "
+            "!!eventsFunctionContext.getArgument(" +
+            parameterNameCode + ") : false)";
+        gd::String outputCode =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val = " + valueCode + ";\n";
+        return outputCode;
       });
 
   GetAllExpressions()["GetArgumentAsNumber"]

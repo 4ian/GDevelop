@@ -28,24 +28,24 @@ module.exports = {
     extension.setExtensionInformation(
       'Notification',
       _('Notification'),
-      _('Use and maniulate notifications'),
+      _('Use and manipulate notifications'),
       'Add00',
       'MIT'
     );
 
     extension
       .addCondition(
-        'RequestPermission',
-        _('Request permission'),
-        _('Request that the user enable notification (browser applications only).'),
-        _('Request permission for notifications'),
+        'IsPermissionGranted',
+        _('Check if permission has been granted'),
+        _('Check if the user has given permission for notifications'),
+        _('Check if the user has granted notification permissions'),
         _('Notification'),
         //'JsPlatform/Extensions/',
         //'JsPlatform/Extensions/'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
-      .setFunctionName('gdjs.evtTools.notification.requestPermission');
+      .setFunctionName('gdjs.evtTools.notification.permissionGranted');
 
     extension
       .addCondition(
@@ -74,7 +74,7 @@ module.exports = {
       .addParameter('expression', _('Id'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
-      .setFunctionName('gdjs.evtTools.notification.onEvent');
+      .setFunctionName('gdjs.evtTools.notification.onClick');
 
     extension
       .addCondition(
@@ -89,7 +89,7 @@ module.exports = {
       .addParameter('expression', _('Id'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
-      .setFunctionName('gdjs.evtTools.notification.onEvent');
+      .setFunctionName('gdjs.evtTools.notification.onShow');
 
     extension
       .addCondition(
@@ -104,7 +104,7 @@ module.exports = {
       .addParameter('expression', _('Id'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
-      .setFunctionName('gdjs.evtTools.notification.onEvent');
+      .setFunctionName('gdjs.evtTools.notification.onClose');
 
     extension
       .addCondition(
@@ -119,7 +119,21 @@ module.exports = {
       .addParameter('expression', _('Id'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
-      .setFunctionName('gdjs.evtTools.notification.onEvent');
+      .setFunctionName('gdjs.evtTools.notification.onError');
+
+    extension
+      .addAction(
+        'RequestPermission',
+        _('Request permissions for notifications'),
+        _('Request permissions for notifications from the user'),
+        _('Request permission for notifications from the user'),
+        _('Notification'),
+        //'JsPlatform/Extensions/',
+        //'JsPlatform/Extensions/'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Notification/notificationtools.js')
+      .setFunctionName('gdjs.evtTools.notification.requestPermission');
 
     extension
       .addAction(
@@ -136,7 +150,8 @@ module.exports = {
       .addParameter('string', _('Message'), '', false)
       .addParameter('string', _('(Optional) file location of an image to display'), '', true)
       .addParameter('string', _('(Optional) change language of text, must be an ISO 2 Letter Language Code'), '', true)
-      .addParameter('string', _('(Optional) tag'), '', true)
+      .setDefaultValue('false')
+      .addParameter('yesorno', _('(Optional) require interaction to make notification disappear'), '', true)
       .setDefaultValue('false')
       .addParameter('yesorno', _('(Optional) notification is silent'), '', true)
       .addParameter('string', _('(Optional) vibrate mobile device, must be a comma separated list'), '', true)
@@ -158,18 +173,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
       .setFunctionName('gdjs.evtTools.notification.removeNotification');
-
-    extension
-      .addStrExpression(
-        'PermissionStatus',
-        _('Returns a string containing the current permissions status'),
-        _('The return value will be one of three things: default, granted, or denied'),
-        _('Notification'),
-        //'JsPlatform/Extensions/'
-        //'JsPlatform/Extensions/'
-      )
-      .getCodeExtraInformation()
-      .setFunctionName('gdjs.evtTools.notification.permissionStatus');
 
     return extension;
   },

@@ -68,7 +68,7 @@ const filterExtensionShortHeaders = (
     );
 };
 
-const MAX_DISPLAYED_RESULTS = 20;
+const MAX_DISPLAYED_RESULTS = 40;
 
 /**
  * Display a list of extensions that the user can search in.

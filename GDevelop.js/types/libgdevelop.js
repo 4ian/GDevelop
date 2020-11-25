@@ -115,6 +115,7 @@ declare class libGDevelop {
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
+  ForEachStructureEvent: Class<gdForEachStructureEvent>;
   CommentEvent: Class<gdCommentEvent>;
   GroupEvent: Class<gdGroupEvent>;
   LinkEvent: Class<gdLinkEvent>;

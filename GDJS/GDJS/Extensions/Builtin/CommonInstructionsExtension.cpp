@@ -11,6 +11,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/ForEachStructureEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -406,6 +407,87 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "} while ( !" + whileBoolean + " );\n";
 
         return outputCode;
+      });
+
+  GetAllEvents()["BuiltinCommonInstructions::ForEachStructure"]
+      .SetCodeGenerator([](gd::BaseEvent& event_,
+                           gd::EventsCodeGenerator& codeGenerator,
+                           gd::EventsCodeGenerationContext& parentContext) {
+        gd::String outputCode;
+        gd::ForEachStructureEvent& event =
+            dynamic_cast<gd::ForEachStructureEvent&>(event_);
+
+        // Context is "reset" each time the event is repeated (i.e. objects are
+        // picked again)
+        gd::EventsCodeGenerationContext context;
+        context.InheritsFrom(parentContext);
+        context.ForbidReuse();
+
+        gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
+            event.GetConditions(), context);
+        gd::String actionsCode =
+            codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+        gd::String ifPredicat =
+            event.GetConditions().empty()
+                ? "true"
+                : codeGenerator.GenerateBooleanFullName(
+                      "condition" +
+                          gd::String::From(event.GetConditions().size() - 1) +
+                          "IsTrue",
+                      context) +
+                      ".val";
+
+        // Prepare object declaration and sub events
+        gd::String subevents =
+            codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+        gd::String objectDeclaration =
+            codeGenerator.GenerateObjectsDeclarationCode(context) + "\n";
+
+        // Write final code
+        gd::String iteratorReferenceVariableName =
+            "iteratorReference" +
+            gd::String::From(context.GetContextDepth());
+        gd::String structureChildVariableName =
+            "structureChild" +
+            gd::String::From(context.GetContextDepth());
+        gd::String structureReferenceVariableName =
+            "structureReference" +
+            gd::String::From(context.GetContextDepth());
+
+        outputCode +=
+            "const $ITERATOR_VARIABLE = runtimeScene.getVariables().get(\"$CHILD_VARIABLE\");\n"
+            "const $STRUCTURE_REFERENCE = runtimeScene.getVariables().get(\"$STRUCTURE_VARIABLE\");\n"
+            "for(\n"
+            "    let $STRUCTURE_CHILD_VARIABLE in \n"
+            "    $STRUCTURE_REFERENCE.getAllChildren()\n"
+            ") {\n"
+            "    $STRUCTURE_CHILD_VARIABLE = $STRUCTURE_REFERENCE.getChild($STRUCTURE_CHILD_VARIABLE)\n"
+            "    if($STRUCTURE_CHILD_VARIABLE.isNumber()) {\n"
+            "        $ITERATOR_VARIABLE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber())\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.isStructure()) {\n"
+            "        // Structures are passed by reference like JS objects\n"
+            "        $ITERATOR_VARIABLE._children = $STRUCTURE_CHILD_VARIABLE.getAllChildren()\n"
+            "    } else {\n"
+            "        $ITERATOR_VARIABLE.setString($STRUCTURE_CHILD_VARIABLE.getAsString())\n"
+            "    }\n";
+        outputCode += objectDeclaration;
+        outputCode += conditionsCode;
+        outputCode += "if (" + ifPredicat + ")\n";
+        outputCode += "{\n";
+        outputCode += actionsCode;
+        if (event.HasSubEvents()) {
+          outputCode += "\n{ //Subevents: \n";
+          outputCode += subevents;
+          outputCode += "} //Subevents end.\n";
+        }
+        outputCode += "}\n";
+        outputCode += "}\n";
+
+        return outputCode.FindAndReplace("$STRUCTURE_CHILD_VARIABLE", structureChildVariableName)
+            .FindAndReplace("$ITERATOR_VARIABLE", iteratorReferenceVariableName)
+            .FindAndReplace("$STRUCTURE_VARIABLE", event.GetStructure())
+            .FindAndReplace("$STRUCTURE_REFERENCE", structureReferenceVariableName)
+            .FindAndReplace("$CHILD_VARIABLE", event.GetVariable());
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Repeat"].SetCodeGenerator(

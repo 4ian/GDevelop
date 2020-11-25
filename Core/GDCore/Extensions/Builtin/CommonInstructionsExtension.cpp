@@ -8,6 +8,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/ForEachStructureEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -117,6 +118,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::ForEachEvent>());
+
+  extension.AddEvent("ForEachStructure",
+                     _("For each strucure child"),
+                     _("Repeat the event for each child of a stucture."),
+                     "",
+                     "res/foreach.png",
+                     std::make_shared<gd::ForEachStructureEvent>());
 
   extension.AddEvent("Group",
                      _("Group"),

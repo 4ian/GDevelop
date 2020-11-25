@@ -1478,6 +1478,34 @@ interface ForEachEvent {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface ForEachStructureEvent {
+    void ForEachStructureEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+
+    [Const, Ref] DOMString GetVariable();
+    [Const, Ref] DOMString GetStructure();
+    void SetVariable([Const] DOMString type);
+    void SetStructure([Const] DOMString type);
+
+    //Inherited from BaseEvent:
+    ForEachStructureEvent Clone();
+    [Const, Ref] DOMString GetType();
+    void SetType([Const] DOMString type);
+    boolean IsExecutable();
+    boolean CanHaveSubEvents();
+    boolean HasSubEvents();
+    [Ref] EventsList GetSubEvents();
+    boolean IsDisabled();
+    void SetDisabled(boolean disable);
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
 interface CommentEvent {
     void CommentEvent();
 

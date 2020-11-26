@@ -36,8 +36,8 @@ const styles = {
 };
 
 type State = {|
-  editingIterator: Boolean,
-  editingIterable: Boolean,
+  editingIteratorVariableName: Boolean,
+  editingIterableVariableName: Boolean,
   anchorEl: ?HTMLSpanElement,
 |};
 
@@ -48,8 +48,8 @@ export default class ForEachChildVariableEvent extends React.Component<
   _iteratorField: ?SceneVariableField = null;
   _iterableField: ?SceneVariableField = null;
   state = {
-    editingIterator: false,
-    editingIterable: false,
+    editingIteratorVariableName: false,
+    editingIterableVariableName: false,
     anchorEl: null,
   };
 
@@ -62,8 +62,8 @@ export default class ForEachChildVariableEvent extends React.Component<
       () =>
         this.setState(
           {
-            editingIterator: variable === 'iterator',
-            editingIterable: variable === 'iterable',
+            editingIteratorVariableName: variable === 'iterator',
+            editingIterableVariableName: variable === 'iterable',
             anchorEl,
           },
           () => {
@@ -88,16 +88,18 @@ export default class ForEachChildVariableEvent extends React.Component<
     if (anchorEl) anchorEl.focus();
 
     this.setState({
-      editingIterator: false,
-      editingIterable: false,
+      editingIteratorVariableName: false,
+      editingIterableVariableName: false,
       anchorEl: null,
     });
   };
 
   render() {
-    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(this.props.event);
-    const iteratorName = forEachChildVariableEvent.getVariable();
-    const iterableName = forEachChildVariableEvent.getStructure();
+    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
+      this.props.event
+    );
+    const iteratorName = forEachChildVariableEvent.getIteratorVariableName();
+    const iterableName = forEachChildVariableEvent.getIterableVariableName();
 
     return (
       <div
@@ -223,7 +225,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           )}
         />
         <InlinePopover
-          open={this.state.editingIterator}
+          open={this.state.editingIteratorVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
@@ -234,7 +236,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             objectsContainer={this.props.objectsContainer}
             value={iteratorName}
             onChange={text => {
-              forEachChildVariableEvent.setVariable(text);
+              forEachChildVariableEvent.setIteratorVariableName(text);
               this.props.onUpdate();
             }}
             isInline
@@ -243,7 +245,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           />
         </InlinePopover>
         <InlinePopover
-          open={this.state.editingIterable}
+          open={this.state.editingIterableVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
@@ -254,7 +256,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             objectsContainer={this.props.objectsContainer}
             value={iterableName}
             onChange={text => {
-              forEachChildVariableEvent.setStructure(text);
+              forEachChildVariableEvent.setIterableVariableName(text);
               this.props.onUpdate();
             }}
             isInline

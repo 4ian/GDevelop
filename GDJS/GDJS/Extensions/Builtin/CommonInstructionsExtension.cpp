@@ -490,8 +490,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             .FindAndReplace("$STRUCTURE_CHILD_VARIABLE", structureChildVariableName)
             .FindAndReplace("$ITERATOR_REFERENCE", iteratorReferenceVariableName)
             .FindAndReplace("$ITERABLE_REFERENCE", iterableReferenceVariableName)
-            .FindAndReplace("$ITERABLE_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetStructure()))
-            .FindAndReplace("$ITERATOR_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetVariable()));
+            .FindAndReplace("$ITERABLE_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetIterableVariableName()))
+            .FindAndReplace("$ITERATOR_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetIteratorVariableName()));
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Repeat"].SetCodeGenerator(

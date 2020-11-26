@@ -15,7 +15,7 @@ using namespace std;
 namespace gd {
 
 ForEachChildVariableEvent::ForEachChildVariableEvent()
-    : BaseEvent(), variable("child"), structure("") {}
+    : BaseEvent(), iteratorVariableName("child"), iterableVariableName("") {}
 
 vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -48,8 +48,8 @@ ForEachChildVariableEvent::GetAllActionsVectors() const {
 }
 
 void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
-  element.AddChild("structure").SetValue(structure);
-  element.AddChild("variable").SetValue(variable);
+  element.AddChild("iterableVariableName").SetValue(iterableVariableName);
+  element.AddChild("iteratorVariableName").SetValue(iteratorVariableName);
   gd::EventsListSerialization::SerializeInstructionsTo(
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(
@@ -60,8 +60,8 @@ void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
 
 void ForEachChildVariableEvent::UnserializeFrom(gd::Project& project,
                                             const SerializerElement& element) {
-  structure = element.GetChild("structure", 0, "").GetValue().GetString();
-  variable = element.GetChild("variable", 0, "").GetValue().GetString();
+  iterableVariableName = element.GetChild("iterableVariableName", 0, "").GetValue().GetString();
+  iteratorVariableName = element.GetChild("iteratorVariableName", 0, "").GetValue().GetString();
   gd::EventsListSerialization::UnserializeInstructionsFrom(
       project, conditions, element.GetChild("conditions", 0, "Conditions"));
   gd::EventsListSerialization::UnserializeInstructionsFrom(

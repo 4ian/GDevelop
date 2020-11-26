@@ -40,34 +40,34 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   gd::InstructionsList& GetActions() { return actions; };
 
   /**
-   * \brief Get the structure attached to the event.
+   * \brief Get the iterable variable name attached to the event.
    *
-   * The structure is the structure variable that will be iterated on.
+   * It is the structure variable that will be iterated on.
    */
-  const gd::String& GetStructure() const { return structure; };
+  const gd::String& GetIterableVariableName() const { return iterableVariableName; };
 
   /**
-   * \brief Set the structure attached to the event.
+   * \brief Set the iterable variable name attached to the event.
    *
-   * The structure is the structure variable that will be iterated on.
+   * It is the structure variable that will be iterated on.
    */
-  void SetStructure(gd::String newStructure) { structure = newStructure; };
+  void SetIterableVariableName(gd::String newName) { iterableVariableName = newName; };
 
   /**
-   * \brief Get the variable attached to the event.
+   * \brief Get the iterator variable attached to the event.
    *
-   * The variable is the variable that will contain the value of the linked
-   * child of the iteration.
+   * It is the variable that will contain the value of the 
+   * iterable's child being iterated on.
    */
-  const gd::String& GetVariable() const { return variable; };
+  const gd::String& GetIteratorVariableName() const { return iteratorVariableName; };
 
   /**
-   * \brief Set the variable attached to the event.
+   * \brief Set the iterator variable attached to the event.
    *
-   * The variable is the variable that will contain the value of the linked
-   * child of the iteration.
+   * It is the variable that will contain the value of the 
+   * iterable's child being iterated on.
    */
-  void SetVariable(gd::String newVariable) { variable = newVariable; };
+  void SetIteratorVariableName(gd::String newName) { iteratorVariableName = newName; };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -81,8 +81,8 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
                                const SerializerElement& element);
 
  private:
-  gd::String structure;
-  gd::String variable;
+  gd::String iteratorVariableName;
+  gd::String iterableVariableName;
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   gd::EventsList events;

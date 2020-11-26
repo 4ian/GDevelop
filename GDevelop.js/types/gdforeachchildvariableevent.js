@@ -3,10 +3,10 @@ declare class gdForEachChildVariableEvent {
   constructor(): void;
   getConditions(): gdInstructionsList;
   getActions(): gdInstructionsList;
-  getVariable(): string;
-  getStructure(): string;
-  setVariable(type: string): void;
-  setStructure(type: string): void;
+  getIterableVariableName(): string;
+  getIteratorVariableName(): string;
+  setIterableVariableName(newName: string): void;
+  setIteratorVariableName(newName: string): void;
   clone(): gdForEachChildVariableEvent;
   getType(): string;
   setType(type: string): void;

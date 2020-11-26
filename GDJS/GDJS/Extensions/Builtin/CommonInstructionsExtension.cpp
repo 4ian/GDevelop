@@ -11,7 +11,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
-#include "GDCore/Events/Builtin/ForEachStructureEvent.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -409,13 +409,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         return outputCode;
       });
 
-  GetAllEvents()["BuiltinCommonInstructions::ForEachStructure"]
+  GetAllEvents()["BuiltinCommonInstructions::ForEachChildVariable"]
       .SetCodeGenerator([](gd::BaseEvent& event_,
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsCodeGenerationContext& parentContext) {
         gd::String outputCode;
-        gd::ForEachStructureEvent& event =
-            dynamic_cast<gd::ForEachStructureEvent&>(event_);
+        gd::ForEachChildVariableEvent& event =
+            dynamic_cast<gd::ForEachChildVariableEvent&>(event_);
 
         // Context is "reset" each time the event is repeated (i.e. objects are
         // picked again)

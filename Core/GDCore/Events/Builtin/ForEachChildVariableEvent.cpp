@@ -4,7 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#include "ForEachStructureEvent.h"
+#include "ForEachChildVariableEvent.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -14,17 +14,17 @@ using namespace std;
 
 namespace gd {
 
-ForEachStructureEvent::ForEachStructureEvent()
+ForEachChildVariableEvent::ForEachChildVariableEvent()
     : BaseEvent(), variable("child"), structure("") {}
 
-vector<gd::InstructionsList*> ForEachStructureEvent::GetAllConditionsVectors() {
+vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);
 
   return allConditions;
 }
 
-vector<gd::InstructionsList*> ForEachStructureEvent::GetAllActionsVectors() {
+vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllActionsVectors() {
   vector<gd::InstructionsList*> allActions;
   allActions.push_back(&actions);
 
@@ -32,7 +32,7 @@ vector<gd::InstructionsList*> ForEachStructureEvent::GetAllActionsVectors() {
 }
 
 vector<const gd::InstructionsList*>
-ForEachStructureEvent::GetAllConditionsVectors() const {
+ForEachChildVariableEvent::GetAllConditionsVectors() const {
   vector<const gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);
 
@@ -40,14 +40,14 @@ ForEachStructureEvent::GetAllConditionsVectors() const {
 }
 
 vector<const gd::InstructionsList*>
-ForEachStructureEvent::GetAllActionsVectors() const {
+ForEachChildVariableEvent::GetAllActionsVectors() const {
   vector<const gd::InstructionsList*> allActions;
   allActions.push_back(&actions);
 
   return allActions;
 }
 
-void ForEachStructureEvent::SerializeTo(SerializerElement& element) const {
+void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
   element.AddChild("structure").SetValue(structure);
   element.AddChild("variable").SetValue(variable);
   gd::EventsListSerialization::SerializeInstructionsTo(
@@ -58,7 +58,7 @@ void ForEachStructureEvent::SerializeTo(SerializerElement& element) const {
                                                  element.AddChild("events"));
 }
 
-void ForEachStructureEvent::UnserializeFrom(gd::Project& project,
+void ForEachChildVariableEvent::UnserializeFrom(gd::Project& project,
                                             const SerializerElement& element) {
   structure = element.GetChild("structure", 0, "").GetValue().GetString();
   variable = element.GetChild("variable", 0, "").GetValue().GetString();

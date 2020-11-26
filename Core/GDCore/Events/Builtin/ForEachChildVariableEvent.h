@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef FOREACHSTRUCTUREEVENT_H
-#define FOREACHSTRUCTUREEVENT_H
+#ifndef FOREACHCHILDVARIABLEEVENT_H
+#define FOREACHCHILDVARIABLEEVENT_H
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 namespace gd {
@@ -19,12 +19,12 @@ namespace gd {
 /**
  * \brief Event repeated for each every child of a structure variable.
  */
-class GD_CORE_API ForEachStructureEvent : public gd::BaseEvent {
+class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
  public:
-  ForEachStructureEvent();
-  virtual ~ForEachStructureEvent(){};
-  virtual gd::ForEachStructureEvent* Clone() const {
-    return new ForEachStructureEvent(*this);
+  ForEachChildVariableEvent();
+  virtual ~ForEachChildVariableEvent(){};
+  virtual gd::ForEachChildVariableEvent* Clone() const {
+    return new ForEachChildVariableEvent(*this);
   }
 
   virtual bool IsExecutable() const { return true; }

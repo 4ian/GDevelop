@@ -1478,8 +1478,8 @@ interface ForEachEvent {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
-interface ForEachStructureEvent {
-    void ForEachStructureEvent();
+interface ForEachChildVariableEvent {
+    void ForEachChildVariableEvent();
 
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
@@ -1490,7 +1490,7 @@ interface ForEachStructureEvent {
     void SetStructure([Const] DOMString type);
 
     //Inherited from BaseEvent:
-    ForEachStructureEvent Clone();
+    ForEachChildVariableEvent Clone();
     [Const, Ref] DOMString GetType();
     void SetType([Const] DOMString type);
     boolean IsExecutable();

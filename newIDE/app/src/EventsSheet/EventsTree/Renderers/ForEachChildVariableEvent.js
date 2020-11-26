@@ -41,7 +41,7 @@ type State = {|
   anchorEl: ?HTMLSpanElement,
 |};
 
-export default class ForEachStructureEvent extends React.Component<
+export default class ForEachChildVariableEvent extends React.Component<
   EventRendererProps,
   State
 > {
@@ -95,9 +95,9 @@ export default class ForEachStructureEvent extends React.Component<
   };
 
   render() {
-    const forEachStructureEvent = gd.asForEachStructureEvent(this.props.event);
-    const iteratorName = forEachStructureEvent.getVariable();
-    const iterableName = forEachStructureEvent.getStructure();
+    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(this.props.event);
+    const iteratorName = forEachChildVariableEvent.getVariable();
+    const iterableName = forEachChildVariableEvent.getStructure();
 
     return (
       <div
@@ -171,7 +171,7 @@ export default class ForEachStructureEvent extends React.Component<
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
-              instrsList={forEachStructureEvent.getConditions()}
+              instrsList={forEachChildVariableEvent.getConditions()}
               style={style}
               className={className}
               selection={this.props.selection}
@@ -195,7 +195,7 @@ export default class ForEachStructureEvent extends React.Component<
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
-              instrsList={forEachStructureEvent.getActions()}
+              instrsList={forEachChildVariableEvent.getActions()}
               style={
                 {
                   ...styles.actionsList,
@@ -234,7 +234,7 @@ export default class ForEachStructureEvent extends React.Component<
             objectsContainer={this.props.objectsContainer}
             value={iteratorName}
             onChange={text => {
-              forEachStructureEvent.setVariable(text);
+              forEachChildVariableEvent.setVariable(text);
               this.props.onUpdate();
             }}
             isInline
@@ -254,7 +254,7 @@ export default class ForEachStructureEvent extends React.Component<
             objectsContainer={this.props.objectsContainer}
             value={iterableName}
             onChange={text => {
-              forEachStructureEvent.setStructure(text);
+              forEachChildVariableEvent.setStructure(text);
               this.props.onUpdate();
             }}
             isInline

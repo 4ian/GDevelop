@@ -14,6 +14,7 @@ declare class libGDevelop {
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
+  asForEachStructureEvent(gdBaseEvent): gdForEachStructureEvent;
   asCommentEvent(gdBaseEvent): gdCommentEvent;
   asGroupEvent(gdBaseEvent): gdGroupEvent;
   asLinkEvent(gdBaseEvent): gdLinkEvent;

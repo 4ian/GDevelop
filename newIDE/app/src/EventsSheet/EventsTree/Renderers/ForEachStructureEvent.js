@@ -8,11 +8,13 @@ import {
   disabledText,
   instructionParameter,
   nameAndIconContainer,
+  icon,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import SceneVariableField from '../../ParameterFields/SceneVariableField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import { Trans } from '@lingui/macro';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
 const gd: libGDevelop = global.gd;
 
@@ -27,37 +29,51 @@ const styles = {
   actionsList: {
     flex: 1,
   },
+  variableContainer: {
+    marginLeft: '3px',
+    marginRight: '2px',
+  },
 };
+
+type State = {|
+  editingIterator: Boolean,
+  editingIterable: Boolean,
+  anchorEl: ?HTMLSpanElement,
+|};
 
 export default class ForEachStructureEvent extends React.Component<
   EventRendererProps,
-  *
+  State
 > {
-  _objectField: ?ObjectField = null;
+  _iteratorField: ?SceneVariableField = null;
+  _iterableField: ?SceneVariableField = null;
   state = {
-    editingVariable: false,
-    editingStructure: false,
+    editingIterator: false,
+    editingIterable: false,
     anchorEl: null,
   };
 
-  edit = (variable: 'structure' | 'variable', domEvent: any) => {
+  edit = (variable: 'iterable' | 'iterator', anchorEl: HTMLSpanElement) => {
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
     // Search the rest of the codebase for inlinepopover-event-hack
-    const anchorEl = domEvent.currentTarget;
     setTimeout(
       () =>
         this.setState(
           {
-            editingVariable: variable === 'variable',
-            editingStructure: variable === 'structure',
+            editingIterator: variable === 'iterator',
+            editingIterable: variable === 'iterable',
             anchorEl,
           },
           () => {
             // Give a bit of time for the popover to mount itself
             setTimeout(() => {
-              if (this._objectField) this._objectField.focus();
+              const field =
+                variable === 'iterable'
+                  ? this._iterableField
+                  : this._iteratorField;
+              if (field) field.focus();
             }, 10);
           }
         ),
@@ -72,16 +88,16 @@ export default class ForEachStructureEvent extends React.Component<
     if (anchorEl) anchorEl.focus();
 
     this.setState({
-      editingVariable: false,
-      editingStructure: false,
+      editingIterator: false,
+      editingIterable: false,
       anchorEl: null,
     });
   };
 
   render() {
     const forEachStructureEvent = gd.asForEachStructureEvent(this.props.event);
-    const variableName = forEachStructureEvent.getVariable();
-    const structureName = forEachStructureEvent.getStructure();
+    const iteratorName = forEachStructureEvent.getVariable();
+    const iterableName = forEachStructureEvent.getStructure();
 
     return (
       <div
@@ -97,7 +113,7 @@ export default class ForEachStructureEvent extends React.Component<
             })}
             tabIndex={0}
           >
-            For every child in{' '}
+            <Trans>For every child in </Trans>
             <span
               className={classNames({
                 [selectableArea]: true,
@@ -105,23 +121,24 @@ export default class ForEachStructureEvent extends React.Component<
                 [nameAndIconContainer]: true,
                 scenevar: true,
               })}
-              onClick={e => this.edit('structure', e)}
+              style={styles.variableContainer}
+              onClick={e => this.edit('iterable', e.currentTarget)}
               onKeyPress={event => {
                 if (shouldActivate(event)) {
-                  this.edit('structure', event);
+                  this.edit('iterable', event.currentTarget);
                 }
               }}
             >
-              <img class="icon" src="res/types/scenevar.png" alt="" />
-              {structureName.length !== 0 ? (
-                <span>{structureName}</span>
+              <img className={icon} src="res/types/scenevar.png" alt="" />
+              {iterableName.length !== 0 ? (
+                <span>{iterableName}</span>
               ) : (
                 <span className="instruction-missing-parameter">
-                  No variable selected!
+                  <Trans>{`<Select a variable>`}</Trans>
                 </span>
               )}
             </span>
-            , store the child in variable{' '}
+            <Trans>, store the child in variable </Trans>
             <span
               className={classNames({
                 [selectableArea]: true,
@@ -129,23 +146,24 @@ export default class ForEachStructureEvent extends React.Component<
                 [nameAndIconContainer]: true,
                 scenevar: true,
               })}
-              onClick={e => this.edit('variable', e)}
+              style={styles.variableContainer}
+              onClick={e => this.edit('iterator', e.currentTarget)}
               onKeyPress={event => {
                 if (shouldActivate(event)) {
-                  this.edit('variable', event);
+                  this.edit('iterator', event.currentTarget);
                 }
               }}
             >
-              <img class="icon" src="res/types/scenevar.png" alt="" />
-              {variableName.length !== 0 ? (
-                <span>{variableName}</span>
+              <img className={icon} src="res/types/scenevar.png" alt="" />
+              {iteratorName.length !== 0 ? (
+                <span>{iteratorName}</span>
               ) : (
                 <span className="instruction-missing-parameter">
-                  No variable selected!
+                  <Trans>{`<Select a variable>`}</Trans>
                 </span>
-              )}{' '}
+              )}
             </span>
-            and do:
+            <Trans> and do:</Trans>
           </span>
         </div>
         <ConditionsActionsColumns
@@ -205,7 +223,7 @@ export default class ForEachStructureEvent extends React.Component<
           )}
         />
         <InlinePopover
-          open={this.state.editingVariable}
+          open={this.state.editingIterator}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
@@ -214,18 +232,18 @@ export default class ForEachStructureEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            value={variableName}
+            value={iteratorName}
             onChange={text => {
               forEachStructureEvent.setVariable(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.endEditing}
-            ref={objectField => (this._objectField = objectField)}
+            ref={iteratorField => (this._iteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover
-          open={this.state.editingStructure}
+          open={this.state.editingIterable}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
@@ -234,14 +252,14 @@ export default class ForEachStructureEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            value={structureName}
+            value={iterableName}
             onChange={text => {
               forEachStructureEvent.setStructure(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.endEditing}
-            ref={objectField => (this._objectField = objectField)}
+            ref={iterableField => (this._iterableField = iterableField)}
           />
         </InlinePopover>
       </div>

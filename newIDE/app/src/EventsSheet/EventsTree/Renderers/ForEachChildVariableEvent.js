@@ -36,8 +36,8 @@ const styles = {
 };
 
 type State = {|
-  editingIteratorVariableName: Boolean,
-  editingIterableVariableName: Boolean,
+  editingIteratorVariableName: boolean,
+  editingIterableVariableName: boolean,
   anchorEl: ?HTMLSpanElement,
 |};
 

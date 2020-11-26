@@ -150,11 +150,11 @@ module.exports = {
       .addParameter('string', _('Message'), '', false)
       .addParameter('string', _('(Optional) file location of an image to display'), '', true)
       .addParameter('string', _('(Optional) change language of text, must be an ISO 2 Letter Language Code'), '', true)
-      .setDefaultValue('false')
+      .addParameter('string', _('(Optional) vibrate mobile device, must be a comma separated list'), '', true)
       .addParameter('yesorno', _('(Optional) require interaction to make notification disappear'), '', true)
       .setDefaultValue('false')
       .addParameter('yesorno', _('(Optional) notification is silent'), '', true)
-      .addParameter('string', _('(Optional) vibrate mobile device, must be a comma separated list'), '', true)
+      .setDefaultValue('false')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Notification/notificationtools.js')
       .setFunctionName('gdjs.evtTools.notification.createNotification');

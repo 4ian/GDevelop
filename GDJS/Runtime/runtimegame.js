@@ -76,6 +76,12 @@ gdjs.RuntimeGame = function (data, options) {
     : null;
 
   /** @type {boolean} */
+  this._sessionMetricsInitialized = false;
+
+  /** @type {boolean} */
+  this._disableMetrics = false;
+
+  /** @type {boolean} */
   this._isPreview = options.isPreview || false;
 };
 
@@ -518,14 +524,27 @@ gdjs.RuntimeGame.prototype.startGameLoop = function () {
     return false;
   });
 
-  this._setupSessionMetrics();
+  setTimeout(() => {
+    this._setupSessionMetrics();
+  }, 10000);
 };
 
 /**
- * Register a new session for the game, and set up listener to follow the session
+ * Set if the session should be registered.
+ * @param {boolean} enable
+ */
+gdjs.RuntimeGame.prototype.enableMetrics = function (enable) {
+  this._disableMetrics = !enable;
+  if (enable) { this._setupSessionMetrics(); }
+}
+
+/**
+ * Register a new session for the game, and set up listeners to follow the session
  * time.
  */
 gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
+  if (this._sessionMetricsInitialized) return;
+  if (this._disableMetrics) return;
   if (this.isPreview()) return;
   if (typeof fetch === 'undefined') return;
   if (!this._data.properties.projectUuid) return;
@@ -617,6 +636,8 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
       });
     }
   }
+
+  this._sessionMetricsInitialized = true;
 };
 
 /**

@@ -122,8 +122,12 @@ bool Exporter::ExportWholePixiProject(
     else if (exportForFacebookInstantGames)
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
-    if (!helper.ExportPixiIndexFile(
-            exportedProject, source, exportDir, includesFiles, "")) {
+    if (!helper.ExportPixiIndexFile(exportedProject,
+                                    source,
+                                    exportDir,
+                                    includesFiles,
+                                    /*nonRuntimeScriptsCacheBurst=*/0,
+                                    "")) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }
@@ -211,7 +215,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   gd::ProjectStripper::StripProjectForExport(exportedProject);
 
   //...and export it
-    gd::SerializerElement noRuntimeGameOptions;
+  gd::SerializerElement noRuntimeGameOptions;
   helper.ExportProjectData(
       fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");

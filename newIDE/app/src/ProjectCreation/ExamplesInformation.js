@@ -1570,6 +1570,51 @@ module.exports = {
       }
     ]
   },
+  "game-feel-demo": {
+    "description": "A demo showing how to enhance the \"game feel\" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "geodash": {
     "description": "A fast paced game where you must jump and avoid obstacles.",
     "usedExtensions": [
@@ -1958,6 +2003,47 @@ module.exports = {
       }
     ]
   },
+  "layer-effects": {
+    "description": "An example showing all the layer effects available in GDevelop.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
   "level-editor": {
     "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
     "usedExtensions": [
@@ -2049,6 +2135,31 @@ module.exports = {
       {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "lights": {
+    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Lights",
+        "name": "Lighting"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },
@@ -2553,6 +2664,55 @@ module.exports = {
       }
     ]
   },
+  "p2p-networking": {
+    "description": "A showcase of some multiplayer/networking possibilities using the P2P extension.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Peer-to-Peer communication (experimental)",
+        "name": "P2P"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "pairs": {
     "description": "Find all matching pairs of cards in this relaxing game. Use tweens to create smooth, natural animations with a few events.\n",
     "usedExtensions": [
@@ -2715,7 +2875,7 @@ module.exports = {
     ]
   },
   "particle-effects-demo": {
-    "description": "",
+    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -3130,16 +3290,24 @@ module.exports = {
         "name": "AnchorBehavior"
       },
       {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
       },
       {
         "fullName": "Features for all objects",
@@ -3148,6 +3316,10 @@ module.exports = {
       {
         "fullName": "System information",
         "name": "SystemInfo"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "Audio",
@@ -3160,10 +3332,6 @@ module.exports = {
       {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },
@@ -4103,6 +4271,68 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      }
+    ]
+  },
+  "tween-animations": {
+    "description": "Examples of how to use a variety of tween animations, including object position, color, opacity, angle, and scale.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
+  "tween-test": {
+    "description": "An example project that tests all Tween extension functionality.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },

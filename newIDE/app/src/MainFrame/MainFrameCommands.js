@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { type I18n } from '@lingui/core';
-import { t } from '@lingui/macro';
 import {
   useCommand,
   useCommandWithOptions,
@@ -58,46 +57,23 @@ type CommandHandlers = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
+  onOpenCommandPalette: () => void,
 |};
-
-const quitAppText = t`Close GDevelop`;
-const openProjectManagerText = t`Open project manager`;
-const launchPreviewText = t`Launch preview`;
-const launchPreviewNewWindowText = t`Launch another preview in a new window`;
-const launchDebugPreviewText = t`Launch preview with debugger and profiler`;
-const launchNetworkPreviewText = t`Launch network preview over WiFi/LAN`;
-const openStartPageText = t`Open start page`;
-const createNewProjectText = t`Create a new project`;
-const openProjectText = t`Open project`;
-const saveProjectText = t`Save project`;
-const saveProjectAsText = t`Save project as...`;
-const closeProjectText = t`Close project`;
-const exportGameText = t`Export game`;
-const openLayoutCommandText = t`Open scene...`;
-const openExternalEventsCommandText = t`Open external events...`;
-const openExternalLayoutCommandText = t`Open external layout...`;
-const openEventsFunctionsExtensionCommandText = t`Open extension...`;
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
   useCommand('QUIT_APP', true, {
-    displayText: quitAppText,
     handler: handlers.onCloseApp,
   });
 
   useCommand('OPEN_PROJECT_MANAGER', !!handlers.project, {
-    displayText: openProjectManagerText,
     handler: handlers.onOpenProjectManager,
   });
 
-  useCommand('LAUNCH_PREVIEW', handlers.previewEnabled, {
-    displayText: handlers.hasPreviewsRunning
-      ? launchPreviewNewWindowText
-      : launchPreviewText,
+  useCommand('LAUNCH_NEW_PREVIEW', handlers.previewEnabled, {
     handler: handlers.onLaunchPreview,
   });
 
   useCommand('HOT_RELOAD_PREVIEW', handlers.hasPreviewsRunning, {
-    displayText: t`Apply changes to the running preview`,
     handler: handlers.onHotReloadPreview,
   });
 
@@ -105,7 +81,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     'LAUNCH_DEBUG_PREVIEW',
     handlers.previewEnabled && handlers.allowNetworkPreview,
     {
-      displayText: launchDebugPreviewText,
       handler: handlers.onLaunchDebugPreview,
     }
   );
@@ -114,48 +89,43 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     'LAUNCH_NETWORK_PREVIEW',
     handlers.previewEnabled && handlers.allowNetworkPreview,
     {
-      displayText: launchNetworkPreviewText,
       handler: handlers.onLaunchNetworkPreview,
     }
   );
 
   useCommand('OPEN_START_PAGE', true, {
-    displayText: openStartPageText,
     handler: handlers.onOpenStartPage,
   });
 
   useCommand('CREATE_NEW_PROJECT', true, {
-    displayText: createNewProjectText,
     handler: handlers.onCreateProject,
   });
 
   useCommand('OPEN_PROJECT', true, {
-    displayText: openProjectText,
     handler: handlers.onOpenProject,
   });
 
   useCommand('SAVE_PROJECT', !!handlers.project, {
-    displayText: saveProjectText,
     handler: handlers.onSaveProject,
   });
 
   useCommand('SAVE_PROJECT_AS', !!handlers.project, {
-    displayText: saveProjectAsText,
     handler: handlers.onSaveProjectAs,
   });
 
   useCommand('CLOSE_PROJECT', !!handlers.project, {
-    displayText: closeProjectText,
     handler: handlers.onCloseProject,
   });
 
   useCommand('EXPORT_GAME', !!handlers.project, {
-    displayText: exportGameText,
     handler: handlers.onExportGame,
   });
 
+  useCommand('OPEN_COMMAND_PALETTE', true, {
+    handler: handlers.onOpenCommandPalette,
+  });
+
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {
-    displayText: openLayoutCommandText,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -168,7 +138,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommandWithOptions('OPEN_EXTERNAL_EVENTS', !!handlers.project, {
-    displayText: openExternalEventsCommandText,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -181,7 +150,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommandWithOptions('OPEN_EXTERNAL_LAYOUT', !!handlers.project, {
-    displayText: openExternalLayoutCommandText,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -194,7 +162,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommandWithOptions('OPEN_EXTENSION', !!handlers.project, {
-    displayText: openEventsFunctionsExtensionCommandText,
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(

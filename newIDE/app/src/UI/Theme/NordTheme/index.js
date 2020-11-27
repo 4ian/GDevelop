@@ -1,10 +1,8 @@
 // @flow
 import { type Theme } from '../DefaultTheme';
-import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './variables.css';
 import './styles.css';
-
 const nord4 = '#D8DEE9';
 const nord5 = '#E5E9F0';
 const nord6 = '#ECEFF4';
@@ -97,7 +95,7 @@ const gdevelopTheme = {
 };
 
 // Theme for Material-UI components
-const muiTheme = createMuiTheme({
+const muiThemeOptions = {
   typography: {
     fontFamily,
   },
@@ -148,6 +146,10 @@ const muiTheme = createMuiTheme({
       },
     },
     MuiInput: {
+      input: {
+        padding: 0,
+        paddingBottom: 3,
+      },
       underline: {
         '&:before': {
           borderBottom: `1px solid ##D8DEE9`,
@@ -166,7 +168,6 @@ const muiTheme = createMuiTheme({
     },
     MuiListItemIcon: {
       root: {
-        // Fix color being grey if not set to (almost) black
         color: '#D8DEE9',
       },
     },
@@ -234,11 +235,11 @@ const muiTheme = createMuiTheme({
       },
     },
   },
-});
+};
 
 const theme: Theme = {
   gdevelopTheme,
-  muiTheme,
+  muiThemeOptions,
 };
 
 export default theme;

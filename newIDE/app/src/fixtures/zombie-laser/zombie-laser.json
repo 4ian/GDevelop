@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -261,7 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
-          "persistentUuid": "31a7781b-255a-4140-8f99-5b062bd3b200",
+          "persistentUuid": "8eaa8b78-7de7-4b02-8a0b-aec81b1c12d4",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -282,7 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
-          "persistentUuid": "e3f1aa8d-8188-4a90-a88f-2fb564dd4ff0",
+          "persistentUuid": "65f64b6c-a0f5-4b0c-af3a-48e746908037",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -298,7 +298,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
-          "persistentUuid": "51879c5b-ac4b-4abf-8f6a-6bcf2512495e",
+          "persistentUuid": "9e9a4352-3b3e-4b4c-a6ed-cc462f629a7b",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -314,7 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
-          "persistentUuid": "c0255f94-5080-404e-9312-ec0ae49690ab",
+          "persistentUuid": "5645f4aa-0272-4cfc-a5b4-0b1ba00ec122",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -330,7 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
-          "persistentUuid": "49d12160-fb24-4b44-ac59-29ef8bde0415",
+          "persistentUuid": "26f11321-1554-4c80-9cee-459a2d8dc5b6",
           "width": 0,
           "x": 257,
           "y": 202,
@@ -3363,6 +3363,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3380,6 +3385,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [

@@ -47,7 +47,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCondition(
           "VariableChildExists",
           _("Child existence"),
-          _("Return true if the specified child of the scene variable exists."),
+          _("Check if the specified child of the scene variable exists."),
           _("Child _PARAM1_ of scene variable _PARAM0_ exists"),
           _("Variables/Structures"),
           "res/conditions/var24.png",
@@ -59,7 +59,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("GlobalVariableChildExists",
                     _("Child existence"),
-                    _("Return true if the specified child of the global "
+                    _("Check if the specified child of the global "
                       "variable exists."),
                     _("Child _PARAM1_ of global variable _PARAM0_ exists"),
                     _("Variables/Global variables/Structures"),

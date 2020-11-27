@@ -123,6 +123,10 @@ gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function () {
   return this._pixiContainer;
 };
 
+gdjs.RuntimeScenePixiRenderer.prototype.getPIXIRenderer = function () {
+  return this._pixiRenderer;
+};
+
 /**
  * @param {gdjs.Layer} layer
  * @param {number} index
@@ -134,8 +138,14 @@ gdjs.RuntimeScenePixiRenderer.prototype.setLayerIndex = function (
   /** @type {gdjs.LayerPixiRenderer} */
   // @ts-ignore - assume the renderer is the correct one
   var layerPixiRenderer = layer.getRenderer();
+
+  /** @type {PIXI.Container | ?PIXI.Sprite} */
   var layerPixiObject = layerPixiRenderer.getRendererObject();
 
+  if (layer.isLightingLayer())
+    layerPixiObject = layerPixiRenderer.getLightingSprite();
+
+  if (!layerPixiObject) return;
   if (this._pixiContainer.children.indexOf(layerPixiObject) === index) return;
 
   this._pixiContainer.removeChild(layerPixiObject);

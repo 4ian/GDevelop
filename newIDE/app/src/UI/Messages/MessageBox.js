@@ -7,13 +7,26 @@ export const showMessageBox = (message: string) => {
   Window.showMessageBox(message, 'info');
 };
 
-export const showErrorBox = (message: string, rawError: any) => {
-  Window.showMessageBox(message, 'error');
-  sendErrorMessage(message, 'error', rawError);
-  console.error(message, 'raw error:', rawError);
+export const showWarningBox = (message: string) => {
+  Window.showMessageBox(message, 'warning');
 };
 
-export const showWarningBox = (message: string, rawError: any) => {
-  Window.showMessageBox(message, 'warning');
-  console.warn(message, 'raw error:', rawError);
+type ErrorArgs = {|
+  message: string,
+  rawError: ?Error | Object,
+  errorId: string,
+  doNotReport?: boolean,
+|};
+
+export const showErrorBox = ({
+  message,
+  rawError,
+  errorId,
+  doNotReport,
+}: ErrorArgs) => {
+  Window.showMessageBox(message, 'error');
+  if (!doNotReport) {
+    sendErrorMessage(message, 'error', rawError, errorId);
+  }
+  console.error(`${errorId}: "${message}". Raw error:`, rawError);
 };

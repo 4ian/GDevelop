@@ -318,7 +318,11 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    theLayer.getRenderer().removeRendererObject(this.getRendererObject());
+
+    var rendererObject = this.getRendererObject();
+    if (rendererObject) {
+        theLayer.getRenderer().removeRendererObject(rendererObject);
+    }
 
     for(var j = 0, lenj = this._behaviors.length;j<lenj;++j) {
         this._behaviors[j].onDestroy();
@@ -516,8 +520,10 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     var newLayer = this._runtimeScene.getLayer(this.layer);
 
     var rendererObject = this.getRendererObject();
-    oldLayer.getRenderer().removeRendererObject(rendererObject);
-    newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+    if (rendererObject) {
+        oldLayer.getRenderer().removeRendererObject(rendererObject);
+        newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+    }
 };
 
 /**
@@ -1364,16 +1370,58 @@ gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
 };
 
 /**
- * Get the squared distance, in pixels, from the *object center* to a position.
- * @param {number} pointX X position
- * @param {number} pointY Y position
+ * Get the distance, in pixels, between *the center* of this object and a position.
+ * @param {number} targetX Target X position
+ * @param {number} targetY Target Y position
  */
-gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
-    var x = this.getDrawableX()+this.getCenterX() - pointX;
-    var y = this.getDrawableY()+this.getCenterY() - pointY;
+gdjs.RuntimeObject.prototype.getDistanceToPosition = function(targetX, targetY) {
+    return Math.sqrt(this.getSqDistanceToPosition(targetX, targetY));
+};
+
+/**
+ * Get the squared distance, in pixels, between *the center* of this object and a position.
+ * @param {number} targetX Target X position
+ * @param {number} targetY Target Y position
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceToPosition = function(targetX, targetY) {
+    var x = this.getDrawableX()+this.getCenterX() - targetX;
+    var y = this.getDrawableY()+this.getCenterY() - targetY;
 
     return x*x+y*y;
 };
+
+/**
+ * Get the squared distance, in pixels, from the *object center* to a position.
+ * @param {number} pointX X position
+ * @param {number} pointY Y position
+ * @deprecated Use `getSqDistanceToPosition` instead.
+ */
+gdjs.RuntimeObject.prototype.getSqDistanceTo = gdjs.RuntimeObject.prototype.getSqDistanceToPosition;
+
+/**
+ * Get the angle, in degrees, from the *object center* to another object.
+ * @param {gdjs.RuntimeObject} otherObject The other object
+ */
+gdjs.RuntimeObject.prototype.getAngleToObject = function(otherObject) {
+    if ( otherObject === null ) return 0;
+
+    var x = this.getDrawableX()+this.getCenterX() - (otherObject.getDrawableX()+otherObject.getCenterX());
+    var y = this.getDrawableY()+this.getCenterY() - (otherObject.getDrawableY()+otherObject.getCenterY());
+
+    return Math.atan2(-y, -x)*180/Math.PI;
+}
+
+/**
+ * Get the angle, in degrees, from the *object center* to a position.
+ * @param {number} targetX Target X position
+ * @param {number} targetY Target Y position
+ */
+gdjs.RuntimeObject.prototype.getAngleToPosition = function(targetX, targetY) {
+    var x = this.getDrawableX()+this.getCenterX() - targetX;
+    var y = this.getDrawableY()+this.getCenterY() - targetY;
+
+    return Math.atan2(-y, -x)*180/Math.PI;
+}
 
 /**
  * Put the object around a position, with a specific distance and angle.

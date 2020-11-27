@@ -1,5 +1,6 @@
 // @flow
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import React from 'react';
@@ -14,6 +15,7 @@ import TextField from '../UI/TextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
+import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
 import Badge from '../UI/Badge';
 
 type Props = {|
@@ -22,9 +24,11 @@ type Props = {|
   onBlur: () => void,
   onRemove: () => void,
   isVisible: boolean,
+  isLightingLayer: boolean,
   onChangeVisibility: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
+  onEditLighting: () => void,
   width: number,
 |};
 
@@ -38,6 +42,8 @@ export default ({
   onEditEffects,
   onChangeVisibility,
   width,
+  isLightingLayer,
+  onEditLighting,
 }: Props) => (
   <I18n>
     {({ i18n }) => (
@@ -66,7 +72,7 @@ export default ({
                   <MoreVert />
                 </IconButton>
               }
-              buildMenuTemplate={() => [
+              buildMenuTemplate={(i18n: I18nType) => [
                 {
                   label: i18n._(t`Edit effects (${effectsCount})`),
                   click: onEditEffects,
@@ -77,6 +83,14 @@ export default ({
                   checked: isVisible,
                   click: () => onChangeVisibility(!isVisible),
                 },
+                ...(isLightingLayer
+                  ? [
+                      {
+                        label: i18n._(t`Edit lighting properties`),
+                        click: onEditLighting,
+                      },
+                    ]
+                  : []),
                 { type: 'separator' },
                 {
                   label: i18n._(t`Delete`),
@@ -102,6 +116,15 @@ export default ({
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
               />
+              {isLightingLayer && (
+                <IconButton
+                  size="small"
+                  onClick={onEditLighting}
+                  tooltip={t`Edit lighting properties`}
+                >
+                  <EmojiObjectsIcon />
+                </IconButton>
+              )}
               <IconButton
                 size="small"
                 onClick={onRemove}

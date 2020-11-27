@@ -16,6 +16,16 @@
     border-radius: 0;
 }
 
+@media only screen and (max-width: 750px) {
+    /**
+     * Slightly reduce the size of the handle on small screens
+     * and phones (where drag'n'drop is not supported anyway).
+     */
+    .gd-events-sheet .rst__moveHandle {
+        width: 4px;
+    }
+}
+
 .gd-events-sheet .events-tree {
     height: 100%;
 }

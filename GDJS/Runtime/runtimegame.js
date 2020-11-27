@@ -601,3 +601,16 @@ gdjs.RuntimeGame.prototype.getSceneStack = function() {
 gdjs.RuntimeGame.prototype.isPreview = function() {
   return this._isPreview;
 }
+
+/**
+ * Gets an extension property from the project data.
+ * @param {string} extensionName The extension name.
+ * @param {string} propertyName The property name.
+ * @return {?string} The property value.
+ */
+gdjs.RuntimeGame.prototype.getExtensionProperty = function(extensionName, propertyName) {
+  for(let property of this._data.properties.extensionProperties) {
+    if(property.extension === extensionName && property.property === propertyName) return property.value;
+  }
+  return null;
+}

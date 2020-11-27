@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -240,7 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
-          "persistentUuid": "64ce63ad-2bd7-4676-8293-c8e2b1da6423",
+          "persistentUuid": "02d3cd43-91f4-40d7-9c5b-5a9a784f14a3",
           "width": 0,
           "x": 288,
           "y": 224,
@@ -256,7 +256,7 @@
           "layer": "",
           "locked": false,
           "name": "play",
-          "persistentUuid": "b3d7b68c-9dd6-4b8f-99c0-51f40a2ca0fa",
+          "persistentUuid": "43189818-6e71-4ef4-ad3e-8717abb6c31d",
           "width": 0,
           "x": 384,
           "y": 320,
@@ -272,7 +272,7 @@
           "layer": "",
           "locked": false,
           "name": "pause",
-          "persistentUuid": "a52dc356-500c-4740-8b11-367b5681db4b",
+          "persistentUuid": "9c85f632-7d9f-43c7-aadd-5a8d7b4d12f7",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -288,7 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "mute",
-          "persistentUuid": "5add142b-1647-4576-8512-09e4ea33a339",
+          "persistentUuid": "17989682-2071-4e9c-8051-2a2c5b1576d9",
           "width": 0,
           "x": 320,
           "y": 320,
@@ -304,7 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "track_info",
-          "persistentUuid": "7679e39f-62a9-453a-a53a-ddd4cd94601b",
+          "persistentUuid": "9abf401b-4b49-4c89-8709-c5ffae6917d7",
           "width": 0,
           "x": 341.773,
           "y": 224,
@@ -320,7 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_background",
-          "persistentUuid": "726c7212-5433-48e6-b570-b365e549f968",
+          "persistentUuid": "7d2bb546-34ed-4c3b-a61c-e70b34ba0810",
           "width": 0,
           "x": 307,
           "y": 293,
@@ -336,7 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_slider",
-          "persistentUuid": "73a39ae4-b783-4c18-84dc-06462a3d2c77",
+          "persistentUuid": "fa8564e7-0d8f-4ee3-8cc8-56deed2898e7",
           "width": 0,
           "x": 307,
           "y": 278,
@@ -352,7 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "slider_button",
-          "persistentUuid": "b6bd393c-0b7d-486d-8ed5-baec35239162",
+          "persistentUuid": "16e5d3f9-7811-4127-ac66-f7efd59d8e3c",
           "width": 0,
           "x": 538,
           "y": 273,
@@ -1937,6 +1937,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

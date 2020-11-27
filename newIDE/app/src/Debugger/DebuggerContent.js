@@ -99,7 +99,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
         toolbarControls: [],
         renderEditor: () => (
           <Background>
-            <Column expand noMargin useMaxHeight>
+            <Column expand noMargin useFullHeight>
               <Line justifyContent="center">
                 <RaisedButton
                   label={<Trans>Refresh</Trans>}

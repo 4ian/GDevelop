@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -209,7 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
-          "persistentUuid": "38b45cc3-fd82-42e5-bf83-e3e743fbac20",
+          "persistentUuid": "b7088905-22e1-4e41-9066-c77e6ebd3856",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -225,7 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
-          "persistentUuid": "6974cc8f-e93b-4885-a999-ffed9310edb2",
+          "persistentUuid": "f31c3362-b6b1-4113-9ee0-fe40c95c41e1",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -241,7 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "5bf3133b-c763-4b88-baa2-25581fd7113e",
+          "persistentUuid": "dea985b7-4c08-4b78-87a2-f4b25d8af239",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -257,7 +257,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
-          "persistentUuid": "d4fee6b5-2948-4d12-9171-3f3b536d386a",
+          "persistentUuid": "aec86c55-8a44-4edb-b871-b15ef3c8dcf9",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -273,7 +273,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
-          "persistentUuid": "adfb3b19-2621-475b-b354-440e3fa76ada",
+          "persistentUuid": "2dcae656-d787-4f3e-8a31-67dcc660907b",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -289,7 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
-          "persistentUuid": "d6d993b6-aa9a-451a-a239-a9b07db9b0a5",
+          "persistentUuid": "1a40493c-3c50-4c11-bdd3-c5f9f34c7282",
           "width": 0,
           "x": 620,
           "y": 427,
@@ -963,6 +963,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -980,6 +985,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Touch",
           "visibility": true,
           "cameras": [],

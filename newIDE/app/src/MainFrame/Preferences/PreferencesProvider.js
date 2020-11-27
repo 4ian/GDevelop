@@ -15,6 +15,8 @@ import {
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -64,7 +66,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
-    setUseCommandPalette: this._setUseCommandPalette.bind(this),
+    setShortcutForCommand: this._setShortcutForCommand.bind(this),
+    resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
   };
 
   componentDidMount() {
@@ -441,10 +444,26 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setUseCommandPalette(enabled: boolean) {
+  _resetShortcutsToDefault() {
     this.setState(
       state => ({
-        values: { ...state.values, useCommandPalette: enabled },
+        values: { ...state.values, userShortcutMap: {} },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShortcutForCommand(commandName: CommandName, shortcutString: string) {
+    const defaultShortcut = defaultShortcuts[commandName] || '';
+    const setToDefault = defaultShortcut === shortcutString;
+
+    const updatedShortcutMap = { ...this.state.values.userShortcutMap };
+    if (setToDefault) delete updatedShortcutMap[commandName];
+    else updatedShortcutMap[commandName] = shortcutString;
+
+    this.setState(
+      state => ({
+        values: { ...state.values, userShortcutMap: updatedShortcutMap },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

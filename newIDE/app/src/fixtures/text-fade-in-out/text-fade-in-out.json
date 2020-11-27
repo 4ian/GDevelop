@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -146,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
-          "persistentUuid": "171e267d-0e08-4fa9-bbfe-2f9b4971ffcd",
+          "persistentUuid": "320c731d-bccb-440a-b12a-68d820050857",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -274,6 +274,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -329,7 +334,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
-          "persistentUuid": "63f2121d-8c20-4ca5-a696-4222aeaae7ea",
+          "persistentUuid": "3323df2b-87b2-43a8-b891-8abfde2770ba",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -457,6 +462,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -512,7 +522,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
-          "persistentUuid": "b5d5fc21-8014-4f6a-9c90-95aa4014f540",
+          "persistentUuid": "41dbf85f-68fe-4d30-a310-6efbd99cbc92",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -640,6 +650,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

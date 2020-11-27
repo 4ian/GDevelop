@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -180,7 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "ObjectToFollow",
-          "persistentUuid": "8564d3b1-c8b6-4fac-b09e-14700dd06362",
+          "persistentUuid": "df1bfdc7-3b48-435e-9f08-d3bd5e1c7636",
           "width": 0,
           "x": -128,
           "y": 320,
@@ -196,7 +196,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "c0be3a54-69a9-45f5-b1c0-13278a00a620",
+          "persistentUuid": "ec57165c-f5d2-4ed8-bd2c-f9a431433d0a",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -212,7 +212,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "ef62ae0d-4137-45dd-84e3-e7c16dbd79ef",
+          "persistentUuid": "0f37b1b2-a80c-4005-aa9a-d284ed33bf07",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -233,7 +233,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "7a26c7c0-3c6a-4858-acfc-4ed5e71a3186",
+          "persistentUuid": "0cbf7e80-3270-41ff-98cb-fe08ca31d135",
           "width": 0,
           "x": -608,
           "y": -32,
@@ -254,7 +254,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "65b1984e-8960-4c68-bf54-011c31a892f4",
+          "persistentUuid": "55e306ce-16a1-467a-8949-b166640ace22",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -275,7 +275,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "e3675533-1f9d-452b-83f8-008c59bb7fd8",
+          "persistentUuid": "31f2dbcf-18fc-4c96-9568-5fc559fab0f5",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -296,7 +296,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "434cb43b-4f49-4ecf-93fd-77609c27f345",
+          "persistentUuid": "3260e490-b629-4c68-9672-c2840119bb7b",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -706,6 +706,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer4",
           "visibility": true,
           "cameras": [
@@ -723,6 +728,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer3",
           "visibility": true,
           "cameras": [
@@ -740,6 +750,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer2",
           "visibility": true,
           "cameras": [
@@ -757,6 +772,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

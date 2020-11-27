@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -177,7 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "c8c6632a-7f09-4476-852f-63f452dd2c18",
+          "persistentUuid": "60f37b2d-042d-4db9-9ac3-011098a1e2ee",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -198,7 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "a12631c3-c7e9-4174-aff0-6d3ab9a9c24d",
+          "persistentUuid": "3e6f6699-93bc-4781-9e20-cdecb1820579",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -522,6 +522,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -577,7 +582,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "219ac629-d272-4246-8b2f-e1f22705be6a",
+          "persistentUuid": "49442996-2958-42fd-b694-b6edf8e6bb68",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -598,7 +603,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "1d686e4d-37a5-4011-9d0c-00a295767f61",
+          "persistentUuid": "3428677f-2d4a-45c6-b814-1e1c71ff532b",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -619,7 +624,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "4fe96b36-11f5-4aa2-a388-a7067523865a",
+          "persistentUuid": "f78d55cc-3309-4625-b0dd-4b8baccf2338",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -640,7 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "470baaf0-9274-44f2-b0e8-2c4d20e6c6bf",
+          "persistentUuid": "9958d7aa-7125-4286-bc49-63387bcb0551",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -990,6 +995,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

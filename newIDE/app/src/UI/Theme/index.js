@@ -9,6 +9,7 @@ import DefaultTheme, {
 import DarkTheme from './DarkTheme';
 import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
+import { type Theme } from './DefaultTheme';
 import './Global.css';
 
 // To add a new theme:

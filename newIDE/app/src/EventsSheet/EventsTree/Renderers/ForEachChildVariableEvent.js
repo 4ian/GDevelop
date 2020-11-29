@@ -35,7 +35,11 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
-  eventLabel: { marginLeft: '5px' },
+  eventLabel: {
+    marginLeft: '5px',
+    whiteSpace: 'normal',
+    wordWrap: 'break-word',
+  },
 };
 
 type State = {|
@@ -191,8 +195,7 @@ export default class ForEachChildVariableEvent extends React.Component<
                   </span>
                 )}
               </span>
-              , <br />
-              the child name in
+              , the child name in
               <span
                 className={classNames({
                   [selectableArea]: true,

@@ -4,9 +4,11 @@ declare class gdForEachChildVariableEvent {
   getConditions(): gdInstructionsList;
   getActions(): gdInstructionsList;
   getIterableVariableName(): string;
-  getIteratorVariableName(): string;
+  getKeyIteratorVariableName(): string;
+  getValueIteratorVariableName(): string;
   setIterableVariableName(newName: string): void;
-  setIteratorVariableName(newName: string): void;
+  setKeyIteratorVariableName(newName: string): void;
+  setValueIteratorVariableName(newName: string): void;
   clone(): gdForEachChildVariableEvent;
   getType(): string;
   setType(type: string): void;

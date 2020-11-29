@@ -54,20 +54,36 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   void SetIterableVariableName(gd::String newName) { iterableVariableName = newName; };
 
   /**
-   * \brief Get the iterator variable attached to the event.
+   * \brief Get the value iterator variable attached to the event.
    *
    * It is the variable that will contain the value of the 
    * iterable's child being iterated on.
    */
-  const gd::String& GetIteratorVariableName() const { return iteratorVariableName; };
+  const gd::String& GetValueIteratorVariableName() const { return valueIteratorVariableName; };
 
   /**
-   * \brief Set the iterator variable attached to the event.
+   * \brief Set the value iterator variable attached to the event.
    *
    * It is the variable that will contain the value of the 
    * iterable's child being iterated on.
    */
-  void SetIteratorVariableName(gd::String newName) { iteratorVariableName = newName; };
+  void SetValueIteratorVariableName(gd::String newName) { valueIteratorVariableName = newName; };
+
+  /**
+   * \brief Get the key iterator variable attached to the event.
+   *
+   * It is the variable that will contain the name of the 
+   * iterable's child being iterated on.
+   */
+  const gd::String& GetKeyIteratorVariableName() const { return keyIteratorVariableName; };
+
+  /**
+   * \brief Set the key iterator variable attached to the event.
+   *
+   * It is the variable that will contain the name of the 
+   * iterable's child being iterated on.
+   */
+  void SetKeyIteratorVariableName(gd::String newName) { keyIteratorVariableName = newName; };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -81,7 +97,8 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
                                const SerializerElement& element);
 
  private:
-  gd::String iteratorVariableName;
+  gd::String valueIteratorVariableName;
+  gd::String keyIteratorVariableName;
   gd::String iterableVariableName;
   gd::InstructionsList conditions;
   gd::InstructionsList actions;

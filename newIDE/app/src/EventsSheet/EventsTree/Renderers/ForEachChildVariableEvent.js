@@ -36,7 +36,8 @@ const styles = {
 };
 
 type State = {|
-  editingIteratorVariableName: boolean,
+  editingValueIteratorVariableName: boolean,
+  editingKeyIteratorVariableName: boolean,
   editingIterableVariableName: boolean,
   anchorEl: ?HTMLSpanElement,
 |};
@@ -45,15 +46,21 @@ export default class ForEachChildVariableEvent extends React.Component<
   EventRendererProps,
   State
 > {
-  _iteratorField: ?SceneVariableField = null;
+  _valueIteratorField: ?SceneVariableField = null;
+  _keyIteratorField: ?SceneVariableField = null;
   _iterableField: ?SceneVariableField = null;
+
   state = {
-    editingIteratorVariableName: false,
+    editingValueIteratorVariableName: false,
+    editingKeyIteratorVariableName: false,
     editingIterableVariableName: false,
     anchorEl: null,
   };
 
-  edit = (variable: 'iterable' | 'iterator', anchorEl: HTMLSpanElement) => {
+  edit = (
+    variable: 'iterable' | 'iteratorValue' | 'iteratorKey',
+    anchorEl: HTMLSpanElement
+  ) => {
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -62,7 +69,8 @@ export default class ForEachChildVariableEvent extends React.Component<
       () =>
         this.setState(
           {
-            editingIteratorVariableName: variable === 'iterator',
+            editingValueIteratorVariableName: variable === 'iteratorValue',
+            editingKeyIteratorVariableName: variable === 'iteratorKey',
             editingIterableVariableName: variable === 'iterable',
             anchorEl,
           },
@@ -72,7 +80,9 @@ export default class ForEachChildVariableEvent extends React.Component<
               const field =
                 variable === 'iterable'
                   ? this._iterableField
-                  : this._iteratorField;
+                  : variable === 'iteratorValue'
+                  ? this._valueIteratorField
+                  : this._keyIteratorField;
               if (field) field.focus();
             }, 10);
           }
@@ -88,7 +98,8 @@ export default class ForEachChildVariableEvent extends React.Component<
     if (anchorEl) anchorEl.focus();
 
     this.setState({
-      editingIteratorVariableName: false,
+      editingKeyIteratorVariableName: false,
+      editingValueIteratorVariableName: false,
       editingIterableVariableName: false,
       anchorEl: null,
     });
@@ -98,7 +109,8 @@ export default class ForEachChildVariableEvent extends React.Component<
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );
-    const iteratorName = forEachChildVariableEvent.getIteratorVariableName();
+    const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
+    const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
     const iterableName = forEachChildVariableEvent.getIterableVariableName();
 
     return (
@@ -108,7 +120,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div>
+        <div style={{ marginLeft: '5px' }}>
           <span
             className={classNames({
               [disabledText]: this.props.disabled,
@@ -131,7 +143,11 @@ export default class ForEachChildVariableEvent extends React.Component<
                 }
               }}
             >
-              <img className={icon} src="res/types/scenevar.png" alt="" />
+              <img
+                className={icon}
+                src="res/types/scenevar.png"
+                alt="Scene variable"
+              />
               {iterableName.length !== 0 ? (
                 <span>{iterableName}</span>
               ) : (
@@ -149,19 +165,54 @@ export default class ForEachChildVariableEvent extends React.Component<
                 scenevar: true,
               })}
               style={styles.variableContainer}
-              onClick={e => this.edit('iterator', e.currentTarget)}
+              onClick={e => this.edit('iteratorValue', e.currentTarget)}
               onKeyPress={event => {
                 if (shouldActivate(event)) {
-                  this.edit('iterator', event.currentTarget);
+                  this.edit('iteratorValue', event.currentTarget);
                 }
               }}
             >
-              <img className={icon} src="res/types/scenevar.png" alt="" />
-              {iteratorName.length !== 0 ? (
-                <span>{iteratorName}</span>
+              <img
+                className={icon}
+                src="res/types/scenevar.png"
+                alt="Scene variable"
+              />
+              {valueIteratorName.length !== 0 ? (
+                <span>{valueIteratorName}</span>
               ) : (
-                <span className="instruction-missing-parameter">
-                  <Trans>{`<Select a variable>`}</Trans>
+                <span>
+                  <Trans>{`<Select a variable> (optional)`}</Trans>
+                </span>
+              )}
+            </span>
+            <Trans>, </Trans>
+            <br />
+            <Trans>the child name in </Trans>
+            <span
+              className={classNames({
+                [selectableArea]: true,
+                [instructionParameter]: true,
+                [nameAndIconContainer]: true,
+                scenevar: true,
+              })}
+              style={styles.variableContainer}
+              onClick={e => this.edit('iteratorKey', e.currentTarget)}
+              onKeyPress={event => {
+                if (shouldActivate(event)) {
+                  this.edit('iteratorKey', event.currentTarget);
+                }
+              }}
+            >
+              <img
+                className={icon}
+                src="res/types/scenevar.png"
+                alt="Scene variable"
+              />
+              {keyIteratorName.length !== 0 ? (
+                <span>{keyIteratorName}</span>
+              ) : (
+                <span>
+                  <Trans>{`<Select a variable> (optional)`}</Trans>
                 </span>
               )}
             </span>
@@ -225,7 +276,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           )}
         />
         <InlinePopover
-          open={this.state.editingIteratorVariableName}
+          open={this.state.editingValueIteratorVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
@@ -234,14 +285,34 @@ export default class ForEachChildVariableEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            value={iteratorName}
+            value={valueIteratorName}
             onChange={text => {
-              forEachChildVariableEvent.setIteratorVariableName(text);
+              forEachChildVariableEvent.setValueIteratorVariableName(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.endEditing}
-            ref={iteratorField => (this._iteratorField = iteratorField)}
+            ref={iteratorField => (this._valueIteratorField = iteratorField)}
+          />
+        </InlinePopover>
+        <InlinePopover
+          open={this.state.editingKeyIteratorVariableName}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.endEditing}
+        >
+          <SceneVariableField
+            project={this.props.project}
+            scope={this.props.scope}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
+            value={keyIteratorName}
+            onChange={text => {
+              forEachChildVariableEvent.setKeyIteratorVariableName(text);
+              this.props.onUpdate();
+            }}
+            isInline
+            onRequestClose={this.endEditing}
+            ref={iteratorField => (this._keyIteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover

@@ -450,29 +450,44 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String iterableReferenceVariableName =
             "iterableReference" +
             gd::String::From(context.GetContextDepth());
-        gd::String iteratorReferenceVariableName =
-            "iteratorReference" +
-            gd::String::From(context.GetContextDepth());
         gd::String iteratorKeyVariableName =
             "iteratorKey" +
             gd::String::From(context.GetContextDepth());
 
+
+        bool valueIteratorExists = !event.GetValueIteratorVariableName().empty();
+        bool keyIteratorExists = !event.GetKeyIteratorVariableName().empty();
+
+        // Define references to variables (if they exist)
+        if(keyIteratorExists) outputCode += 
+            "const $KEY_ITERATOR_REFERENCE = runtimeScene.getVariables().get($KEY_ITERATOR_VARIABLE_NAME);\n";
+        if(valueIteratorExists) outputCode += 
+            "const $VALUE_ITERATOR_REFERENCE = runtimeScene.getVariables().get($VALUE_ITERATOR_VARIABLE_NAME);\n";
         outputCode +=
-            "const $ITERATOR_REFERENCE = runtimeScene.getVariables().get($ITERATOR_VARIABLE_NAME);\n"
-            "const $ITERABLE_REFERENCE = runtimeScene.getVariables().get($ITERABLE_VARIABLE_NAME);\n"
+            "const $ITERABLE_REFERENCE = runtimeScene.getVariables().get($ITERABLE_VARIABLE_NAME);\n";
+        
+        // Begin the for loop
+        outputCode +=
             "for(\n"
             "    const $ITERATOR_KEY in \n"
             "    $ITERABLE_REFERENCE.getAllChildren()\n"
-            ") {\n"
-            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
+            ") {\n";
+        
+        // If variables are defined, store the value in them
+        if(keyIteratorExists) outputCode += 
+            "    $KEY_ITERATOR_REFERENCE.setString($ITERATOR_KEY);\n";
+        if(valueIteratorExists) outputCode += 
+            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY);\n"
             "    if($STRUCTURE_CHILD_VARIABLE.isNumber()) {\n"
-            "        $ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber())\n"
+            "        $VALUE_ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber());\n"
             "    } else if ($STRUCTURE_CHILD_VARIABLE.isStructure()) {\n"
             "        // Structures are passed by reference like JS objects\n"
-            "        $ITERATOR_REFERENCE._children = $STRUCTURE_CHILD_VARIABLE.getAllChildren()\n"
+            "        $VALUE_ITERATOR_REFERENCE._children = $STRUCTURE_CHILD_VARIABLE.getAllChildren();\n"
             "    } else {\n"
-            "        $ITERATOR_REFERENCE.setString($STRUCTURE_CHILD_VARIABLE.getAsString())\n"
+            "        $VALUE_ITERATOR_REFERENCE.setString($STRUCTURE_CHILD_VARIABLE.getAsString());\n"
             "    }\n";
+        
+        // Now do the rest of standard event generation
         outputCode += objectDeclaration;
         outputCode += conditionsCode;
         outputCode += "if (" + ifPredicat + ")\n";
@@ -484,14 +499,32 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           outputCode += "} //Subevents end.\n";
         }
         outputCode += "}\n";
+
+        // End the for loop
         outputCode += "}\n";
+
+        if(valueIteratorExists) {
+            gd::String iteratorReferenceVariableName =
+                "valueIteratorReference" +
+                gd::String::From(context.GetContextDepth());
+            outputCode = outputCode
+                .FindAndReplace("$VALUE_ITERATOR_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetValueIteratorVariableName()))
+                .FindAndReplace("$VALUE_ITERATOR_REFERENCE", iteratorReferenceVariableName);
+        }
+
+        if(keyIteratorExists) {
+            gd::String iteratorReferenceVariableName =
+                "keyIteratorReference" +
+                gd::String::From(context.GetContextDepth());
+            outputCode = outputCode
+                .FindAndReplace("$KEY_ITERATOR_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetKeyIteratorVariableName()))
+                .FindAndReplace("$KEY_ITERATOR_REFERENCE", iteratorReferenceVariableName);
+        }
 
         return outputCode.FindAndReplace("$ITERATOR_KEY", iteratorKeyVariableName)
             .FindAndReplace("$STRUCTURE_CHILD_VARIABLE", structureChildVariableName)
-            .FindAndReplace("$ITERATOR_REFERENCE", iteratorReferenceVariableName)
             .FindAndReplace("$ITERABLE_REFERENCE", iterableReferenceVariableName)
-            .FindAndReplace("$ITERABLE_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetIterableVariableName()))
-            .FindAndReplace("$ITERATOR_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetIteratorVariableName()));
+            .FindAndReplace("$ITERABLE_VARIABLE_NAME", codeGenerator.ConvertToStringExplicit(event.GetIterableVariableName()));            
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Repeat"].SetCodeGenerator(

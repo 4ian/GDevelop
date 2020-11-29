@@ -1485,9 +1485,11 @@ interface ForEachChildVariableEvent {
     [Ref] InstructionsList GetActions();
 
     [Const, Ref] DOMString GetIterableVariableName();
-    [Const, Ref] DOMString GetIteratorVariableName();
+    [Const, Ref] DOMString GetKeyIteratorVariableName();
+    [Const, Ref] DOMString GetValueIteratorVariableName();
     void SetIterableVariableName([Const] DOMString newName);
-    void SetIteratorVariableName([Const] DOMString newName);
+    void SetKeyIteratorVariableName([Const] DOMString newName);
+    void SetValueIteratorVariableName([Const] DOMString newName);
 
     //Inherited from BaseEvent:
     ForEachChildVariableEvent Clone();

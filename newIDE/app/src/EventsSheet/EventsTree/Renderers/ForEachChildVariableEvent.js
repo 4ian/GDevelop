@@ -4,6 +4,8 @@ import InstructionsList from '../InstructionsList.js';
 import classNames from 'classnames';
 import {
   selectableArea,
+  largeSelectableArea,
+  largeSelectedArea,
   executableEventContainer,
   disabledText,
   instructionParameter,
@@ -33,6 +35,7 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
+  eventLabel: { marginLeft: '5px' },
 };
 
 type State = {|
@@ -118,106 +121,109 @@ export default class ForEachChildVariableEvent extends React.Component<
         style={styles.container}
         className={classNames({
           [executableEventContainer]: true,
+          [largeSelectableArea]: true,
+          [largeSelectedArea]: this.props.selected,
         })}
       >
-        <div style={{ marginLeft: '5px' }}>
-          <span
-            className={classNames({
-              [disabledText]: this.props.disabled,
-            })}
-            tabIndex={0}
-          >
-            <Trans>For every child in </Trans>
+        <div style={styles.eventLabel}>
+          <Trans>
             <span
               className={classNames({
-                [selectableArea]: true,
-                [instructionParameter]: true,
-                [nameAndIconContainer]: true,
-                scenevar: true,
+                [disabledText]: this.props.disabled,
               })}
-              style={styles.variableContainer}
-              onClick={e => this.edit('iterable', e.currentTarget)}
-              onKeyPress={event => {
-                if (shouldActivate(event)) {
-                  this.edit('iterable', event.currentTarget);
-                }
-              }}
+              tabIndex={0}
             >
-              <img
-                className={icon}
-                src="res/types/scenevar.png"
-                alt="Scene variable"
-              />
-              {iterableName.length !== 0 ? (
-                <span>{iterableName}</span>
-              ) : (
-                <span className="instruction-missing-parameter">
-                  <Trans>{`<Select a variable>`}</Trans>
-                </span>
-              )}
+              For every child in
+              <span
+                className={classNames({
+                  [selectableArea]: true,
+                  [instructionParameter]: true,
+                  [nameAndIconContainer]: true,
+                  scenevar: true,
+                })}
+                style={styles.variableContainer}
+                onClick={e => this.edit('iterable', e.currentTarget)}
+                onKeyPress={event => {
+                  if (shouldActivate(event)) {
+                    this.edit('iterable', event.currentTarget);
+                  }
+                }}
+              >
+                <img
+                  className={icon}
+                  src="res/types/scenevar.png"
+                  alt="Scene variable"
+                />
+                {iterableName.length !== 0 ? (
+                  <span>{iterableName}</span>
+                ) : (
+                  <span className="instruction-missing-parameter">
+                    <Trans>{`<Select a variable>`}</Trans>
+                  </span>
+                )}
+              </span>
+              , store the child in variable
+              <span
+                className={classNames({
+                  [selectableArea]: true,
+                  [instructionParameter]: true,
+                  [nameAndIconContainer]: true,
+                  scenevar: true,
+                })}
+                style={styles.variableContainer}
+                onClick={e => this.edit('iteratorValue', e.currentTarget)}
+                onKeyPress={event => {
+                  if (shouldActivate(event)) {
+                    this.edit('iteratorValue', event.currentTarget);
+                  }
+                }}
+              >
+                <img
+                  className={icon}
+                  src="res/types/scenevar.png"
+                  alt="Scene variable"
+                />
+                {valueIteratorName.length !== 0 ? (
+                  <span>{valueIteratorName}</span>
+                ) : (
+                  <span>
+                    <Trans>{`<Select a variable> (optional)`}</Trans>
+                  </span>
+                )}
+              </span>
+              , <br />
+              the child name in
+              <span
+                className={classNames({
+                  [selectableArea]: true,
+                  [instructionParameter]: true,
+                  [nameAndIconContainer]: true,
+                  scenevar: true,
+                })}
+                style={styles.variableContainer}
+                onClick={e => this.edit('iteratorKey', e.currentTarget)}
+                onKeyPress={event => {
+                  if (shouldActivate(event)) {
+                    this.edit('iteratorKey', event.currentTarget);
+                  }
+                }}
+              >
+                <img
+                  className={icon}
+                  src="res/types/scenevar.png"
+                  alt="Scene variable"
+                />
+                {keyIteratorName.length !== 0 ? (
+                  <span>{keyIteratorName}</span>
+                ) : (
+                  <span>
+                    <Trans>{`<Select a variable> (optional)`}</Trans>
+                  </span>
+                )}
+              </span>
+              and do:
             </span>
-            <Trans>, store the child in variable </Trans>
-            <span
-              className={classNames({
-                [selectableArea]: true,
-                [instructionParameter]: true,
-                [nameAndIconContainer]: true,
-                scenevar: true,
-              })}
-              style={styles.variableContainer}
-              onClick={e => this.edit('iteratorValue', e.currentTarget)}
-              onKeyPress={event => {
-                if (shouldActivate(event)) {
-                  this.edit('iteratorValue', event.currentTarget);
-                }
-              }}
-            >
-              <img
-                className={icon}
-                src="res/types/scenevar.png"
-                alt="Scene variable"
-              />
-              {valueIteratorName.length !== 0 ? (
-                <span>{valueIteratorName}</span>
-              ) : (
-                <span>
-                  <Trans>{`<Select a variable> (optional)`}</Trans>
-                </span>
-              )}
-            </span>
-            <Trans>, </Trans>
-            <br />
-            <Trans>the child name in </Trans>
-            <span
-              className={classNames({
-                [selectableArea]: true,
-                [instructionParameter]: true,
-                [nameAndIconContainer]: true,
-                scenevar: true,
-              })}
-              style={styles.variableContainer}
-              onClick={e => this.edit('iteratorKey', e.currentTarget)}
-              onKeyPress={event => {
-                if (shouldActivate(event)) {
-                  this.edit('iteratorKey', event.currentTarget);
-                }
-              }}
-            >
-              <img
-                className={icon}
-                src="res/types/scenevar.png"
-                alt="Scene variable"
-              />
-              {keyIteratorName.length !== 0 ? (
-                <span>{keyIteratorName}</span>
-              ) : (
-                <span>
-                  <Trans>{`<Select a variable> (optional)`}</Trans>
-                </span>
-              )}
-            </span>
-            <Trans> and do:</Trans>
-          </span>
+          </Trans>
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}

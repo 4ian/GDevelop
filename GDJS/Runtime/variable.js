@@ -165,6 +165,15 @@ gdjs.Variable.prototype.clearChildren = function() {
 };
 
 /**
+ * Replaces all the children with a new map of children.
+ * @param {Object<string, gdjs.Variable>} newChildren The map of new children.
+ */
+gdjs.Variable.prototype.replaceChildren = function(newChildren) {
+	this._isStructure = true;
+	this._children = newChildren;
+};
+
+/**
  * Get the value of the variable, considered as a number
  * @method
  * @return {number} The number stored in the variable

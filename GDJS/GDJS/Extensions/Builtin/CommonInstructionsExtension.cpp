@@ -482,7 +482,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        $VALUE_ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber());\n"
             "    } else if ($STRUCTURE_CHILD_VARIABLE.isStructure()) {\n"
             "        // Structures are passed by reference like JS objects\n"
-            "        $VALUE_ITERATOR_REFERENCE._children = $STRUCTURE_CHILD_VARIABLE.getAllChildren();\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
             "    } else {\n"
             "        $VALUE_ITERATOR_REFERENCE.setString($STRUCTURE_CHILD_VARIABLE.getAsString());\n"
             "    }\n";

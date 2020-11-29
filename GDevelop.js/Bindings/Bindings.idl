@@ -1478,6 +1478,36 @@ interface ForEachEvent {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface ForEachChildVariableEvent {
+    void ForEachChildVariableEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+
+    [Const, Ref] DOMString GetIterableVariableName();
+    [Const, Ref] DOMString GetKeyIteratorVariableName();
+    [Const, Ref] DOMString GetValueIteratorVariableName();
+    void SetIterableVariableName([Const] DOMString newName);
+    void SetKeyIteratorVariableName([Const] DOMString newName);
+    void SetValueIteratorVariableName([Const] DOMString newName);
+
+    //Inherited from BaseEvent:
+    ForEachChildVariableEvent Clone();
+    [Const, Ref] DOMString GetType();
+    void SetType([Const] DOMString type);
+    boolean IsExecutable();
+    boolean CanHaveSubEvents();
+    boolean HasSubEvents();
+    [Ref] EventsList GetSubEvents();
+    boolean IsDisabled();
+    void SetDisabled(boolean disable);
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
 interface CommentEvent {
     void CommentEvent();
 

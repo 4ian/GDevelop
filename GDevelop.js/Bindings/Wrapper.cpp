@@ -1,5 +1,6 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
 #include <GDCore/Events/Builtin/LinkEvent.h>
 #include <GDCore/Events/Builtin/RepeatEvent.h>

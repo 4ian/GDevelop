@@ -150,33 +150,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "islandTilesetAtlas-scaledDown.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "islandTilesetAtlas-scaledDown.png",
-        "smoothed": true,
-        "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "islander.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "islander.png",
-        "smoothed": true,
-        "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "islandTilesetAtlas-scaledUp.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "islandTilesetAtlas-scaledUp.png",
-        "smoothed": true,
-        "userAdded": true
-      },
-      {
-        "alwaysLoaded": false,
         "file": "desert/tmw_desert_spacing.png",
         "kind": "image",
         "metadata": "",

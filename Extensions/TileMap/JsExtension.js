@@ -12,7 +12,7 @@
  */
 
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -25,7 +25,7 @@ module.exports = {
       .setExtensionHelpPath('/objects/tile_map');
 
     var objectTileMap = new gd.ObjectJsImplementation();
-    objectTileMap.updateProperty = function(
+    objectTileMap.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -39,7 +39,7 @@ module.exports = {
 
       return false;
     };
-    objectTileMap.getProperties = function(objectContent) {
+    objectTileMap.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
@@ -105,7 +105,7 @@ module.exports = {
       })
     );
 
-    objectTileMap.updateInitialInstanceProperty = function(
+    objectTileMap.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -115,7 +115,7 @@ module.exports = {
     ) {
       return false;
     };
-    objectTileMap.getInitialInstanceProperties = function(
+    objectTileMap.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -140,12 +140,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
       )
-      .addIncludeFile(
-        'Extensions/TileMap/pako/dist/pako.min.js'
-      )
-      .addIncludeFile(
-        'Extensions/TileMap/pixi-tilemap-helper.js'
-      );
+      .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
+      .addIncludeFile('Extensions/TileMap/pixi-tilemap-helper.js');
 
     object
       .addCondition(
@@ -160,7 +156,7 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tilemap json file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('isTilemapJsonFileName');
+      .setFunctionName('isTilemapJsonFile');
 
     object
       .addAction(
@@ -210,7 +206,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setTilesetJsonFile')
       .setGetter('getTilesetJsonFile');
-      
+
     object
       .addCondition(
         'DisplayMode',
@@ -395,7 +391,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -403,7 +399,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function(objectsEditorService) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -416,7 +412,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function(objectsRenderingService) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -472,7 +468,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-    RenderedTileMapInstance.getThumbnail = function(
+    RenderedTileMapInstance.getThumbnail = function (
       project,
       resourcesLoader,
       object
@@ -481,9 +477,12 @@ module.exports = {
     };
 
     /**
-    * This is used to reload the tilemap
-    */
-    RenderedTileMapInstance.prototype._loadTileMapWithTileset = function(tileMapJsonData, tilesetJsonData) {
+     * This is used to reload the tilemap
+     */
+    RenderedTileMapInstance.prototype._loadTileMapWithTileset = function (
+      tileMapJsonData,
+      tilesetJsonData
+    ) {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
@@ -506,8 +505,11 @@ module.exports = {
         .getValue();
 
       PixiTilemapHelper.getPIXITileSet(
-        textureName => this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-        tilesetJsonData ? {...tileMapJsonData, tilesets: [tilesetJsonData]} : tileMapJsonData,
+        (textureName) =>
+          this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+        tilesetJsonData
+          ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
+          : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
         (tileset) => {
@@ -521,13 +523,13 @@ module.exports = {
             );
           }
         }
-      )
+      );
     };
 
     /**
      * This is called to update the TileMap
      */
-    RenderedTileMapInstance.prototype.updateTileMap = function() {
+    RenderedTileMapInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
       const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
@@ -538,24 +540,24 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      this._pixiResourcesLoader.getResourceJsonData(this._project, tilemapJsonFile).then(
-        tileMapJsonData => {
+      this._pixiResourcesLoader
+        .getResourceJsonData(this._project, tilemapJsonFile)
+        .then((tileMapJsonData) => {
           if (tilesetJsonFile) {
-            this._pixiResourcesLoader.getResourceJsonData(this._project, tilesetJsonFile).then(
-              tilesetJsonData => {
+            this._pixiResourcesLoader
+              .getResourceJsonData(this._project, tilesetJsonFile)
+              .then((tilesetJsonData) => {
                 this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
-              }
-            )
+              });
           } else {
             this._loadTileMapWithTileset(tileMapJsonData);
           }
-        }
-      );
+        });
     };
     /**
      * This is called to update the PIXI object on the scene editor
      */
-    RenderedTileMapInstance.prototype.update = function() {
+    RenderedTileMapInstance.prototype.update = function () {
       const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
         .get('tilemapJsonFile')
@@ -636,14 +638,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-    RenderedTileMapInstance.prototype.getDefaultWidth = function() {
+    RenderedTileMapInstance.prototype.getDefaultWidth = function () {
       return this._pixiObject.width / this._pixiObject.scale.x;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-    RenderedTileMapInstance.prototype.getDefaultHeight = function() {
+    RenderedTileMapInstance.prototype.getDefaultHeight = function () {
       return this._pixiObject.height / this._pixiObject.scale.y;
     };
 

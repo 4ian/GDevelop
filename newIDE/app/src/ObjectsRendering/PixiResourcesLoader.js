@@ -211,7 +211,7 @@ export default class PixiResourcesLoader {
     return invalidTexture;
   }
 
-    /**
+  /**
    * Get the the data from a json resource in the IDE.
    */
   static getResourceJsonData(project: gdProject, resourceName: string) {

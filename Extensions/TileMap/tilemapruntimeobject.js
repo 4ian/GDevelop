@@ -4,7 +4,7 @@
  * @class TileMapRuntimeObject
  * @extends RuntimeObject
  */
-gdjs.TileMapRuntimeObject = function(runtimeScene, objectData) {
+gdjs.TileMapRuntimeObject = function (runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
   this._frameElapsedTime = 0;
 
@@ -39,26 +39,25 @@ gdjs.TileMapRuntimeObject.prototype = Object.create(
 );
 gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);
 
-gdjs.TileMapRuntimeObject.prototype.getRendererObject = function() {
+gdjs.TileMapRuntimeObject.prototype.getRendererObject = function () {
   return this._renderer.getRendererObject();
 };
 
-gdjs.TileMapRuntimeObject.prototype.update = function(runtimeScene) {
+gdjs.TileMapRuntimeObject.prototype.update = function (runtimeScene) {
   if (this._animationSpeedScale <= 0 || this._animationFps === 0) return;
-  var elapsedTime = this.getElapsedTime(runtimeScene) / 1000; 
-  
-  this._frameElapsedTime += elapsedTime * this._animationSpeedScale; 
+  var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+
+  this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
   while (this._frameElapsedTime > 1 / this._animationFps) {
     this._renderer.incrementAnimationFrameX();
     this._frameElapsedTime -= 1 / this._animationFps;
   }
-  
 };
 /**
  * @param { TileMapObjectDataType} oldObjectData
  * @param { TileMapObjectDataType} newObjectData
  */
-gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
+gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function (
   oldObjectData,
   newObjectData
 ) {
@@ -108,7 +107,7 @@ gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function(
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
-gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
+gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = function (
   initialInstanceData
 ) {
   if (initialInstanceData.customSize) {
@@ -120,82 +119,74 @@ gdjs.TileMapRuntimeObject.prototype.extraInitializationFromInitialInstance = fun
 /**
  * Set the Tilemap json file to display.
  */
-gdjs.TileMapRuntimeObject.prototype.setTilemapJsonFile = function(tilemapJsonFile) {
+gdjs.TileMapRuntimeObject.prototype.setTilemapJsonFile = function (
+  tilemapJsonFile
+) {
   this._tilemapJsonFile = tilemapJsonFile;
   this._renderer.updateTileMap();
 };
 
-gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function() {
+gdjs.TileMapRuntimeObject.prototype.getTilemapJsonFile = function () {
   return this._tilemapJsonFile;
 };
 
-gdjs.TileMapRuntimeObject.prototype.isTilemapJsonFileName = function(selectedTilemapJsonFile) {
+gdjs.TileMapRuntimeObject.prototype.isTilemapJsonFile = function (
+  selectedTilemapJsonFile
+) {
   return this._tilemapJsonFile === selectedTilemapJsonFile;
 };
 
-gdjs.RuntimeObject.prototype.setTilesetJsonFile = function(tilesetJsonFile) {
+gdjs.RuntimeObject.prototype.setTilesetJsonFile = function (tilesetJsonFile) {
   this._tilesetJsonFile = tilesetJsonFile;
   this._renderer.updateTileMap();
 };
 
-gdjs.RuntimeObject.prototype.getTilesetJsonFile = function() {
+gdjs.RuntimeObject.prototype.getTilesetJsonFile = function () {
   return this._tilesetJsonFile;
 };
 
-gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function(displayMode) {
+gdjs.TileMapRuntimeObject.prototype.setDisplayMode = function (displayMode) {
   this._displayMode = displayMode;
   this._renderer.updateTileMap();
 };
 
-gdjs.TileMapRuntimeObject.prototype.getDisplayMode = function() {
+gdjs.TileMapRuntimeObject.prototype.getDisplayMode = function () {
   return this._displayMode;
 };
 
-gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function(layerIndex) {
+gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function (layerIndex) {
   this._layerIndex = layerIndex;
   this._renderer.updateTileMap();
 };
 
-gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function() {
+gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function () {
   return this._layerIndex;
 };
-gdjs.TileMapRuntimeObject.prototype.setAnimationSpeedScale = function(animationSpeedScale) {
+gdjs.TileMapRuntimeObject.prototype.setAnimationSpeedScale = function (
+  animationSpeedScale
+) {
   this._animationSpeedScale = animationSpeedScale;
 };
 
-gdjs.TileMapRuntimeObject.prototype.getAnimationSpeedScale = function() {
+gdjs.TileMapRuntimeObject.prototype.getAnimationSpeedScale = function () {
   return this._animationSpeedScale;
 };
 
-gdjs.RuntimeObject.prototype.setAnimationFps = function(animationFps) {
+gdjs.RuntimeObject.prototype.setAnimationFps = function (animationFps) {
   this._animationFps = animationFps;
 };
 
-gdjs.RuntimeObject.prototype.getAnimationFps = function() {
+gdjs.RuntimeObject.prototype.getAnimationFps = function () {
   return this._animationFps;
 };
 
-gdjs.RuntimeObject.prototype.isTilemapJsonFile = function(
-  selectedTilemapJsonFile
-) {
-  return this._tilemapJsonFile === selectedTilemapJsonFile;
-};
-
-gdjs.RuntimeObject.prototype.isTilemapJsonFile = function(
-  selectedTilemapJsonFile
-) {
-  return this._tilemapJsonFile === selectedTilemapJsonFile;
-};
-
-gdjs.RuntimeObject.prototype.isTilesetJsonFile = function(
+gdjs.RuntimeObject.prototype.isTilesetJsonFile = function (
   selectedTilesetJsonFile
 ) {
   return this._tilesetJsonFile === selectedTilesetJsonFile;
 };
 
-gdjs.RuntimeObject.prototype.isDisplayMode = function(
-  selectedDisplayMode
-) {
+gdjs.RuntimeObject.prototype.isDisplayMode = function (selectedDisplayMode) {
   return this._displayMode === selectedDisplayMode;
 };
 
@@ -203,7 +194,7 @@ gdjs.RuntimeObject.prototype.isDisplayMode = function(
  * Set the width of the object.
  * @param {number} width The new width.
  */
-gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
+gdjs.TileMapRuntimeObject.prototype.setWidth = function (width) {
   this._renderer.setWidth(width);
 };
 
@@ -211,7 +202,7 @@ gdjs.TileMapRuntimeObject.prototype.setWidth = function(width) {
  * Set the height of the object.
  * @param {number} height The new height.
  */
-gdjs.TileMapRuntimeObject.prototype.setHeight = function(height) {
+gdjs.TileMapRuntimeObject.prototype.setHeight = function (height) {
   this._renderer.setHeight(height);
 };
 
@@ -219,7 +210,7 @@ gdjs.TileMapRuntimeObject.prototype.setHeight = function(height) {
  * Set object position on X axis.
  * @param {number} x The new position X of the object.
  */
-gdjs.TileMapRuntimeObject.prototype.setX = function(x) {
+gdjs.TileMapRuntimeObject.prototype.setX = function (x) {
   gdjs.RuntimeObject.prototype.setX.call(this, x);
   this._renderer.updatePosition();
 };
@@ -228,7 +219,7 @@ gdjs.TileMapRuntimeObject.prototype.setX = function(x) {
  * Set object position on Y axis.
  * @param {number} y The new position Y of the object.
  */
-gdjs.TileMapRuntimeObject.prototype.setY = function(y) {
+gdjs.TileMapRuntimeObject.prototype.setY = function (y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
   this._renderer.updatePosition();
 };
@@ -237,7 +228,7 @@ gdjs.TileMapRuntimeObject.prototype.setY = function(y) {
  * Set the angle of the object.
  * @param {number} angle The new angle of the object.
  */
-gdjs.TileMapRuntimeObject.prototype.setAngle = function(angle) {
+gdjs.TileMapRuntimeObject.prototype.setAngle = function (angle) {
   gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
   this._renderer.updateAngle();
 };
@@ -246,7 +237,7 @@ gdjs.TileMapRuntimeObject.prototype.setAngle = function(angle) {
  * Set object opacity.
  * @param {number} opacity The new opacity of the object (0-255).
  */
-gdjs.TileMapRuntimeObject.prototype.setOpacity = function(opacity) {
+gdjs.TileMapRuntimeObject.prototype.setOpacity = function (opacity) {
   this._opacity = opacity;
   this._renderer.updateOpacity();
 };
@@ -254,20 +245,20 @@ gdjs.TileMapRuntimeObject.prototype.setOpacity = function(opacity) {
 /**
  * Get object opacity.
  */
-gdjs.TileMapRuntimeObject.prototype.getOpacity = function() {
+gdjs.TileMapRuntimeObject.prototype.getOpacity = function () {
   return this._opacity;
 };
 
 /**
  * Get the width of the object.
  */
-gdjs.TileMapRuntimeObject.prototype.getWidth = function() {
+gdjs.TileMapRuntimeObject.prototype.getWidth = function () {
   return this._renderer.getWidth();
 };
 
 /**
  * Get the height of the object.
  */
-gdjs.TileMapRuntimeObject.prototype.getHeight = function() {
+gdjs.TileMapRuntimeObject.prototype.getHeight = function () {
   return this._renderer.getHeight();
 };

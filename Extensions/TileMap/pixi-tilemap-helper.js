@@ -1,16 +1,16 @@
-;(function (root, factory) {
+(function (root, factory) {
   if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
     // CommonJS
-    factory(exports)
+    factory(exports);
   } else {
     // Browser globals
-    factory((root.PixiTileMapHelper = {}))
+    factory((root.PixiTileMapHelper = {}));
   }
 })(typeof self !== 'undefined' ? self : this, function (exports) {
   /**
    * Tileset/Tilemap related data.
    */
-  const loadedTileSets = {}
+  const loadedTileSets = {};
 
   /**
    * Creates a Tileset resource from a tiledData json file exported from https://www.mapeditor.org/.
@@ -27,15 +27,15 @@
     if (!tiledData.tiledversion) {
       console.warn(
         "The json data doesn't contain a tiledversion key. Are you sure this file has been exported from mapeditor.org?"
-      )
-      return // TODO handle detecting and loading LDtk tilesets/maps
+      );
+      return; // TODO handle detecting and loading LDtk tilesets/maps
     }
     // This assumes that the tileset is embedded in the tilemap, which it might not always be, so we need to check
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(`
         ${jsonResourceName} doesn't appear to contain any tileset data.
-      `)
-      return
+      `);
+      return;
     }
     const {
       tilewidth,
@@ -46,17 +46,15 @@
       columns,
       spacing,
       margin,
-    } = tiledData.tilesets[0]
-    if (!tex) tex = getTexture(image)
+    } = tiledData.tilesets[0];
+    if (!tex) tex = getTexture(image);
 
-    const rows = tilecount / columns
-    const tileWidth = tilewidth;
-    const tileHeight = tileheight;
+    const rows = tilecount / columns;
     // We try to detect what size tiled is expecting and if the texture is not the right size, dont load it
     const expectedAtlasWidth =
-      (tilewidth * columns) + (spacing * (columns - 1)) + (margin * 2)
+      tilewidth * columns + spacing * (columns - 1) + margin * 2;
     const expectedAtlasHeight =
-      (tileheight * rows) + (spacing * (rows - 1)) + (margin * 2)
+      tileheight * rows + spacing * (rows - 1) + margin * 2;
     if (
       (tex.width !== 1 && expectedAtlasWidth !== tex.width) ||
       (tex.height !== 1 && expectedAtlasHeight !== tex.height)
@@ -64,168 +62,170 @@
       console.warn(`
         Have you resized your atlas?
         It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.
-      `)
-      return
+      `);
+      return;
     }
 
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
-      const columnMultiplier = Math.floor((frame - 1) % columns)
-      const rowMultiplier = Math.floor((frame - 1) / columns)
-      const x = (margin + (columnMultiplier * (tileWidth + spacing)))
-      const y = margin + (rowMultiplier * (tileHeight + spacing))
+      const columnMultiplier = Math.floor((frame - 1) % columns);
+      const rowMultiplier = Math.floor((frame - 1) / columns);
+      const x = margin + columnMultiplier * (tilewidth + spacing);
+      const y = margin + rowMultiplier * (tileheight + spacing);
 
       try {
-        const rect = new PIXI.Rectangle(x, y, tileWidth, tileHeight)
-        const texture = new PIXI.Texture(tex, rect)
-        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
-        texture.cacheAsBitmap = true
+        const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
+        const texture = new PIXI.Texture(tex, rect);
+        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
-        return texture
+        return texture;
       } catch (error) {
-        console.log(rect);
         console.error(
-          'Error occured while trying to create PIXI.Texture!',
+          'An error occurred while creating a PIXI.Texture to be used in a TileSet:',
           error
-        )
-        return null
+        );
+        return null;
       }
-    })
+    });
     const newTileset = {
       width: tex.width,
       height: tex.height,
-      tileWidth,
-      tileHeight,
+      tileWidth: tilewidth,
+      tileHeight: tileheight,
       texture: tex,
       textureCache,
       layers: tiledData.layers,
       tiles,
       tilecount,
-      // these scales are used as multipliers on some absolute pixel values from tiled that might be on a resized atlas
-      // they help to adopt to changed dimentions when rendering in updatePIXITileMap
       margin,
       spacing,
-    }
-    onLoad(newTileset)
-    loadedTileSets[requestedTileSetId] = newTileset
-  }
-  exports.createTileSetResource = createTileSetResource
+    };
+    onLoad(newTileset);
+    loadedTileSets[requestedTileSetId] = newTileset;
+  };
+  exports.createTileSetResource = createTileSetResource;
 
   /**
    * Decodes the layer data, which tiled can sometimes store as a compressed base64 string
    * https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data
    */
   const decodeBase64 = (layer, pako) => {
-    const { data, compression } = layer
+    const { data, compression } = layer;
     var index = 4,
       arr = [],
       step1 = atob(data)
         .split('')
         .map(function (x) {
-          return x.charCodeAt(0)
-        })
+          return x.charCodeAt(0);
+        });
     try {
       const decodeString = (str, index) =>
         (str.charCodeAt(index) +
           (str.charCodeAt(index + 1) << 8) +
           (str.charCodeAt(index + 2) << 16) +
           (str.charCodeAt(index + 3) << 24)) >>>
-        0
+        0;
       const decodeArray = (arr, index) =>
         (arr[index] +
           (arr[index + 1] << 8) +
           (arr[index + 2] << 16) +
           (arr[index + 3] << 24)) >>>
-        0
+        0;
 
       if (compression === 'zlib') {
-        var binData = new Uint8Array(step1)
-        step1 = pako.inflate(binData)
+        var binData = new Uint8Array(step1);
+        step1 = pako.inflate(binData);
         while (index <= step1.length) {
-          arr.push(decodeArray(step1, index - 4))
-          index += 4
+          arr.push(decodeArray(step1, index - 4));
+          index += 4;
         }
       } else {
         while (index <= step1.length) {
-          arr.push(decodeString(step1, index - 4))
-          index += 4
+          arr.push(decodeString(step1, index - 4));
+          index += 4;
         }
       }
-      return arr
+      return arr;
     } catch (error) {
       console.error(
         'Failed to decompress and unzip base64 layer.data string',
         error
-      )
-      return null
+      );
+      return null;
     }
-  }
+  };
 
   /**
    * Re-renders the tilemap whenever its rendering settings have been changed
    */
-  exports.updatePIXITileMap = (tileMap, tileSet, render, layerIndex, pako) => {
-    if (!tileMap || !tileSet) return
-    tileMap.clear()
+  exports.updatePIXITileMap = (
+    tileMap,
+    tileSet,
+    displayMode,
+    layerIndex,
+    pako
+  ) => {
+    if (!tileMap || !tileSet) return;
+    tileMap.clear();
 
     tileSet.layers.forEach(function (layer, index) {
-      if (render === 'index' && layerIndex !== index) return
-      else if (render === 'visible' && !layer.visible) return
+      if (displayMode === 'index' && layerIndex !== index) return;
+      else if (displayMode === 'visible' && !layer.visible) return;
 
-      // todo filter groups
+      // TODO add support for filtering a specific tiled object group by its name
       if (layer.type === 'objectgroup') {
         layer.objects.forEach(function (object) {
-          const { gid, x, y, visible } = object
-          if (render === 'visible' && !visible) return
+          const { gid, x, y, visible } = object;
+          if (displayMode === 'visible' && !visible) return;
           if (tileSet.textureCache[gid]) {
             tileMap.addFrame(
               tileSet.textureCache[gid],
               x,
               y - tileSet.tileHeight
-            )
+            );
           }
-        })
+        });
       } else if (layer.type === 'tilelayer') {
-        let ind = 0
-        let layerData = layer.data
+        let tileIndex = 0;
+        let layerData = layer.data;
 
         if (layer.encoding === 'base64') {
-          layerData = decodeBase64(layer, pako)
+          layerData = decodeBase64(layer, pako);
           if (!layerData) {
-            console.warn('Failed to uncompress layer.data')
-            return
+            console.warn('Failed to uncompress layer.data');
+            return;
           }
-          layerData.encoding = 'csv'
+          layerData.encoding = 'csv';
         }
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
-            const xPos = tileSet.tileWidth * j
-            const yPos = tileSet.tileHeight * i
-            const tileUid = layerData[ind]
+            const xPos = tileSet.tileWidth * j;
+            const yPos = tileSet.tileHeight * i;
+            const tileUid = layerData[tileIndex];
 
             if (tileUid !== 0 && tileSet.textureCache[tileUid]) {
               const tileData = tileSet.tiles.find(function (tile) {
-                return tile.id === tileUid - 1
-              })
+                return tile.id === tileUid - 1;
+              });
 
               // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
               if (tileData && tileData.animation) {
                 tileMap
                   .addFrame(tileSet.textureCache[tileUid], xPos, yPos)
-                  .tileAnimX(tileSet.tileWidth, tileData.animation.length)
+                  .tileAnimX(tileSet.tileWidth, tileData.animation.length);
               } else {
                 // Non animated props dont require tileAnimX or Y
-                tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos)
+                tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos);
               }
             }
-            ind += 1
+            tileIndex += 1;
           }
         }
       }
-    })
-  }
+    });
+  };
   exports.getLoadedTileSets = () => {
-    return loadedTileSets
-  }
+    return loadedTileSets;
+  };
   /**
    * If a Tileset changes (json or image), a tilemap using it needs to re-render
    * The tileset needs to be rebuilt for use
@@ -241,14 +241,14 @@
     jsonResourceName,
     onLoad
   ) => {
-    const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`
+    const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
-      onLoad(loadedTileSets[requestedTileSetId])
-      return
+      onLoad(loadedTileSets[requestedTileSetId]);
+      return;
     }
 
-    const texture = imageResourceName ? getTexture(imageResourceName) : null // we do this because gdevelop doesnt return a null when it fails to load textures
+    const texture = imageResourceName ? getTexture(imageResourceName) : null; // we do this because gdevelop doesnt return a null when it fails to load textures
     createTileSetResource(
       tiledData,
       texture,
@@ -256,6 +256,6 @@
       onLoad,
       getTexture,
       jsonResourceName
-    )
-  }
-})
+    );
+  };
+});

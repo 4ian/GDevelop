@@ -185,7 +185,7 @@
           }
         });
       } else if (layer.type === 'tilelayer') {
-        let tileIndex = 0;
+        let tileSlotIndex = 0;
         let layerData = layer.data;
 
         if (layer.encoding === 'base64') {
@@ -200,7 +200,7 @@
           for (let j = 0; j < layer.width; j++) {
             const xPos = tileSet.tileWidth * j;
             const yPos = tileSet.tileHeight * i;
-            const tileUid = layerData[tileIndex];
+            const tileUid = layerData[tileSlotIndex];
 
             if (tileUid !== 0 && tileSet.textureCache[tileUid]) {
               const tileData = tileSet.tiles.find(function (tile) {
@@ -217,7 +217,7 @@
                 tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos);
               }
             }
-            tileIndex += 1;
+            tileSlotIndex += 1;
           }
         }
       }

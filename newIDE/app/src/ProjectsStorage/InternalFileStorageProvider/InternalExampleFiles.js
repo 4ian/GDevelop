@@ -114,17 +114,18 @@ import exampleFile109 from '../../fixtures/splash-screen/splash-screen.json';
 import exampleFile110 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import exampleFile111 from '../../fixtures/tabbed-menu-with-layers/tabbed-menu-with-layers.json';
 import exampleFile112 from '../../fixtures/take-screenshot/take-screenshot.json';
-import exampleFile113 from '../../fixtures/text-entry-object/text-entry-object.json';
-import exampleFile114 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
-import exampleFile115 from '../../fixtures/text-to-speech/text-to-speech.json';
-import exampleFile116 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile117 from '../../fixtures/tween-animations/tween-animations.json';
-import exampleFile118 from '../../fixtures/tween-test/tween-test.json';
-import exampleFile119 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile120 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile121 from '../../fixtures/video-player/video-player.json';
-import exampleFile122 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile123 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile113 from '../../fixtures/tetris-demo/tetris-demo.json';
+import exampleFile114 from '../../fixtures/text-entry-object/text-entry-object.json';
+import exampleFile115 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
+import exampleFile116 from '../../fixtures/text-to-speech/text-to-speech.json';
+import exampleFile117 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile118 from '../../fixtures/tween-animations/tween-animations.json';
+import exampleFile119 from '../../fixtures/tween-test/tween-test.json';
+import exampleFile120 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile121 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile122 from '../../fixtures/video-player/video-player.json';
+import exampleFile123 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile124 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -241,15 +242,16 @@ export default {
   'example://sprite-fade-in-out': exampleFile110,
   'example://tabbed-menu-with-layers': exampleFile111,
   'example://take-screenshot': exampleFile112,
-  'example://text-entry-object': exampleFile113,
-  'example://text-fade-in-out': exampleFile114,
-  'example://text-to-speech': exampleFile115,
-  'example://toggle-music-play-sound': exampleFile116,
-  'example://tween-animations': exampleFile117,
-  'example://tween-test': exampleFile118,
-  'example://type-on-text-effect': exampleFile119,
-  'example://unlock-items': exampleFile120,
-  'example://video-player': exampleFile121,
-  'example://z-depth': exampleFile122,
-  'example://zombie-laser': exampleFile123,
+  'example://tetris-demo': exampleFile113,
+  'example://text-entry-object': exampleFile114,
+  'example://text-fade-in-out': exampleFile115,
+  'example://text-to-speech': exampleFile116,
+  'example://toggle-music-play-sound': exampleFile117,
+  'example://tween-animations': exampleFile118,
+  'example://tween-test': exampleFile119,
+  'example://type-on-text-effect': exampleFile120,
+  'example://unlock-items': exampleFile121,
+  'example://video-player': exampleFile122,
+  'example://z-depth': exampleFile123,
+  'example://zombie-laser': exampleFile124,
 };

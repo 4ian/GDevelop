@@ -339,6 +339,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
   }
 
+  // TODO: migrate the plugins to the package.json
   str =
       str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 

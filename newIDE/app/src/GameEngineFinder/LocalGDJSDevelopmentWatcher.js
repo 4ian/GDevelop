@@ -94,6 +94,7 @@ const getAllDevelopmentWatchPaths = (): Promise<DevelopmentWatchPaths> => {
           'events-tools',
           'fontfaceobserver-font-manager',
           'howler-sound-manager',
+          'empty-sound-manager',
           'libs',
           'pixi-renderers',
           'websocket-debugger-client',

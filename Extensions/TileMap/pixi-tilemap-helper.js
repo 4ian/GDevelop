@@ -22,7 +22,7 @@
     requestedTileSetId,
     onLoad,
     getTexture,
-    jsonResourceName
+    tilemapResourceName
   ) => {
     if (!tiledData.tiledversion) {
       console.warn(
@@ -33,7 +33,8 @@
     // This assumes that the tileset is embedded in the tilemap, which it might not always be, so we need to check
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(`
-        ${jsonResourceName} doesn't appear to contain any tileset data.
+        ${tilemapResourceName} doesn't appear to contain any tileset data.
+        Have you saved it in a sepparate Json file?
       `);
       return;
     }
@@ -232,16 +233,19 @@
    * But we need to have the capacity to instance a tilemap, so more than one tilemaps with different tileset layers
    * We need to cache the tileset somewhere, the tilemap instance will have to re-render it
    * Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
-   * tileset id == jsonResourceName + imageResourcename
+   * tileset id == tilemapResourceName + imageResourcename
    */
   exports.getPIXITileSet = (
     getTexture,
     tiledData,
     imageResourceName,
-    jsonResourceName,
+    tilemapResourceName,
+    tilesetResourceName,
     onLoad
   ) => {
-    const requestedTileSetId = `${jsonResourceName}@${imageResourceName}`;
+    const requestedTileSetId = `${
+      tilesetResourceName || tilemapResourceName
+    }@${imageResourceName}`;
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
       onLoad(loadedTileSets[requestedTileSetId]);
@@ -255,7 +259,7 @@
       requestedTileSetId,
       onLoad,
       getTexture,
-      jsonResourceName
+      tilemapResourceName
     );
   };
 });

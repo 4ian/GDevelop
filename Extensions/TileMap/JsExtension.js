@@ -503,6 +503,10 @@ module.exports = {
         .getProperties(this.project)
         .get('displayMode')
         .getValue();
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
 
       PixiTilemapHelper.getPIXITileSet(
         (textureName) =>
@@ -512,6 +516,7 @@ module.exports = {
           : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
+        tilesetJsonFile,
         (tileset) => {
           if (tileset && this._pixiObject) {
             PixiTilemapHelper.updatePIXITileMap(

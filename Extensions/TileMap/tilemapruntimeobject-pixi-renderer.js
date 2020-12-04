@@ -60,6 +60,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
         tilesetJsonData ? { ...content, tilesets: [tilesetJsonData] } : content,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
+        this._object._tilesetJsonFile,
         (tileset) => {
           if (tileset && this._pixiObject) {
             PixiTileMapHelper.updatePIXITileMap(

@@ -29,6 +29,7 @@ export const declareExtension = (
       eventsFunctionsExtension.getAuthor(),
       ''
     )
+    .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
     .setIconUrl(eventsFunctionsExtension.getIconUrl());
 };
 

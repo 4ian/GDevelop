@@ -21,6 +21,8 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   getPreviewIconUrl(): string;
   setIconUrl(iconUrl: string): gdEventsFunctionsExtension;
   getIconUrl(): string;
+  setHelpPath(helpPath: string): gdEventsFunctionsExtension;
+  getHelpPath(): string;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

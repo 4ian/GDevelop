@@ -222,6 +222,8 @@ export default class Window {
   }
 
   static openExternalURL(url: string) {
+    if (!url) return;
+
     if (electron) {
       if (shell) shell.openExternal(url);
       return;

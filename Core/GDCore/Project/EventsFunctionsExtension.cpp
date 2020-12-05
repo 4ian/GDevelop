@@ -37,6 +37,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   author = other.author;
   previewIconUrl = other.previewIconUrl;
   iconUrl = other.iconUrl;
+  helpPath = other.helpPath;
   EventsFunctionsContainer::Init(other);
   eventsBasedBehaviors = other.eventsBasedBehaviors;
 }
@@ -52,6 +53,7 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("author", author);
   element.SetAttribute("previewIconUrl", previewIconUrl);
   element.SetAttribute("iconUrl", iconUrl);
+  element.SetAttribute("helpPath", helpPath);
 
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
@@ -70,6 +72,7 @@ void EventsFunctionsExtension::UnserializeFrom(
   author = element.GetStringAttribute("author");
   previewIconUrl = element.GetStringAttribute("previewIconUrl");
   iconUrl = element.GetStringAttribute("iconUrl");
+  helpPath = element.GetStringAttribute("helpPath");
 
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(

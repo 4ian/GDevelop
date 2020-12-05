@@ -16,12 +16,14 @@ type PropsType = {
  */
 const HelpButton = (props: PropsType) => {
   if (!props.helpPagePath) return null;
+  const helpLink = getHelpLink(props.helpPagePath);
+  if (!helpLink) return null;
 
   return (
     <FlatButton
       onClick={() => {
         if (props.helpPagePath) {
-          Window.openExternalURL(getHelpLink(props.helpPagePath));
+          Window.openExternalURL(helpLink);
         }
       }}
       target="_blank"

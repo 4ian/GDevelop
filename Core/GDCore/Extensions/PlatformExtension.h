@@ -100,7 +100,7 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
-   * \brief Set the path to the help, relative to the wiki/documentation root.
+   * \brief Set the path to the help, relative to the GDevelop documentation root.
    * For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
    *
@@ -275,7 +275,7 @@ class GD_CORE_API PlatformExtension {
 
   /**
    * \brief Return the help path of extension, relative to the
-   * wiki/documentation root.
+   * GDevelop documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 

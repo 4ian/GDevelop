@@ -1943,6 +1943,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetPreviewIconUrl();
     [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
     [Const, Ref] DOMString GetIconUrl();
+    [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
+    [Const, Ref] DOMString GetHelpPath();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

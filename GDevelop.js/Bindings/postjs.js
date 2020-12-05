@@ -88,6 +88,7 @@ var adaptNamingConventions = function(gd) {
     gd.asRepeatEvent = function(evt) { return gd.castObject(evt, gd.RepeatEvent); }
     gd.asWhileEvent = function(evt) { return gd.castObject(evt, gd.WhileEvent); }
     gd.asForEachEvent = function(evt) { return gd.castObject(evt, gd.ForEachEvent); }
+    gd.asForEachChildVariableEvent = function(evt) { return gd.castObject(evt, gd.ForEachChildVariableEvent); }
     gd.asCommentEvent = function(evt) { return gd.castObject(evt, gd.CommentEvent); }
     gd.asGroupEvent = function(evt) { return gd.castObject(evt, gd.GroupEvent); }
     gd.asLinkEvent = function(evt) { return gd.castObject(evt, gd.LinkEvent); }

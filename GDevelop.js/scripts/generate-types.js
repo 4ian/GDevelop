@@ -152,6 +152,7 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         `  asRepeatEvent(gdBaseEvent): gdRepeatEvent;`,
         `  asWhileEvent(gdBaseEvent): gdWhileEvent;`,
         `  asForEachEvent(gdBaseEvent): gdForEachEvent;`,
+        `  asForEachChildVariableEvent(gdBaseEvent): gdForEachChildVariableEvent;`,
         `  asCommentEvent(gdBaseEvent): gdCommentEvent;`,
         `  asGroupEvent(gdBaseEvent): gdGroupEvent;`,
         `  asLinkEvent(gdBaseEvent): gdLinkEvent;`,

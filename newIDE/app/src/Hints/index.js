@@ -114,6 +114,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Be careful with this action, you may have problems exiting the preview if you don't add a way to toggle it back.`,
     };
   }
+  if (type === 'GetArgumentAsBoolean') {
+    return {
+      kind: 'info',
+      message: t`If the parameter is a string or a number, you probably want to use the expressions "GetArgumentAsString" or "GetArgumentAsNumber", along with the conditions "Compare two strings" or "Compare two numbers".`,
+    };
+  }
 
   return null;
 };

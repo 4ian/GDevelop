@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\rotate-toward-mouse\\game.json",
+    "projectUuid": "1172f44f-2943-4eab-b0dd-6c824b437405",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -171,7 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "b04f5aa2-2a2b-4d50-a58d-57393237cded",
+          "persistentUuid": "d8f90603-6d0a-4c55-bda8-4ed8f0215b2b",
           "width": 0,
           "x": 335.312,
           "y": 292.07,

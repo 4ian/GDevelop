@@ -234,7 +234,7 @@ export default class Window {
     return !!electron;
   }
 
-  static isDev() {
+  static isDev(): boolean {
     if (!electron)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 

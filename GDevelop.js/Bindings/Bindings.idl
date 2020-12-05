@@ -300,6 +300,9 @@ interface Project {
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
+    void SetProjectUuid([Const] DOMString projectUuid);
+    [Const, Ref] DOMString GetProjectUuid();
+    void ResetProjectUuid();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
     void SetGameResolutionSize(long width, long height);
@@ -317,6 +320,8 @@ interface Project {
     void SetMinimumFPS(long fps);
     void SetFolderProject(boolean enable);
     boolean IsFolderProject();
+    void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
+    boolean GetUseDeprecatedZeroAsDefaultZOrder();
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
@@ -651,6 +656,9 @@ interface Layer {
     void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
     void RemoveEffect([Const] DOMString name);
     void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
 interface PropertyDescriptor {
@@ -710,6 +718,9 @@ interface Resource {
     [Const, Ref] DOMString GetFile();
     void SetMetadata([Const] DOMString metadata);
     [Const, Ref] DOMString GetMetadata();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
@@ -724,6 +735,8 @@ interface ResourcesManager {
     [Value] VectorString GetAllResourceNames();
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
+    [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
@@ -832,6 +845,7 @@ interface HighestZOrderFinder {
     void RestrictSearchToLayer([Const] DOMString layer);
     long GetHighestZOrder();
     long GetLowestZOrder();
+    unsigned long GetInstancesCount();
 };
 
 interface InitialInstanceFunctor {};
@@ -1239,6 +1253,7 @@ interface PlatformExtension {
                                 [Const] DOMString author,
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
+    [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     void MarkAsDeprecated();
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
@@ -1297,6 +1312,7 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
@@ -1447,6 +1463,36 @@ interface ForEachEvent {
 
     //Inherited from BaseEvent:
     ForEachEvent Clone();
+    [Const, Ref] DOMString GetType();
+    void SetType([Const] DOMString type);
+    boolean IsExecutable();
+    boolean CanHaveSubEvents();
+    boolean HasSubEvents();
+    [Ref] EventsList GetSubEvents();
+    boolean IsDisabled();
+    void SetDisabled(boolean disable);
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface ForEachChildVariableEvent {
+    void ForEachChildVariableEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+
+    [Const, Ref] DOMString GetIterableVariableName();
+    [Const, Ref] DOMString GetKeyIteratorVariableName();
+    [Const, Ref] DOMString GetValueIteratorVariableName();
+    void SetIterableVariableName([Const] DOMString newName);
+    void SetKeyIteratorVariableName([Const] DOMString newName);
+    void SetValueIteratorVariableName([Const] DOMString newName);
+
+    //Inherited from BaseEvent:
+    ForEachChildVariableEvent Clone();
     [Const, Ref] DOMString GetType();
     void SetType([Const] DOMString type);
     boolean IsExecutable();
@@ -1893,6 +1939,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
+    [Const, Ref] DOMString GetIconUrl();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

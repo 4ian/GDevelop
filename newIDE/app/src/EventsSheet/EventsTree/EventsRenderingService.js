@@ -3,6 +3,7 @@ import StandardEvent from './Renderers/StandardEvent';
 import GroupEvent from './Renderers/GroupEvent';
 import CommentEvent from './Renderers/CommentEvent';
 import ForEachEvent from './Renderers/ForEachEvent';
+import ForEachChildVariableEvent from './Renderers/ForEachChildVariableEvent';
 import RepeatEvent from './Renderers/RepeatEvent';
 import WhileEvent from './Renderers/WhileEvent';
 import LinkEvent from './Renderers/LinkEvent';
@@ -15,6 +16,7 @@ export default {
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
+    'BuiltinCommonInstructions::ForEachChildVariable': ForEachChildVariableEvent,
     'BuiltinCommonInstructions::Repeat': RepeatEvent,
     'BuiltinCommonInstructions::While': WhileEvent,
     'BuiltinCommonInstructions::Link': LinkEvent,

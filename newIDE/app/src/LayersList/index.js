@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -8,7 +8,6 @@ import LayerRow from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
-import RaisedButton from '../UI/RaisedButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -19,6 +18,7 @@ import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -38,12 +38,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
   };
 
   render() {
-    const {
-      layersContainer,
-      onEditEffects,
-      onEditLighting,
-      width,
-    } = this.props;
+    const { layersContainer, onEditEffects, onEdit, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -61,7 +56,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           nameError={this.state.nameErrors[layerName]}
           effectsCount={layer.getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
-          onEditLighting={() => onEditLighting(layer)}
+          onEdit={() => onEdit(layer)}
           onBlur={event => {
             const newName = event.target.value;
             if (layerName === newName) return;
@@ -122,7 +117,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
-  onEditLightingLayer: (layer: ?gdLayer) => void,
+  onEditLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
     oldName: string,
@@ -195,7 +190,7 @@ export default class LayersList extends Component<Props, State> {
                 key={listKey}
                 layersContainer={this.props.layersContainer}
                 onEditEffects={this.props.onEditLayerEffects}
-                onEditLighting={this.props.onEditLightingLayer}
+                onEdit={this.props.onEditLayer}
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
@@ -215,19 +210,18 @@ export default class LayersList extends Component<Props, State> {
           </FullSizeMeasurer>
           <Column>
             <Line justifyContent="flex-end" expand>
-              <RaisedButton
+              <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
                 primary
                 onClick={this._addLayer}
                 icon={<Add />}
-              />
-            </Line>
-            <Line justifyContent="flex-end" expand>
-              <RaisedButton
-                label={<Trans>Add lighting layer</Trans>}
-                disabled={isLightingLayerPresent}
-                onClick={this._addLightingLayer}
-                icon={<Add />}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: i18n._(t`Add lighting layer`),
+                    enabled: !isLightingLayerPresent,
+                    click: this._addLightingLayer,
+                  },
+                ]}
               />
             </Line>
           </Column>

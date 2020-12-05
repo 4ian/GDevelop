@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\change-scale-of-sprites\\game.json",
+    "projectUuid": "8ff999f0-be79-40d9-9fb2-7b1cd70c887e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -153,7 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "d4b78499-2f42-4f45-b3b4-4b8c9d0e5b87",
+          "persistentUuid": "62c9e09d-fd3b-46d2-8320-7495517e18e2",
           "width": 0,
           "x": 15.1197,
           "y": 19.1174,

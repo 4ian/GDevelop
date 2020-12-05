@@ -103,6 +103,14 @@ gdjs.evtTools.network.sendDeprecatedSynchronousRequest = function (
 };
 
 /**
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {boolean} enable
+ */
+gdjs.evtTools.network.enableMetrics = function(runtimeScene, enable) {
+  runtimeScene.getGame().enableMetrics(enable);
+}
+
+/**
  * Convert a variable to JSON.
  * TODO: Move to gdjs.Variable static
  * @param {gdjs.Variable} variable The variable to convert to JSON
@@ -178,7 +186,7 @@ gdjs.evtTools.network.jsonToVariableStructure = function (jsonStr, variable) {
     gdjs.evtTools.network._objectToVariable(obj, variable);
     return true;
   } catch (e) {
-    //Do nothing iF JSON was not properly parsed;
+    // Do nothing if JSON was not properly parsed.
     return false;
   }
 };

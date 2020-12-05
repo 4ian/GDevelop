@@ -238,7 +238,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -246,7 +247,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle function of the extension. Choose another name for your function.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -272,7 +274,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -280,7 +283,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -345,7 +349,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return;
     }

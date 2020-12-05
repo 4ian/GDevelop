@@ -232,7 +232,6 @@ gdjs.LightRuntimeObjectPixiRenderer.prototype.updateColor = function () {
 };
 
 gdjs.LightRuntimeObjectPixiRenderer.prototype.updateTexture = function () {
-  if (!this._light) return;
   var texture = this._object.getTexture();
   this._texture =
     texture !== ''

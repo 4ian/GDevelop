@@ -21,12 +21,12 @@ export type CreateProjectDialogWithComponentsProps = {|
   onOpen: (
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
-  ) => void,
+  ) => Promise<void>,
   onCreate: (
     gdProject,
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
-  ) => void,
+  ) => Promise<void>,
 |};
 
 type Props = {|

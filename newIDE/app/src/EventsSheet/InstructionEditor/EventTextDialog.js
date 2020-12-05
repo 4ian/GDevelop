@@ -6,7 +6,8 @@ import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Line, Column } from '../../UI/Grid';
-import ColorPicker, { type RGBColor } from '../../UI/ColorField/ColorPicker';
+import ColorPicker from '../../UI/ColorField/ColorPicker';
+import { type RGBColor } from '../../Utils/ColorTransformer';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 

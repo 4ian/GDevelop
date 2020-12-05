@@ -20,6 +20,7 @@ gdjs.Layer = function (layerData, runtimeScene) {
   this._cameraRotation = 0;
   this._zoomFactor = 1;
   this._timeScale = 1;
+  this._defaultZOrder = 0;
   this._hidden = !layerData.visibility;
   this._initialEffectsData = layerData.effects || [];
   this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
@@ -54,6 +55,23 @@ gdjs.Layer = function (layerData, runtimeScene) {
 gdjs.Layer.prototype.getRenderer = function () {
   return this._renderer;
 };
+
+/**
+ * Get the default Z order to be attributed to objects created on this layer
+ * (usually from events generated code).
+ * @returns {number}
+ */
+gdjs.Layer.prototype.getDefaultZOrder = function () {
+  return this._defaultZOrder;
+}
+
+/**
+ * Set the default Z order to be attributed to objects created on this layer.
+ * @param {number} defaultZOrder The Z order to use when creating a new object from events.
+ */
+gdjs.Layer.prototype.setDefaultZOrder = function (defaultZOrder) {
+  this._defaultZOrder = defaultZOrder;
+}
 
 /**
  * Called by the RuntimeScene whenever the game resolution size is changed.

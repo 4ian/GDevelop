@@ -11,8 +11,6 @@ import {
   listAllResources,
 } from '../../Utils/GDevelopServices/Asset';
 import { useSearchItem } from '../UseSearchItem';
-import optionalRequire from '../../Utils/OptionalRequire';
-const electron = optionalRequire('electron');
 
 const defaultSearchText = '';
 
@@ -112,9 +110,6 @@ export const ResourceStoreStateProvider = ({
 
   React.useEffect(
     () => {
-      // Don't prefetch anything if not on the web-app.
-      if (!!electron) return;
-
       // Don't attempt to load again resources and filters if they
       // were loaded already.
       if (resourcesByUrl || isLoading.current) return;

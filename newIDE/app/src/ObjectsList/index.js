@@ -394,7 +394,8 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     if (project.hasObjectNamed(objectName)) {
       showWarningBox(
-        'A global object with this name already exists. Please change the object name before setting it as a global object'
+        'A global object with this name already exists. Please change the object name before setting it as a global object',
+        { delayToNextTick: true }
       );
       return;
     }

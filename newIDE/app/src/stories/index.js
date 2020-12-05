@@ -100,11 +100,15 @@ import {
   completeElectronBuild,
   completeWebBuild,
   fakeAssetShortHeader1,
-  fakeAssetShortHeader2,
-  fakeAssetShortHeader3,
-  fakeAssetWithBehaviorCustomizations1,
-  fakeAssetWithEventCustomizationsAndFlashExtension1,
+  game1,
+  game2,
+  gameRollingMetrics1,
+  gameRollingMetricsWithoutPlayersAndRetention1,
 } from '../fixtures/GDevelopServicesTestData';
+import {
+  GDevelopAnalyticsApi,
+  GDevelopGameApi,
+} from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
@@ -170,7 +174,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
-import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
@@ -181,6 +185,7 @@ import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -210,10 +215,15 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global.css';
 import { AssetCard } from '../AssetStore/AssetCard';
-import { SearchResults } from '../AssetStore/SearchResults';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
+import { GameCard } from '../GameDashboard/GameCard';
+import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
+import { GamesList } from '../GameDashboard/GamesList';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 configureActions({
   depth: 2,
@@ -271,6 +281,39 @@ storiesOf('UI Building Blocks/Buttons', module)
         />
       </Line>
       <Line>
+        <Text>Buttons with split menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Button with split menu"
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Primary button with split menu"
+          primary
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and with icon"
+          icon={<Brush />}
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
         <Text>Buttons with menus:</Text>
       </Line>
       <Line>
@@ -285,6 +328,12 @@ storiesOf('UI Building Blocks/Buttons', module)
         <RaisedButtonWithMenu
           label="... and with icon"
           icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
       </Line>
@@ -4162,6 +4211,7 @@ storiesOf('ProjectManager', module)
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
       onOpenProfile={action('onOpenProfile')}
+      onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -4202,6 +4252,7 @@ storiesOf('ProjectManager', module)
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
       onOpenProfile={action('onOpenProfile')}
+      onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -4306,8 +4357,8 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      onEditLayerEffects={layer => {}}
-      onEditLightingLayer={layer => {}}
+      onEditLayerEffects={action('onEditLayerEffects')}
+      onEditLayer={action('onEditLayer')}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4328,8 +4379,8 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
-        onEditLayerEffects={layer => {}}
-        onEditLightingLayer={layer => {}}
+        onEditLayerEffects={action('onEditLayerEffects')}
+        onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4548,6 +4599,13 @@ storiesOf('AssetStore/ResourceStore', module)
         <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
       </ResourceStoreStateProvider>
     </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: svg (for icons)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('AssetStore/AssetCard', module)
@@ -4599,3 +4657,235 @@ storiesOf('AssetStore/AssetDetails', module)
       resourceSources={[]}
     />
   ));
+
+storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
+  .addDecorator(muiDecorator)
+  .add('in progress', () => (
+    <ResourceFetcherDialog
+      progress={40}
+      fetchedResources={null}
+      onAbandon={null}
+      onRetry={null}
+    />
+  ))
+  .add('with errors', () => (
+    <ResourceFetcherDialog
+      progress={100}
+      fetchedResources={{
+        fetchedResources: [],
+        erroredResources: [
+          {
+            resourceName: 'Player.png',
+            error: new Error('Fake download error'),
+          },
+          {
+            resourceName: 'Spaceship.png',
+            error: new Error('Another fake error'),
+          },
+        ],
+      }}
+      onAbandon={action('abandon')}
+      onRetry={action('retry')}
+    />
+  ));
+
+storiesOf('GameDashboard/GamesList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('without a project opened', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(200, [game1, game2])
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('without a project opened, long loading', () => {
+    const mock = new MockAdapter(axios, { delayResponse: 2500 });
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(200, [game1, game2])
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('with an error', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(500)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  });
+
+storiesOf('GameDashboard/GameCard', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <GameCard
+      game={game1}
+      isCurrentGame={false}
+      onOpenDetails={action('onOpenDetails')}
+      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenMonetization={action('onOpenMonetization')}
+    />
+  ))
+  .add('current game', () => (
+    <GameCard
+      game={game1}
+      isCurrentGame={true}
+      onOpenDetails={action('onOpenDetails')}
+      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenMonetization={action('onOpenMonetization')}
+    />
+  ));
+
+storiesOf('GameDashboard/GameDetailsDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('Error loading analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(500)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('Missing analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(404)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With partial analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetrics1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With analytics, long loading', () => {
+    const mock = new MockAdapter(axios, { delayResponse: 2000 });
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetrics1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  });

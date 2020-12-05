@@ -11,6 +11,9 @@ declare class gdProject extends gdObjectsContainer {
   getPackageName(): string;
   setOrientation(orientation: string): void;
   getOrientation(): string;
+  setProjectUuid(projectUuid: string): void;
+  getProjectUuid(): string;
+  resetProjectUuid(): void;
   setProjectFile(file: string): void;
   getProjectFile(): string;
   setGameResolutionSize(width: number, height: number): void;
@@ -28,6 +31,8 @@ declare class gdProject extends gdObjectsContainer {
   setMinimumFPS(fps: number): void;
   setFolderProject(enable: boolean): void;
   isFolderProject(): boolean;
+  setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
+  getUseDeprecatedZeroAsDefaultZOrder(): boolean;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getUsedExtensions(): gdVectorString;

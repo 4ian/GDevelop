@@ -8,6 +8,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -117,6 +118,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::ForEachEvent>());
+
+  extension.AddEvent("ForEachChildVariable",
+                     _("For each child variable (of a structure)"),
+                     _("Repeat the event for each child variable of a structure."),
+                     "",
+                     "res/foreach.png",
+                     std::make_shared<gd::ForEachChildVariableEvent>());
 
   extension.AddEvent("Group",
                      _("Group"),

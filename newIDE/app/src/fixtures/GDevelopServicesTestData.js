@@ -8,6 +8,8 @@ import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { type Game } from '../Utils/GDevelopServices/Game';
+import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { type UserProfile } from '../Profile/UserProfileContext';
 import {
   type AssetShortHeader,
@@ -84,8 +86,7 @@ export const fakeIndieUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNoSubscriptionUserProfile: UserProfile = {
@@ -100,8 +101,7 @@ export const fakeNoSubscriptionUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
@@ -116,8 +116,7 @@ export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNotAuthenticatedUserProfile: UserProfile = {
@@ -132,8 +131,7 @@ export const fakeNotAuthenticatedUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const release: Release = {
@@ -289,6 +287,10 @@ const spaceshipSerializedResources = [
   {
     alwaysLoaded: false,
     file: 'https://example.com/player-ship1.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship1.png',
+    },
     kind: 'image',
     metadata: '',
     name: 'player-ship1.png',
@@ -298,6 +300,10 @@ const spaceshipSerializedResources = [
   {
     alwaysLoaded: false,
     file: 'https://example.com/player-ship2.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship2.png',
+    },
     kind: 'image',
     metadata: '',
     name: 'player-ship2.png',
@@ -589,6 +595,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/FireBullet.json',
   headerUrl: 'Extensions/FireBullet-header.json',
   tags: 'fire, bullets, spawn, firerate',
+  previewIconUrl: 'http://example.com/icon.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };
@@ -603,6 +610,51 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: 'flash, blink, visible, invisible, hit, damage',
+  previewIconUrl: 'http://example.com/icon.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+};
+
+export const game1: Game = {
+  id: 'fake-game1-id',
+  authorName: 'My company',
+  gameName: 'My Great Game',
+  createdAt: 1606065498,
+};
+
+export const game2: Game = {
+  id: 'fake-game2-id',
+  authorName: 'My company',
+  gameName: 'My Other Game',
+  createdAt: 1607065498,
+};
+
+export const gameRollingMetrics1: GameMetrics = {
+  date: '2020-10-01',
+
+  sessions: {
+    d0Sessions: 350,
+  },
+  players: {
+    d0Players: 200,
+    d0NewPlayers: 220,
+  },
+  retention: {
+    d1RetainedPlayers: 193,
+    d2RetainedPlayers: 153,
+    d3RetainedPlayers: 121,
+    d4RetainedPlayers: 83,
+    d5RetainedPlayers: 74,
+    d6RetainedPlayers: 73,
+    d7RetainedPlayers: 67,
+  },
+};
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
+  date: '2020-10-01',
+
+  sessions: {
+    d0Sessions: 350,
+  },
+  players: null,
+  retention: null,
 };

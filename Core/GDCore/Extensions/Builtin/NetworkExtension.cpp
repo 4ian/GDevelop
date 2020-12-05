@@ -115,6 +115,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
 
   extension
       .AddAction(
+          "EnableMetrics",
+          _("Enable (or disable) metrics collection"),
+          _("Enable, or disable, the sending of anonymous data used to compute "
+            "the number of sessions and other metrics from your game "
+            "players.\nBe sure to only send metrics if in accordance with the "
+            "terms of service of your game and if they player gave their "
+            "consent, depending on how your game/company handles this."),
+          _("Enable analytics metrics: _PARAM1_"),
+          _("Network"),
+          "res/actions/net24.png",
+          "res/actions/net.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("yesorno", _("Enable the metrics?"));
+
+  extension
+      .AddAction(
           "JSONToVariableStructure",
           _("Convert JSON to a scene variable"),
           _("Parse a JSON object and store it into a scene variable"),

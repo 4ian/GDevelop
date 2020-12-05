@@ -21,6 +21,7 @@ import EventsFunctionsExtensionsContext, {
 import PlaceholderError from '../UI/PlaceholderError';
 import EmptyMessage from '../UI/EmptyMessage';
 import SearchbarWithChips from '../UI/SearchbarWithChips';
+import ListIcon from '../UI/ListIcon';
 import { addSerializedExtensionsToProject } from '../AssetStore/InstallAsset';
 
 type Props = {|
@@ -67,7 +68,7 @@ const filterExtensionShortHeaders = (
     );
 };
 
-const MAX_DISPLAYED_RESULTS = 20;
+const MAX_DISPLAYED_RESULTS = 40;
 
 /**
  * Display a list of extensions that the user can search in.
@@ -221,6 +222,13 @@ export default class ExtensionsSearch extends Component<Props, State> {
 
                         return (
                           <ListItem
+                            leftIcon={
+                              <ListIcon
+                                useExactIconSize
+                                iconSize={40}
+                                src={extensionShortHeader.previewIconUrl}
+                              />
+                            }
                             key={extensionShortHeader.name}
                             primaryText={
                               <span>

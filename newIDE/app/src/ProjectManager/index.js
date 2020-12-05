@@ -41,6 +41,7 @@ import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import FileCopy from '@material-ui/icons/FileCopy';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -48,6 +49,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -163,8 +165,7 @@ class Item extends React.Component<ItemProps, {||}> {
         defaultValue={this.props.primaryText}
         onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
+          if (shouldValidate(event)) {
             if (this.textField) this.textField.blur();
           }
         }}
@@ -275,6 +276,7 @@ type Props = {|
   onExportProject: () => void,
   onOpenPreferences: () => void,
   onOpenProfile: () => void,
+  onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
@@ -700,6 +702,12 @@ export default class ProjectManager extends React.Component<Props, State> {
           primaryText={<Trans>My profile</Trans>}
           leftIcon={<AccountCircle />}
           onClick={() => this.props.onOpenProfile()}
+        />
+        <ListItem
+          key="games-dashboard"
+          primaryText={<Trans>Published Games Dashboard</Trans>}
+          leftIcon={<TimelineIcon />}
+          onClick={() => this.props.onOpenGamesDashboard()}
         />
       </React.Fragment>
     );

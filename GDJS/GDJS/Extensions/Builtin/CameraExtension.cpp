@@ -81,6 +81,13 @@ CameraExtension::CameraExtension() {
   GetAllExpressions()["LayerTimeScale"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerTimeScale");
 
+  GetAllConditions()["LayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.getLayerDefaultZOrder");
+  GetAllActions()["SetLayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerDefaultZOrder");
+  GetAllExpressions()["LayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.getLayerDefaultZOrder");
+
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:
   /*

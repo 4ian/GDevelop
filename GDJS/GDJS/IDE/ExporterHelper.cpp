@@ -282,8 +282,12 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
                                      "167",
                                      "29",
                                      "58",
+                                     "87",
                                      "50",
-                                     "100"};
+                                     "20",
+                                     "100",
+                                     "167",
+                                     "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -339,6 +343,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
   }
 
+  // TODO: migrate the plugins to the package.json
   str =
       str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 

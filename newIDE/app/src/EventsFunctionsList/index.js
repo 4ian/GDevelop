@@ -127,7 +127,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     if (eventsFunction.getName() === newName) return;
 
     if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
-      showWarningBox('Another function with this name already exists.');
+      showWarningBox('Another function with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 

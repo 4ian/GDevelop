@@ -8,7 +8,7 @@
   }
 })(typeof self !== 'undefined' ? self : this, function (exports) {
   /**
-   * Tileset/Tilemap related data.
+   * The Tilesets that are ready to be used, indexed by their id.
    */
   const loadedTileSets = {};
 
@@ -19,23 +19,22 @@
   const createTileSetResource = (
     tiledData,
     tex,
-    requestedTileSetId,
     onLoad,
     getTexture,
     tilemapResourceName
   ) => {
     if (!tiledData.tiledversion) {
       console.warn(
-        "The json data doesn't contain a tiledversion key. Are you sure this file has been exported from mapeditor.org?"
+        "The json data doesn't contain a tiledversion key. Are you sure this file has been exported from Tiled Map Editor (mapeditor.org)?"
       );
       return; // TODO handle detecting and loading LDtk tilesets/maps
     }
-    // This assumes that the tileset is embedded in the tilemap, which it might not always be, so we need to check
+
+    // We only handle tileset embedded in the tilemap. Warn if it's not the case
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
-      console.warn(`
-        ${tilemapResourceName} doesn't appear to contain any tileset data.
-        Have you saved it in a sepparate Json file?
-      `);
+      console.warn(
+        `${tilemapResourceName} seems not to contain any tileset data. Have you saved it in a separate Json file?`
+      );
       return;
     }
     const {
@@ -60,10 +59,9 @@
       (tex.width !== 1 && expectedAtlasWidth !== tex.width) ||
       (tex.height !== 1 && expectedAtlasHeight !== tex.height)
     ) {
-      console.warn(`
-        Have you resized your atlas?
-        It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.
-      `);
+      console.warn(
+        `It seems the atlas file was resized, which is not supported. It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.`
+      );
       return;
     }
 
@@ -93,27 +91,26 @@
       tileWidth: tilewidth,
       tileHeight: tileheight,
       texture: tex,
-      textureCache,
+      textureCache: textureCache,
       layers: tiledData.layers,
-      tiles,
-      tilecount,
-      margin,
-      spacing,
+      tiles: tiles,
+      tilecount: tilecount,
+      margin: margin,
+      spacing: spacing,
     };
     onLoad(newTileset);
-    loadedTileSets[requestedTileSetId] = newTileset;
   };
-  exports.createTileSetResource = createTileSetResource;
 
   /**
-   * Decodes the layer data, which tiled can sometimes store as a compressed base64 string
-   * https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data
+   * Decodes a layer data, which can sometimes be store as a compressed base64 string
+   * by Tiled.
+   * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
    */
-  const decodeBase64 = (layer, pako) => {
+  const decodeBase64LayerData = (layer, pako) => {
     const { data, compression } = layer;
-    var index = 4,
-      arr = [],
-      step1 = atob(data)
+    let index = 4;
+    const decodedData = [];
+    let step1 = atob(data)
         .split('')
         .map(function (x) {
           return x.charCodeAt(0);
@@ -133,19 +130,19 @@
         0;
 
       if (compression === 'zlib') {
-        var binData = new Uint8Array(step1);
+        const binData = new Uint8Array(step1);
         step1 = pako.inflate(binData);
         while (index <= step1.length) {
-          arr.push(decodeArray(step1, index - 4));
+          decodedData.push(decodeArray(step1, index - 4));
           index += 4;
         }
       } else {
         while (index <= step1.length) {
-          arr.push(decodeString(step1, index - 4));
+          decodedData.push(decodeString(step1, index - 4));
           index += 4;
         }
       }
-      return arr;
+      return decodedData;
     } catch (error) {
       console.error(
         'Failed to decompress and unzip base64 layer.data string',
@@ -190,7 +187,7 @@
         let layerData = layer.data;
 
         if (layer.encoding === 'base64') {
-          layerData = decodeBase64(layer, pako);
+          layerData = decodeBase64LayerData(layer, pako);
           if (!layerData) {
             console.warn('Failed to uncompress layer.data');
             return;
@@ -228,9 +225,9 @@
     return loadedTileSets;
   };
   /**
-   * If a Tileset changes (json or image), a tilemap using it needs to re-render
-   * The tileset needs to be rebuilt for use
-   * But we need to have the capacity to instance a tilemap, so more than one tilemaps with different tileset layers
+   * If a Tileset changes (json or image), a tilemap using it needs to re-render.
+   * The tileset needs to be rebuilt for use.
+   * But we need to have the capacity to instance a tilemap, so more than one tilemap with different tileset layers
    * We need to cache the tileset somewhere, the tilemap instance will have to re-render it
    * Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
    * tileset id == tilemapResourceName + imageResourcename
@@ -246,6 +243,7 @@
     const requestedTileSetId = `${
       tilesetResourceName || tilemapResourceName
     }@${imageResourceName}`;
+
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
       onLoad(loadedTileSets[requestedTileSetId]);
@@ -256,8 +254,10 @@
     createTileSetResource(
       tiledData,
       texture,
-      requestedTileSetId,
-      onLoad,
+      (tileset) => {
+        loadedTileSets[requestedTileSetId] = tileset;
+        onLoad(tileset);
+      },
       getTexture,
       tilemapResourceName
     );

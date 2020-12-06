@@ -40,60 +40,65 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.incrementAnimationFrameX = funct
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = function (
+  tileMapJsonData,
   tilesetJsonData
 ) {
-  this._runtimeScene
-    .getGame()
-    .getJsonManager()
-    .loadJson(this._object._tilemapJsonFile, (error, content) => {
-      if (error || !content) {
-        console.error('An error happened while loading JSON resource:', error);
-        return;
+  PixiTileMapHelper.getPIXITileSet(
+    (textureName) =>
+      this._runtimeScene
+        .getGame()
+        .getImageManager()
+        .getPIXITexture(textureName),
+    tilesetJsonData
+      ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
+      : tileMapJsonData,
+    this._object._tilemapAtlasImage,
+    this._object._tilemapJsonFile,
+    this._object._tilesetJsonFile,
+    (tileset) => {
+      if (tileset && this._pixiObject) {
+        PixiTileMapHelper.updatePIXITileMap(
+          this._pixiObject,
+          tileset,
+          this._object._displayMode,
+          this._object._layerIndex,
+          pako
+        );
       }
-
-      PixiTileMapHelper.getPIXITileSet(
-        (textureName) =>
-          this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(textureName),
-        tilesetJsonData ? { ...content, tilesets: [tilesetJsonData] } : content,
-        this._object._tilemapAtlasImage,
-        this._object._tilemapJsonFile,
-        this._object._tilesetJsonFile,
-        (tileset) => {
-          if (tileset && this._pixiObject) {
-            PixiTileMapHelper.updatePIXITileMap(
-              this._pixiObject,
-              tileset,
-              this._object._displayMode,
-              this._object._layerIndex,
-              pako
-            );
-          }
-        }
-      );
-    });
+    }
+  );
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function () {
   this._runtimeScene
     .getGame()
     .getJsonManager()
-    .loadJson(this._object._tilemapJsonFile, (error, content) => {
-      if (error || !content) {
-        console.error('An error happened while loading JSON resource:', error);
+    .loadJson(this._object._tilemapJsonFile, (error, tileMapJsonData) => {
+      if (error) {
+        console.error(
+          'An error happened while loading a Tilemap JSON data:',
+          error
+        );
         return;
       }
+
       if (this._object._tilesetJsonFile) {
         this._runtimeScene
           .getGame()
           .getJsonManager()
-          .loadJson(this._object._tilesetJsonFile, (error, tilesetData) => {
-            this._loadTileMapWithTileset(tilesetData);
+          .loadJson(this._object._tilesetJsonFile, (error, tilesetJsonData) => {
+            if (error) {
+              console.error(
+                'An error happened while loading Tileset JSON data:',
+                error
+              );
+              return;
+            }
+
+            this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
           });
       } else {
-        this._loadTileMapWithTileset();
+        this._loadTileMapWithTileset(tileMapJsonData, null);
       }
     });
 };

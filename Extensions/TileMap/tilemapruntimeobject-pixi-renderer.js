@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * The PIXI.js renderer for the Tile map runtime object.
  *
@@ -101,10 +102,6 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function () {
         this._loadTileMapWithTileset(tileMapJsonData, null);
       }
     });
-};
-
-gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTilesetJsonFile = function () {
-  this._tilesetJsonFile = this._object._tilesetJsonFile;
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updatePosition = function () {

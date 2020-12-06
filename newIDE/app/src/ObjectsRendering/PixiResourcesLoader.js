@@ -1,5 +1,6 @@
 // @flow
 import slugs from 'slugs';
+import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
@@ -219,5 +220,18 @@ export default class PixiResourcesLoader {
 
   static getInvalidPIXITexture() {
     return invalidTexture;
+  }
+
+  /**
+   * Get the the data from a json resource in the IDE.
+   */
+  static getResourceJsonData(project: gdProject, resourceName: string) {
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return Promise.reject();
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'json') return Promise.reject();
+    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName);
+    return axios.get(fullUrl).then(response => response.data);
   }
 }

@@ -15,6 +15,7 @@ import * as PIXI from 'pixi.js-legacy';
 import optionalRequire from '../Utils/OptionalRequire';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
+global.PIXI = PIXI;
 const gd: libGDevelop = global.gd;
 
 const requirableModules = {};

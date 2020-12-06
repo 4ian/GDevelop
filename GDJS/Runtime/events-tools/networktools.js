@@ -149,13 +149,17 @@ gdjs.evtTools.network.objectVariableStructureToJSON = function (
 };
 
 gdjs.evtTools.network._objectToVariable = function (obj, variable) {
-  if (obj == null) {
+  if (obj === null) {
     variable.setString("null");
   } else if (!isNaN(obj)) {
-    //Number
     variable.setNumber(obj);
   } else if (typeof obj == 'string' || obj instanceof String) {
     variable.setString(obj);
+  } else if (typeof obj === "undefined") {
+    // Do not modify the variable, as there is no value to set it to.
+  } else if (typeof obj === "boolean") {
+    // Convert boolean to string.
+    variable.setString("" + obj);
   } else if (Array.isArray(obj)) {
     for (var i = 0; i < obj.length; ++i) {
       gdjs.evtTools.network._objectToVariable(
@@ -163,12 +167,22 @@ gdjs.evtTools.network._objectToVariable = function (obj, variable) {
         variable.getChild(i.toString())
       );
     }
-  } else {
+  } else if (typeof obj === "object") {
     for (var p in obj) {
       if (obj.hasOwnProperty(p)) {
         gdjs.evtTools.network._objectToVariable(obj[p], variable.getChild(p));
       }
     }
+  } else if (typeof obj === "symbol") {
+    variable.setString(obj.toString());
+  } else if (typeof obj === "bigint") {
+    if(obj > Number.MAX_SAFE_INTEGER) 
+      console.warn("Integers bigger than " + Number.MAX_SAFE_INTEGER + " aren't supported by variables, it will be reduced to that size.");
+    variable.setNumber(parseInt(obj, 10));
+  } else if (typeof obj === "function") {
+    console.error("Error: Impossible to set variable value to a function.")
+  } else {
+    console.error("Cannot identify type of object:", obj);
   }
 };
 

@@ -20,13 +20,18 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'TileMap',
-        _('TileMap Object'),
-        _('Displays a tilemap (mapeditor.org supported).'),
+        _('Tile Map'),
+        _(
+          'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
+        ),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
@@ -57,21 +62,23 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
           .setType('resource')
           .addExtraInfo('json')
-          .setLabel(_('Tilemap json file'))
+          .setLabel(_('Tilemap JSON file'))
+          .setDescription(_('This is the JSON file that was saved or exported from Tiled.'))
       );
       objectProperties.set(
         'tilesetJsonFile',
         new gd.PropertyDescriptor(objectContent.tilesetJsonFile)
           .setType('resource')
           .addExtraInfo('json')
-          .setLabel(_('Tileset json file'))
+          .setLabel(_('Tileset JSON file (optional)'))
+          .setDescription(_('Optional, don\'t specify it if you\'ve not saved the tileset in a different file.'))
       );
       objectProperties.set(
         'tilemapAtlasImage',
         new gd.PropertyDescriptor(objectContent.tilemapAtlasImage)
           .setType('resource')
           .addExtraInfo('image')
-          .setLabel(_('Tilemap atlas image'))
+          .setLabel(_('Atlas image'))
       );
       objectProperties.set(
         'displayMode',
@@ -86,7 +93,8 @@ module.exports = {
         'layerIndex',
         new gd.PropertyDescriptor(objectContent.layerIndex.toString())
           .setType('number')
-          .setLabel(_('Layer index'))
+          .setLabel(_('Layer index to display'))
+          .setDescription(_('If "index" is selected as the display mode, this is the index of the layer to display.'))
       );
       objectProperties.set(
         'animationSpeedScale',
@@ -98,7 +106,7 @@ module.exports = {
         'animationFps',
         new gd.PropertyDescriptor(objectContent.animationFps.toString())
           .setType('number')
-          .setLabel(_('Animation fps'))
+          .setLabel(_('Animation FPS'))
       );
 
       return objectProperties;
@@ -140,8 +148,10 @@ module.exports = {
     const object = extension
       .addObject(
         'TileMap',
-        _('TileMap'),
-        _('Displays a tilemap (mapeditor.org supported)'),
+        _('Tile Map'),
+        _(
+          'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
+        ),
         'JsPlatform/Extensions/tile_map32.png',
         objectTileMap
       )
@@ -403,7 +413,10 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
   /**

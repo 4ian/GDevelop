@@ -531,10 +531,7 @@ module.exports = {
       );
     };
 
-    /**
-     * This is called to update the TileMap
-     */
-    RenderedTileMapInstance.prototype.updateTileMap = function () {
+    RenderedTileMapInstance.prototype.updateTileMap = async function () {
       // Get the tileset resource to use
       const tilemapJsonFile = this._associatedObject
         .getProperties(this.project)
@@ -545,19 +542,23 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      this._pixiResourcesLoader
-        .getResourceJsonData(this._project, tilemapJsonFile)
-        .then((tileMapJsonData) => {
-          if (tilesetJsonFile) {
-            this._pixiResourcesLoader
-              .getResourceJsonData(this._project, tilesetJsonFile)
-              .then((tilesetJsonData) => {
-                this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
-              });
-          } else {
-            this._loadTileMapWithTileset(tileMapJsonData);
-          }
-        });
+      try {
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+          this._project,
+          tilemapJsonFile
+        );
+
+        const tilesetJsonData = tilesetJsonFile
+          ? await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilesetJsonFile
+            )
+          : null;
+
+        this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
+      } catch (err) {
+        console.error('Unable to load a Tilemap JSON data: ', err);
+      }
     };
     /**
      * This is called to update the PIXI object on the scene editor

@@ -1,11 +1,12 @@
 /**
- * Displays a tilemap (mapeditor.org supported).
+ * Displays a Tilemap object (mapeditor.org supported).
  * @memberof gdjs
  * @class TileMapRuntimeObject
  * @extends RuntimeObject
  */
 gdjs.TileMapRuntimeObject = function (runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+
   this._frameElapsedTime = 0;
 
   /** @type {number} */
@@ -53,9 +54,10 @@ gdjs.TileMapRuntimeObject.prototype.update = function (runtimeScene) {
     this._frameElapsedTime -= 1 / this._animationFps;
   }
 };
+
 /**
- * @param { TileMapObjectDataType} oldObjectData
- * @param { TileMapObjectDataType} newObjectData
+ * @param {TileMapObjectDataType} oldObjectData
+ * @param {TileMapObjectDataType} newObjectData
  */
 gdjs.TileMapRuntimeObject.prototype.updateFromObjectData = function (
   oldObjectData,
@@ -162,6 +164,7 @@ gdjs.TileMapRuntimeObject.prototype.setLayerIndex = function (layerIndex) {
 gdjs.TileMapRuntimeObject.prototype.getLayerIndex = function () {
   return this._layerIndex;
 };
+
 gdjs.TileMapRuntimeObject.prototype.setAnimationSpeedScale = function (
   animationSpeedScale
 ) {

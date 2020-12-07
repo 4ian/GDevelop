@@ -2,7 +2,7 @@
  * Displays a Tilemap object (mapeditor.org supported).
  * @memberof gdjs
  * @class TileMapRuntimeObject
- * @extends RuntimeObject
+ * @extends gdjs.RuntimeObject
  */
 gdjs.TileMapRuntimeObject = function (runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);

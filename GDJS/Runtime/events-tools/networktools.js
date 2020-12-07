@@ -151,9 +151,9 @@ gdjs.evtTools.network.objectVariableStructureToJSON = function (
 gdjs.evtTools.network._objectToVariable = function (obj, variable) {
   if (obj === null) {
     variable.setString("null");
-  } else if (!isNaN(obj)) {
+  } else if ((typeof obj === "number" || typeof obj === "string") && !isNaN(obj)) {
     variable.setNumber(obj);
-  } else if (typeof obj == 'string' || obj instanceof String) {
+  } else if (typeof obj === 'string' || obj instanceof String) {
     variable.setString(obj);
   } else if (typeof obj === "undefined") {
     // Do not modify the variable, as there is no value to set it to.
@@ -175,6 +175,9 @@ gdjs.evtTools.network._objectToVariable = function (obj, variable) {
     }
   } else if (typeof obj === "symbol") {
     variable.setString(obj.toString());
+  } else if (typeof obj === "number" && isNaN(obj)) {
+    console.warning("Variables cannot be set to NaN, setting it to 0.")
+    variable.setNumber(0);
   } else if (typeof obj === "bigint") {
     if(obj > Number.MAX_SAFE_INTEGER) 
       console.warn("Integers bigger than " + Number.MAX_SAFE_INTEGER + " aren't supported by variables, it will be reduced to that size.");

@@ -497,7 +497,7 @@ module.exports = {
           .getProperties(this.project)
           .get('layerIndex')
           .getValue(),
-        0
+        10
       );
       const displayMode = this._associatedObject
         .getProperties(this.project)
@@ -563,55 +563,6 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedTileMapInstance.prototype.update = function () {
-      const tilemapJsonFile = this._associatedObject
-        .getProperties(this.project)
-        .get('tilemapJsonFile')
-        .getValue();
-      if (this._pixiObject.tilemapJsonFile !== tilemapJsonFile)
-        this._pixiObject.tilemapJsonFile = tilemapJsonFile;
-
-      const tilesetJsonFile = this._associatedObject
-        .getProperties(this.project)
-        .get('tilesetJsonFile')
-        .getValue();
-      if (this._pixiObject.tilesetJsonFile !== tilesetJsonFile)
-        this._pixiObject.tilesetJsonFile = tilesetJsonFile;
-
-      const tilemapAtlasImage = this._associatedObject
-        .getProperties(this.project)
-        .get('tilemapAtlasImage')
-        .getValue();
-      if (this._pixiObject.tilemapAtlasImage !== tilemapAtlasImage)
-        this._pixiObject.tilemapAtlasImage = tilemapAtlasImage;
-
-      const displayMode = this._associatedObject
-        .getProperties(this.project)
-        .get('displayMode')
-        .getValue();
-      if (this._pixiObject.displayMode !== displayMode)
-        this._pixiObject.displayMode = displayMode;
-
-      const layerIndex = this._associatedObject
-        .getProperties(this.project)
-        .get('layerIndex')
-        .getValue();
-      if (this._pixiObject.layerIndex !== layerIndex)
-        this._pixiObject.layerIndex = layerIndex;
-
-      const animationSpeedScale = this._associatedObject
-        .getProperties(this.project)
-        .get('animationSpeedScale')
-        .getValue();
-      if (this._pixiObject.animationSpeedScale !== animationSpeedScale)
-        this._pixiObject.animationSpeedScale = animationSpeedScale;
-
-      const animationFps = this._associatedObject
-        .getProperties(this.project)
-        .get('animationFps')
-        .getValue();
-      if (this._pixiObject.animationFps !== animationFps)
-        this._pixiObject.animationFps = animationFps;
-
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();
         this._pixiObject.height = this._instance.getCustomHeight();

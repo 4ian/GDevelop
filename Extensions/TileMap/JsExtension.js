@@ -74,19 +74,19 @@ module.exports = {
       );
       objectProperties.set(
         'layerIndex',
-        new gd.PropertyDescriptor(objectContent.layerIndex?.toString())
+        new gd.PropertyDescriptor(objectContent.layerIndex.toString())
           .setType('number')
           .setLabel(_('Layer index'))
       );
       objectProperties.set(
         'animationSpeedScale',
-        new gd.PropertyDescriptor(objectContent.animationSpeedScale?.toString())
+        new gd.PropertyDescriptor(objectContent.animationSpeedScale.toString())
           .setType('number')
           .setLabel(_('Animation speed scale'))
       );
       objectProperties.set(
         'animationFps',
-        new gd.PropertyDescriptor(objectContent.animationFps?.toString())
+        new gd.PropertyDescriptor(objectContent.animationFps.toString())
           .setType('number')
           .setLabel(_('Animation fps'))
       );

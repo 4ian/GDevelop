@@ -28,7 +28,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'TileMap',
-        _('Tile Map'),
+        _('Tilemap'),
         _(
           'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
         ),
@@ -148,7 +148,7 @@ module.exports = {
     const object = extension
       .addObject(
         'TileMap',
-        _('Tile Map'),
+        _('Tilemap'),
         _(
           'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
         ),
@@ -168,66 +168,66 @@ module.exports = {
     object
       .addCondition(
         'TilemapJsonFile',
-        _('Tilemap json file'),
-        _('Compare the value of the tilemap json file.'),
+        _('Tilemap JSON file'),
+        _('Compare the value of the Tilemap JSON file.'),
         _('Json file of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap json file'), '', false)
+      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilemapJsonFile');
 
     object
       .addAction(
         'SetTilemapJsonFile',
-        _('Tilemap json file'),
-        _('Set the json file with the tilemap data (mapeditor.org supported)'),
-        _('Set the tilemap json file of _PARAM0_ to _PARAM1_'),
+        _('Tilemap JSON file'),
+        _('Set the JSON file containing the Tilemap data to display. This is usually the JSON file exported from Tiled.'),
+        _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap json file'), '', false)
+      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilemapJsonFile')
-      .setGetter('getTilemapJsonFile');
+      .setGetter('getTilemapJsonFile'); // TODO: remove this useless Getter.
 
     object
       .addCondition(
         'TilesetJsonFile',
-        _('Tileset json file'),
-        _('Compare the value of the tileset json file.'),
-        _('The tileset json file of _PARAM0_ is _PARAM1_'),
+        _('Tileset JSON file'),
+        _('Compare the value of the tileset JSON file.'),
+        _('The tileset JSON file of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset json file'), '', false)
+      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilesetJsonFile');
 
     object
       .addAction(
         'SetTilesetJsonFile',
-        _('Tileset json file'),
+        _('Tileset JSON file'),
         _(
-          'Set the json file with the tileset data (sometimes that is embeded in the tilemap, so not needed)'
+          'Set the JSON file with the tileset data (sometimes that is embeded in the Tilemap, so not needed)'
         ),
-        _('Set the tileset json file of _PARAM0_ to _PARAM1_'),
+        _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset json file'), '', false)
+      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilesetJsonFile')
-      .setGetter('getTilesetJsonFile');
+      .setGetter('getTilesetJsonFile'); // TODO: remove this useless Getter.
 
     object
       .addCondition(
@@ -268,14 +268,14 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('setDisplayMode')
-      .setGetter('getDisplayMode');
+      .setGetter('getDisplayMode'); // TODO: remove this useless Getter.
 
     object
       .addCondition(
         'LayerIndex',
         _('Layer index'),
         _('Compare the value of the layer index.'),
-        _('The layer index'),
+        _('the layer index'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -289,7 +289,7 @@ module.exports = {
       .addAction(
         'SetLayerIndex',
         _('Layer index'),
-        _('Set the layer index of the tilemap.'),
+        _('Set the layer index of the Tilemap.'),
         _('the layer index'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -304,8 +304,8 @@ module.exports = {
     object
       .addExpression(
         'LayerIndex',
-        _('Get the Layer index'),
-        _('Get the Layer index'),
+        _('Layer index'),
+        _('Get the layer index being displayed'),
         '',
         'JsPlatform/Extensions/tile_map32.png'
       )
@@ -316,9 +316,9 @@ module.exports = {
     object
       .addCondition(
         'animationSpeedScale',
-        _('Animation speed'),
-        _('Compare the value of the animation speed.'),
-        _('The animation speed'),
+        _('Animation speed scale'),
+        _('Compare the value of the animation speed scale.'),
+        _('the animation speed scale'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -331,9 +331,9 @@ module.exports = {
     object
       .addAction(
         'SetAnimationSpeedScale',
-        _('Animation speed'),
-        _('Set the animation speed scale of the tilemap (1 by default).'),
-        _('the animation speed'),
+        _('Animation speed scale'),
+        _('Set the animation speed scale of the Tilemap (1 by default).'),
+        _('the animation speed scale'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -347,8 +347,8 @@ module.exports = {
     object
       .addExpression(
         'animationSpeedScale',
-        _('Get the Animation speed'),
-        _('Get the Animation speed'),
+        _('Animation speed scale'),
+        _('Get the Animation speed scale'),
         '',
         'JsPlatform/Extensions/tile_map32.png'
       )
@@ -359,9 +359,9 @@ module.exports = {
     object
       .addCondition(
         'AnimationFps',
-        _('Animation fps'),
-        _('Compare the value of the animation fps.'),
-        _('The animation fps'),
+        _('Animation FPS'),
+        _('Compare the value of the animation FPS.'),
+        _('the animation FPS'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -374,9 +374,9 @@ module.exports = {
     object
       .addAction(
         'SetAnimationFps',
-        _('Animation fps'),
-        _('Set the animation fps of the tilemap (4 by default).'),
-        _('the animation fps'),
+        _('Animation FPS'),
+        _('Set the animation FPS of the Tilemap (4 by default).'),
+        _('the animation FPS'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -390,8 +390,8 @@ module.exports = {
     object
       .addExpression(
         'AnimationFps',
-        _('Get the Animation fps'),
-        _('Get the Animation fps'),
+        _('Animation FPS'),
+        _('Get the animation FPS'),
         '',
         'JsPlatform/Extensions/tile_map32.png'
       )
@@ -506,7 +506,7 @@ module.exports = {
     };
 
     /**
-     * This is used to reload the tilemap
+     * This is used to reload the Tilemap
      */
     RenderedTileMapInstance.prototype._loadTileMapWithTileset = function (
       tileMapJsonData,

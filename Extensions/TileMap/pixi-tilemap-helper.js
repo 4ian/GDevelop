@@ -1,10 +1,12 @@
 // @ts-check
 (function (root, factory) {
+  // @ts-ignore
   if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
     // CommonJS
     factory(exports);
   } else {
     // Browser globals
+    // @ts-ignore
     factory((root.PixiTileMapHelper = {}));
   }
 })(typeof self !== 'undefined' ? self : this, function (exports) {

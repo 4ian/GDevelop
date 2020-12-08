@@ -169,8 +169,8 @@ module.exports = {
       .addCondition(
         'TilemapJsonFile',
         _('Tilemap JSON file'),
-        _('Compare the value of the Tilemap JSON file.'),
-        _('Json file of _PARAM0_ is _PARAM1_'),
+        _('Check the Tilemap JSON file being used.'),
+        _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -193,14 +193,13 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setTilemapJsonFile')
-      .setGetter('getTilemapJsonFile'); // TODO: remove this useless Getter.
+      .setFunctionName('setTilemapJsonFile');
 
     object
       .addCondition(
         'TilesetJsonFile',
         _('Tileset JSON file'),
-        _('Compare the value of the tileset JSON file.'),
+        _('Check the tileset JSON file being used.'),
         _('The tileset JSON file of _PARAM0_ is _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -226,8 +225,7 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .addParameter('jsonResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setTilesetJsonFile')
-      .setGetter('getTilesetJsonFile'); // TODO: remove this useless Getter.
+      .setFunctionName('setTilesetJsonFile');
 
     object
       .addCondition(
@@ -253,8 +251,8 @@ module.exports = {
       .addAction(
         'SetDisplayMode',
         _('Display mode'),
-        _('Set the Display mode'),
-        _('Set display mode of _PARAM0_ to _PARAM1_'),
+        _('Set the display mode'),
+        _('Set the display mode of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -267,8 +265,7 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('setDisplayMode')
-      .setGetter('getDisplayMode'); // TODO: remove this useless Getter.
+      .setFunctionName('setDisplayMode');
 
     object
       .addCondition(
@@ -315,9 +312,9 @@ module.exports = {
 
     object
       .addCondition(
-        'animationSpeedScale',
+        'AnimationSpeedScale',
         _('Animation speed scale'),
-        _('Compare the value of the animation speed scale.'),
+        _('Compare the animation speed scale.'),
         _('the animation speed scale'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -346,7 +343,7 @@ module.exports = {
 
     object
       .addExpression(
-        'animationSpeedScale',
+        'AnimationSpeedScale',
         _('Animation speed scale'),
         _('Get the Animation speed scale'),
         '',
@@ -359,9 +356,9 @@ module.exports = {
     object
       .addCondition(
         'AnimationFps',
-        _('Animation FPS'),
-        _('Compare the value of the animation FPS.'),
-        _('the animation FPS'),
+        _('Animation speed (FPS)'),
+        _('Compare the animation speed (in frames per second).'),
+        _('the animation speed (FPS)'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -374,9 +371,9 @@ module.exports = {
     object
       .addAction(
         'SetAnimationFps',
-        _('Animation FPS'),
-        _('Set the animation FPS of the Tilemap (4 by default).'),
-        _('the animation FPS'),
+        _('Animation speed (FPS)'),
+        _('Set the animation speed (in frames per second) of the Tilemap.'),
+        _('the animation speed (FPS)'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
@@ -390,8 +387,8 @@ module.exports = {
     object
       .addExpression(
         'AnimationFps',
-        _('Animation FPS'),
-        _('Get the animation FPS'),
+        _('Animation speed (FPS)'),
+        _('Get the animation speed (in frames per second)'),
         '',
         'JsPlatform/Extensions/tile_map32.png'
       )

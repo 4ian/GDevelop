@@ -482,7 +482,6 @@ module.exports = {
       );
 
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
-      this._tileSet = null;
       this._pixiContainer.addChild(this._pixiObject);
       this.update();
       this.updateTileMap();

@@ -63,7 +63,9 @@ module.exports = {
           .setType('resource')
           .addExtraInfo('json')
           .setLabel(_('Tilemap JSON file'))
-          .setDescription(_('This is the JSON file that was saved or exported from Tiled.'))
+          .setDescription(
+            _('This is the JSON file that was saved or exported from Tiled.')
+          )
       );
       objectProperties.set(
         'tilesetJsonFile',
@@ -71,7 +73,11 @@ module.exports = {
           .setType('resource')
           .addExtraInfo('json')
           .setLabel(_('Tileset JSON file (optional)'))
-          .setDescription(_('Optional, don\'t specify it if you\'ve not saved the tileset in a different file.'))
+          .setDescription(
+            _(
+              "Optional, don't specify it if you've not saved the tileset in a different file."
+            )
+          )
       );
       objectProperties.set(
         'tilemapAtlasImage',
@@ -94,7 +100,11 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.layerIndex.toString())
           .setType('number')
           .setLabel(_('Layer index to display'))
-          .setDescription(_('If "index" is selected as the display mode, this is the index of the layer to display.'))
+          .setDescription(
+            _(
+              'If "index" is selected as the display mode, this is the index of the layer to display.'
+            )
+          )
       );
       objectProperties.set(
         'animationSpeedScale',
@@ -184,7 +194,9 @@ module.exports = {
       .addAction(
         'SetTilemapJsonFile',
         _('Tilemap JSON file'),
-        _('Set the JSON file containing the Tilemap data to display. This is usually the JSON file exported from Tiled.'),
+        _(
+          'Set the JSON file containing the Tilemap data to display. This is usually the JSON file exported from Tiled.'
+        ),
         _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
         '',
         'JsPlatform/Extensions/tile_map24.png',
@@ -482,6 +494,27 @@ module.exports = {
       );
 
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
+
+      // Implement `containsPoint` so that we can set `interactive` to true and
+      // the Tilemap will properly emit events when hovered/clicked.
+      // By default, this is not implemented in pixi-tilemap.
+      this._pixiObject.containsPoint = (position) => {
+        // Turns the world position to the local object coordinates
+        const localPosition = new PIXI.Point();
+        this._pixiObject.worldTransform.applyInverse(position, localPosition);
+
+        // Check if the point is inside the object bounds
+        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
+        const originalHeight =
+          this._pixiObject.height / this._pixiObject.scale.y;
+
+        return (
+          localPosition.x >= 0 &&
+          localPosition.x < originalWidth &&
+          localPosition.y >= 0 &&
+          localPosition.y < originalHeight
+        );
+      };
       this._pixiContainer.addChild(this._pixiObject);
       this.update();
       this.updateTileMap();

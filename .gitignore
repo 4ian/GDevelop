@@ -60,3 +60,4 @@
 **/node_modules/
 .idea
 .vscode/ipch
+/newIDE/app/src/UI/Theme/**/*ThemeVariables.*

@@ -78,7 +78,7 @@ npm run format # or yarn format
 
 ### Theming
 
-It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
+It's pretty easy to create new themes. Check the [README about themes](./README-themes.md)
 
 ### Development of the game engine or extensions.
 

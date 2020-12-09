@@ -1,0 +1,28 @@
+{
+  "gdevelop": {
+    "color": {
+      "light-blue": {
+        "value": "#4ab0e4"
+      },
+      "blue": {
+        "value": "#2c6bf5"
+      },
+      "dark-blue": {
+        "value": "#3c4698"
+      },
+      "purple": {
+        "value": "#9100ce"
+      },
+      "contrast-text": {
+        "value": "#fff"
+      },
+      "selection": {
+        "value": "#4c92ff",
+        "comment": "OS X selection"
+      }
+    },
+    "font-family": {
+      "value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'"
+    }
+  }
+}

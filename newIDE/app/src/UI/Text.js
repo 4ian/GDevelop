@@ -18,7 +18,7 @@ type Props = {|
     // Allow to specify that the text should break words
     overflow?: 'hidden',
     overflowWrap?: 'break-word',
-    whiteSpace?: 'nowrap',
+    whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
     // Allow to expand the text

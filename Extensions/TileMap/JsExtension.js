@@ -566,7 +566,7 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      PixiTilemapHelper.getPIXITileSet(
+      const tileset = PixiTilemapHelper.getPIXITileSet(
         (textureName) =>
           this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
         tilesetJsonData
@@ -574,19 +574,18 @@ module.exports = {
           : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
-        tilesetJsonFile,
-        (tileset) => {
-          if (tileset && this._pixiObject) {
-            PixiTilemapHelper.updatePIXITileMap(
-              this._pixiObject,
-              tileset,
-              displayMode,
-              layerIndex,
-              pako
-            );
-          }
-        }
+        tilesetJsonFile
       );
+
+      if (tileset) {
+        PixiTilemapHelper.updatePIXITileMap(
+          this._pixiObject,
+          tileset,
+          displayMode,
+          layerIndex,
+          pako
+        );
+      }
     };
 
     RenderedTileMapInstance.prototype.updateTileMap = async function () {

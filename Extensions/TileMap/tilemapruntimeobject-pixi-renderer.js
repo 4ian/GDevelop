@@ -16,8 +16,8 @@ gdjs.TileMapRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   if (this._pixiObject === undefined) {
     // @ts-ignore - pixi-tilemap types to be added.
     this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
-    this._pixiObject.tileAnim = [0, 0];
   }
+  this._pixiObject.tileAnim = [0, 0];
 
   runtimeScene
     .getLayer('')
@@ -48,7 +48,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
   tilesetJsonData
 ) {
   // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-  PixiTileMapHelper.getPIXITileSet(
+  const tileset = PixiTileMapHelper.getPIXITileSet(
     (textureName) =>
       this._runtimeScene
         .getGame()
@@ -60,21 +60,20 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
       : tileMapJsonData,
     this._object._tilemapAtlasImage,
     this._object._tilemapJsonFile,
-    this._object._tilesetJsonFile,
-    (tileset) => {
-      if (tileset && this._pixiObject) {
-        // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-        PixiTileMapHelper.updatePIXITileMap(
-          this._pixiObject,
-          tileset,
-          this._object._displayMode,
-          this._object._layerIndex,
-          // @ts-ignore - TODO: Add typings for pako.
-          pako
-        );
-      }
-    }
+    this._object._tilesetJsonFile
   );
+
+  if (tileset) {
+    // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
+    PixiTileMapHelper.updatePIXITileMap(
+      this._pixiObject,
+      tileset,
+      this._object._displayMode,
+      this._object._layerIndex,
+      // @ts-ignore - TODO: Add typings for pako.
+      pako
+    );
+  }
 };
 
 gdjs.TileMapRuntimeObjectPixiRenderer.prototype.updateTileMap = function () {

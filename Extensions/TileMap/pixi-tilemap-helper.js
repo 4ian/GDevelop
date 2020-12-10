@@ -22,7 +22,6 @@
   const createTileSetResource = (
     tiledData,
     tex,
-    onLoad,
     getTexture,
     tilemapResourceName
   ) => {
@@ -30,7 +29,7 @@
       console.warn(
         "The json data doesn't contain a tiledversion key. Are you sure this file has been exported from Tiled Map Editor (mapeditor.org)?"
       );
-      return; // TODO handle detecting and loading LDtk tilesets/maps
+      return null; // TODO handle detecting and loading LDtk tilesets/maps
     }
 
     // We only handle tileset embedded in the tilemap. Warn if it's not the case
@@ -38,8 +37,9 @@
       console.warn(
         `${tilemapResourceName} seems not to contain any tileset data. Have you saved it in a separate Json file?`
       );
-      return;
+      return null;
     }
+
     const {
       tilewidth,
       tileheight,
@@ -65,7 +65,7 @@
       console.warn(
         `It seems the atlas file was resized, which is not supported. It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.`
       );
-      return;
+      return null;
     }
 
     const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
@@ -88,6 +88,7 @@
         return null;
       }
     });
+
     const newTileset = {
       width: tex.width,
       height: tex.height,
@@ -101,7 +102,7 @@
       margin: margin,
       spacing: spacing,
     };
-    onLoad(newTileset);
+    return newTileset;
   };
 
   /**
@@ -114,10 +115,10 @@
     let index = 4;
     const decodedData = [];
     let step1 = atob(data)
-        .split('')
-        .map(function (x) {
-          return x.charCodeAt(0);
-        });
+      .split('')
+      .map(function (x) {
+        return x.charCodeAt(0);
+      });
     try {
       const decodeString = (str, index) =>
         (str.charCodeAt(index) +
@@ -224,9 +225,11 @@
       }
     });
   };
+
   exports.getLoadedTileSets = () => {
     return loadedTileSets;
   };
+
   /**
    * If a Tileset changes (json or image), a tilemap using it needs to re-render.
    * The tileset needs to be rebuilt for use.
@@ -240,29 +243,25 @@
     tiledData,
     imageResourceName,
     tilemapResourceName,
-    tilesetResourceName,
-    onLoad
+    tilesetResourceName
   ) => {
-    const requestedTileSetId = `${
-      tilesetResourceName || tilemapResourceName
-    }@${imageResourceName}`;
+    const requestedTileSetId =
+      (tilesetResourceName || tilemapResourceName) + '@' + imageResourceName;
 
     // If the tileset is already in the cache, just load it
     if (loadedTileSets[requestedTileSetId]) {
-      onLoad(loadedTileSets[requestedTileSetId]);
-      return;
+      return loadedTileSets[requestedTileSetId];
     }
 
     const texture = imageResourceName ? getTexture(imageResourceName) : null; // we do this because gdevelop doesnt return a null when it fails to load textures
-    createTileSetResource(
+    const tileset = createTileSetResource(
       tiledData,
       texture,
-      (tileset) => {
-        loadedTileSets[requestedTileSetId] = tileset;
-        onLoad(tileset);
-      },
       getTexture,
       tilemapResourceName
     );
+
+    if (tileset) loadedTileSets[requestedTileSetId] = tileset;
+    return tileset;
   };
 });

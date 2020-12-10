@@ -48,7 +48,7 @@ export default class Tutorials extends PureComponent {
                 onClick={() => {
                   sendTutorialOpened('Platformer');
                   Window.openExternalURL(
-                    getHelpLink('/tutorials/platform-game/start')
+                    getHelpLink('/tutorials/platformer/start')
                   );
                 }}
               />

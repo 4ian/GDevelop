@@ -57,6 +57,11 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Firebase',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Firebase/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
     objectsRenderingServiceModules: {},

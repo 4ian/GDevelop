@@ -1501,6 +1501,10 @@ module.exports = {
       }
     ]
   },
+  "firebase-example": {
+    "description": "A twitter-like social network called \"Not Twitter\" using Firestore, and showcase of some other features of Firebase.",
+    "usedExtensions": []
+  },
   "flappy-bird": {
     "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
     "usedExtensions": [

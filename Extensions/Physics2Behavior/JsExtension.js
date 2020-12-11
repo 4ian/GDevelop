@@ -2736,7 +2736,9 @@ module.exports = {
       .addAction(
         'AddMouseJoint',
         _('Add mouse joint'),
-        _('Add a mouse joint between two joints.'),
+        _(
+          'Add a mouse joint to an object (makes the object move towards a specific point).'
+        ),
         _('Add a mouse joint to _PARAM0_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',

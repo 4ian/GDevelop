@@ -125,12 +125,7 @@ gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
 
   // Resume the tween, and add it back to the scene of living tweens
   // (the invariant is that scene only contains tweens being played).
-  tween.instance.resume().catch(function() {
-    // Do nothing if the Promise is rejected. Rejection is used
-    // by Shifty.js to signal that the tween was not finished.
-    // We catch it to avoid an uncaught promise error, and to
-    // ensure that the content of the "then" is always applied:
-  });
+  tween.instance.resume();
   if (this._runtimeScene.shiftyJsScene) {
     this._runtimeScene.shiftyJsScene.add(tween.instance);
   }
@@ -180,12 +175,6 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
   if (destroyObjectWhenFinished) {
     this._tweens[identifier].instance
       .tween()
-      .catch(function() {
-        // Do nothing if the Promise is rejected. Rejection is used
-        // by Shifty.js to signal that the tween was not finished.
-        // We catch it to avoid an uncaught promise error, and to
-        // ensure that the content of the "then" is always applied:
-      })
       .then(function() {
         that._removeObjectFromScene(identifier);
       })
@@ -198,12 +187,6 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
   } else {
     this._tweens[identifier].instance
       .tween()
-      .catch(function() {
-        // Do nothing if the Promise is rejected. Rejection is used
-        // by Shifty.js to signal that the tween was not finished.
-        // We catch it to avoid an uncaught promise error, and to
-        // ensure that the content of the "then" is always applied:
-      })
       .then(function() {
         if (that._tweens[identifier]) {
           that._tweens[identifier].hasFinished = true;

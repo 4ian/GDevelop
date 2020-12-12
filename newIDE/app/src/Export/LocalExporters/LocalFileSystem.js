@@ -4,6 +4,12 @@ var path = optionalRequire('path');
 var os = optionalRequire('os');
 const gd /* TODO: add flow in this file */ = global.gd;
 
+/**
+ * Gives access to the local filesystem, but returns paths
+ * that are using "/" as a path separator, even on Windows
+ * (so that in exported games, paths are slashs, which is
+ * supported everywhere).
+ */
 export default {
   mkDir: function(path) {
     try {
@@ -45,17 +51,17 @@ export default {
   getTempDir: function() {
     return os.tmpdir();
   },
-  fileNameFrom: function(fullpath) {
-    if (this._isExternalUrl(fullpath)) return fullpath;
+  fileNameFrom: function(fullPath) {
+    if (this._isExternalUrl(fullPath)) return fullPath;
 
-    fullpath = this._translateUrl(fullpath);
-    return path.basename(fullpath);
+    fullPath = this._translateUrl(fullPath);
+    return path.basename(fullPath);
   },
-  dirNameFrom: function(fullpath) {
-    if (this._isExternalUrl(fullpath)) return '';
+  dirNameFrom: function(fullPath) {
+    if (this._isExternalUrl(fullPath)) return '';
 
-    fullpath = this._translateUrl(fullpath);
-    return path.dirname(fullpath);
+    fullPath = this._translateUrl(fullPath);
+    return path.dirname(fullPath).replace(/\\/g, '/');
   },
   makeAbsolute: function(filename, baseDirectory) {
     if (this._isExternalUrl(filename)) return filename;
@@ -64,22 +70,26 @@ export default {
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
-    return path.resolve(baseDirectory, path.normalize(filename));
+    return path
+      .resolve(baseDirectory, path.normalize(filename))
+      .replace(/\\/g, '/');
   },
   makeRelative: function(filename, baseDirectory) {
     if (this._isExternalUrl(filename)) return filename;
 
     filename = this._translateUrl(filename);
-    return path.relative(baseDirectory, path.normalize(filename));
+    return path
+      .relative(baseDirectory, path.normalize(filename))
+      .replace(/\\/g, '/');
   },
-  isAbsolute: function(fullpath) {
-    if (this._isExternalUrl(fullpath)) return true;
+  isAbsolute: function(fullPath) {
+    if (this._isExternalUrl(fullPath)) return true;
 
-    if (fullpath.length === 0) return true;
-    fullpath = this._translateUrl(fullpath);
+    if (fullPath.length === 0) return true;
+    fullPath = this._translateUrl(fullPath);
     return (
-      (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
-      (fullpath.length > 1 && fullpath.charAt(1) === ':')
+      (fullPath.length > 0 && fullPath.charAt(0) === '/') ||
+      (fullPath.length > 1 && fullPath.charAt(1) === ':')
     );
   },
   copyFile: function(source, dest) {

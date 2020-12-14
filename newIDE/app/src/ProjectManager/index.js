@@ -30,7 +30,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
-import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';

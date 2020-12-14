@@ -34,7 +34,8 @@ export type AlertMessageIdentifier =
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-broker-recommendation'
   | 'command-palette-shortcut'
-  | 'asset-installed-explanation';
+  | 'asset-installed-explanation'
+  | 'extension-installed-explanation';
 
 export type EditorMosaicName =
   | 'scene-editor'

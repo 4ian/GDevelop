@@ -168,12 +168,16 @@ export const FiltersChooser = ({ filtersState, allFilters, error }: Props) => {
 
   return (
     <React.Fragment>
-      <Subheader>Categories</Subheader>
-      <MemoizedTagsTree
-        chosenCategory={filtersState.chosenCategory}
-        setChosenCategory={filtersState.setChosenCategory}
-        allFilters={allFilters}
-      />
+      {allFilters.tagsTree.length ? (
+        <React.Fragment>
+          <Subheader>Categories</Subheader>
+          <MemoizedTagsTree
+            chosenCategory={filtersState.chosenCategory}
+            setChosenCategory={filtersState.setChosenCategory}
+            allFilters={allFilters}
+          />
+        </React.Fragment>
+      ) : null}
       <Subheader>Filters</Subheader>
       <ColumnStackLayout>
         {!selectedCategoryTags ? (

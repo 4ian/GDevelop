@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorVariable {
+    unsigned long size();
+    [Const, Ref] VariablePointer at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -166,13 +171,29 @@ interface PairStringVariable {
     [Ref] Variable WRAPPED_GetVariable();
 };
 
+enum Variable_TYPES {
+    "Variable_TYPES::STRING",
+    "Variable_TYPES::NUMBER",
+    "Variable_TYPES::BOOLEAN",
+    "Variable_TYPES::STRUCTURE",
+    "Variable_TYPES::ARRAY"
+};
+
+interface VariablePointer {
+    Variable get();
+};
+
 interface Variable {
     void Variable();
+
+    Variable_TYPES GetType();
 
     void SetString([Const] DOMString str);
     [Const, Ref] DOMString GetString();
     void SetValue([Const] double val);
     double GetValue();
+    void SetBool([Const] boolean val);
+    boolean GetBool();
 
     boolean HasChild([Const] DOMString str);
     [Ref] Variable GetChild([Const] DOMString str);
@@ -180,10 +201,13 @@ interface Variable {
     boolean RenameChild([Const] DOMString oldName, [Const] DOMString newName);
     [Value] VectorString GetAllChildrenNames();
     unsigned long GetChildrenCount();
-    boolean IsNumber();
-    boolean IsStructure();
     boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
     void RemoveRecursively([Const, Ref] Variable variableToRemove);
+
+    boolean HasIndex([Const] unsigned long index);
+    [Ref] Variable GetIndex([Const] unsigned long index);
+    void RemoveIndex([Const] unsigned long index);
+    [Const, Ref] VectorVariable GetAllChildrenList();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

@@ -1,6 +1,6 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
-#include <GDCore/Events/Builtin/ForEachEvent.h>
 #include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
+#include <GDCore/Events/Builtin/ForEachEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
 #include <GDCore/Events/Builtin/LinkEvent.h>
 #include <GDCore/Events/Builtin/RepeatEvent.h>
@@ -368,6 +368,8 @@ typedef std::map<gd::String, gd::InstructionMetadata>
     MapStringInstructionMetadata;
 typedef std::map<gd::String, gd::EventMetadata> MapStringEventMetadata;
 typedef std::map<gd::String, gd::Variable> MapStringVariable;
+typedef std::vector<std::shared_ptr<gd::Variable>> VectorVariable;
+typedef std::shared_ptr<gd::Variable> VariablePointer;
 typedef std::map<gd::String, gd::PropertyDescriptor>
     MapStringPropertyDescriptor;
 typedef std::set<gd::String> SetString;
@@ -395,6 +397,7 @@ typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
+typedef gd::Variable::TYPES Variable_TYPES;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

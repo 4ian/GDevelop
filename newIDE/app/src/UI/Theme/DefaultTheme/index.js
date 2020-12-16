@@ -206,6 +206,9 @@ const muiThemeOptions = {
     MuiDialogContent: {
       root: {
         padding: 8,
+        '&:first-child': {
+          paddingTop: 8,
+        },
       },
     },
     // Remove default margins on form controls (we already use a Grid)

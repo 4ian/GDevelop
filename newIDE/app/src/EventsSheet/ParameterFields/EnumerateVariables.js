@@ -15,7 +15,7 @@ export const enumerateVariables = (
     variable: gdVariable
   ): Array<string> => {
     const names = [fullName];
-    if (!variable.getType() === gd.Variable.Structure) return names;
+    if (variable.getType() !== gd.Variable.Structure) return names;
 
     variable
       .getAllChildrenNames()

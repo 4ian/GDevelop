@@ -191,13 +191,14 @@ interface Variable {
     void SetBool([Const] boolean val);
     boolean GetBool();
 
+    unsigned long GetChildrenCount();
+    boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
+
     boolean HasChild([Const] DOMString str);
     [Ref] Variable GetChild([Const] DOMString str);
     void RemoveChild([Const] DOMString name);
     boolean RenameChild([Const] DOMString oldName, [Const] DOMString newName);
     [Value] VectorString GetAllChildrenNames();
-    unsigned long GetChildrenCount();
-    boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
     void RemoveRecursively([Const, Ref] Variable variableToRemove);
 
     [Ref] Variable GetAtIndex([Const] unsigned long index);

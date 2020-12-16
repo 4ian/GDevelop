@@ -26,14 +26,9 @@ const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
-
-class VariablesListBody extends React.Component<*, *> {
-  render() {
-    return <div>{this.props.children}</div>;
-  }
-}
-
-const SortableVariablesListBody = SortableContainer(VariablesListBody);
+const SortableVariablesListBody = SortableContainer(({ children }) => (
+  <div>{children}</div>
+));
 SortableVariablesListBody.muiName = 'TableBody';
 
 type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
@@ -164,7 +159,7 @@ export default class VariablesList extends React.Component<Props, State> {
     }
   };
 
-  _renderVariableChildren(
+  _renderStructureChildren(
     name: string,
     parentVariable: gdVariable,
     depth: number,
@@ -187,6 +182,26 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
+  _renderArrayChildren(
+    parentVariable: gdVariable,
+    depth: number,
+    origin: VariableOrigin
+  ): Array<React.Node> {
+    const variables = parentVariable.getAllChildrenList();
+
+    return mapFor(0, parentVariable.getChildrenCount(), index => {
+      const variable = parentVariable.getAtIndex(index);
+      return this._renderVariableAndChildrenRows(
+        index,
+        variable,
+        depth + 1,
+        index,
+        parentVariable,
+        origin
+      );
+    });
+  }
+
   _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
@@ -196,15 +211,18 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   _renderVariableAndChildrenRows(
-    name: string,
+    name: ?string,
     variable: gdVariable,
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
+    console.log(variable);
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
-    const isStructure = variable.getType() === gd.Variable.Structure;
+    const type = variable.getType();
+    const isStructural =
+      type === gd.Variable.Structure || type === gd.Variable.Array;
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 
@@ -256,24 +274,44 @@ export default class VariablesList extends React.Component<Props, State> {
           if (!parentVariable) {
             variablesContainer.remove(name);
           } else {
-            parentVariable.removeChild(name);
+            if (type === gd.Variable.Structure)
+              parentVariable.removeChild(name);
+            else parentVariable.removeAtIndex(index);
           }
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
-        onAddChild={() => {
-          const name = newNameGenerator('ChildVariable', name =>
-            variable.hasChild(name)
-          );
-          variable.getChild(name).setString('');
+        onAddChild={(forceType: ?string) => {
+          if (typeof forceType === 'string') {
+            if (forceType === 'structure') {
+              const name = newNameGenerator('ChildVariable', name =>
+                variable.hasChild(name)
+              );
+              variable.getChild(name).setString('');
+            } else
+              variable.getAtIndex(variable.getChildrenCount()).setString('');
+          } else {
+            // This shouldn't happen, non stuctural types should be converted via forceType
+            if (!isStructural) return;
+
+            if (type === gd.Variable.Structure) {
+              const name = newNameGenerator('ChildVariable', name =>
+                variable.hasChild(name)
+              );
+              variable.getChild(name).setString('');
+            } else if (type === gd.Variable.Array)
+              variable.getAtIndex(variable.getChildrenCount()).setString('');
+          }
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         children={
-          isStructure
-            ? this._renderVariableChildren(name, variable, depth, origin)
+          type === gd.Variable.Structure
+            ? this._renderStructureChildren(name, variable, depth, origin)
+            : type === gd.Variable.Array
+            ? this._renderArrayChildren(variable, depth, origin)
             : null
         }
         showHandle={this.state.mode === 'move'}

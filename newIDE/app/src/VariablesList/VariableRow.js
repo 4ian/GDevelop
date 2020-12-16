@@ -7,12 +7,16 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from '../UI/Checkbox';
 import AddCircle from '@material-ui/icons/AddCircle';
 import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
+import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
+import { toArray } from 'lodash';
+import Popover from '@material-ui/core/Popover';
 const gd: libGDevelop = global.gd;
 
 //TODO: Refactor into TreeTable?
@@ -23,7 +27,7 @@ const Indent = ({ width }) => (
 );
 
 type Props = {|
-  name: string,
+  name: string | number,
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
@@ -59,10 +63,27 @@ const VariableRow = ({
   onSelect,
   origin,
 }: Props) => {
-  const isStructure = variable.getType() === gd.Variable.Structure;
-  const key = '' + depth + name;
+  const type = variable.getType();
+  const isStructural =
+    type === gd.Variable.Structure || type === gd.Variable.Array;
 
+  const key = '' + depth + name;
   const limitEditing = origin === 'parent' || origin === 'inherited';
+
+  const [popoverElement, openPopover] = React.useState<?HTMLButtonElement>(
+    null
+  );
+
+  const addChild = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isStructural && e.button === 0) onAddChild();
+    else openPopover(e.currentTarget);
+  };
+
+  const close = () => {
+    if (!!popoverElement) {
+      openPopover(false);
+    }
+  };
 
   const columns = [
     <TreeTableCell key="name" expand>
@@ -76,21 +97,36 @@ const VariableRow = ({
           onCheck={(e, checked) => onSelect(checked)}
         />
       )}
-      <TextField
-        margin="none"
-        style={{
-          fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
-        }}
-        fullWidth
-        name={key + 'name'}
-        defaultValue={name}
-        errorText={errorText}
-        onBlur={onBlur}
-        disabled={origin === 'parent'}
-      />
+      {typeof name === 'string' && (
+        <TextField
+          margin="none"
+          style={{
+            fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
+          }}
+          fullWidth
+          name={key + 'name'}
+          defaultValue={name}
+          errorText={errorText}
+          onBlur={onBlur}
+          disabled={origin === 'parent'}
+        />
+      )}
+      {typeof name === 'number' && <Text noMargin>{'' + name}</Text>}
     </TreeTableCell>,
   ];
-  if (!isStructure) {
+  if (isStructural) {
+    columns.push(
+      <TreeTableCell
+        expand
+        key="value"
+        style={limitEditing ? styles.fadedButton : undefined}
+      >
+        <Text noMargin>
+          ({type === gd.Variable.Structure ? 'Structure' : 'Array'})
+        </Text>
+      </TreeTableCell>
+    );
+  } else {
     columns.push(
       <TreeTableCell key="value" expand>
         <SemiControlledTextField
@@ -109,38 +145,68 @@ const VariableRow = ({
         />
       </TreeTableCell>
     );
-  } else {
-    columns.push(
-      <TreeTableCell
-        expand
-        key="value"
-        style={limitEditing ? styles.fadedButton : undefined}
-      >
-        <Text noMargin>(Structure)</Text>
-      </TreeTableCell>
-    );
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      {origin === 'inherited' && depth === 0 && (
+      {origin === 'inherited' && depth === 0 ? (
         <IconButton
           size="small"
           onClick={onResetToDefaultValue}
-          style={isStructure ? undefined : styles.fadedButton}
+          style={isStructural ? undefined : styles.fadedButton}
           tooltip={t`Reset`}
         >
           <Replay />
         </IconButton>
-      )}
-      {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
-        <IconButton
-          size="small"
-          onClick={onAddChild}
-          style={isStructure ? undefined : styles.fadedButton}
-          tooltip={t`Add child variable`}
-        >
-          <AddCircle />
-        </IconButton>
+      ) : (
+        origin !== 'parent' && (
+          <>
+            <IconButton
+              size="small"
+              onClick={addChild}
+              style={isStructural ? undefined : styles.fadedButton}
+              tooltip={t`Add child variable`}
+            >
+              <AddCircle />
+            </IconButton>
+            {!!popoverElement && (
+              <Popover
+                anchorOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'right',
+                }}
+                open
+                onClose={close}
+                anchorEl={popoverElement}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    onAddChild('structure');
+                    close();
+                  }}
+                  tooltip={t`Convert variable into structure`}
+                >
+                  <AccountTreeIcon />
+                </IconButton>
+                <br />
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    onAddChild('array');
+                    close();
+                  }}
+                  tooltip={t`Convert variable into array`}
+                >
+                  <FormatListNumberedIcon />
+                </IconButton>
+              </Popover>
+            )}
+          </>
+        )
       )}
     </TreeTableCell>
   );

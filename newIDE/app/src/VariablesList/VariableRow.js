@@ -76,12 +76,14 @@ const VariableRow = ({
     null
   );
 
-  const addChild = (e: {
-    currentTarget: HTMLButtonElement,
-    button: 0 | 1 | 2 | 3,
-  }) => {
-    if (isStructural && e.button === 0) onAddChild();
-    else openPopover(e.currentTarget);
+  const addChild = (
+    e: ?{
+      currentTarget: HTMLButtonElement,
+      shiftKey: boolean,
+    }
+  ) => {
+    if (!isStructural || e.shiftKey) openPopover(e.currentTarget);
+    else onAddChild();
   };
 
   const close = () => {

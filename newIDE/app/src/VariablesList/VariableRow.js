@@ -34,7 +34,7 @@ type Props = {|
   commitVariableValueOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
-  onAddChild: () => void,
+  onAddChild: (forceType: string) => void,
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
@@ -81,7 +81,7 @@ const VariableRow = ({
 
   const close = () => {
     if (!!popoverElement) {
-      openPopover(false);
+      openPopover(null);
     }
   };
 

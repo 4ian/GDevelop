@@ -31,7 +31,7 @@ const SortableVariablesListBody = SortableContainer(({ children }) => (
 ));
 SortableVariablesListBody.muiName = 'TableBody';
 
-type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
+type VariableAndName = {| name: string | number, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
@@ -136,7 +136,7 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   _updateOrDefineVariable = (
-    name: string,
+    name: string | number,
     variable: gdVariable,
     newValue: string,
     index: number,
@@ -144,7 +144,7 @@ export default class VariablesList extends React.Component<Props, State> {
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
-    if (inheritedVariablesContainer && origin === 'parent') {
+    if (inheritedVariablesContainer && origin === 'parent' && typeof name !== "number") {
       const serializedVariable = serializeToJSObject(
         inheritedVariablesContainer.get(name)
       );
@@ -160,7 +160,6 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   _renderStructureChildren(
-    name: string,
     parentVariable: gdVariable,
     depth: number,
     origin: VariableOrigin
@@ -202,23 +201,23 @@ export default class VariablesList extends React.Component<Props, State> {
     });
   }
 
-  _getVariableOrigin = (name: string) => {
+  _getVariableOrigin = (name: string | number) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
+    if (typeof name === "number") return '';
     if (!inheritedVariablesContainer || !inheritedVariablesContainer.has(name))
       return '';
     return variablesContainer.has(name) ? 'inherited' : 'parent';
   };
 
   _renderVariableAndChildrenRows(
-    name: ?string,
+    name: string | number,
     variable: gdVariable,
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null
   ) {
-    console.log(variable);
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const type = variable.getType();
     const isStructural =
@@ -309,7 +308,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         children={
           type === gd.Variable.Structure
-            ? this._renderStructureChildren(name, variable, depth, origin)
+            ? this._renderStructureChildren(variable, depth, origin)
             : type === gd.Variable.Array
             ? this._renderArrayChildren(variable, depth, origin)
             : null

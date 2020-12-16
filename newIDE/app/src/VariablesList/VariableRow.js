@@ -13,6 +13,7 @@ import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
+const gd: libGDevelop = global.gd;
 
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
@@ -58,7 +59,7 @@ const VariableRow = ({
   onSelect,
   origin,
 }: Props) => {
-  const isStructure = variable.isStructure();
+  const isStructure = variable.getType() === gd.Variable.Structure;
   const key = '' + depth + name;
 
   const limitEditing = origin === 'parent' || origin === 'inherited';

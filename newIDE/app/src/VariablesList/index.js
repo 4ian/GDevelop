@@ -204,7 +204,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentOrigin: ?VariableOrigin = null
   ) {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
-    const isStructure = variable.isStructure();
+    const isStructure = variable.getType() === gd.Variable.Structure;
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 

@@ -1,6 +1,7 @@
 // @flow
 import flatten from 'lodash/flatten';
 import { mapFor } from '../../Utils/MapFor';
+const gd: libGDevelop = global.gd;
 
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer
@@ -14,7 +15,7 @@ export const enumerateVariables = (
     variable: gdVariable
   ): Array<string> => {
     const names = [fullName];
-    if (!variable.isStructure()) return names;
+    if (!variable.getType() === gd.Variable.Structure) return names;
 
     variable
       .getAllChildrenNames()

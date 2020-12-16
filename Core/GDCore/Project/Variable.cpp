@@ -165,19 +165,26 @@ bool Variable::RenameChild(const gd::String& oldName,
 }
 
 Variable& Variable::GetAtIndex(const size_t index) {
-  while (childrenList.size() < index)
+  type = Type::Array;
+  while (childrenList.size() <= index)
     childrenList.push_back(std::make_shared<gd::Variable>());
   return *childrenList[index];
 };
 
 const Variable& Variable::GetAtIndex(const size_t index) const {
-  if (childrenList.size() < index) return *std::make_shared<gd::Variable>();
+  if (childrenList.size() <= index) return *std::make_shared<gd::Variable>();
   return *childrenList.at(index);
 };
 
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenList.size()) return;
   childrenList.erase(childrenList.begin() + index);
+
+  // If the array is now empty, demote back to a primitive.
+  if (childrenList.empty()) {
+    type = Type::Number;
+    value = 0.0;
+  }
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
@@ -249,6 +256,10 @@ bool Variable::Contains(const gd::Variable& variableToSearch,
   for (auto& it : children) {
     if (it.second.get() == &variableToSearch) return true;
     if (recursive && it.second->Contains(variableToSearch, true)) return true;
+  }
+  for (auto& it : childrenList) {
+    if (it.get() == &variableToSearch) return true;
+    if (recursive && it->Contains(variableToSearch, true)) return true;
   }
 
   return false;

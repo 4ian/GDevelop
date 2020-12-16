@@ -10,11 +10,43 @@
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
 
 namespace gd {
+
+gd::String Variable::TypeAsString(Type t) {
+  switch (t) {
+    case Type::String:
+      return "string";
+    case Type::Number:
+      return "number";
+    case Type::Boolean:
+      return "boolean";
+    case Type::Structure:
+      return "structure";
+    case Type::Array:
+      return "array";
+    default:
+      return "error-type";
+  }
+};
+
+Variable::Type Variable::StringAsType(const gd::String& str) {
+  if (str == "string")
+    return Type::String;
+  else if (str == "number")
+    return Type::Number;
+  else if (str == "boolean")
+    return Type::Boolean;
+  else if (str == "structure")
+    return Type::Structure;
+  else if (str == "array")
+    return Type::Array;
+
+  // Default to number
+  return Type::Number;
+}
 
 /**
  * Get value as a double
@@ -111,7 +143,7 @@ const Variable& Variable::GetChild(const gd::String& name) const {
 }
 
 void Variable::RemoveChild(const gd::String& name) {
-  if (type == Type::Structure) return;
+  if (type != Type::Structure) return;
   children.erase(name);
 
   // If the structure is empty, make it a default empty variable again.
@@ -149,7 +181,7 @@ void Variable::RemoveAtIndex(const size_t index) {
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
-  element.SetStringAttribute("type", gd::String(static_cast<char>(GetType())));
+  element.SetStringAttribute("type", TypeAsString(GetType()));
 
   if (type == Type::String) {
     element.SetStringAttribute("value", GetString());
@@ -175,8 +207,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
-  const Type typeName =
-      static_cast<Type>(element.GetStringAttribute("type")[0]);
+  const Type typeName = StringAsType(element.GetStringAttribute("type"));
 
   if (element.HasChild("children", "Children")) {
     const SerializerElement& childrenElement =

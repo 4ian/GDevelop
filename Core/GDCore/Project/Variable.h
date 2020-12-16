@@ -14,7 +14,6 @@
 namespace gd {
 class SerializerElement;
 }
-class TiXmlElement;
 
 namespace gd {
 
@@ -28,16 +27,26 @@ namespace gd {
  */
 class GD_CORE_API Variable {
  public:
-  enum class Type : char {
+  enum Type {
     // Primitive types
-    String = 't',
-    Number = 'n',
-    Boolean = 'b',
+    String,
+    Number,
+    Boolean,
 
     // Structural types
-    Structure = 's',
-    Array = 'a'
+    Structure,
+    Array
   };
+
+  /**
+   * \brief Converts a Type to a string.
+   */
+  static gd::String TypeAsString(Type t);
+
+  /**
+   * \brief Converts a string to a Type.
+   */
+  static Type StringAsType(const gd::String& str);
 
   /**
    * \brief Default constructor creating a variable with 0 as value.

@@ -722,17 +722,17 @@ describe('libGD.js', function () {
 
     it('should have initial value', function () {
       expect(variable.getValue()).toBe(0);
-      expect(variable.isNumber()).toBe(true);
+      expect(variable.getType()).toBe(gd.Variable.Number);
     });
     it('can have a value', function () {
       variable.setValue(5);
       expect(variable.getValue()).toBe(5);
-      expect(variable.isNumber()).toBe(true);
+      expect(variable.getType()).toBe(gd.Variable.Number);
     });
     it('can have a string', function () {
       variable.setString('Hello');
       expect(variable.getString()).toBe('Hello');
-      expect(variable.isNumber()).toBe(false);
+      expect(variable.getType()).toBe(gd.Variable.String);
     });
     it('can be a structure', function () {
       variable.getChild('FirstChild').setValue(1);
@@ -741,11 +741,16 @@ describe('libGD.js', function () {
       expect(variable.hasChild('SecondChild')).toBe(true);
       expect(variable.hasChild('NotExisting')).toBe(false);
       expect(variable.getChild('SecondChild').getString()).toBe('two');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
       variable.removeChild('FirstChild');
       expect(variable.hasChild('FirstChild')).toBe(false);
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      variable.removeChild('SecondChild');
+      expect(variable.getType()).toBe(gd.Variable.Number);
     });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
+      variable.getChild('SecondChild').setValue(1);
 
       var childrenNames = variable.getAllChildrenNames();
       expect(childrenNames.size()).toBe(2);

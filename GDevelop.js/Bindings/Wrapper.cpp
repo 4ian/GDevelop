@@ -397,7 +397,7 @@ typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
-typedef gd::Variable::TYPES Variable_TYPES;
+typedef gd::Variable::Type Variable_Type;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

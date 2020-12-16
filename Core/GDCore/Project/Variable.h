@@ -28,21 +28,21 @@ namespace gd {
  */
 class GD_CORE_API Variable {
  public:
-  enum TYPES {
+  enum class Type {
     // Primitive types
-    STRING,
-    NUMBER,
-    BOOLEAN,
+    String,
+    Number,
+    Boolean,
 
     // Structural types
-    STRUCTURE,
-    ARRAY
+    Structure,
+    Array
   };
 
   /**
    * \brief Default constructor creating a variable with 0 as value.
    */
-  Variable() : value(0), type(TYPES::NUMBER){};
+  Variable() : value(0), type(Type::Number){};
   Variable(const Variable&);
   virtual ~Variable(){};
 
@@ -51,7 +51,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Get the type of the variable.
    */
-  TYPES GetType() const { return type; }
+  Type GetType() const { return type; }
 
   /** \name Primitives
    * Methods and operators used when the variable is considered as a primitive.
@@ -68,7 +68,7 @@ class GD_CORE_API Variable {
    */
   void SetString(const gd::String& newStr) {
     str = newStr;
-    type = TYPES::STRING;
+    type = Type::String;
   }
 
   /**
@@ -81,7 +81,7 @@ class GD_CORE_API Variable {
    */
   void SetValue(double val) {
     value = val;
-    type = TYPES::NUMBER;
+    type = Type::Number;
   }
 
   /**
@@ -94,7 +94,7 @@ class GD_CORE_API Variable {
    */
   void SetBool(bool val) {
     boolVal = val;
-    type = TYPES::BOOLEAN;
+    type = Type::Boolean;
   }
 
   // Operators are overloaded to allow accessing to variable using a simple
@@ -146,9 +146,9 @@ class GD_CORE_API Variable {
    * \brief Get the count of children that the variable has.
    */
   size_t GetChildrenCount() const {
-    return type == TYPES::STRUCTURE
+    return type == Type::Structure
                ? children.size()
-               : type == TYPES::ARRAY ? childrenList.size() : 0;
+               : type == Type::Array ? childrenList.size() : 0;
   };
 
   /** \name Structure
@@ -224,18 +224,12 @@ class GD_CORE_API Variable {
   ///@{
 
   /**
-   * \brief Return true if the variable is an array and has the specified
-   * index.
-   */
-  bool HasIndex(const size_t index) const;
-
-  /**
    * \brief Return the element with the specified index.
    *
    * If the variable does not have the specified index,
    * the array will be filled up to that index with empty variables.
    */
-  Variable& GetIndex(const size_t index);
+  Variable& GetAtIndex(const size_t index);
 
   /**
    * \brief Return the element with the specified index.
@@ -243,14 +237,14 @@ class GD_CORE_API Variable {
    * If the variable has not the specified child,
    * an empty variable is returned.
    */
-  const Variable& GetIndex(const size_t index) const;
+  const Variable& GetAtIndex(const size_t index) const;
 
   /**
    * \brief Remove the element with the specified index.
    *
    * And shifts all the next elements back by one.
    */
-  void RemoveIndex(const size_t index);
+  void RemoveAtIndex(const size_t index);
 
   /**
    * \brief Get the vector containing all the children.
@@ -277,7 +271,7 @@ class GD_CORE_API Variable {
   ///@}
 
  private:
-  mutable TYPES type;
+  mutable Type type;
   mutable gd::String str;
   mutable double value;
   mutable bool boolVal;

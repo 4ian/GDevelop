@@ -20,64 +20,64 @@ namespace gd {
  * Get value as a double
  */
 double Variable::GetValue() const {
-  if (type == TYPES::NUMBER) {
+  if (type == Type::Number) {
     return value;
-  } else if (type == TYPES::STRING) {
+  } else if (type == Type::String) {
     value = str.To<double>();
-    type = TYPES::NUMBER;
+    type = Type::Number;
     return value;
-  } else if (type == TYPES::BOOLEAN) {
+  } else if (type == Type::Boolean) {
     value = boolVal ? 1.0 : 0.0;
-    type = TYPES::NUMBER;
+    type = Type::Number;
     return value;
   }
 
   // It isn't possible to convert a structural type to a number
   value = 0.0;
-  type = TYPES::NUMBER;
+  type = Type::Number;
   return value;
 }
 
 const gd::String& Variable::GetString() const {
-  if (type == TYPES::STRING) {
+  if (type == Type::String) {
     return str;
-  } else if (type == TYPES::NUMBER) {
+  } else if (type == Type::Number) {
     str = gd::String::From(value);
-    type = TYPES::STRING;
+    type = Type::String;
     return str;
-  } else if (type == TYPES::BOOLEAN) {
+  } else if (type == Type::Boolean) {
     str = boolVal ? "1" : "0";
-    type = TYPES::STRING;
+    type = Type::String;
     return str;
   }
 
   // It isn't possible to convert a structural type to a string
   str = "0";
-  type = TYPES::STRING;
+  type = Type::String;
   return str;
 }
 
 bool Variable::GetBool() const {
-  if (type == TYPES::BOOLEAN) {
+  if (type == Type::Boolean) {
     return boolVal;
-  } else if (type == TYPES::STRING) {
+  } else if (type == Type::String) {
     boolVal = !(str.empty() || str == "0");
-    type = TYPES::BOOLEAN;
+    type = Type::Boolean;
     return boolVal;
-  } else if (type == TYPES::NUMBER) {
+  } else if (type == Type::Number) {
     boolVal = value != 0;
-    type = TYPES::BOOLEAN;
+    type = Type::Boolean;
     return boolVal;
   }
 
   // It isn't possible to convert a structural type to a boolean
   boolVal = false;
-  type = TYPES::BOOLEAN;
+  type = Type::Boolean;
   return boolVal;
 }
 
 bool Variable::HasChild(const gd::String& name) const {
-  return type == TYPES::STRUCTURE && children.find(name) != children.end();
+  return type == Type::Structure && children.find(name) != children.end();
 }
 
 /**
@@ -90,7 +90,7 @@ Variable& Variable::GetChild(const gd::String& name) {
   auto it = children.find(name);
   if (it != children.end()) return *it->second;
 
-  type = TYPES::STRUCTURE;
+  type = Type::Structure;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -105,25 +105,25 @@ const Variable& Variable::GetChild(const gd::String& name) const {
   auto it = children.find(name);
   if (it != children.end()) return *it->second;
 
-  type = TYPES::STRUCTURE;
+  type = Type::Structure;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
 
 void Variable::RemoveChild(const gd::String& name) {
-  if (type == TYPES::STRUCTURE) return;
+  if (type == Type::Structure) return;
   children.erase(name);
 
   // If the structure is empty, make it a default empty variable again.
   if (children.empty()) {
-    type = TYPES::NUMBER;
+    type = Type::Number;
     value = 0;
   }
 }
 
 bool Variable::RenameChild(const gd::String& oldName,
                            const gd::String& newName) {
-  if (type != TYPES::STRUCTURE || !HasChild(oldName) || HasChild(newName))
+  if (type != Type::Structure || !HasChild(oldName) || HasChild(newName))
     return false;
 
   children[newName] = children[oldName];
@@ -132,36 +132,32 @@ bool Variable::RenameChild(const gd::String& oldName,
   return true;
 }
 
-bool Variable::HasIndex(const size_t index) const {
-  return type == TYPES::ARRAY && childrenList.size() < index;
-};
-
-Variable& Variable::GetIndex(const size_t index) {
+Variable& Variable::GetAtIndex(const size_t index) {
   while (childrenList.size() < index)
     childrenList.push_back(std::make_shared<gd::Variable>());
   return *childrenList[index];
 };
 
-const Variable& Variable::GetIndex(const size_t index) const {
+const Variable& Variable::GetAtIndex(const size_t index) const {
   if (childrenList.size() < index) return *std::make_shared<gd::Variable>();
   return *childrenList.at(index);
 };
 
-void Variable::RemoveIndex(const size_t index) {
-  if (!HasIndex(index)) return;
+void Variable::RemoveAtIndex(const size_t index) {
+  if (index >= childrenList.size()) return;
   childrenList.erase(childrenList.begin() + index);
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
   element.SetIntAttribute("type", static_cast<int>(GetType()));
 
-  if (type == TYPES::STRING) {
+  if (type == Type::String) {
     element.SetStringAttribute("value", GetString());
-  } else if (type == TYPES::NUMBER) {
-    element.SetBoolAttribute("value", GetValue());
-  } else if (type == TYPES::BOOLEAN) {
+  } else if (type == Type::Number) {
+    element.SetDoubleAttribute("value", GetValue());
+  } else if (type == Type::Boolean) {
     element.SetBoolAttribute("value", GetBool());
-  } else if (type == TYPES::STRUCTURE) {
+  } else if (type == Type::Structure) {
     SerializerElement& childrenElement = element.AddChild("children");
     childrenElement.ConsiderAsArrayOf("variable");
     for (auto i = children.begin(); i != children.end(); ++i) {
@@ -169,7 +165,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
       variableElement.SetAttribute("name", i->first);
       i->second->SerializeTo(variableElement);
     }
-  } else if (type == TYPES::ARRAY) {
+  } else if (type == Type::Array) {
     SerializerElement& childrenElement = element.AddChild("childrenList");
     childrenElement.ConsiderAsArrayOf("variable");
     for (auto child : childrenList) {
@@ -179,7 +175,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
-  const TYPES typeName = static_cast<TYPES>(element.GetIntAttribute("type"));
+  const Type typeName = static_cast<Type>(element.GetIntAttribute("type"));
 
   if (element.HasChild("children", "Children")) {
     const SerializerElement& childrenElement =
@@ -198,11 +194,11 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
         childrenList.back()->UnserializeFrom(childrenElement);
       }
     }
-  } else if (typeName == TYPES::STRING) {
+  } else if (typeName == Type::String) {
     SetString(element.GetStringAttribute("value", "0", "Value"));
-  } else if (typeName == TYPES::NUMBER) {
+  } else if (typeName == Type::Number) {
     SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
-  } else if (typeName == TYPES::BOOLEAN) {
+  } else if (typeName == Type::Boolean) {
     SetBool(element.GetBoolAttribute("value", false, "Value"));
   };
 }
@@ -239,12 +235,12 @@ void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
     if (it->get() == &variableToRemove) {
       childrenList.erase(it);
     } else {
-      it->get()->RemoveRecursively(variableToRemove);
+      (*it)->RemoveRecursively(variableToRemove);
       it++;
     }
-    if ((type == TYPES::STRUCTURE && children.empty()) ||
-        (type == TYPES::ARRAY && childrenList.empty())) {
-      type = TYPES::NUMBER;
+    if ((type == Type::Structure && children.empty()) ||
+        (type == Type::Array && childrenList.empty())) {
+      type = Type::Number;
       value = 0.0;
     }
   }

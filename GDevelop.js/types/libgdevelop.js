@@ -51,8 +51,7 @@ declare class libGDevelop {
   Platform: Class<gdPlatform>;
   JsPlatform: Class<gdJsPlatform>;
   PairStringVariable: Class<gdPairStringVariable>;
-  Variable_TYPES: Class<Variable_TYPES>;
-  VariablePointer: Class<gdVariablePointer>;
+  Variable_Type: Class<Variable_Type>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
   ObjectGroup: Class<gdObjectGroup>;

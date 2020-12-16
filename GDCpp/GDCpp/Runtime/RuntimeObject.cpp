@@ -766,6 +766,6 @@ void RuntimeObject::VariableClearChildren(gd::Variable &variable) {
 }
 
 unsigned int RuntimeObject::GetVariableChildCount(gd::Variable &variable) {
-  if (variable.IsStructure() == false) return 0;
+  if (variable.GetType() != gd::Variable::Type::Structure) return 0;
   return variable.GetChildrenCount();
 }

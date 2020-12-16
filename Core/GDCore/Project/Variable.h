@@ -112,6 +112,20 @@ class GD_CORE_API Variable {
   bool operator==(double val) const { return GetValue() == val; };
   bool operator!=(double val) const { return GetValue() != val; };
 
+  // Avoid ambiguous operators
+  void operator=(int val) { SetValue(val); };
+  void operator+=(int val) { SetValue(val + GetValue()); }
+  void operator-=(int val) { SetValue(GetValue() - val); }
+  void operator*=(int val) { SetValue(val * GetValue()); }
+  void operator/=(int val) { SetValue(GetValue() / val); }
+
+  bool operator<=(int val) const { return GetValue() <= val; };
+  bool operator>=(int val) const { return GetValue() >= val; };
+  bool operator<(int val) const { return GetValue() < val; };
+  bool operator>(int val) const { return GetValue() > val; };
+  bool operator==(int val) const { return GetValue() == val; };
+  bool operator!=(int val) const { return GetValue() != val; };
+
   // Operators are overloaded to allow accessing to variable using a simple
   // string-like semantic.
   void operator=(const gd::String& val) { SetString(val); };

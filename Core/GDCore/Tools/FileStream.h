@@ -24,7 +24,7 @@ namespace gd {
 class GD_CORE_API FileStream : public std::iostream {
  public:
 #if defined(WINDOWS) && __GLIBCXX__
-  using InternalBufferType = __gnu_cxx::stdio_filebuf<char>;
+  using InternalBufferType = std::basic_filebuf<char>;
 #else
   using InternalBufferType = std::filebuf;
 #endif

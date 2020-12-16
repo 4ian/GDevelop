@@ -369,7 +369,6 @@ typedef std::map<gd::String, gd::InstructionMetadata>
 typedef std::map<gd::String, gd::EventMetadata> MapStringEventMetadata;
 typedef std::map<gd::String, gd::Variable> MapStringVariable;
 typedef std::vector<std::shared_ptr<gd::Variable>> VectorVariable;
-typedef std::shared_ptr<gd::Variable> VariablePointer;
 typedef std::map<gd::String, gd::PropertyDescriptor>
     MapStringPropertyDescriptor;
 typedef std::set<gd::String> SetString;

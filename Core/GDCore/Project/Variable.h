@@ -28,15 +28,15 @@ namespace gd {
  */
 class GD_CORE_API Variable {
  public:
-  enum class Type {
+  enum class Type : char {
     // Primitive types
-    String,
-    Number,
-    Boolean,
+    String = 't',
+    Number = 'n',
+    Boolean = 'b',
 
     // Structural types
-    Structure,
-    Array
+    Structure = 's',
+    Array = 'a'
   };
 
   /**

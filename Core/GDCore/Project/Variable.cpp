@@ -149,7 +149,7 @@ void Variable::RemoveAtIndex(const size_t index) {
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
-  element.SetIntAttribute("type", static_cast<int>(GetType()));
+  element.SetStringAttribute("type", gd::String(static_cast<char>(GetType())));
 
   if (type == Type::String) {
     element.SetStringAttribute("value", GetString());
@@ -175,7 +175,8 @@ void Variable::SerializeTo(SerializerElement& element) const {
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
-  const Type typeName = static_cast<Type>(element.GetIntAttribute("type"));
+  const Type typeName =
+      static_cast<Type>(element.GetStringAttribute("type")[0]);
 
   if (element.HasChild("children", "Children")) {
     const SerializerElement& childrenElement =

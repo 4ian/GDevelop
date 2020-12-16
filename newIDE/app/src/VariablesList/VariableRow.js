@@ -34,7 +34,7 @@ type Props = {|
   commitVariableValueOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
-  onAddChild: (forceType: string) => void,
+  onAddChild: (forceType: ?string) => void,
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
@@ -76,7 +76,10 @@ const VariableRow = ({
     null
   );
 
-  const addChild = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const addChild = (e: {
+    currentTarget: HTMLButtonElement,
+    button: 0 | 1 | 2 | 3,
+  }) => {
     if (isStructural && e.button === 0) onAddChild();
     else openPopover(e.currentTarget);
   };

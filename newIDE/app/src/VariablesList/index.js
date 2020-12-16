@@ -144,7 +144,11 @@ export default class VariablesList extends React.Component<Props, State> {
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
-    if (inheritedVariablesContainer && origin === 'parent' && typeof name !== "number") {
+    if (
+      inheritedVariablesContainer &&
+      origin === 'parent' &&
+      typeof name !== 'number'
+    ) {
       const serializedVariable = serializeToJSObject(
         inheritedVariablesContainer.get(name)
       );
@@ -205,7 +209,7 @@ export default class VariablesList extends React.Component<Props, State> {
   _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
-    if (typeof name === "number") return '';
+    if (typeof name === 'number') return '';
     if (!inheritedVariablesContainer || !inheritedVariablesContainer.has(name))
       return '';
     return variablesContainer.has(name) ? 'inherited' : 'parent';

@@ -27,7 +27,7 @@ const Indent = ({ width }) => (
 );
 
 type Props = {|
-  name: string | number,
+  name: string,
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
@@ -43,6 +43,7 @@ type Props = {|
   isSelected: boolean,
   onSelect: boolean => void,
   origin: VariableOrigin,
+  arrayElement: boolean,
 |};
 
 const VariableRow = ({
@@ -62,6 +63,7 @@ const VariableRow = ({
   isSelected,
   onSelect,
   origin,
+  arrayElement,
 }: Props) => {
   const type = variable.getType();
   const isStructural =
@@ -97,7 +99,9 @@ const VariableRow = ({
           onCheck={(e, checked) => onSelect(checked)}
         />
       )}
-      {typeof name === 'string' && (
+      {arrayElement ? (
+        <Text noMargin>{name}</Text>
+      ) : (
         <TextField
           margin="none"
           style={{
@@ -111,7 +115,6 @@ const VariableRow = ({
           disabled={origin === 'parent'}
         />
       )}
-      {typeof name === 'number' && <Text noMargin>{'' + name}</Text>}
     </TreeTableCell>,
   ];
   if (isStructural) {

@@ -31,7 +31,7 @@ const SortableVariablesListBody = SortableContainer(({ children }) => (
 ));
 SortableVariablesListBody.muiName = 'TableBody';
 
-type VariableAndName = {| name: string | number, ptr: number, variable: gdVariable |};
+type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
@@ -136,7 +136,7 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   _updateOrDefineVariable = (
-    name: string | number,
+    name: string,
     variable: gdVariable,
     newValue: string,
     index: number,
@@ -191,17 +191,18 @@ export default class VariablesList extends React.Component<Props, State> {
     return mapFor(0, parentVariable.getChildrenCount(), index => {
       const variable = parentVariable.getAtIndex(index);
       return this._renderVariableAndChildrenRows(
-        index,
+        '' + index,
         variable,
         depth + 1,
         index,
         parentVariable,
-        origin
+        origin,
+        /* arrayElement= */ true
       );
     });
   }
 
-  _getVariableOrigin = (name: string | number) => {
+  _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
     if (typeof name === "number") return '';
@@ -211,12 +212,13 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   _renderVariableAndChildrenRows(
-    name: string | number,
+    name: string,
     variable: gdVariable,
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentOrigin: ?VariableOrigin = null
+    parentOrigin: ?VariableOrigin = null,
+    arrayElement: ?boolean = false
   ) {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const type = variable.getType();
@@ -234,6 +236,7 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        arrayElement={!!arrayElement}
         commitVariableValueOnBlur={commitVariableValueOnBlur}
         errorText={
           this.state.nameErrors[variable.ptr.toString()]

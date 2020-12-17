@@ -24,7 +24,6 @@ export const addToSelection = <T: ObjectType>(
   object: T,
   select: boolean = true
 ): SelectionState<T> => {
-  console.log(object, select);
   return {
     ...selection,
     [object.ptr]: select ? object : null,

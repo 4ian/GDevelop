@@ -535,8 +535,10 @@ gdjs.RuntimeGame.prototype.startGameLoop = function () {
  */
 gdjs.RuntimeGame.prototype.enableMetrics = function (enable) {
   this._disableMetrics = !enable;
-  if (enable) { this._setupSessionMetrics(); }
-}
+  if (enable) {
+    this._setupSessionMetrics();
+  }
+};
 
 /**
  * Register a new session for the game, and set up listeners to follow the session
@@ -550,7 +552,7 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
   if (!this._data.properties.projectUuid) return;
 
   const baseUrl = 'https://api.gdevelop-app.com/analytics';
-  const playerId = this._getPlayerUuid();
+  const playerId = this._makePlayerUuid();
   let sessionId = null;
   let lastSessionHitTime = Date.now();
 
@@ -645,14 +647,18 @@ gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {
  * the player from others in the game metrics.
  * @returns {string}
  */
-gdjs.RuntimeGame.prototype._getPlayerUuid = function () {
-  const key = 'GDJS-internal-player-uuid';
-  const existingPlayerUuid = localStorage.getItem(key);
-  if (existingPlayerUuid) return existingPlayerUuid;
+gdjs.RuntimeGame.prototype._makePlayerUuid = function () {
+  try {
+    const key = 'GDJS-internal-player-uuid';
+    const existingPlayerUuid = localStorage.getItem(key);
+    if (existingPlayerUuid) return existingPlayerUuid;
 
-  const newPlayerUuid = gdjs.makeUuid();
-  localStorage.setItem(key, newPlayerUuid);
-  return newPlayerUuid;
+    const newPlayerUuid = gdjs.makeUuid();
+    localStorage.setItem(key, newPlayerUuid);
+    return newPlayerUuid;
+  } catch (err) {
+    return gdjs.makeUuid();
+  }
 };
 
 /**

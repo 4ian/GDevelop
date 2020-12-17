@@ -226,7 +226,7 @@ export default class VariablesList extends React.Component<Props, State> {
   ) {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const type = variable.getType();
-    const isStructural =
+    const isCollection =
       type === gd.Variable.Structure || type === gd.Variable.Array;
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
@@ -299,7 +299,7 @@ export default class VariablesList extends React.Component<Props, State> {
               variable.getAtIndex(variable.getChildrenCount()).setString('');
           } else {
             // This shouldn't happen, non stuctural types should be converted via forceType
-            if (!isStructural) return;
+            if (!isCollection) return;
 
             if (type === gd.Variable.Structure) {
               const name = newNameGenerator('ChildVariable', name =>

@@ -66,7 +66,7 @@ const VariableRow = ({
   arrayElement,
 }: Props) => {
   const type = variable.getType();
-  const isStructural =
+  const isCollection =
     type === gd.Variable.Structure || type === gd.Variable.Array;
 
   const key = '' + depth + name;
@@ -82,7 +82,7 @@ const VariableRow = ({
       shiftKey: boolean,
     }
   ) => {
-    if (typeof e !== 'undefined' && (!isStructural || e.shiftKey))
+    if (typeof e !== 'undefined' && (!isCollection || e.shiftKey))
       openPopover(e.currentTarget);
     else onAddChild();
   };
@@ -123,7 +123,7 @@ const VariableRow = ({
       )}
     </TreeTableCell>,
   ];
-  if (isStructural) {
+  if (isCollection) {
     columns.push(
       <TreeTableCell
         expand
@@ -161,7 +161,7 @@ const VariableRow = ({
         <IconButton
           size="small"
           onClick={onResetToDefaultValue}
-          style={isStructural ? undefined : styles.fadedButton}
+          style={isCollection ? undefined : styles.fadedButton}
           tooltip={t`Reset`}
         >
           <Replay />
@@ -172,7 +172,7 @@ const VariableRow = ({
             <IconButton
               size="small"
               onClick={addChild}
-              style={isStructural ? undefined : styles.fadedButton}
+              style={isCollection ? undefined : styles.fadedButton}
               tooltip={t`Add child variable`}
             >
               <AddCircle />

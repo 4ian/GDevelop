@@ -26,6 +26,11 @@ const Indent = ({ width }) => (
   </div>
 );
 
+type MouseEvent = {|
+  currentTarget: HTMLButtonElement,
+  shiftKey: boolean,
+|};
+
 type Props = {|
   name: string,
   variable: gdVariable,
@@ -76,15 +81,10 @@ const VariableRow = ({
     null
   );
 
-  const addChild = (
-    e: ?{
-      currentTarget: HTMLButtonElement,
-      shiftKey: boolean,
-    }
-  ) => {
-    if (typeof e !== 'undefined' && (!isCollection || e.shiftKey))
-      openPopover(e.currentTarget);
-    else onAddChild();
+  const addChild = (e: ?MouseEvent) => {
+    if (typeof e !== 'undefined') {
+      if (!isCollection || e.shiftKey) openPopover(e.currentTarget);
+    } else onAddChild();
   };
 
   const close = () => {

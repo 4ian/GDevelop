@@ -176,6 +176,10 @@ const Variable& Variable::GetAtIndex(const size_t index) const {
   return *childrenList.at(index);
 };
 
+Variable& Variable::PushNew() {
+  return GetAtIndex(GetChildrenCount());
+};
+
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenList.size()) return;
   childrenList.erase(childrenList.begin() + index);

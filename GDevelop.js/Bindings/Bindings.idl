@@ -202,6 +202,7 @@ interface Variable {
     void RemoveRecursively([Const, Ref] Variable variableToRemove);
 
     [Ref] Variable GetAtIndex([Const] unsigned long index);
+    [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenList();
 

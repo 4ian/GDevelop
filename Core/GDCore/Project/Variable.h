@@ -263,6 +263,11 @@ class GD_CORE_API Variable {
   const Variable& GetAtIndex(const size_t index) const;
 
   /**
+   * \brief Appends a new variable at the end of the list and returns it.
+   */
+  Variable& PushNew();
+
+  /**
    * \brief Remove the element with the specified index.
    *
    * And shifts all the next elements back by one.

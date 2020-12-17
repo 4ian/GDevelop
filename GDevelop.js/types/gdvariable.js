@@ -13,15 +13,16 @@ declare class gdVariable {
   getValue(): number;
   setBool(val: boolean): void;
   getBool(): boolean;
+  getChildrenCount(): number;
+  contains(variableToSearch: gdVariable, recursive: boolean): boolean;
   hasChild(str: string): boolean;
   getChild(str: string): gdVariable;
   removeChild(name: string): void;
   renameChild(oldName: string, newName: string): boolean;
   getAllChildrenNames(): gdVectorString;
-  getChildrenCount(): number;
-  contains(variableToSearch: gdVariable, recursive: boolean): boolean;
   removeRecursively(variableToRemove: gdVariable): void;
   getAtIndex(index: number): gdVariable;
+  pushNew(): gdVariable;
   removeAtIndex(index: number): void;
   getAllChildrenList(): gdVectorVariable;
   serializeTo(element: gdSerializerElement): void;

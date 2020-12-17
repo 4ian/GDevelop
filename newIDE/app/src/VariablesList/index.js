@@ -296,8 +296,7 @@ export default class VariablesList extends React.Component<Props, State> {
                 variable.hasChild(name)
               );
               variable.getChild(name).setString('');
-            } else
-              variable.getAtIndex(variable.getChildrenCount()).setString('');
+            } else if (forceType === 'array') variable.pushNew();
           } else {
             // This shouldn't happen, non stuctural types should be converted via forceType
             if (!isCollection) return;

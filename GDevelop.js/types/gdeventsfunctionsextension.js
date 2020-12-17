@@ -13,8 +13,8 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   getName(): string;
   setFullName(fullName: string): gdEventsFunctionsExtension;
   getFullName(): string;
-  setTags(tags: string): gdEventsFunctionsExtension;
-  getTags(): string;
+  setTags(newTags: gdVectorString): gdEventsFunctionsExtension;
+  getTags(): gdVectorString;
   setAuthor(author: string): gdEventsFunctionsExtension;
   getAuthor(): string;
   setPreviewIconUrl(previewIconUrl: string): gdEventsFunctionsExtension;

@@ -283,11 +283,22 @@ export default function OptionsEditorDialog({
               }}
               fullWidth
             />
-            <TextField
+            <SemiControlledTextField
               floatingLabelText={<Trans>Tags (comma separated)</Trans>}
-              value={eventsFunctionsExtension.getTags()}
-              onChange={(e, text) => {
-                eventsFunctionsExtension.setTags(text);
+              value={eventsFunctionsExtension
+                .getTags()
+                .toJSArray()
+                .join(', ')}
+              onChange={text => {
+                const tags = eventsFunctionsExtension.getTags();
+                tags.clear();
+                text
+                  .split(',')
+                  .map(tag => tag.trim())
+                  .filter(Boolean)
+                  .forEach(tag => {
+                    tags.push_back(tag);
+                  });
                 forceUpdate();
               }}
               fullWidth

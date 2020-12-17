@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
-import ButtonBase from '@material-ui/core/ButtonBase';
-import Text from '../../UI/Text';
-import { Trans } from '@lingui/macro';
-import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const styles = {

@@ -289,4 +289,40 @@ TEST_CASE("Utf8 String", "[common][utf8]") {
     gd::String str6 = u8"ßßß";
     REQUIRE(str6.FindAndReplace(u8"ßß", u8"ß") == u8"ßß");
   }
+
+  SECTION("trimming") {
+    REQUIRE(gd::String("").Trim() == "");
+    REQUIRE(gd::String("").LeftTrim() == "");
+    REQUIRE(gd::String("").RightTrim() == "");
+    REQUIRE(gd::String(" ").Trim() == "");
+    REQUIRE(gd::String(" ").LeftTrim() == "");
+    REQUIRE(gd::String(" ").RightTrim() == "");
+    REQUIRE(gd::String("   ").Trim() == "");
+    REQUIRE(gd::String("   ").LeftTrim() == "");
+    REQUIRE(gd::String("   ").RightTrim() == "");
+    REQUIRE(gd::String("a").Trim() == "a");
+    REQUIRE(gd::String("a").LeftTrim() == "a");
+    REQUIRE(gd::String("a").RightTrim() == "a");
+    REQUIRE(gd::String("aß").Trim() == "aß");
+    REQUIRE(gd::String("aß").LeftTrim() == "aß");
+    REQUIRE(gd::String("aß").RightTrim() == "aß");
+    REQUIRE(gd::String(" a ").Trim() == "a");
+    REQUIRE(gd::String(" a ").LeftTrim() == "a ");
+    REQUIRE(gd::String(" a ").RightTrim() == " a");
+    REQUIRE(gd::String(" aß ").Trim() == "aß");
+    REQUIRE(gd::String(" aß ").LeftTrim() == "aß ");
+    REQUIRE(gd::String(" aß ").RightTrim() == " aß");
+    REQUIRE(gd::String(" a ß ").Trim() == "a ß");
+    REQUIRE(gd::String(" a ß ").LeftTrim() == "a ß ");
+    REQUIRE(gd::String(" a ß ").RightTrim() == " a ß");
+    REQUIRE(gd::String("   aß   ").Trim() == "aß");
+    REQUIRE(gd::String("   aß   ").LeftTrim() == "aß   ");
+    REQUIRE(gd::String("   aß   ").RightTrim() == "   aß");
+    REQUIRE(gd::String("---aß---").Trim("-/") == "aß");
+    REQUIRE(gd::String("---aß---").LeftTrim("-/") == "aß---");
+    REQUIRE(gd::String("---aß---").RightTrim("-/") == "---aß");
+    REQUIRE(gd::String("-/=aß=/-").Trim("-/") == "=aß=");
+    REQUIRE(gd::String("-/=aß=/-").LeftTrim("-/") == "=aß=/-");
+    REQUIRE(gd::String("-/=aß=/-").RightTrim("-/") == "-/=aß=");
+  }
 }

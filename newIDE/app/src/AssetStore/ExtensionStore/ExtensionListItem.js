@@ -5,7 +5,6 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
-import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { ExtensionIcon } from './ExtensionIcon';
 
 const styles = {

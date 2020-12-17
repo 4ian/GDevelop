@@ -1935,8 +1935,7 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
-    [Ref] EventsFunctionsExtension SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
+    [Ref] VectorString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
     [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);

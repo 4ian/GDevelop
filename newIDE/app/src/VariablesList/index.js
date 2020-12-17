@@ -280,9 +280,10 @@ export default class VariablesList extends React.Component<Props, State> {
           if (!parentVariable) {
             variablesContainer.remove(name);
           } else {
-            if (type === gd.Variable.Structure)
+            if (parentVariable.getType() === gd.Variable.Structure)
               parentVariable.removeChild(name);
-            else parentVariable.removeAtIndex(index);
+            else if (parentVariable.getType() === gd.Variable.Array)
+              parentVariable.removeAtIndex(index);
           }
 
           this.forceUpdate();

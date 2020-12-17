@@ -61,7 +61,10 @@ gdjs.evtTools.network.sendAsyncRequest = function (
   }
 };
 
-/** @deprecated */
+/**
+ * @deprecated
+ * @private
+ */
 gdjs.evtTools.network.sendDeprecatedSynchronousRequest = function (
   host,
   uri,

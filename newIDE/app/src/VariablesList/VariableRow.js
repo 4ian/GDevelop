@@ -82,7 +82,8 @@ const VariableRow = ({
       shiftKey: boolean,
     }
   ) => {
-    if (!isStructural || e.shiftKey) openPopover(e.currentTarget);
+    if (typeof e !== 'undefined' && (!isStructural || e.shiftKey))
+      openPopover(e.currentTarget);
     else onAddChild();
   };
 

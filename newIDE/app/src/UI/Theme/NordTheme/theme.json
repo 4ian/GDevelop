@@ -35,7 +35,7 @@
     },
     "selection": {
       "background-color": {
-        "value": "{gdevelop.color.selection.value}"
+        "value": "#88C0D0"
       },
       "color": {
         "value": "white"
@@ -156,6 +156,11 @@
       "color": {
         "value": "#D8DEE9"
       }
+    }
+  },
+  "tabs": {
+    "background-color": {
+      "value": "#81A1C1"
     }
   },
   "event-sheet": {

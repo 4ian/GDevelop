@@ -2,7 +2,7 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "{gdevelop.color.dark-blue.value}"
+        "value": "{gdevelop.color.blue.value}"
       },
       "text-contrast-color": {
         "value": "#fff"
@@ -156,6 +156,11 @@
       "color": {
         "value": "#444444"
       }
+    }
+  },
+  "tabs": {
+    "background-color": {
+      "value": "#3c4698"
     }
   },
   "event-sheet": {

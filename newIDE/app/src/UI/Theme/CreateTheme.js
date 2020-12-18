@@ -17,9 +17,10 @@ export function getRootClassNames(theme: string) {
 }
 
 export function getMuiOverrides(
-  color: string,
-  borderBottomColor: string,
-  primaryColor: string,
+  tabTextColor: string,
+  tabBackgroundColor: string,
+  inputBorderBottomColor: string,
+  appBarBackgroundColor: string,
   iconColor: string
 ) {
   return {
@@ -36,13 +37,13 @@ export function getMuiOverrides(
       },
       underline: {
         '&:before': {
-          borderBottom: `1px solid ${borderBottomColor}`,
+          borderBottom: `1px solid ${inputBorderBottomColor}`,
         },
       },
     },
     MuiAppBar: {
       colorPrimary: {
-        backgroundColor: primaryColor,
+        backgroundColor: appBarBackgroundColor,
       },
     },
     MuiIconButton: {
@@ -74,13 +75,13 @@ export function getMuiOverrides(
     // Use a more visible color scheme for tabs:
     MuiTabs: {
       root: {
-        backgroundColor: primaryColor,
+        backgroundColor: tabBackgroundColor,
         minHeight: 32, // Reduce the height of tabs to 32px
       },
     },
     MuiTab: {
       textColorPrimary: {
-        color: color + ' !important',
+        color: tabTextColor + ' !important',
       },
       root: {
         // Reduce the height of tabs to 32px
@@ -113,7 +114,7 @@ export function getMuiOverrides(
         padding: 8,
         '&:first-child': {
           paddingTop: 8,
-        }
+        },
       },
     },
     // Remove default margins on form controls (we already use a Grid)
@@ -244,8 +245,9 @@ export function createGdevelopTheme(
       },
       overrides: getMuiOverrides(
         styles['ThemeTextContrastColor'],
+        styles['TabsBackgroundColor'],
         styles['InputBorderBottomColor'],
-        styles['ThemePrimaryColor'],
+        styles['MosaicToolbarBackgroundColor'],
         styles['ThemeTextDefaultColor']
       ),
     },

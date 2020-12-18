@@ -158,6 +158,11 @@
       }
     }
   },
+  "tabs": {
+    "background-color": {
+      "value": "#047AA6"
+    }
+  },
   "event-sheet": {
     "event-tree": {
       "background-color": {

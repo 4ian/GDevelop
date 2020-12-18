@@ -8,15 +8,11 @@
  * Store input made on a canvas: mouse position, key pressed
  * and touches states.
  *
- * See **bindStandardEvents** method for connecting the input
- * manager to a canvas and **onFrameEnded** for signaling the
- * end of a frame (necessary for proper touches events handling).
- *
  * @constructor
  * @memberof gdjs
  * @class InputManager
  */
-gdjs.InputManager = function() {
+gdjs.InputManager = function () {
   this._pressedKeys = new Hashtable();
   this._releasedKeys = new Hashtable();
   this._lastPressedKey = 0;
@@ -59,7 +55,7 @@ gdjs.InputManager._DEFAULT_LEFT_VARIANT_KEYS = [16, 17, 18, 91];
  * @param {number} keyCode The raw key code
  * @param {?number} location The location
  */
-gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
+gdjs.InputManager.prototype._getLocationAwareKeyCode = function (
   keyCode,
   location
 ) {
@@ -86,7 +82,7 @@ gdjs.InputManager.prototype._getLocationAwareKeyCode = function(
  * @param {number} keyCode The raw key code associated to the key press.
  * @param {number=} location The location of the event.
  */
-gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
+gdjs.InputManager.prototype.onKeyPressed = function (keyCode, location) {
   var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);
 
   this._pressedKeys.put(locationAwareKeyCode, true);
@@ -100,7 +96,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode, location) {
  * @param {number} keyCode The raw key code associated to the key release.
  * @param {number=} location The location of the event.
  */
-gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
+gdjs.InputManager.prototype.onKeyReleased = function (keyCode, location) {
   var locationAwareKeyCode = this._getLocationAwareKeyCode(keyCode, location);
 
   this._pressedKeys.put(locationAwareKeyCode, false);
@@ -111,7 +107,7 @@ gdjs.InputManager.prototype.onKeyReleased = function(keyCode, location) {
  * Return the location-aware code of the last key that was pressed.
  * @return {number} The location-aware code of the last key pressed.
  */
-gdjs.InputManager.prototype.getLastPressedKey = function() {
+gdjs.InputManager.prototype.getLastPressedKey = function () {
   return this._lastPressedKey;
 };
 
@@ -119,7 +115,7 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
  * Return true if the key corresponding to the location-aware keyCode is pressed.
  * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
-gdjs.InputManager.prototype.isKeyPressed = function(locationAwareKeyCode) {
+gdjs.InputManager.prototype.isKeyPressed = function (locationAwareKeyCode) {
   return (
     this._pressedKeys.containsKey(locationAwareKeyCode) &&
     this._pressedKeys.get(locationAwareKeyCode)
@@ -130,7 +126,7 @@ gdjs.InputManager.prototype.isKeyPressed = function(locationAwareKeyCode) {
  * Return true if the key corresponding to the location-aware keyCode was released during the last frame.
  * @param {number} locationAwareKeyCode The location-aware key code to be tested.
  */
-gdjs.InputManager.prototype.wasKeyReleased = function(locationAwareKeyCode) {
+gdjs.InputManager.prototype.wasKeyReleased = function (locationAwareKeyCode) {
   return (
     this._releasedKeys.containsKey(locationAwareKeyCode) &&
     this._releasedKeys.get(locationAwareKeyCode)
@@ -139,8 +135,9 @@ gdjs.InputManager.prototype.wasKeyReleased = function(locationAwareKeyCode) {
 
 /**
  * Return true if any key is pressed.
+ * @return {boolean} true if any key is pressed.
  */
-gdjs.InputManager.prototype.anyKeyPressed = function() {
+gdjs.InputManager.prototype.anyKeyPressed = function () {
   for (var keyCode in this._pressedKeys.items) {
     if (this._pressedKeys.items.hasOwnProperty(keyCode)) {
       if (this._pressedKeys.items[keyCode]) {
@@ -160,26 +157,26 @@ gdjs.InputManager.prototype.anyKeyPressed = function() {
  * @param {number} x The mouse new X position
  * @param {number} y The mouse new Y position
  */
-gdjs.InputManager.prototype.onMouseMove = function(x, y) {
+gdjs.InputManager.prototype.onMouseMove = function (x, y) {
   this._mouseX = x;
   this._mouseY = y;
 };
 
 /**
- * Get the mouse X position
+ * Get the mouse X position.
  *
- * @return the mouse X position, relative to the game view.
+ * @return {number} the mouse X position, relative to the game view.
  */
-gdjs.InputManager.prototype.getMouseX = function() {
+gdjs.InputManager.prototype.getMouseX = function () {
   return this._mouseX;
 };
 
 /**
- * Get the mouse Y position
+ * Get the mouse Y position.
  *
- * @return the mouse Y position, relative to the game view.
+ * @return {number} the mouse Y position, relative to the game view.
  */
-gdjs.InputManager.prototype.getMouseY = function() {
+gdjs.InputManager.prototype.getMouseY = function () {
   return this._mouseY;
 };
 
@@ -188,7 +185,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
  * @param {number} buttonCode The mouse button code associated to the event.
  * See gdjs.InputManager.MOUSE_LEFT_BUTTON, gdjs.InputManager.MOUSE_RIGHT_BUTTON, gdjs.InputManager.MOUSE_MIDDLE_BUTTON
  */
-gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
+gdjs.InputManager.prototype.onMouseButtonPressed = function (buttonCode) {
   this._pressedMouseButtons[buttonCode] = true;
   this._releasedMouseButtons[buttonCode] = false;
 };
@@ -197,7 +194,7 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
  * Should be called whenever a mouse button is released.
  * @param {number} buttonCode The mouse button code associated to the event. (see onMouseButtonPressed)
  */
-gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
+gdjs.InputManager.prototype.onMouseButtonReleased = function (buttonCode) {
   this._pressedMouseButtons[buttonCode] = false;
   this._releasedMouseButtons[buttonCode] = true;
 };
@@ -206,7 +203,7 @@ gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
  * Return true if the mouse button corresponding to buttonCode is pressed.
  * @param {number} buttonCode The mouse button code (0: Left button, 1: Right button).
  */
-gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
+gdjs.InputManager.prototype.isMouseButtonPressed = function (buttonCode) {
   return (
     this._pressedMouseButtons[buttonCode] !== undefined &&
     this._pressedMouseButtons[buttonCode]
@@ -217,7 +214,7 @@ gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
  * Return true if the mouse button corresponding to buttonCode was just released.
  * @param {number} buttonCode The mouse button code (0: Left button, 1: Right button).
  */
-gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
+gdjs.InputManager.prototype.isMouseButtonReleased = function (buttonCode) {
   return (
     this._releasedMouseButtons[buttonCode] !== undefined &&
     this._releasedMouseButtons[buttonCode]
@@ -228,34 +225,34 @@ gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
  * Should be called whenever the mouse wheel is used
  * @param {number} wheelDelta The mouse wheel delta
  */
-gdjs.InputManager.prototype.onMouseWheel = function(wheelDelta) {
+gdjs.InputManager.prototype.onMouseWheel = function (wheelDelta) {
   this._mouseWheelDelta = wheelDelta;
 };
 
 /**
  * Return the mouse wheel delta
  */
-gdjs.InputManager.prototype.getMouseWheelDelta = function() {
+gdjs.InputManager.prototype.getMouseWheelDelta = function () {
   return this._mouseWheelDelta;
 };
 
 /**
- * Get a touch X position
+ * Get a touch X position.
  *
- * @return the touch X position, relative to the game view.
+ * @return {number} the touch X position, relative to the game view.
  */
-gdjs.InputManager.prototype.getTouchX = function(identifier) {
+gdjs.InputManager.prototype.getTouchX = function (identifier) {
   if (!this._touches.containsKey(identifier)) return 0;
 
   return this._touches.get(identifier).x;
 };
 
 /**
- * Get a touch Y position
+ * Get a touch Y position.
  *
- * @return the touch Y position, relative to the game view.
+ * @return {number} the touch Y position, relative to the game view.
  */
-gdjs.InputManager.prototype.getTouchY = function(identifier) {
+gdjs.InputManager.prototype.getTouchY = function (identifier) {
   if (!this._touches.containsKey(identifier)) return 0;
 
   return this._touches.get(identifier).y;
@@ -263,9 +260,8 @@ gdjs.InputManager.prototype.getTouchY = function(identifier) {
 
 /**
  * Update and return the array containing the identifiers of all touches.
- *
  */
-gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
+gdjs.InputManager.prototype.getAllTouchIdentifiers = function () {
   gdjs.InputManager._allTouchIds = gdjs.InputManager._allTouchIds || [];
   gdjs.InputManager._allTouchIds.length = 0;
 
@@ -278,7 +274,7 @@ gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
   return gdjs.InputManager._allTouchIds;
 };
 
-gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
+gdjs.InputManager.prototype.onTouchStart = function (identifier, x, y) {
   this._startedTouches.push(identifier);
   this._touches.put(identifier, { x: x, y: y });
 
@@ -288,7 +284,7 @@ gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
   }
 };
 
-gdjs.InputManager.prototype.onTouchMove = function(identifier, x, y) {
+gdjs.InputManager.prototype.onTouchMove = function (identifier, x, y) {
   var touch = this._touches.get(identifier);
   if (!touch) return;
 
@@ -300,7 +296,7 @@ gdjs.InputManager.prototype.onTouchMove = function(identifier, x, y) {
   }
 };
 
-gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
+gdjs.InputManager.prototype.onTouchEnd = function (identifier) {
   this._endedTouches.push(identifier);
   if (this._touches.containsKey(identifier)) {
     //Postpone deletion at the end of the frame
@@ -312,15 +308,15 @@ gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
   }
 };
 
-gdjs.InputManager.prototype.getStartedTouchIdentifiers = function() {
+gdjs.InputManager.prototype.getStartedTouchIdentifiers = function () {
   return this._startedTouches;
 };
 
-gdjs.InputManager.prototype.popStartedTouch = function() {
+gdjs.InputManager.prototype.popStartedTouch = function () {
   return this._startedTouches.shift();
 };
 
-gdjs.InputManager.prototype.popEndedTouch = function() {
+gdjs.InputManager.prototype.popEndedTouch = function () {
   return this._endedTouches.shift();
 };
 
@@ -329,9 +325,9 @@ gdjs.InputManager.prototype.popEndedTouch = function() {
  *
  * If true, any touch will move the mouse position and set mouse buttons
  * as pressed/released.
- * @param enable {Boolean} true to simulate mouse events, false to disable it.
+ * @param {boolean} enable true to simulate mouse events, false to disable it.
  */
-gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
+gdjs.InputManager.prototype.touchSimulateMouse = function (enable) {
   if (enable === undefined) enable = true;
 
   this._touchSimulateMouse = enable;
@@ -341,9 +337,10 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  * Notify the input manager that the frame ended, so anything that last
  * only for one frame (started/ended touches) should be reset.
  *
- * This method should be called in the game loop (see gdjs.RuntimeGame.startGameLoop).
+ * This method should be called in the game loop (see `gdjs.RuntimeGame.startGameLoop`).
+ * You don't need to call it otherwise.
  */
-gdjs.InputManager.prototype.onFrameEnded = function() {
+gdjs.InputManager.prototype.onFrameEnded = function () {
   //Only clear the ended touches at the end of the frame.
   for (var id in this._touches.items) {
     if (this._touches.items.hasOwnProperty(id)) {
@@ -364,13 +361,13 @@ gdjs.InputManager.prototype.onFrameEnded = function() {
 /**
  * Return true if the mouse wheel scroll to up
  */
-gdjs.InputManager.prototype.isScrollingUp = function() {
+gdjs.InputManager.prototype.isScrollingUp = function () {
   return this.getMouseWheelDelta() > 0;
 };
 
 /**
  * Return true if the mouse wheel scroll to down
  */
-gdjs.InputManager.prototype.isScrollingDown = function() {
+gdjs.InputManager.prototype.isScrollingDown = function () {
   return this.getMouseWheelDelta() < 0;
 };

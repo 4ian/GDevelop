@@ -6,7 +6,7 @@
  */
 
 /**
- * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
+ * A scene being played, containing instances of objects rendered on screen.
  *
  * @class RuntimeScene
  * @memberof gdjs
@@ -286,13 +286,13 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 };
 
 /**
- * Create objects from initial instances data ( for example, the initial instances
- * of the scene or from an external layout ).
+ * Create objects from initial instances data (for example, the initial instances
+ * of the scene or the instances of an external layout).
  *
  * @param {InstanceData[]} data The instances data
  * @param {number} xPos The offset on X axis
  * @param {number} yPos The offset on Y axis
- * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their persistentUuid
+ * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
  * to the same as the associated instance. Useful for hot-reloading when instances are changed.
  */
 gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, trackByPersistentUuid) {

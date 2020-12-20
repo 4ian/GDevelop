@@ -640,7 +640,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("1");
+      .SetDefaultValue("0");
 
   extension
       .AddExpression("VueRotation",

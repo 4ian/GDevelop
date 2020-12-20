@@ -631,6 +631,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0");
 
   extension
+      .AddExpression("CameraZoom",
+                     _("Zoom of a camera of a layer"),
+                     _("Zoom of a camera of a layer"),
+                     _("Layers and cameras"),
+                     "res/actions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("1");
+
+  extension
       .AddExpression("VueRotation",
                      _("Angle of a camera of a layer"),
                      _("Angle of a camera of a layer"),

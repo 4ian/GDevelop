@@ -51,6 +51,7 @@ describe('gdjs.HotReloader.deepEqual', () => {
       {
         name: 'MyVariable',
         value: '123',
+        type: 'number',
       },
     ];
     hotReloader._hotReloadVariablesContainer(
@@ -75,6 +76,7 @@ describe('gdjs.HotReloader.deepEqual', () => {
       {
         name: 'MyVariable',
         value: 'Hello World',
+        type: 'string',
       },
     ];
     hotReloader._hotReloadVariablesContainer(
@@ -92,14 +94,17 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructure = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
             value: '123',
+            type: 'number',
           },
           {
             name: 'MyChild2',
             value: 'Hello World',
+            type: 'string',
           },
         ],
       },
@@ -129,14 +134,17 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructure2 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
             value: '124',
+            type: 'number',
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -166,10 +174,12 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructureWithoutChild1 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -196,19 +206,23 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructureWithChild1AsStructure = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild1',
                 value: '456',
+                type: 'number',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -251,19 +265,23 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructureWithChild1AsStructure2 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild1',
                 value: '789',
+                type: 'number',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -306,19 +324,23 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const dataWithMyVariableAsStructureWithChild1AsStructure3 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild2',
                 value: 'Hello World 3',
+                type: 'string',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },

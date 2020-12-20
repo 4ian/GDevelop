@@ -20,7 +20,7 @@ export interface ProjectData {
   properties: ProjectPropertiesData;
   resources: ResourcesData;
   objects: ObjectData[];
-  variables: any[];
+  variables: VariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
 }

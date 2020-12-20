@@ -1,3 +1,4 @@
+//@ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -74,11 +75,10 @@ gdjs.evtTools.common.variableChildExists = function (variable, childName) {
  * Remove the child with the given name in a variable.
  * @param {gdjs.Variable} variable Variable.
  * @param {string} childName Name of the child.
- * @returns {gdjs.Variable} The new variable, with the child removed.
  * @private
  */
 gdjs.evtTools.common.variableRemoveChild = function (variable, childName) {
-  return variable.removeChild(childName);
+  variable.removeChild(childName);
 };
 
 /**
@@ -97,13 +97,12 @@ gdjs.evtTools.common.variableClearChildren = function (variable) {
  * @private
  */
 gdjs.evtTools.common.getVariableChildCount = function (variable) {
-  if (variable.isStructure() == false) return 0;
-  return Object.keys(variable.getAllChildren()).length;
+  return variable.getChildrenCount();
 };
 
 /**
  * Convert a string to a number.
- * @param {boolean} str String to convert.
+ * @param {string} str String to convert.
  * @returns {number} The parsed number, or NaN if invalid.
  * @private
  */

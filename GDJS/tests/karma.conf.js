@@ -1,7 +1,7 @@
 module.exports = function(config) {
   config.set({
     frameworks: ['mocha'],
-
+    browserNoActivityTimeout: 400000,
     files: [
       'node_modules/expect.js/index.js',
 

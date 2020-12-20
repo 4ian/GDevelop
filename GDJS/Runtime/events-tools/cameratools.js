@@ -174,6 +174,24 @@ gdjs.evtTools.camera.getCameraRotation = function (
 
 /**
  * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {string} layer
+ * @param {number} cameraId
+ * @returns {number}
+ */
+gdjs.evtTools.camera.getCameraZoom = function (
+  runtimeScene,
+  layer,
+  cameraId
+) {
+  if (!runtimeScene.hasLayer(layer)) {
+    return 0;
+  }
+
+  return runtimeScene.getLayer(layer).getCameraZoom(cameraId);
+};
+
+/**
+ * @param {gdjs.RuntimeScene} runtimeScene
  * @param {number} newZoom
  * @param {string} layer
  * @param {number} cameraId

@@ -226,7 +226,8 @@ gdjs.Variable.prototype.setString = function (newValue) {
 gdjs.Variable.prototype.getAsBoolean = function () {
   if (this._type !== 'boolean') {
     if (this._type === 'number') return this._value !== 0;
-    else if (this._type === 'string') return this._str !== '0';
+    else if (this._type === 'string')
+      return this._str !== '0' && this._str !== '' && this._str !== 'false';
   }
 
   return this._bool;
@@ -349,7 +350,7 @@ gdjs.Variable.prototype.concatenateString = function (str) {
  * @deprecated
  * @private
  */
-gdjs.Variable.prototype.concatenate = gdjs.Variable.prototype.concatenateString
+gdjs.Variable.prototype.concatenate = gdjs.Variable.prototype.concatenateString;
 
 /**
  * Returns the variable at a specific index in the array.

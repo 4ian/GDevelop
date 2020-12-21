@@ -37,7 +37,7 @@ gdjs.evtTools.common.getVariableString = function (variable) {
  * This shorcut function is needed for events code generation.
  *
  * @param {gdjs.Variable} variable Variable.
- * @returns {string} The content of the variable, as a string.
+ * @returns {boolean} The content of the variable, as a string.
  * @private
  */
 gdjs.evtTools.common.getVariableBoolean = function (variable) {

@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
+import {findDOMNode} from 'react-dom';
 import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
@@ -55,6 +56,14 @@ class GroupsList extends Component<*, *> {
 
   forceUpdateGrid() {
     if (this.list) this.list.forceUpdateGrid();
+  }
+
+  // Workaround for whitespace issue caused by react-virtualized
+  componentDidUpdate(){
+    const listNode = findDOMNode(this.list);
+    if(listNode.hasChildNodes() && listNode.firstChild.hasChildNodes())
+      if(!listNode.scrollTop && !!listNode.firstChild.firstChild.offsetTop)
+        this.list.scrollToPosition(listNode.firstChild.firstChild.offsetTop);
   }
 
   render() {

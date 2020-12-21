@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { findDOMNode } from 'react-dom';
 import { List } from 'react-virtualized';
 import ItemRow from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
@@ -84,6 +85,14 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         connectIconDragSource={connectIconDragSource || null}
       />
     );
+  }
+
+  // Workaround for whitespace issue cause by react-visualized
+  componentDidUpdate(){
+    const listNode = findDOMNode(this._list);
+    if(listNode.hasChildNodes() && listNode.firstChild.hasChildNodes())
+      if(!listNode.scrollTop && !!listNode.firstChild.firstChild.offsetTop)
+        this._list.scrollToPosition(listNode.firstChild.firstChild.offsetTop);
   }
 
   render() {

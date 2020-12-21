@@ -34,6 +34,8 @@ gdjs.evtTools.common.getVariableString = function (variable) {
 
 /**
  * Get the boolean value of a variable. Equivalent to `variable.getAsBoolean()`.
+ * This shorcut function is needed for events code generation.
+ *
  * @param {gdjs.Variable} variable Variable.
  * @returns {string} The content of the variable, as a string.
  * @private
@@ -44,12 +46,23 @@ gdjs.evtTools.common.getVariableBoolean = function (variable) {
 
 /**
  * Set the boolean value of a variable. Equivalent to `variable.setBoolean()`.
+ * This shorcut function is needed for events code generation.
+ *
  * @param {gdjs.Variable} variable Variable.
  * @param {boolean} bool The new boolean value of the variable.
  * @private
  */
 gdjs.evtTools.common.setVariableBoolean = function (variable, bool) {
-  return variable.setBoolean(bool);
+  variable.setBoolean(bool);
+};
+
+/**
+ * Toggles the boolean value of a variable.
+ * @param {gdjs.Variable} variable Variable.
+ * @private
+ */
+gdjs.evtTools.common.toggleVariableBoolean = function (variable) {
+  variable.setBoolean(!variable.getAsBoolean());
 };
 
 /**

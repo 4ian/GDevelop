@@ -56,6 +56,10 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.setVariableBoolean");
   GetAllActions()["SetGlobalVariableAsBoolean"].SetFunctionName(
       "gdjs.evtTools.common.setVariableBoolean");
+  GetAllActions()["ToggleSceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.toggleVariableBoolean");
+  GetAllActions()["ToggleGlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.toggleVariableBoolean");
 
   GetAllConditions()["VariableChildExists"].SetFunctionName(
       "gdjs.evtTools.common.variableChildExists");

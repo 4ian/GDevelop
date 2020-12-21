@@ -320,6 +320,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"));
 
+  obj.AddAction("ToggleObjectVariableAsBoolean",
+                _("Toggles the boolean value of a variable of an object"),
+                _("Toggles the boolean value of a variable of an object.\n"
+                  "If it was true, it will become false, and if it was false "
+                  "it will become true."),
+                _("Toggle the boolean value of the variable _PARAM1_ of object "
+                  "_PARAM0_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"));
+
   obj.AddCondition("ObjectVariableChildExists",
                    _("Child existence"),
                    _("Check if the specified child of the variable exists."),

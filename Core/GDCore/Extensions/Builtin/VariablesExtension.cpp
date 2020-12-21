@@ -161,15 +161,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardOperatorParameters("string");
 
   extension
-      .AddAction("SetSceneVariableAsBoolean",
-                    _("Bolean value of a scene variable"),
-                    _("Modify the boolean value of a scene variable."),
-                    _("Set the boolean value of scene variable _PARAM0_ to _PARAM1_"),
-                    _("Variables"),
-                    "res/conditions/var24.png",
-                    "res/conditions/var.png")
+      .AddAction(
+          "SetSceneVariableAsBoolean",
+          _("Boolean value of a scene variable"),
+          _("Modify the boolean value of a scene variable."),
+          _("Set the boolean value of scene variable _PARAM0_ to _PARAM1_"),
+          _("Variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"));
+
+  extension
+      .AddAction("ToggleSceneVariableAsBoolean",
+                 _("Toggle boolean value of a scene variable"),
+                 _("Toggle the boolean value of a scene variable.\n"
+                   "If it was true, it will become false, and if it was false "
+                   "it will become true."),
+                 _("Toggle the boolean value of scene variable _PARAM0_"),
+                 _("Variables"),
+                 "res/conditions/var24.png",
+                 "res/conditions/var.png")
+      .AddParameter("scenevar", _("Variable"));
 
   extension
       .AddAction("ModVarGlobal",
@@ -196,15 +209,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("SetGlobalVariableAsBoolean",
-                    _("Bolean value of a global variable"),
-                    _("Modify the boolean value of a global variable."),
-                    _("Set the boolean value of global variable _PARAM0_ to _PARAM1_"),
-                    _("Variables/Global variables"),
-                    "res/conditions/var24.png",
-                    "res/conditions/var.png")
+      .AddAction(
+          "SetGlobalVariableAsBoolean",
+          _("Boolean value of a global variable"),
+          _("Modify the boolean value of a global variable."),
+          _("Set the boolean value of global variable _PARAM0_ to _PARAM1_"),
+          _("Variables/Global variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"));
+
+  extension
+      .AddAction("ToggleGlobalVariableAsBoolean",
+                 _("Toggle boolean value of a global variable"),
+                 _("Toggle the boolean value of a global variable.\n"
+                   "If it was true, it will become false, and if it was false "
+                   "it will become true."),
+                 _("Toggle the boolean value of global variable _PARAM0_"),
+                 _("Variables/Global variables"),
+                 "res/conditions/var24.png",
+                 "res/conditions/var.png")
+      .AddParameter("globalvar", _("Variable"));
 
   extension
       .AddAction("VariableRemoveChild",

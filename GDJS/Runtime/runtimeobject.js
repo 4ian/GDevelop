@@ -667,6 +667,19 @@ gdjs.RuntimeObject.getVariableBoolean = function(variable) {
 gdjs.RuntimeObject.prototype.getVariableBoolean = gdjs.RuntimeObject.getVariableBoolean;
 
 /**
+ * Toggles a variable.
+ * This shorcut function is needed for events code generation.
+ *
+ * @private
+ * @param {gdjs.Variable} variable
+ * @see {gdjs.evtTools.common.toggleVariableBoolean}
+ */
+gdjs.RuntimeObject.toggleVariableBoolean = function(variable) {
+    gdjs.evtTools.common.toggleVariableBoolean(variable);
+};
+gdjs.RuntimeObject.prototype.toggleVariableBoolean = gdjs.RuntimeObject.toggleVariableBoolean;
+
+/**
  * @static
  * @private
  * @param {gdjs.Variable} variable The variable to be tested

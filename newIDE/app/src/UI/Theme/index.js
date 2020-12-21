@@ -32,8 +32,6 @@ export function getTheme({
 |}): ActualTheme {
   let theme: Theme = themes[themeName];
 
-  console.log('theme', theme);
-
   if (!theme) {
     console.warn(
       `Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`

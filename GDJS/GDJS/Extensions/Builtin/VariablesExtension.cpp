@@ -113,7 +113,7 @@ VariablesExtension::VariablesExtension() {
         if (op == "=")
           return varGetter + ".setString(" + expressionCode + ");\n";
         else if (op == "+")
-          return varGetter + ".concatenate(" + expressionCode + ");\n";
+          return varGetter + ".concatenateString(" + expressionCode + ");\n";
 
         return gd::String("");
       });
@@ -172,7 +172,7 @@ VariablesExtension::VariablesExtension() {
             if (op == "=")
               return varGetter + ".setString(" + expressionCode + ");\n";
             else if (op == "+")
-              return varGetter + ".concatenate(" + expressionCode + ");\n";
+              return varGetter + ".concatenateString(" + expressionCode + ");\n";
 
             return gd::String("");
           });

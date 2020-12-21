@@ -435,38 +435,53 @@ gdjs.HotReloader.prototype._hotReloadVariablesContainer = function (
 ) {
   newVariablesData.forEach((newVariableData) => {
     const variableName = newVariableData.name;
-    const oldVariableData = oldVariablesData.filter(
-      (variable) => variable.name === newVariableData.name
-    )[0];
+    const oldVariableData = oldVariablesData.find(
+      (variable) => variable.name === variableName
+    );
     const variable = variablesContainer.get(newVariableData.name);
 
     if (!oldVariableData) {
       // New variable
       variablesContainer.add(variableName, new gdjs.Variable(newVariableData));
     } else if (
-      !newVariableData.children &&
+      gdjs.Variable.isPrimitive(newVariableData.type) &&
       (oldVariableData.value !== newVariableData.value ||
-        oldVariableData.children)
+        !gdjs.Variable.isPrimitive(oldVariableData.type))
     ) {
       // Variable value was changed or was converted from
       // a structure to a variable with value.
       variablesContainer.remove(variableName);
       variablesContainer.add(variableName, new gdjs.Variable(newVariableData));
-    } else if (newVariableData.children) {
-      // Variable is a structure (or was converted from a non structure
-      // to a structure).
-      // Note: oldVariableData.children can be null!
-      this._hotReloadStructureVariable(
-        oldVariableData.children,
-        newVariableData.children,
-        variable
-      );
+    } else if (!gdjs.Variable.isPrimitive(newVariableData.type)) {
+      // Variable is a structure or array (or was converted from a primitive
+      // to one of those).
+      if (newVariableData.type === 'structure')
+        this._hotReloadStructureVariable(
+          oldVariableData.children,
+          newVariableData.children,
+          variable
+        );
+      else {
+        /**
+         * Arrays cannot be hot reloaded.
+         * As indices can change at runtime, and in the IDE, they can be desychronized.
+         * It will in that case mess up the whole array,
+         * and there is no way to know if that was the case.
+         *
+         * We therefore just replace the old array with the new one.
+         */
+        variablesContainer.remove(variableName);
+        variablesContainer.add(
+          variableName,
+          new gdjs.Variable(newVariableData)
+        );
+      }
     }
   });
   oldVariablesData.forEach((oldVariableData) => {
-    const newVariableData = newVariablesData.filter(
+    const newVariableData = newVariablesData.find(
       (variable) => variable.name === oldVariableData.name
-    )[0];
+    );
 
     if (!newVariableData) {
       // Variable was removed
@@ -487,18 +502,18 @@ gdjs.HotReloader.prototype._hotReloadStructureVariable = function (
 ) {
   if (oldChildren) {
     oldChildren.forEach((oldChildVariableData) => {
-      const newChildVariableData = newChildren.filter(
+      const newChildVariableData = newChildren.find(
         (childVariableData) =>
           childVariableData.name === oldChildVariableData.name
-      )[0];
+      );
 
       if (!newChildVariableData) {
         // Child variable was removed.
         variable.removeChild(oldChildVariableData.name);
       } else if (
-        !newChildVariableData.children &&
+        gdjs.Variable.isPrimitive(newChildVariableData.type) &&
         (oldChildVariableData.value !== newChildVariableData.value ||
-          !oldChildVariableData.children)
+          !gdjs.Variable.isPrimitive(oldChildVariableData.type))
       ) {
         // The child variable value was changed or was converted from
         // structure to a variable with value.
@@ -506,20 +521,33 @@ gdjs.HotReloader.prototype._hotReloadStructureVariable = function (
           newChildVariableData.name,
           new gdjs.Variable(newChildVariableData)
         );
-      } else if (newChildVariableData.children) {
-        // The child variable is a structure.
-        this._hotReloadStructureVariable(
-          oldChildVariableData.children,
-          newChildVariableData.children,
-          variable.getChild(newChildVariableData.name)
-        );
+      } else if (!gdjs.Variable.isPrimitive(newChildVariableData.type)) {
+        // Variable is a structure or array (or was converted from a primitive
+        // to one of those).
+        if (newChildVariableData.type === 'structure')
+          this._hotReloadStructureVariable(
+            oldChildVariableData.children,
+            newChildVariableData.children,
+            variable.getChild(newChildVariableData.name)
+          );
+        else {
+          /**
+           * Arrays cannot be hot reloaded.
+           * As indices can change at runtime, and in the IDE, they can be desychronized.
+           * It will in that case mess up the whole array,
+           * and there is no way to know if that was the case.
+           *
+           * We therefore just replace the old array with the new one.
+           */
+          variable.addChild(newChildVariableData.name, new gdjs.Variable(newChildVariableData));
+        }
       }
     });
     newChildren.forEach((newChildVariableData) => {
-      const oldChildVariableData = oldChildren.filter(
+      const oldChildVariableData = oldChildren.find(
         (childVariableData) =>
           childVariableData.name === newChildVariableData.name
-      )[0];
+      );
 
       if (!oldChildVariableData) {
         // Child variable was added
@@ -995,7 +1023,7 @@ gdjs.HotReloader.prototype._hotReloadRuntimeSceneLayers = function (
   });
   newLayers.forEach((newLayerData, index) => {
     runtimeScene.setLayerIndex(newLayerData.name, index);
-  })
+  });
 };
 
 /**
@@ -1013,15 +1041,15 @@ gdjs.HotReloader.prototype._hotReloadRuntimeLayer = function (
     runtimeLayer.show(newLayer.visibility);
   }
 
-  if(newLayer.isLightingLayer) {
+  if (newLayer.isLightingLayer) {
     if (oldLayer.ambientLightColorR !== newLayer.ambientLightColorR) {
       runtimeLayer.setClearColor(newLayer.ambientLightColorR, null, null);
     }
-  
+
     if (oldLayer.ambientLightColorG !== newLayer.ambientLightColorG) {
       runtimeLayer.setClearColor(null, newLayer.ambientLightColorG, null);
     }
-  
+
     if (oldLayer.ambientLightColorB !== newLayer.ambientLightColorB) {
       runtimeLayer.setClearColor(null, null, newLayer.ambientLightColorB);
     }

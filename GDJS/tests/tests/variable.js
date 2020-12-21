@@ -9,6 +9,7 @@ describe('gdjs.Variable', function () {
     var floatVar = new gdjs.Variable({ value: '10.568', type: 'number' });
     var strVar = new gdjs.Variable({ value: 'test variable', type: 'string' });
     var numStrVar = new gdjs.Variable({ value: '5Apples', type: 'string' });
+    var boolVar = new gdjs.Variable({ value: 'true', type: 'boolean' });
 
     expect(intVar.getAsNumber()).to.be(526);
     expect(intVar.getAsString()).to.be('526');
@@ -31,7 +32,7 @@ describe('gdjs.Variable', function () {
     expect(a.getAsNumber()).to.be(-6);
     a.div(-2);
     expect(a.getAsNumber()).to.be(3);
-    a.concatenate('Apples');
+    a.concatenateString('Apples');
     expect(a.getAsString()).to.be('3Apples');
   });
 

@@ -66,6 +66,15 @@ gdjs.Variable = function (varData) {
 };
 
 /**
+ * Return true if the variable type is a primitive type.
+ * @param {VariableType} type
+ * @return {boolean}
+ */
+gdjs.Variable.isPrimitive = function (type) {
+  return type === 'string' || type === 'number' || type === 'boolean';
+};
+
+/**
  * Used (usually by gdjs.VariablesContainer) to set that the variable must be
  * considered as not existing in the container.
  * @private
@@ -211,6 +220,28 @@ gdjs.Variable.prototype.setString = function (newValue) {
 };
 
 /**
+ * Get the value of the variable, considered as a boolean
+ * @return {boolean}
+ */
+gdjs.Variable.prototype.getAsBoolean = function () {
+  if (this._type !== 'boolean') {
+    if (this._type === 'number') return this._value !== 0;
+    else if (this._type === 'string') return this._str !== '0';
+  }
+
+  return this._bool;
+};
+
+/**
+ * Change the value of the variable, considered as a boolean
+ * @param {boolean} newValue
+ */
+gdjs.Variable.prototype.setBoolean = function (newValue) {
+  this._type = 'boolean';
+  this._bool = newValue;
+};
+
+/**
  * Return true if the variable is a structure.
  * @return {boolean} true if the variable is a structure.
  * @deprecated Use {@link gdjs.Variable.getType} instead.
@@ -233,11 +264,7 @@ gdjs.Variable.prototype.isNumber = function () {
  * @return {boolean}
  */
 gdjs.Variable.prototype.isPrimitive = function () {
-  return (
-    this._type === 'string' ||
-    this._type === 'number' ||
-    this._type === 'boolean'
-  );
+  return gdjs.Variable.isPrimitive(this._type);
 };
 
 /**
@@ -314,6 +341,79 @@ gdjs.Variable.prototype.div = function (val) {
  * Concatenate the given string at the end of the variable value
  * @param {string} str
  */
-gdjs.Variable.prototype.concatenate = function (str) {
+gdjs.Variable.prototype.concatenateString = function (str) {
   this.setString(this.getAsString() + str);
+};
+
+/**
+ * @deprecated
+ * @private
+ */
+gdjs.Variable.prototype.concatenate = gdjs.Variable.prototype.concatenateString
+
+/**
+ * Returns the variable at a specific index in the array.
+ * If it doesn't yet exists, create it.
+ * @param {number} index
+ * @returns {gdjs.Variable}
+ */
+gdjs.Variable.prototype.getAtIndex = function (index) {
+  if (this._childrenList[index] === undefined) {
+    this._type = 'array';
+    this._childrenList[index] = new gdjs.Variable();
+  }
+  return this._childrenList[index];
+};
+
+/**
+ * Removes a variable at a given index of the variable.
+ * @param {number} index
+ */
+gdjs.Variable.prototype.removeAtIndex = function (index) {
+  if (this._type === 'array') this._childrenList.splice(index, 1);
+};
+
+/**
+ * Pushes a variable onto the array.
+ * @param {gdjs.Variable} variable
+ */
+gdjs.Variable.prototype.push = function (variable) {
+  if (this._type === 'array' && variable instanceof gdjs.Variable)
+    this._childrenList.push(variable);
+};
+
+/**
+ * Sets another variable to an array from
+ * the range selected in the current array
+ * @param {gdjs.Variable} variable
+ * @param {number} start
+ * @param {number} end
+ */
+gdjs.Variable.prototype.slice = function (variable, start, end) {
+  if (this._type === 'array') {
+    variable._type = 'array';
+    variable._childrenList = this._childrenList.slice(start, end);
+  }
+};
+
+/**
+ * Removes elements from the array in a given range.
+ * @param {number} start
+ * @param {number} deleteCount
+ */
+gdjs.Variable.prototype.splice = function (start, deleteCount) {
+  if (this._type === 'array') this._childrenList.splice(start, deleteCount);
+};
+
+/**
+ * Adds the elements of another array to the current array.
+ * @param {gdjs.Variable} variable
+ */
+gdjs.Variable.prototype.concatenateArray = function (variable) {
+  if (
+    this._type === 'array' &&
+    variable instanceof gdjs.Variable &&
+    variable.getType() === 'array'
+  )
+    this._childrenList = this._childrenList.concat(variable._childrenList);
 };

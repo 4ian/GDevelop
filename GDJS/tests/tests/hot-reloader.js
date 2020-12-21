@@ -89,6 +89,23 @@ describe('gdjs.HotReloader.deepEqual', () => {
       'Hello World'
     );
 
+    // Change a variable to a boolean
+    /** @type {VariableData[]} */
+    const dataWithMyVariableAsBool = [
+      {
+        name: 'MyVariable',
+        value: 'true',
+        type: 'boolean',
+      },
+    ];
+    hotReloader._hotReloadVariablesContainer(
+      dataWithMyVariableAsString,
+      dataWithMyVariableAsBool,
+      variablesContainer
+    );
+    expect(variablesContainer.has('MyVariable')).to.be(true);
+    expect(variablesContainer.get('MyVariable').getAsBoolean()).to.be(true);
+
     // Add a new structure
     /** @type {VariableData[]} */
     const dataWithMyVariableAsStructure = [
@@ -383,5 +400,45 @@ describe('gdjs.HotReloader.deepEqual', () => {
         .getChild('MyGrandChild2')
         .getAsString()
     ).to.be('Hello World 3');
+
+    // Make the variable an array
+    /** @type {VariableData[]} */
+    const dataWithMyVariableAsArray = [
+      {
+        name: 'MyVariable',
+        type: 'array',
+        children: [
+          {
+            type: 'structure',
+            children: [
+              {
+                name: 'MyGrandChild2',
+                value: 'Hello World 3',
+                type: 'string',
+              },
+            ],
+          },
+          {
+            value: 'Hello World 2',
+            type: 'string',
+          },
+        ],
+      },
+    ];
+    hotReloader._hotReloadVariablesContainer(
+      dataWithMyVariableAsStructureWithChild1AsStructure3,
+      dataWithMyVariableAsArray,
+      variablesContainer
+    );
+    expect(variablesContainer.has('MyVariable')).to.be(true);
+    expect(variablesContainer.get('MyVariable').getType()).to.be('array');
+    expect(variablesContainer.get('MyVariable').getChildrenCount()).to.be(2);
+    const array = variablesContainer.get('MyVariable');
+    expect(array.getAtIndex(0).getType()).to.be('structure');
+    expect(array.getAtIndex(0).getChild('MyGrandChild2').getAsString()).to.be(
+      'Hello World 3'
+    );
+    expect(array.getAtIndex(1).getType()).to.be('string');
+    expect(array.getAtIndex(1).getAsString()).to.be('Hello World 2');
   });
 });

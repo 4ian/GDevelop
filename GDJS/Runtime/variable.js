@@ -381,39 +381,3 @@ gdjs.Variable.prototype.push = function (variable) {
   if (this._type === 'array' && variable instanceof gdjs.Variable)
     this._childrenList.push(variable);
 };
-
-/**
- * Sets another variable to an array from
- * the range selected in the current array
- * @param {gdjs.Variable} variable
- * @param {number} start
- * @param {number} end
- */
-gdjs.Variable.prototype.slice = function (variable, start, end) {
-  if (this._type === 'array') {
-    variable._type = 'array';
-    variable._childrenList = this._childrenList.slice(start, end);
-  }
-};
-
-/**
- * Removes elements from the array in a given range.
- * @param {number} start
- * @param {number} deleteCount
- */
-gdjs.Variable.prototype.splice = function (start, deleteCount) {
-  if (this._type === 'array') this._childrenList.splice(start, deleteCount);
-};
-
-/**
- * Adds the elements of another array to the current array.
- * @param {gdjs.Variable} variable
- */
-gdjs.Variable.prototype.concatenateArray = function (variable) {
-  if (
-    this._type === 'array' &&
-    variable instanceof gdjs.Variable &&
-    variable.getType() === 'array'
-  )
-    this._childrenList = this._childrenList.concat(variable._childrenList);
-};

@@ -87,6 +87,9 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["VarObjetTxt"]
       .SetFunctionName("getVariableString")
       .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectVariableAsBoolean"]
+      .SetFunctionName("getVariableBoolean")
+      .SetIncludeFile("runtimeobject.js");
   objectConditions["VarObjetDef"]
       .SetFunctionName("hasVariable")
       .SetIncludeFile("runtimeobject.js");
@@ -250,6 +253,10 @@ BaseObjectExtension::BaseObjectExtension() {
           {"=", "setString"},
           {"+", "concatenate"},
       })
+      .SetIncludeFile("runtimeobject.js");
+
+  objectActions["SetObjectVariableAsBoolean"]
+      .SetFunctionName("setVariableBoolean")
       .SetIncludeFile("runtimeobject.js");
 
   GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(

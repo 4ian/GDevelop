@@ -307,6 +307,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("string");
 
+  obj.AddAction("SetObjectVariableAsBoolean",
+                _("Modify the boolean value of a variable of an object"),
+                _("Modify the boolean value of a variable of an object"),
+                _("Set the boolean value of the variable _PARAM1_ of object "
+                  "_PARAM0_ to _PARAM2_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("trueorfalse", _("New Value:"));
+
   obj.AddCondition("ObjectVariableChildExists",
                    _("Child existence"),
                    _("Check if the specified child of the variable exists."),
@@ -483,6 +496,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters("string");
+
+  obj.AddCondition(
+         "ObjectVariableAsBoolean",
+         _("Boolean value of an object's variable"),
+         _("Check the boolean value of a variable of an object."),
+         _("Check the boolean value of variable _PARAM1_ of object _PARAM0_"),
+         _("Variables"),
+         "res/conditions/var24.png",
+         "res/conditions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"));
 
   obj.AddCondition("VarObjetDef",
                    _("Variable defined"),

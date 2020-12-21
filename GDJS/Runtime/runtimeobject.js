@@ -645,6 +645,28 @@ gdjs.RuntimeObject.setVariableString = function(variable, newValue) {
 gdjs.RuntimeObject.prototype.setVariableString = gdjs.RuntimeObject.setVariableString;
 
 /**
+ * Shortcut to set the value of a variable considered as a boolean.
+ * @private
+ * @param {gdjs.Variable} variable
+ * @param {boolean} newValue
+ */
+gdjs.RuntimeObject.setVariableBoolean = function(variable, newValue) {
+    variable.setBoolean(newValue);
+};
+gdjs.RuntimeObject.prototype.setVariableBoolean = gdjs.RuntimeObject.setVariableBoolean;
+
+/**
+ * Shortcut to get the value of a variable considered as a boolean.
+ * @private
+ * @param {gdjs.Variable} variable
+ * @returns {boolean}
+ */
+gdjs.RuntimeObject.getVariableBoolean = function(variable) {
+    return variable.getAsBoolean();
+};
+gdjs.RuntimeObject.prototype.getVariableBoolean = gdjs.RuntimeObject.getVariableBoolean;
+
+/**
  * @static
  * @private
  * @param {gdjs.Variable} variable The variable to be tested

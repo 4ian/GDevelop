@@ -659,10 +659,11 @@ gdjs.RuntimeObject.prototype.setVariableBoolean = gdjs.RuntimeObject.setVariable
  * Shortcut to get the value of a variable considered as a boolean.
  * @private
  * @param {gdjs.Variable} variable
+ * @param {boolean} compareWith
  * @returns {boolean}
  */
-gdjs.RuntimeObject.getVariableBoolean = function(variable) {
-    return variable.getAsBoolean();
+gdjs.RuntimeObject.getVariableBoolean = function(variable, compareWith) {
+    return gdjs.evtTools.common.getVariableBoolean(variable, compareWith);
 };
 gdjs.RuntimeObject.prototype.getVariableBoolean = gdjs.RuntimeObject.getVariableBoolean;
 

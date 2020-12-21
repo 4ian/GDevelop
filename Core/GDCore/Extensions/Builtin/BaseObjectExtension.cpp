@@ -514,13 +514,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition(
          "ObjectVariableAsBoolean",
          _("Boolean value of an object's variable"),
-         _("Check the boolean value of a variable of an object."),
-         _("Check the boolean value of variable _PARAM1_ of object _PARAM0_"),
+         _("Compare the boolean value of a variable of an object."),
+         _("The boolean value of variable _PARAM1_ of object _PARAM0_ = _PARAM2_"),
          _("Variables"),
          "res/conditions/var24.png",
          "res/conditions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"));
+      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("trueorfalse", _("Compare with:"))
+      .SetDefaultValue("true");
 
   obj.AddCondition("VarObjetDef",
                    _("Variable defined"),

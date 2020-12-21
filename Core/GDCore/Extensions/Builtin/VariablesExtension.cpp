@@ -46,12 +46,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("SceneVariableAsBoolean",
                     _("Boolean value of a scene variable"),
-                    _("Check the boolean value of a scene variable."),
-                    _("Check the boolean value of scene variable _PARAM0_"),
+                    _("Compare the boolean value of a scene variable."),
+                    _("The boolean value of scene variable _PARAM0_ = _PARAM1_"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("scenevar", _("Variable"));
+      .AddParameter("scenevar", _("Variable"))
+      .AddParameter("trueorfalse", _("Compare with:"))
+      .SetDefaultValue("true");
 
   extension
       .AddCondition(
@@ -118,12 +120,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("GlobalVariableAsBoolean",
                     _("Boolean value of a global variable"),
-                    _("Check the boolean value of a global variable."),
-                    _("Check the boolean value of global variable _PARAM0_"),
+                    _("Compare the boolean value of a global variable."),
+                    _("The boolean value of global variable _PARAM0_ = _PARAM1_"),
                     _("Variables/Global variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("globalvar", _("Variable"));
+      .AddParameter("globalvar", _("Variable"))
+      .AddParameter("trueorfalse", _("Compare with:"))
+      .SetDefaultValue("true");
 
   extension
       .AddCondition("VarGlobalDef",

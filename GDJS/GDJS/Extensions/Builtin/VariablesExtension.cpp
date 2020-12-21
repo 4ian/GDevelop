@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDJS/Extensions/Builtin/VariablesExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -25,10 +26,14 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarSceneTxt"].SetFunctionName(
       "gdjs.evtTools.common.getVariableString");
+  GetAllConditions()["SceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllConditions()["VarGlobal"].SetFunctionName(
       "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarGlobalTxt"].SetFunctionName(
       "gdjs.evtTools.common.getVariableString");
+  GetAllConditions()["GlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllExpressions()["Variable"].SetFunctionName(
       "gdjs.evtTools.common.getVariableNumber");
   GetAllStrExpressions()["VariableString"].SetFunctionName(
@@ -46,6 +51,11 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.sceneVariableExists");
   GetAllConditions()["VarGlobalDef"].SetFunctionName(
       "gdjs.evtTools.common.globalVariableExists");
+
+  GetAllActions()["SetSceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.setVariableBoolean");
+  GetAllActions()["SetGlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.setVariableBoolean");
 
   GetAllConditions()["VariableChildExists"].SetFunctionName(
       "gdjs.evtTools.common.variableChildExists");
@@ -172,7 +182,8 @@ VariablesExtension::VariablesExtension() {
             if (op == "=")
               return varGetter + ".setString(" + expressionCode + ");\n";
             else if (op == "+")
-              return varGetter + ".concatenateString(" + expressionCode + ");\n";
+              return varGetter + ".concatenateString(" + expressionCode +
+                     ");\n";
 
             return gd::String("");
           });

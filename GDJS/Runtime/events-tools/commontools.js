@@ -33,6 +33,26 @@ gdjs.evtTools.common.getVariableString = function (variable) {
 };
 
 /**
+ * Get the boolean value of a variable. Equivalent to `variable.getAsBoolean()`.
+ * @param {gdjs.Variable} variable Variable.
+ * @returns {string} The content of the variable, as a string.
+ * @private
+ */
+gdjs.evtTools.common.getVariableBoolean = function (variable) {
+  return variable.getAsBoolean();
+};
+
+/**
+ * Set the boolean value of a variable. Equivalent to `variable.setBoolean()`.
+ * @param {gdjs.Variable} variable Variable.
+ * @param {boolean} bool The new boolean value of the variable.
+ * @private
+ */
+gdjs.evtTools.common.setVariableBoolean = function (variable, bool) {
+  return variable.setBoolean(bool);
+};
+
+/**
  * Check if a scene variable exists.
  * @param {gdjs.RuntimeScene} runtimeScene The scene.
  * @param {string} variableName Name of the scene variable.

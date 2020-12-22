@@ -6,6 +6,7 @@ import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from '../UI/Checkbox';
 import AddCircle from '@material-ui/icons/AddCircle';
+import BuildIcon from '@material-ui/icons/Build';
 import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
 import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
@@ -147,53 +148,94 @@ const VariableRow = ({
         </IconButton>
       ) : (
         origin !== 'parent' && (
-          <ElementWithMenu
-            onClick={e =>
-              isCollection && !e.shiftKey && e.type !== 'contextmenu'
-                ? onAddChild() && false
-                : true
-            }
-            element={
-              <IconButton
-                size="small"
-                style={isCollection ? undefined : styles.fadedButton}
-                tooltip={t`Add child variable`}
-              >
-                <AddCircle />
-              </IconButton>
-            }
-            buildMenuTemplate={(i18n: I18nType) =>
-              (isCollection
-                ? [
-                    {
-                      label: i18n._(t`Add child`),
-                      click: () => onAddChild(),
-                    },
-                  ]
-                : []
-              )
-                .concat(
-                  variable.getType() !== gd.Variable.Structure
-                    ? [
-                        {
-                          label: i18n._(t`Convert to structure`),
-                          click: () => onChangeType('structure'),
-                        },
-                      ]
-                    : []
+          <>
+            <ElementWithMenu
+              shouldOpen={e =>
+                isCollection && !e.shiftKey && e.type !== 'contextmenu'
+                  ? onAddChild() && false
+                  : true
+              }
+              element={
+                <IconButton
+                  size="small"
+                  style={isCollection ? undefined : styles.fadedButton}
+                  tooltip={t`Add child variable`}
+                >
+                  <AddCircle />
+                </IconButton>
+              }
+              buildMenuTemplate={(i18n: I18nType) =>
+                (isCollection
+                  ? [
+                      {
+                        label: i18n._(t`Add child`),
+                        click: () => onAddChild(),
+                      },
+                    ]
+                  : []
                 )
-                .concat(
-                  variable.getType() !== gd.Variable.Array
-                    ? [
-                        {
-                          label: i18n._(t`Convert to array`),
-                          click: () => onChangeType('array'),
-                        },
-                      ]
-                    : []
-                )
-            }
-          />
+                  .concat(
+                    variable.getType() !== gd.Variable.Structure
+                      ? [
+                          {
+                            label: i18n._(t`Convert to structure`),
+                            click: () => onChangeType('structure'),
+                          },
+                        ]
+                      : []
+                  )
+                  .concat(
+                    variable.getType() !== gd.Variable.Array
+                      ? [
+                          {
+                            label: i18n._(t`Convert to array`),
+                            click: () => onChangeType('array'),
+                          },
+                        ]
+                      : []
+                  )
+              }
+            />
+            <ElementWithMenu
+              element={
+                <IconButton size="small" tooltip={t`Change variable type`}>
+                  <BuildIcon />
+                </IconButton>
+              }
+              buildMenuTemplate={(i18n: I18nType) =>
+                [
+                  {
+                    gdType: gd.Variable.String,
+                    label: i18n._(t`Convert to string`),
+                    click: () => onChangeType('string'),
+                  },
+                  {
+                    gdType: gd.Variable.Number,
+                    label: i18n._(t`Convert to number`),
+                    click: () => onChangeType('number'),
+                  },
+                  {
+                    gdType: gd.Variable.Boolean,
+                    label: i18n._(t`Convert to boolean`),
+                    click: () => onChangeType('boolean'),
+                  },
+                  {
+                    type: 'separator',
+                  },
+                  {
+                    gdType: gd.Variable.Structure,
+                    label: i18n._(t`Convert to structure`),
+                    click: () => onChangeType('structure'),
+                  },
+                  {
+                    gdType: gd.Variable.Array,
+                    label: i18n._(t`Convert to array`),
+                    click: () => onChangeType('array'),
+                  },
+                ].filter(e => e.gdType !== type)
+              }
+            />
+          </>
         )
       )}
     </TreeTableCell>

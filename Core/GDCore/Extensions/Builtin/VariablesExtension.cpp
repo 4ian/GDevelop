@@ -44,15 +44,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardRelationalOperatorParameters("string");
 
   extension
-      .AddCondition("SceneVariableAsBoolean",
-                    _("Boolean value of a scene variable"),
-                    _("Compare the boolean value of a scene variable."),
-                    _("The boolean value of scene variable _PARAM0_ = _PARAM1_"),
-                    _("Variables"),
-                    "res/conditions/var24.png",
-                    "res/conditions/var.png")
+      .AddCondition(
+          "SceneVariableAsBoolean",
+          _("Boolean value of a scene variable"),
+          _("Compare the boolean value of a scene variable."),
+          _("The boolean value of scene variable _PARAM0_ is _PARAM1_"),
+          _("Variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("trueorfalse", _("Compare with:"))
+      .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true");
 
   extension
@@ -118,15 +119,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("GlobalVariableAsBoolean",
-                    _("Boolean value of a global variable"),
-                    _("Compare the boolean value of a global variable."),
-                    _("The boolean value of global variable _PARAM0_ = _PARAM1_"),
-                    _("Variables/Global variables"),
-                    "res/conditions/var24.png",
-                    "res/conditions/var.png")
+      .AddCondition(
+          "GlobalVariableAsBoolean",
+          _("Boolean value of a global variable"),
+          _("Compare the boolean value of a global variable."),
+          _("The boolean value of global variable _PARAM0_ is _PARAM1_"),
+          _("Variables/Global variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("trueorfalse", _("Compare with:"))
+      .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true");
 
   extension

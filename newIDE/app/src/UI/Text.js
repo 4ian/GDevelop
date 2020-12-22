@@ -8,6 +8,7 @@ type Props = {|
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   noShrink?: boolean,
   noMargin?: boolean,
+  fullWidth?: boolean,
   style?: {|
     // Margins
     marginLeft?: number,
@@ -39,6 +40,7 @@ export default ({
   align,
   noShrink,
   noMargin,
+  fullWidth,
 }: Props) => (
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
@@ -47,6 +49,7 @@ export default ({
       flexShrink: noShrink ? 0 : undefined,
       marginTop: noMargin ? 0 : 6,
       marginBottom: noMargin ? 0 : 6,
+      ...(fullWidth ? { width: '100%' } : {}),
     }}
     align={align || 'inherit'}
   >

@@ -190,8 +190,6 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     origin: VariableOrigin
   ): Array<React.Node> {
-    const variables = parentVariable.getAllChildrenList();
-
     return mapFor(0, parentVariable.getChildrenCount(), index => {
       const variable = parentVariable.getAtIndex(index);
       return this._renderVariableAndChildrenRows(
@@ -226,8 +224,7 @@ export default class VariablesList extends React.Component<Props, State> {
   ) {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const type = variable.getType();
-    const isCollection =
-      type === gd.Variable.Structure || type === gd.Variable.Array;
+    const isCollection = !gd.Variable.isPrimitive(variable.getType());
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 
@@ -257,6 +254,10 @@ export default class VariablesList extends React.Component<Props, State> {
           variablesContainer.removeRecursively(variable);
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        }}
+        onChangeType={newType => {
+          variable.castTo(newType);
+          this.forceUpdate();
         }}
         onBlur={event => {
           const text = event.target.value;
@@ -289,26 +290,16 @@ export default class VariablesList extends React.Component<Props, State> {
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
-        onAddChild={(forceType: ?string) => {
-          if (typeof forceType === 'string') {
-            if (forceType === 'structure') {
-              const name = newNameGenerator('ChildVariable', name =>
-                variable.hasChild(name)
-              );
-              variable.getChild(name).setString('');
-            } else if (forceType === 'array') variable.pushNew();
-          } else {
-            // This shouldn't happen, non stuctural types should be converted via forceType
-            if (!isCollection) return;
+        onAddChild={() => {
+          // This shouldn't happen, non stuctural types should be converted via forceType
+          if (!isCollection) return;
 
-            if (type === gd.Variable.Structure) {
-              const name = newNameGenerator('ChildVariable', name =>
-                variable.hasChild(name)
-              );
-              variable.getChild(name).setString('');
-            } else if (type === gd.Variable.Array)
-              variable.getAtIndex(variable.getChildrenCount()).setString('');
-          }
+          if (type === gd.Variable.Structure) {
+            const name = newNameGenerator('ChildVariable', name =>
+              variable.hasChild(name)
+            );
+            variable.getChild(name).setString('');
+          } else if (type === gd.Variable.Array) variable.pushNew();
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();

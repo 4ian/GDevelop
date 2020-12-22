@@ -182,7 +182,10 @@ enum Variable_Type {
 interface Variable {
     void Variable();
 
+    boolean STATIC_IsPrimitive([Const] Variable_Type type);
+
     Variable_Type GetType();
+    void CastTo([Const] DOMString type);
 
     void SetString([Const] DOMString str);
     [Const, Ref] DOMString GetString();

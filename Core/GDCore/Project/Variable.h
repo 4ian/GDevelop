@@ -49,6 +49,11 @@ class GD_CORE_API Variable {
   static Type StringAsType(const gd::String& str);
 
   /**
+   * \brief Returns true if the passed type is primitive
+   */
+  static bool IsPrimitive(const Type type);
+
+  /**
    * \brief Default constructor creating a variable with 0 as value.
    */
   Variable() : value(0), type(Type::Number){};
@@ -61,6 +66,16 @@ class GD_CORE_API Variable {
    * \brief Get the type of the variable.
    */
   Type GetType() const { return type; }
+
+  /**
+   * \brief Converts the variable to a new type.
+   */
+  void CastTo(const Type newType);
+
+  /**
+   * \brief Converts the variable to a new type.
+   */
+  void CastTo(const gd::String& type) {return CastTo(StringAsType(type));};
 
   /** \name Primitives
    * Methods and operators used when the variable is considered as a primitive.

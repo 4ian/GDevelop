@@ -7,16 +7,13 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from '../UI/Checkbox';
 import AddCircle from '@material-ui/icons/AddCircle';
 import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
-import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
-import { toArray } from 'lodash';
-import Popover from '@material-ui/core/Popover';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 const gd: libGDevelop = global.gd;
 
 //TODO: Refactor into TreeTable?
@@ -26,20 +23,16 @@ const Indent = ({ width }) => (
   </div>
 );
 
-type MouseEvent = {|
-  currentTarget: HTMLButtonElement,
-  shiftKey: boolean,
-|};
-
 type Props = {|
   name: string,
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
   commitVariableValueOnBlur: boolean,
+  onChangeType: (type: string) => void,
   onBlur: () => void,
   onRemove: () => void,
-  onAddChild: (forceType: ?string) => void,
+  onAddChild: () => void,
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
@@ -56,6 +49,7 @@ const VariableRow = ({
   variable,
   depth,
   errorText,
+  onChangeType,
   onBlur,
   commitVariableValueOnBlur,
   onRemove,
@@ -71,27 +65,10 @@ const VariableRow = ({
   arrayElement,
 }: Props) => {
   const type = variable.getType();
-  const isCollection =
-    type === gd.Variable.Structure || type === gd.Variable.Array;
+  const isCollection = !gd.Variable.isPrimitive(type);
 
   const key = '' + depth + name;
   const limitEditing = origin === 'parent' || origin === 'inherited';
-
-  const [popoverElement, openPopover] = React.useState<?HTMLButtonElement>(
-    null
-  );
-
-  const addChild = (e: ?MouseEvent) => {
-    if (typeof e !== 'undefined') {
-      if (!isCollection || e.shiftKey) openPopover(e.currentTarget);
-    } else onAddChild();
-  };
-
-  const close = () => {
-    if (!!popoverElement) {
-      openPopover(null);
-    }
-  };
 
   const columns = [
     <TreeTableCell key="name" expand>
@@ -106,7 +83,9 @@ const VariableRow = ({
         />
       )}
       {arrayElement ? (
-        <Text noMargin>{name}</Text>
+        <Text noMargin fullWidth>
+          {name}
+        </Text>
       ) : (
         <TextField
           margin="none"
@@ -168,53 +147,53 @@ const VariableRow = ({
         </IconButton>
       ) : (
         origin !== 'parent' && (
-          <>
-            <IconButton
-              size="small"
-              onClick={addChild}
-              style={isCollection ? undefined : styles.fadedButton}
-              tooltip={t`Add child variable`}
-            >
-              <AddCircle />
-            </IconButton>
-            {!!popoverElement && (
-              <Popover
-                anchorOrigin={{
-                  vertical: 'center',
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'center',
-                  horizontal: 'right',
-                }}
-                open
-                onClose={close}
-                anchorEl={popoverElement}
+          <ElementWithMenu
+            onClick={e =>
+              isCollection && !e.shiftKey && e.type !== 'contextmenu'
+                ? onAddChild() && false
+                : true
+            }
+            element={
+              <IconButton
+                size="small"
+                style={isCollection ? undefined : styles.fadedButton}
+                tooltip={t`Add child variable`}
               >
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    onAddChild('structure');
-                    close();
-                  }}
-                  tooltip={t`Convert variable into structure`}
-                >
-                  <AccountTreeIcon />
-                </IconButton>
-                <br />
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    onAddChild('array');
-                    close();
-                  }}
-                  tooltip={t`Convert variable into array`}
-                >
-                  <FormatListNumberedIcon />
-                </IconButton>
-              </Popover>
-            )}
-          </>
+                <AddCircle />
+              </IconButton>
+            }
+            buildMenuTemplate={(i18n: I18nType) =>
+              (isCollection
+                ? [
+                    {
+                      label: i18n._(t`Add child`),
+                      click: () => onAddChild(),
+                    },
+                  ]
+                : []
+              )
+                .concat(
+                  variable.getType() !== gd.Variable.Structure
+                    ? [
+                        {
+                          label: i18n._(t`Convert to structure`),
+                          click: () => onChangeType('structure'),
+                        },
+                      ]
+                    : []
+                )
+                .concat(
+                  variable.getType() !== gd.Variable.Array
+                    ? [
+                        {
+                          label: i18n._(t`Convert to array`),
+                          click: () => onChangeType('array'),
+                        },
+                      ]
+                    : []
+                )
+            }
+          />
         )
       )}
     </TreeTableCell>

@@ -6,7 +6,9 @@ declare class gdVariable {
   static Structure: 3;
   static Array: 4;
   constructor(): void;
+  static isPrimitive(type: Variable_Type): boolean;
   getType(): Variable_Type;
+  castTo(type: string): void;
   setString(str: string): void;
   getString(): string;
   setValue(val: number): void;

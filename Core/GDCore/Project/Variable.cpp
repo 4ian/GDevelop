@@ -48,26 +48,54 @@ Variable::Type Variable::StringAsType(const gd::String& str) {
   return Type::Number;
 }
 
-/**
- * Get value as a double
- */
+bool Variable::IsPrimitive(const Type type) {
+  return type == Type::String || type == Type::Number || type == Type::Boolean;
+}
+
+void Variable::CastTo(const Type newType) {
+  if (newType == Type::Number)
+    SetValue(GetValue());
+  else if (newType == Type::String)
+    SetString(GetString());
+  else if (newType == Type::Boolean)
+    SetBool(GetBool());
+  else if (newType == Type::Structure) {
+    children.clear();
+
+    // Conversion is only possible for non prmitive types
+    if (type == Type::Array)
+      for (auto i = childrenList.begin(); i != childrenList.end(); ++i)
+        children.insert(
+            std::make_pair(gd::String::From(i - childrenList.begin()), (*i)));
+
+    type = Type::Structure;
+    // A valid structure has at least 1 child
+    if (children.empty()) GetChild("ChildVariable");
+  } else if (newType == Type::Array) {
+    childrenList.clear();
+
+    // Conversion is only possible for non prmitive types
+    if (type == Type::Structure)
+      for (auto i = children.begin(); i != children.end(); ++i)
+        childrenList.push_back((*i).second);
+
+    type = Type::Array;
+    // A valid array has at least 1 element
+    if (childrenList.empty()) GetAtIndex(0);
+  }
+}
+
 double Variable::GetValue() const {
   if (type == Type::Number) {
     return value;
   } else if (type == Type::String) {
-    value = str.To<double>();
-    type = Type::Number;
-    return value;
+    return str.To<double>();
   } else if (type == Type::Boolean) {
-    value = boolVal ? 1.0 : 0.0;
-    type = Type::Number;
-    return value;
+    return boolVal ? 1.0 : 0.0;
   }
 
-  // It isn't possible to convert a structural type to a number
-  value = 0.0;
-  type = Type::Number;
-  return value;
+  // It isn't possible to convert a non-primitive type to a number
+  return 0.0;
 }
 
 const gd::String& Variable::GetString() const {
@@ -75,17 +103,14 @@ const gd::String& Variable::GetString() const {
     return str;
   } else if (type == Type::Number) {
     str = gd::String::From(value);
-    type = Type::String;
     return str;
   } else if (type == Type::Boolean) {
     str = boolVal ? "1" : "0";
-    type = Type::String;
     return str;
   }
 
   // It isn't possible to convert a structural type to a string
   str = "0";
-  type = Type::String;
   return str;
 }
 
@@ -93,19 +118,13 @@ bool Variable::GetBool() const {
   if (type == Type::Boolean) {
     return boolVal;
   } else if (type == Type::String) {
-    boolVal = !(str.empty() || str == "0");
-    type = Type::Boolean;
-    return boolVal;
+    return !str.empty() && str != "0" && str != "false";
   } else if (type == Type::Number) {
-    boolVal = value != 0;
-    type = Type::Boolean;
-    return boolVal;
+    return value != 0;
   }
 
-  // It isn't possible to convert a structural type to a boolean
-  boolVal = false;
-  type = Type::Boolean;
-  return boolVal;
+  // It isn't possible to convert a non-primitive type to a boolean
+  return false;
 }
 
 bool Variable::HasChild(const gd::String& name) const {
@@ -176,9 +195,7 @@ const Variable& Variable::GetAtIndex(const size_t index) const {
   return *childrenList.at(index);
 };
 
-Variable& Variable::PushNew() {
-  return GetAtIndex(GetChildrenCount());
-};
+Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
 
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenList.size()) return;

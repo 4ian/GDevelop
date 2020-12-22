@@ -81,7 +81,7 @@
     "xxhashjs": "^0.2.2"
   },
   "scripts": {
-    "postinstall": "npm run import-resources && npm run make-version-metadata",
+    "postinstall": "cd ../../GDJS && npm install && npm ../newIE/app && npm run import-resources && npm run make-version-metadata",
     "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js --clean && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",

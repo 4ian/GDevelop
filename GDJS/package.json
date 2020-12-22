@@ -4,22 +4,26 @@
   "private": true,
   "license": "MIT",
   "homepage": "https://gdevelop-app.com",
-  "//": "Note that pixi.js is installed here just for its types. Be sure to keep the version in sync with the version in GDJS/Runtime/pixi-renderers/pixi.js (and the one in the IDE too if possible).",
+  "//": "We use esbuild for a near instant build (important for quick feedback loop when developing). Typechecking is a separate process as much longer.",
   "devDependencies": {
     "@types/electron": "^1.6.10",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
     "@types/node": "^14.11.1",
     "better-docs": "^2.3.2",
+    "esbuild": "^0.8.26",
     "jsdoc": "^3.6.6",
     "jsdoc-autoprivate": "0.0.1",
     "jsdoc-plugin-intersection": "^1.0.2",
     "jsdoc-typeof-plugin": "^1.0.0",
     "pixi.js": "5.3.0",
+    "recursive-readdir": "^2.2.2",
+    "shelljs": "^0.8.4",
     "typescript": "3.6.4"
   },
   "scripts": {
     "check-types": "tsc",
+    "build": "node scripts/build.js",
     "test": "cd tests && npm test",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
   }

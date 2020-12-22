@@ -15,6 +15,15 @@ const destinationPaths = [
   ),
 ];
 
+// Build GDJS
+const output = shell.exec(`node scripts/build.js`, {
+  cwd: path.join(gdevelopRootPath, 'GDJS'),
+});
+if (output.code !== 0) {
+  shell.exit(0);
+}
+
+// Then copy the Runtime to the IDE
 const copyOptions = {
   overwrite: true,
   expand: true,
@@ -22,49 +31,32 @@ const copyOptions = {
   junk: true,
 };
 
+shell.echo(
+  `ℹ️ Copying GDJS and extensions runtime files (*.js) to ${destinationPaths.join(
+    ', '
+  )}...`
+);
 destinationPaths.forEach(destinationPath => {
-  shell.echo(
-    `ℹ️ Copying GDJS and extensions runtime files (*.js) to "${destinationPath}"...`
-  );
-
   if (args.clean) {
     shell.echo(`ℹ️ Cleaning destination first...`);
     shell.rm('-rf', destinationPath);
   }
   shell.mkdir('-p', destinationPath);
 
-  copy(
-    path.join(gdevelopRootPath, 'GDJS', 'Runtime'),
+  const startTime = Date.now();
+  return copy(
+    path.join(gdevelopRootPath, 'GDJS', 'Runtime-bundled'),
     destinationPath,
     copyOptions
   )
     .then(function(results) {
+      const totalFilesCount = results.length;
+      const duration = Date.now() - startTime;
       console.info(
-        `✅ GDJS and extensions runtime copy succeeded (${
-          results.length
-        } file(s) copied`
+        `✅ Runtime files copy done (${totalFilesCount} file(s) copied in ${duration}ms).`
       );
     })
     .catch(function(error) {
-      console.error('❌ Copy failed: ' + error);
-    });
-
-  copy(
-    path.join(gdevelopRootPath, 'Extensions'),
-    path.join(destinationPath, 'Extensions'),
-    {
-      ...copyOptions,
-      filter: ['**/*.js'],
-    }
-  )
-    .then(function(results) {
-      console.info(
-        `✅ GDJS and extensions runtime copy succeeded (${
-          results.length
-        } file(s) copied`
-      );
-    })
-    .catch(function(error) {
-      console.error('❌ Copy failed: ' + error);
+      console.error('❌ Copy failed: ', error);
     });
 });

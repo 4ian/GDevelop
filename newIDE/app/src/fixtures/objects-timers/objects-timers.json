@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -165,6 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "dc5531e0-4088-414d-a5ab-908687811f9d",
           "width": 0,
           "x": 556.402,
           "y": 101.694,
@@ -185,6 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "c499549d-7ed7-4228-ab9f-836ad34376ba",
           "width": 0,
           "x": 65.3582,
           "y": 100.513,
@@ -205,6 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "2740d30e-f3bc-446d-9354-4a4b54c7ec27",
           "width": 0,
           "x": 319.143,
           "y": 99.333,
@@ -225,6 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "6ec718d3-9bf9-4b34-adbb-5e77cde4de1d",
           "width": 0,
           "x": 568.206,
           "y": 396.792,
@@ -245,6 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "b14a7661-ac62-4106-bd58-1ae86533ea87",
           "width": 0,
           "x": 87.7857,
           "y": 395.612,
@@ -265,6 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "43a96069-c4bb-4b4e-9bba-dd0e1f258701",
           "width": 0,
           "x": 323.865,
           "y": 394.431,
@@ -285,6 +291,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "24144e6b-f589-44f7-a607-d0f9f0541614",
           "width": 0,
           "x": 598.896,
           "y": 327.149,
@@ -305,6 +312,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "f8aeaaba-0596-477a-a610-59279d4f2d37",
           "width": 0,
           "x": 116.115,
           "y": 322.427,
@@ -325,6 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "967b08e1-57dd-4dcf-a37f-39be1b5f61cd",
           "width": 0,
           "x": 351.014,
           "y": 325.969,
@@ -345,6 +354,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "baa0f5d0-d196-4e66-8f2a-e2143b17faa6",
           "width": 0,
           "x": 604.798,
           "y": 52.1173,
@@ -365,6 +375,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "2c048e4c-8804-482d-90bf-ba7f267e1b7d",
           "width": 0,
           "x": 111.394,
           "y": 43.8546,
@@ -385,6 +396,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "68440cf3-4a02-4fcb-b882-fb3a1ff707b8",
           "width": 0,
           "x": 367.539,
           "y": 48.5762,
@@ -1008,6 +1020,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

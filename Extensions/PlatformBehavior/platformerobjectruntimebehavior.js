@@ -77,6 +77,44 @@ gdjs.registerBehavior(
   gdjs.PlatformerObjectRuntimeBehavior
 );
 
+gdjs.PlatformerObjectRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+  if (oldBehaviorData.roundCoordinates !== newBehaviorData.roundCoordinates) {
+    this._roundCoordinates = newBehaviorData.roundCoordinates;
+  }
+  if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
+    this.setGravity(newBehaviorData.gravity);
+  }
+  if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
+    this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
+  }
+  if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
+    this.setAcceleration(newBehaviorData.acceleration);
+  }
+  if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
+    this.setDeceleration(newBehaviorData.deceleration);
+  }
+  if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
+    this.setMaxSpeed(newBehaviorData.maxSpeed);
+  }
+  if (oldBehaviorData.jumpSpeed !== newBehaviorData.jumpSpeed) {
+    this.setJumpSpeed(newBehaviorData.jumpSpeed);
+  }
+  if (oldBehaviorData.canGrabPlatforms !== newBehaviorData.canGrabPlatforms) {
+    this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
+  }
+  if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
+    this._yGrabOffset = newBehaviorData.yGrabOffset;
+  }
+  if (oldBehaviorData.xGrabTolerance !== newBehaviorData.xGrabTolerance) {
+    this._xGrabTolerance = newBehaviorData.xGrabTolerance;
+  }
+  if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
+    this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+  }
+
+  return true;
+};
+
 gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(
   runtimeScene
 ) {

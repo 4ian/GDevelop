@@ -17,6 +17,31 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 
+const checkFileContent = (filePath: string, expectedContent: string) => {
+  const time = performance.now();
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, { encoding: 'utf8' }, (err, content) => {
+      if (err) return reject(err);
+
+      if (content === '') {
+        reject(new Error(`Written file is empty, did the write fail?`));
+      }
+      if (content !== expectedContent) {
+        reject(
+          new Error(
+            `Written file is not containing the expected content, did the write fail?`
+          )
+        );
+      }
+      const verificationTime = performance.now() - time;
+      console.info(
+        `Verified ${filePath} content in ${verificationTime.toFixed()}ms.`
+      );
+      resolve();
+    });
+  });
+};
+
 const writeJSONFile = (object: Object, filePath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
 
@@ -28,18 +53,21 @@ const writeJSONFile = (object: Object, filePath: string): Promise<void> => {
       );
     }
 
-    return fs.ensureDir(path.dirname(filePath)).then(
-      () =>
-        new Promise((resolve, reject) => {
-          fs.writeFile(filePath, content, (err: ?Error) => {
-            if (err) {
-              return reject(err);
-            }
+    return fs
+      .ensureDir(path.dirname(filePath))
+      .then(
+        () =>
+          new Promise((resolve, reject) => {
+            fs.writeFile(filePath, content, (err: ?Error) => {
+              if (err) {
+                return reject(err);
+              }
 
-            return resolve();
-          });
-        })
-    );
+              return resolve();
+            });
+          })
+      )
+      .then(() => checkFileContent(filePath, content));
   } catch (stringifyException) {
     return Promise.reject(stringifyException);
   }

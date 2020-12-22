@@ -309,6 +309,30 @@ gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the ob
 //Others initialization and internal state management :
 
 /**
+ * @param {SpriteObjectData} oldObjectData
+ * @param {SpriteObjectData} newObjectData
+ */
+gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    var runtimeScene = this._runtimeScene;
+    for(var i = 0, len = newObjectData.animations.length;i<len;++i) {
+        var animData = newObjectData.animations[i];
+
+        if ( i < this._animations.length )
+            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
+        else
+            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+    }
+    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
+
+    this._updateAnimationFrame();
+    if (!this._animationFrame) {
+        this.setAnimation(0);
+    }
+    this.hitBoxesDirty = true;
+    return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @param {{numberProperties: Array<{name: string, value: number}>, customSize: {width: number, height: number}}} initialInstanceData The extra parameters
  */
@@ -879,7 +903,7 @@ gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.SpriteRuntimeObject.prototype.getColor = function() {
     return this._renderer.getColor();

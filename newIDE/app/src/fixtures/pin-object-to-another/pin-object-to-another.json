@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -168,6 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "d0b2dac7-6002-4864-85aa-b3f5cce065f6",
           "width": 0,
           "x": 10,
           "y": 12.5,
@@ -183,6 +184,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "54232dd3-f2b7-443a-b093-1367cf0d9c14",
           "width": 0,
           "x": 406,
           "y": 343,
@@ -198,6 +200,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "152d1e6f-e414-4e14-8b00-dfb32e646759",
           "width": 54.7414,
           "x": 516,
           "y": 215,
@@ -213,6 +216,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "16731e6a-940d-4d37-add9-cab2bc45040c",
           "width": 215.06,
           "x": 373,
           "y": 198,
@@ -228,6 +232,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "4dc3c363-23cf-4647-9acb-a2b69e67d497",
           "width": 160.345,
           "x": 566,
           "y": 455,
@@ -243,6 +248,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "184cb808-d927-481a-b5fa-5a025ab14bee",
           "width": 100,
           "x": 233.433,
           "y": 453.542,
@@ -258,6 +264,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "2674d278-83b6-46be-adea-a12216c28e84",
           "width": 73.0603,
           "x": 216,
           "y": 221,
@@ -670,6 +677,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -18,7 +18,11 @@ gdjs.BBTextRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
           .getFontManager()
           .getFontFamily(runtimeObject._fontFamily),
         fontSize: runtimeObject._fontSize + 'px',
-        fill: runtimeObject._color,
+        fill: gdjs.rgbToHexNumber(
+          runtimeObject._color[0],
+          runtimeObject._color[1],
+          runtimeObject._color[2]
+        ),
         tagStyle: 'bbcode',
         wordWrap: runtimeObject._wordWrap,
         wordWrapWidth: runtimeObject._wrappingWidth,
@@ -67,12 +71,16 @@ gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function ()
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateText = function () {
-  this._pixiObject.setText(this._object._text);
+  this._pixiObject.text = this._object._text;
   this.updatePosition();
 };
 
 gdjs.BBTextRuntimeObjectPixiRenderer.prototype.updateColor = function () {
-  this._pixiObject.textStyles.default.fill = this._object._color;
+  this._pixiObject.textStyles.default.fill = gdjs.rgbToHexNumber(
+    this._object._color[0],
+    this._object._color[1],
+    this._object._color[2]
+  );
   this._pixiObject.dirty = true;
 };
 

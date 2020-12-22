@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useOnResize } from '../../Utils/UseOnResize';
 
 export type WidthType = 'small' | 'medium' | 'large';
 
@@ -13,12 +15,14 @@ type Props = {|
  * are small.
  */
 export const ResponsiveWindowMeasurer = ({ children }: Props) => {
+  useOnResize(useForceUpdate());
+
   if (typeof window === 'undefined') {
     return children('medium');
   }
 
   return children(
-    window.innerWidth < 750 || window.innerHeight < 475
+    window.innerWidth < 750 || window.innerHeight < 350
       ? 'small'
       : window.innerWidth < 1150
       ? 'medium'

@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -161,6 +161,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyPressed",
+          "persistentUuid": "d0d56956-31be-4fd2-8fa6-41a3004ab3ba",
           "width": 0,
           "x": 64,
           "y": 192,
@@ -176,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyText",
+          "persistentUuid": "48da6b54-b38d-4811-a63c-8ff2848435d0",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -191,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "1abb4e5f-31de-4bca-a5e8-3986dcd4d660",
           "width": 0,
           "x": 356.5,
           "y": 439.5,
@@ -206,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "ff091f68-49fb-427c-b091-f2f7104fb5ff",
           "width": 0,
           "x": 113,
           "y": 323,
@@ -221,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyUsed",
+          "persistentUuid": "7ce69185-14d5-41a8-afbf-ebdb7985e5c1",
           "width": 0,
           "x": 64,
           "y": 224,
@@ -236,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyText",
+          "persistentUuid": "30d63ca6-eeae-435d-9702-7985bc26b896",
           "width": 0,
           "x": 256,
           "y": 224,
@@ -607,6 +613,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

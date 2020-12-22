@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
@@ -30,7 +30,7 @@ function RenderedTiledSpriteInstance(
   //Setup the PIXI object:
   var tiledSprite = gd.asTiledSpriteObject(associatedObject);
   this._texture = tiledSprite.getTexture();
-  this._pixiObject = new PIXI.extras.TilingSprite(
+  this._pixiObject = new PIXI.TilingSprite(
     this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
     tiledSprite.getWidth(),
     tiledSprite.getHeight()
@@ -53,7 +53,11 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 ) {
   var tiledSprite = gd.asTiledSpriteObject(object);
 
-  return resourcesLoader.getResourceFullUrl(project, tiledSprite.getTexture());
+  return resourcesLoader.getResourceFullUrl(
+    project,
+    tiledSprite.getTexture(),
+    {}
+  );
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {

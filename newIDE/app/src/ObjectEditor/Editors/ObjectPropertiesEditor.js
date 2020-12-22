@@ -8,8 +8,15 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type EditorProps } from './EditorProps.flow';
 import { Column, Line } from '../../UI/Grid';
-import { getExtraObjectsInformation } from '../../Hints';
+import {
+  getExtraObjectsInformation,
+  getObjectTutorialHints,
+} from '../../Hints';
 import AlertMessage from '../../UI/AlertMessage';
+import { ColumnStackLayout } from '../../UI/Layout';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
+
+const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
@@ -22,9 +29,14 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    console.log(object);
-    // TODO: cast to gdObject?
-    const properties = object.getProperties();
+
+    // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
+    // and associated methods are redefined in JS, they have different arguments (
+    // see ObjectJsImplementation C++ implementation). If called directly here from JS,
+    // the arguments will be mismatched. To workaround this, always case the object to
+    // a base gdObject to ensure C++ methods are called.
+    const objectAsGdObject = gd.castObject(object, gd.gdObject);
+    const properties = objectAsGdObject.getProperties();
 
     const propertiesSchema = propertiesMapToSchema(
       properties,
@@ -32,12 +44,22 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
       (object, name, value) => object.updateProperty(name, value)
     );
 
-    const extraInformation = getExtraObjectsInformation()[object.getType()];
+    const extraInformation = getExtraObjectsInformation()[
+      objectAsGdObject.getType()
+    ];
+
+    const tutorialHints = getObjectTutorialHints(objectAsGdObject.getType());
 
     return (
       <I18n>
         {({ i18n }) => (
-          <Column>
+          <ColumnStackLayout>
+            {tutorialHints.map(tutorialHint => (
+              <DismissableTutorialMessage
+                key={tutorialHint.identifier}
+                tutorialHint={tutorialHint}
+              />
+            ))}
             {propertiesSchema.length ? (
               <React.Fragment>
                 {extraInformation ? (
@@ -54,7 +76,7 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
                 <PropertiesEditor
                   unsavedChanges={this.props.unsavedChanges}
                   schema={propertiesSchema}
-                  instances={[object]}
+                  instances={[objectAsGdObject]}
                   project={project}
                   resourceSources={resourceSources}
                   onChooseResource={onChooseResource}
@@ -69,7 +91,7 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
                 </Trans>
               </EmptyMessage>
             )}
-          </Column>
+          </ColumnStackLayout>
         )}
       </I18n>
     );

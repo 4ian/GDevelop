@@ -21,7 +21,7 @@ class GD_EXTENSION_API DestroyOutsideBehavior : public gd::Behavior {
  public:
   DestroyOutsideBehavior(){};
   virtual ~DestroyOutsideBehavior(){};
-  virtual Behavior* Clone() const { return new DestroyOutsideBehavior(*this); }
+  virtual Behavior* Clone() const override { return new DestroyOutsideBehavior(*this); }
 
 #if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(

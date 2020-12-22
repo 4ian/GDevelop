@@ -17,6 +17,7 @@ type State = {|
 |};
 
 type Props = {|
+  getIncludeFileHashs: () => { [string]: number },
   onExport?: () => void,
   onChangeSubscription?: () => void,
 |};
@@ -26,6 +27,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => false;
+  canDoHotReload = () => false;
 
   state = {
     showPreviewLinkDialog: false,
@@ -76,16 +78,21 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
     return this._prepareExporter()
       .then(({ exporter, outputDir, browserS3FileSystem }) => {
+        const previewExportOptions = new gd.PreviewExportOptions(
+          project,
+          outputDir
+        );
+        previewExportOptions.setLayoutName(layout.getName());
         if (externalLayout) {
-          exporter.exportExternalLayoutForPixiPreview(
-            project,
-            layout,
-            externalLayout,
-            outputDir
-          );
-        } else {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+          previewExportOptions.setExternalLayoutName(externalLayout.getName());
         }
+
+        // Scripts generated from extensions keep the same URL even after being modified.
+        // Use a cache bursting parameter to force the browser to reload them.
+        previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+
+        exporter.exportProjectForPixiPreview(previewExportOptions);
+        previewExportOptions.delete();
         exporter.delete();
         return browserS3FileSystem
           .uploadPendingObjects()

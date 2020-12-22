@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n } from '@lingui/core';
 
 import React from 'react';
 import SelectField from '../../UI/SelectField';
@@ -15,15 +16,16 @@ import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
+import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import { isMacLike } from '../../Utils/Platform';
+import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 
 type Props = {|
+  i18n: I18n,
   onClose: Function,
 |};
 
-const PreferencesDialog = ({ onClose }: Props) => {
+const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const {
     values,
@@ -31,6 +33,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
     setCodeEditorThemeName,
     setAutoDownloadUpdates,
     showAlertMessage,
+    showTutorialHint,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -40,7 +43,8 @@ const PreferencesDialog = ({ onClose }: Props) => {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
-    setUseCommandPalette,
+    resetShortcutsToDefault,
+    setShortcutForCommand,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -63,6 +67,7 @@ const PreferencesDialog = ({ onClose }: Props) => {
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab label={<Trans>Preferences</Trans>} value="preferences" />
         <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
+        <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
       </Tabs>
       {currentTab === 'preferences' && (
         <Column>
@@ -256,29 +261,6 @@ const PreferencesDialog = ({ onClose }: Props) => {
               />
             </Line>
           )}
-          <Text size="title">
-            <Trans>Command Palette</Trans>
-          </Text>
-          <Line>
-            <Column noMargin>
-              <Toggle
-                onToggle={(e, check) => setUseCommandPalette(check)}
-                toggled={values.useCommandPalette}
-                labelPosition="right"
-                label={<Trans>Enable command palette (experimental)</Trans>}
-              />
-              <FormHelperText>
-                <Trans>
-                  Open the command palette with{' '}
-                  {isMacLike() ? 'Cmd + P' : 'Ctrl + P'}.
-                </Trans>{' '}
-                <Trans>
-                  This is an experimental feature, new commands will be added in
-                  the next versions.
-                </Trans>
-              </FormHelperText>
-            </Column>
-          </Line>
         </Column>
       )}
       {currentTab === 'hints' && (
@@ -298,8 +280,31 @@ const PreferencesDialog = ({ onClose }: Props) => {
                   />
                 </Line>
               ))}
+              <Text>
+                <Trans>Show link to tutorials:</Trans>
+              </Text>
+              {getAllTutorialHints().map(({ identifier, name }) => (
+                <Line key={identifier}>
+                  <Toggle
+                    onToggle={(e, check) => showTutorialHint(identifier, check)}
+                    toggled={!values.hiddenTutorialHints[identifier]}
+                    labelPosition="right"
+                    label={name}
+                  />
+                </Line>
+              ))}
             </Column>
           </Line>
+        </Column>
+      )}
+      {currentTab === 'shortcuts' && (
+        <Column>
+          <ShortcutsList
+            i18n={i18n}
+            userShortcutMap={values.userShortcutMap}
+            onEdit={setShortcutForCommand}
+            onReset={resetShortcutsToDefault}
+          />
         </Column>
       )}
     </Dialog>

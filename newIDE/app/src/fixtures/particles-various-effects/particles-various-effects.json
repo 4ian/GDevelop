@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -156,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "Fire",
+          "persistentUuid": "06c47957-5a6c-4ff3-a814-362cb65a102a",
           "width": 0,
           "x": 71,
           "y": 430,
@@ -171,6 +172,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "b6bc67e2-6807-4549-9ac4-18c84177f8a6",
           "width": 0,
           "x": 71,
           "y": 428,
@@ -186,6 +188,7 @@
           "layer": "",
           "locked": false,
           "name": "Fire",
+          "persistentUuid": "c2fdf280-e0aa-4509-ba42-34fb6bcf0f6e",
           "width": 0,
           "x": 185,
           "y": 494,
@@ -201,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "2afcfe4f-eda1-4b70-bfba-0d3758c46904",
           "width": 0,
           "x": 185,
           "y": 492,
@@ -216,6 +220,7 @@
           "layer": "",
           "locked": false,
           "name": "Beam2",
+          "persistentUuid": "d6454a4b-6bae-4848-8383-78672ab16bcf",
           "width": 0,
           "x": 686,
           "y": 558,
@@ -231,6 +236,7 @@
           "layer": "",
           "locked": false,
           "name": "Beam",
+          "persistentUuid": "f7f1a0a4-3258-4c9e-8ce4-7eed00c4baf9",
           "width": 0,
           "x": 556,
           "y": 234,
@@ -246,6 +252,7 @@
           "layer": "",
           "locked": false,
           "name": "Particles",
+          "persistentUuid": "8d7aa48c-0274-40f8-acf0-14368f6fc7fc",
           "width": 0,
           "x": 556,
           "y": 234,
@@ -261,6 +268,7 @@
           "layer": "",
           "locked": false,
           "name": "Particles",
+          "persistentUuid": "ea996db1-c50a-49bc-98bd-45db7375724b",
           "width": 0,
           "x": 526,
           "y": 202,
@@ -276,6 +284,7 @@
           "layer": "",
           "locked": false,
           "name": "Beam",
+          "persistentUuid": "de3e428e-4283-4e73-8072-58a4fa8e664a",
           "width": 0,
           "x": 527,
           "y": 204,
@@ -680,6 +689,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

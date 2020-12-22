@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <set>
 #include <string>
+
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
@@ -215,7 +216,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
-            size_t uniqueId = (size_t)&instruction;
+            size_t uniqueId = codeGenerator.GenerateSingleUsageUniqueIdFor(
+                instruction.GetOriginalInstruction().lock().get());
             return "conditionTrue = runtimeContext->TriggerOnce(" +
                    gd::String::From(uniqueId) + ");\n";
           });

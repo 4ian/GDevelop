@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -225,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
+          "persistentUuid": "ab253822-1c4a-40b2-99a8-d4fb0639ed0b",
           "width": 0,
           "x": 10,
           "y": 25,
@@ -240,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
+          "persistentUuid": "340bbfb5-a5e3-40bc-984b-7d9a3a970930",
           "width": 0,
           "x": 10,
           "y": 135,
@@ -255,6 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "Desktop",
+          "persistentUuid": "f1a947b7-ab5b-4e59-9732-b334dea6ba35",
           "width": 0,
           "x": 100,
           "y": 50,
@@ -270,6 +273,7 @@
           "layer": "",
           "locked": false,
           "name": "Documents",
+          "persistentUuid": "89f8993d-1c33-4ab5-ad50-bcb7a15f4d48",
           "width": 0,
           "x": 100,
           "y": 160,
@@ -285,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDocuments",
+          "persistentUuid": "e3fe6ee1-f588-42c5-9867-f1ef95a57707",
           "width": 400,
           "x": 10,
           "y": 120,
@@ -300,6 +305,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
+          "persistentUuid": "57a44504-26a0-4467-a803-fffb258ecb02",
           "width": 0,
           "x": 415,
           "y": 126,
@@ -315,6 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
+          "persistentUuid": "da49d143-064d-4c02-8b19-52df4d219ced",
           "width": 0,
           "x": 512.867,
           "y": 338.5,
@@ -330,6 +337,7 @@
           "layer": "",
           "locked": false,
           "name": "CreateMessage",
+          "persistentUuid": "c7ba21f1-72d2-4ba7-977c-a6f3159847c7",
           "width": 0,
           "x": 300,
           "y": 300,
@@ -345,6 +353,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDesktop",
+          "persistentUuid": "ec7ed8a4-5fea-4cc7-8faa-b9603d92272d",
           "width": 400,
           "x": 10,
           "y": 10,
@@ -760,6 +769,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -824,6 +838,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDesktop",
+          "persistentUuid": "cc584849-e3bc-4b20-9572-c22841714804",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -839,6 +854,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
+          "persistentUuid": "5c1015ce-2495-476b-98e2-504a539bd989",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1352,6 +1368,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1416,6 +1437,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDocuments",
+          "persistentUuid": "4560bdf5-dcd7-4b63-b0e3-d07439f6ba8d",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -1431,6 +1453,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
+          "persistentUuid": "7c3fa1b3-32f6-4c25-9308-19fc8395bb56",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1944,6 +1967,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

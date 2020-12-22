@@ -43,6 +43,20 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.registerObject("TiledSpriteObject::TiledSprite", gdjs.TiledSpriteRuntimeObject);
 
+gdjs.TiledSpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.texture !== newObjectData.texture) {
+        this.setTexture(newObjectData.texture, this._runtimeScene);
+    }
+    if (oldObjectData.width !== newObjectData.width) {
+        this.setWidth(newObjectData.width);
+    }
+    if (oldObjectData.height !== newObjectData.height) {
+        this.setHeight(newObjectData.height);
+    }
+
+    return true;
+};
+
 gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
@@ -199,7 +213,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the tiled sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.TiledSpriteRuntimeObject.prototype.getColor = function() {
     return this._renderer.getColor();

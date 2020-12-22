@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
@@ -67,7 +67,7 @@ RenderedSpriteInstance.getThumbnail = function(
       .getDirection(0)
       .getSprite(0)
       .getImageName();
-    return resourcesLoader.getResourceFullUrl(project, imageName);
+    return resourcesLoader.getResourceFullUrl(project, imageName, {});
   }
 
   return 'res/unknown32.png';
@@ -146,7 +146,7 @@ RenderedSpriteInstance.prototype.updatePIXITexture = function() {
   this._originY = origin.getY();
 
   if (this._sprite.isDefaultCenterPoint()) {
-    if (this._pixiObject.texture.noFrame) {
+    if (!this._pixiObject.texture.baseTexture.valid) {
       var that = this;
       // We might have to wait for the texture to load
       this._pixiObject.texture.on('update', function() {

@@ -99,6 +99,11 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  fakeAssetShortHeader1,
+  fakeAssetShortHeader2,
+  fakeAssetShortHeader3,
+  fakeAssetWithBehaviorCustomizations1,
+  fakeAssetWithEventCustomizationsAndFlashExtension1,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -152,7 +157,7 @@ import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../ObjectsList/NewObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -196,6 +201,19 @@ import {
   type NamedCommand,
   type CommandOption,
 } from '../CommandPalette/CommandManager';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
+import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { AssetStore } from '../AssetStore';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import ScrollView from '../UI/ScrollView';
+import '../UI/Theme/Global.css';
+import { AssetCard } from '../AssetStore/AssetCard';
+import { SearchResults } from '../AssetStore/SearchResults';
+import { AssetDetails } from '../AssetStore/AssetDetails';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ResourceStore } from '../AssetStore/ResourceStore';
 
 configureActions({
   depth: 2,
@@ -219,6 +237,11 @@ const buildFakeMenuTemplate = () => [
     click: action('click option 2'),
   },
 ];
+
+const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
+  hasPreviewsRunning: false,
+  launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+};
 
 storiesOf('Welcome', module)
   .addDecorator(muiDecorator)
@@ -726,6 +749,33 @@ storiesOf('UI Building Blocks/SearchBar', module)
     />
   ));
 
+storiesOf('UI Building Blocks/Layout/Grid', module)
+  .addDecorator(muiDecorator)
+  .add('Line and ScrollView in a fixed height container', () => (
+    <FixedHeightFlexContainer height={100}>
+      <Column expand>
+        <Line overflow="hidden">
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+        </Line>
+      </Column>
+    </FixedHeightFlexContainer>
+  ));
+
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   .addDecorator(muiDecorator)
   .add('Default', () => (
@@ -1090,6 +1140,29 @@ storiesOf('UI Building Blocks/AlertMessage', module)
   ))
   .add('long text with button', () => (
     <AlertMessage kind="info" onHide={() => {}}>
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
+  .add('long text with icon', () => (
+    <AlertMessage
+      kind="info"
+      renderLeftIcon={() => (
+        <img
+          src="res/tutorial_icons/tween-behavior.jpg"
+          alt=""
+          style={{
+            maxWidth: 128,
+            maxHeight: 128,
+          }}
+        />
+      )}
+      onHide={() => {}}
+    >
       Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
       cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
       nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
@@ -1553,6 +1626,11 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     getThumbnail={() => 'res/unknown32.png'}
                     project={testProject.project}
                     objectsContainer={testProject.testLayout}
+                    layout={testProject.testLayout}
+                    events={testProject.testLayout.getEvents()}
+                    resourceSources={[]}
+                    onChooseResource={() => Promise.reject('unimplemented')}
+                    resourceExternalEditors={fakeResourceExternalEditors}
                     onEditObject={action('On edit object')}
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
@@ -1565,6 +1643,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     }
                     onObjectCreated={() => {}}
                     onObjectSelected={() => {}}
+                    hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   />
                 </TabContentContainer>
               }
@@ -2641,6 +2720,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'medium'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2679,6 +2759,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2717,6 +2798,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2807,6 +2889,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('default (no results)', () => (
@@ -2817,6 +2900,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ))
   .add('3 results', () => (
@@ -2827,6 +2911,7 @@ storiesOf('SearchPanel', module)
       hasEventSelected={false}
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
     />
   ));
 
@@ -2994,6 +3079,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('Existing condition (scope: without layout)', () => (
@@ -3015,6 +3102,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('New condition (scope: without layout)', () => (
@@ -3036,6 +3125,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ));
 
@@ -3064,6 +3155,8 @@ storiesOf('NewInstructionEditorMenu', module)
           onCancel={onClose}
           onSubmit={onClose}
           anchorEl={buttonElement}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
         />
       )}
     </PopoverButton>
@@ -3202,6 +3295,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3212,6 +3310,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3225,6 +3324,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3242,6 +3346,7 @@ storiesOf('ObjectsList', module)
             onDeleteObject={(objectWithContext, cb) => cb(true)}
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3293,16 +3398,21 @@ storiesOf('InstancePropertiesEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <InstancePropertiesEditor
-        project={testProject.project}
-        layout={testProject.testLayout}
-        instances={[testProject.testLayoutInstance1]}
-        editInstanceVariables={action('edit instance variables')}
-        editObjectVariables={action('edit object variables')}
-        onEditObjectByName={action('edit object')}
-      />
-    </SerializedObjectDisplay>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.testLayout}>
+          <InstancePropertiesEditor
+            i18n={i18n}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testLayoutInstance1]}
+            editInstanceVariables={action('edit instance variables')}
+            editObjectVariables={action('edit object variables')}
+            onEditObjectByName={action('edit object')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
   ));
 
 storiesOf('ObjectGroupEditor', module)
@@ -3341,6 +3451,10 @@ storiesOf('BehaviorsEditor', module)
       <BehaviorsEditor
         project={testProject.project}
         object={testProject.spriteObjectWithBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
   ));
@@ -3957,7 +4071,7 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4056,6 +4170,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('Error in functions', () => (
@@ -4097,6 +4212,7 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ));
 
@@ -4166,7 +4282,7 @@ storiesOf('ExtensionsSearchDialog', module)
       {({ i18n }) => (
         <EventsFunctionsExtensionsProvider
           i18n={i18n}
-          eventsFunctionCodeWriter={null}
+          makeEventsFunctionCodeWriter={() => null}
           eventsFunctionsExtensionWriter={null}
           eventsFunctionsExtensionOpener={null}
         >
@@ -4191,6 +4307,7 @@ storiesOf('LayersList', module)
       }}
       resourceSources={[]}
       onEditLayerEffects={layer => {}}
+      onEditLightingLayer={layer => {}}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4198,6 +4315,7 @@ storiesOf('LayersList', module)
         cb(true);
       }}
       layersContainer={testProject.testLayout}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
     />
   ))
   .add('small width and height', () => (
@@ -4211,6 +4329,7 @@ storiesOf('LayersList', module)
         }}
         resourceSources={[]}
         onEditLayerEffects={layer => {}}
+        onEditLightingLayer={layer => {}}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4218,6 +4337,7 @@ storiesOf('LayersList', module)
           cb(true);
         }}
         layersContainer={testProject.testLayout}
+        hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       />
     </div>
   ));
@@ -4268,12 +4388,23 @@ storiesOf('EffectsList', module)
 storiesOf('NewObjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <NewObjectDialog
-      open
-      project={testProject.project}
-      onClose={action('close')}
-      onChoose={action('choose')}
-    />
+    <AssetStoreStateProvider>
+      <NewObjectDialog
+        project={testProject.project}
+        layout={testProject.testLayout}
+        onClose={action('onClose')}
+        onCreateNewObject={action('onCreateNewObject')}
+        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        events={testProject.testLayout.getEvents()}
+        objectsContainer={testProject.testLayout}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+      />
+    </AssetStoreStateProvider>
   ));
 
 storiesOf('CommandPalette', module)
@@ -4287,17 +4418,14 @@ storiesOf('CommandPalette', module)
             ([
               {
                 name: 'OPEN_PROJECT',
-                displayText: t`Open project`,
                 handler: () => {},
               },
               {
-                name: 'SAVE_PROJECT',
-                displayText: t`Save project`,
+                name: 'OPEN_PROJECT_PROPERTIES',
                 handler: () => {},
               },
               {
                 name: 'EDIT_OBJECT',
-                displayText: t`Edit object...`,
                 handler: () => {},
               },
             ]: Array<NamedCommand>)
@@ -4339,4 +4467,135 @@ storiesOf('CommandPalette', module)
         />
       )}
     </I18n>
+  ));
+
+storiesOf('HotReloadPreviewButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={false}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ))
+  .add('with preview(s) running', () => (
+    <HotReloadPreviewButton
+      hasPreviewsRunning={true}
+      launchProjectDataOnlyPreview={() => {}}
+    />
+  ));
+
+storiesOf('HotReloadLogsDialog', module)
+  .addDecorator(muiDecorator)
+  .add('with an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'error',
+          message: 'Oops, something could not be hot-reloaded.',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ))
+  .add('without an error', () => (
+    <HotReloadLogsDialog
+      logs={[
+        {
+          kind: 'info',
+          message: 'Everything is fine',
+        },
+      ]}
+      onClose={() => {}}
+      onLaunchNewPreview={() => {}}
+    />
+  ));
+
+storiesOf('AssetStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <AssetStoreStateProvider>
+        <AssetStore
+          onOpenDetails={action('onOpenDetails')}
+          events={testProject.testLayout.getEvents()}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+        />
+      </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ResourceStore', module)
+  .addDecorator(muiDecorator)
+  .add('resourceKind: image', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: audio', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: font', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/AssetCard', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetCard
+      size={128}
+      onOpenDetails={action('onOpenDetails')}
+      assetShortHeader={fakeAssetShortHeader1}
+    />
+  ));
+
+storiesOf('AssetStore/AssetDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetDetails
+      canInstall={true}
+      isBeingInstalled={false}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('being installed', () => (
+    <AssetDetails
+      canInstall={false}
+      isBeingInstalled={true}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
   ));

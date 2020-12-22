@@ -11,7 +11,7 @@ import Text from '../UI/Text';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import ExamplesList from './ExamplesList';
-import { showWarningBox } from '../UI/Messages/MessageBox';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 const path = optionalRequire('path');
@@ -40,14 +40,15 @@ type State = {|
 export const showGameFileCreationError = (
   i18n: I18nType,
   outputPath: string,
-  error: Error
+  rawError: Error
 ) => {
-  showWarningBox(
-    i18n._(
+  showErrorBox({
+    message: i18n._(
       t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
     ),
-    error
-  );
+    rawError,
+    errorId: 'local-example-creation-error',
+  });
 };
 
 export default class LocalExamples extends Component<Props, State> {

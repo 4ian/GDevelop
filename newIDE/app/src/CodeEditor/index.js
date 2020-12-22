@@ -16,7 +16,8 @@ export type State = {|
 export type Props = {|
   value: string,
   onChange: string => void,
-  width: number,
+  width?: number,
+  height?: number,
   onEditorMounted?: () => void,
 |};
 
@@ -136,7 +137,7 @@ export class CodeEditor extends React.Component<Props, State> {
           {({ values }) => (
             <MonacoEditor
               width={this.props.width || 600}
-              height="400"
+              height={this.props.height || 200}
               language="javascript"
               theme={values.codeEditorThemeName}
               value={this.props.value}

@@ -5,9 +5,8 @@ import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 import RaisedButton from '../UI/RaisedButton';
-import { Spacer, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 
 export default class BetaIntroDialog extends Component {
   _onOpenWebsite() {
@@ -57,39 +56,13 @@ export default class BetaIntroDialog extends Component {
                   to create your own game without limits!
                 </Trans>
               </Text>
-              {windowWidth === 'small' &&
-                (!Window.isFullscreen() ? (
-                  <React.Fragment>
-                    <Spacer />
-                    <Text>
-                      <Trans>
-                        You're working on a small screen. It's recommended to
-                        activate Fullscreen Mode for using GDevelop.
-                      </Trans>
-                    </Text>
-                    <Line justifyContent="center">
-                      <RaisedButton
-                        label={<Trans>Activate Fullscreen</Trans>}
-                        primary
-                        onClick={() => {
-                          Window.requestFullscreen();
-                          setTimeout(() => {
-                            this.forceUpdate();
-                          }, 250 /* Let a bit of time for the fullscreen to kick in */);
-                        }}
-                        icon={<Fullscreen />}
-                      />
-                    </Line>
-                  </React.Fragment>
-                ) : (
-                  <Line justifyContent="center">
-                    <RaisedButton
-                      label={<Trans>Start using GDevelop</Trans>}
-                      primary
-                      onClick={onClose}
-                    />
-                  </Line>
-                ))}
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Start using GDevelop</Trans>}
+                  primary
+                  onClick={onClose}
+                />
+              </Line>
             </div>
           </Dialog>
         )}

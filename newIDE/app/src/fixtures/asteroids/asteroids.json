@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -374,6 +374,7 @@
           "layer": "",
           "locked": false,
           "name": "button",
+          "persistentUuid": "aa379e37-06a9-413f-86b2-ea440a8a9562",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -389,6 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
+          "persistentUuid": "b89c5ee0-cff3-4aa9-9580-3eb408d6cec4",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -658,6 +660,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -742,6 +749,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_left",
+          "persistentUuid": "217b054c-cfc7-4b72-9dda-9cf60c5dfa68",
           "width": 0,
           "x": 64,
           "y": 480,
@@ -757,6 +765,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_right",
+          "persistentUuid": "1e99aea9-e5ea-4653-a1e4-6c60286a9b4a",
           "width": 0,
           "x": 160,
           "y": 480,
@@ -772,6 +781,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_fire",
+          "persistentUuid": "53384c13-833f-4635-bf78-c66410c3e440",
           "width": 0,
           "x": 608,
           "y": 480,
@@ -787,6 +797,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_thruster",
+          "persistentUuid": "27fcac51-c8fe-4635-a43b-7f4c9a537e35",
           "width": 0,
           "x": 672,
           "y": 416,
@@ -7660,6 +7671,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7677,6 +7693,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "gui",
           "visibility": true,
           "cameras": [
@@ -7694,6 +7715,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "touch",
           "visibility": true,
           "cameras": [],
@@ -7738,6 +7764,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
+          "persistentUuid": "c93067af-aada-4007-9393-481a7a9bc85d",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -7753,6 +7780,7 @@
           "layer": "",
           "locked": false,
           "name": "restart",
+          "persistentUuid": "0b1d530d-7548-4916-b14c-133165333354",
           "width": 0,
           "x": 311,
           "y": 262,
@@ -8012,6 +8040,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

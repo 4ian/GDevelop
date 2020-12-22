@@ -19,7 +19,7 @@
  * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
  * @property {boolean} absoluteCoordinates Use absolute coordinates?
  * @property {boolean} clearBetweenFrames Clear the previous render before the next draw?
- * 
+ *
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
 
@@ -74,6 +74,50 @@ gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
+/**
+ * @param {ShapePainterObjectData} oldObjectData
+ * @param {ShapePainterObjectData} newObjectData
+ */
+gdjs.ShapePainterRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.fillColor.r !== newObjectData.fillColor.r ||
+        oldObjectData.fillColor.g !== newObjectData.fillColor.g ||
+        oldObjectData.fillColor.b !== newObjectData.fillColor.b) {
+        this.setFillColor(
+            '' + newObjectData.fillColor.r + ';' +
+            newObjectData.fillColor.g  + ';' +
+            newObjectData.fillColor.b
+        );
+    }
+    if (oldObjectData.outlineColor.r !== newObjectData.outlineColor.r ||
+        oldObjectData.outlineColor.g !== newObjectData.outlineColor.g ||
+        oldObjectData.outlineColor.b !== newObjectData.outlineColor.b) {
+        this.setOutlineColor(
+            '' + newObjectData.outlineColor.r + ';' +
+            newObjectData.outlineColor.g  + ';' +
+            newObjectData.outlineColor.b
+        );
+    }
+    if (oldObjectData.fillOpacity !== newObjectData.fillOpacity) {
+        this.setFillOpacity(newObjectData.fillOpacity);
+    }
+    if (oldObjectData.outlineOpacity !== newObjectData.outlineOpacity) {
+        this.setOutlineOpacity(newObjectData.outlineOpacity);
+    }
+    if (oldObjectData.outlineSize !== newObjectData.outlineSize) {
+        this.setOutlineSize(newObjectData.outlineSize);
+    }
+    if (oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates) {
+        this._absoluteCoordinates = newObjectData.absoluteCoordinates;
+        this._renderer.updateXPosition();
+        this._renderer.updateYPosition();
+    }
+    if (oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames) {
+        this._clearBetweenFrames = newObjectData.clearBetweenFrames
+    }
+
+    return true;
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
     //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
     if(this._clearBetweenFrames){
@@ -120,11 +164,11 @@ gdjs.ShapePainterRuntimeObject.prototype.drawArc = function(centerX, centerY, ra
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawBezierCurve = function(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
-    this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);  
+    this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawQuadraticCurve = function(x1, y1, cpX, cpY, x2, y2) {
-    this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);  
+    this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.beginFillPath = function(x1, y1) {
@@ -140,12 +184,12 @@ gdjs.ShapePainterRuntimeObject.prototype.drawPathMoveTo = function(x1, y1) {
     this._renderer.drawPathMoveTo(x1, y1);
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1, thickness) {
-    this._renderer.drawPathLineTo(x1, y1, thickness);
+gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1) {
+    this._renderer.drawPathLineTo(x1, y1, this._outlineSize);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathBezierCurveTo = function(cpX, cpY, cpX2, cpY2, toX, toY) {
-    this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);  
+    this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathArc = function(cx, cy, radius, startAngle, endAngle, anticlockwise) {
@@ -153,11 +197,11 @@ gdjs.ShapePainterRuntimeObject.prototype.drawPathArc = function(cx, cy, radius, 
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawPathQuadraticCurveTo = function(cpX, cpY, toX, toY) {
-    this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);  
+    this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.closePath = function() {
-    this._renderer.closePath();  
+    this._renderer.closePath();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setClearBetweenFrames = function(value) {

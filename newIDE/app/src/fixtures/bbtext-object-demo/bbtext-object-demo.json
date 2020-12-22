@@ -7,7 +7,6 @@
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
@@ -33,6 +32,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -148,6 +148,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
+          "persistentUuid": "1b774e88-f44c-4ba0-bcb8-876f39cb8167",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -163,6 +164,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
+          "persistentUuid": "939c8eb1-0aa1-4072-910a-8ad66225b3f2",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -178,6 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "ce67b0f8-5b05-4520-aeff-f4f9ae38081a",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -193,6 +196,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "6086d7f0-de01-4ee6-8b24-b04861961b29",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -208,6 +212,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
+          "persistentUuid": "7fcc31a9-0833-4353-82b0-8c99c27ade3b",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -223,6 +228,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
+          "persistentUuid": "4f154d12-e4e2-4488-b0ab-891ab9525a60",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -238,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
+          "persistentUuid": "c1fd3663-554b-4c09-8b38-ea0334255417",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -253,6 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
+          "persistentUuid": "d943b12b-05dc-44b0-a0d7-114fdba02324",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -313,7 +321,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#027c61",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "right",
             "wordWrap": true
           }
@@ -330,7 +338,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#696969",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "center",
             "wordWrap": true
           }
@@ -352,7 +360,7 @@
             "fontSize": "40",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -374,7 +382,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -391,7 +399,7 @@
             "fontSize": "20",
             "visible": true,
             "color": "#000000",
-            "fontFamily": "Arial",
+            "fontFamily": "https://resources.gdevelop-app.com/examples/bbtext-object-demo/Arial",
             "align": "left",
             "wordWrap": true
           }
@@ -1123,6 +1131,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

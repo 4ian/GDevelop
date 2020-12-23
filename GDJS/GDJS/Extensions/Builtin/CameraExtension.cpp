@@ -89,6 +89,9 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.setLayerDefaultZOrder");
   GetAllExpressions()["LayerDefaultZOrder"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerDefaultZOrder");
+    
+  GetAllActions()["SetLayerAmbientLightColor"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerAmbientLightColor");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

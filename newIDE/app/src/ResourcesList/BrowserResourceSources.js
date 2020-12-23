@@ -197,7 +197,6 @@ export default [
         return (
           <GenericResourcesChooser
             {...this.props}
-            urls={publicBitmapFontUrls}
             urlsAreImages={false}
             createNewResource={() => new gd.BitmapFontResource()}
             title={<Trans>Choose a bitmap font from the library</Trans>}

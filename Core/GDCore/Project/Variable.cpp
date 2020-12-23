@@ -269,7 +269,7 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
         children[name] = std::make_shared<gd::Variable>();
         children[name]->UnserializeFrom(childElement);
       } else if (type == Type::Array)
-        PushNew().UnserializeFrom(childrenElement);
+        PushNew().UnserializeFrom(childElement);
     }
   }
 }  // namespace gd

@@ -157,9 +157,20 @@ export default class VariablesList extends React.Component<Props, State> {
       variablesContainer.insert(name, newVariable, index);
       newVariable.delete();
 
-      variablesContainer.get(name).setString(newValue);
-    } else {
-      variable.setString(newValue);
+      variable = variablesContainer.get(name);
+    }
+    switch (variable.getType()) {
+      case gd.Variable.String:
+        variable.setString(newValue);
+        break;
+      case gd.Variable.Number:
+        variable.setValue(newValue);
+        break;
+      case gd.Variable.Boolean:
+        variable.setBool(newValue);
+        break;
+      default:
+        console.error("Cannot set variable with type ", variable.getType())
     }
   };
 
@@ -389,7 +400,6 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled
         onAdd={() => {
           const variable = new gd.Variable();
-          variable.setString('');
           const name = newNameGenerator('Variable', name =>
             inheritedVariablesContainer
               ? inheritedVariablesContainer.has(name) ||

@@ -12,6 +12,7 @@ import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
+import BooleanEditor from '../UI/BooleanField';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
@@ -116,24 +117,44 @@ const VariableRow = ({
       </TreeTableCell>
     );
   } else {
-    columns.push(
-      <TreeTableCell key="value" expand>
-        <SemiControlledTextField
-          margin="none"
-          commitOnBlur={commitVariableValueOnBlur}
-          fullWidth
-          name={key + 'value'}
-          value={variable.getString()}
-          onChange={text => {
-            if (variable.getString() !== text) {
-              onChangeValue(text);
+    if (type !== gd.Variable.Boolean)
+      columns.push(
+        <TreeTableCell key="value" expand>
+          <SemiControlledTextField
+            margin="none"
+            type={type === gd.Variable.String ? 'text' : 'number'}
+            commitOnBlur={commitVariableValueOnBlur}
+            fullWidth
+            name={key + 'value'}
+            value={
+              type === gd.Variable.String
+                ? variable.getString()
+                : variable.getValue()
             }
-          }}
-          multiline
-          disabled={origin === 'parent' && depth !== 0}
-        />
-      </TreeTableCell>
-    );
+            onChange={newValue => {
+              if (
+                type === gd.Variable.String
+                  ? variable.getString() !== newValue
+                  : variable.getValue() !== newValue
+              ) {
+                onChangeValue(newValue);
+              }
+            }}
+            disabled={origin === 'parent' && depth !== 0}
+            multiline={type === gd.Variable.String}
+          />
+        </TreeTableCell>
+      );
+    else
+      columns.push(
+        <TreeTableCell key="value" expand>
+          <BooleanEditor
+            value={variable.getBool()}
+            onToggle={onChangeValue}
+            disabled={origin === 'parent' && depth !== 0}
+          />
+        </TreeTableCell>
+      );
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>

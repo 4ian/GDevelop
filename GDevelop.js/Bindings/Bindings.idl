@@ -751,6 +751,11 @@ interface FontResource {
 };
 FontResource implements Resource;
 
+interface BitmapFontResource {
+    void BitmapFontResource();
+};
+BitmapFontResource implements Resource;
+
 interface VideoResource {
     void VideoResource();
 };
@@ -2018,6 +2023,7 @@ interface ResourcesInUseHelper {
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();
+    [Ref] SetString GetAllBitmapFonts();
     [Ref] SetString GetAll([Const] DOMString resourceType);
 };
 

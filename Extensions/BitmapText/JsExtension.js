@@ -79,8 +79,8 @@ module.exports = {
         .setLabel(_('Alignment, when multiple lines are displayed'));
 
       objectProperties
-        .getOrCreate('fontResourceName')
-        .setValue(objectContent.fontResourceName)
+        .getOrCreate('bitmapFontResourceName')
+        .setValue(objectContent.bitmapFontResourceName)
         .setType('resource')
         .addExtraInfo('bitmapFont') //fnt or xml files
         .setLabel(_('Bitmap Font'));
@@ -124,7 +124,7 @@ module.exports = {
         opacity: 255,
         fontSize: 20,
         fontColor: '#000000',
-        fontResourceName: '',
+        bitmapFontResourceName: '',
         bitmapTexture: '',
         align: 'left',
         wordWrap: true,
@@ -231,7 +231,7 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardRelationalOperatorParameters('string')
       .getCodeExtraInformation()
-      .setFunctionName('getFontResourceName');
+      .setFunctionName('getBitmapFontResourceName');
 
     object
       .addCondition(
@@ -345,7 +345,7 @@ module.exports = {
 
     object
       .addAction(
-        'SetFontResourceName',
+        'SetBitmapFontResourceName',
         _('Font'),
         _('Change the font used by the Bitmap text object.'),
         _('Set the font of _PARAM0_ to _PARAM1_'),
@@ -356,7 +356,7 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('font', _('Font resource'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setFontResourceName');
+      .setFunctionName('setBitmapFontResourceName');
 
     object
       .addAction(
@@ -491,7 +491,7 @@ module.exports = {
       this._bitmapFontStyle.specialChars= '';
 
       // We'll track changes of the font to trigger the loading of the new font.
-      this._currentFontResourceName = '';
+      this._currentBitmapFontResourceName = '';
       this._currentBitmapTexture = '';
 
       const fontName = this._ensureFontAvailableAndGetFontName();
@@ -578,12 +578,12 @@ module.exports = {
       this._pixiObject.fontSize = fontSize; // We also need to update the BitmapText fontSize
 
       // Track the changes in font to load the new requested font.
-      const fontResourceName = properties.get('fontResourceName').getValue();
-      if (this._currentFontResourceName !== fontResourceName) {
-        this._currentFontResourceName = fontResourceName;
+      const bitmapFontResourceName = properties.get('bitmapFontResourceName').getValue();
+      if (this._currentBitmapFontResourceName !== bitmapFontResourceName) {
+        this._currentBitmapFontResourceName = bitmapFontResourceName;
 
         this._pixiResourcesLoader
-          .loadFontFamily(this._project, fontResourceName)
+          .loadFontFamily(this._project, bitmapFontResourceName)
           .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
             this._bitmapFontStyle.fontFamily = fontFamily;

@@ -229,9 +229,9 @@ export default [
         const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
         const options = {
           multiSelections,
-          title: i18n._(t`Choose a bitmapfont file`),
+          title: i18n._(t`Choose a bitmap font file`),
           name: i18n._(t`FNT, XML file`),
-          extensions: ['fnt','xml'],
+          extensions: ['fnt', 'xml'],
         };
         return selectLocalResourcePath(
           i18n,
@@ -244,8 +244,12 @@ export default [
           return resources.map(resourcePath => {
             const bitmapFontResource = new gd.BitmapFontResource();
             const projectPath = path.dirname(project.getProjectFile());
-            bitmapFontResource.setFile(path.relative(projectPath, resourcePath));
-            bitmapFontResource.setName(path.relative(projectPath, resourcePath));
+            bitmapFontResource.setFile(
+              path.relative(projectPath, resourcePath)
+            );
+            bitmapFontResource.setName(
+              path.relative(projectPath, resourcePath)
+            );
 
             return bitmapFontResource;
           });

@@ -75,7 +75,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   this._bitmapFontStyle.fontFamily = runtimeScene
     .getGame()
     .getFontManager()
-    .getFontFamily(runtimeObject._fontResourceName);
+    .getFontFamily(runtimeObject._bitmapFontResourceName);
   this._bitmapFontStyle.fontSize = runtimeObject._fontSize;
   this._bitmapFontStyle.specialChars = runtimeObject._specialChars;
   this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
@@ -176,7 +176,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
   this._bitmapFontStyle.fontFamily = this._object._runtimeScene
     .getGame()
     .getFontManager()
-    .getFontFamily(this._object._fontResourceName);
+    .getFontFamily(this._object._bitmapFontResourceName);
   this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
     this._pixiObject.fontName
   );

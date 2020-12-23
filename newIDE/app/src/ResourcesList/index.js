@@ -281,6 +281,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Remove Unused Fonts',
         click: () => {
           this.props.onRemoveUnusedResources('font');
+          this.props.onRemoveUnusedResources('bitmapFont');
         },
       },
       {

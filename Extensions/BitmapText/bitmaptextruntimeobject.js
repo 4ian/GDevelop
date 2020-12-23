@@ -4,7 +4,8 @@
  * @property {number} content.opacity The opacity of the BitmapText
  * @property {string} content.text Content of the text
  * @property {string} content.fontColor The color of the font of the text
- * @property {string} content.fontResourceName The font of the text
+ * @property {string} content.bitmapFontResourceName The bitmap font file used for the text
+ * @property {string} content.bitmapTextureResourceName The bitmap texture used with the bitmap font file
  * @property {number} content.fontSize The size of the font of the text
  * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
@@ -35,7 +36,9 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
     objectData.content.fontColor
   );
   /** @type {string} */
-  this._fontResourceName = objectData.content.fontResourceName;
+  this._bitmapFontResourceName = objectData.content.bitmapFontResourceName; // fnt/xml files
+  /** @type {string} */
+  this._bitmapTextureResourceName = objectData.content.bitmapTextureResourceName; // texture file used with fnt/xml (bitmap font file)
   /** @type {number} */
   this._fontSize = objectData.content.fontSize;
   /** @type {boolean} */
@@ -93,10 +96,10 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
     this._renderer.updateColor();
   }
   if (
-    oldObjectData.content.fontResourceName !==
-    newObjectData.content.fontResourceName
+    oldObjectData.content.bitmapFontResourceName !==
+    newObjectData.content.bitmapFontResourceName
   ) {
-    this.setFontFamily(newObjectData.content.fontResourceName);
+    this.setFontFamily(newObjectData.content.bitmapFontResourceName);
   }
   if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
     this.setFontSize(newObjectData.content.fontSize);
@@ -108,7 +111,8 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
     this.setAlignment(newObjectData.content.align);
   }
   if (oldObjectData.content.specialChars !== newObjectData.content.specialChars) {
-    this.updateFont();
+    this.updateBitmapFont();
+    this.updateTextureFont();
   }
 
   return true;
@@ -173,15 +177,26 @@ gdjs.BitmapTextRuntimeObject.prototype.getFontSize = function () {
   return this._fontSize;
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setFontResourceName = function (
-  fontResourceName
+gdjs.BitmapTextRuntimeObject.prototype.setBitmapFontResourceName = function (
+  bitmapFontResourceName
 ) {
-  this._fontResourceName = fontResourceName;
-  this._renderer.updateFont();
+  this._bitmapFontResourceName = bitmapFontResourceName;
+  this._renderer.updateBitmapFont();
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.getFontResourceName = function () {
-  return this._fontResourceName;
+gdjs.BitmapTextRuntimeObject.prototype.getBitmapFontResourceName = function () {
+  return this._bitmapFontResourceName;
+};
+
+gdjs.BitmapTextRuntimeObject.prototype.setBitmapTextureResourceName = function (
+  bitmapTextureResourceName
+) {
+  this._bitmapTextureResourceName = bitmapTextureResourceName;
+  this._renderer.updateTextureFont();
+};
+
+gdjs.BitmapTextRuntimeObject.prototype.getBitmapTextureResourceName = function () {
+  return this._bitmapTextureResourceName;
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.setAlignment = function (align) {

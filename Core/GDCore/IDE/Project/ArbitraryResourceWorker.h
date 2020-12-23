@@ -71,6 +71,12 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeFont(gd::String &fontName);
 
   /**
+   * \brief Expose a bitmap font, which is either a reference to a "bitmapFont" resource,
+   * or a filename if no resource with this name exists.
+   */
+  virtual void ExposeBitmapFont(gd::String &bitmapFontName);
+
+  /**
    * \brief Expose a shader.
    * \warn Currently unsupported.
    */

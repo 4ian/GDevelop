@@ -337,6 +337,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
+         // Allow to get a layer directly from the context for convenience:
+         "  getLayer: function(layerName) {\n"
+         "    return runtimeScene.getLayer(layerName);\n"
+         "  },\n"
          // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
          argumentsGetters + "    return \"\";\n" + "  },\n" +

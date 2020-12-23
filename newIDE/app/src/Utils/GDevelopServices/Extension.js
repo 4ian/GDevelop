@@ -12,13 +12,15 @@ export type ExtensionShortHeader = {|
   gdevelopVersion?: string,
   url: string,
   headerUrl: string,
-  tags: string,
+  tags: Array<string>,
+  previewIconUrl: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
   description: string,
+  iconUrl: string,
 |};
 
 export type SerializedExtension = {
@@ -29,6 +31,63 @@ export type ExtensionsRegistry = {
   version: string,
   allTags: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
+};
+
+/**
+ * The ExtensionShortHeader returned by the API, with tags being a string
+ * (which is kept in the API for compatibility with older GDevelop versions).
+ */
+type ExtensionShortHeaderWithTagsAsString = {|
+  ...ExtensionShortHeader,
+  tags: string,
+|};
+
+/**
+ * The ExtensionHeader returned by the API, with tags being a string
+ * (which is kept in the API for compatibility with older GDevelop versions).
+ */
+type ExtensionHeaderWithTagsAsString = {|
+  ...ExtensionHeader,
+  tags: string,
+|};
+
+/**
+ * The SerializedExtension returned by the API, with tags being a string
+ * (which is kept in the API for compatibility with older GDevelop versions).
+ */
+type SerializedExtensionWithTagsAsString = {
+  ...SerializedExtension,
+  tags: string,
+};
+
+/**
+ * The ExtensionsRegistry returned by the API, with tags being a string
+ * (which is kept in the API for compatibility with older GDevelop versions).
+ */
+type ExtensionsRegistryWithTagsAsString = {
+  ...ExtensionsRegistry,
+  extensionShortHeaders: Array<ExtensionShortHeaderWithTagsAsString>,
+};
+
+/**
+ * Transform the tags from their old representation sent by the API (a string)
+ * to their new representation (array of strings).
+ */
+const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
+  dataWithTags: T
+): $Exact<{ ...T, tags: Array<string> }> => {
+  // Handle potential future update of the API that would
+  // return tags as an array of strings.
+  if (Array.isArray(dataWithTags.tags)) {
+    // $FlowIgnore
+    return dataWithTags;
+  }
+
+  // $FlowIgnore - ignore issue with non exact types
+  return {
+    ...dataWithTags,
+    tags: dataWithTags.tags.split(',').map(tag => tag.trim().toLowerCase()),
+  };
 };
 
 /** Check if the IDE version, passed as argument, satisfiy the version required by the extension. */
@@ -56,7 +115,16 @@ const resolveExtensionUrl = (url: string): string => {
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
     .get(`${GDevelopExtensionApi.baseUrl}/extensions-registry.json`)
-    .then(response => response.data);
+    .then(response => {
+      const data: ExtensionsRegistryWithTagsAsString = response.data;
+
+      return {
+        ...data,
+        extensionShortHeaders: data.extensionShortHeaders.map(
+          transformTagsAsStringToTagsAsArray
+        ),
+      };
+    });
 };
 
 export const getExtensionHeader = (
@@ -64,13 +132,23 @@ export const getExtensionHeader = (
 ): Promise<ExtensionHeader> => {
   return axios
     .get(resolveExtensionUrl(extensionShortHeader.headerUrl))
-    .then(response => response.data);
+    .then(response => {
+      const data: ExtensionHeaderWithTagsAsString = response.data;
+      const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
+        data
+      );
+      return transformedData;
+    });
 };
 
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | ExtensionHeader
 ): Promise<SerializedExtension> => {
-  return axios
-    .get(resolveExtensionUrl(extensionHeader.url))
-    .then(response => response.data);
+  return axios.get(resolveExtensionUrl(extensionHeader.url)).then(response => {
+    const data: SerializedExtensionWithTagsAsString = response.data;
+    const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
+      data
+    );
+    return transformedData;
+  });
 };

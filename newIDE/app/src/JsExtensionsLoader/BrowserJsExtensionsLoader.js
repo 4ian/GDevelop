@@ -57,6 +57,11 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Firebase',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Firebase/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
     objectsRenderingServiceModules: {},
@@ -81,6 +86,11 @@ const jsExtensions = [
   {
     name: 'P2P',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'Lighting',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Lighting/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
 ];

@@ -1501,6 +1501,10 @@ module.exports = {
       }
     ]
   },
+  "firebase-example": {
+    "description": "A twitter-like social network called \"Not Twitter\" using Firestore, and showcase of some other features of Firebase.",
+    "usedExtensions": []
+  },
   "flappy-bird": {
     "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
     "usedExtensions": [
@@ -2003,6 +2007,47 @@ module.exports = {
       }
     ]
   },
+  "layer-effects": {
+    "description": "An example showing all the layer effects available in GDevelop.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
   "level-editor": {
     "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
     "usedExtensions": [
@@ -2119,22 +2164,6 @@ module.exports = {
       {
         "fullName": "",
         "name": ""
-      },
-      {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
-      },
-      {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
-      },
-      {
-        "fullName": "Audio",
-        "name": "BuiltinAudio"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },
@@ -2618,8 +2647,29 @@ module.exports = {
       }
     ]
   },
-  "online-multiplayer": {
-    "description": "A showcase of some multiplayer possibilities using the P2P extension.",
+  "open-url-in-browser": {
+    "description": "This shows how to open a website on the system default browser.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      }
+    ]
+  },
+  "p2p-networking": {
+    "description": "A showcase of some multiplayer/networking possibilities using the P2P extension.",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2658,37 +2708,12 @@ module.exports = {
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Time",
-        "name": "BuiltinTime"
-      },
-      {
         "fullName": "",
         "name": ""
       },
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
-      }
-    ]
-  },
-  "open-url-in-browser": {
-    "description": "This shows how to open a website on the system default browser.",
-    "usedExtensions": [
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Storage",
-        "name": "BuiltinFile"
       }
     ]
   },
@@ -3265,20 +3290,28 @@ module.exports = {
         "name": "PlatformBehavior"
       },
       {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
         "fullName": "Anchor",
         "name": "AnchorBehavior"
+      },
+      {
+        "fullName": "",
+        "name": ""
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
-      },
-      {
         "fullName": "Standard events",
         "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
       },
       {
         "fullName": "Features for all objects",
@@ -3287,6 +3320,10 @@ module.exports = {
       {
         "fullName": "System information",
         "name": "SystemInfo"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       },
       {
         "fullName": "Audio",
@@ -3299,10 +3336,6 @@ module.exports = {
       {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Variable features",
-        "name": "BuiltinVariables"
       }
     ]
   },
@@ -4153,6 +4186,71 @@ module.exports = {
       }
     ]
   },
+  "tetris-demo": {
+    "description": "A complete demo of a Tetris game, with all the concepts of modern Tetris such as SRS (Super Rotation System) and ghost piece, with high scores, music, sound effects.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Text entry object",
+        "name": "TextEntryObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "fullName": "Storage",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Filesystem",
+        "name": "FileSystem"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "text-entry-object": {
     "description": "This shows how to use the Text Entry object to capture what is written on the keyboard.",
     "usedExtensions": [
@@ -4242,6 +4340,68 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      }
+    ]
+  },
+  "tween-animations": {
+    "description": "Examples of how to use a variety of tween animations, including object position, color, opacity, angle, and scale.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
+  "tween-test": {
+    "description": "An example project that tests all Tween extension functionality.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },

@@ -13,6 +13,7 @@ import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
+import { shouldCloseOrCancel } from './KeyboardShortcuts/InteractionKeys';
 
 type Option =
   | {|
@@ -45,6 +46,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   textFieldStyle?: Object,
   openOnFocus?: boolean,
+  style?: Object,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
@@ -141,17 +143,30 @@ const filterFunction = (
 };
 
 const handleChange = (
-  event: SyntheticKeyboardEvent<HTMLInputElement>,
+  input: HTMLInputElement,
   option: Option,
   props: Props
 ): void => {
-  if (option.type !== 'separator') {
-    if (option.onClick) option.onClick();
-    else {
-      props.onChoose
-        ? props.onChoose(option.value)
-        : props.onChange(option.value);
-      if (props.onRequestClose) props.onRequestClose();
+  if (option.type === 'separator') return;
+  else if (option.onClick) option.onClick();
+  else {
+    // Force the input to the selected value. We do this, bypassing inputValue state,
+    // because the change could be immediately followed by a blur, in which case the blur
+    // must have the updated value.
+    // Search for "blur-value" in this file for the rest of this "workaround".
+    input.value = option.value;
+
+    // Call the props to notify of the change. Note that if the component is blurred just after,
+    // onChange could be called again. Hence why we immediately set the input.value below.
+    // Search for "blur-value" in this file for the rest of this "workaround".
+    if (props.onChoose) {
+      props.onChoose(option.value);
+    } else {
+      props.onChange(option.value);
+    }
+
+    if (props.onRequestClose) {
+      props.onRequestClose();
     }
   }
 };
@@ -174,7 +189,7 @@ const getDefaultStylingProps = (
       className: null,
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
-        if (event.key === 'Escape' && props.onRequestClose)
+        if (shouldCloseOrCancel(event) && props.onRequestClose)
           props.onRequestClose();
       },
     },
@@ -225,37 +240,22 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
               option: Option | null
             ) => {
-              if (option !== null) {
-                handleChange(event, option, props);
-                setIsMenuOpen(false);
-              }
+              if (option === null || !input.current) return;
+
+              handleChange(input.current, option, props);
+              setIsMenuOpen(false);
             }}
             open={isMenuOpen}
-            style={styles.container}
+            style={{
+              ...props.style,
+              ...styles.container,
+            }}
             inputValue={currentInputValue}
             value={currentInputValue}
             onInputChange={handleInputChange}
             options={props.dataSource}
             renderOption={renderItem}
             getOptionDisabled={isOptionDisabled}
-            ListboxProps={{
-              // We need to stop the propagation since ClickAwayListener of InlinePopover does not
-              // recognise listbox as a part of Autocomplete, which is fair since it's in a different DOM tree.
-              // We have basically killed these events completely by using stopImmediatePropagation() since Portals dont
-              // stop propagation by simply using stopPropagation(), more about this issue https://github.com/facebook/react/issues/11387
-              // Material-UI has issues regarding this too, https://github.com/mui-org/material-ui/issues/18586.
-              // This change was implemented in this PR https://github.com/4ian/GDevelop/pull/1586,
-              // which is meant to solve this issue, https://github.com/4ian/GDevelop/issues/1562
-              // Important takeaway: Never try to catch these events, our underlying assumption is that we don't need these events
-              // anymore after selection of option. Stopping propagation of events is never a good idea,
-              // but this is meant to be a hack and not a proper solution.
-              onClick: (event: SyntheticMouseEvent<HTMLUListElement>) => {
-                event.nativeEvent.stopImmediatePropagation();
-              },
-              onTouchEnd: (event: SyntheticTouchEvent<HTMLUListElement>) => {
-                event.nativeEvent.stopImmediatePropagation();
-              },
-            }}
             getOptionLabel={(option: Option) =>
               getOptionLabel(option, currentInputValue)
             }
@@ -266,7 +266,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               const {
                 InputProps,
                 inputProps,
-                ...other
+                ...otherStylingProps
               } = getDefaultStylingProps(params, currentInputValue, props);
               return (
                 <TextField
@@ -287,22 +287,31 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                         input.current.selectionStart =
                           input.current.value.length;
                     },
+                    // Redefine onBlur to call onChange when the component is blurred.
+                    // We do this because the default behavior of the Autocomplete is not
+                    // to call onChange when blurred (though it should according to the docs?).
                     onBlur: (
                       event: SyntheticFocusEvent<HTMLInputElement>
                     ): void => {
                       setInputValue(null);
                       setIsMenuOpen(false);
+
+                      // Use the value of the input, rather than inputValue
+                      // that could be not updated.
+                      // Search for "blur-value" in this file for the rest of this "workaround".
                       props.onChange(event.currentTarget.value);
+
                       if (props.onBlur) props.onBlur(event);
                     },
                     onMouseDown: (
                       event: SyntheticMouseEvent<HTMLInputElement>
                     ): void => {
+                      // Toggle the menu when clicked and empty
                       if (input.current && !input.current.value.length)
                         setIsMenuOpen(!isMenuOpen);
                     },
                   }}
-                  {...other}
+                  {...otherStylingProps}
                   {...computeTextFieldStyleProps(props)}
                   style={props.textFieldStyle}
                   label={props.floatingLabelText}

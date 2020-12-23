@@ -1,5 +1,6 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
 #include <GDCore/Events/Builtin/LinkEvent.h>
 #include <GDCore/Events/Builtin/RepeatEvent.h>
@@ -37,6 +38,7 @@
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
+#include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/Effect.h>

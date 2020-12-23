@@ -40,7 +40,7 @@ export type CommandName =
   | 'TOGGLE_GRID'
   | 'OPEN_SETUP_GRID'
   | 'EDIT_LAYER_EFFECTS'
-  | 'EDIT_LIGHTING_LAYER'
+  | 'EDIT_LAYER'
   | 'EDIT_NETWORK_PREVIEW'
   | 'EDIT_OBJECT'
   | 'EDIT_OBJECT_VARIABLES'
@@ -53,7 +53,9 @@ export type CommandName =
   | 'EVENTS_EDITOR_REDO'
   | 'DELETE_SELECTION'
   | 'SEARCH_EVENTS'
-  | 'OPEN_EXTENSION_SETTINGS';
+  | 'OPEN_EXTENSION_SETTINGS'
+  | 'OPEN_PROFILE'
+  | 'OPEN_GAMES_DASHBOARD';
 
 export const commandAreas = {
   GENERAL: t`General`,
@@ -84,6 +86,14 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'IDE',
     displayText: t`Open project manager`,
     handledByElectron: true,
+  },
+  OPEN_PROFILE: {
+    area: 'IDE',
+    displayText: t`Open My Profile`,
+  },
+  OPEN_GAMES_DASHBOARD: {
+    area: 'IDE',
+    displayText: t`Open My Games Dashboard`,
   },
   LAUNCH_NEW_PREVIEW: { area: 'PROJECT', displayText: t`Launch new preview` },
   LAUNCH_DEBUG_PREVIEW: {
@@ -224,9 +234,9 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'SCENE',
     displayText: t`Edit layer effects...`,
   },
-  EDIT_LIGHTING_LAYER: {
+  EDIT_LAYER: {
     area: 'SCENE',
-    displayText: t`Edit lighting layer...`,
+    displayText: t`Edit layer...`,
   },
 
   // Objects list commands

@@ -2,7 +2,9 @@
 
 exports[`HelpButton renders nothing if the helpPagePath is empty 1`] = `null`;
 
-exports[`HelpButton renders the button linking to a help page 1`] = `
+exports[`HelpButton renders nothing if the helpPagePath is not a valid URL or path 1`] = `null`;
+
+exports[`HelpButton renders the button linking to a GDevelop documentation help page 1`] = `
 <button
   className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSizeSmall MuiButton-sizeSmall"
   disabled={false}
@@ -26,7 +28,7 @@ exports[`HelpButton renders the button linking to a help page 1`] = `
     className="MuiButton-label"
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="MuiSvgIcon-root"
       focusable="false"
       viewBox="0 0 24 24"

@@ -6,7 +6,7 @@
  */
 
 /**
- * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
+ * A scene being played, containing instances of objects rendered on screen.
  *
  * @class RuntimeScene
  * @memberof gdjs
@@ -118,6 +118,9 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
     //Create initial instances of objects
     this.createObjectsFrom(sceneData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
+
+    // Set up the default z order (for objects created from events)
+    this._setLayerDefaultZOrders();
 
     //Set up the function to be executed at each tick
     this.setEventsGeneratedCodeFunction(sceneData);
@@ -283,13 +286,13 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 };
 
 /**
- * Create objects from initial instances data ( for example, the initial instances
- * of the scene or from an external layout ).
+ * Create objects from initial instances data (for example, the initial instances
+ * of the scene or the instances of an external layout).
  *
  * @param {InstanceData[]} data The instances data
  * @param {number} xPos The offset on X axis
  * @param {number} yPos The offset on Y axis
- * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their persistentUuid
+ * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
  * to the same as the associated instance. Useful for hot-reloading when instances are changed.
  */
 gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, trackByPersistentUuid) {
@@ -315,6 +318,36 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, track
     }
 };
 
+/**
+ * Set the default Z order for each layer, which is the highest Z order found on each layer.
+ * Useful as it ensures that instances created from events are, by default, shown in front
+ * of other instances.
+ * @private
+ */
+gdjs.RuntimeScene.prototype._setLayerDefaultZOrders = function() {
+    if (this._runtimeGame.getGameData().properties.useDeprecatedZeroAsDefaultZOrder) {
+        // Deprecated option to still support games that were made considered 0 as the
+        // default Z order for all layers.
+        return;
+    }
+
+    /** @type {Object.<string, number>} */
+    var layerHighestZOrders = {};
+
+    var allInstances = this.getAdhocListOfAllInstances();
+    for(var i = 0, len = allInstances.length;i<len;++i) {
+        var object = allInstances[i];
+        var layerName = object.getLayer();
+        var zOrder = object.getZOrder();
+
+        if (layerHighestZOrders[layerName] === undefined || layerHighestZOrders[layerName] < zOrder)
+            layerHighestZOrders[layerName] = zOrder;
+    }
+
+    for(var layerName in layerHighestZOrders) {
+        this.getLayer(layerName).setDefaultZOrder(layerHighestZOrders[layerName] + 1);
+    }
+}
 
 /**
  * Set the function called each time the scene is stepped to be the events generated code,

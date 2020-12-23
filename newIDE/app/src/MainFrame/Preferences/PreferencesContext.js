@@ -6,6 +6,8 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -31,7 +33,9 @@ export type AlertMessageIdentifier =
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-broker-recommendation'
-  | 'command-palette-shortcut';
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation'
+  | 'extension-installed-explanation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -136,6 +140,12 @@ export const allAlertMessages: Array<{
     key: 'command-palette-shortcut',
     label: <Trans>Command palette keyboard shortcut</Trans>,
   },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
 ];
 
 /**
@@ -164,6 +174,7 @@ export type PreferencesValues = {|
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
+  newObjectDialogDefaultTab: 'asset-store' | 'new-object',
 |};
 
 /**
@@ -210,13 +221,19 @@ export type Preferences = {|
   setHasProjectOpened: (enabled: boolean) => void,
   resetShortcutsToDefault: () => void,
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
+  getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
+  setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
 |};
 
 export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName: electron
+      ? electron.remote.nativeTheme.shouldUseDarkColors
+        ? 'Nord'
+        : 'GDevelop default'
+      : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -234,6 +251,7 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -270,6 +288,8 @@ export const initialPreferences = {
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
+  getNewObjectDialogDefaultTab: () => 'asset-store',
+  setNewObjectDialogDefaultTab: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

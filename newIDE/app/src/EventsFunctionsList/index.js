@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -124,7 +127,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     if (eventsFunction.getName() === newName) return;
 
     if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
-      showWarningBox('Another function with this name already exists.');
+      showWarningBox('Another function with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 
@@ -203,18 +208,18 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.forceUpdate();
   }
 
-  _renderEventsFunctionMenuTemplate = (
+  _renderEventsFunctionMenuTemplate = (i18n: I18nType) => (
     eventsFunction: gdEventsFunction,
     index: number
   ) => {
     return [
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsFunction),
         enabled: this.props.canRename(eventsFunction),
       },
       {
-        label: 'Remove',
+        label: i18n._(t`Remove`),
         click: () =>
           this._deleteEventsFunction(eventsFunction, {
             askForConfirmation: true,
@@ -224,15 +229,15 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         type: 'separator',
       },
       {
-        label: 'Copy',
+        label: i18n._(t`Copy`),
         click: () => this._copyEventsFunction(eventsFunction),
       },
       {
-        label: 'Cut',
+        label: i18n._(t`Cut`),
         click: () => this._cutEventsFunction(eventsFunction),
       },
       {
-        label: 'Paste',
+        label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
         click: () => this._pasteEventsFunction(index),
       },
@@ -291,25 +296,31 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={list}
-                width={width}
-                height={height}
-                onAddNewItem={this._addNewEventsFunction}
-                addNewItemLabel={<Trans>Add a new function</Trans>}
-                getItemName={getEventsFunctionName}
-                selectedItems={
-                  selectedEventsFunction ? [selectedEventsFunction] : []
-                }
-                onItemSelected={onSelectEventsFunction}
-                renamedItem={this.state.renamedEventsFunction}
-                onRename={this._rename}
-                onMoveSelectionToItem={this._moveSelectionTo}
-                buildMenuTemplate={this._renderEventsFunctionMenuTemplate}
-                reactDndType="GD_EVENTS_FUNCTION"
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={list}
+                    width={width}
+                    height={height}
+                    onAddNewItem={this._addNewEventsFunction}
+                    addNewItemLabel={<Trans>Add a new function</Trans>}
+                    getItemName={getEventsFunctionName}
+                    selectedItems={
+                      selectedEventsFunction ? [selectedEventsFunction] : []
+                    }
+                    onItemSelected={onSelectEventsFunction}
+                    renamedItem={this.state.renamedEventsFunction}
+                    onRename={this._rename}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    buildMenuTemplate={this._renderEventsFunctionMenuTemplate(
+                      i18n
+                    )}
+                    reactDndType="GD_EVENTS_FUNCTION"
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>

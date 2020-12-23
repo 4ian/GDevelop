@@ -5,7 +5,7 @@
  * @param {gdjs.RuntimeGame} game The game that is being rendered
  * @param {boolean} forceFullscreen If fullscreen should be always activated
  */
-gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen) {
+gdjs.RuntimeGamePixiRenderer = function (game, forceFullscreen) {
   this._game = game;
 
   this._isFullPage = true; //Used to track if the canvas is displayed on the full page.
@@ -18,6 +18,8 @@ gdjs.RuntimeGamePixiRenderer = function(game, forceFullscreen) {
   this._canvasHeight = 0; // Current height of the canvas (might be scaled down/up compared to renderer)
   this._keepRatio = true;
   this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
+
+  this._setupOrientation();
 };
 
 gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to let the engine use it.
@@ -26,19 +28,17 @@ gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to
  * Create a standard canvas inside canvasArea.
  *
  */
-gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
+gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function (
   parentElement
 ) {
   //Create the renderer and setup the rendering area
   //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-  this._pixiRenderer = PIXI.autoDetectRenderer(
-    {
-      width: this._game.getGameResolutionWidth(),
-      height: this._game.getGameResolutionHeight(),
-      preserveDrawingBuffer: true,
-      antialias: false,
-    }
-  );
+  this._pixiRenderer = PIXI.autoDetectRenderer({
+    width: this._game.getGameResolutionWidth(),
+    height: this._game.getGameResolutionHeight(),
+    preserveDrawingBuffer: true,
+    antialias: false,
+  });
   parentElement.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
   this._pixiRenderer.view.style['position'] = 'absolute';
   this._pixiRenderer.view.tabIndex = 1; //Ensure that the canvas has the focus.
@@ -55,7 +55,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
 
   //Handle resize
   var that = this;
-  window.addEventListener('resize', function() {
+  window.addEventListener('resize', function () {
     that._game.onWindowInnerSizeChanged();
     that._resizeCanvas();
     that._game._notifySceneForResize = true;
@@ -64,11 +64,11 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(
   return this._pixiRenderer;
 };
 
-gdjs.RuntimeGamePixiRenderer.getWindowInnerWidth = function() {
+gdjs.RuntimeGamePixiRenderer.getWindowInnerWidth = function () {
   return typeof window !== 'undefined' ? window.innerWidth : 800;
 };
 
-gdjs.RuntimeGamePixiRenderer.getWindowInnerHeight = function() {
+gdjs.RuntimeGamePixiRenderer.getWindowInnerHeight = function () {
   return typeof window !== 'undefined' ? window.innerHeight : 800;
 };
 
@@ -79,8 +79,33 @@ gdjs.RuntimeGamePixiRenderer.getWindowInnerHeight = function() {
  * Note that if the canvas is fullscreen, it won't be resized, but when going back to
  * non fullscreen mode, the requested size will be used.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function () {
   this._resizeCanvas();
+};
+
+/**
+ * Set the proper screen orientation from the project properties.
+ * @private
+ */
+gdjs.RuntimeGamePixiRenderer.prototype._setupOrientation = function () {
+  if (
+    typeof window === 'undefined' ||
+    !window.screen ||
+    !window.screen.orientation
+  )
+    return;
+
+  var gameOrientation = this._game.getGameData().properties.orientation;
+  try {
+    // We ignore the error as some platforms may not supporting locking (i.e: desktop).
+    if (gameOrientation === 'default') {
+      window.screen.orientation.unlock().catch(() => {});
+    } else {
+      window.screen.orientation.lock(gameOrientation).catch(() => {});
+    }
+  } catch (error) {
+    console.error('Unexpected error while setting up orientation: ', error);
+  }
 };
 
 /**
@@ -89,7 +114,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.updateRendererSize = function() {
  *
  * @private
  */
-gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
+gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function () {
   // Set the Pixi renderer size to the game size.
   // There is no "smart" resizing to be done here: the rendering of the game
   // should be done with the size set on the game.
@@ -146,7 +171,7 @@ gdjs.RuntimeGamePixiRenderer.prototype._resizeCanvas = function() {
  * Set if the aspect ratio must be kept when the game canvas is resized to fill
  * the page.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.keepAspectRatio = function(enable) {
+gdjs.RuntimeGamePixiRenderer.prototype.keepAspectRatio = function (enable) {
   if (this._keepRatio === enable) return;
 
   this._keepRatio = enable;
@@ -157,7 +182,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.keepAspectRatio = function(enable) {
 /**
  * Change the margin that must be preserved around the game canvas.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function(
+gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function (
   top,
   right,
   bottom,
@@ -184,7 +209,10 @@ gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function(
  * @param {number} width The new width, in pixels.
  * @param {number} height The new height, in pixels.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.setWindowSize = function(width, height) {
+gdjs.RuntimeGamePixiRenderer.prototype.setWindowSize = function (
+  width,
+  height
+) {
   var electron = this.getElectron();
   if (electron) {
     // Use Electron BrowserWindow API
@@ -200,7 +228,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.setWindowSize = function(width, height) {
 /**
  * Center the window on screen.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.centerWindow = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.centerWindow = function () {
   var electron = this.getElectron();
   if (electron) {
     // Use Electron BrowserWindow API
@@ -216,7 +244,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.centerWindow = function() {
 /**
  * De/activate fullscreen for the game.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
+gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function (enable) {
   if (this._forceFullscreen) return;
 
   if (this._isFullscreen !== enable) {
@@ -257,9 +285,21 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
 };
 
 /**
+ * Checks if the game is in full screen.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.isFullScreen = function () {
+  var electron = this.getElectron();
+  if (electron) {
+    return electron.remote.getCurrentWindow().isFullScreen();
+  }
+  // Height check is used to detect user triggered full screen (for example F11 shortcut).
+  return this._isFullscreen || window.screen.height === window.innerHeight;
+};
+
+/**
  * Add the standard events handler.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
+gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function (
   manager,
   window,
   document
@@ -323,18 +363,18 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
   })();
 
   //Keyboard
-  document.onkeydown = function(e) {
+  document.onkeydown = function (e) {
     manager.onKeyPressed(e.keyCode, e.location);
   };
-  document.onkeyup = function(e) {
+  document.onkeyup = function (e) {
     manager.onKeyReleased(e.keyCode, e.location);
   };
   //Mouse
-  renderer.view.onmousemove = function(e) {
+  renderer.view.onmousemove = function (e) {
     var pos = getEventPosition(e);
     manager.onMouseMove(pos[0], pos[1]);
   };
-  renderer.view.onmousedown = function(e) {
+  renderer.view.onmousedown = function (e) {
     manager.onMouseButtonPressed(
       e.button === 2
         ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -345,7 +385,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
     if (window.focus !== undefined) window.focus();
     return false;
   };
-  renderer.view.onmouseup = function(e) {
+  renderer.view.onmouseup = function (e) {
     manager.onMouseButtonReleased(
       e.button === 2
         ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -357,24 +397,24 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
   };
   window.addEventListener(
     'click',
-    function(e) {
+    function (e) {
       if (window.focus !== undefined) window.focus();
       e.preventDefault();
       return false;
     },
     false
   );
-  renderer.view.oncontextmenu = function(event) {
+  renderer.view.oncontextmenu = function (event) {
     event.preventDefault();
     event.stopPropagation();
     return false;
   };
-  renderer.view.onmousewheel = function(event) {
+  renderer.view.onmousewheel = function (event) {
     manager.onMouseWheel(event.wheelDelta);
   };
   //Touches
   //Also simulate mouse events when receiving touch events
-  window.addEventListener('touchmove', function(e) {
+  window.addEventListener('touchmove', function (e) {
     e.preventDefault();
     if (e.changedTouches) {
       for (var i = 0; i < e.changedTouches.length; ++i) {
@@ -383,7 +423,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
       }
     }
   });
-  window.addEventListener('touchstart', function(e) {
+  window.addEventListener('touchstart', function (e) {
     e.preventDefault();
     if (e.changedTouches) {
       for (var i = 0; i < e.changedTouches.length; ++i) {
@@ -393,7 +433,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
     }
     return false;
   });
-  window.addEventListener('touchend', function(e) {
+  window.addEventListener('touchend', function (e) {
     e.preventDefault();
     if (e.changedTouches) {
       for (var i = 0; i < e.changedTouches.length; ++i) {
@@ -405,15 +445,15 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(
   });
 };
 
-gdjs.RuntimeGamePixiRenderer.prototype.setWindowTitle = function(title) {
+gdjs.RuntimeGamePixiRenderer.prototype.setWindowTitle = function (title) {
   if (typeof document !== 'undefined') document.title = title;
 };
 
-gdjs.RuntimeGamePixiRenderer.prototype.getWindowTitle = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.getWindowTitle = function () {
   return typeof document !== 'undefined' ? document.title : '';
 };
 
-gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
+gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function (fn) {
   requestAnimationFrame(gameLoop);
 
   var oldTime = 0;
@@ -425,14 +465,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
   }
 };
 
-gdjs.RuntimeGamePixiRenderer.prototype.getPIXIRenderer = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.getPIXIRenderer = function () {
   return this._pixiRenderer;
 };
 
 /**
  * Open the given URL in the system browser (or a new tab)
  */
-gdjs.RuntimeGamePixiRenderer.prototype.openURL = function(url) {
+gdjs.RuntimeGamePixiRenderer.prototype.openURL = function (url) {
   // Try to detect the environment to use the most adapted
   // way of opening an URL.
   if (typeof Cocoon !== 'undefined' && Cocoon.App && Cocoon.App.openURL) {
@@ -446,7 +486,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.openURL = function(url) {
 /**
  * Close the game, if applicable
  */
-gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function () {
   // Try to detect the environment to use the most adapted
   // way of closing the app
   var electron = this.getElectron();
@@ -469,7 +509,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
 /**
  * Get the canvas DOM element.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.getCanvas = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.getCanvas = function () {
   return this._pixiRenderer.view;
 };
 
@@ -477,14 +517,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.getCanvas = function() {
  * Check if the device supports WebGL.
  * @returns {boolean} true if WebGL is supported
  */
-gdjs.RuntimeGamePixiRenderer.prototype.isWebGLSupported = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.isWebGLSupported = function () {
   return this._pixiRenderer.type === PIXI.RENDERER_TYPE.WEBGL;
 };
 
 /**
  * Get the electron module, if running as a electron renderer process.
  */
-gdjs.RuntimeGamePixiRenderer.prototype.getElectron = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.getElectron = function () {
   if (typeof require !== 'undefined') {
     return require('electron');
   }

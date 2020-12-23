@@ -17,16 +17,17 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.getRendererObject = functio
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.clear = function() {
     this._graphics.clear();
-    this.updateOutline();
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRectangle = function(x1, y1, x2, y2) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawRect(x1, y1, x2 - x1, y2 - y1);
     this._graphics.endFill();
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawCircle = function(x, y, radius) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawCircle(x, y, radius);
     this._graphics.endFill();
@@ -55,12 +56,14 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawLineV2 = function(x1, y
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawEllipse = function(x1, y1, width, height) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawEllipse(x1, y1, width/2, height/2);
     this._graphics.endFill();
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = function(x1, y1, x2, y2, radius) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
     this._graphics.closePath();
@@ -68,6 +71,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawRoundedRectangle = func
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1, points, radius, innerRadius, rotation) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.drawStar(x1, y1, points, radius, innerRadius ? innerRadius : radius/2, rotation ? gdjs.toRad(rotation) : 0);
     this._graphics.closePath();
@@ -75,6 +79,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawStar = function(x1, y1,
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, radius, startAngle, endAngle, anticlockwise, closePath) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.moveTo(  x1 + radius * Math.cos(gdjs.toRad(startAngle)), y1 + radius * Math.sin(gdjs.toRad(startAngle)));
     this._graphics.arc(x1, y1, radius, gdjs.toRad(startAngle), gdjs.toRad(endAngle), anticlockwise ? true : false);
@@ -85,6 +90,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawArc = function(x1, y1, 
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawBezierCurve = function(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.moveTo(x1, y1);
     this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, x2, y2);  
@@ -92,6 +98,7 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawBezierCurve = function(
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.drawQuadraticCurve = function(x1, y1, cpX, cpY, x2, y2) {
+    this.updateOutline();
     this._graphics.beginFill(this._object._fillColor, this._object._fillOpacity / 255);
     this._graphics.moveTo(x1, y1);
     this._graphics.quadraticCurveTo(cpX, cpY, x2, y2);

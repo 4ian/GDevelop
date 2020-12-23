@@ -319,6 +319,7 @@ function generateBehavior(
     // Declare the instructions/expressions for properties
     declareBehaviorPropertiesInstructionAndExpressions(
       options.i18n,
+      extension,
       behaviorMetadata,
       eventsBasedBehavior
     );
@@ -334,6 +335,7 @@ function generateBehavior(
       );
 
       const instructionOrExpression = declareBehaviorInstructionOrExpressionMetadata(
+        extension,
         behaviorMetadata,
         eventsBasedBehavior,
         eventsFunction

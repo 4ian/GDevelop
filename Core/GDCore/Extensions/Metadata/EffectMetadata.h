@@ -49,7 +49,7 @@ class GD_CORE_API EffectMetadata {
   };
 
   /**
-   * Set the help path of the effect, relative to the documentation root.
+   * Set the help path of the effect, relative to the GDevelop documentation root.
    */
   EffectMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
@@ -81,7 +81,7 @@ class GD_CORE_API EffectMetadata {
   }
 
   /**
-   * \brief Get the help path of the effect, relative to the documentation root.
+   * \brief Get the help path of the effect, relative to the GDevelop documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 

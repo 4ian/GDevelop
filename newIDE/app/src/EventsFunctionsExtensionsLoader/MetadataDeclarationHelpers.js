@@ -20,14 +20,21 @@ export const declareExtension = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  extension.setExtensionInformation(
-    eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getFullName() ||
+  extension
+    .setExtensionInformation(
       eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getDescription(),
-    '',
-    ''
-  );
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      eventsFunctionsExtension.getDescription(),
+      eventsFunctionsExtension.getAuthor(),
+      ''
+    )
+    .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
+    .setIconUrl(eventsFunctionsExtension.getIconUrl());
+};
+
+const getExtensionIconUrl = (extension: gdPlatformExtension) => {
+  return extension.getIconUrl() || 'res/function24.png';
 };
 
 /**
@@ -144,7 +151,7 @@ export const declareBehaviorMetadata = (
       eventsBasedBehavior.getName(), // Default name is the name
       eventsBasedBehavior.getDescription(),
       '',
-      'res/function24.png',
+      getExtensionIconUrl(extension),
       eventsBasedBehavior.getName(), // Class name is the name, actually unused
       generatedBehavior,
       new gd.BehaviorsSharedData()
@@ -199,7 +206,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
     return extension.addStrExpression(
@@ -208,7 +215,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
     return extension.addCondition(
@@ -218,8 +225,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getSentence(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   } else {
     return extension.addAction(
@@ -229,8 +236,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getSentence(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   }
 };
@@ -240,6 +247,7 @@ export const declareInstructionOrExpressionMetadata = (
  * behavior events function.
  */
 export const declareBehaviorInstructionOrExpressionMetadata = (
+  extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
@@ -251,7 +259,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
     return behaviorMetadata.addStrExpression(
@@ -259,7 +267,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
@@ -271,8 +279,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   } else {
     // Use the new "scoped" way to declare an instruction, because
@@ -284,8 +292,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   }
 };
@@ -302,6 +310,7 @@ type gdInstructionOrExpressionMetadata =
  */
 export const declareBehaviorPropertiesInstructionAndExpressions = (
   i18n: I18nType,
+  extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): void => {
@@ -357,7 +366,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -370,8 +379,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Compare the content of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .useStandardRelationalOperatorParameters('string')
@@ -385,8 +394,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Change the content of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .useStandardOperatorParameters('string')
@@ -401,7 +410,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -414,8 +423,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Compare the value of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .useStandardRelationalOperatorParameters('number')
@@ -429,8 +438,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Change the value of ${propertyLabel}`),
           i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .useStandardOperatorParameters('number')
@@ -445,8 +454,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Check the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -459,8 +468,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function32.png',
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .addParameter('yesorno', i18n._(t`New value to set`), '', false)

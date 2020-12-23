@@ -211,6 +211,7 @@ class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor {
   HighestZOrderFinder()
       : highestZOrder(0),
         lowestZOrder(0),
+        instancesCount(0),
         firstCall(true),
         layerRestricted(false){};
   virtual ~HighestZOrderFinder(){};
@@ -237,9 +238,16 @@ class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor {
    */
   int GetLowestZOrder() const { return lowestZOrder; }
 
+  /**
+   * \brief After calling the instances container iterate method with this
+   * functor, this method will return the number of instances.
+   */
+  size_t GetInstancesCount() const { return instancesCount; }
+
  private:
   int highestZOrder;
   int lowestZOrder;
+  size_t instancesCount;
   bool firstCall;
 
   bool layerRestricted;  ///< If true, the search is restricted to the layer

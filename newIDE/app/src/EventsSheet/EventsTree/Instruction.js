@@ -22,9 +22,17 @@ import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
 import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import {
+  type ScreenType,
+  useScreenType,
+} from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useLongTouch } from '../../Utils/UseLongTouch';
+import {
+  shouldActivate,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -86,7 +94,13 @@ type Props = {|
 |};
 
 const Instruction = (props: Props) => {
-  const { instruction, isCondition, onClick, onMoveToInstruction } = props;
+  const {
+    instruction,
+    isCondition,
+    onClick,
+    onMoveToInstruction,
+    onContextMenu,
+  } = props;
 
   const instrFormatter = React.useMemo(
     () => gd.InstructionSentenceFormatter.get(),
@@ -151,7 +165,7 @@ const Instruction = (props: Props) => {
                 }
               }}
               onKeyPress={event => {
-                if (event.key === 'Enter' || event.key === ' ') {
+                if (shouldActivate(event)) {
                   props.onParameterClick(event, parameterIndex);
                   event.stopPropagation();
                   event.preventDefault();
@@ -185,6 +199,21 @@ const Instruction = (props: Props) => {
         instruction.getType()
       );
 
+  // Disable drag on touchscreens, because it would interfere with the
+  // scroll, and would create too much mistake/frustration.
+  const screenType = useScreenType();
+  const dragAllowed = screenType !== 'touch';
+
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        onContextMenu(event.clientX, event.clientY);
+      },
+      [onContextMenu]
+    )
+  );
+
   return (
     <DragSourceAndDropTarget
       beginDrag={() => {
@@ -196,6 +225,7 @@ const Instruction = (props: Props) => {
           isCondition,
         };
       }}
+      canDrag={() => dragAllowed}
       canDrop={draggedItem => draggedItem.isCondition === isCondition}
       drop={() => {
         onMoveToInstruction();
@@ -230,14 +260,15 @@ const Instruction = (props: Props) => {
             }}
             onContextMenu={e => {
               e.stopPropagation();
-              props.onContextMenu(e.clientX, e.clientY);
+              onContextMenu(e.clientX, e.clientY);
             }}
+            {...longTouchForContextMenuProps}
             onKeyPress={event => {
-              if (event.key === 'Enter') {
+              if (shouldValidate(event)) {
                 props.onDoubleClick();
                 event.stopPropagation();
                 event.preventDefault();
-              } else if (event.key === ' ') {
+              } else if (shouldActivate(event)) {
                 props.onClick();
                 event.stopPropagation();
                 event.preventDefault();

@@ -24,6 +24,7 @@ type KeyType =
  * Returns null if the key code can't be categorised.
  */
 const getKeyTypeFromCode = (code: string): KeyType | null => {
+  if (!code) return null;
   if (code.indexOf('Key') === 0) return 'alphabet';
   if (code.indexOf('Digit') === 0) return 'number';
   if (code.indexOf('F') === 0) return 'fn-row';
@@ -42,8 +43,9 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
   if (e.shiftKey) shortcutString += 'Shift+';
   if (e.altKey) shortcutString += 'Alt+';
 
-  const keyType = getKeyTypeFromCode(e.code);
-  if (keyType) shortcutString += e.code;
+  const code = e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+  const keyType = getKeyTypeFromCode(code);
+  if (keyType) shortcutString += code;
   return shortcutString;
 };
 
@@ -53,7 +55,8 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
  */
 export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
   // Check if action key is a shortcut supported key
-  const keyType = getKeyTypeFromCode(e.code);
+  const code = e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+  const keyType = getKeyTypeFromCode(code);
   if (!keyType) return false;
 
   const ctrlOrCmdPressed = e.ctrlKey || e.metaKey;

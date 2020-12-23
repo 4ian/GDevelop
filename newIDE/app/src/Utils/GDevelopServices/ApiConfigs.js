@@ -37,3 +37,21 @@ export const GDevelopExtensionApi = {
     ? 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master'
     : 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master',
 };
+
+export const GDevelopAssetApi = {
+  baseUrl: isDev
+    ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/asset',
+};
+
+export const GDevelopAnalyticsApi = {
+  baseUrl: isDev
+    ? 'https://fixpe96o0h.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/analytics',
+};
+
+export const GDevelopGameApi = {
+  baseUrl: isDev
+    ? 'https://we7eqjifc2.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/game',
+};

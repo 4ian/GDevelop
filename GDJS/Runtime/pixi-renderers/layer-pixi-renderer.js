@@ -284,7 +284,7 @@ gdjs.LayerPixiRenderer.prototype.updateClearColor = function () {
  * Also, render texture is cleared with a specified clear color.
  */
 gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
-  if (!this._pixiRenderer) return;
+  if (!this._pixiRenderer || this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) return;
 
   if (!this._renderTexture) {
     this._oldWidth = this._pixiRenderer.screen.width;
@@ -334,7 +334,7 @@ gdjs.LayerPixiRenderer.prototype._updateRenderTexture = function () {
  * @private used only in lighting for now as the sprite could have MULTIPLY blend mode.
  */
 gdjs.LayerPixiRenderer.prototype._replaceContainerWithSprite = function () {
-  if (!this._pixiRenderer) return;
+  if (!this._pixiRenderer || this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) return;
 
   this._updateRenderTexture();
   if (!this._renderTexture) return;

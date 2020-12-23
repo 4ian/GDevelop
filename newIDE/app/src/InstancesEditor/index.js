@@ -25,6 +25,7 @@ import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
+import LongTouchHandler from './LongTouchHandler';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -93,10 +94,12 @@ export default class InstancesEditor extends Component<Props> {
   backgroundColor: BackgroundColor;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
+  longTouchHandler: LongTouchHandler;
   grid: Grid;
   _unmounted = false;
   _renderingPaused = false;
   nextFrame: AnimationFrameID;
+  contextMenuLongTouchTimeoutID: TimeoutID;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -135,6 +138,13 @@ export default class InstancesEditor extends Component<Props> {
       // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
     canvasArea.appendChild(this.pixiRenderer.view);
+
+    this.longTouchHandler = new LongTouchHandler({
+      canvas: this.pixiRenderer.view,
+      onLongTouch: event =>
+        this.props.onContextMenu(event.clientX, event.clientY),
+    });
+
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
 
@@ -145,6 +155,7 @@ export default class InstancesEditor extends Component<Props> {
 
       return false;
     });
+
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomBy(event.wheelDelta / 5000);
@@ -375,6 +386,7 @@ export default class InstancesEditor extends Component<Props> {
     this.instancesRenderer.delete();
     this._instancesAdder.unmount();
     this.pinchHandler.unmount();
+    this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }
@@ -624,16 +636,20 @@ export default class InstancesEditor extends Component<Props> {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX: number, deltaY: number) => {
-    const sceneDeltaX = deltaX / this.getZoomFactor();
-    const sceneDeltaY = deltaY / this.getZoomFactor();
+  _onResize = (deltaX: number | null, deltaY: number | null) => {
+    const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
+    const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const forceProportional =
+      this.props.screenType === 'touch' && deltaX !== null && deltaY !== null;
+    const proportional =
+      forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
-      this.keyboardShortcuts.shouldResizeProportionally()
+      proportional
     );
   };
 

@@ -1,0 +1,429 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "folderProject": true,
+    "orientation": "landscape",
+    "packageName": "com.gdexample.firebase",
+    "projectUuid": "d60130fb-79a3-476b-bedb-0c65931a8082",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Firebase Example",
+    "author": "Arthur Pacaud (arthuro555)",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": false
+    },
+    "extensionProperties": [
+      {
+        "extension": "Firebase",
+        "property": "FirebaseConfig",
+        "value": "{\n    \"apiKey\": \"AIzaSyCbFhG_bCyAvnxlmVSgIgn7Em0XOYE9YXA\",\n    \"authDomain\": \"tutorial-gdevelop.firebaseapp.com\",\n    \"databaseURL\": \"https://tutorial-gdevelop.firebaseio.com\",\n    \"projectId\": \"tutorial-gdevelop\",\n    \"storageBucket\": \"tutorial-gdevelop.appspot.com\",\n    \"messagingSenderId\": \"386980638073\",\n    \"appId\": \"1:386980638073:web:b00afc0ecb3ed7ca4f53a8\",\n    \"measurementId\": \"G-R0KBN0HPQ8\"\n  }"
+      }
+    ],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/Modal.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\Modal.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/button_up.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\button_up.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/button_pressed.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\button_pressed.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/inputHighlight.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\inputHighlight.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/inputInnactive.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\inputInnactive.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/text_field.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\text_field.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/green_button_up.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\green_button_up.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/back_arrow.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\back_arrow.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/arrow_up.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\arrow_up.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/firebase-example/Assets/arrow_down.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\arrow_down.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": false,
+      "mangledName": "",
+      "name": "",
+      "oglFOV": 0,
+      "oglZFar": 0,
+      "oglZNear": 0,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": false,
+      "title": "(No title)",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "description": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "tags": "",
+      "version": "",
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": []
+    }
+  ],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

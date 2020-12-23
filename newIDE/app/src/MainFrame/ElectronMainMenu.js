@@ -26,6 +26,7 @@ type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
+  | 'main-menu-open-games-dashboard'
   | 'update-status';
 
 type MenuItemTemplate =
@@ -35,6 +36,7 @@ type MenuItemTemplate =
       accelerator?: string,
       enabled?: boolean,
       label?: string,
+      role?: string,
       eventArgs?: any,
     |}
   | {|
@@ -54,11 +56,15 @@ type MenuItemTemplate =
 
 type RootMenuTemplate =
   | {|
-      label: string,
+      label?: string,
+      role?: string,
       submenu: Array<MenuItemTemplate>,
     |}
   | {|
       role: string,
+      submenu: Array<MenuItemTemplate>,
+    |}
+  | {|
       submenu: Array<MenuItemTemplate>,
     |};
 
@@ -140,6 +146,10 @@ const buildAndSendMenuTemplate = (
         onClickSendEvent: 'main-menu-open-profile',
       },
       {
+        label: i18n._(t`Games Dashboard`),
+        onClickSendEvent: 'main-menu-open-games-dashboard',
+      },
+      {
         label: i18n._(t`Preferences`),
         onClickSendEvent: 'main-menu-open-preferences',
       },
@@ -199,11 +209,13 @@ const buildAndSendMenuTemplate = (
   };
 
   const windowTemplate = {
+    label: i18n._(t`Window`),
     role: 'window',
-    submenu: [{ role: 'minimize' }],
+    submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
   };
 
   const helpTemplate = {
+    label: i18n._(t`Help`),
     role: 'help',
     submenu: [
       {
@@ -272,6 +284,10 @@ const buildAndSendMenuTemplate = (
           onClickSendEvent: 'main-menu-open-profile',
         },
         {
+          label: i18n._(t`Games Dashboard`),
+          onClickSendEvent: 'main-menu-open-games-dashboard',
+        },
+        {
           label: i18n._(t`Preferences`),
           onClickSendEvent: 'main-menu-open-preferences',
         },
@@ -337,6 +353,10 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
   useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
   useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
+  useIPCEventListener(
+    'main-menu-open-games-dashboard',
+    props.onOpenGamesDashboard
+  );
   useIPCEventListener('update-status', props.setUpdateStatus);
 
   React.useEffect(

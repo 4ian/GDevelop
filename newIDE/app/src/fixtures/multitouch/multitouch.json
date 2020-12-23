@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\multitouch\\multitouch.json",
+    "projectUuid": "48931a10-7c18-4162-bdc8-755608eff9b7",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Projet",
     "author": "",
     "windowWidth": 800,
@@ -156,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
-          "persistentUuid": "30ed037c-7e0a-4042-8055-34ba405c990a",
+          "persistentUuid": "b91ee70b-a342-4ca9-bd79-939528fcd80a",
           "width": 0,
           "x": 63,
           "y": 28,

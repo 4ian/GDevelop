@@ -7,7 +7,7 @@ import {
   Column as RVColumn,
 } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import SearchBar from '../../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 const gd /*TODO: add flow in this file */ = global.gd;
 
 type State = {|
@@ -50,7 +50,8 @@ export default class InstancesList extends Component<Props, State> {
   _searchBar = React.createRef<SearchBar>();
 
   componentDidMount() {
-    if (this._searchBar.current) this._searchBar.current.focus();
+    if (useShouldAutofocusSearchbar() && this._searchBar.current)
+      this._searchBar.current.focus();
   }
 
   componentWillMount() {
@@ -136,7 +137,7 @@ export default class InstancesList extends Component<Props, State> {
                     key={tableKey}
                     headerHeight={30}
                     height={height}
-                    className={muiTheme.tableRootClassName}
+                    className={`gd-table ${muiTheme.tableRootClassName}`}
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}

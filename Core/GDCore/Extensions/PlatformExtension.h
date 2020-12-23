@@ -92,7 +92,15 @@ class GD_CORE_API PlatformExtension {
                                              const gd::String& license_);
 
   /**
-   * \brief Set the path to the help, relative to the wiki/documentation root.
+   * \brief Set the URL of the extension icon.
+   */
+  PlatformExtension& SetIconUrl(const gd::String& iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the path to the help, relative to the GDevelop documentation root.
    * For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
    *
@@ -267,9 +275,15 @@ class GD_CORE_API PlatformExtension {
 
   /**
    * \brief Return the help path of extension, relative to the
-   * wiki/documentation root.
+   * GDevelop documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
+
+  /**
+   * \brief Return the URL to the icon to be displayed for this
+   * extension.
+   */
+  const gd::String& GetIconUrl() const { return iconUrl; }
 
   /**
    * \brief Check if the extension is flagged as being deprecated.
@@ -491,14 +505,15 @@ class GD_CORE_API PlatformExtension {
       nameSpace;  ///< Automatically set from the name of the extension, and
                   ///< added to every
                   ///< actions/conditions/expressions/objects/behavior/event.
-  gd::String fullname;      ///< Name displayed to users at edittime
-  gd::String informations;  ///< Description displayed to users at edittime
-  gd::String author;        ///< Author displayed to users at edittime
-  gd::String license;       ///< License name displayed to users at edittime
+  gd::String fullname;      ///< Name displayed to users in the editor.
+  gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String author;        ///< Author displayed to users in the editor.
+  gd::String license;       ///< License name displayed to users in the editor.
   bool deprecated;  ///< true if the extension is deprecated and shouldn't be
                     ///< shown in IDE.
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
+  gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;

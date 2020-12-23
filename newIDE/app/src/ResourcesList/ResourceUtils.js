@@ -43,7 +43,8 @@ export const getLocalResourceFullPath = (
 ) => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
-    resourceName
+    resourceName,
+    {}
   ).substring(7 /* Remove "file://" from the URL to get a local path */);
 
   if (resourcePath.indexOf('?cache=') !== -1) {

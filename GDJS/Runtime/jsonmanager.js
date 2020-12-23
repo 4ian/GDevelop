@@ -6,7 +6,7 @@
  */
 
 /**
- * JsonManager loads json files (using XMLHttpRequest), using the "json" resources
+ * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
  * registered in the game resources.
  *
  * Contrary to audio/fonts, json files are loaded asynchronously, when requested.

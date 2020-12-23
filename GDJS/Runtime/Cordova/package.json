@@ -10,5 +10,13 @@
     "keywords": [
         "ecosystem:cordova"
     ],
-    "author": "GDJS_GAME_AUTHOR"
+    "author": "GDJS_GAME_AUTHOR",
+    "devDependencies": {
+        "cordova-plugin-ionic-webview": "5.0.0"
+    },
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-ionic-webview": {}
+        }
+    }
 }

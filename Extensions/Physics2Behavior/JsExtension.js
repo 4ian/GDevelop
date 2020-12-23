@@ -419,9 +419,9 @@ module.exports = {
     aut
       .addCondition(
         'GravityX',
-        _('Gravity X'),
-        _('Test the world gravity on X.'),
-        _('the gravity on X'),
+        _('World gravity on X axis'),
+        _('Compare the world gravity on X axis.'),
+        _('the world gravity on X axis'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -435,8 +435,8 @@ module.exports = {
     aut
       .addExpression(
         'GravityX',
-        _('Gravity X'),
-        _('Gravity X'),
+        _('World gravity on X axis'),
+        _('World gravity on X axis'),
         _('Global'),
         'res/physics16.png'
       )
@@ -448,9 +448,9 @@ module.exports = {
     aut
       .addCondition(
         'GravityY',
-        _('Gravity Y'),
-        _('Test the world gravity on Y.'),
-        _('the gravity on Y'),
+        _('World gravity on Y axis'),
+        _('Compare the world gravity on Y axis.'),
+        _('the world gravity on Y axis'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -464,8 +464,8 @@ module.exports = {
     aut
       .addExpression(
         'GravityY',
-        _('Gravity Y'),
-        _('Gravity Y'),
+        _('World gravity on Y axis'),
+        _('World gravity on Y axis'),
         _('Global'),
         'res/physics16.png'
       )
@@ -477,9 +477,13 @@ module.exports = {
     aut
       .addAction(
         'Gravity',
-        _('Gravity'),
-        _('Modify the world gravity.'),
-        _('Set the gravity to _PARAM2_;_PARAM3_'),
+        _('World gravity'),
+        _('Modify the world gravity.') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('Set the world gravity of _PARAM0_ to _PARAM2_;_PARAM3_'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -494,9 +498,9 @@ module.exports = {
     aut
       .addCondition(
         'TimeScale',
-        _('Time scale'),
-        _('Test the world time scale.'),
-        _('the time scale'),
+        _('World time scale'),
+        _('Compare the world time scale.'),
+        _('the world time scale'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -511,9 +515,13 @@ module.exports = {
     extension
       .addAction(
         'TimeScale',
-        _('Time scale'),
-        _('Modify the world time scale.'),
-        _('Set the world time scale to _PARAM2_'),
+        _('World time scale'),
+        _('Modify the world time scale.') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('Set the world time scale of _PARAM0_ to _PARAM2_'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -528,8 +536,8 @@ module.exports = {
     aut
       .addExpression(
         'TimeScale',
-        _('Time scale'),
-        _('Time scale'),
+        _('World time scale'),
+        _('World time scale'),
         _('Global'),
         'res/physics16.png'
       )
@@ -2728,7 +2736,9 @@ module.exports = {
       .addAction(
         'AddMouseJoint',
         _('Add mouse joint'),
-        _('Add a mouse joint between two joints.'),
+        _(
+          'Add a mouse joint to an object (makes the object move towards a specific point).'
+        ),
         _('Add a mouse joint to _PARAM0_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',

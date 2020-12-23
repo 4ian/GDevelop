@@ -56,10 +56,14 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
+    paddingTop: 12,
     flexShrink: 0,
   },
   invertToggle: {
     marginTop: 8,
+  },
+  description: {
+    whiteSpace: 'pre-wrap',
   },
 };
 
@@ -186,9 +190,15 @@ export default class InstructionParametersEditor extends React.Component<
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
-          {this.props.isCondition
-            ? 'Choose a condition (or an object then a condition) on the left'
-            : 'Choose an action (or an object then an action) on the left'}
+          {this.props.isCondition ? (
+            <Trans>
+              Choose a condition (or an object then a condition) on the left
+            </Trans>
+          ) : (
+            <Trans>
+              Choose an action (or an object then an action) on the left
+            </Trans>
+          )}
         </EmptyMessage>
       </div>
     );
@@ -236,13 +246,15 @@ export default class InstructionParametersEditor extends React.Component<
       <I18n>
         {({ i18n }) => (
           <div style={styles.container}>
-            <Line alignItems="center">
+            <Line alignItems="flex-start">
               <img
                 src={instructionMetadata.getIconFilename()}
                 alt=""
                 style={styles.icon}
               />
-              <Text>{instructionMetadata.getDescription()}</Text>
+              <Text style={styles.description}>
+                {instructionMetadata.getDescription()}
+              </Text>
               {isAnEventFunctionMetadata(instructionMetadata) && (
                 <IconButton
                   onClick={() => {

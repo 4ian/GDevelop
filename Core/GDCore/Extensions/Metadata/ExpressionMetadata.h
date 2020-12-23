@@ -151,12 +151,12 @@ class GD_CORE_API ExpressionMetadata {
   }
 
   /**
-   * Get the help path of the expression, relative to the documentation root.
+   * Get the help path of the expression, relative to the GDevelop documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the expression, relative to the documentation root.
+   * Set the help path of the expression, relative to the GDevelop documentation root.
    */
   ExpressionMetadata &SetHelpPath(const gd::String &path) {
     helpPath = path;

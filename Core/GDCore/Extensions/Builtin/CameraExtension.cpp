@@ -470,6 +470,35 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
+      .AddCondition(
+          "LayerDefaultZOrder",
+          _("Layer default Z order"),
+          _("Compare the default Z order set to objects when they are created on a layer."),
+          _("the default Z order of objects created on _PARAM1_"),
+          _("Layers and cameras"),
+          "res/conditions/layer24.png",
+          "res/conditions/layer.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "SetLayerDefaultZOrder",
+          _("Change layer default Z order"),
+          _("Change the default Z order set to objects when they are created on a layer."),
+          _("Set the default Z order of objects created on _PARAM1_ to _PARAM2_"),
+          _("Layers and cameras"),
+          "res/actions/layer24.png",
+          "res/actions/layer.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("New default Z order"));
+
+  extension
       .AddExpression("CameraWidth",
                      _("Width of a camera of a layer"),
                      _("Width of a camera of a layer"),
@@ -602,6 +631,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0");
 
   extension
+      .AddExpression("CameraZoom",
+                     _("Zoom of a camera of a layer"),
+                     _("Zoom of a camera of a layer"),
+                     _("Layers and cameras"),
+                     "res/actions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0");
+
+  extension
       .AddExpression("VueRotation",
                      _("Angle of a camera of a layer"),
                      _("Angle of a camera of a layer"),
@@ -620,6 +661,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                      _("Time scale"),
                      _("Layers and cameras"),
                      "res/actions/time.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer"));
+
+  extension
+      .AddExpression("LayerDefaultZOrder",
+                     _("Default Z Order for a layer"),
+                     _("Default Z Order for a layer"),
+                     _("Layers and cameras"),
+                     "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"));
 #endif

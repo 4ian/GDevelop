@@ -222,6 +222,8 @@ export default class Window {
   }
 
   static openExternalURL(url: string) {
+    if (!url) return;
+
     if (electron) {
       if (shell) shell.openExternal(url);
       return;
@@ -230,40 +232,11 @@ export default class Window {
     window.open(url, '_blank');
   }
 
-  static isFullscreen() {
-    // $FlowFixMe
-    return !!document.fullscreenElement;
-  }
-
-  static requestFullscreen() {
-    const { documentElement } = document;
-    if (!documentElement) return;
-
-    if (documentElement.requestFullscreen) {
-      documentElement.requestFullscreen();
-      // $FlowFixMe
-    } else if (documentElement.mozRequestFullScreen) {
-      /* Firefox */
-      // $FlowFixMe
-      documentElement.mozRequestFullScreen();
-      // $FlowFixMe
-    } else if (documentElement.webkitRequestFullscreen) {
-      /* Chrome, Safari and Opera */
-      // $FlowFixMe
-      documentElement.webkitRequestFullscreen();
-      // $FlowFixMe
-    } else if (documentElement.msRequestFullscreen) {
-      /* IE/Edge */
-      // $FlowFixMe
-      documentElement.msRequestFullscreen();
-    }
-  }
-
   static hasMainMenu() {
     return !!electron;
   }
 
-  static isDev() {
+  static isDev(): boolean {
     if (!electron)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 

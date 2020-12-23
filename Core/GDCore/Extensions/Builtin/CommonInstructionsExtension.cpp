@@ -8,6 +8,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -35,7 +36,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("Or",
                     _("Or"),
-                    _("Return true if one of the sub conditions is true"),
+                    _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
                     _("Advanced"),
                     "res/conditions/or24.png",
@@ -46,7 +47,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("And",
                     _("And"),
-                    _("Return true if all sub conditions are true"),
+                    _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
                     _("Advanced"),
                     "res/conditions/and24.png",
@@ -117,6 +118,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::ForEachEvent>());
+
+  extension.AddEvent("ForEachChildVariable",
+                     _("For each child variable (of a structure)"),
+                     _("Repeat the event for each child variable of a structure."),
+                     "",
+                     "res/foreach.png",
+                     std::make_shared<gd::ForEachChildVariableEvent>());
 
   extension.AddEvent("Group",
                      _("Group"),

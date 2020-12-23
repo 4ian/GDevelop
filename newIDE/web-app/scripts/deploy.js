@@ -100,6 +100,12 @@ isGitClean()
           return;
         }
 
+        if (!args['skip-examples-resources-deploy']) {
+          shell.exec('npm run deploy:examples-resources');
+        } else {
+          shell.echo('⚠️ Skipping examples resources deployment.');
+        }
+
         shell.echo('✅ Upload finished to GitHub.');
         if (!args['cf-zoneid'] || !args['cf-token']) {
           shell.echo('⚠️ You should probably purge the reverse proxy cache.');

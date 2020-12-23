@@ -54,12 +54,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       globalObjectsContainer.getObjectGroups().has(newName)
     ) {
       showWarningBox(
-        'Another object or group with this name already exists in this function.'
+        'Another object or group with this name already exists in this function.',
+        { delayToNextTick: true }
       );
       return false;
     } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.'
+        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
+        { delayToNextTick: true }
       );
       return false;
     }
@@ -147,7 +149,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <Column expand noMargin useMaxHeight>
+      <Column expand noMargin useFullHeight>
         <Tabs value={this.state.currentTab} onChange={this._chooseTab}>
           <Tab
             label={<Trans>Configuration</Trans>}

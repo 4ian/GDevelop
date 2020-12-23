@@ -307,14 +307,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("string");
 
-  obj.AddCondition(
-         "ObjectVariableChildExists",
-         _("Child existence"),
-         _("Return true if the specified child of the variable exists."),
-         _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
-         _("Variables/Structures"),
-         "res/conditions/var24.png",
-         "res/conditions/var.png")
+  obj.AddCondition("ObjectVariableChildExists",
+                   _("Child existence"),
+                   _("Check if the specified child of the variable exists."),
+                   _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
+                   _("Variables/Structures"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
@@ -497,14 +496,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Variable"))
       .SetHidden();
 
-  obj.AddCondition(
-         "BehaviorActivated",
-         _("Behavior activated"),
-         _("Return true if the behavior is activated for the object."),
-         _("Behavior _PARAM1_ of _PARAM0_ is activated"),
-         _("Behaviors"),
-         "res/behavior24.png",
-         "res/behavior16.png")
+  obj.AddCondition("BehaviorActivated",
+                   _("Behavior activated"),
+                   _("Check if the behavior is activated for the object."),
+                   _("Behavior _PARAM1_ of _PARAM0_ is activated"),
+                   _("Behaviors"),
+                   "res/behavior24.png",
+                   "res/behavior16.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"))
@@ -835,6 +833,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
+  obj.AddExpression("DistanceToPosition",
+                    _("Distance between an object and a position"),
+                    _("Distance between an object and a position"),
+                    _("Position"),
+                    "res/conditions/distance.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
+
+  obj.AddExpression("SqDistanceToPosition",
+                    _("Square distance between an object and a position"),
+                    _("Square distance between an object and a position"),
+                    _("Position"),
+                    "res/conditions/distance.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
+
   obj.AddExpression("Variable",
                     _("Object's variable"),
                     _("Object's variable"),
@@ -866,6 +882,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));
+
+  obj.AddExpression("AngleToObject",
+                    _("Angle between two objects"),
+                    _("Compute the angle between two objects. If you need the "
+                      "angle to an arbitrary position, use AngleToPosition."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Object"));
+
+  obj.AddExpression("AngleToPosition",
+                    _("Angle between an object and a position"),
+                    _("Compute the angle between the object center and a "
+                      "\"target\" position. If you need the angle between two "
+                      "objects, use AngleToObject."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Target X position"))
+      .AddParameter("expression", _("Target Y position"));
 
   extension
       .AddAction("Create",

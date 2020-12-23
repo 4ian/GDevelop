@@ -60,3 +60,8 @@
 **/node_modules/
 .idea
 .vscode/ipch
+/newIDE/app/src/UI/Theme/**/*ThemeVariables.*
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db

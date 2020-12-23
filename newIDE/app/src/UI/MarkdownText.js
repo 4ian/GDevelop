@@ -8,11 +8,22 @@ import classNames from 'classnames';
 const makeMarkdownCustomRenderers = (isStandaloneText: boolean) => ({
   // Ensure link are opened in a new page
   root: props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
-  link: props => (
-    <a href={props.href} target="_blank" rel="noopener noreferrer">
-      {props.children}
-    </a>
-  ),
+  link: props =>
+    props.href ? (
+      <a href={props.href} target="_blank" rel="noopener noreferrer">
+        {props.children}
+      </a>
+    ) : (
+      props.children
+    ),
+  linkReference: props =>
+    props.href ? (
+      <a href={props.href} target="_blank" rel="noopener noreferrer">
+        {props.children}
+      </a>
+    ) : (
+      props.children
+    ),
   // Add paragraphs only if we explictly opt in.
   paragraph: props =>
     isStandaloneText ? <p>{props.children}</p> : props.children,
@@ -38,6 +49,7 @@ export const MarkdownText = (props: Props) => {
       escapeHtml
       source={props.source}
       className={classNames({
+        'gd-markdown': true,
         [gdevelopTheme.markdownRootClassName]: true,
         'standalone-text-container': props.isStandaloneText,
       })}

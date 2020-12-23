@@ -14,6 +14,7 @@ declare class libGDevelop {
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
+  asForEachChildVariableEvent(gdBaseEvent): gdForEachChildVariableEvent;
   asCommentEvent(gdBaseEvent): gdCommentEvent;
   asGroupEvent(gdBaseEvent): gdGroupEvent;
   asLinkEvent(gdBaseEvent): gdLinkEvent;
@@ -115,6 +116,7 @@ declare class libGDevelop {
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
+  ForEachChildVariableEvent: Class<gdForEachChildVariableEvent>;
   CommentEvent: Class<gdCommentEvent>;
   GroupEvent: Class<gdGroupEvent>;
   LinkEvent: Class<gdLinkEvent>;
@@ -160,6 +162,7 @@ declare class libGDevelop {
   ArbitraryResourceWorker: Class<gdArbitraryResourceWorker>;
   ArbitraryResourceWorkerJS: Class<gdArbitraryResourceWorkerJS>;
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
+  ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   LayoutEditorCanvasOptions: Class<gdLayoutEditorCanvasOptions>;

@@ -226,7 +226,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
       i->second->SerializeTo(variableElement);
     }
   } else if (type == Type::Array) {
-    SerializerElement& childrenElement = element.AddChild("childrenList");
+    SerializerElement& childrenElement = element.AddChild("children");
     childrenElement.ConsiderAsArrayOf("variable");
     for (auto child : childrenList) {
       child->SerializeTo(childrenElement.AddChild("variable"));
@@ -235,33 +235,44 @@ void Variable::SerializeTo(SerializerElement& element) const {
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
-  const Type typeName = StringAsType(element.GetStringAttribute("type"));
+  type = StringAsType(element.GetStringAttribute("type", "string"));
 
-  if (element.HasChild("children", "Children")) {
+  // Compatibility with GD <= 5.0.0-beta102
+  // Before, everything was stored as strings.
+  // We can unserialize primitives as string as they can be converted from/to
+  // strings anyways, but structures cannot be converted from a string.
+  // If we detect children, but the type is primitive (meaning the default type
+  // is used as a type if missing), then it should be unserialized as a
+  // structure instead of a string.
+  if (element.HasChild("children", "Children") && IsPrimitive(type))
+    type = Type::Structure;
+  // end of compatibility code
+
+  if (IsPrimitive(type)) {
+    if (type == Type::String) {
+      SetString(element.GetStringAttribute("value", "0", "Value"));
+    } else if (type == Type::Number) {
+      SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
+    } else if (type == Type::Boolean) {
+      SetBool(element.GetBoolAttribute("value", false, "Value"));
+    }
+  } else {
     const SerializerElement& childrenElement =
         element.GetChild("children", 0, "Children");
     childrenElement.ConsiderAsArrayOf("variable", "Variable");
     if (childrenElement.GetChildrenCount() == 0) return;
-    bool isStructure = childrenElement.GetChild(0).HasAttribute("name");
+
     for (int i = 0; i < childrenElement.GetChildrenCount(); ++i) {
       const SerializerElement& childElement = childrenElement.GetChild(i);
-      if (isStructure) {
+      if (type == Type::Structure) {
         gd::String name = childElement.GetStringAttribute("name", "", "Name");
         children[name] = std::make_shared<gd::Variable>();
         children[name]->UnserializeFrom(childElement);
-      } else {
-        childrenList.push_back(std::make_shared<gd::Variable>());
-        childrenList.back()->UnserializeFrom(childrenElement);
-      }
+      } else if (type == Type::Array)
+        PushNew().UnserializeFrom(childrenElement);
     }
-  } else if (typeName == Type::String) {
-    SetString(element.GetStringAttribute("value", "0", "Value"));
-  } else if (typeName == Type::Number) {
-    SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
-  } else if (typeName == Type::Boolean) {
-    SetBool(element.GetBoolAttribute("value", false, "Value"));
-  };
-}
+  }
+}  // namespace gd
 
 std::vector<gd::String> Variable::GetAllChildrenNames() const {
   std::vector<gd::String> names;

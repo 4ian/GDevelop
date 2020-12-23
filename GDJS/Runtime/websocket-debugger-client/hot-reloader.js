@@ -7,6 +7,10 @@
  */
 
 /**
+ * @typedef {{oldBehaviorConstructor: Function, newBehaviorConstructor: Function, behaviorTypeName: string }} ChangedRuntimeBehavior
+ */
+
+/**
  * Reload scripts/data of an exported game and applies the changes
  * to the running runtime game.
  *
@@ -226,10 +230,6 @@ gdjs.HotReloader.prototype.hotReload = function () {
       });
   });
 };
-
-/**
- * @typedef {{oldBehaviorConstructor: Function, newBehaviorConstructor: Function, behaviorTypeName: string }} ChangedRuntimeBehavior
- */
 
 /**
  * @param {Object.<string, Function>} oldBehaviorConstructors
@@ -1017,11 +1017,11 @@ gdjs.HotReloader.prototype._hotReloadRuntimeLayer = function (
     if (oldLayer.ambientLightColorR !== newLayer.ambientLightColorR) {
       runtimeLayer.setClearColor(newLayer.ambientLightColorR, null, null);
     }
-  
+
     if (oldLayer.ambientLightColorG !== newLayer.ambientLightColorG) {
       runtimeLayer.setClearColor(null, newLayer.ambientLightColorG, null);
     }
-  
+
     if (oldLayer.ambientLightColorB !== newLayer.ambientLightColorB) {
       runtimeLayer.setClearColor(null, null, newLayer.ambientLightColorB);
     }

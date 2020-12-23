@@ -36,7 +36,9 @@
  * @property {number} flow
  * @property {number} tank
  * @property {boolean} destroyWhenNoParticles Destroy the object when there is no particles?
- *
+ */
+
+/**
  * @typedef {ObjectData & ParticleEmitterObjectDataType} ParticleEmitterObjectData
  */
 

@@ -7,7 +7,9 @@
  * @typedef {Object} TiledSpriteObjectDataType Initial properties for a Tiled Sprite object
  * @property {number} width The width of the object
  * @property {number} height The height of the object
- *
+ */
+
+/**
  * @typedef {ObjectData & TiledSpriteObjectDataType} TiledSpriteObjectData
  */
 

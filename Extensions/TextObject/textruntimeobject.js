@@ -15,7 +15,9 @@
  * @property {number} color.g The Green level from 0 to 255
  * @property {number} color.b The Blue level from 0 to 255
  * @property {string} string The text of the object
- *
+ */
+
+/**
  * @typedef {ObjectData & TextObjectDataType} TextObjectData
  */
 

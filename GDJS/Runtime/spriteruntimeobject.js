@@ -53,7 +53,9 @@
  * @typedef {Object} SpriteObjectDataType Represents the data of a {@link gdjs.SpriteRuntimeObject}.
  * @property {boolean} updateIfNotVisible Update the object even if he is not visible?.
  * @property {Array<SpriteAnimationData>} animations The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances.
- *
+ */
+
+/**
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
 

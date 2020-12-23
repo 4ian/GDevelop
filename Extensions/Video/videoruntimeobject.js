@@ -5,7 +5,9 @@
  * @property {boolean} content.loop Does the video loops itself?
  * @property {number} content.volume The volume of the video
  * @property {string} content.videoResource Name of the resource corresponding to the video
- *
+ */
+
+/**
  * @typedef {ObjectData & VideoObjectDataType} VideoObjectData
  */
 

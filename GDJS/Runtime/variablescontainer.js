@@ -197,6 +197,8 @@ gdjs.VariablesContainer.badVariablesContainer = {
  * @private
  */
 gdjs.VariablesContainer.badVariable = {
+    getType : function() { return "number"; },
+    isPrimitive : function() { return true; },
     getChild : function() { return gdjs.VariablesContainer.badVariable; },
     hasChild: function() {return false;},
     isStructure: function() {return false;},
@@ -204,14 +206,21 @@ gdjs.VariablesContainer.badVariable = {
     removeChild : function() { return; },
     setNumber : function() { return; },
     setString : function() { return; },
-    getAsString : function() { return ""; },
+    setBoolean : function() { return; },
+    getAsString : function() { return "0"; },
     getAsNumber : function() { return 0; },
+    getAsBoolean : function() { return "false"; },
     getAllChildren : function() { return {}; },
+    getAllChildrenList : function() { return []; },
+    getAtIndex : function() { return gdjs.VariablesContainer.badVariable; },
+    push : function() { return; },
+    removeAtIndex : function() { return; },
     add : function() { return; },
     sub : function() { return; },
     mul : function() { return; },
     div : function() { return; },
     concatenate : function() { return; },
+    concatenateString : function() { return; },
     setUndefinedInContainer : function() { return; },
     isUndefinedInContainer : function() { return; }
 };

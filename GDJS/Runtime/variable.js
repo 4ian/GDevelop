@@ -286,14 +286,14 @@ gdjs.Variable.prototype.getAllChildren = function () {
 
 /**
  * Return an Array containing all the children of the variable
- * @return {?gdjs.Variable[]}
+ * @return {gdjs.Variable[]}
  */
 gdjs.Variable.prototype.getAllChildrenList = function () {
   return this._type === 'structure'
     ? Object.values(this._children)
     : this._type === 'array'
     ? this._childrenList
-    : null;
+    : [];
 };
 
 /**

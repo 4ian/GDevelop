@@ -499,6 +499,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("New default Z order"));
 
   extension
+      .AddAction("SetLayerAmbientLightColor",
+                 _("Set the ambient light color"),
+                 _("Set the ambient light color of the lighting layer in format \"R;G;B\" string."),
+                 _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),
+                 _("Layers and cameras/Lighting"),
+                 "res/actions/color24.png",
+                 "res/actions/color.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"Lighting\"")
+      .AddParameter("color", _("Color"))
+      .MarkAsAdvanced();
+
+  extension
       .AddExpression("CameraWidth",
                      _("Width of a camera of a layer"),
                      _("Width of a camera of a layer"),

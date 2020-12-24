@@ -86,6 +86,12 @@ gdjs.SceneStack.prototype.pop = function() {
 	return scene;
 };
 
+/**
+ * Pause the scene currently being played and start the new scene that is specified.
+ * If `externalLayoutName` is set, also instantiate the objects from this external layout.
+ * @param {string} newSceneName
+ * @param {string=} externalLayoutName
+ */
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     // Tell the scene it's being paused
     var currentScene = this._stack[this._stack.length - 1];
@@ -109,6 +115,12 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     return newScene;
 };
 
+/**
+ * Start the specified scene, replacing the one currently being played.
+ * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+ * @param {string} newSceneName
+ * @param {boolean=} clear
+ */
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
         // Unload all the scenes

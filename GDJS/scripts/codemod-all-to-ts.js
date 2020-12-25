@@ -15,7 +15,8 @@ const {
   const allInOutFilePaths = [
     ...allGDJSInOutFilePaths,
     ...allExtensionsInOutFilePaths,
-  ].filter(({ inPath }) => !isUntransformedFile(inPath));
+  ].filter(({ inPath }) => !isUntransformedFile(inPath))
+  .filter(({ inPath }) => path.extname(inPath) === '.js');
   const totalCount = allInOutFilePaths.length;
   let doneCount = 0;
 

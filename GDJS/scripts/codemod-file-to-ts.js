@@ -81,9 +81,13 @@ const identifyClassNames = (code) => {
   const classNames = [];
   let match;
 
+  const isClass = (name) => {
+    return name && name[0] === name[0].toUpperCase();
+  }
+
   do {
     match = classNameRegex.exec(code);
-    if (match) {
+    if (match && isClass(match[1])) {
       classNames.push(match[1]);
     }
   } while (match);

@@ -19,8 +19,8 @@ namespace gdjs {
     const thisIsUnusedButEnsureTheNamespaceIsDeclared = true;
   }
 
-  export const objectsTypes = new Hashtable();
-  export const behaviorsTypes = new Hashtable();
+  export const objectsTypes = new Hashtable<typeof gdjs.RuntimeObject>();
+  export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 
   type RuntimeSceneCallback = (runtimeScene: RuntimeScene) => void;
 
@@ -362,7 +362,7 @@ namespace gdjs {
    * @returns {Array}
    */
   export const objectsListsToArray = function (
-    objectsLists: Hashtable
+    objectsLists: Hashtable<RuntimeObject>
   ): Array<RuntimeObject> {
     var lists = gdjs.staticArray(gdjs.objectsListsToArray);
     objectsLists.values(lists);

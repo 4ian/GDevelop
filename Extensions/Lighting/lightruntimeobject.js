@@ -40,9 +40,7 @@ gdjs.LightRuntimeObject = function (runtimeScene, lightObjectData) {
   /** @type {gdjs.LightObstaclesManager} */
   this._obstaclesManager = gdjs.LightObstaclesManager.getManager(runtimeScene);
 
-  if (this._renderer)
-    gdjs.LightRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  else this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
+  this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
 
   /** @type {gdjs.RuntimeScene} */
   this._runtimeScene = runtimeScene;

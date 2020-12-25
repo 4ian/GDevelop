@@ -29,11 +29,8 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
     this._yOffset = 0;
     this.opacity = 255;
 
-    if (this._renderer)
-        gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, tiledSpriteObjectData.texture);
-    else
-        /** @type {gdjs.TiledSpriteRuntimeObjectRenderer} */
-        this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, tiledSpriteObjectData.texture);
+    /** @type {gdjs.TiledSpriteRuntimeObjectRenderer} */
+    this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, tiledSpriteObjectData.texture);
 
     this.setWidth(tiledSpriteObjectData.width);
     this.setHeight(tiledSpriteObjectData.height);

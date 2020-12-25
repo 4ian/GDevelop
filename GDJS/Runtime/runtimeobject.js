@@ -114,14 +114,13 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
     this.pick = false;
 
     //Hit boxes:
-    if ( this._defaultHitBoxes === undefined ) {
-        /**
-         * @type {Array<gdjs.Polygon>}
-         * @protected
-         */
-        this._defaultHitBoxes = [];
-        this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
-    }
+    /**
+     * @type {Array<gdjs.Polygon>}
+     * @protected
+     */
+    this._defaultHitBoxes = [];
+    this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0,0));
+
     /**
      * @type {Array<gdjs.Polygon>}
      * @protected
@@ -132,85 +131,54 @@ gdjs.RuntimeObject = function(runtimeScene, objectData) {
      * @protected
      */
     this.hitBoxesDirty = true;
-    if ( this.aabb === undefined )
-        /**
-         * @type {AABB}
-         * @protected
-         */
-        this.aabb = { min:[0,0], max:[0,0] };
-    else {
-        this.aabb.min[0] = 0; this.aabb.min[1] = 0;
-        this.aabb.max[0] = 0; this.aabb.max[1] = 0;
-    }
+
+    /**
+     * @type {AABB}
+     * @protected
+     */
+    this.aabb = { min:[0,0], max:[0,0] };
 
     //Variables:
-    if ( !this._variables )
-        /**
-         * @type {gdjs.VariablesContainer}
-         * @protected
-         */
-        this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
-    else
-        gdjs.VariablesContainer.call(this._variables, objectData ? objectData.variables : undefined);
+    /**
+     * @type {gdjs.VariablesContainer}
+     * @protected
+     */
+    this._variables = new gdjs.VariablesContainer(objectData ? objectData.variables : undefined);
 
     //Forces:
-    if ( this._forces === undefined )
-        /**
-         * @type {Array<gdjs.Force>}
-         * @protected
-         */
-        this._forces = [];
-    else
-        this.clearForces();
+    /**
+     * @type {Array<gdjs.Force>}
+     * @protected
+     */
+    this._forces = [];
 
-    if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,0);
+    this._averageForce = new gdjs.Force(0,0,0);
 
-    //Behaviors:
-    if (this._behaviors === undefined)
-        /**
-         * Contains the behaviors of the object.
-         * @type {Array<gdjs.RuntimeBehavior>}
-         * @protected
-         */
-        this._behaviors = [];
+    /**
+     * Contains the behaviors of the object.
+     * @type {Array<gdjs.RuntimeBehavior>}
+     * @protected
+     */
+    this._behaviors = [];
 
-    if (this._behaviorsTable === undefined)
-        //TODO: add <string, gdjs.RuntimeBehavior> typing to Hashtable.
-        /**
-         * @type {Hashtable}
-         * @protected
-         */
-        this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
-    else
-        this._behaviorsTable.clear();
+    /**
+     * @type {Hashtable}
+     * @protected
+     */
+    this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
 
 	for(var i = 0, len = objectData.behaviors.length;i<len;++i) {
 		var autoData = objectData.behaviors[i];
         var Ctor = gdjs.getBehaviorConstructor(autoData.type);
-
-        //Try to reuse already existing behaviors.
-        if ( i < this._behaviors.length ) {
-            if ( this._behaviors[i] instanceof Ctor )
-                Ctor.call(this._behaviors[i], runtimeScene, autoData, this);
-            else
-                this._behaviors[i] = new Ctor(runtimeScene, autoData, this);
-        }
-        else this._behaviors.push(new Ctor(runtimeScene, autoData, this));
-
+        this._behaviors.push(new Ctor(runtimeScene, autoData, this));
         this._behaviorsTable.put(autoData.name, this._behaviors[i]);
     }
-    this._behaviors.length = i;//Make sure to delete already existing behaviors which are not used anymore.
 
-    //Timers:
-    if (this._timers === undefined)
-        //TODO: add <string, gdjs.Timer> typing to Hashtable.
-        /**
-         * @type {Hashtable}
-         * @protected
-         */
-        this._timers = new Hashtable();
-    else
-        this._timers.clear();
+    /**
+     * @type {Hashtable}
+     * @protected
+     */
+    this._timers = new Hashtable();
 };
 
 /**
@@ -249,6 +217,69 @@ gdjs.RuntimeObject.prototype.onCreated = function() {
     for(var i =0;i<this._behaviors.length;++i) {
         this._behaviors[i].onCreated();
     }
+}
+
+gdjs.RuntimeObject.supportsReinitialization = false;
+
+/**
+ * Called to reset the object to its default state. This is used for objects that are
+ * "recycled": they are dismissed (at which point `onDestroyFromScene` is called) but still
+ * stored in a cache to be reused next time an object must be created. At this point,
+ * `reinitialize` will be called. The object must then work as if it was a newly constructed
+ * object.
+ *
+ * To implement this in your object:
+ * * Set `gdjs.YourRuntimeObject.supportsReinitialization = true;` to declare support for recycling.
+ * * Implement `reinitialize`. It **must** call the `reinitialize` of `gdjs.RuntimeObject`, and call `this.onCreated();`
+ * at the end of `reinitizalize`.
+ * * It must reset the object as if it was newly constructed (be careful about your renderers and any global state).
+ * * The `_runtimeScene`, `_nameId`, `name` and `type` are guaranteed to stay the same and do not
+ * need to be set again.
+ *
+ * @param {ObjectData} objectData
+ */
+gdjs.RuntimeObject.prototype.reinitialize = function(objectData) {
+    const runtimeScene = this._runtimeScene;
+
+    this.x = 0;
+    this.y = 0;
+    this.angle = 0;
+    this.zOrder = 0;
+    this.hidden = false;
+    this.layer = "";
+    this._livingOnScene = true;
+    this.id = runtimeScene.createNewUniqueId();
+    this.persistentUuid = null;
+    this.pick = false;
+    this.hitBoxesDirty = true;
+
+    this.aabb.min[0] = 0;
+    this.aabb.min[1] = 0;
+    this.aabb.max[0] = 0;
+    this.aabb.max[1] = 0;
+
+    this._variables = new gdjs.VariablesContainer(objectData.variables);
+
+    this.clearForces();
+
+    this._behaviorsTable.clear();
+    var i = 0;
+	for(var len = objectData.behaviors.length;i<len;++i) {
+		var behaviorData = objectData.behaviors[i];
+        var Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
+
+        if (i < this._behaviors.length) {
+            // TODO: Add support for behavior recycling with a `reinitialize` method.
+            this._behaviors[i] = new Ctor(runtimeScene, behaviorData, this);
+        } else {
+            this._behaviors.push(new Ctor(runtimeScene, behaviorData, this));
+        }
+
+        this._behaviorsTable.put(behaviorData.name, this._behaviors[i]);
+    }
+    this._behaviors.length = i; // Make sure to delete already existing behaviors which are not used anymore.
+
+    this._timers.clear();
 }
 
 /**

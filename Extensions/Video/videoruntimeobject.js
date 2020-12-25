@@ -42,10 +42,8 @@ gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
   /** @type {boolean} */
   this._pausedAsScenePaused = false;
 
-  if (this._renderer)
-    gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  /** @type {gdjs.VideoRuntimeObjectRenderer} */ else
-    this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+  /** @type {gdjs.VideoRuntimeObjectRenderer} */
+  this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();

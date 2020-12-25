@@ -10,23 +10,19 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
 
   // Load (or reset) the video
-  if (this._pixiObject === undefined) {
-    this._pixiObject = new PIXI.Sprite(
-      runtimeScene
-        .getGame()
-        .getImageManager()
-        .getPIXIVideoTexture(this._object._videoResource)
-    );
-    this._pixiObject._texture.baseTexture.autoPlay = false;
-  } else {
-    this._pixiObject._texture.baseTexture.resource.source.currentTime = 0;
-  }
-  
+  this._pixiObject = new PIXI.Sprite(
+    runtimeScene
+      .getGame()
+      .getImageManager()
+      .getPIXIVideoTexture(this._object._videoResource)
+  );
+  this._pixiObject._texture.baseTexture.autoPlay = false;
+
   // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
   // See https://github.com/pixijs/pixi.js/issues/5996
   this._pixiObject._texture.baseTexture.resource.source.preload = "auto";
   this._pixiObject._texture.baseTexture.resource.source.autoload = true;
-  
+
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   runtimeScene

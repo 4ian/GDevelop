@@ -20,6 +20,15 @@ gdjs.SpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.SpriteRuntimeObjectRenderer = gdjs.SpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
+gdjs.SpriteRuntimeObjectPixiRenderer.prototype.reinitialize = function(runtimeObject, runtimeScene) {
+    this._object = runtimeObject;
+    this._spriteDirty = true;
+    this._textureDirty = true;
+
+    var layer = runtimeScene.getLayer("");
+    if (layer) layer.getRenderer().addRendererObject(this._sprite, runtimeObject.getZOrder());
+}
+
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
     return this._sprite;
 };

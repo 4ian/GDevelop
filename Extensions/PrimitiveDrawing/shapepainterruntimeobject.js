@@ -59,11 +59,8 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
     /** @type {boolean} */
     this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
 
-    if (this._renderer)
-        gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-    else
-        /** @type {gdjs.ShapePainterRuntimeObjectRenderer} */
-        this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
+    /** @type {gdjs.ShapePainterRuntimeObjectRenderer} */
+    this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
     this.onCreated();
@@ -71,6 +68,8 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.registerObject("PrimitiveDrawing::Drawer", gdjs.ShapePainterRuntimeObject);
+
+gdjs.ShapePainterRuntimeObject.supportsReinitialization = false;
 
 gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();

@@ -17,6 +17,17 @@ gdjs.SpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.SpriteRuntimeObjectRenderer = gdjs.SpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
+// Same as the constructor - we don't really support reinitialization.
+gdjs.SpriteRuntimeObjectCocosRenderer.prototype.reinitialize = function(runtimeObject, runtimeScene) {
+    this._object = runtimeObject;
+    this._sprite = new cc.Sprite(runtimeScene.getGame().getImageManager().getInvalidTexture());
+    this._currentBlendMode = undefined;
+
+    var renderer = runtimeScene.getLayer("").getRenderer();
+    renderer.addRendererObject(this._sprite, runtimeObject.getZOrder());
+    this._convertYPosition = renderer.convertYPosition;
+};
+
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
     return this._sprite;
 };

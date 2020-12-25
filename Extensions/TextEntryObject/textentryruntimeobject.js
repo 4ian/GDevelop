@@ -22,11 +22,8 @@ gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
     /** @type {boolean} */
     this._activated = true;
 
-    if (this._renderer)
-        gdjs.TextEntryRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-    else
-        /** @type {gdjs.TextEntryRuntimeObjectRenderer} */
-        this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
+    /** @type {gdjs.TextEntryRuntimeObjectRenderer} */
+    this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
 
     // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
     this.onCreated();

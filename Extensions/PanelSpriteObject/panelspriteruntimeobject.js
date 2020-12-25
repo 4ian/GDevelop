@@ -55,23 +55,13 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, panelSpriteObjectData) {
   /** @type {number} */
   this.opacity = 255;
 
-  if (this._renderer) {
-    gdjs.PanelSpriteRuntimeObjectRenderer.call(
-      this._renderer,
-      this,
-      runtimeScene,
-      panelSpriteObjectData.texture,
-      panelSpriteObjectData.tiled
-    );
-  } else {
-    /** @type {gdjs.PanelSpriteRuntimeObjectRenderer} */
-    this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
-      this,
-      runtimeScene,
-      panelSpriteObjectData.texture,
-      panelSpriteObjectData.tiled
-    );
-  }
+  /** @type {gdjs.PanelSpriteRuntimeObjectRenderer} */
+  this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
+    this,
+    runtimeScene,
+    panelSpriteObjectData.texture,
+    panelSpriteObjectData.tiled
+  );
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();

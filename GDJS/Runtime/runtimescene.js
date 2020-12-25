@@ -152,7 +152,6 @@ gdjs.RuntimeScene.prototype.isObjectRegistered = function(objectName) {
     return (
         this._objects.containsKey(objectName) &&
         this._instances.containsKey(objectName) &&
-        this._instancesCache.containsKey(objectName) &&
         this._objectsCtor.containsKey(objectName)
     );
 }
@@ -163,9 +162,16 @@ gdjs.RuntimeScene.prototype.isObjectRegistered = function(objectName) {
  */
 gdjs.RuntimeScene.prototype.registerObject = function(objectData) {
     this._objects.put(objectData.name, objectData);
-    this._instances.put(objectData.name, []); //Also reserve an array for the instances
-    this._instancesCache.put(objectData.name, []); //and for cached instances
-    this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectData.type)); //And cache the constructor for the performance sake
+    this._instances.put(objectData.name, []);
+
+    // Cache the constructor
+    const Ctor = gdjs.getObjectConstructor(objectData.type);
+    this._objectsCtor.put(objectData.name, Ctor);
+
+    // Also prepare a cache for recycled instances, if the object supports it.
+    if (Ctor.supportsReinitialization) {
+        this._instancesCache.put(objectData.name, []);
+    }
 }
 
 /**
@@ -533,9 +539,12 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
  */
 gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
     for(var k =0, lenk=this._instancesRemoved.length;k<lenk;++k) {
-        //Cache the instance to recycle it into a new instance later.
+        // Cache the instance to recycle it into a new instance later.
+        // If the object does not support recycling, the cache won't be defined.
         var cache = this._instancesCache.get(this._instancesRemoved[k].getName());
-        if ( cache.length < 128 ) cache.push(this._instancesRemoved[k]);
+        if (cache) {
+            if ( cache.length < 128 ) cache.push(this._instancesRemoved[k]);
+        }
     }
 
     this._instancesRemoved.length = 0;
@@ -694,24 +703,24 @@ gdjs.RuntimeScene.prototype.getObjects = function(name){
  * @param {string} objectName The name of the object to be created
  * @return {?gdjs.RuntimeObject} The created object
  */
-gdjs.RuntimeScene.prototype.createObject = function(objectName){
+gdjs.RuntimeScene.prototype.createObject = function(objectName) {
 
     if ( !this._objectsCtor.containsKey(objectName) ||
         !this._objects.containsKey(objectName) )
         return null; //There is no such object in this scene.
 
-    //Create a new object using the object constructor ( cached during loading )
-    //and the stored object's data:
+    // Create a new object using the object constructor (cached during loading)
+    // and the stored object's data:
     var cache = this._instancesCache.get(objectName);
     var ctor = this._objectsCtor.get(objectName);
     var obj = null;
-    if ( cache.length === 0 ) {
+    if ( !cache || cache.length === 0 ) {
         obj = new ctor(this, this._objects.get(objectName));
-    }
-    else {
-        //Reuse an objet destroyed before:
+    } else {
+        // Reuse an objet destroyed before. If there is an object in the cache,
+        // then it means it does support reinitialization.
         obj = cache.pop();
-        ctor.call(obj, this, this._objects.get(objectName));
+        obj.reinitialize(this._objects.get(objectName));
     }
 
     this.addObject(obj);

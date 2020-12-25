@@ -70,47 +70,46 @@
  * @param {gdjs.ImageManager} imageManager The game image manager
  * @param {SpriteFrameData} frameData The frame data used to initialize the frame
  */
-
 gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
     /** @type {string} */
     this.image = frameData ? frameData.image : ""; //TODO: Rename in imageName, and do not store it in the object?
     this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(imageManager, this.image);
 
-    if ( this.center === undefined ) {
-        /** @type {SpritePoint} */
-        this.center = { x:0, y:0 };
-    }
-    if ( this.origin === undefined ) {
-        /** @type {SpritePoint} */
-        this.origin = { x:0, y:0 }
-    }
+    /** @type {SpritePoint} */
+    this.center = { x:0, y:0 };
+
+    /** @type {SpritePoint} */
+    this.origin = { x:0, y:0 }
+
     /** @type {boolean} */
     this.hasCustomHitBoxes = false;
-    if ( this.customHitBoxes === undefined ) {
-        /** @type {Array<gdjs.Polygon>} */
-        this.customHitBoxes = []
-    };
-    if ( this.points === undefined ){
-        /** @type {Hashtable} */
-        this.points = new Hashtable();
-    } else this.points.clear();
 
-    //Initialize points:
+    /** @type {Array<gdjs.Polygon>} */
+    this.customHitBoxes = []
+
+    /** @type {Hashtable} */
+    this.points = new Hashtable();
+
+    this.reinitialize(imageManager, frameData);
+};
+
+/**
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {SpriteFrameData} frameData The frame data used to initialize the frame
+ */
+gdjs.SpriteAnimationFrame.prototype.reinitialize = function(imageManager, frameData) {
+    this.points.clear();
 	for(var i = 0, len = frameData.points.length;i<len;++i) {
-        /** @type {SpriteCustomPointData} */
 		var ptData = frameData.points[i];
-
-        /** @type {SpritePoint} */
         var point = {x: ptData.x, y: ptData.y};
         this.points.put(ptData.name, point);
     }
-    /** @type {SpritePoint} */
+
     var origin = frameData.originPoint;
     this.origin.x = origin.x;
     this.origin.y = origin.y;
 
-    /** @type {SpriteCenterPointData} */
     var center = frameData.centerPoint;
     if ( center.automatic !== true ) {
         this.center.x = center.x;
@@ -149,11 +148,10 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
         }
 
         this.customHitBoxes.length = i;
-    }
-    else {
+    } else {
         this.customHitBoxes.length = 0;
     }
-};
+}
 
 /**
  * Get a point of the frame.<br>
@@ -184,22 +182,31 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
     /** @type {boolean} */
     this.loop = !!directionData.looping;
 
-    if ( this.frames === undefined ) {
-        /** @type {Array<SpriteAnimationFrame>} */
-        this.frames = [];
-    }
+    /** @type {Array<SpriteAnimationFrame>} */
+    this.frames = [];
+
+    this.reinitialize(imageManager, directionData);
+};
+
+/**
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {SpriteDirectionData} directionData The direction data used to initialize the direction
+ */
+gdjs.SpriteAnimationDirection.prototype.reinitialize = function(imageManager, directionData) {
+    this.timeBetweenFrames = directionData ? directionData.timeBetweenFrames : 1.0;
+    this.loop = !!directionData.looping;
+
     var i = 0;
     for(var len = directionData.sprites.length;i<len;++i) {
-        /** @type {SpriteFrameData} */
         var frameData = directionData.sprites[i];
 
         if ( i < this.frames.length )
-            gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
+            this.frames[i].reinitialize(imageManager, frameData);
         else
             this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
     }
     this.frames.length = i;
-};
+}
 
 /**
  * Represents an animation of a {@link SpriteRuntimeObject}.
@@ -215,21 +222,31 @@ gdjs.SpriteAnimation = function(imageManager, animData)
     this.hasMultipleDirections = !!animData.useMultipleDirections;
     /** @type {string} */
     this.name = animData.name || '';
-
     /** @type {Array<gdjs.SpriteAnimationDirection>} */
-    if ( this.directions === undefined ) this.directions = [];
+    this.directions = [];
+
+    this.reinitialize(imageManager, animData);
+};
+
+/**
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {SpriteAnimationData} animData The animation data used to initialize the animation
+ */
+gdjs.SpriteAnimation.prototype.reinitialize = function(imageManager, animData) {
+    this.hasMultipleDirections = !!animData.useMultipleDirections;
+    this.name = animData.name || '';
+
     var i = 0;
     for(var len = animData.directions.length;i<len;++i) {
-        /** @type {SpriteDirectionData} */
         var directionData = animData.directions[i];
 
         if ( i < this.directions.length )
-            gdjs.SpriteAnimationDirection.call(this.directions[i], imageManager, directionData);
+            this.directions[i].reinitialize(imageManager, directionData);
         else
             this.directions.push(new gdjs.SpriteAnimationDirection(imageManager, directionData));
     }
     this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
-};
+}
 
 /**
  * The SpriteRuntimeObject represents an object that can display images.
@@ -271,21 +288,12 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
     this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
 
     //Animations:
+    /** @type {Array<gdjs.SpriteAnimation>} */
+    this._animations = [];
 
-    if ( this._animations === undefined ) {
-        /** @type {Array<gdjs.SpriteAnimation>} */
-        this._animations = [];
-    }
     for(var i = 0, len = spriteObjectData.animations.length;i<len;++i) {
-        /** @type {SpriteAnimationData} */
-        var animData = spriteObjectData.animations[i];
-
-        if ( i < this._animations.length )
-            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
-        else
-            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+        this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), spriteObjectData.animations[i]));
     }
-    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
 
     /**
      * Reference to the current SpriteAnimationFrame that is displayd.
@@ -297,11 +305,8 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
      */
     this._animationFrame = null;
 
-    if (this._renderer)
-        gdjs.SpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-    else
-        /** @type {gdjs.SpriteRuntimeObjectRenderer} */
-        this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
+    /** @type {gdjs.SpriteRuntimeObjectRenderer} */
+    this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
 
     this._updateAnimationFrame();
 
@@ -313,6 +318,50 @@ gdjs.SpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype
 gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the object existence.
 
 //Others initialization and internal state management :
+
+gdjs.SpriteRuntimeObject.supportsReinitialization = true;
+
+/**
+ * @param {SpriteObjectData} spriteObjectData
+ */
+gdjs.SpriteRuntimeObject.prototype.reinitialize = function(spriteObjectData) {
+    gdjs.RuntimeObject.prototype.reinitialize.call(this, spriteObjectData);
+    var runtimeScene = this._runtimeScene;
+
+    this._currentAnimation = 0;
+    this._currentDirection = 0;
+    this._currentFrame = 0;
+    this._frameElapsedTime = 0;
+    this._animationSpeedScale = 1;
+    this._animationPaused = false;
+    this._scaleX = 1;
+    this._scaleY = 1;
+    this._blendMode = 0;
+    this._flippedX = false;
+    this._flippedY = false;
+    this.opacity = 255;
+    this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
+
+    var i = 0;
+    for(var len = spriteObjectData.animations.length;i<len;++i) {
+        var animData = spriteObjectData.animations[i];
+
+        if ( i < this._animations.length )
+            this._animations[i].reinitialize(runtimeScene.getGame().getImageManager(), animData);
+        else
+            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+    }
+    this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
+
+    this._animationFrame = null;
+
+    this._renderer.reinitialize(this, runtimeScene);
+
+    this._updateAnimationFrame();
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
+    this.onCreated();
+}
 
 /**
  * @param {SpriteObjectData} oldObjectData
@@ -326,7 +375,7 @@ gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
         var animData = newObjectData.animations[i];
 
         if ( i < this._animations.length )
-            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
+            this._animations[i].reinitialize(runtimeScene.getGame().getImageManager(), animData);
         else
             this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
     }

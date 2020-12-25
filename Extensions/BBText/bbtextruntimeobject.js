@@ -23,7 +23,7 @@
  * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
  * @param {BBTextObjectData} objectData The object data used to initialize the object
  */
-gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
+gdjs.BBTextRuntimeObject = function (runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   /** @type {number} */
@@ -32,7 +32,9 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
-  this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(objectData.content.color);
+  this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(
+    objectData.content.color
+  );
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
   /** @type {number} */
@@ -45,10 +47,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type {string} */
   this._align = objectData.content.align;
 
-  if (this._renderer)
-    gdjs.BBTextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  else
-    this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
+  this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
 
   // While this should rather be exposed as a property for all objects, honor the "visible"
   // property that is specific to this object.
@@ -68,7 +67,9 @@ gdjs.BBTextRuntimeObject.hexToRGBColor = function (hex) {
   return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
 };
 
-gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
+gdjs.BBTextRuntimeObject.supportsReinitialization = false;
+
+gdjs.BBTextRuntimeObject.prototype.getRendererObject = function () {
   return this._renderer.getRendererObject();
 };
 
@@ -76,7 +77,10 @@ gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
  * @param {BBTextObjectDataType} oldObjectData
  * @param {BBTextObjectDataType} newObjectData
  */
-gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function (
+  oldObjectData,
+  newObjectData
+) {
   if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
     this.setOpacity(newObjectData.content.opacity);
   }
@@ -87,7 +91,9 @@ gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
     this.setBBText(newObjectData.content.text);
   }
   if (oldObjectData.content.color !== newObjectData.content.color) {
-    this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(newObjectData.content.color);
+    this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(
+      newObjectData.content.color
+    );
     this._renderer.updateColor();
   }
   if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {
@@ -110,21 +116,24 @@ gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
  * Initialize the extra parameters that could be set for an instance.
  * @private
  */
-gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
+gdjs.BBTextRuntimeObject.prototype.extraInitializationFromInitialInstance = function (
+  initialInstanceData
+) {
   if (initialInstanceData.customSize)
     this.setWrappingWidth(initialInstanceData.width);
-  else
-    this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
+  else this.setWrappingWidth(250); // This value is the default wrapping width of the runtime object.
 };
 
-gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+gdjs.BBTextRuntimeObject.prototype.onDestroyFromScene = function (
+  runtimeScene
+) {
   gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 };
 
 /**
  * Set the markup text to display.
  */
-gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
+gdjs.BBTextRuntimeObject.prototype.setBBText = function (text) {
   this._text = text;
   this._renderer.updateText();
 };
@@ -132,11 +141,11 @@ gdjs.BBTextRuntimeObject.prototype.setBBText = function(text) {
 /**
  * Get the markup text displayed by the object.
  */
-gdjs.BBTextRuntimeObject.prototype.getBBText = function() {
+gdjs.BBTextRuntimeObject.prototype.getBBText = function () {
   return this._text;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
+gdjs.BBTextRuntimeObject.prototype.setColor = function (rgbColorString) {
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
 
@@ -150,34 +159,34 @@ gdjs.BBTextRuntimeObject.prototype.setColor = function(rgbColorString) {
  * Get the base color.
  * @return {string} The color as a "R;G;B" string, for example: "255;0;0"
  */
-gdjs.BBTextRuntimeObject.prototype.getColor = function() {
-  return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
+gdjs.BBTextRuntimeObject.prototype.getColor = function () {
+  return this._color[0] + ';' + this._color[1] + ';' + this._color[2];
 };
 
-gdjs.BBTextRuntimeObject.prototype.setFontSize = function(fontSize) {
+gdjs.BBTextRuntimeObject.prototype.setFontSize = function (fontSize) {
   this._fontSize = fontSize;
   this._renderer.updateFontSize();
 };
 
-gdjs.BBTextRuntimeObject.prototype.getFontSize = function() {
+gdjs.BBTextRuntimeObject.prototype.getFontSize = function () {
   return this._fontSize;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setFontFamily = function(fontFamily) {
+gdjs.BBTextRuntimeObject.prototype.setFontFamily = function (fontFamily) {
   this._fontFamily = fontFamily;
   this._renderer.updateFontFamily();
 };
 
-gdjs.BBTextRuntimeObject.prototype.getFontFamily = function() {
+gdjs.BBTextRuntimeObject.prototype.getFontFamily = function () {
   return this._fontFamily;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setAlignment = function(align) {
+gdjs.BBTextRuntimeObject.prototype.setAlignment = function (align) {
   this._align = align;
   this._renderer.updateAlignment();
 };
 
-gdjs.BBTextRuntimeObject.prototype.getAlignment = function() {
+gdjs.BBTextRuntimeObject.prototype.getAlignment = function () {
   return this._align;
 };
 
@@ -185,7 +194,7 @@ gdjs.BBTextRuntimeObject.prototype.getAlignment = function() {
  * Set object position on X axis.
  * @param {number} x The new position X of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.setX = function(x) {
+gdjs.BBTextRuntimeObject.prototype.setX = function (x) {
   gdjs.RuntimeObject.prototype.setX.call(this, x);
   this._renderer.updatePosition();
 };
@@ -194,7 +203,7 @@ gdjs.BBTextRuntimeObject.prototype.setX = function(x) {
  * Set object position on Y axis.
  * @param {number} y The new position Y of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.setY = function(y) {
+gdjs.BBTextRuntimeObject.prototype.setY = function (y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
   this._renderer.updatePosition();
 };
@@ -203,7 +212,7 @@ gdjs.BBTextRuntimeObject.prototype.setY = function(y) {
  * Set the angle of the object.
  * @param {number} angle The new angle of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.setAngle = function(angle) {
+gdjs.BBTextRuntimeObject.prototype.setAngle = function (angle) {
   gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
   this._renderer.updateAngle();
 };
@@ -212,7 +221,7 @@ gdjs.BBTextRuntimeObject.prototype.setAngle = function(angle) {
  * Set object opacity.
  * @param {number} opacity The new opacity of the object (0-255).
  */
-gdjs.BBTextRuntimeObject.prototype.setOpacity = function(opacity) {
+gdjs.BBTextRuntimeObject.prototype.setOpacity = function (opacity) {
   this._opacity = opacity;
   this._renderer.updateOpacity();
 };
@@ -220,7 +229,7 @@ gdjs.BBTextRuntimeObject.prototype.setOpacity = function(opacity) {
 /**
  * Get object opacity.
  */
-gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
+gdjs.BBTextRuntimeObject.prototype.getOpacity = function () {
   return this._opacity;
 };
 
@@ -228,7 +237,7 @@ gdjs.BBTextRuntimeObject.prototype.getOpacity = function() {
  * Set the width.
  * @param {number} width The new width in pixels.
  */
-gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
+gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function (width) {
   this._wrappingWidth = width;
   this._renderer.updateWrappingWidth();
 };
@@ -236,29 +245,29 @@ gdjs.BBTextRuntimeObject.prototype.setWrappingWidth = function(width) {
 /**
  * Get the wrapping width of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function() {
+gdjs.BBTextRuntimeObject.prototype.getWrappingWidth = function () {
   return this._wrappingWidth;
 };
 
-gdjs.BBTextRuntimeObject.prototype.setWordWrap = function(wordWrap) {
+gdjs.BBTextRuntimeObject.prototype.setWordWrap = function (wordWrap) {
   this._wordWrap = wordWrap;
   this._renderer.updateWordWrap();
 };
 
-gdjs.BBTextRuntimeObject.prototype.getWordWrap = function(wordWrap) {
+gdjs.BBTextRuntimeObject.prototype.getWordWrap = function (wordWrap) {
   return this._wordWrap;
 };
 
 /**
  * Get the width of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.getWidth = function() {
+gdjs.BBTextRuntimeObject.prototype.getWidth = function () {
   return this._renderer.getWidth();
 };
 
 /**
  * Get the height of the object.
  */
-gdjs.BBTextRuntimeObject.prototype.getHeight = function() {
+gdjs.BBTextRuntimeObject.prototype.getHeight = function () {
   return this._renderer.getHeight();
 };

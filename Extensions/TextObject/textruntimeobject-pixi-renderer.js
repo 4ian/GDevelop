@@ -3,7 +3,7 @@ gdjs.TextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
     this._object = runtimeObject;
     this._fontManager = runtimeScene.getGame().getFontManager();
 
-    if ( this._text === undefined ) this._text = new PIXI.Text(" ", {align:"left"});
+    this._text = new PIXI.Text(" ", {align:"left"});
     this._text.anchor.x = 0.5;
     this._text.anchor.y = 0.5;
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._text, runtimeObject.getZOrder());
@@ -69,7 +69,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     style.dropShadowAngle = this._object._shadowAngle;
     style.dropShadowDistance = this._object._shadowDistance;
     style.padding = this._object._padding;
-    // Prevent spikey outlines by adding a miter limit 
+    // Prevent spikey outlines by adding a miter limit
     style.miterLimit = 3;
 
     this.updatePosition();
@@ -123,7 +123,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype._getGradientHex = function() {
                 this._object._gradient[colorIndex][2]
             )
         );
-    } 
+    }
     return gradient;
 }
 /**

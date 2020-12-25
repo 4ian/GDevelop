@@ -13,9 +13,7 @@ gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
   this._property1 = objectData.content.property1;
 
   // Create the renderer (see dummyruntimeobject-pixi-renderer.js)
-  if (this._renderer)
-    gdjs.DummyRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  else this._renderer = new gdjs.DummyRuntimeObjectRenderer(this, runtimeScene);
+  this._renderer = new gdjs.DummyRuntimeObjectRenderer(this, runtimeScene);
 
   // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
   this.onCreated();

@@ -44,11 +44,13 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
              eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
           runtimeBehaviorPropertyMethodsCode +=
               GenerateRuntimeBehaviorPropertyTemplateCode(
-                  eventsBasedBehavior, codeNamespace, *property);
+                  eventsBasedBehavior, *property);
         }
 
         return runtimeBehaviorPropertyMethodsCode;
       },
+      // TODO: Update code generation to be able to generate methods (which would allow
+      // for a cleaner output, not having to add methods to the prototype).
       [&]() {
         gd::String runtimeBehaviorMethodsCode;
         for (auto& eventsFunction : eventsFunctionsVector) {
@@ -103,7 +105,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
              eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
           updateFromBehaviorCode +=
               GenerateUpdatePropertyFromBehaviorDataCode(
-                  eventsBasedBehavior, codeNamespace, *property);
+                  eventsBasedBehavior, *property);
         }
 
         return updateFromBehaviorCode;
@@ -115,43 +117,40 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::String& codeNamespace,
     std::function<gd::String()> generateInitializePropertiesCode,
-    std::function<gd::String()> generateMethodsCode,
     std::function<gd::String()> generatePropertiesCode,
+    std::function<gd::String()> generateMethodsCode,
     std::function<gd::String()> generateUpdateFromBehaviorDataCode) {
   return gd::String(R"jscode_template(
 CODE_NAMESPACE = CODE_NAMESPACE || {};
 
 /**
  * Behavior generated from BEHAVIOR_FULL_NAME
- * @class RUNTIME_BEHAVIOR_CLASSNAME
- * @extends gdjs.RuntimeBehavior
- * @constructor
  */
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = function(runtimeScene, behaviorData, owner)
-{
-    gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME extends gdjs.RuntimeBehavior {
+  constructor(runtimeScene, behaviorData, owner) {
+    super(runtimeScene, behaviorData, owner);
     this._runtimeScene = runtimeScene;
 
     this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
     INITIALIZE_PROPERTIES_CODE
-};
+  }
 
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME);
-
-// Hot-reload:
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
-UPDATE_FROM_BEHAVIOR_DATA_CODE
+  // Hot-reload:
+  updateFromBehaviorData(oldBehaviorData, newBehaviorData) {
+    UPDATE_FROM_BEHAVIOR_DATA_CODE
 
     return true;
-}
+  }
 
-// Properties:
-PROPERTIES_CODE
+  // Properties:
+  PROPERTIES_CODE
+}
 
 // Methods:
 METHODS_CODE
+
+gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME);
 )jscode_template")
       .FindAndReplace("EXTENSION_NAME", extensionName)
       .FindAndReplace("BEHAVIOR_NAME", eventsBasedBehavior.GetName())
@@ -185,15 +184,14 @@ BehaviorCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
-    const gd::String& codeNamespace,
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.GETTER_NAME = function() {
+  GETTER_NAME() {
     return this._behaviorData.PROPERTY_NAME !== undefined ? this._behaviorData.PROPERTY_NAME : DEFAULT_VALUE;
-};
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.SETTER_NAME = function(newValue) {
+  }
+  SETTER_NAME(newValue) {
     this._behaviorData.PROPERTY_NAME = newValue;
-};)jscode_template")
+  })jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
                       GetBehaviorPropertyGetterName(property.GetName()))
@@ -201,17 +199,15 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.SETTER_NAME = function(newVa
                       GetBehaviorPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
-                      eventsBasedBehavior.GetName())
-      .FindAndReplace("CODE_NAMESPACE", codeNamespace);
+                      eventsBasedBehavior.GetName());
 }
 
 gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
-    const gd::String& codeNamespace,
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
     if (oldBehaviorData.PROPERTY_NAME !== newBehaviorData.PROPERTY_NAME)
-        this._behaviorData.PROPERTY_NAME = newBehaviorData.PROPERTY_NAME;)jscode_template")
+      this._behaviorData.PROPERTY_NAME = newBehaviorData.PROPERTY_NAME;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 

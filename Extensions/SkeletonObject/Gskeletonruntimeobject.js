@@ -344,7 +344,7 @@ gdjs.SkeletonRuntimeObject.prototype.isPointInsideSlot = function(slotPath, x, y
 
 // Extension instructions
 gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angle, dist, closest){
-    var result = gdjs.Polygon.raycastTest._statics.result;
+    var result = gdjs.Polygon.raycastTestStatics.result;
     result.collision = false;
 
     var endX = x + dist*Math.cos(angle*Math.PI/180.0);

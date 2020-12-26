@@ -1619,7 +1619,7 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
     var sqBoundingR = (objW*objW + objH*objH) / 4.0;
     var sqDist = (endX - x)*(endX - x) + (endY - y)*(endY - y);
 
-    var result = gdjs.Polygon.raycastTest._statics.result;
+    var result = gdjs.Polygon.raycastTestStatics.result;
     result.collision = false;
 
     if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*Math.sqrt(sqDist*sqBoundingR) )

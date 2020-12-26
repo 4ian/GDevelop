@@ -83,7 +83,7 @@ module.exports = {
     extension
       .addCondition(
         'IsVisible',
-        _('Window visibile'),
+        _('Window visible'),
         _('Checks if the window is visible.'),
         _('The window is visible'),
         _('Advanced window management/Windows, Linux, macOS'),

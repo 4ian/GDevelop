@@ -151,7 +151,7 @@ namespace gdjs {
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */
-    getSoundManager(): gdjs.HowlerSoundManager | gdjs.CocosSoundManager {
+    getSoundManager(): gdjs.HowlerSoundManager {
       // @ts-ignore
       return this._soundManager;
     }
@@ -160,7 +160,7 @@ namespace gdjs {
      * Get the gdjs.ImageManager of the RuntimeGame.
      * @return The image manager.
      */
-    getImageManager(): gdjs.PixiImageManager | gdjs.CocosImageManager {
+    getImageManager(): gdjs.PixiImageManager {
       // @ts-ignore
       return this._imageManager;
     }
@@ -419,7 +419,7 @@ namespace gdjs {
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssets(callback, progressCallback) {
+    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._data.properties.loadingScreen

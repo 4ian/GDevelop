@@ -14,7 +14,7 @@
 /**
  * Contains the data of a serialized exported project.
  */
-export interface ProjectData {
+declare interface ProjectData {
   firstLayout: string;
   gdVersion: GdVersionData;
   properties: ProjectPropertiesData;
@@ -25,14 +25,44 @@ export interface ProjectData {
   externalLayouts: ExternalLayoutData[];
 }
 
-export interface GdVersionData {
+/** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
+declare type ObjectData = {
+  /** The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example). */
+  name: string;
+  /** The object type. */
+  type: string;
+  /** The list of default variables. */
+  variables: Array<VariableData>;
+  /** The list of default behaviors. */
+  behaviors: Array<BehaviorData>;
+};
+
+/** Data representation of a GDevelop variable */
+declare type VariableData = {
+  /** The name of the variable. Used if a child variable. */
+  name: string;
+  /** The value of the variable, either string or number. Leave blank for structures. */
+  value?: string;
+  /** The children of the structure. Leave blank if value is defined. */
+  children?: Array<VariableData>;
+};
+
+/** Properties to set up a behavior. */
+declare type BehaviorData = {
+  /** The name of the behavior (for getting from an object (object.getBehavior) for example) */
+  name: string;
+  /** The behavior type. Used by GDJS to find the proper behavior to construct. */
+  type: string;
+};
+
+declare interface GdVersionData {
   build: number;
   major: number;
   minor: number;
   revision: number;
 }
 
-export interface LayoutData {
+declare interface LayoutData {
   r: number;
   v: number;
   b: number;
@@ -47,17 +77,17 @@ export interface LayoutData {
   behaviorsSharedData: BehaviorSharedData[];
 }
 
-export interface BehaviorSharedData {
+declare interface BehaviorSharedData {
   name: string;
   type: string;
 }
 
-export interface ExternalLayoutData {
+declare interface ExternalLayoutData {
   name: string;
   instances: InstanceData[];
 }
 
-export interface InstanceData {
+declare interface InstanceData {
   persistentUuid: string;
   angle: number;
   customSize: boolean;
@@ -74,16 +104,16 @@ export interface InstanceData {
   initialVariables: VariableData[];
 }
 
-export interface InstanceNumberProperty {
+declare interface InstanceNumberProperty {
   name: string;
   value: number;
 }
-export interface InstanceStringProperty {
+declare interface InstanceStringProperty {
   name: string;
   value: number;
 }
 
-export interface LayerData {
+declare interface LayerData {
   name: string;
   visibility: boolean;
   cameras: CameraData[];
@@ -95,7 +125,7 @@ export interface LayerData {
   followBaseLayerCamera: boolean;
 }
 
-export interface CameraData {
+declare interface CameraData {
   defaultSize: boolean;
   defaultViewport: boolean;
   height: number;
@@ -106,7 +136,7 @@ export interface CameraData {
   width: number;
 }
 
-export interface EffectData {
+declare interface EffectData {
   effectType: string;
   name: string;
   doubleParameters: {
@@ -120,7 +150,7 @@ export interface EffectData {
   };
 }
 
-export interface ProjectPropertiesData {
+declare interface ProjectPropertiesData {
   adaptGameResolutionAtRuntime: boolean;
   folderProject: boolean;
   orientation: string;
@@ -145,21 +175,21 @@ export interface ProjectPropertiesData {
   projectUuid?: string;
 }
 
-export interface ExtensionProperty {
+declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
 }
 
-export interface LoadingScreenData {
+declare interface LoadingScreenData {
   showGDevelopSplash: boolean;
 }
 
-export interface ResourcesData {
+declare interface ResourcesData {
   resources: ResourceData[];
 }
 
-export interface ResourceData {
+declare interface ResourceData {
   alwaysLoaded?: boolean;
   file: string;
   kind: ResourceKind;
@@ -170,7 +200,7 @@ export interface ResourceData {
   disablePreload?: boolean;
 }
 
-export enum ResourceKind {
+declare enum ResourceKind {
   Audio = 'audio',
   Image = 'image',
   Font = 'font',

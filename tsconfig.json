@@ -7,18 +7,22 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"]
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"],
+    "typeRoots": ["GDJS/node_modules/@types/"]
   },
   "include": [
     "GDJS/Runtime/**/*",
-    "GDJS/node_modules/@types/**/*",
-    "Extensions/**/*.js",
-    "Extensions/**/*.ts",
+    // "Extensions/**/*.js",
+    // "Extensions/**/*.ts",
     "GDJS/tests/tests/**/*.js",
     "GDJS/tests/tests-utils/**/*.js",
     "GDJS/tests/benchmarks/**/*.js"
   ],
+  "//": "As Cocos2D-JS renderers are not maintained, we exclude them from TypeScript checks. Also exclude some libraries or deprecated extensions.",
   "exclude": [
+    "GDJS/Runtime/cocos-renderers",
+    "GDJS/Runtime/cocos-sound-manager",
+    "Extensions/**/*-cocos-renderer.ts",
     "GDJS/Runtime/pixi-renderers/pixi.js",
     "GDJS/Runtime/Cocos2d",
     "GDJS/Runtime/Cordova",
@@ -26,6 +30,7 @@
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/**/JsExtension.js",
+    "Extensions/SkeletonObject",
     "Extensions/Effects/pixi-filters/filter-alpha.js"
   ]
 }

@@ -5,7 +5,6 @@ namespace gdjs {
    * @memberof gdjs
    */
   export class SpriteRuntimeObjectPixiRenderer {
-    /** @type gdjs.SpriteRuntimeObject */
     _object: gdjs.SpriteRuntimeObject;
     _spriteDirty: boolean = true;
     _textureDirty: boolean = true;
@@ -200,6 +199,7 @@ namespace gdjs {
     }
   }
 
-  // @ts-ignore - Register the class to let the engine use it.
+  // Register the class to let the engine use it.
   export const SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
+  export type SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
 }

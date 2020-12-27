@@ -4,14 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Properties to set up a behavior. */
-  export type BehaviorData = {
-    /** The name of the behavior (for getting from an object (object.getBehavior) for example) */
-    name: string;
-    /** The behavior type. Used by GDJS to find the proper behavior to construct. */
-    type: string;
-  };
-
   /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
    *

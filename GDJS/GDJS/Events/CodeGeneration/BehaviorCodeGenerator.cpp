@@ -234,7 +234,8 @@ gd::String BehaviorCodeGenerator::
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.onDestroy = function() {
   // Redirect call to onOwnerRemovedFromScene (the old name of onDestroy)
   if (this.onOwnerRemovedFromScene) this.onOwnerRemovedFromScene();
-};)jscode_template")
+};
+)jscode_template")
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace);
@@ -246,7 +247,8 @@ gd::String BehaviorCodeGenerator::GenerateDefaultDoStepPreEventsFunctionCode(
   return gd::String(R"jscode_template(
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.doStepPreEvents = function() {
   PRELUDE_CODE
-};)jscode_template")
+};
+)jscode_template")
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)

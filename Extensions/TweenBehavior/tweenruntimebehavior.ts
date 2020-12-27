@@ -1,4 +1,6 @@
 namespace gdjs {
+  declare var shifty: any;
+
   /**
    * @memberof gdjs
    * @class TweenRuntimeBehavior
@@ -16,7 +18,7 @@ namespace gdjs {
      */
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      behaviorData: Object,
+      behaviorData: BehaviorData,
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
@@ -387,6 +389,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore
       if (!this.owner.setScaleX || !this.owner.setScaleY) {
         return;
       }
@@ -446,6 +449,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore
       if (!this.owner.setScaleX) {
         return;
       }

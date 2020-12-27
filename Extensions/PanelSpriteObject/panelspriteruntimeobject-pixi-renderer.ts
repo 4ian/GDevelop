@@ -17,8 +17,9 @@ namespace gdjs {
       if (this._spritesContainer === undefined) {
         const texture = (runtimeScene
           .getGame()
-          .getImageManager() as gdjs.PixiImageManager)
-          .getPIXITexture(textureName);
+          .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+          textureName
+        );
         const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
         this._spritesContainer = new PIXI.Container();
         // @ts-ignore

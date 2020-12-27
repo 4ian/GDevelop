@@ -747,12 +747,12 @@ namespace gdjs {
       ) {
         return true;
       }
-      if (this._animations[this._currentAnimation].loop) {
-        return false;
-      }
       const direction = this._animations[this._currentAnimation].directions[
         this._currentDirection
       ];
+      if (direction.loop) {
+        return false;
+      }
       return this._currentFrame === direction.frames.length - 1;
     }
 

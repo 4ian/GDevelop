@@ -22,7 +22,11 @@ namespace gdjs {
   export const objectsTypes = new Hashtable<typeof gdjs.RuntimeObject>();
   export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 
-  type RuntimeSceneCallback = (runtimeScene: RuntimeScene) => void;
+  type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
+  type RuntimeSceneRuntimeObjectCallback = (
+    runtimeScene: gdjs.RuntimeScene,
+    runtimeObject: gdjs.RuntimeObject
+  ) => void;
 
   export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
@@ -32,7 +36,7 @@ namespace gdjs {
   export const callbacksRuntimeSceneResumed: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
-  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneCallback> = [];
+  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> = [];
 
   /**
    * Convert a rgb color value to a hex string.
@@ -265,7 +269,7 @@ namespace gdjs {
    * @param callback The function to be called.
    */
   export const registerObjectDeletedFromSceneCallback = function (
-    callback: RuntimeSceneCallback
+    callback: RuntimeSceneRuntimeObjectCallback
   ) {
     gdjs.callbacksObjectDeletedFromScene.push(callback);
   };

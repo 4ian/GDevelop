@@ -17,18 +17,20 @@ const transformIncludedExtensions = ['.js', '.ts'];
 
 // Among the files matching the previous extensions, these extensions won't be built with esbuild
 // (they will be copied).
-const transformExcludedExtensions = ['.d.ts'];
+const transformExcludedExtensions = ['.min.js', '.d.ts'];
 
 // Files under these paths (relative to the GDevelop root path) won't
 // be built with esbuild, but simply copied.
 const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
+  'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
   'GDJS/Runtime/Cocos2d',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
+  'GDJS/Runtime/libs/rbush.js',
 
   // Extensions pre-built files:
   'Extensions/Firebase/B_firebasejs',
@@ -41,6 +43,7 @@ const untransformedPaths = [
   'Extensions/PhysicsBehavior/box2djs',
   'Extensions/Shopify/shopify-buy.umd.polyfilled.min.js',
   'Extensions/TweenBehavior/shifty.js',
+  'Extensions/JsExtensionTypes.flow.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
 /**
@@ -72,14 +75,12 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
 };
 
 /**
- * Check if a file is declaration of an extension (should not be included in the built Runtime).
- * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * Check if a file is declaration of an extension (should not be transformed).
+ * @param {string} filePath
  */
-const isJsExtensionDeclaration = (fileOrDirectoryPath, stats) => {
+const isJsExtensionDeclaration = (filePath) => {
   return (
-    !stats.isDirectory() &&
-    path.basename(fileOrDirectoryPath) === 'JsExtension.js'
+    path.basename(filePath) === 'JsExtension.js'
   );
 };
 
@@ -114,6 +115,7 @@ module.exports = {
 
     return (
       !isSupportedExtension ||
+      isJsExtensionDeclaration(path) ||
       untransformedPaths.some((untransformedPath) =>
         path.startsWith(untransformedPath)
       )
@@ -131,7 +133,6 @@ module.exports = {
     const allExtensionsInFilePaths = await recursive(extensionsRuntimePath, [
       isNotAllowedExtension,
       isTestDirectory,
-      isJsExtensionDeclaration,
     ]);
 
     // Generate the output file paths

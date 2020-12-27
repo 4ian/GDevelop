@@ -42,8 +42,9 @@ namespace gdjs {
         const sprite = new PIXI.Sprite(
           (runtimeScene
             .getGame()
-            .getImageManager() as gdjs.PixiImageManager)
-            .getPIXITexture(objectData.textureParticleName)
+            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+            objectData.textureParticleName
+          )
         );
         sprite.width = objectData.rendererParam1;
         sprite.height = objectData.rendererParam2;

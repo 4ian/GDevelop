@@ -19,7 +19,7 @@ namespace gdjs {
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
-    _initialEffectsData: Array<EffectsData>;
+    _initialEffectsData: Array<EffectData>;
     _cameraX: float;
     _cameraY: float;
     _cachedGameResolutionWidth: integer;

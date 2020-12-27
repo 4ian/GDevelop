@@ -4,18 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
-  export type ObjectData = {
-    /** The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example). */
-    name: string;
-    /** The object type. */
-    type: string;
-    /** The list of default variables. */
-    variables: Array<VariableData>;
-    /** The list of default behaviors. */
-    behaviors: Array<BehaviorData>;
-  };
-
   /** An axis-aligned bounding box. Used to represents a box around an object for example. */
   export type AABB = {
     /** The [x,y] coordinates of the top left point */

@@ -210,9 +210,12 @@ namespace gdjs {
   }
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     if (
+      // @ts-ignore
       runtimeScene.physics2SharedData &&
+      // @ts-ignore
       runtimeScene.physics2SharedData.world
     ) {
+      // @ts-ignore
       Box2D.destroy(runtimeScene.physics2SharedData.world);
     }
   });
@@ -220,7 +223,7 @@ namespace gdjs {
   export class Physics2RuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyType: any;
     bullet: any;
-    fixedRotation: float;
+    fixedRotation: boolean;
     canSleep: any;
     shape: any;
     shapeDimensionA: any;
@@ -414,7 +417,7 @@ namespace gdjs {
       // Check for repeated vertices or check if all vertices are aligned (would crash Box2D)
       let alignedX = true;
       let alignedY = true;
-      for (i = 0; i < polygon.vertices.length - 1; ++i) {
+      for (let i = 0; i < polygon.vertices.length - 1; ++i) {
         for (let j = i + 1; j < polygon.vertices.length; ++j) {
           if (
             polygon.vertices[i][0] === polygon.vertices[j][0] &&
@@ -1383,7 +1386,7 @@ namespace gdjs {
     applyPolarImpulse(angle, length, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        his.createBody();
+        this.createBody();
       }
 
       // Wake up the object

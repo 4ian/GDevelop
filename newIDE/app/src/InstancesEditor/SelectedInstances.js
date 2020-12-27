@@ -54,7 +54,7 @@ export default class SelectedInstances {
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
   resizeButton = new PIXI.Graphics();
-  resizeIcon = new PIXI.Sprite.from('res/actions/direction.png');
+  resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
   rightResizeButton = new PIXI.Graphics();
   bottomResizeButton = new PIXI.Graphics();
   rotateButton = new PIXI.Graphics();

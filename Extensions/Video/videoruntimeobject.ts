@@ -1,18 +1,19 @@
-/** The initial properties for {@link gdjs.VideoRuntimeObject} */
-export type VideoObjectDataType = {
-  /** The base parameters of the video */
-  content: {
-    /** The opacity of the video */
-    opacity: number;
-    /** Does the video loops itself? */
-    loop: boolean;
-    /** The volume of the video */
-    volume: number;
-    /** Name of the resource corresponding to the video */
-    videoResource: string;
-  };
-};
 namespace gdjs {
+  /** The initial properties for {@link gdjs.VideoRuntimeObject} */
+  export type VideoObjectDataType = {
+    /** The base parameters of the video */
+    content: {
+      /** The opacity of the video */
+      opacity: number;
+      /** Does the video loops itself? */
+      loop: boolean;
+      /** The volume of the video */
+      volume: number;
+      /** Name of the resource corresponding to the video */
+      videoResource: string;
+    };
+  };
+
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
   /**

@@ -129,7 +129,7 @@ This project is released under the MIT License.
         plist.angle =
           -(objectData.emitterAngleA + objectData.emitterAngleB) / 2.0;
         // @ts-ignore
-          plist.angleVariance = Math.abs(plist.angle + objectData.emitterAngleB);
+        plist.angleVariance = Math.abs(plist.angle + objectData.emitterAngleB);
       }
       if (objectData.redParam === 'Mutable') {
         // @ts-ignore
@@ -144,7 +144,7 @@ This project is released under the MIT License.
           plist.startColorRed = plist.finishColorRed =
             (objectData.particleRed1 + objectData.particleRed2) / (2.0 * 255.0);
           // @ts-ignore
-            plist.startColorVarianceRed = Math.abs(
+          plist.startColorVarianceRed = Math.abs(
             // @ts-ignore
             plist.startColorRed - objectData.particleRed2 / 255.0
           );
@@ -173,7 +173,7 @@ This project is released under the MIT License.
             (objectData.particleGreen1 + objectData.particleGreen2) /
             (2.0 * 255.0);
           // @ts-ignore
-            plist.startColorVarianceGreen = Math.abs(
+          plist.startColorVarianceGreen = Math.abs(
             // @ts-ignore
             plist.startColorGreen - objectData.particleGreen2 / 255.0
           );
@@ -202,7 +202,7 @@ This project is released under the MIT License.
             (objectData.particleBlue1 + objectData.particleBlue2) /
             (2.0 * 255.0);
           // @ts-ignore
-            plist.startColorVarianceBlue = Math.abs(
+          plist.startColorVarianceBlue = Math.abs(
             // @ts-ignore
             plist.startColorBlue - objectData.particleBlue2 / 255.0
           );
@@ -225,7 +225,7 @@ This project is released under the MIT License.
           (objectData.particleAlpha1 + objectData.particleAlphaRandomness2) /
           255.0;
         // @ts-ignore
-          plist.startColorAlpha = (alphaInit + alphaEnd) / 2.0;
+        plist.startColorAlpha = (alphaInit + alphaEnd) / 2.0;
         // @ts-ignore
         plist.startColorVarianceAlpha = alphaEnd - plist.startColorAlpha;
         alphaInit =
@@ -235,7 +235,7 @@ This project is released under the MIT License.
           (objectData.particleAlpha2 + objectData.particleAlphaRandomness2) /
           255.0;
         // @ts-ignore
-          plist.finishColorAlpha = (alphaInit + alphaEnd) / 2.0;
+        plist.finishColorAlpha = (alphaInit + alphaEnd) / 2.0;
         // @ts-ignore
         plist.finishColorVarianceAlpha = alphaEnd - plist.finishColorAlpha;
       } else {
@@ -244,7 +244,7 @@ This project is released under the MIT License.
             objectData.particleAlphaRandomness2) /
           (2.0 * 255.0);
         // @ts-ignore
-          plist.startColorAlpha = plist.endColorAlpha = alphaMid;
+        plist.startColorAlpha = plist.endColorAlpha = alphaMid;
         // @ts-ignore
         plist.startColorVarianceAlpha = Math.abs(
           alphaMid - objectData.particleAlphaRandomness1
@@ -270,17 +270,17 @@ This project is released under the MIT License.
             (maxSizeVariance - minSizeVariance)) /
           2.0;
         // @ts-ignore
-          plist.finishParticleSizeVariance =
+        plist.finishParticleSizeVariance =
           (((this.originalSize * objectData.particleSize2) / 100.0) *
             (maxSizeVariance - minSizeVariance)) /
           2.0;
         // @ts-ignore
-          plist.startParticleSize =
+        plist.startParticleSize =
           (this.originalSize * objectData.particleSize1) / 100.0 -
           // @ts-ignore
           plist.startParticleSizeVariance;
         // @ts-ignore
-          plist.finishParticleSize =
+        plist.finishParticleSize =
           (this.originalSize * objectData.particleSize2) / 100.0 -
           // @ts-ignore
           plist.finishParticleSizeVariance;
@@ -288,19 +288,19 @@ This project is released under the MIT License.
         const sizeMid =
           (objectData.particleSize1 + objectData.particleSize2) / (2.0 * 100.0);
         // @ts-ignore
-          plist.startParticleSize = plist.finishParticleSize =
+        plist.startParticleSize = plist.finishParticleSize =
           this.originalSize * sizeMid;
         // @ts-ignore
-          plist.startParticleSizeVariance =
+        plist.startParticleSizeVariance =
           this.originalSize *
           Math.abs(sizeMid - objectData.particleSizeRandomness1 / 100.0);
         // @ts-ignore
-          plist.finishParticleSizeVariance = plist.startParticleSizeVariance;
+        plist.finishParticleSizeVariance = plist.startParticleSizeVariance;
       }
       const mediumLifetime =
         (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax) / 2.0;
       // @ts-ignore
-        plist.rotationStart = 0.0;
+      plist.rotationStart = 0.0;
       // @ts-ignore
       plist.rotationStartVariance = 0.0;
       // @ts-ignore
@@ -308,7 +308,7 @@ This project is released under the MIT License.
         ((objectData.particleAngle1 + objectData.particleAngle2) / 2.0) *
         mediumLifetime;
       // @ts-ignore
-        plist.rotationEndVariance =
+      plist.rotationEndVariance =
         ((Math.max(objectData.particleAngle1, objectData.particleAngle2) -
           Math.min(objectData.particleAngle1, objectData.particleAngle2)) *
           mediumLifetime) /

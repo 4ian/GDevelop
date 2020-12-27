@@ -4,11 +4,17 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  type JsonManagerOnProgressCallback = (loadedCount: integer, totalCount: integer) => void;
+  type JsonManagerOnProgressCallback = (
+    loadedCount: integer,
+    totalCount: integer
+  ) => void;
   type JsonManagerOnCompleteCallback = (totalCount: integer) => void;
 
   /** The callback called when a json that was requested is loaded (or an error occured). */
-  export type JsonManagerRequestCallback = (error: Error | null, content: Object | null) => void;
+  export type JsonManagerRequestCallback = (
+    error: Error | null,
+    content: Object | null
+  ) => void;
 
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources

@@ -1,4 +1,6 @@
 namespace gdjs {
+  declare var rbush: any;
+
   /**
    * @memberof gdjs
    * @class LightObstaclesManager
@@ -21,12 +23,15 @@ namespace gdjs {
     static getManager(
       runtimeScene: gdjs.RuntimeScene
     ): gdjs.LightObstaclesManager {
+      // @ts-ignore
       if (!runtimeScene._lightObstaclesManager) {
         // Create the shared manager if necessary.
+        // @ts-ignore
         runtimeScene._lightObstaclesManager = new gdjs.LightObstaclesManager(
           runtimeScene
         );
       }
+      // @ts-ignore
       return runtimeScene._lightObstaclesManager;
     }
 
@@ -54,7 +59,7 @@ namespace gdjs {
     getAllObstaclesAround(
       object: gdjs.RuntimeObject,
       radius: number,
-      result: gdjs.RuntimeObject[]
+      result: gdjs.LightObstacleRuntimeBehavior[]
     ) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -63,9 +68,13 @@ namespace gdjs {
       const searchArea = gdjs.staticObject(
         LightObstaclesManager.prototype.getAllObstaclesAround
       );
+      // @ts-ignore
       searchArea.minX = x - radius;
+      // @ts-ignore
       searchArea.minY = y - radius;
+      // @ts-ignore
       searchArea.maxX = x + radius;
+      // @ts-ignore
       searchArea.maxY = y + radius;
       const nearbyObstacles = this._obstacleRBush.search(searchArea);
       result.length = 0;

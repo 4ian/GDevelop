@@ -10,7 +10,11 @@ namespace gdjs {
   export class DummyRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, behaviorData: any, owner: gdjs.RuntimeObject) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData: any,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
 
       // Here you can access to the behavior data (JSON declared in JsExtension.js)

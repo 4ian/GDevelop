@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"]
+  },
+  "include": [
+    "GDJS/Runtime/**/*",
+    "GDJS/node_modules/@types/**/*",
+    "Extensions/**/*.js",
+    "Extensions/**/*.ts",
+    "GDJS/tests/tests/**/*.js",
+    "GDJS/tests/tests-utils/**/*.js",
+    "GDJS/tests/benchmarks/**/*.js"
+  ],
+  "exclude": [
+    "GDJS/Runtime/pixi-renderers/pixi.js",
+    "GDJS/Runtime/Cocos2d",
+    "GDJS/Runtime/Cordova",
+    "GDJS/Runtime/Electron",
+    "GDJS/Runtime/FacebookInstantGames",
+    "GDJS/Runtime/libs/CocoonJS",
+    "Extensions/**/JsExtension.js",
+    "Extensions/Effects/pixi-filters/filter-alpha.js"
+  ]
+}

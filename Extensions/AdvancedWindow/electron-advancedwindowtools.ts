@@ -12,9 +12,7 @@ namespace gdjs {
        */
       let electronBrowserWindow: any = null;
 
-      // @ts-ignore
       if (typeof require === 'function') {
-        // @ts-ignore
         electronBrowserWindow = require('electron').remote.getCurrentWindow();
       }
       export const focus = function (activate: boolean) {

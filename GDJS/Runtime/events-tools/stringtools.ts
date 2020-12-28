@@ -9,7 +9,6 @@ namespace gdjs {
      * Tools related to strings manipulation, for events generated code.
      */
     export namespace string {
-
       /**
        * Return a string containing a new line character.
        */

@@ -38,7 +38,7 @@ namespace gdjs {
       this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
         this,
         runtimeScene,
-        tiledSpriteObjectData.texture
+        (tiledSpriteObjectData as any).texture
       );
       this.setWidth(tiledSpriteObjectData.width);
       this.setHeight(tiledSpriteObjectData.height);
@@ -66,8 +66,8 @@ namespace gdjs {
 
     onDestroyFromScene(runtimeScene): void {
       super.onDestroyFromScene(runtimeScene);
-      if (this._renderer.onDestroy) {
-        this._renderer.onDestroy();
+      if ((this._renderer as any).onDestroy) {
+        (this._renderer as any).onDestroy();
       }
     }
 

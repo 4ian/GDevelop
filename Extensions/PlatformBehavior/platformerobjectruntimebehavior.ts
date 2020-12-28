@@ -337,7 +337,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
         this._upKey |=
           !this._ignoreDefaultControls &&
           runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
-          // @ts-ignore - improper usage of |=
+        // @ts-ignore - improper usage of |=
         this._downKey |=
           !this._ignoreDefaultControls &&
           runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
@@ -717,7 +717,11 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
      * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
-    _isCollidingWith(candidates, exceptThisOne?: number | null, excludeJumpThrus?: boolean) {
+    _isCollidingWith(
+      candidates,
+      exceptThisOne?: number | null,
+      excludeJumpThrus?: boolean
+    ) {
       excludeJumpThrus = !!excludeJumpThrus;
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];

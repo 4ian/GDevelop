@@ -27,6 +27,14 @@ namespace gdjs {
     }
 
     reinitialize(varData?: VariableData | undefined) {
+      this._value = 0;
+      this._str = '';
+      this._numberDirty = false;
+      this._stringDirty = true;
+      this._isStructure = false;
+      this._children = {};
+      this._undefinedInContainer = false;
+
       if (varData !== undefined) {
         if (varData.value !== undefined) {
           //Variable is a string or a number

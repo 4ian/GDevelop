@@ -60,8 +60,11 @@ namespace gdjs {
       // Pause the tween, and remove it from the scene of living tweens
       // (the invariant is that scene only contains tweens being played).
       tween.instance.pause();
-      if (this._runtimeScene.shiftyJsScene) {
-        this._runtimeScene.shiftyJsScene.remove(tween.instance);
+
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
+      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
+      if (shiftyJsScene) {
+        shiftyJsScene.remove(tween.instance);
       }
     }
 
@@ -71,8 +74,11 @@ namespace gdjs {
       // Resume the tween, and add it back to the scene of living tweens
       // (the invariant is that scene only contains tweens being played).
       tween.instance.resume();
-      if (this._runtimeScene.shiftyJsScene) {
-        this._runtimeScene.shiftyJsScene.add(tween.instance);
+
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
+      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
+      if (shiftyJsScene) {
+        shiftyJsScene.add(tween.instance);
       }
     }
 
@@ -413,14 +419,18 @@ namespace gdjs {
       );
       newTweenable.setConfig({
         from: {
+          // @ts-ignore - objects are duck typed
           scaleX: this.owner.getScaleX(),
+          // @ts-ignore - objects are duck typed
           scaleY: this.owner.getScaleY(),
         },
         to: { scaleX: toScaleX, scaleY: toScaleY },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setScaleX(state.scaleX);
+          // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
         },
       });
@@ -452,7 +462,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
-      // @ts-ignore
+      // @ts-ignore - objects are duck typed
       if (!this.owner.setScaleX) {
         return;
       }
@@ -466,11 +476,13 @@ namespace gdjs {
         this._runtimeScene
       );
       newTweenable.setConfig({
+        // @ts-ignore - objects are duck typed
         from: { scaleX: this.owner.getScaleX() },
         to: { scaleX: toScaleX },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setScaleX(state.scaleX);
         },
       });
@@ -502,6 +514,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore - objects are duck typed
       if (!this.owner.setScaleY) {
         return;
       }
@@ -515,11 +528,13 @@ namespace gdjs {
         this._runtimeScene
       );
       newTweenable.setConfig({
+        // @ts-ignore - objects are duck typed
         from: { scaleY: this.owner.getScaleY() },
         to: { scaleY: toScaleY },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
         },
       });
@@ -551,6 +566,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore - objects are duck typed
       if (!this.owner.getOpacity || !this.owner.setOpacity) {
         return;
       }
@@ -564,11 +580,13 @@ namespace gdjs {
         this._runtimeScene
       );
       newTweenable.setConfig({
+        // @ts-ignore - objects are duck typed
         from: { opacity: this.owner.getOpacity() },
         to: { opacity: toOpacity },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setOpacity(state.opacity);
         },
       });
@@ -600,6 +618,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore - objects are duck typed
       if (!this.owner.getColor || !this.owner.setColor) {
         return;
       }
@@ -616,6 +635,7 @@ namespace gdjs {
       if (this._tweenExists(identifier)) {
         this.removeTween(identifier);
       }
+      // @ts-ignore - objects are duck typed
       const fromColor = this.owner.getColor().split(';');
       let toColor = toColorStr.split(';');
       if (toColor.length !== 3) {
@@ -630,6 +650,7 @@ namespace gdjs {
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setColor(
             Math.floor(state.red) +
               ';' +
@@ -667,6 +688,7 @@ namespace gdjs {
       if (!this._isActive) {
         return;
       }
+      // @ts-ignore - objects are duck typed
       if (!this.owner.setCharacterSize) {
         return;
       }
@@ -680,11 +702,13 @@ namespace gdjs {
         this._runtimeScene
       );
       newTweenable.setConfig({
+        // @ts-ignore - objects are duck typed
         from: { size: this.owner.getCharacterSize() },
         to: { size: toSize },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          // @ts-ignore - objects are duck typed
           that.owner.setCharacterSize(state.size);
         },
       });
@@ -930,10 +954,13 @@ namespace gdjs {
      * @returns The new tweenable
      */
     static makeNewTweenable(runtimeScene: gdjs.RuntimeScene): shifty.Tweenable {
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
       if (!runtimeScene.shiftyJsScene) {
+        // @ts-ignore - shiftyJsScene is added to runtime scene.
         runtimeScene.shiftyJsScene = new shifty.Scene();
       }
       const tweenable = new shifty.Tweenable();
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
       runtimeScene.shiftyJsScene.add(tweenable);
       return tweenable;
     }
@@ -946,9 +973,11 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       tweenable: shifty.Tweenable
     ) {
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
       if (!runtimeScene.shiftyJsScene) {
         return;
       }
+      // @ts-ignore - shiftyJsScene is added to runtime scene.
       runtimeScene.shiftyJsScene.remove(tweenable);
     }
 
@@ -1033,33 +1062,37 @@ namespace gdjs {
    * Stop and "destroy" all the tweens when a scene is unloaded.
    */
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
-    if (!runtimeScene.shiftyJsScene) {
+    // @ts-ignore - shiftyJsScene is added to runtime scene.
+    const shiftyJsScene = runtimeScene.shiftyJsScene;
+    if (!shiftyJsScene) {
       return;
     }
 
     // Stop and explictly remove all tweenables to be sure to drop
     // all references to the tweenables of the scene.
-    runtimeScene.shiftyJsScene.stop(false);
-    runtimeScene.shiftyJsScene.tweenables.forEach(
-      runtimeScene.shiftyJsScene.remove.bind(runtimeScene.shiftyJsScene)
-    );
+    shiftyJsScene.stop(false);
+    shiftyJsScene.tweenables.forEach(shiftyJsScene.remove.bind(shiftyJsScene));
   });
 
   /**
    * When a scene is paused, pause all the tweens of this scene.
    */
   gdjs.registerRuntimeScenePausedCallback(function (runtimeScene) {
-    if (!runtimeScene.shiftyJsScene) {
+    // @ts-ignore - shiftyJsScene is added to runtime scene.
+    const shiftyJsScene = runtimeScene.shiftyJsScene;
+    if (!shiftyJsScene) {
       return;
     }
-    runtimeScene.shiftyJsScene.pause();
+    shiftyJsScene.pause();
   });
 
   /**
    * When a scene is paused, resume all the tweens of this scene.
    */
   gdjs.registerRuntimeSceneResumedCallback(function (runtimeScene) {
-    if (!runtimeScene.shiftyJsScene) {
+    // @ts-ignore - shiftyJsScene is added to runtime scene.
+    const shiftyJsScene = runtimeScene.shiftyJsScene;
+    if (!shiftyJsScene) {
       return;
     }
 
@@ -1073,7 +1106,7 @@ namespace gdjs {
 
     // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
     // contains tweenables that should be playing (so calling resume is safe).
-    runtimeScene.shiftyJsScene.resume();
+    shiftyJsScene.resume();
   });
 
   // Handle Shifty.js updates (the time and the "tick" of tweens

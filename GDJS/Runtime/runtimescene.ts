@@ -61,7 +61,6 @@ namespace gdjs {
       this._initialBehaviorSharedData = new Hashtable();
       this._renderer = new gdjs.RuntimeSceneRenderer(
         this,
-        // @ts-ignore - allow no renderer for tests
         runtimeGame ? runtimeGame.getRenderer() : null
       );
       this._variables = new gdjs.VariablesContainer();
@@ -324,7 +323,6 @@ namespace gdjs {
       this._instancesRemoved = [];
       this._lastId = 0;
 
-      // @ts-ignore - set to null to force garbage collection.
       this._onceTriggers = null;
       this._isLoaded = false;
       this.onGameResolutionResized();
@@ -439,7 +437,7 @@ namespace gdjs {
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
      */
-    renderAndStep(elapsedTime): boolean {
+    renderAndStep(elapsedTime: float): boolean {
       if (this._profiler) {
         this._profiler.beginFrame();
       }
@@ -809,7 +807,7 @@ namespace gdjs {
         // Reuse an objet destroyed before. If there is an object in the cache,
         // then it means it does support reinitialization.
         obj = cache.pop();
-        // @ts-ignore (obj can't be null)
+        // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
         obj.reinitialize(this._objects.get(objectName));
       }
       this.addObject(obj);

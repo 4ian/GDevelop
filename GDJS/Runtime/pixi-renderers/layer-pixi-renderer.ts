@@ -157,7 +157,6 @@ namespace gdjs {
 
       //Extend the pixi object with a z order.
       for (let i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
-        // @ts-ignore
         if (this._pixiContainer.children[i].zOrder >= zOrder) {
           //TODO : Dichotomic search
           this._pixiContainer.addChildAt(child, i);
@@ -361,5 +360,4 @@ namespace gdjs {
 
   //Register the class to let the engine use it.
   export const LayerRenderer = gdjs.LayerPixiRenderer;
-
 }

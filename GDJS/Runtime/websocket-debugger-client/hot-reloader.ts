@@ -30,7 +30,9 @@ namespace gdjs {
       this._runtimeGame = runtimeGame;
     }
 
-    static groupByPersistentUuid<ObjectWithPersistentId extends {persistentUuid: string | null}>(
+    static groupByPersistentUuid<
+      ObjectWithPersistentId extends { persistentUuid: string | null }
+    >(
       objectsWithPersistentId: ObjectWithPersistentId[]
     ): { [key: string]: ObjectWithPersistentId } {
       return objectsWithPersistentId.reduce(function (objectsMap, object) {

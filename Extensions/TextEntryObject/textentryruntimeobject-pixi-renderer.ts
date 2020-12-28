@@ -42,6 +42,7 @@ namespace gdjs {
         }
         return false;
       };
+      // @ts-expect-error ts-migrate(7030) FIXME: Not all code paths return a value.
       this._downHandler = function (evt) {
         evt = evt || window.event;
         const charCode = evt.which || evt.keyCode;
@@ -74,7 +75,6 @@ namespace gdjs {
     }
   }
 
-  // @ts-ignore - Register the class to let the engine use it.
   export const TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
   export type TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
 }

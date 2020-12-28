@@ -1,10 +1,8 @@
-
-  /**
+/**
 GDevelop - Platform Behavior Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-
   declare var rbush: any;
 
   /**

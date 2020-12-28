@@ -95,7 +95,6 @@ namespace gdjs {
      * @param callback The callback function called when json is loaded (or an error occured).
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback) {
-      // @ts-ignore - find is not ES5
       const resource = this._resources.find(function (resource) {
         return resource.kind === 'json' && resource.name === resourceName;
       });

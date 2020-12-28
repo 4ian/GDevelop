@@ -12,6 +12,7 @@ namespace gdjs {
 
     // Create the renderer (see dummyruntimeobject-pixi-renderer.js)
     _renderer: any;
+    // @ts-expect-error ts-migrate(2564) FIXME: Property 'opacity' has no initializer and is not d... Remove this comment to see the full error message
     opacity: float;
 
     constructor(runtimeScene, objectData) {

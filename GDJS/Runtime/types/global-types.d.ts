@@ -23,7 +23,9 @@ declare type EventsFunctionContext = {
    * You can alter the list and this will alter the objects picked for the next conditions/actions/events.
    * If you don't need this, prefer using `getObjects`.
    */
-  getObjectsLists: (objectName: string) => Hashtable<Array<gdjs.RuntimeObject>> | null;
+  getObjectsLists: (
+    objectName: string
+  ) => Hashtable<Array<gdjs.RuntimeObject>> | null;
 
   /**  Get the "real" behavior name, that can be used with `getBehavior`. For example: `object.getBehavior(eventsFunctionContext.getBehaviorName("MyBehavior"))` */
   getBehaviorName: (behaviorName: string) => string;
@@ -42,12 +44,12 @@ declare type EventsFunctionContext = {
 };
 
 declare namespace gdjs {
-    var runtimeGameOptions: gdjs.RuntimeGameOptions;
+  var runtimeGameOptions: gdjs.RuntimeGameOptions;
 }
 
 interface Window {
-    /** The global PIXI object from Pixi.js. */
-    PIXI: typeof import('pixi.js')
+  /** The global PIXI object from Pixi.js. */
+  PIXI: typeof import('pixi.js');
 }
 
 /** The global cc object from Cocos2D-Js. */

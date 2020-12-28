@@ -43,25 +43,17 @@ namespace gdjs {
         if (request === gdjs.RuntimeScene.STOP_GAME) {
           this._runtimeGame.getRenderer().stopGame();
           return true;
+        } else if (request === gdjs.RuntimeScene.POP_SCENE) {
+          this.pop();
+        } else if (request === gdjs.RuntimeScene.PUSH_SCENE) {
+          this.push(currentScene.getRequestedScene());
+        } else if (request === gdjs.RuntimeScene.REPLACE_SCENE) {
+          this.replace(currentScene.getRequestedScene());
+        } else if (request === gdjs.RuntimeScene.CLEAR_SCENES) {
+          this.replace(currentScene.getRequestedScene(), true);
         } else {
-          if (request === gdjs.RuntimeScene.POP_SCENE) {
-            this.pop();
-          } else {
-            if (request === gdjs.RuntimeScene.PUSH_SCENE) {
-              this.push(currentScene.getRequestedScene());
-            } else {
-              if (request === gdjs.RuntimeScene.REPLACE_SCENE) {
-                this.replace(currentScene.getRequestedScene());
-              } else {
-                if (request === gdjs.RuntimeScene.CLEAR_SCENES) {
-                  this.replace(currentScene.getRequestedScene(), true);
-                } else {
-                  console.error('Unrecognized change in scene stack.');
-                  return false;
-                }
-              }
-            }
-          }
+          console.error('Unrecognized change in scene stack.');
+          return false;
         }
       }
       return true;

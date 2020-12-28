@@ -31,7 +31,6 @@ namespace gdjs {
     _followBaseLayerCamera: boolean;
     _clearColor: Array<integer>;
 
-    // @ts-ignore - assume the proper renderer is passed
     _renderer: any;
 
     /**

@@ -11,7 +11,6 @@ namespace gdjs {
     _fs: null,
   };
 
-
   /** Get the Node.js path module, or null if it can't be loaded */
   gdjs.fileSystem._getPath = function () {
     if (!gdjs.fileSystem._path) {

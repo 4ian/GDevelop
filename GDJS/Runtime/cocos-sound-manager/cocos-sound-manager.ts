@@ -190,5 +190,4 @@ namespace gdjs {
   }
   //Register the class to let the engine use it.
   gdjs.SoundManager = gdjs.CocosSoundManager;
-
 }

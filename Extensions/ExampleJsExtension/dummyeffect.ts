@@ -49,8 +49,9 @@ namespace gdjs {
         (layer
           .getRuntimeScene()
           .getGame()
-          .getImageManager() as gdjs.PixiImageManager)
-          .getPIXITexture(effectData.stringParameters.someImage)
+          .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+          effectData.stringParameters.someImage
+        )
       );
       return filter;
     },

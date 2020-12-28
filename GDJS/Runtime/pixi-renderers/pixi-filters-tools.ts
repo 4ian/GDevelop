@@ -21,10 +21,7 @@ namespace gdjs {
      * @param filter The filter to enable or disable
      * @param value Set to true to enable, false to disable
      */
-    export const enableEffect = function (
-      filter: Filter,
-      value: boolean
-    ) {
+    export const enableEffect = function (filter: Filter, value: boolean) {
       filter.pixiFilter.enabled = value;
     };
 
@@ -33,9 +30,7 @@ namespace gdjs {
      * @param filter The filter to be checked
      * @return true if the filter is enabled
      */
-    export const isEffectEnabled = function (
-      filter: Filter
-    ): boolean {
+    export const isEffectEnabled = function (filter: Filter): boolean {
       return filter.pixiFilter.enabled;
     };
 

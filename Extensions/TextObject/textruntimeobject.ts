@@ -62,7 +62,6 @@ namespace gdjs {
     _scaleX: number = 1;
     _scaleY: number = 1;
     _str: string;
-    // @ts-ignore
     _renderer: gdjs.TextRuntimeObjectRenderer;
     hitBoxesDirty: any;
 

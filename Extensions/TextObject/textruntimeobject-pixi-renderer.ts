@@ -188,4 +188,5 @@ namespace gdjs {
 
   // Register the class to let the engine use it.
   export const TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
+  export type TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
 }

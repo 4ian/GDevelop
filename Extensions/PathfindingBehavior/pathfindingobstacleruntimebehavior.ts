@@ -17,6 +17,7 @@ namespace gdjs {
     radius: any;
 
     constructor(runtimeScene) {
+      // @ts-ignore
       this._obstaclesHSHG = new gdjs.HSHG.HSHG();
     }
 

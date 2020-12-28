@@ -8,15 +8,13 @@ namespace gdjs {
       let cachedIsMobile: boolean | null = null;
       let cachedHasTouchScreen: boolean | null = null;
       const checkIsMobile = (): boolean => {
-        // @ts-ignore
         if (typeof cc !== 'undefined' && cc.sys) {
-          // @ts-ignore
           return cc.sys.isMobile;
-          // @ts-ignore
-        } else if (typeof Cocoon !== 'undefined' && Cocoon.App) {
+        }
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'Cocoon'.
+        else if (typeof Cocoon !== 'undefined' && Cocoon.App) {
           return true;
-          // @ts-ignore
-        } else if (typeof window !== 'undefined' && window.cordova) {
+        } else if (typeof window !== 'undefined' && (window as any).cordova) {
           return true;
         } else if (typeof window !== 'undefined') {
           // Try to detect mobile device browsers.

@@ -15,7 +15,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer
     ) {
-      // @ts-ignore
+      // @ts-expect-error ts-migrate(2322) FIXME: Type 'Renderer | null' is not assignable to type '... Remove this comment to see the full error message
       this._pixiRenderer = runtimeGameRenderer
         ? runtimeGameRenderer.getPIXIRenderer()
         : null;
@@ -129,7 +129,6 @@ namespace gdjs {
     }
 
     setLayerIndex(layer: gdjs.Layer, index: float): void {
-      // @ts-ignore - assume the renderer is the correct one
       const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
       let layerPixiObject:
         | PIXI.Container

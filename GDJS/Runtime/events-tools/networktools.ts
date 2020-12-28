@@ -173,7 +173,10 @@ namespace gdjs {
         } else if (typeof obj === 'object') {
           for (var p in obj) {
             if (obj.hasOwnProperty(p)) {
-              gdjs.evtTools.network._objectToVariable(obj[p], variable.getChild(p));
+              gdjs.evtTools.network._objectToVariable(
+                obj[p],
+                variable.getChild(p)
+              );
             }
           }
         } else if (typeof obj === 'symbol') {
@@ -191,7 +194,9 @@ namespace gdjs {
           // @ts-ignore
           variable.setNumber(parseInt(obj, 10));
         } else if (typeof obj === 'function') {
-          console.error('Error: Impossible to set variable value to a function.');
+          console.error(
+            'Error: Impossible to set variable value to a function.'
+          );
         } else {
           console.error('Cannot identify type of object:', obj);
         }

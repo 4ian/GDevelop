@@ -86,7 +86,7 @@ namespace gdjs {
       if (colors.length < 3) {
         return;
       }
-      // @ts-ignore - replace by rgbToHexNumber
+      // @ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number'.
       this._tiledSprite.tint =
         '0x' +
         gdjs.rgbToHex(
@@ -108,7 +108,6 @@ namespace gdjs {
     }
   }
 
-  // @ts-ignore - Register the class to let the engine use it.
   export const TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;
   export type TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;
 }

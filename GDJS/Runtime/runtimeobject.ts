@@ -967,7 +967,7 @@ namespace gdjs {
      *
      * You should probably redefine updateAABB instead of this function.
      *
-     * @return`)
+     * @return The bounding box
      */
     getAABB(): AABB {
       if (this.hitBoxesDirty) {
@@ -987,7 +987,7 @@ namespace gdjs {
      *
      * If `null` is returned, the object is assumed to be always visible.
      *
-     * @return`) or `null`.
+     * @return The bounding box or `null`.
      */
     getVisibilityAABB(): AABB | null {
       return this.getAABB();

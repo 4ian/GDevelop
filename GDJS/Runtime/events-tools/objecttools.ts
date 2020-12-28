@@ -52,8 +52,8 @@ namespace gdjs {
        *
        *
        * @param predicate The predicate function is called with the two objects to compare, and an optional argument `extraArg`
-       * @param);
-       * @param);
+       * @param objectsLists1 The first lists of objects
+       * @param objectsLists2 The second lists of objects
        * @param inverted If `inverted` == true, only the objects of the first table are filtered.
        * @param extraArg (optional) This argument should be used to avoid declaring the predicate as a closure that would be created and destroyed at each call to twoListsTest (potentially multiple time per frame).
        */

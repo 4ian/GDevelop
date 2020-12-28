@@ -79,15 +79,15 @@ module.exports = {
         .setLabel(_('Alignment, when multiple lines are displayed'));
 
       objectProperties
-        .getOrCreate('bitmapFontResourceName')
-        .setValue(objectContent.bitmapFontResourceName)
+        .getOrCreate('bitmapFontFile')
+        .setValue(objectContent.bitmapFontFile)
         .setType('resource')
         .addExtraInfo('bitmapFont') //fnt or xml files
         .setLabel(_('Bitmap Font'));
 
       objectProperties
-        .getOrCreate('bitmapTexture')
-        .setValue(objectContent.bitmapTexture)
+        .getOrCreate('bitmapTextureFile')
+        .setValue(objectContent.bitmapTextureFile)
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Bitmap texture'));
@@ -110,12 +110,6 @@ module.exports = {
         .setType('boolean')
         .setLabel(_('Word wrapping'));
 
-      objectProperties
-        .getOrCreate('specialChars')
-        .setValue(objectContent.specialChars)
-        .setType('string')
-        .setLabel(_('Special chars to include'));
-
       return objectProperties;
     };
     bitmapTextObject.setRawJSONContent(
@@ -124,11 +118,10 @@ module.exports = {
         opacity: 255,
         fontSize: 20,
         fontColor: '#000000',
-        bitmapFontResourceName: '',
-        bitmapTexture: '',
+        bitmapFontFile: '',
+        bitmapTextureFile: '',
         align: 'left',
         wordWrap: true,
-        specialChars: '',
       })
     );
 
@@ -488,11 +481,10 @@ module.exports = {
       this._bitmapFontStyle.fontSize = 20;
       this._bitmapFontStyle.wordWrap = false;
       this._bitmapFontStyle.fill = '#ffffff';
-      this._bitmapFontStyle.specialChars= '';
 
       // We'll track changes of the font to trigger the loading of the new font.
-      this._currentBitmapFontResourceName = '';
-      this._currentBitmapTexture = '';
+      this._currentBitmapFontFile = '';
+      this._currentBitmapTextureFile = '';
 
       const fontName = this._ensureFontAvailableAndGetFontName();
       this._pixiObject = new PIXI.BitmapText('', {
@@ -522,33 +514,64 @@ module.exports = {
      * Generate the PIXI.BitmapFont for the object according to `this._bitmapFontStyle`.
      * You must ensure that *the font family is already loaded* before calling this.
      */
-    RenderedBitmapTextInstance.prototype._ensureFontAvailableAndGetFontName = function () {
+    RenderedBitmapTextInstance.prototype._ensureFontAvailableAndGetFontName = async function () {
       const slugFontName =
         this._bitmapFontStyle.fontFamily +
         '-' +
         this._bitmapFontStyle.fontSize +
         '-' +
         this._bitmapFontStyle.fill +
-        '-' +
-        this._bitmapFontStyle.specialChars +
         '-bitmapFont';
+
+      // NOTE : The name of the fontFamily used is the name in the fnt/xml not the name of the file/resource name from resource tabs of GD,
+      // this particularity should require an optionnal string property in the object panel 'Override font name'.
+      // instead for now rename the resource name of the fnt/xml file to the name of the font.
 
       // Load the font if it's not available yet.
       if (!PIXI.BitmapFont.available[slugFontName]) {
-        console.info('Generating font "' + slugFontName + '" for BitmapText.');
-        PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-          chars: [
-            [' ', '~'], // All the printable ASCII characters
-            this._bitmapFontStyle.specialChars
+        try {
+          const bitmapFontResourceName = this._associatedObject
+            .getProperties()
+            .get('bitmapFontFile')
+            .getValue();
+
+          const fontData = await this._pixiResourcesLoader.getResourceBitmapFont(
+            this._project,
+            bitmapFontResourceName
+          );
+
+          const bitmapTextureResourceName = this._associatedObject
+            .getProperties()
+            .get('bitmapTextureFile')
+            .getValue();
+
+          const texture = this._pixiResourcesLoader.getPIXITexture(
+            this._project,
+            bitmapTextureResourceName
+          );
+
+          const bitmapFont = PIXI.BitmapFont.install(fontData, texture);
+          return bitmapFont.font;
+        } catch (err) {
+          console.error('Unable to load a bitmap font data: ', err);
+          console.info(
+            'Generating font "' + slugFontName + '" for BitmapText.'
+          );
+
+          PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
+            chars: [
+              [' ', '~'], // All the printable ASCII characters
+              this._bitmapFontStyle.specialChars,
             ],
-        });
+          });
+
+          return slugFontName;
+        }
       }
 
       // TODO: find a way to unload the BitmapFont that are not used anymore, otherwise
       // we risk filling up the memory with useless BitmapFont - especially when the user
       // plays with the color/size.
-
-      return slugFontName;
     };
 
     /**
@@ -578,12 +601,12 @@ module.exports = {
       this._pixiObject.fontSize = fontSize; // We also need to update the BitmapText fontSize
 
       // Track the changes in font to load the new requested font.
-      const bitmapFontResourceName = properties.get('bitmapFontResourceName').getValue();
-      if (this._currentBitmapFontResourceName !== bitmapFontResourceName) {
-        this._currentBitmapFontResourceName = bitmapFontResourceName;
+      const bitmapFontFile = properties.get('bitmapFontFile').getValue();
+      if (this._currentBitmapFontFile !== bitmapFontFile) {
+        this._currentBitmapFontFile = bitmapFontFile;
 
         this._pixiResourcesLoader
-          .loadFontFamily(this._project, bitmapFontResourceName)
+          .getResourceBitmapFont(this._project, bitmapFontFile)
           .then((fontFamily) => {
             // Once the font is loaded, we can use the given fontFamily.
             this._bitmapFontStyle.fontFamily = fontFamily;
@@ -599,8 +622,9 @@ module.exports = {
           });
       }
 
-      const bitmapTexture = properties.get('bitmapTexture').getValue();
-      const texture = this._pixiResourcesLoader.getPIXITexture(this._project, bitmapTexture);
+
+      const bitmapTextureResourceName = properties.get('bitmapTextureFile').getValue();
+      const texture = this._pixiResourcesLoader.getPIXITexture(this._project, bitmapTextureResourceName);
 
       if (this._currentBitmapTexture !== texture) {
         this._currentBitmapTexture = texture;
@@ -615,10 +639,6 @@ module.exports = {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
-
-      // Set up the characters wanted by the user for the generation of the bitmapFont.
-      const specialChars = properties.get('specialChars').getValue();
-      this._bitmapFontStyle.specialChars = specialChars;
 
       // Assign the font name (that will change if fontFamily, fontSize or color were
       // changed).

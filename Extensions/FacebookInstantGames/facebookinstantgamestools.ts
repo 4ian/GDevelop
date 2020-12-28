@@ -339,7 +339,7 @@ namespace gdjs {
               });
             },
             setDataAsync: function (data) {
-              return new Promise(function (resolve) {
+              return new Promise<void>(function (resolve) {
                 FBInstantMock._mockedPlayerData = data;
                 resolve();
               });

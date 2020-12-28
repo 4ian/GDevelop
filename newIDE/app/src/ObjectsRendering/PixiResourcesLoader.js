@@ -1,5 +1,6 @@
 // @flow
 import slugs from 'slugs';
+import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
@@ -215,6 +216,37 @@ export default class PixiResourcesLoader {
 
     const fontFamily = slugs(resourceName);
     return fontFamily;
+  }
+
+  /**
+   * Get the the data from a bitmap font (fnt/xml) resource in the IDE.
+   */
+  static getResourceBitmapFont(
+    project: gdProject,
+    resourceName: string
+  ): Promise<any> {
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return Promise.reject(
+        new Error(`Can't find resource called ${resourceName}.`)
+      );
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'bitmapFont')
+      return Promise.reject(
+        new Error(
+          `The resource called ${resourceName} is not a bitmap font file. Require .fnt or .xml format.`
+        )
+      );
+
+    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      isResourceForPixi: true,
+    });
+
+    if (!fullUrl) {
+      return Promise.resolve('Arial');
+    }
+
+    return axios.get(fullUrl).then(response => response.data);
   }
 
   static getInvalidPIXITexture() {

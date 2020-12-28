@@ -285,6 +285,56 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddAction("SceneVariablePush",
+                 _("Push variable on a scene array"),
+                 _("Appends a variable at the end of a scene array variable."),
+                 _("Append variable _PARAM0_ to array variable _PARAM1_"),
+                 _("Variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Variable to push"))
+      .AddParameter("scenevar", _("Array variable"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "SceneVariableRemoveAt",
+          _("Remove index of scene array"),
+          _("Removes a variable at an index of a scene array variable."),
+          _("Remove variable at index _PARAM0_ from array variable _PARAM1_"),
+          _("Variables/Arrays"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("expression", _("Index to remove"))
+      .AddParameter("scenevar", _("Variable"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("GlobalVariablePush",
+                 _("Push variable on a global array"),
+                 _("Appends a variable at the end of a global array variable."),
+                 _("Append variable _PARAM0_ to array variable _PARAM1_"),
+                 _("Variables/Global variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Variable to push"))
+      .AddParameter("globalvar", _("Array variable"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "GlobalVariableRemoveAt",
+          _("Remove index of global array"),
+          _("Removes a variable at an index of a global array variable."),
+          _("Remove variable at index _PARAM0_ from array variable _PARAM1_"),
+          _("Variables/Global variables/Arrays"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("expression", _("Index to remove"))
+      .AddParameter("globalvar", _("Variable"))
+      .MarkAsAdvanced();
+
+  extension
       .AddExpression("GlobalVariableChildCount",
                      _("Number of children of a global variable"),
                      _("Get the number of children of a global variable"),

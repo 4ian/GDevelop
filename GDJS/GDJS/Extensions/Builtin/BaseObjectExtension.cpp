@@ -265,6 +265,13 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("toggleVariableBoolean")
       .SetIncludeFile("runtimeobject.js");
 
+  objectActions["ObjectVariablePush"]
+      .SetFunctionName("variablePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariableRemoveAt"]
+      .SetFunctionName("variableRemoveAt")
+      .SetIncludeFile("runtimeobject.js");
+
   GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,

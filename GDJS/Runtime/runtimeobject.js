@@ -713,6 +713,24 @@ gdjs.RuntimeObject.variableClearChildren = function(variable) {
 gdjs.RuntimeObject.prototype.variableClearChildren = gdjs.RuntimeObject.variableClearChildren;
 
 /**
+ * @param {gdjs.Variable} variable
+ * @param {gdjs.Variable} array
+ * @private
+ */
+gdjs.RuntimeObject.prototype.variablePush = function (variable, array) {
+    array.push(variable);
+};
+
+/**
+ * @param {number} index
+ * @param {gdjs.Variable} array
+ * @private
+ */
+gdjs.RuntimeObject.prototype.variableRemoveAt = function (index, array) {
+    array.removeAtIndex(index);
+};
+
+/**
  * Shortcut to test if a variable exists for the object.
  * @param {string} name The variable to be tested
  * @return {boolean} true if the variable exists.

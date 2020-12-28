@@ -125,6 +125,28 @@ gdjs.evtTools.common.variableClearChildren = function (variable) {
 };
 
 /**
+ * Pushes a variable onto an array.
+ *
+ * @param {gdjs.Variable} variable
+ * @param {gdjs.Variable} array
+ * @private
+ */
+gdjs.evtTools.common.variablePush = function (variable, array) {
+  array.push(variable);
+};
+
+/**
+ * Removes an index from an array.
+ *
+ * @param {number} index
+ * @param {gdjs.Variable} array
+ * @private
+ */
+gdjs.evtTools.common.variableRemoveAt = function (index, array) {
+  array.removeAtIndex(index);
+};
+
+/**
  * Get the number of children in a variable.
  * @param {gdjs.Variable} variable Variable.
  * @returns {number} The number of children in the variable.

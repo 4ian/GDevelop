@@ -74,6 +74,15 @@ VariablesExtension::VariablesExtension() {
   GetAllActions()["GlobalVariableClearChildren"].SetFunctionName(
       "gdjs.evtTools.common.variableClearChildren");
 
+  GetAllActions()["SceneVariablePush"].SetFunctionName(
+      "gdjs.evtTools.common.variablePush");
+  GetAllActions()["SceneVariableRemoveAt"].SetFunctionName(
+      "gdjs.evtTools.common.variableRemoveAt");
+  GetAllActions()["GlobalVariablePush"].SetFunctionName(
+      "gdjs.evtTools.common.variablePush");
+  GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
+      "gdjs.evtTools.common.variableRemoveAt");
+
   GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,

@@ -161,7 +161,7 @@ namespace gdjs {
     static mouseDraggingSomething = false;
 
     //Static property used to avoid start dragging an object while another is dragged by the same touch.
-    static touchDraggingSomething = [];
+    static touchDraggingSomething: Array<boolean> = [];
 
     //Static property used to only start dragging when clicking.
     static leftPressedLastFrame = false;

@@ -5,12 +5,12 @@ namespace gdjs {
    *
    */
   gdjs.fileSystem = {
-    _path: null,
     // The Node.js path module, or null if it can't be loaded.
+    _path: null,
+    // The Node.js fs module, or null if it can't be loaded.
     _fs: null,
   };
 
-  // The Node.js fs module, or null if it can't be loaded.
 
   /** Get the Node.js path module, or null if it can't be loaded */
   gdjs.fileSystem._getPath = function () {

@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Noise', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Noise', {
     makePIXIFilter: function (layer, effectData) {
       const noise = new PIXI.filters.NoiseFilter();
       return noise;

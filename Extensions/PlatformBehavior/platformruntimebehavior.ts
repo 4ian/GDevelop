@@ -1,8 +1,11 @@
-namespace gdjs {
+
   /**
 GDevelop - Platform Behavior Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
+namespace gdjs {
+
+  declare var rbush: any;
 
   /**
    * Manages the common objects shared by objects having a
@@ -19,7 +22,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
     /**
      * @param object The object
      */
-    constructor(runtimeScene, sharedData) {
+    constructor(runtimeScene: gdjs.RuntimeScene) {
       this._platformRBush = new rbush(9, [
         '.owner.getAABB().min[0]',
         '.owner.getAABB().min[1]',
@@ -31,13 +34,16 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
     /**
      * Get the platforms manager of a scene.
      */
-    static getManager(runtimeScene) {
+    static getManager(runtimeScene: gdjs.RuntimeScene) {
+      // @ts-ignore
       if (!runtimeScene.platformsObjectsManager) {
         //Create the shared manager if necessary.
+        // @ts-ignore
         runtimeScene.platformsObjectsManager = new gdjs.PlatformObjectsManager(
           runtimeScene
         );
       }
+      // @ts-ignore
       return runtimeScene.platformsObjectsManager;
     }
 
@@ -71,9 +77,13 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
       const searchArea = gdjs.staticObject(
         PlatformObjectsManager.prototype.getAllPlatformsAround
       );
+      // @ts-ignore
       searchArea.minX = x - ow / 2 - maxMovementLength;
+      // @ts-ignore
       searchArea.minY = y - oh / 2 - maxMovementLength;
+      // @ts-ignore
       searchArea.maxX = x + ow / 2 + maxMovementLength;
+      // @ts-ignore
       searchArea.maxY = y + oh / 2 + maxMovementLength;
       const nearbyPlatforms = this._platformRBush.search(searchArea);
       result.length = 0;

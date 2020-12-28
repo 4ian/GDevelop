@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Outline', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Outline', {
     makePIXIFilter: function (layer, effectData) {
       const outlineFilter = new PIXI.filters.OutlineFilter();
       return outlineFilter;

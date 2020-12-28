@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Twist', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
     makePIXIFilter: function (layer, effectData) {
       const twistFilter = new PIXI.filters.TwistFilter();
       twistFilter.offset = new PIXI.Point(0, 0);
@@ -13,22 +12,14 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'radius') {
         filter.radius = value;
-      } else {
-        if (parameterName === 'angle') {
-          filter.angle = value;
-        } else {
-          if (parameterName === 'padding') {
-            filter.padding = value;
-          } else {
-            if (parameterName === 'offsetX') {
-              filter._offsetX = value;
-            } else {
-              if (parameterName === 'offsetY') {
-                filter._offsetY = value;
-              }
-            }
-          }
-        }
+      } else if (parameterName === 'angle') {
+        filter.angle = value;
+      } else if (parameterName === 'padding') {
+        filter.padding = value;
+      } else if (parameterName === 'offsetX') {
+        filter._offsetX = value;
+      } else if (parameterName === 'offsetY') {
+        filter._offsetY = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

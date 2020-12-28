@@ -4,10 +4,6 @@
 //Thus, it must be included after gd.js
 
 namespace gdjs {
-  /**
-   * @namespace
-   * @memberof gdjs
-   */
   gdjs.HSHG = gdjs.HSHG || {};
 
   (function (root, undefined) {

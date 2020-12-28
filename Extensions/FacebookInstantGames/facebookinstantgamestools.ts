@@ -258,7 +258,7 @@ namespace gdjs {
       _playerRank: any = null;
       _playerExtraData: any = null;
 
-      setScoreAsync(score, extraData): void {
+      setScoreAsync(score, extraData): Promise<void> {
         const that = this;
         return new Promise(function (resolve) {
           that._playerScore = score;
@@ -321,7 +321,7 @@ namespace gdjs {
         return Promise.resolve();
       }
 
-      showAsync(): void {
+      showAsync(): Promise<void> {
         if (this._isLoaded) {
           console.info(
             'In a real Instant Game, an interstitial should have been shown to the user.'
@@ -331,7 +331,7 @@ namespace gdjs {
         return Promise.reject(new Error('Interstitial is not loaded.'));
       }
     }
-    const supportedAPIs = [];
+    const supportedAPIs: Array<string> = [];
     const FBInstantMock = {
       _mockedPlayerData: {},
       _mockedLeaderboards: {},

@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('ColorReplace', {
+  gdjs.PixiFiltersTools.registerFilterCreator('ColorReplace', {
     makePIXIFilter: function (layer, effectData) {
       const colorReplaceFilter = new PIXI.filters.ColorReplaceFilter();
       return colorReplaceFilter;
@@ -14,10 +13,8 @@ namespace gdjs {
     updateStringParameter: function (filter, parameterName, value) {
       if (parameterName === 'originalColor') {
         filter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
-      } else {
-        if (parameterName === 'newColor') {
-          filter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
-        }
+      } else if (parameterName === 'newColor') {
+        filter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {},

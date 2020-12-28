@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Displacement', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Displacement', {
     makePIXIFilter: function (layer, effectData) {
       const displacementMapTexture = layer
         .getRuntimeScene()

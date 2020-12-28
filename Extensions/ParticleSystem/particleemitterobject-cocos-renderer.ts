@@ -467,5 +467,5 @@ This project is released under the MIT License.
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectCocosRenderer;
+  gdjs.ParticleEmitterObjectRenderer = ParticleEmitterObjectCocosRenderer;
 }

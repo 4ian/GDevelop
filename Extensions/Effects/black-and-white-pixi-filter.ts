@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('BlackAndWhite', {
+  gdjs.PixiFiltersTools.registerFilterCreator('BlackAndWhite', {
     makePIXIFilter: function (layer, effectData) {
       const colorMatrix = new PIXI.filters.ColorMatrixFilter();
       colorMatrix.blackAndWhite();

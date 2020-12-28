@@ -685,7 +685,8 @@ namespace gdjs {
         }
 
         //No so construct a new node (or get it from the cache)...
-        let newNode = null;
+        // @ts-ignore
+        let newNode: gdjs.PathfindingRuntimeBehavior.Node = null;
         if (this._nodeCache.length !== 0) {
           newNode = this._nodeCache.shift();
           newNode.reinitialize(xPos, yPos);

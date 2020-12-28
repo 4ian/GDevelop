@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('ColorMap', {
+  gdjs.PixiFiltersTools.registerFilterCreator('ColorMap', {
     makePIXIFilter: function (layer, effectData) {
       const colorMapTexture = layer
         .getRuntimeScene()

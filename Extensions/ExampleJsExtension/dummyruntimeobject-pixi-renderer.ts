@@ -73,6 +73,7 @@ namespace gdjs {
     }
   }
 
-  // @ts-ignore - Register the class to let the engine use it.
+  // Register the class to let the engine use it.
   export const DummyRuntimeObjectRenderer = DummyRuntimeObjectPixiRenderer;
+  export type DummyRuntimeObjectRenderer = DummyRuntimeObjectPixiRenderer;
 }

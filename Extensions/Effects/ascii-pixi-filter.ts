@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Ascii', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Ascii', {
     makePIXIFilter: function (layer, effectData) {
       const asciiFilter = new PIXI.filters.AsciiFilter();
       return asciiFilter;

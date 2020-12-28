@@ -90,6 +90,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
       this._potentialCollidingObjects.length = 0;
       this._overlappedJumpThru = this._overlappedJumpThru || [];
       this._overlappedJumpThru.length = 0;
+      this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
       this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
     }
@@ -151,9 +152,11 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
       let requestedDeltaY = 0;
 
       //Change the speed according to the player's input.
+      // @ts-ignore
       this._leftKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+      // @ts-ignore
       this._rightKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
@@ -317,6 +320,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
       //2) Y axis:
 
       //Go on a ladder
+      // @ts-ignore - improper usage of |=
       this._ladderKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
@@ -329,9 +333,11 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
         this._isOnLadder = true;
       }
       if (this._isOnLadder) {
+        // @ts-ignore - improper usage of |=
         this._upKey |=
           !this._ignoreDefaultControls &&
           runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+          // @ts-ignore - improper usage of |=
         this._downKey |=
           !this._ignoreDefaultControls &&
           runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
@@ -424,6 +430,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
       }
 
       //Jumping
+      // @ts-ignore - improper usage of |=
       this._jumpKey |=
         !this._ignoreDefaultControls &&
         (runtimeScene.getGame().getInputManager().isKeyPressed(LSHIFTKEY) ||
@@ -710,7 +717,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
      * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
-    _isCollidingWith(candidates, exceptThisOne, excludeJumpThrus) {
+    _isCollidingWith(candidates, exceptThisOne?: number | null, excludeJumpThrus?: boolean) {
       excludeJumpThrus = !!excludeJumpThrus;
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];

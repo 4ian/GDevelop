@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('BlendingMode', {
+  gdjs.PixiFiltersTools.registerFilterCreator('BlendingMode', {
     makePIXIFilter: function (layer, effectData) {
       const blendingModeFilter = new PIXI.filters.AlphaFilter();
       return blendingModeFilter;

@@ -44,7 +44,7 @@ namespace gdjs {
 
     // This value is the default wrapping width of the runtime object.
     _align: string;
-    _renderer: any;
+    _renderer: gdjs.BBTextRuntimeObjectRenderer;
 
     // While this should rather be exposed as a property for all objects, honor the "visible"
     // property that is specific to this object.

@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Bevel', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Bevel', {
     makePIXIFilter: function (layer, effectData) {
       const bevelFilter = new PIXI.filters.BevelFilter();
       return bevelFilter;
@@ -9,22 +8,14 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'rotation') {
         filter.rotation = value;
-      } else {
-        if (parameterName === 'thickness') {
-          filter.thickness = value;
-        } else {
-          if (parameterName === 'distance') {
-            filter.distance = value;
-          } else {
-            if (parameterName === 'lightAlpha') {
-              filter.lightAlpha = value;
-            } else {
-              if (parameterName === 'shadowAlpha') {
-                filter.shadowAlpha = value;
-              }
-            }
-          }
-        }
+      } else if (parameterName === 'thickness') {
+        filter.thickness = value;
+      } else if (parameterName === 'distance') {
+        filter.distance = value;
+      } else if (parameterName === 'lightAlpha') {
+        filter.lightAlpha = value;
+      } else if (parameterName === 'shadowAlpha') {
+        filter.shadowAlpha = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {

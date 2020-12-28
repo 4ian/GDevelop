@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.physics2 = gdjs.physics2 || {};
+  gdjs.physics2 = gdjs.physics2 || {};
   gdjs.physics2.objectsCollide = function (
     objectsLists1,
     behavior,

@@ -1,5 +1,8 @@
 namespace gdjs {
   declare var shifty: any;
+  namespace shifty {
+    export type Tweenable = any;
+  }
 
   /**
    * @memberof gdjs

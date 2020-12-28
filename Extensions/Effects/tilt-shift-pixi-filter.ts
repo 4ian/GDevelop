@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('TiltShift', {
+  gdjs.PixiFiltersTools.registerFilterCreator('TiltShift', {
     makePIXIFilter: function (layer, effectData) {
       const tiltShiftFilter = new PIXI.filters.TiltShiftFilter();
       return tiltShiftFilter;
@@ -9,10 +8,8 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'blur') {
         filter.blur = value;
-      } else {
-        if (parameterName === 'gradientBlur') {
-          filter.gradientBlur = value;
-        }
+      } else if (parameterName === 'gradientBlur') {
+        filter.gradientBlur = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Reflection', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Reflection', {
     makePIXIFilter: function (layer, effectData) {
       let time = 0;
       const reflectionFilter = new PIXI.filters.ReflectionFilter(

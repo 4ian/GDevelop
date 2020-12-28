@@ -1,5 +1,5 @@
 namespace gdjs {
-  class Inventory {
+  export class Inventory {
     _items: any = {};
 
     constructor() {

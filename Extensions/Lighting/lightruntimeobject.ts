@@ -29,7 +29,7 @@ namespace gdjs {
     _debugMode: boolean;
     _texture: string;
     _obstaclesManager: gdjs.LightObstaclesManager;
-    _renderer: any;
+    _renderer: gdjs.LightRuntimeObjectRenderer;
     _runtimeScene: gdjs.RuntimeScene;
 
     constructor(

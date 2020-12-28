@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('Dot', {
+  gdjs.PixiFiltersTools.registerFilterCreator('Dot', {
     makePIXIFilter: function (layer, effectData) {
       const dotFilter = new PIXI.filters.DotFilter();
       return dotFilter;
@@ -9,10 +8,8 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'scale') {
         filter.scale = value;
-      } else {
-        if (parameterName === 'angle') {
-          filter.angle = value;
-        }
+      } else if (parameterName === 'angle') {
+        filter.angle = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

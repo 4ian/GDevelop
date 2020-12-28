@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('DropShadow', {
+  gdjs.PixiFiltersTools.registerFilterCreator('DropShadow', {
     makePIXIFilter: function (layer, effectData) {
       const dropShadowFilter = new PIXI.filters.DropShadowFilter();
       return dropShadowFilter;
@@ -9,22 +8,14 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'blur') {
         filter.blur = value;
-      } else {
-        if (parameterName === 'quality') {
-          filter.quality = value;
-        } else {
-          if (parameterName === 'alpha') {
-            filter.alpha = value;
-          } else {
-            if (parameterName === 'distance') {
-              filter.distance = value;
-            } else {
-              if (parameterName === 'rotation') {
-                filter.rotation = value;
-              }
-            }
-          }
-        }
+      } else if (parameterName === 'quality') {
+        filter.quality = value;
+      } else if (parameterName === 'alpha') {
+        filter.alpha = value;
+      } else if (parameterName === 'distance') {
+        filter.distance = value;
+      } else if (parameterName === 'rotation') {
+        filter.rotation = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {

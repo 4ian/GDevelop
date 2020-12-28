@@ -135,4 +135,5 @@ namespace gdjs {
 
   // @ts-ignore - Register the class to let the engine use it.
   export const BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
+  export type BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
 }

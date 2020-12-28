@@ -244,7 +244,7 @@ namespace gdjs {
     }
 
     drawPathLineTo(x1, y1) {
-      this._renderer.drawPathLineTo(x1, y1, this._outlineSize);
+      this._renderer.drawPathLineTo(x1, y1);
     }
 
     drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY) {

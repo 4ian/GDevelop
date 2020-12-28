@@ -1,3 +1,5 @@
+// @ts-nocheck
+// This is deprecated and not worth typing.
 /**
 GDevelop - Physics Behavior Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)

@@ -12,8 +12,8 @@
   },
   "include": [
     "GDJS/Runtime/**/*",
-    // "Extensions/**/*.js",
-    // "Extensions/**/*.ts",
+    "Extensions/**/*.js",
+    "Extensions/**/*.ts",
     "GDJS/tests/tests/**/*.js",
     "GDJS/tests/tests-utils/**/*.js",
     "GDJS/tests/benchmarks/**/*.js"

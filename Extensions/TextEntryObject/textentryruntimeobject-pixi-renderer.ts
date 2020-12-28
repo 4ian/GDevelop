@@ -76,4 +76,5 @@ namespace gdjs {
 
   // @ts-ignore - Register the class to let the engine use it.
   export const TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
+  export type TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
 }

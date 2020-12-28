@@ -338,4 +338,5 @@ namespace gdjs {
 
   // @ts-ignore - Register the class to let the engine use it.
   export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
 }

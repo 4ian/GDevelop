@@ -1,6 +1,5 @@
-gd;
 namespace gdjs {
-  js.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
+  gdjs.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
     makePIXIFilter: function (layer, effectData) {
       const kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
       return kawaseBlurFilter;
@@ -9,18 +8,12 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'pixelizeX') {
         filter.pixelizeX = value;
-      } else {
-        if (parameterName === 'pixelizeY') {
-          filter.pixelizeY = value;
-        } else {
-          if (parameterName === 'blur') {
-            filter.blur = value;
-          } else {
-            if (parameterName === 'quality') {
-              filter.quality = value;
-            }
-          }
-        }
+      } else if (parameterName === 'pixelizeY') {
+        filter.pixelizeY = value;
+      } else if (parameterName === 'blur') {
+        filter.blur = value;
+      } else if (parameterName === 'quality') {
+        filter.quality = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

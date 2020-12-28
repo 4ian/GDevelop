@@ -1,11 +1,5 @@
 namespace gdjs {
   /**
-   * Firebase Tools Collection
-   * @fileoverview
-   * @author arthuro555
-   */
-
-  /**
    * A special array where push tries to reuse old unused indices.
    * Why? This is for storing UIDs. You can see this as a sort of memory optimization:
    * Each time an object is removed, it is replaced with null in the array.

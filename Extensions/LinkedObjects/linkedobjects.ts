@@ -81,55 +81,50 @@ namespace gdjs {
    * @class linkedObjects
    * @static
    */
-  gdjs.evtTools.linkedObjects = {};
-  gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
-    LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
-  });
-  gdjs.evtTools.linkedObjects.linkObjects = function (
-    runtimeScene,
-    objA,
-    objB
-  ) {
-    if (objA === null || objB === null) {
-      return;
+  export namespace evtTools {
+    export namespace linkedObjects {
+      gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
+        LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
+      });
+      export const linkObjects = function (runtimeScene, objA, objB) {
+        if (objA === null || objB === null) {
+          return;
+        }
+        LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
+      };
+      export const removeLinkBetween = function (runtimeScene, objA, objB) {
+        if (objA === null || objB === null) {
+          return;
+        }
+        LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
+      };
+      export const removeAllLinksOf = function (runtimeScene, objA) {
+        if (objA === null) {
+          return;
+        }
+        LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
+      };
+      export const _objectIsInList = function (obj, linkedObjects) {
+        return linkedObjects.indexOf(obj) !== -1;
+      };
+      export const pickObjectsLinkedTo = function (
+        runtimeScene,
+        objectsLists,
+        obj
+      ) {
+        if (obj === null) {
+          return false;
+        }
+        const linkedObjects = LinksManager.getManager(
+          runtimeScene
+        ).getObjectsLinkedWith(obj);
+        return gdjs.evtTools.object.pickObjectsIf(
+          gdjs.evtTools.linkedObjects._objectIsInList,
+          objectsLists,
+          false,
+          linkedObjects
+        );
+      };
     }
-    LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
-  };
-  gdjs.evtTools.linkedObjects.removeLinkBetween = function (
-    runtimeScene,
-    objA,
-    objB
-  ) {
-    if (objA === null || objB === null) {
-      return;
-    }
-    LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
-  };
-  gdjs.evtTools.linkedObjects.removeAllLinksOf = function (runtimeScene, objA) {
-    if (objA === null) {
-      return;
-    }
-    LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
-  };
-  gdjs.evtTools.linkedObjects._objectIsInList = function (obj, linkedObjects) {
-    return linkedObjects.indexOf(obj) !== -1;
-  };
-  gdjs.evtTools.linkedObjects.pickObjectsLinkedTo = function (
-    runtimeScene,
-    objectsLists,
-    obj
-  ) {
-    if (obj === null) {
-      return false;
-    }
-    const linkedObjects = LinksManager.getManager(
-      runtimeScene
-    ).getObjectsLinkedWith(obj);
-    return gdjs.evtTools.object.pickObjectsIf(
-      gdjs.evtTools.linkedObjects._objectIsInList,
-      objectsLists,
-      false,
-      linkedObjects
-    );
-  };
+  }
 }

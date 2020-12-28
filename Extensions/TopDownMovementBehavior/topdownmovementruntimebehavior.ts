@@ -163,15 +163,19 @@ namespace gdjs {
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
       //Get the player input:
+      // @ts-ignore
       this._leftKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+      // @ts-ignore
       this._rightKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
+      // @ts-ignore
       this._downKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
+      // @ts-ignore
       this._upKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
@@ -247,9 +251,11 @@ namespace gdjs {
           this._deceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity -=
           this._deceleration * timeDelta * Math.sin(directionInRad);
+        // @ts-ignore
         if ((this._xVelocity > 0) ^ xVelocityWasPositive) {
           this._xVelocity = 0;
         }
+        // @ts-ignore
         if ((this._yVelocity > 0) ^ yVelocityWasPositive) {
           this._yVelocity = 0;
         }

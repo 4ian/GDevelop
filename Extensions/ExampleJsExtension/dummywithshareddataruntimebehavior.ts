@@ -9,7 +9,7 @@ namespace gdjs {
     constructor(
       runtimeScene: gdjs.RuntimeScene,
       behaviorData: any,
-      owner: gdjs.Object
+      owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
 
@@ -21,7 +21,7 @@ namespace gdjs {
       const sharedData = runtimeScene.getInitialSharedDataForBehavior(
         behaviorData.name
       );
-      this._textToSet = sharedData.sharedProperty1;
+      this._textToSet = (sharedData as any).sharedProperty1;
 
       // You can also run arbitrary code at the creation of the behavior:
       console.log(

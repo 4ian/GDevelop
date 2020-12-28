@@ -6,14 +6,17 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const kawaseBlurFilter = filter as PIXI.filters.KawaseBlurFilter;
       if (parameterName === 'pixelizeX') {
-        filter.pixelizeX = value;
+        // @ts-ignore: fix these wrong parameters
+        kawaseBlurFilter.pixelizeX = value;
       } else if (parameterName === 'pixelizeY') {
-        filter.pixelizeY = value;
+        // @ts-ignore: fix these wrong parameters
+        kawaseBlurFilter.pixelizeY = value;
       } else if (parameterName === 'blur') {
-        filter.blur = value;
+        kawaseBlurFilter.blur = value;
       } else if (parameterName === 'quality') {
-        filter.quality = value;
+        kawaseBlurFilter.quality = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

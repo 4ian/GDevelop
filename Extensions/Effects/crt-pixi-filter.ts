@@ -1,3 +1,5 @@
+// @ts-nocheck - TODO: fix typings in this file
+
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('CRT', {
     makePIXIFilter: function (layer, effectData) {

@@ -6,10 +6,11 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const tiltShiftFilter = filter as PIXI.filters.TiltShiftFilter;
       if (parameterName === 'blur') {
-        filter.blur = value;
+        tiltShiftFilter.blur = value;
       } else if (parameterName === 'gradientBlur') {
-        filter.gradientBlur = value;
+        tiltShiftFilter.gradientBlur = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

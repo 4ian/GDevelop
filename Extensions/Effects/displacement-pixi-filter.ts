@@ -15,11 +15,12 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const displacementFilter = filter as PIXI.filters.DisplacementFilter;
       if (parameterName === 'scaleX') {
-        filter.scale.x = value;
+        displacementFilter.scale.x = value;
       }
       if (parameterName === 'scaleY') {
-        filter.scale.y = value;
+        displacementFilter.scale.y = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

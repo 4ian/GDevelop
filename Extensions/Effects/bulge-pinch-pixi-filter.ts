@@ -6,14 +6,15 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const bulgePinchFilter = filter as PIXI.filters.BulgePinchFilter;
       if (parameterName === 'centerX') {
-        filter.center[0] = value;
+        bulgePinchFilter.center[0] = value;
       } else if (parameterName === 'centerY') {
-        filter.center[1] = value;
+        bulgePinchFilter.center[1] = value;
       } else if (parameterName === 'radius') {
-        filter.radius = value;
+        bulgePinchFilter.radius = value;
       } else if (parameterName === 'strength') {
-        filter.strength = gdjs.PixiFiltersTools.clampValue(value, -1, 1);
+        bulgePinchFilter.strength = gdjs.PixiFiltersTools.clampValue(value, -1, 1);
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

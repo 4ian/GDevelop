@@ -6,16 +6,17 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const advancedBloomFilter = filter as PIXI.filters.AdvancedBloomFilter;
       if (parameterName === 'threshold') {
-        filter.threshold = value;
+        advancedBloomFilter.threshold = value;
       } else if (parameterName === 'bloomScale') {
-        filter.bloomScale = value;
+        advancedBloomFilter.bloomScale = value;
       } else if (parameterName === 'brightness') {
-        filter.brightness = value;
+        advancedBloomFilter.brightness = value;
       } else if (parameterName === 'blur') {
-        filter.blur = value;
+        advancedBloomFilter.blur = value;
       } else if (parameterName === 'quality') {
-        filter.quality = value;
+        advancedBloomFilter.quality = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

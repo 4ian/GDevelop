@@ -6,22 +6,23 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const adjustmentFilter = filter as PIXI.filters.AdjustmentFilter;
       if (parameterName === 'gamma') {
-        filter.gamma = value;
+        adjustmentFilter.gamma = value;
       } else if (parameterName === 'saturation') {
-        filter.saturation = value;
+        adjustmentFilter.saturation = value;
       } else if (parameterName === 'contrast') {
-        filter.contrast = value;
+        adjustmentFilter.contrast = value;
       } else if (parameterName === 'brightness') {
-        filter.brightness = value;
+        adjustmentFilter.brightness = value;
       } else if (parameterName === 'red') {
-        filter.red = value;
+        adjustmentFilter.red = value;
       } else if (parameterName === 'green') {
-        filter.green = value;
+        adjustmentFilter.green = value;
       } else if (parameterName === 'blue') {
-        filter.blue = value;
+        adjustmentFilter.blue = value;
       } else if (parameterName === 'alpha') {
-        filter.alpha = value;
+        adjustmentFilter.alpha = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

@@ -20,14 +20,16 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const colorMapFilter = filter as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {
-        filter.mix = gdjs.PixiFiltersTools.clampValue(value / 100, 0, 1);
+        colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(value / 100, 0, 1);
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},
     updateBooleanParameter: function (filter, parameterName, value) {
+      const colorMapFilter = filter as PIXI.filters.ColorMapFilter;
       if (parameterName === 'nearest') {
-        filter.nearest = value;
+        colorMapFilter.nearest = value;
       }
     },
   });

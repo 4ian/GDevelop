@@ -6,17 +6,20 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const glowFilter = filter as PIXI.filters.GlowFilter;
       if (parameterName === 'innerStrength') {
-        filter.innerStrength = value;
+        glowFilter.innerStrength = value;
       } else if (parameterName === 'outerStrength') {
-        filter.outerStrength = value;
+        glowFilter.outerStrength = value;
       } else if (parameterName === 'distance') {
-        filter.distance = value;
+        // @ts-ignore
+        glowFilter.distance = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
+      const glowFilter = filter as PIXI.filters.GlowFilter;
       if (parameterName === 'color') {
-        filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        glowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {},

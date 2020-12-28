@@ -1,15 +1,16 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Pixelate', {
     makePIXIFilter: function (layer, effectData) {
-      const PixelateFilter = new PIXI.filters.PixelateFilter(
+      const pixelateFilter = new PIXI.filters.PixelateFilter(
         effectData.doubleParameters.size
       );
-      return PixelateFilter;
+      return pixelateFilter;
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const pixelateFilter = filter as PIXI.filters.PixelateFilter;
       if (parameterName === 'size') {
-        filter.size = value;
+        pixelateFilter.size = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

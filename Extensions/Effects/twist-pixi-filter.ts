@@ -6,20 +6,26 @@ namespace gdjs {
       return twistFilter;
     },
     update: function (filter, layer) {
-      filter.offset.x = Math.round(filter._offsetX * layer.getWidth());
-      filter.offset.y = Math.round(filter._offsetY * layer.getHeight());
+      const twistFilter = filter as PIXI.filters.TwistFilter;
+      // @ts-ignore - extra properties are stored on the filter.
+      twistFilter.offset.x = Math.round(twistFilter._offsetX * layer.getWidth());
+      // @ts-ignore - extra properties are stored on the filter.
+      twistFilter.offset.y = Math.round(twistFilter._offsetY * layer.getHeight());
     },
     updateDoubleParameter: function (filter, parameterName, value) {
+      const twistFilter = filter as PIXI.filters.TwistFilter;
       if (parameterName === 'radius') {
-        filter.radius = value;
+        twistFilter.radius = value;
       } else if (parameterName === 'angle') {
-        filter.angle = value;
+        twistFilter.angle = value;
       } else if (parameterName === 'padding') {
-        filter.padding = value;
+        twistFilter.padding = value;
       } else if (parameterName === 'offsetX') {
-        filter._offsetX = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        twistFilter._offsetX = value;
       } else if (parameterName === 'offsetY') {
-        filter._offsetY = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        twistFilter._offsetY = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

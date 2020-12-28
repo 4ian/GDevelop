@@ -6,18 +6,19 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const rgbSplitFilter = filter as PIXI.filters.RGBSplitFilter;
       if (parameterName === 'redX') {
-        filter.red.x = value;
+        rgbSplitFilter.red.x = value;
       } else if (parameterName === 'redY') {
-        filter.red.y = value;
+        rgbSplitFilter.red.y = value;
       } else if (parameterName === 'greenX') {
-        filter.green.x = value;
+        rgbSplitFilter.green.x = value;
       } else if (parameterName === 'greenY') {
-        filter.green.y = value;
+        rgbSplitFilter.green.y = value;
       } else if (parameterName === 'blueX') {
-        filter.blue.x = value;
+        rgbSplitFilter.blue.x = value;
       } else if (parameterName === 'blueY') {
-        filter.blue.y = value;
+        rgbSplitFilter.blue.y = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

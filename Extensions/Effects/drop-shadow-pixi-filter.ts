@@ -6,26 +6,29 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
       if (parameterName === 'blur') {
-        filter.blur = value;
+        dropShadowFilter.blur = value;
       } else if (parameterName === 'quality') {
-        filter.quality = value;
+        dropShadowFilter.quality = value;
       } else if (parameterName === 'alpha') {
-        filter.alpha = value;
+        dropShadowFilter.alpha = value;
       } else if (parameterName === 'distance') {
-        filter.distance = value;
+        dropShadowFilter.distance = value;
       } else if (parameterName === 'rotation') {
-        filter.rotation = value;
+        dropShadowFilter.rotation = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
+      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
       if (parameterName === 'color') {
-        filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {
+      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
       if (parameterName === 'shadowOnly') {
-        filter.shadowOnly = value;
+        dropShadowFilter.shadowOnly = value;
       }
     },
   });

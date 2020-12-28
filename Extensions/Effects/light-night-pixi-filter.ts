@@ -1,7 +1,7 @@
 namespace gdjs {
-  class LightNightPixiFilter extends PIXI.Filter {
+  export class LightNightPixiFilter extends PIXI.Filter {
     constructor() {
-      const vertexShader = null;
+      const vertexShader = undefined;
       const fragmentShader = [
         'precision mediump float;',
         '',

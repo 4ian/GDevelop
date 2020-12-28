@@ -6,11 +6,11 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const blendingModeFilter = filter as PIXI.filters.AlphaFilter;
       if (parameterName === 'alpha') {
-        filter.alpha = value;
-      }
-      if (parameterName === 'blendmode') {
-        filter.blendMode = value;
+        blendingModeFilter.alpha = value;
+      } else if (parameterName === 'blendmode') {
+        blendingModeFilter.blendMode = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

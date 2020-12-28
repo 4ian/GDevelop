@@ -6,10 +6,11 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const dotFilter = filter as PIXI.filters.DotFilter;
       if (parameterName === 'scale') {
-        filter.scale = value;
+        dotFilter.scale = value;
       } else if (parameterName === 'angle') {
-        filter.angle = value;
+        dotFilter.angle = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

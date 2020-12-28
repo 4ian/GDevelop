@@ -1,3 +1,5 @@
+// @ts-nocheck - TODO: fix typings in this file
+
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Godray', {
     makePIXIFilter: function (layer, effectData) {

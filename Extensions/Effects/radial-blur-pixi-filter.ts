@@ -5,20 +5,26 @@ namespace gdjs {
       return radialBlurFilter;
     },
     update: function (filter, layer) {
-      filter.center[0] = Math.round(filter._centerX * layer.getWidth());
-      filter.center[1] = Math.round(filter._centerY * layer.getHeight());
+      const radialBlurFilter = filter as PIXI.filters.RadialBlurFilter;
+      // @ts-ignore - extra properties are stored on the filter.
+      radialBlurFilter.center[0] = Math.round(radialBlurFilter._centerX * layer.getWidth());
+      // @ts-ignore - extra properties are stored on the filter.
+      radialBlurFilter.center[1] = Math.round(radialBlurFilter._centerY * layer.getHeight());
     },
     updateDoubleParameter: function (filter, parameterName, value) {
+      const radialBlurFilter = filter as PIXI.filters.RadialBlurFilter;
       if (parameterName === 'radius') {
-        filter.radius = value < 0 ? -1 : value;
+        radialBlurFilter.radius = value < 0 ? -1 : value;
       } else if (parameterName === 'angle') {
-        filter.angle = value;
+        radialBlurFilter.angle = value;
       } else if (parameterName === 'kernelSize') {
-        filter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(value, 3, 25);
+        radialBlurFilter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(value, 3, 25);
       } else if (parameterName === 'centerX') {
-        filter._centerX = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        radialBlurFilter._centerX = value;
       } else if (parameterName === 'centerY') {
-        filter._centerY = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        radialBlurFilter._centerY = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

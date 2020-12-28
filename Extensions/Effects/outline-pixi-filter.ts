@@ -6,13 +6,15 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
+      const outlineFilter = filter as PIXI.filters.OutlineFilter;
       if (parameterName === 'thickness') {
-        filter.thickness = value;
+        outlineFilter.thickness = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
+      const outlineFilter = filter as PIXI.filters.OutlineFilter;
       if (parameterName === 'color') {
-        filter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        outlineFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {},

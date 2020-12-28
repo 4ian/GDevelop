@@ -5,18 +5,32 @@ namespace gdjs {
       return zoomBlurFilter;
     },
     update: function (filter, layer) {
-      filter.center[0] = Math.round(filter._centerX * layer.getWidth());
-      filter.center[1] = Math.round(filter._centerY * layer.getHeight());
+      const zoomBlurFilter = filter as PIXI.filters.ZoomBlurFilter;
+      zoomBlurFilter.center[0] = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
+        zoomBlurFilter._centerX * layer.getWidth()
+      );
+      zoomBlurFilter.center[1] = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
+        zoomBlurFilter._centerY * layer.getHeight()
+      );
     },
     updateDoubleParameter: function (filter, parameterName, value) {
+      const zoomBlurFilter = filter as PIXI.filters.ZoomBlurFilter;
       if (parameterName === 'centerX') {
-        filter._centerX = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        zoomBlurFilter._centerX = value;
       } else if (parameterName === 'centerY') {
-        filter._centerY = value;
+        // @ts-ignore - extra properties are stored on the filter.
+        zoomBlurFilter._centerY = value;
       } else if (parameterName === 'innerRadius') {
-        filter.innerRadius = value;
+        zoomBlurFilter.innerRadius = value;
       } else if (parameterName === 'strength') {
-        filter.strength = gdjs.PixiFiltersTools.clampValue(value / 10, 0, 20);
+        zoomBlurFilter.strength = gdjs.PixiFiltersTools.clampValue(
+          value / 10,
+          0,
+          20
+        );
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

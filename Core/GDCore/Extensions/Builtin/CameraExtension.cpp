@@ -245,7 +245,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddAction("ZoomCamera",
-                 _("Change camera zoom."),
+                 _("Change camera zoom"),
                  _("Change camera zoom."),
                  _("Change camera zoom to _PARAM1_ (layer : _PARAM2_, camera : "
                    "_PARAM3_)"),

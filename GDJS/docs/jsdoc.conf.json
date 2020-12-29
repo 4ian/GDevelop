@@ -24,20 +24,12 @@
     "../node_modules/jsdoc-typeof-plugin"
   ],
   "templates": {
-    "search": true,
-    "better-docs": {
-      "name": "GDJS Documentation",
-      "hideGenerator": true,
-      "navLinks": [
-        {
-          "label": "Github",
-          "href": "https://github.com/4ian/GDevelop"
-        },
-        {
-          "label": "GDevelop Documentation",
-          "href": "http://wiki.compilgames.net/doku.php/gdevelop5/start"
-        }
-      ]
+    "referenceTitle": "GDevelop JavaScript reference",
+    "disableSort": false,
+    "collapse": false,
+    "resources": {
+        "Github -": "https://github.com/4ian/GDevelop",
+        "GDevelop Documentation": "http://wiki.compilgames.net/doku.php/gdevelop5/start"
     }
   },
   "markdown": {
@@ -49,7 +41,7 @@
     "recurse": true,
     "private": false,
     "lenient": true,
-    "template": "../node_modules/better-docs",
+    "template": "../node_modules/jsdoc-fresh",
     "destination": "../docs/GDJS Runtime Documentation"
   }
 }

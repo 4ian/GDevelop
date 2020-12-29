@@ -14,6 +14,7 @@
     "esbuild": "^0.8.26",
     "jsdoc": "^3.6.6",
     "jsdoc-autoprivate": "0.0.1",
+    "jsdoc-fresh": "^1.0.5",
     "jsdoc-plugin-intersection": "^1.0.2",
     "jsdoc-typeof-plugin": "^1.0.0",
     "lebab": "^3.1.0",

@@ -117,13 +117,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("CameraAngle",
-                    _("Angle of a camera of a layer"),
-                    _("Test a camera angle."),
-                    _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
+      .AddCondition(
+          "CameraAngle",
+          _("Angle of a camera of a layer"),
+          _("Test a camera angle."),
+          _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
+          _("Layers and cameras"),
+          "res/conditions/camera24.png",
+          "res/conditions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardRelationalOperatorParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
@@ -247,7 +248,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddAction("ZoomCamera",
                  _("Change camera zoom"),
                  _("Change camera zoom."),
-                 _("Change camera zoom to _PARAM1_ (layer : _PARAM2_, camera : "
+                 _("Change camera zoom to _PARAM1_ (layer: _PARAM2_, camera: "
                    "_PARAM3_)"),
                  _("Layers and cameras"),
                  "res/actions/camera24.png",
@@ -470,14 +471,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
-      .AddCondition(
-          "LayerDefaultZOrder",
-          _("Layer default Z order"),
-          _("Compare the default Z order set to objects when they are created on a layer."),
-          _("the default Z order of objects created on _PARAM1_"),
-          _("Layers and cameras"),
-          "res/conditions/layer24.png",
-          "res/conditions/layer.png")
+      .AddCondition("LayerDefaultZOrder",
+                    _("Layer default Z order"),
+                    _("Compare the default Z order set to objects when they "
+                      "are created on a layer."),
+                    _("the default Z order of objects created on _PARAM1_"),
+                    _("Layers and cameras"),
+                    "res/conditions/layer24.png",
+                    "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
@@ -485,27 +486,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "SetLayerDefaultZOrder",
-          _("Change layer default Z order"),
-          _("Change the default Z order set to objects when they are created on a layer."),
-          _("Set the default Z order of objects created on _PARAM1_ to _PARAM2_"),
-          _("Layers and cameras"),
-          "res/actions/layer24.png",
-          "res/actions/layer.png")
+      .AddAction("SetLayerDefaultZOrder",
+                 _("Change layer default Z order"),
+                 _("Change the default Z order set to objects when they are "
+                   "created on a layer."),
+                 _("Set the default Z order of objects created on _PARAM1_ to "
+                   "_PARAM2_"),
+                 _("Layers and cameras"),
+                 "res/actions/layer24.png",
+                 "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("New default Z order"));
 
   extension
-      .AddAction("SetLayerAmbientLightColor",
-                 _("Set the ambient light color"),
-                 _("Set the ambient light color of the lighting layer in format \"R;G;B\" string."),
-                 _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),
-                 _("Layers and cameras/Lighting"),
-                 "res/actions/color24.png",
-                 "res/actions/color.png")
+      .AddAction(
+          "SetLayerAmbientLightColor",
+          _("Set the ambient light color"),
+          _("Set the ambient light color of the lighting layer in format "
+            "\"R;G;B\" string."),
+          _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),
+          _("Layers and cameras/Lighting"),
+          "res/actions/color24.png",
+          "res/actions/color.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"Lighting\"")

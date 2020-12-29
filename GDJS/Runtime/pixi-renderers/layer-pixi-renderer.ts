@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
-   *
-   * @class LayerPixiRenderer
-   * @memberof gdjs
    */
   export class LayerPixiRenderer {
     _pixiContainer: any;

@@ -85,9 +85,6 @@ namespace gdjs {
    *
    * It contains the texture displayed as well as information like the points position
    * or the collision mask.
-   *
-   * @memberOf gdjs
-   * @class SpriteAnimationFrame
    */
   export class SpriteAnimationFrame {
     image: string;
@@ -196,8 +193,6 @@ namespace gdjs {
   /**
    * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
    *
-   * @class SpriteAnimationDirection
-   * @memberOf gdjs
    * @param imageManager The game image manager
    * @param directionData The direction data used to initialize the direction
    */
@@ -244,8 +239,6 @@ namespace gdjs {
   /**
    * Represents an animation of a {@link SpriteRuntimeObject}.
    *
-   * @class SpriteAnimation
-   * @memberOf gdjs
    * @param imageManager The game image manager
    * @param animData The animation data used to initialize the animation
    */
@@ -290,9 +283,6 @@ namespace gdjs {
   /**
    * The SpriteRuntimeObject represents an object that can display images.
    *
-   * @class SpriteRuntimeObject
-   * @memberOf gdjs
-   * @extends gdjs.RuntimeObject
    * @param runtimeScene The scene the object belongs to
    * @param spriteObjectData The object data used to initialize the object
    */

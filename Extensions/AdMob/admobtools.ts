@@ -1,11 +1,6 @@
 namespace gdjs {
   declare var admob: any;
 
-  /**
-   * @memberof gdjs
-   * @class adMob
-   * @static
-   */
   export namespace adMob {
     // Banner
     export let bannerLoading = false;

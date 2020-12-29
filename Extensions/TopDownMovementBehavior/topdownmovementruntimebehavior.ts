@@ -7,8 +7,6 @@ namespace gdjs {
   /**
    * TopDownMovementRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
-   *
-   * @class TopDownMovementRuntimeBehavior
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:

@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * CocosImageManager loads and stores textures that can be used by the Cocos2D-JS renderers.
-   *
-   * @class CocosImageManager
-   * @memberof gdjs
    */
   export class CocosImageManager {
     _resources: any = {};

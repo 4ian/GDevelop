@@ -3,8 +3,6 @@ declare var MultiStyleText: any;
 namespace gdjs {
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
-   *
-   * @class BBTextRuntimeObjectPixiRenderer
    */
   export class BBTextRuntimeObjectPixiRenderer {
     _object: gdjs.BBTextRuntimeObject;

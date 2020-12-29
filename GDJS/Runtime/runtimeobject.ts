@@ -24,10 +24,6 @@ namespace gdjs {
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
-   *
-   * @memberOf gdjs
-   * @name RuntimeObject
-   * @class
    */
   export class RuntimeObject {
     name: string;

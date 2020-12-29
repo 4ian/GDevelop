@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * A vector used to move objects.
-   *
-   * @memberof gdjs
-   * @class Force
    */
   export class Force {
     _x: float;

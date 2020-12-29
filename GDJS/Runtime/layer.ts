@@ -8,9 +8,6 @@ namespace gdjs {
    * Represents a layer of a scene, used to display objects.
    *
    * Viewports and multiple cameras are not supported.
-   *
-   * @class Layer
-   * @memberof gdjs
    */
   export class Layer {
     _name: string;

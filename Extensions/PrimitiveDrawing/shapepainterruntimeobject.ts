@@ -35,10 +35,6 @@ namespace gdjs {
 
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
-   *
-   * @class ShapePainterRuntimeObject
-   * @extends RuntimeObject
-   * @memberof gdjs
    */
   export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
     _fillColor: integer;

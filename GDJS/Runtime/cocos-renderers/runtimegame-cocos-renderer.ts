@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * The renderer for a gdjs.RuntimeGame using Cocos2D-JS.
-   *
-   * @class RuntimeGameCocosRenderer
-   * @memberof gdjs
    */
   export class RuntimeGameCocosRenderer {
     _directorManager: any;

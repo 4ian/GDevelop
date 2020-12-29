@@ -1,9 +1,6 @@
 namespace gdjs {
   /**
-   * Hold the stack of scenes (gdjs.RuntimeScene) being played.
-   *
-   * @memberof gdjs
-   * @class SceneStack
+   * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
    */
   export class SceneStack {
     _runtimeGame: gdjs.RuntimeGame;

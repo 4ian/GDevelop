@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
-   *
-   * @class RuntimeBehavior
-   * @memberof gdjs
    */
   export class RuntimeBehavior {
     name: string;

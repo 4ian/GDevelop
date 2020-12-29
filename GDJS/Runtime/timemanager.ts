@@ -7,9 +7,6 @@ namespace gdjs {
   /**
    * Manage the timers and times elapsed during last
    * frame, since the beginning of the scene and other time related values.
-   *
-   * @class TimeManager
-   * @memberof gdjs
    */
   export class TimeManager {
     _elapsedTime: float = 0;

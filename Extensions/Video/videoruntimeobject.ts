@@ -23,10 +23,6 @@ namespace gdjs {
    * as a HTMLVideoElement). This means that two objects displaying the same
    * video will have the same state for this video (paused/playing, current time,
    * volume, etc...).
-   *
-   * @memberOf gdjs
-   * @class VideoRuntimeObject
-   * @extends RuntimeObject
    */
   export class VideoRuntimeObject extends gdjs.RuntimeObject {
     _opacity: float;

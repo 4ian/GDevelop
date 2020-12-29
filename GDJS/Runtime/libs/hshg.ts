@@ -73,9 +73,6 @@ namespace gdjs {
 
     /**
      * A hierarchical spatial grid containing objects and allowing fast test collisions between them.
-     *
-     * @class HSHG
-     * @memberof gdjs.HSHG
      */
     class HSHG {
       MAX_OBJECT_CELL_DENSITY: any;
@@ -368,8 +365,6 @@ namespace gdjs {
     /**
      * Grid
      *
-     * @class Grid
-     * @memberof gdjs.HSHG
      * @param cellSize {int} the pixel size of each cell of the grid
      * @param cellCount {int} the total number of cells for the grid (width x height)
      * @param parentHierarchy {HSHG} the HSHG to which this grid belongs
@@ -644,9 +639,6 @@ namespace gdjs {
 
     /**
      * A cell of a grid
-     *
-     * @class Cell
-     * @memberof gdjs.HSHG
      */
     class Cell {
       objectContainer: any = [];

@@ -3,9 +3,6 @@ namespace gdjs {
    * The DummyRuntimeBehavior changes a variable in the object that is owning
    * it, at every tick before events are run, to set it to the string that was
    * set in one of the behavior property.
-   *
-   * @class DummyRuntimeBehavior
-   * @extends gdjs.RuntimeBehavior
    */
   export class DummyRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;

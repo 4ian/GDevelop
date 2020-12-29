@@ -7,9 +7,6 @@ namespace gdjs {
   /**
    * OnceTriggers is used to store the status of the conditions "Trigger once",
    * that are used in events to have conditions that are only valid for one frame in a row.
-   *
-   * @memberof gdjs
-   * @class OnceTriggers
    */
   export class OnceTriggers {
     _onceTriggers: any = {};

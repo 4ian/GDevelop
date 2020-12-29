@@ -1,8 +1,4 @@
 namespace gdjs {
-  /**
-   * @class DummyWithSharedDataRuntimeBehavior
-   * @extends gdjs.RuntimeBehavior
-   */
   export class DummyWithSharedDataRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;
 

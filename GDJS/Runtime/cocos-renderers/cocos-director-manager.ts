@@ -8,9 +8,6 @@ namespace gdjs {
    * Encapsulate the Cocos2D director singleton, and makes sure that
    * Cocos scenes that are pushed/popped from it are done according to the
    * director needs (always a scene living, different call to push the 1st scene).
-   *
-   * @class CocosDirectorManager
-   * @memberof gdjs
    */
   export class CocosDirectorManager {
     _cocosDirector: any;

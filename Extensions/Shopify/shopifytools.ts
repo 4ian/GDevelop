@@ -19,11 +19,6 @@ namespace gdjs {
     }
   }
 
-  /**
-   * @memberof gdjs.evtTools
-   * @class shopify
-   * @static
-   */
   export namespace evtTools {
     export namespace shopify {
       export const buildClient = function (

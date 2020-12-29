@@ -13,9 +13,6 @@ namespace gdjs {
   /**
    * Reload scripts/data of an exported game and applies the changes
    * to the running runtime game.
-   *
-   * @memberof gdjs
-   * @class HotReloader
    */
   export class HotReloader {
     _runtimeGame: gdjs.RuntimeGame;

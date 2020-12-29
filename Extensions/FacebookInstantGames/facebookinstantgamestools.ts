@@ -242,7 +242,6 @@ namespace gdjs {
 
         /**
          * A mocked Leaderboard, part of the mock of FBInstant.
-         * @class MockedLeaderboard
          */
         class MockedLeaderboard {
           _playerScore: any = null;
@@ -279,7 +278,6 @@ namespace gdjs {
 
         /**
          * A mocked RewardedVideo, part of the mock of FBInstant.
-         * @class RewardedVideo
          */
         class MockedRewardedVideo {
           _isLoaded: boolean = false;
@@ -302,7 +300,6 @@ namespace gdjs {
 
         /**
          * A mocked MockedInterstitial, part of the mock of FBInstant.
-         * @class MockedInterstitial
          */
         class MockedInterstitial {
           _isLoaded: boolean = false;

@@ -32,9 +32,6 @@ namespace gdjs {
 
   /**
    * Represents a game being played.
-   *
-   * @memberof gdjs
-   * @class RuntimeGame
    */
   export class RuntimeGame {
     _variables: any;

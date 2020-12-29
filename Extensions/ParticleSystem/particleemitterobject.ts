@@ -49,10 +49,6 @@ namespace gdjs {
 
   /**
    * Displays particles.
-   *
-   * @memberof gdjs
-   * @class ParticleEmitterObject
-   * @extends RuntimeObject
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
     singleAngle: boolean;

@@ -4,10 +4,6 @@ namespace gdjs {
     export type Tweenable = any;
   }
 
-  /**
-   * @memberof gdjs
-   * @class TweenRuntimeBehavior
-   */
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     /** @type Object.<string, TweenRuntimeBehavior.TweenInstance > */
     _tweens: { [key: string]: TweenRuntimeBehavior.TweenInstance } = {};

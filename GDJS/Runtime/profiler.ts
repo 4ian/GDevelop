@@ -1,9 +1,6 @@
 namespace gdjs {
   /**
    * A basic profiling tool that can be used to measure time spent in sections of the engine.
-   * @class Profiler
-   * @see gdjs.RuntimeGame
-   * @memberof gdjs
    */
   export class Profiler {
     _framesMeasures: any = [];

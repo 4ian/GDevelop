@@ -1,6 +1,6 @@
 {
   "tags": {
-    "allowUnknownTags": false
+    "allowUnknownTags": true
   },
   "source": {
     "include": ["./Runtime/"],

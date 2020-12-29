@@ -52,9 +52,7 @@ namespace gdjs {
    * the data of the current game, and receive message to change a field or
    * call a function, specified by a path from the {@link RuntimeGame}.
    *
-   * @memberof gdjs
-   * @class WebsocketDebuggerClient
-   * @param runtimeGame -  The `gdjs.RuntimeGame` to be debugged
+   * @param runtimeGame - The `gdjs.RuntimeGame` to be debugged
    */
   export class WebsocketDebuggerClient implements IDebuggerClient {
     _runtimegame: gdjs.RuntimeGame;

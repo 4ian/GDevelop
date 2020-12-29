@@ -22,9 +22,6 @@ namespace gdjs {
 
   /**
    * Polygon represents a polygon which can be used to create collisions masks for RuntimeObject.
-   *
-   * @memberof gdjs
-   * @class Polygon
    */
   export class Polygon {
     /**

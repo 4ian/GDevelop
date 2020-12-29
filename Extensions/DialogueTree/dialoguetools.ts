@@ -1,11 +1,6 @@
 // @ts-nocheck - Weird usage of `this` in this file. Should be refactored.
 
 namespace gdjs {
-  /**
-   * @memberof gdjs
-   * @class dialogueTree
-   * @static
-   */
   gdjs.dialogueTree = {};
   gdjs.dialogueTree.runner = new bondage.Runner();
 

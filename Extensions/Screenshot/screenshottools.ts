@@ -1,9 +1,4 @@
 namespace gdjs {
-  /**
-   * @memberof gdjs
-   * @class screenshot
-   * @static
-   */
   export namespace screenshot {
     /**
      * Save a screenshot of the game.

@@ -4,13 +4,6 @@
  * This project is released under the MIT License.
  */
 
-// ⚠️ While this file is a TypeScript type definitions file, it's used only
-// for describing a serialized exported project. The game engine itself is still typed
-// using JSDoc style annotations (see https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc).
-
-// ℹ️ See this doc about supported JavaScript features and type checking in the
-// game engine: https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md
-
 /**
  * Contains the data of a serialized exported project.
  */

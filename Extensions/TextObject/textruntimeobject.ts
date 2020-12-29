@@ -32,10 +32,6 @@ namespace gdjs {
 
   /**
    * Displays a text.
-   *
-   * @memberof gdjs
-   * @class TextRuntimeObject
-   * @extends RuntimeObject
    */
   export class TextRuntimeObject extends gdjs.RuntimeObject {
     _characterSize: number;

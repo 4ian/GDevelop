@@ -5,9 +5,6 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 namespace gdjs {
   /**
    * Manages the links between objects.
-   *
-   * @memberof gdjs
-   * @class LinksManager
    */
   export class LinksManager {
     links: any = {};
@@ -76,11 +73,6 @@ namespace gdjs {
     }
   }
 
-  /**
-   * @memberof gdjs.evtTools
-   * @class linkedObjects
-   * @static
-   */
   export namespace evtTools {
     export namespace linkedObjects {
       gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {

@@ -15,10 +15,6 @@ namespace gdjs {
 
   /**
    * The TiledSpriteRuntimeObject displays a tiled texture.
-   *
-   * @class TiledSpriteRuntimeObject
-   * @extends RuntimeObject
-   * @memberof gdjs
    */
   export class TiledSpriteRuntimeObject extends gdjs.RuntimeObject {
     _xOffset: float = 0;

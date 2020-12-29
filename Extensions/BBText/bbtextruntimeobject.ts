@@ -25,9 +25,6 @@ namespace gdjs {
 
   /**
    * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
-   * @memberof gdjs
-   * @class BBTextRuntimeObject
-   * @extends RuntimeObject
    */
   export class BBTextRuntimeObject extends gdjs.RuntimeObject {
     _opacity: float;

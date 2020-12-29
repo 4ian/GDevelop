@@ -1,8 +1,6 @@
 namespace gdjs {
   /**
    * Common tools that can be used for rendering with Cocos2d-JS.
-   * @class CocosTools
-   * @memberof gdjs
    */
   export class CocosTools {
     /**

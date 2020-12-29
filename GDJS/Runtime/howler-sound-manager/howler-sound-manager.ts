@@ -12,10 +12,7 @@ namespace gdjs {
    * * Extra methods `paused`, `stopped`, `getRate`/`setRate` and `canBeDestroyed` methods.
    * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
    *
-   * See https://github.com/goldfire/howler.js#methods for the full documentation.
-   *
-   * @memberof gdjs
-   * @class HowlerSound
+   * See [Howler.js documentation](https://github.com/goldfire/howler.js#methods) for the full documentation.
    */
   export class HowlerSound extends Howl {
     _paused: boolean = false;
@@ -110,9 +107,6 @@ namespace gdjs {
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
-   *
-   * @memberof gdjs
-   * @class HowlerSoundManager
    */
   export class HowlerSoundManager {
     _resources: any;

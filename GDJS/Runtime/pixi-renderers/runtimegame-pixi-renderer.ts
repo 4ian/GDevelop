@@ -1,8 +1,6 @@
 namespace gdjs {
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
-   * @class RuntimeGamePixiRenderer
-   * @memberof gdjs
    */
   export class RuntimeGamePixiRenderer {
     _game: any;

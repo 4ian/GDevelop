@@ -100,9 +100,6 @@ namespace gdjs {
   /**
    * PathfindingObstacleRuntimeBehavior represents a behavior allowing objects to be
    * considered as a obstacle by objects having Pathfinding Behavior.
-   *
-   * @class PathfindingObstacleRuntimeBehavior
-   * @memberof gdjs
    */
   export class PathfindingObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _impassable: boolean;

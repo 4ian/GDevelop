@@ -5,10 +5,6 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
-  /**
-   * @memberof gdjs.sk
-   * @class SharedBone
-   */
   gdjs.sk.SharedBone = function () {
     this.x = 0;
     this.y = 0;
@@ -47,10 +43,6 @@ This project is released under the MIT License.
 
   /**
    * The Bone holds basic transform data in a hierarchy tree.
-   *
-   * @memberof gdjs.sk
-   * @class Bone
-   * @extends gdjs.sk.Transform
    */
   gdjs.sk.Bone = function (armature) {
     gdjs.sk.Transform.call(this);

@@ -5,10 +5,6 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
-  /**
-   * @memberof gdjs.sk
-   * @class SharedAnimation
-   */
   gdjs.sk.SharedAnimation = function () {
     this.fps = 30;
     this.name = '';
@@ -73,9 +69,6 @@ This project is released under the MIT License.
 
   /**
    * The Animation holds information to transform bones and slots through time.
-   *
-   * @memberof gdjs.sk
-   * @class Animation
    */
   gdjs.sk.Animation = function (armature) {
     this.shared = null;

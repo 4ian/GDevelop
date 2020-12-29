@@ -7,9 +7,6 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
-   *
-   * @class PlatformerObjectRuntimeBehavior
-   * @augments {gdjs.RuntimeBehavior}
    */
   export class PlatformerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     // To achieve pixel-perfect precision when positioning object on platform or

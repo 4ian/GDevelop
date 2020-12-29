@@ -4,10 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /**
-   * @memberof gdjs
-   * @class CocosEffect
-   */
   export class CocosEffect {
     _effectId: any;
     _paused: boolean = false;
@@ -67,10 +63,6 @@ namespace gdjs {
 
   //Unsupported
 
-  /**
-   * @memberof gdjs
-   * @class CocosSoundManager
-   */
   export class CocosSoundManager {
     _resources: any;
     _availableResources: any = {};

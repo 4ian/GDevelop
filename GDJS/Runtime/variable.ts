@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * A Variable is an object storing a value (number or a string) or children variables.
-   *
-   * @memberOf gdjs
-   * @class Variable
    */
   export class Variable {
     _value: float = 0;

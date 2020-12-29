@@ -6,9 +6,6 @@
 namespace gdjs {
   /**
    * A scene being played, containing instances of objects rendered on screen.
-   *
-   * @class RuntimeScene
-   * @memberof gdjs
    */
   export class RuntimeScene {
     _eventsFunction: any = null;

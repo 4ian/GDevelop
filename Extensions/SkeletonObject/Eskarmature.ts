@@ -5,10 +5,6 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
-  /**
-   * @memberof gdjs.sk
-   * @class SharedArmature
-   */
   gdjs.sk.SharedArmature = function () {
     this.name = '';
     this.bones = [];
@@ -87,10 +83,6 @@ This project is released under the MIT License.
 
   /**
    * The Armature holds the bones and slots/attachments as well as its animations.
-   *
-   * @memberof gdjs.sk
-   * @class Armature
-   * @extends gdjs.sk.Transform
    */
   gdjs.sk.Armature = function (
     skeleton,

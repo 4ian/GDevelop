@@ -8,8 +8,6 @@ namespace gdjs {
   /**
    * Manage the common objects shared by objects having a
    * physics behavior.
-   * @memberof gdjs
-   * @class PhysicsSharedData
    */
   export class PhysicsSharedData {
     stepped: boolean = false;
@@ -129,8 +127,6 @@ namespace gdjs {
 
   /**
    * Allows objects to be moved in a realistic way thanks to a physics engine (Box2D).
-   *
-   * @class PhysicsRuntimeBehavior
    */
   export class PhysicsRuntimeBehavior extends gdjs.RuntimeBehavior {
     _box2DBody: any = null;

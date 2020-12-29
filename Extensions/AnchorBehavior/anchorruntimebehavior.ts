@@ -4,9 +4,6 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
-  /**
-   * @class AnchorRuntimeBehavior
-   */
   export class AnchorRuntimeBehavior extends gdjs.RuntimeBehavior {
     _relativeToOriginalWindowSize: any;
     _leftEdgeAnchor: any;

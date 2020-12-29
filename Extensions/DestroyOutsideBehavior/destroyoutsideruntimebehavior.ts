@@ -7,8 +7,6 @@ namespace gdjs {
   /**
    * The DestroyOutsideRuntimeBehavior represents a behavior allowing objects to be
    * moved using the mouse.
-   *
-   * @class DestroyOutsideRuntimeBehavior
    */
   export class DestroyOutsideRuntimeBehavior extends gdjs.RuntimeBehavior {
     _extraBorder: any;

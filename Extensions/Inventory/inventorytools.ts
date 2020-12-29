@@ -13,11 +13,6 @@ namespace gdjs {
     }
   }
 
-  /**
-   * @memberof gdjs.evtTools
-   * @class inventory
-   * @static
-   */
   export namespace evtTools {
     export namespace inventory {
       export const add = function (runtimeScene, inventoryName, name) {

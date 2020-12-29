@@ -17,9 +17,6 @@ namespace gdjs {
 
   /**
    * Displays a Light object.
-   * @memberof gdjs
-   * @class LightRuntimeObject
-   * @extends RuntimeObject
    */
   export class LightRuntimeObject extends gdjs.RuntimeObject {
     _radius: number;

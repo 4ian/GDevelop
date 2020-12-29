@@ -1,9 +1,4 @@
 namespace gdjs {
-  /**
-   * @memberof gdjs
-   * @class deviceVibration
-   * @static
-   */
   export namespace deviceVibration {
     /**
      * Vibrate the mobile device.

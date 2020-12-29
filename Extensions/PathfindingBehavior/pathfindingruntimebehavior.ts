@@ -7,9 +7,6 @@ namespace gdjs {
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
-   *
-   * @class PathfindingRuntimeBehavior
-   * @memberof gdjs
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: any = [];

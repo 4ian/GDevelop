@@ -5,10 +5,6 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
-  /**
-   * @memberof gdjs.sk
-   * @class SharedSlot
-   */
   gdjs.sk.SharedSlot = function () {
     // Transform
     this.x = 0;
@@ -181,10 +177,6 @@ This project is released under the MIT License.
 
   /**
    * The Slot display images transformed by animations itself and bones.
-   *
-   * @memberof gdjs.sk
-   * @class Slot
-   * @extends gdjs.sk.Transform
    */
   gdjs.sk.Slot = function (armature) {
     gdjs.sk.Transform.call(this);

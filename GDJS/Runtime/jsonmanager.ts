@@ -23,9 +23,6 @@ namespace gdjs {
    * Contrary to audio/fonts, json files are loaded asynchronously, when requested.
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
-   *
-   * @class JsonManager
-   * @memberof gdjs
    */
   export class JsonManager {
     _resources: any;

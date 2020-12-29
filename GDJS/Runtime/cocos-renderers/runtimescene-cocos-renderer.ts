@@ -6,8 +6,6 @@
 namespace gdjs {
   /**
    * Renderer for a gdjs.RuntimeScene with Cocos2d-JS.
-   * @memberof gdjs
-   * @class RuntimeSceneCocosRenderer
    */
   export class RuntimeSceneCocosRenderer {
     _runtimeScene: gdjs.RuntimeScene;

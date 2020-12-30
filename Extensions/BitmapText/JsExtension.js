@@ -478,6 +478,7 @@ module.exports = {
       // font (see `update` method) so we go ahead with some defaults:
       this._bitmapFontStyle = new PIXI.TextStyle();
       this._bitmapFontStyle.fontFamily = 'Arial';
+      this._bitmapFontStyle.fontName = '';
       this._bitmapFontStyle.fontSize = 20;
       this._bitmapFontStyle.wordWrap = false;
       this._bitmapFontStyle.fill = '#ffffff';
@@ -486,10 +487,23 @@ module.exports = {
       this._currentBitmapFontFile = '';
       this._currentBitmapTextureFile = '';
 
-      const fontName = this._ensureFontAvailableAndGetFontName();
-      this._pixiObject = new PIXI.BitmapText('', {
-        fontName,
+     // this._pixiObject = new PIXI.BitmapText('',this._bitmapFontStyle);
+
+      this._ensureFontAvailableAndGetFontName().then(
+        (fontName) => {
+          this._bitmapFontStyle.fontName = fontName;
+        },
+        (error) => {
+          console.warn(
+            'There was an issue loading the bitmap font for a BitmapText object, instead a bitmap font was generated with Arial font.' + error
+          );
+        }
+      );
+
+      this._pixiObject = new PIXI.BitmapText('BitmapText initialization...', {
+        fontName: this._bitmapFontStyle.fontName,
       });
+
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -561,7 +575,6 @@ module.exports = {
           PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
             chars: [
               [' ', '~'], // All the printable ASCII characters
-              this._bitmapFontStyle.specialChars,
             ],
           });
 
@@ -642,7 +655,16 @@ module.exports = {
 
       // Assign the font name (that will change if fontFamily, fontSize or color were
       // changed).
-      this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName();
+      this._ensureFontAvailableAndGetFontName().then(
+        (fontName) => {
+          this._pixiObject.fontName = fontName;
+        },
+        () => {
+          console.warn(
+            'There was an issue loading the bitmap font for a BitmapText object, instead a bitmap font was generated with Arial font.'
+          );
+        }
+      );
 
       // Note: use `textWidth` as `width` seems unreliable.
       this._pixiObject.position.x =

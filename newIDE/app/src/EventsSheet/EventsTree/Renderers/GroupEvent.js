@@ -16,6 +16,7 @@ import {
   shouldCloseOrCancel,
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -121,7 +122,11 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             })}
             style={{ ...styles.title, color: textColor }}
           >
-            {groupEvent.getName() || '<Enter group name>'}
+            {groupEvent.getName() ? (
+              groupEvent.getName()
+            ) : (
+              <Trans>{`<Enter group name>`}</Trans>
+            )}
           </span>
         )}
       </div>

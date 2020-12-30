@@ -104,7 +104,7 @@ export default class ForEachEvent extends React.Component<
             tabIndex={0}
           >
             {objectName ? (
-              <Trans>{`Repeat for each instance of ${objectName}:`}</Trans>
+              <Trans>Repeat for each instance of {objectName}:</Trans>
             ) : (
               <i>
                 <Trans>

@@ -188,9 +188,11 @@ export default class JsCodeEvent extends React.Component<
         style={textStyle}
       >
         {parameterObjects ? (
-          <Trans>{`, objects /*${parameterObjects}*/`}</Trans>
+          <Trans>, objects /*{parameterObjects}*/</Trans>
         ) : (
-          <Trans>{`\u00A0/* Click here to choose objects to pass to JavaScript */`}</Trans>
+          <>{' '}
+          <Trans>/* Click here to choose objects to pass to JavaScript */</Trans>
+          </>
         )}
       </span>
     );

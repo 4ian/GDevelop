@@ -105,7 +105,7 @@ export default class RepeatEvent extends React.Component<
             tabIndex={0}
           >
             {expression ? (
-              <Trans>{`Repeat ${expression} times:`}</Trans>
+              <Trans>Repeat {expression} times:</Trans>
             ) : (
               <i>
                 <Trans>Click to choose how many times will be repeated</Trans>

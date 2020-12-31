@@ -193,7 +193,7 @@ export default class JsCodeEvent extends React.Component<
           <>
             {' '}
             <Trans>
-              /* Click here to choose objects to pass to JavaScript */
+              {'/* Click here to choose objects to pass to JavaScript */'}
             </Trans>
           </>
         )}

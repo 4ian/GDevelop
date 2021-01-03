@@ -1677,7 +1677,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       _showSnackMessage,
       getStorageProvider,
-      preferences
+      preferences,
     ]
   );
 

@@ -225,7 +225,10 @@ export default class PixiResourcesLoader {
   /**
    * Get the the data from a json resource in the IDE.
    */
-  static getResourceJsonData(project: gdProject, resourceName: string): Promise<any> {
+  static getResourceJsonData(
+    project: gdProject,
+    resourceName: string
+  ): Promise<any> {
     if (!project.getResourcesManager().hasResource(resourceName))
       return Promise.reject(
         new Error(`Can't find resource called ${resourceName}.`)

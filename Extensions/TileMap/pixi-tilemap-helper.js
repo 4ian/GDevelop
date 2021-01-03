@@ -205,9 +205,11 @@
             const tileUid = layerData[tileSlotIndex];
 
             if (tileUid !== 0 && tileSet.textureCache[tileUid]) {
-              const tileData = tileSet.tiles.find(function (tile) {
-                return tile.id === tileUid - 1;
-              });
+              const tileData =
+                tileSet.tiles &&
+                tileSet.tiles.find(function (tile) {
+                  return tile.id === tileUid - 1;
+                });
 
               // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
               if (tileData && tileData.animation) {

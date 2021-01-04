@@ -170,7 +170,7 @@ export default class VariablesList extends React.Component<Props, State> {
         variable.setBool(newValue);
         break;
       default:
-        console.error("Cannot set variable with type ", variable.getType())
+        console.error('Cannot set variable with type ', variable.getType());
     }
   };
 

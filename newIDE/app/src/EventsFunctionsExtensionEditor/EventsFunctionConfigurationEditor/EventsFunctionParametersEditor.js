@@ -39,8 +39,19 @@ type Props = {|
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
-  makeMoveFreeEventsParameter?: boolean,
-  makeMoveBehaviorEventsParameter?: boolean,
+  onMoveFreeEventsParameter?: (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: () => void
+  ) => void,
+  onMoveBehaviorEventsParameter?: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
 |};
 
 type State = {|
@@ -193,12 +204,35 @@ export default class EventsFunctionParametersEditor extends React.Component<
   };
 
   _moveParameters = (oldIndex: number, newIndex: number) => {
-    const { eventsFunction } = this.props;
+    const { eventsFunction, eventsBasedBehavior } = this.props;
     const parameters = eventsFunction.getParameters();
 
-    gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
-    this.forceUpdate();
-    this.props.onParametersUpdated();
+    if (eventsBasedBehavior) {
+      this.props.onMoveBehaviorEventsParameter(
+        eventsBasedBehavior,
+        eventsFunction,
+        oldIndex,
+        newIndex,
+        isDone => {
+          if (!isDone) return;
+          gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+          this.forceUpdate();
+          this.props.onParametersUpdated();
+        }
+      );
+    } else {
+      this.props.onMoveFreeEventsParameter(
+        eventsFunction,
+        oldIndex,
+        newIndex,
+        isDone => {
+          if (!isDone) return;
+          gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+          this.forceUpdate();
+          this.props.onParametersUpdated();
+        }
+      );
+    }
   };
 
   render() {

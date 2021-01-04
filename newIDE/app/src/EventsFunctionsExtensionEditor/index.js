@@ -619,36 +619,49 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         title: t`Function Configuration`,
         toolbarControls: [],
         renderEditor: () => (
-          <Background>
-            {selectedEventsFunction &&
-            this._globalObjectsContainer &&
-            this._objectsContainer ? (
-              <EventsFunctionConfigurationEditor
-                project={project}
-                eventsFunction={selectedEventsFunction}
-                eventsBasedBehavior={selectedEventsBasedBehavior}
-                globalObjectsContainer={this._globalObjectsContainer}
-                objectsContainer={this._objectsContainer}
-                helpPagePath={
-                  !!selectedEventsBasedBehavior
-                    ? '/behaviors/events-based-behaviors'
-                    : '/events/functions'
-                }
-                onParametersOrGroupsUpdated={() => {
-                  this._loadEventsFunctionFrom(project, selectedEventsFunction);
-                  this.forceUpdate();
-                }}
-                unsavedChanges={this.props.unsavedChanges}
-              />
-            ) : (
-              <EmptyMessage>
-                <Trans>
-                  Choose a function, or a function of a behavior, to set the
-                  parameters that it accepts.
-                </Trans>
-              </EmptyMessage>
+          <I18n>
+            {({ i18n }) => (
+              <Background>
+                {selectedEventsFunction &&
+                this._globalObjectsContainer &&
+                this._objectsContainer ? (
+                  <EventsFunctionConfigurationEditor
+                    project={project}
+                    eventsFunction={selectedEventsFunction}
+                    eventsBasedBehavior={selectedEventsBasedBehavior}
+                    globalObjectsContainer={this._globalObjectsContainer}
+                    objectsContainer={this._objectsContainer}
+                    helpPagePath={
+                      !!selectedEventsBasedBehavior
+                        ? '/behaviors/events-based-behaviors'
+                        : '/events/functions'
+                    }
+                    onParametersOrGroupsUpdated={() => {
+                      this._loadEventsFunctionFrom(
+                        project,
+                        selectedEventsFunction
+                      );
+                      this.forceUpdate();
+                    }}
+                    onMoveFreeEventsParameter={this._makeMoveFreeEventsParameter(
+                      i18n
+                    )}
+                    onMoveBehaviorEventsParameter={this._makeMoveBehaviorEventsParameter(
+                      i18n
+                    )}
+                    unsavedChanges={this.props.unsavedChanges}
+                  />
+                ) : (
+                  <EmptyMessage>
+                    <Trans>
+                      Choose a function, or a function of a behavior, to set the
+                      parameters that it accepts.
+                    </Trans>
+                  </EmptyMessage>
+                )}
+              </Background>
             )}
-          </Background>
+          </I18n>
         ),
       },
       'events-sheet': {

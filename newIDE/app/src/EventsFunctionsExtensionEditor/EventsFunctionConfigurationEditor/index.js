@@ -27,8 +27,19 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
-  makeMoveFreeEventsParameter?: boolean,
-  makeMoveBehaviorEventsParameter?: boolean,
+  onMoveFreeEventsParameter?: (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveBehaviorEventsParameter?: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -148,8 +159,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       freezeParameters,
       helpPagePath,
       renderConfigurationHeader,
-      makeMoveFreeEventsParameter,
-      makeMoveBehaviorEventsParameter,
+      onMoveFreeEventsParameter,
+      onMoveBehaviorEventsParameter,
     } = this.props;
 
     return (
@@ -192,8 +203,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}
-                makeMoveBehaviorEventsParameter={makeMoveBehaviorEventsParameter}
-                makeMoveFreeEventsParameter={makeMoveFreeEventsParameter}
+                onMoveFreeEventsParameter={onMoveFreeEventsParameter}
+                onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
               />
             </Line>
           </ScrollView>

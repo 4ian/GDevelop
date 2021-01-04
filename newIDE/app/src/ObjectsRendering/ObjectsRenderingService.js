@@ -15,8 +15,12 @@ import * as PIXI from 'pixi.js-legacy';
 import optionalRequire from '../Utils/OptionalRequire';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
-global.PIXI = PIXI;
 const gd: libGDevelop = global.gd;
+
+// Some PixiJS plugins like pixi-tilemap are not distributed as UMD modules,
+// or still require a global PIXI object to be accessible, so we expose PIXI here.
+// This can be removed if no more extension PixiJS plugin requires this.
+global.PIXI = PIXI;
 
 const requirableModules = {};
 

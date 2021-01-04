@@ -39,6 +39,8 @@ type Props = {|
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
+  makeMoveFreeEventsParameter?: boolean,
+  makeMoveBehaviorEventsParameter?: boolean,
 |};
 
 type State = {|

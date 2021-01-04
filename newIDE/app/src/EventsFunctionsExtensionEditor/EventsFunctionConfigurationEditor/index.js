@@ -27,8 +27,8 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
-  makeMoveFreeEventsParameter?: any, //idk which type use so i set any by default
-  makeMoveBehaviorEventsParameter?: any,
+  makeMoveFreeEventsParameter?: boolean,
+  makeMoveBehaviorEventsParameter?: boolean,
   unsavedChanges?: ?UnsavedChanges,
 |};
 

@@ -48,7 +48,7 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
   tilesetJsonData
 ) {
   // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-  const tileset = PixiTileMapHelper.getPIXITileSet(
+  const pixiTileMapData = PixiTileMapHelper.loadPixiTileMapData(
     (textureName) =>
       this._runtimeScene
         .getGame()
@@ -63,11 +63,11 @@ gdjs.TileMapRuntimeObjectPixiRenderer.prototype._loadTileMapWithTileset = functi
     this._object._tilesetJsonFile
   );
 
-  if (tileset) {
+  if (pixiTileMapData) {
     // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-    PixiTileMapHelper.updatePIXITileMap(
+    PixiTileMapHelper.updatePixiTileMap(
       this._pixiObject,
-      tileset,
+      pixiTileMapData,
       this._object._displayMode,
       this._object._layerIndex,
       // @ts-ignore - TODO: Add typings for pako.

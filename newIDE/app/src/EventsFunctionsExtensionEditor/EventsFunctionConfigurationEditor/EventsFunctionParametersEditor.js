@@ -385,11 +385,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 />
                                 <SelectOption
                                   value="yesorno"
-                                  primaryText={t`Yes or No (number)`}
+                                  primaryText={t`Yes or No (boolean)`}
                                 />
                                 <SelectOption
                                   value="trueorfalse"
-                                  primaryText={t`True or False (text)`}
+                                  primaryText={t`True or False (boolean)`}
                                 />
                               </SelectField>
                             )}

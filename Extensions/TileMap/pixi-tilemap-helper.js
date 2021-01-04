@@ -49,7 +49,7 @@
     height: number,
     tileWidth: number,
     tileHeight: number,
-    texture: PIXI.BaseTexture,
+    atlasTexture: PIXI.BaseTexture,
     textureCache: Array<PIXI.Texture>,
     layers: Array<TiledDataLayer>,
     tiles: Array<TiledDataTile>,
@@ -151,7 +151,7 @@
       height: atlasTexture.height,
       tileWidth: tilewidth,
       tileHeight: tileheight,
-      texture: atlasTexture,
+      atlasTexture: atlasTexture,
       textureCache: textureCache,
       layers: tiledData.layers,
       tiles: tiles,
@@ -337,12 +337,12 @@
       return loadedGenericPixiTileMapData[requestedTileMapDataId];
     }
 
-    const texture = atlasImageResourceName
+    const atlasTexture = atlasImageResourceName
       ? getTexture(atlasImageResourceName)
       : null;
     const genericPixiTileMapData = parseTiledData(
       tiledData,
-      texture,
+      atlasTexture,
       getTexture
     );
 

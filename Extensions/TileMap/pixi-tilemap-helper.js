@@ -11,31 +11,81 @@
   }
 })(typeof self !== 'undefined' ? self : this, function (exports) {
   /**
-   * The Tilesets that are ready to be used, indexed by their id.
+   * Information about one or more tiles. Loosely based on
+   * https://doc.mapeditor.org/en/stable/reference/json-map-format/#tile-definition.
+   *
+   * @typedef {{
+    "id": number,
+    "terrain"?: Array<number>,
+    "animation"?: Array<{duration: number, tileid: number}>
+   }} TiledDataTile
    */
-  const loadedTileSets = {};
 
   /**
-   * Creates a Tileset resource from a tiledData json file exported from https://www.mapeditor.org/.
-   * Later on this can potentially be refactored to support other data structures (LED editor for example) https://github.com/deepnight/led
+   * Information about a layer. Loosely based on
+   * https://doc.mapeditor.org/en/stable/reference/json-map-format/#layer.
+   *
+   * @typedef {{
+    "compression"?:"zlib" | "gzip" | "zstd",
+    "data":Array<number> | string,
+    "encoding"?:"base64",
+    "height":number,
+    "id":number,
+    "name": string,
+    "opacity": number,
+    "type": string,
+    "visible":boolean,
+    "width":number,
+    "objects": Array<{ gid: number, x: number, y: number, visible: boolean }>
+   }} TiledDataLayer
    */
-  const createTileSetResource = (
-    tiledData,
-    tex,
-    getTexture,
-    tilemapResourceName
-  ) => {
+
+  /**
+   * Data to render a tile map. Loosely based on the merge of a Tiled
+   * map and tileset.
+   *
+   * @typedef {{
+    width: number,
+    height: number,
+    tileWidth: number,
+    tileHeight: number,
+    texture: PIXI.BaseTexture,
+    textureCache: Array<PIXI.Texture>,
+    layers: Array<TiledDataLayer>,
+    tiles: Array<TiledDataTile>,
+   }} GenericPixiTileMapData
+   */
+
+  /**
+   * The Tilesets that are ready to be used
+   * with Pixi Tilemap, indexed by their id.
+   * @type {Object<string, GenericPixiTileMapData>}
+   */
+  const loadedGenericPixiTileMapData = {};
+
+  /**
+   * Parse a Tiled map JSON file,
+   * exported from Tiled (https://www.mapeditor.org/)
+   * into a generic tile map data (`GenericPixiTileMapData`).
+   *
+   * @param {Object} tiledData A JS object representing a map exported from Tiled.
+   * @param {PIXI.BaseTexture} atlasTexture
+   * @param {(textureName: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
+   * @returns {GenericPixiTileMapData}
+   */
+  const parseTiledData = (tiledData, atlasTexture, getTexture) => {
     if (!tiledData.tiledversion) {
       console.warn(
-        "The json data doesn't contain a tiledversion key. Are you sure this file has been exported from Tiled Map Editor (mapeditor.org)?"
+        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
-      return null; // TODO handle detecting and loading LDtk tilesets/maps
+
+      return null;
     }
 
-    // We only handle tileset embedded in the tilemap. Warn if it's not the case
+    // We only handle tileset embedded in the tilemap. Warn if it's not the case.
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(
-        `${tilemapResourceName} seems not to contain any tileset data. Have you saved it in a separate Json file?`
+        "The loaded Tiled map seems not to contain any tileset data (nothing in 'tilesets' key)."
       );
       return null;
     }
@@ -50,20 +100,26 @@
       spacing,
       margin,
     } = tiledData.tilesets[0];
-    if (!tex) tex = getTexture(image);
+    if (!atlasTexture) atlasTexture = getTexture(image);
 
+    // We try to detect what size Tiled is expecting.
     const rows = tilecount / columns;
-    // We try to detect what size tiled is expecting and if the texture is not the right size, dont load it
     const expectedAtlasWidth =
       tilewidth * columns + spacing * (columns - 1) + margin * 2;
     const expectedAtlasHeight =
       tileheight * rows + spacing * (rows - 1) + margin * 2;
     if (
-      (tex.width !== 1 && expectedAtlasWidth !== tex.width) ||
-      (tex.height !== 1 && expectedAtlasHeight !== tex.height)
+      (atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
+      (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)
     ) {
+      const expectedSize = expectedAtlasWidth + 'x' + expectedAtlasHeight;
+      const actualSize = atlasTexture.width + 'x' + atlasTexture.height;
       console.warn(
-        `It seems the atlas file was resized, which is not supported. It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, but it's ${tex.width}x${tex.height} px.`
+        'It seems the atlas file was resized, which is not supported. It should be ' +
+          expectedSize +
+          "px, but it's " +
+          actualSize +
+          ' px.'
       );
       return null;
     }
@@ -76,7 +132,7 @@
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-        const texture = new PIXI.Texture(tex, rect);
+        const texture = new PIXI.Texture(atlasTexture, rect);
         texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
         return texture;
@@ -89,20 +145,18 @@
       }
     });
 
-    const newTileset = {
-      width: tex.width,
-      height: tex.height,
+    /** @type {GenericPixiTileMapData} */
+    const tileMapData = {
+      width: atlasTexture.width,
+      height: atlasTexture.height,
       tileWidth: tilewidth,
       tileHeight: tileheight,
-      texture: tex,
+      texture: atlasTexture,
       textureCache: textureCache,
       layers: tiledData.layers,
       tiles: tiles,
-      tilecount: tilecount,
-      margin: margin,
-      spacing: spacing,
     };
-    return newTileset;
+    return tileMapData;
   };
 
   /**
@@ -140,6 +194,11 @@
           decodedData.push(decodeArray(step1, index - 4));
           index += 4;
         }
+      } else if (compression === 'zstd') {
+        console.error(
+          'Zstandard compression is not supported for layers in a Tilemap. Use instead zlib compression or no compression.'
+        );
+        return null;
       } else {
         while (index <= step1.length) {
           decodedData.push(decodeString(step1, index - 4));
@@ -158,31 +217,37 @@
 
   /**
    * Re-renders the tilemap whenever its rendering settings have been changed
+   *
+   * @param {any} pixiTileMap
+   * @param {GenericPixiTileMapData} genericTileMapData
+   * @param {'index' | 'visible' | 'all'} displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
+   * @param {number} layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
+   * @param {any} pako The Pako library object, to decompress the layer data.
    */
-  exports.updatePIXITileMap = (
-    tileMap,
-    tileSet,
+  exports.updatePixiTileMap = (
+    pixiTileMap,
+    genericTileMapData,
     displayMode,
     layerIndex,
     pako
   ) => {
-    if (!tileMap || !tileSet) return;
-    tileMap.clear();
+    if (!pixiTileMap || !genericTileMapData) return;
+    pixiTileMap.clear();
 
-    tileSet.layers.forEach(function (layer, index) {
+    genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
-      // TODO add support for filtering a specific tiled object group by its name
+      // TODO: add support for filtering a specific tiled object group by its name.
       if (layer.type === 'objectgroup') {
         layer.objects.forEach(function (object) {
           const { gid, x, y, visible } = object;
           if (displayMode === 'visible' && !visible) return;
-          if (tileSet.textureCache[gid]) {
-            tileMap.addFrame(
-              tileSet.textureCache[gid],
+          if (genericTileMapData.textureCache[gid]) {
+            pixiTileMap.addFrame(
+              genericTileMapData.textureCache[gid],
               x,
-              y - tileSet.tileHeight
+              y - genericTileMapData.tileHeight
             );
           }
         });
@@ -196,29 +261,42 @@
             console.warn('Failed to uncompress layer.data');
             return;
           }
-          layerData.encoding = 'csv';
         }
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
-            const xPos = tileSet.tileWidth * j;
-            const yPos = tileSet.tileHeight * i;
+            const xPos = genericTileMapData.tileWidth * j;
+            const yPos = genericTileMapData.tileHeight * i;
+
+            /** @type {number} */
+            // @ts-ignore
             const tileUid = layerData[tileSlotIndex];
 
-            if (tileUid !== 0 && tileSet.textureCache[tileUid]) {
+            if (tileUid !== 0 && genericTileMapData.textureCache[tileUid]) {
               const tileData =
-                tileSet.tiles &&
-                tileSet.tiles.find(function (tile) {
+                genericTileMapData.tiles &&
+                genericTileMapData.tiles.find(function (tile) {
                   return tile.id === tileUid - 1;
                 });
 
               // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
               if (tileData && tileData.animation) {
-                tileMap
-                  .addFrame(tileSet.textureCache[tileUid], xPos, yPos)
-                  .tileAnimX(tileSet.tileWidth, tileData.animation.length);
+                pixiTileMap
+                  .addFrame(
+                    genericTileMapData.textureCache[tileUid],
+                    xPos,
+                    yPos
+                  )
+                  .tileAnimX(
+                    genericTileMapData.tileWidth,
+                    tileData.animation.length
+                  );
               } else {
                 // Non animated props dont require tileAnimX or Y
-                tileMap.addFrame(tileSet.textureCache[tileUid], xPos, yPos);
+                pixiTileMap.addFrame(
+                  genericTileMapData.textureCache[tileUid],
+                  xPos,
+                  yPos
+                );
               }
             }
             tileSlotIndex += 1;
@@ -228,42 +306,50 @@
     });
   };
 
-  exports.getLoadedTileSets = () => {
-    return loadedTileSets;
-  };
-
   /**
-   * If a Tileset changes (json or image), a tilemap using it needs to re-render.
-   * The tileset needs to be rebuilt for use.
-   * But we need to have the capacity to instance a tilemap, so more than one tilemap with different tileset layers
-   * We need to cache the tileset somewhere, the tilemap instance will have to re-render it
-   * Tileset changes => rerender it => tilemaps using it rerender too (keeping their layer visibility option)
-   * tileset id == tilemapResourceName + imageResourcename
+   * Load the given data, exported from Tiled, into a generic tilemap data (`GenericPixiTileMapData`),
+   * which can then be used to update a PIXI.Tilemap (see `updatePixiTileMap`).
+   *
+   * Later on, this could potentially be refactored to support other data structures
+   * (LDtk, for example: https://github.com/deepnight/ldtk).
+   *
+   * @param {(textureName: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
+   * @param {Object} tiledData A JS object representing a map exported from Tiled.
+   * @param {string} atlasImageResourceName The name of the resource to pass to `getTexture` to load the atlas.
+   * @param {string} tilemapResourceName The name of the tilemap resource - used to index internally the loaded tilemap data.
+   * @param {string} tilesetResourceName The name of the tileset resource - used to index internally the loaded tilemap data.
+   * @returns {GenericPixiTileMapData}
    */
-  exports.getPIXITileSet = (
+  exports.loadPixiTileMapData = (
     getTexture,
     tiledData,
-    imageResourceName,
+    atlasImageResourceName,
     tilemapResourceName,
     tilesetResourceName
   ) => {
-    const requestedTileSetId =
-      (tilesetResourceName || tilemapResourceName) + '@' + imageResourceName;
+    const requestedTileMapDataId =
+      (tilesetResourceName || tilemapResourceName) +
+      '@' +
+      atlasImageResourceName;
 
-    // If the tileset is already in the cache, just load it
-    if (loadedTileSets[requestedTileSetId]) {
-      return loadedTileSets[requestedTileSetId];
+    // If the tilemap data is already in the cache, use it directly.
+    if (loadedGenericPixiTileMapData[requestedTileMapDataId]) {
+      return loadedGenericPixiTileMapData[requestedTileMapDataId];
     }
 
-    const texture = imageResourceName ? getTexture(imageResourceName) : null; // we do this because gdevelop doesnt return a null when it fails to load textures
-    const tileset = createTileSetResource(
+    const texture = atlasImageResourceName
+      ? getTexture(atlasImageResourceName)
+      : null;
+    const genericPixiTileMapData = parseTiledData(
       tiledData,
       texture,
-      getTexture,
-      tilemapResourceName
+      getTexture
     );
 
-    if (tileset) loadedTileSets[requestedTileSetId] = tileset;
-    return tileset;
+    if (genericPixiTileMapData)
+      loadedGenericPixiTileMapData[
+        requestedTileMapDataId
+      ] = genericPixiTileMapData;
+    return genericPixiTileMapData;
   };
 });

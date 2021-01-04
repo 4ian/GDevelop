@@ -11,15 +11,14 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "64754fbc-09c9-47f3-8b99-cc8c37e796c6",
+    "projectUuid": "df096f61-187a-4157-bac2-18c97e542682",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
-    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Project",
     "author": "",
-    "windowWidth": 800,
+    "windowWidth": 1200,
     "windowHeight": 600,
     "latestCompilationDirectory": "",
     "maxFPS": 60,
@@ -189,18 +188,18 @@
   "variables": [],
   "layouts": [
     {
-      "b": 209,
+      "b": 0,
       "disableInputWhenNotFocused": true,
       "mangledName": "New_32scene",
       "name": "New scene",
       "oglFOV": 90,
       "oglZFar": 500,
       "oglZNear": 1,
-      "r": 209,
+      "r": 0,
       "standardSortMethod": true,
       "stopSoundsOnStartup": true,
       "title": "",
-      "v": 209,
+      "v": 0,
       "uiSettings": {
         "grid": false,
         "gridB": 255,
@@ -212,7 +211,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.712
+        "zoomFactor": 0.2224
       },
       "objectsGroups": [],
       "variables": [
@@ -227,32 +226,16 @@
       ],
       "instances": [
         {
-          "angle": -5.07961,
-          "customSize": true,
-          "height": 211,
-          "layer": "",
-          "locked": false,
-          "name": "islandMap2",
-          "persistentUuid": "71cce901-879e-49f9-b750-854dc3339be0",
-          "width": 302,
-          "x": -50,
-          "y": 400,
-          "zOrder": 25,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 495,
           "layer": "",
           "locked": false,
-          "name": "islandMap",
+          "name": "IslandMap",
           "persistentUuid": "d2e2b20c-2a0a-48c1-97d5-fb1abe0a8f97",
-          "width": 0,
-          "x": 0,
-          "y": -96,
+          "width": 594,
+          "x": 2,
+          "y": 3,
           "zOrder": 3,
           "numberProperties": [],
           "stringProperties": [],
@@ -260,13 +243,13 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 72,
           "layer": "",
           "locked": false,
           "name": "About",
           "persistentUuid": "25fdc84c-b235-4194-8dc5-7e543bb0e175",
-          "width": 0,
+          "width": 466,
           "x": 7,
           "y": 8,
           "zOrder": 7,
@@ -277,14 +260,14 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 17,
+          "height": 39,
           "layer": "",
           "locked": false,
           "name": "about2",
           "persistentUuid": "db9126ab-f712-4eef-aa6e-4fad7fc69491",
           "width": 236,
-          "x": 7,
-          "y": 557,
+          "x": 15,
+          "y": 517,
           "zOrder": 31,
           "numberProperties": [],
           "stringProperties": [],
@@ -299,8 +282,8 @@
           "name": "animationsNote",
           "persistentUuid": "fda89498-be2e-4f5b-aa56-aa18cd5ef1ef",
           "width": 0,
-          "x": 531,
-          "y": 388,
+          "x": 644,
+          "y": 107,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -308,15 +291,15 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 28,
           "layer": "",
           "locked": false,
           "name": "about3",
           "persistentUuid": "20f3edb8-1e56-4f82-917e-b5c89ff92600",
-          "width": 0,
-          "x": 317,
-          "y": 370,
+          "width": 528,
+          "x": 650,
+          "y": 14,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
@@ -328,27 +311,11 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "animationNote2",
-          "persistentUuid": "4c21a4c1-01a9-4630-873f-4aa3639dc90c",
-          "width": 0,
-          "x": 263,
-          "y": 419,
-          "zOrder": 11,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "DesertExample",
+          "name": "DesertAtlas",
           "persistentUuid": "f1edccc1-bffb-4a95-8721-fc254b2d141a",
           "width": 0,
-          "x": -353,
-          "y": 513,
+          "x": -647,
+          "y": 608,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
@@ -360,11 +327,11 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "atlasVikings",
+          "name": "VikingsAtlas",
           "persistentUuid": "ff9ddb9e-95d9-42b5-98fe-ece2864002ed",
           "width": 0,
-          "x": -535,
-          "y": -546,
+          "x": -741,
+          "y": -517,
           "zOrder": 15,
           "numberProperties": [],
           "stringProperties": [],
@@ -379,8 +346,8 @@
           "name": "about5",
           "persistentUuid": "c5469dec-5bc8-48a6-97a4-110ae0f0ae50",
           "width": 427,
-          "x": 265,
-          "y": 491,
+          "x": 651,
+          "y": 175,
           "zOrder": 21,
           "numberProperties": [],
           "stringProperties": [],
@@ -388,16 +355,48 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 536,
           "layer": "",
           "locked": false,
           "name": "tilesetWithSpacingAndCompressedLayedData",
           "persistentUuid": "e3734856-68e3-484f-b968-8128cb251878",
-          "width": 0,
-          "x": -55,
-          "y": 463,
+          "width": 536,
+          "x": 657,
+          "y": 288,
           "zOrder": 19,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -26.2278,
+          "customSize": true,
+          "height": 181,
+          "layer": "",
+          "locked": false,
+          "name": "AnotherIslandMap",
+          "persistentUuid": "e6a44cbe-5e05-4d15-b0bd-220c1bcd4a02",
+          "width": 259,
+          "x": 329,
+          "y": 456,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 79,
+          "layer": "",
+          "locked": false,
+          "name": "AboutAtlas",
+          "persistentUuid": "1bb2e6b3-e1a9-4abd-882c-3ffac1c660c9",
+          "width": 1209,
+          "x": -743,
+          "y": -830,
+          "zOrder": 101,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -405,7 +404,7 @@
       ],
       "objects": [
         {
-          "name": "islandMap2",
+          "name": "AnotherIslandMap",
           "tags": "",
           "type": "TileMap::TileMap",
           "variables": [],
@@ -420,7 +419,7 @@
           }
         },
         {
-          "name": "islandMap",
+          "name": "IslandMap",
           "tags": "",
           "type": "TileMap::TileMap",
           "variables": [],
@@ -448,9 +447,9 @@
           "font": "",
           "characterSize": 20,
           "color": {
-            "b": 172,
-            "g": 255,
-            "r": 242
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         },
         {
@@ -463,9 +462,9 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "We can have multiple tilemaps loaded too",
+          "string": "Multiple Tilemaps can be loaded, and tilemaps can be rotated/resized.",
           "font": "",
-          "characterSize": 15,
+          "characterSize": 20,
           "color": {
             "b": 255,
             "g": 255,
@@ -521,9 +520,9 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "Arrange your animation frames on one row in the x axis of the Atlas,\notherwise you get a glitchy metal viking",
+          "string": "Animation are supported, with some limitations: you have to put all the animated tiles on a row and there the speed of the tilemap animation must be set for the whole tilemap.",
           "font": "",
-          "characterSize": 12,
+          "characterSize": 20,
           "color": {
             "b": 255,
             "g": 255,
@@ -531,46 +530,7 @@
           }
         },
         {
-          "name": "animationNote2",
-          "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 0.08,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "incorrectWay.PNG",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "DesertExample",
+          "name": "DesertAtlas",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -609,7 +569,7 @@
           ]
         },
         {
-          "name": "atlasVikings",
+          "name": "VikingsAtlas",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -657,13 +617,13 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "The desert tilemap has layer.data stored as a base64 string. It also has spacing and margin on its atlas - we can parse that too",
+          "string": "The desert tilemap has compressed layer data (an option that can be enabled in Tiled). It also has spacing and margin on its atlas - all of this is supported.",
           "font": "",
           "characterSize": 20,
           "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
+            "b": 255,
+            "g": 255,
+            "r": 255
           }
         },
         {
@@ -681,9 +641,43 @@
             "animationSpeedScale": 1,
             "animationFps": 4
           }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "AboutAtlas",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "These are the \"atlas\" images used by the tilemaps (shown here for educational purpose):",
+          "font": "",
+          "characterSize": 70,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
         }
       ],
       "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "This is a demo and playground of what can be done with Tilemap objects.\nTilemap maps must be authored in a separated program, Tiled, that can be downloaded on mapeditor.org",
+          "comment2": ""
+        },
         {
           "disabled": false,
           "folded": false,
@@ -708,7 +702,7 @@
                 "value": "TileMap::SetAnimationSpeedScale"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "-",
                 "0.2"
               ],
@@ -741,7 +735,7 @@
                 "value": "TileMap::SetAnimationSpeedScale"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "+",
                 "0.2"
               ],
@@ -839,7 +833,7 @@
                     "value": "TileMap::SetLayerIndex"
                   },
                   "parameters": [
-                    "islandMap",
+                    "IslandMap",
                     "=",
                     "Variable(displayMode)"
                   ],
@@ -907,7 +901,7 @@
                     "value": "TileMap::SetLayerIndex"
                   },
                   "parameters": [
-                    "islandMap",
+                    "IslandMap",
                     "=",
                     "Variable(displayMode)"
                   ],
@@ -951,7 +945,7 @@
                 "value": "TileMap::SetDisplayMode"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "\"visible\""
               ],
               "subInstructions": []
@@ -992,7 +986,7 @@
                 "value": "TileMap::SetDisplayMode"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "\"index\""
               ],
               "subInstructions": []
@@ -1022,7 +1016,7 @@
                 "value": "TileMap::TilemapJsonFile"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "island.json"
               ],
               "subInstructions": []
@@ -1035,7 +1029,7 @@
                 "value": "TileMap::SetTilemapJsonFile"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "anotherIsland.json"
               ],
               "subInstructions": []
@@ -1065,7 +1059,7 @@
                 "value": "TileMap::TilemapJsonFile"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "anotherIsland.json"
               ],
               "subInstructions": []
@@ -1078,7 +1072,7 @@
                 "value": "TileMap::SetTilemapJsonFile"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "island.json"
               ],
               "subInstructions": []
@@ -1097,7 +1091,7 @@
                 "value": "TileMap::DisplayMode"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "\"index\""
               ],
               "subInstructions": []
@@ -1111,16 +1105,6 @@
               },
               "parameters": [
                 "animationsNote"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Cache"
-              },
-              "parameters": [
-                "animationNote2"
               ],
               "subInstructions": []
             },
@@ -1148,7 +1132,7 @@
                 "value": "TileMap::DisplayMode"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "\"index\""
               ],
               "subInstructions": []
@@ -1162,17 +1146,6 @@
               },
               "parameters": [
                 "animationsNote",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Montre"
-              },
-              "parameters": [
-                "animationNote2",
                 ""
               ],
               "subInstructions": []
@@ -1202,7 +1175,7 @@
                 "value": "TileMap::LayerIndex"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 ">",
                 "1"
               ],
@@ -1216,7 +1189,7 @@
                 "value": "Cache"
               },
               "parameters": [
-                "islandMap2"
+                "AnotherIslandMap"
               ],
               "subInstructions": []
             }
@@ -1234,7 +1207,7 @@
                 "value": "TileMap::LayerIndex"
               },
               "parameters": [
-                "islandMap",
+                "IslandMap",
                 "<=",
                 "1"
               ],
@@ -1248,7 +1221,7 @@
                 "value": "Montre"
               },
               "parameters": [
-                "islandMap2",
+                "AnotherIslandMap",
                 ""
               ],
               "subInstructions": []

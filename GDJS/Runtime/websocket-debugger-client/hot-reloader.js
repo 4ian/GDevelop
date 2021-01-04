@@ -71,6 +71,8 @@ gdjs.HotReloader.prototype._canReloadScriptFile = function (srcFilename) {
       endsWith(srcFilename, 'shopify-buy.umd.polyfilled.min.js') ||
       // Don't reload pixi-multistyle-text library.
       endsWith(srcFilename, 'pixi-multistyle-text.umd.js') ||
+      // Don't reload pixi-tilemap library.
+      endsWith(srcFilename, 'pixi-tilemap.umd.js') ||
       // Don't reload bondage.js library.
       endsWith(srcFilename, 'bondage.min.js') ||
       // Don't reload pixi-particles library.

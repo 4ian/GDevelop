@@ -292,8 +292,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Variables/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable to push"))
       .AddParameter("scenevar", _("Array variable"))
+      .AddParameter("scenevar", _("Variable to push"))
       .MarkAsAdvanced();
 
   extension
@@ -301,24 +301,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "SceneVariableRemoveAt",
           _("Remove index of scene array"),
           _("Removes a variable at an index of a scene array variable."),
-          _("Remove variable at index _PARAM0_ from array variable _PARAM1_"),
+          _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
           _("Variables/Arrays"),
           "res/actions/var24.png",
           "res/actions/var.png")
-      .AddParameter("expression", _("Index to remove"))
       .AddParameter("scenevar", _("Variable"))
+      .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariablePush",
                  _("Push variable on a global array"),
                  _("Appends a variable at the end of a global array variable."),
-                 _("Append variable _PARAM0_ to array variable _PARAM1_"),
+                 _("Append variable _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Global variables/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable to push"))
       .AddParameter("globalvar", _("Array variable"))
+      .AddParameter("scenevar", _("Variable to push"))
       .MarkAsAdvanced();
 
   extension
@@ -326,12 +326,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "GlobalVariableRemoveAt",
           _("Remove index of global array"),
           _("Removes a variable at an index of a global array variable."),
-          _("Remove variable at index _PARAM0_ from array variable _PARAM1_"),
+          _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
           _("Variables/Global variables/Arrays"),
           "res/actions/var24.png",
           "res/actions/var.png")
-      .AddParameter("expression", _("Index to remove"))
       .AddParameter("globalvar", _("Variable"))
+      .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
 
   extension

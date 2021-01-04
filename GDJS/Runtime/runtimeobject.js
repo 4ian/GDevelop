@@ -713,20 +713,16 @@ gdjs.RuntimeObject.variableClearChildren = function(variable) {
 gdjs.RuntimeObject.prototype.variableClearChildren = gdjs.RuntimeObject.variableClearChildren;
 
 /**
- * @param {gdjs.Variable} variable
- * @param {gdjs.Variable} array
  * @private
  */
-gdjs.RuntimeObject.prototype.variablePush = function (variable, array) {
+gdjs.RuntimeObject.prototype.variablePush = function (array, variable) {
     array.push(variable);
 };
 
 /**
- * @param {number} index
- * @param {gdjs.Variable} array
  * @private
  */
-gdjs.RuntimeObject.prototype.variableRemoveAt = function (index, array) {
+gdjs.RuntimeObject.prototype.variableRemoveAt = function (array, index) {
     array.removeAtIndex(index);
 };
 

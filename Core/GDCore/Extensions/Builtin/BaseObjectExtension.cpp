@@ -539,28 +539,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("ObjectVariablePush",
                 _("Push variable on an object array"),
                 _("Appends a variable at the end of a object array variable."),
-                _("Append variable _PARAM0_ to array variable _PARAM2_ of "
-                  "object _PARAM1_"),
+                _("Append variable _PARAM2_ to array variable _PARAM1_ of "
+                  "object _PARAM0_"),
                 _("Variables/Arrays"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable to push"))
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("scenevar", _("Variable to push"))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "ObjectVariableRemoveAt",
          _("Remove index of object array"),
          _("Removes a variable at an index of an object array variable."),
-         _("Remove variable at index _PARAM0_ from array variable _PARAM2_ of "
-           "object _PARAM1_"),
+         _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
+           "object _PARAM0_"),
          _("Variables/Arrays"),
          "res/actions/var24.png",
          "res/actions/var.png")
-      .AddParameter("expression", _("Index to remove"))
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
+      .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
 
   obj.AddCondition("BehaviorActivated",

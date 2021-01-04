@@ -566,7 +566,7 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      const tileset = PixiTilemapHelper.getPIXITileSet(
+      const pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
         (textureName) =>
           this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
         tilesetJsonData
@@ -577,10 +577,10 @@ module.exports = {
         tilesetJsonFile
       );
 
-      if (tileset) {
-        PixiTilemapHelper.updatePIXITileMap(
+      if (pixiTileMapData) {
+        PixiTilemapHelper.updatePixiTileMap(
           this._pixiObject,
-          tileset,
+          pixiTileMapData,
           displayMode,
           layerIndex,
           pako

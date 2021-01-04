@@ -6,7 +6,7 @@
  * @extends RuntimeObject
  */
 gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
-  // Always call the base gdjs.RuntimeObject constructor.
+  // *ALWAYS* call the base gdjs.RuntimeObject constructor.
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   // Load any required data from the object properties.
@@ -16,14 +16,27 @@ gdjs.DummyRuntimeObject = function(runtimeScene, objectData) {
   if (this._renderer)
     gdjs.DummyRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else this._renderer = new gdjs.DummyRuntimeObjectRenderer(this, runtimeScene);
+
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
 gdjs.DummyRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.DummyRuntimeObject.thisIsARuntimeObjectConstructor =
-  "MyDummyExtension::DummyObject"; //Replace by your extension + object name.
+gdjs.registerObject("MyDummyExtension::DummyObject", gdjs.DummyRuntimeObject); //Replace by your extension + object name.
 
 gdjs.DummyRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
+};
+
+gdjs.DummyRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  // Compare previous and new data for the object and update it accordingly.
+  // This is useful for "hot-reloading".
+  if (oldObjectData.content.property1 !== newObjectData.content.property1) {
+    this._property1 = newObjectData.content.property1;
+    this._renderer.updateText();
+  }
+
+  return true;
 };
 
 /**
@@ -106,7 +119,6 @@ gdjs.DummyRuntimeObject.prototype.getOpacity = function() {
 gdjs.DummyRuntimeObject.prototype.getText = function() {
   return this._property1;
 };
-
 
 /**
  * A dummy method that can be called from events

@@ -1,10 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import Chip from 'material-ui/Chip';
-import TextField from 'material-ui/TextField';
+import Chip from '@material-ui/core/Chip';
 import { Column, Line } from '../UI/Grid';
 import randomColor from 'randomcolor';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 
 type Props = {|
   value: string,
@@ -34,10 +33,11 @@ const getChipColor = (tag: string) => {
 };
 
 export default class SearchbarWithChips extends Component<Props> {
-  _textField: ?TextField;
+  _searchBar: ?SearchBar;
 
   componentDidMount() {
-    if (this._textField) this._textField.focus();
+    if (useShouldAutofocusSearchbar() && this._searchBar)
+      this._searchBar.focus();
   }
 
   render() {
@@ -58,7 +58,7 @@ export default class SearchbarWithChips extends Component<Props> {
           onChange={value => {
             onChange(value);
           }}
-          ref={textField => (this._textField = textField)}
+          ref={searchBar => (this._searchBar = searchBar)}
         />
         <Line>
           <Column>
@@ -66,22 +66,24 @@ export default class SearchbarWithChips extends Component<Props> {
               {chips &&
                 chips.map(({ text, value }) => (
                   <Chip
+                    size="small"
                     key={value}
-                    labelColor={
-                      !chosenChip || chosenChip === value ? 'black' : undefined
-                    }
-                    backgroundColor={
-                      !chosenChip || chosenChip === value
-                        ? getChipColor(value)
-                        : undefined
-                    }
-                    style={styles.chip}
+                    style={{
+                      ...styles.chip,
+                      backgroundColor:
+                        !chosenChip || chosenChip === value
+                          ? getChipColor(value)
+                          : undefined,
+                      color:
+                        !chosenChip || chosenChip === value
+                          ? 'black'
+                          : undefined,
+                    }}
                     onClick={() =>
                       onChooseChip(chosenChip === value ? '' : value)
                     }
-                  >
-                    {text}
-                  </Chip>
+                    label={text}
+                  />
                 ))}
             </div>
           </Column>

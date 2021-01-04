@@ -18,7 +18,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
         "with items in memory."),
       "Florian Rival",
       "Open source (MIT License)")
-      .SetExtensionHelpPath("all-features/inventory");
+      .SetExtensionHelpPath("/all-features/inventory");
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -55,7 +55,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCondition("Count",
                     _("Item count"),
                     _("Compare the number of an item in an inventory."),
-                    _("Count of _PARAM2_ in _PARAM1_ is _PARAM3__PARAM4_"),
+                    _("the count of _PARAM2_ in _PARAM1_"),
                     _("Inventories"),
                     "CppPlatform/Extensions/Inventoryicon24.png",
                     "CppPlatform/Extensions/Inventoryicon16.png")
@@ -63,11 +63,9 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Count"))
+      .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("InventoryTools::Count")
-      .SetIncludeFile("Inventory/InventoryTools.h")
-      .SetManipulatedType("number");
+      .SetIncludeFile("Inventory/InventoryTools.h");
 
   extension
       .AddCondition("Has",
@@ -172,8 +170,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddAction("SerializeToVariable",
-                 _("Save an inventory in a variable"),
-                 _("Save all the items of the inventory in a variable, so that "
+                 _("Save an inventory in a scene variable"),
+                 _("Save all the items of the inventory in a scene variable, so that "
                    "it can be restored later."),
                  _("Save inventory _PARAM1_ in variable _PARAM2_"),
                  _("Inventories/Variables"),
@@ -188,8 +186,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddAction("UnserializeFromVariable",
-                 _("Load an inventory from a variable"),
-                 _("Load the content of the inventory from a variable."),
+                 _("Load an inventory from a scene variable"),
+                 _("Load the content of the inventory from a scene variable."),
                  _("Load inventory _PARAM1_ from variable _PARAM2_"),
                  _("Inventories/Variables"),
                  "CppPlatform/Extensions/Inventoryicon24.png",

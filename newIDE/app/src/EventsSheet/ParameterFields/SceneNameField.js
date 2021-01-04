@@ -1,14 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
 import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
 
 export default class SceneNameField extends Component<
   ParameterFieldProps,
   {||}
 > {
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._field) this._field.focus();
@@ -28,14 +30,19 @@ export default class SceneNameField extends Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
+        fullWidth
         value={value}
         onChange={onChange}
         openOnFocus={isInline}
         dataSource={layoutNames.map(layoutName => ({
-          text: layoutName,
+          text: `"${layoutName}"`,
           value: `"${layoutName}"`,
         }))}
         hintText={'""'}

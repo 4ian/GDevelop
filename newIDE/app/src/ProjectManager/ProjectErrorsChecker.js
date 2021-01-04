@@ -12,6 +12,12 @@ export type ProjectErrors = {
   [string]: Array<ProjectError>,
 };
 
+export const validatePackageName = (packageName: string) => {
+  const pattern = /^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$/i;
+
+  return pattern.test(packageName);
+};
+
 type TFunction = string => string; //TODO
 
 export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
@@ -46,6 +52,15 @@ export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
       t('The package name is too long.'),
       t('Change the package name in the game properties.')
     );
+  } else if (!validatePackageName(project.getPackageName())) {
+    addError(
+      'packageName',
+      'error',
+      t(
+        'The package name is containing invalid characters or not following the convention "xxx.yyy.zzz" (numbers allowed after a letter only).'
+      ),
+      t('Change the package name in the game properties.')
+    );
   }
 
   if (!project.getName()) {
@@ -75,17 +90,30 @@ export const displayProjectErrorsBox = (
 ): boolean => {
   if (!Object.keys(errors).length) return true;
 
-  showErrorBox(
-    t(
-      'Your game has some invalid elements, please fix these before continuing:'
-    ) +
+  showErrorBox({
+    message:
+      t(
+        'Your game has some invalid elements, please fix these before continuing:'
+      ) +
       '\n\n' +
       values(errors)
         .map(errors =>
           errors.map((error: ProjectError) => `- ${error.message}`).join('\n')
         )
-        .join('\n')
-  );
+        .join('\n'),
+    rawError: undefined,
+    errorId: 'project-invalid-settings-error',
+    doNotReport: true,
+  });
 
   return false;
+};
+
+export const validateJSON = (jsonString: string): boolean => {
+  try {
+    JSON.parse(jsonString);
+    return true;
+  } catch {
+    return false;
+  }
 };

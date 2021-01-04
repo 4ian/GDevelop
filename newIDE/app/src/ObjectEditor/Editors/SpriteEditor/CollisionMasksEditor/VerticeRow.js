@@ -1,13 +1,13 @@
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
-import IconButton from 'material-ui/IconButton';
-import Delete from 'material-ui/svg-icons/action/delete';
-import TextField from 'material-ui/TextField';
-import Warning from 'material-ui/svg-icons/alert/warning';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import { TableRow, TableRowColumn } from '../../../../UI/Table';
+import IconButton from '../../../../UI/IconButton';
+import Delete from '@material-ui/icons/Delete';
+import TextField from '../../../../UI/TextField';
+import Warning from '@material-ui/icons/Warning';
 import styles from './styles';
+import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 
-const ThemableVerticeRow = ({
+const VerticeRow = ({
   hasWarning,
   canRemove,
   onRemove,
@@ -15,42 +15,50 @@ const ThemableVerticeRow = ({
   verticeY,
   onChangeVerticeX,
   onChangeVerticeY,
-  muiTheme,
 }) => (
-  <TableRow
-    style={{
-      backgroundColor: muiTheme.list.itemsBackgroundColor,
-    }}
-  >
-    <TableRowColumn style={styles.handleColumn}>
-      {/* <DragHandle /> Reordering vertices is not supported for now */}
-    </TableRowColumn>
-    <TableRowColumn>{hasWarning && <Warning />}</TableRowColumn>
-    <TableRowColumn style={styles.coordinateColumn}>
-      <TextField
-        value={verticeX}
-        type="number"
-        id="vertice-x"
-        onChange={(e, value) => onChangeVerticeX(parseFloat(value || 0, 10))}
-      />
-    </TableRowColumn>
-    <TableRowColumn style={styles.coordinateColumn}>
-      <TextField
-        value={verticeY}
-        type="number"
-        id="vertice-y"
-        onChange={(e, value) => onChangeVerticeY(parseFloat(value || 0, 10))}
-      />
-    </TableRowColumn>
-    <TableRowColumn style={styles.toolColumn}>
-      {!!onRemove && (
-        <IconButton onClick={onRemove} disabled={!canRemove}>
-          <Delete />
-        </IconButton>
-      )}
-    </TableRowColumn>
-  </TableRow>
+  <ThemeConsumer>
+    {muiTheme => (
+      <TableRow
+        style={{
+          backgroundColor: muiTheme.list.itemsBackgroundColor,
+        }}
+      >
+        <TableRowColumn style={styles.handleColumn}>
+          {/* <DragHandle /> Reordering vertices is not supported for now */}
+        </TableRowColumn>
+        <TableRowColumn>{hasWarning && <Warning />}</TableRowColumn>
+        <TableRowColumn style={styles.coordinateColumn}>
+          <TextField
+            margin="none"
+            value={verticeX}
+            type="number"
+            id="vertice-x"
+            onChange={(e, value) =>
+              onChangeVerticeX(parseFloat(value || 0, 10))
+            }
+          />
+        </TableRowColumn>
+        <TableRowColumn style={styles.coordinateColumn}>
+          <TextField
+            margin="none"
+            value={verticeY}
+            type="number"
+            id="vertice-y"
+            onChange={(e, value) =>
+              onChangeVerticeY(parseFloat(value || 0, 10))
+            }
+          />
+        </TableRowColumn>
+        <TableRowColumn style={styles.toolColumn}>
+          {!!onRemove && (
+            <IconButton size="small" onClick={onRemove} disabled={!canRemove}>
+              <Delete />
+            </IconButton>
+          )}
+        </TableRowColumn>
+      </TableRow>
+    )}
+  </ThemeConsumer>
 );
 
-const PointRow = muiThemeable()(ThemableVerticeRow);
-export default PointRow;
+export default VerticeRow;

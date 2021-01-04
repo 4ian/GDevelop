@@ -1,5 +1,5 @@
 // @flow
-import createReactContext, { type Context } from 'create-react-context';
+import * as React from 'react';
 import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
@@ -9,11 +9,17 @@ export type EventsFunctionsExtensionsState = {|
   eventsFunctionsExtensionsError: ?Error,
   loadProjectEventsFunctionsExtensions: (project: ?gdProject) => Promise<void>,
   unloadProjectEventsFunctionsExtensions: (project: gdProject) => void,
+  unloadProjectEventsFunctionsExtension: (
+    project: gdProject,
+    extensionName: string
+  ) => void,
   reloadProjectEventsFunctionsExtensions: (
     project: ?gdProject
   ) => Promise<void>,
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
+  ensureLoadFinished: () => Promise<void>,
+  getIncludeFileHashs: () => { [string]: number },
 |};
 
 const defaultState = {
@@ -23,11 +29,14 @@ const defaultState = {
   unloadProjectEventsFunctionsExtensions: () => {},
   reloadProjectEventsFunctionsExtensions: () =>
     Promise.reject(new Error('Use a provider')),
+  unloadProjectEventsFunctionsExtension: () => {},
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
+  ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
+  getIncludeFileHashs: () => ({}),
 };
 
-const EventsFunctionsExtensionsContext: Context<EventsFunctionsExtensionsState> = createReactContext(
+const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(
   defaultState
 );
 

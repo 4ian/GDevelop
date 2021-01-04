@@ -4,9 +4,14 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BehaviorCodeGenerator.h"
+
 #include "EventsCodeGenerator.h"
 
 namespace gdjs {
+
+gd::String BehaviorCodeGenerator::doStepPreEventsFunctionName =
+    "doStepPreEvents";
+
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
     const gd::String& extensionName,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
@@ -14,6 +19,9 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
     const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  auto& eventsFunctionsVector =
+      eventsBasedBehavior.GetEventsFunctions().GetInternalVector();
+
   return GenerateRuntimeBehaviorTemplateCode(
       extensionName,
       eventsBasedBehavior,
@@ -43,8 +51,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
       },
       [&]() {
         gd::String runtimeBehaviorMethodsCode;
-        for (auto& eventsFunction :
-             eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
+        for (auto& eventsFunction : eventsFunctionsVector) {
           const gd::String& functionName =
               behaviorMethodMangledNames.find(eventsFunction->GetName()) !=
                       behaviorMethodMangledNames.end()
@@ -63,11 +70,43 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
                   *eventsFunction,
                   methodCodeNamespace,
                   methodFullyQualifiedName,
+                  "that._onceTriggers",
+                  functionName == doStepPreEventsFunctionName
+                      ? GenerateDoStepPreEventsPreludeCode()
+                      : "",
                   includeFiles,
                   compilationForRuntime);
+
+          // Compatibility with GD <= 5.0 beta 75
+          if (functionName == "onOwnerRemovedFromScene") {
+            runtimeBehaviorMethodsCode +=
+                GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+                    eventsBasedBehavior, codeNamespace);
+          }
+          // end of compatibility code
+        }
+
+        bool hasDoStepPreEventsFunction =
+            eventsBasedBehavior.GetEventsFunctions().HasEventsFunctionNamed(
+                doStepPreEventsFunctionName);
+        if (!hasDoStepPreEventsFunction) {
+          runtimeBehaviorMethodsCode +=
+              GenerateDefaultDoStepPreEventsFunctionCode(eventsBasedBehavior,
+                                                         codeNamespace);
         }
 
         return runtimeBehaviorMethodsCode;
+      },
+      [&]() {
+        gd::String updateFromBehaviorCode;
+        for (auto& property :
+             eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+          updateFromBehaviorCode +=
+              GenerateUpdatePropertyFromBehaviorDataCode(
+                  eventsBasedBehavior, codeNamespace, *property);
+        }
+
+        return updateFromBehaviorCode;
       });
 }
 
@@ -77,7 +116,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
     const gd::String& codeNamespace,
     std::function<gd::String()> generateInitializePropertiesCode,
     std::function<gd::String()> generateMethodsCode,
-    std::function<gd::String()> generatePropertiesCode) {
+    std::function<gd::String()> generatePropertiesCode,
+    std::function<gd::String()> generateUpdateFromBehaviorDataCode) {
   return gd::String(R"jscode_template(
 CODE_NAMESPACE = CODE_NAMESPACE || {};
 
@@ -92,14 +132,20 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = function(runtimeScene, behaviorData,
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
     this._runtimeScene = runtimeScene;
 
+    this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
     INITIALIZE_PROPERTIES_CODE
-
-    if (this.onCreated) { this.onCreated(); }
 };
 
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.thisIsARuntimeBehaviorConstructor = "EXTENSION_NAME::BEHAVIOR_NAME";
+gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME);
+
+// Hot-reload:
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+UPDATE_FROM_BEHAVIOR_DATA_CODE
+
+    return true;
+}
 
 // Properties:
 PROPERTIES_CODE
@@ -115,6 +161,7 @@ METHODS_CODE
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
                       generateInitializePropertiesCode())
+      .FindAndReplace("UPDATE_FROM_BEHAVIOR_DATA_CODE", generateUpdateFromBehaviorDataCode())
       .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("METHODS_CODE", generateMethodsCode());
   ;
@@ -156,7 +203,16 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.SETTER_NAME = function(newVa
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace);
-  ;
+}
+
+gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& codeNamespace,
+    const gd::NamedPropertyDescriptor& property) {
+  return gd::String(R"jscode_template(
+    if (oldBehaviorData.PROPERTY_NAME !== newBehaviorData.PROPERTY_NAME)
+        this._behaviorData.PROPERTY_NAME = newBehaviorData.PROPERTY_NAME;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
@@ -172,6 +228,37 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
   }
 
   return "0 /* Error: property was of an unrecognized type */";
+}
+
+gd::String BehaviorCodeGenerator::
+    GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+        const gd::EventsBasedBehavior& eventsBasedBehavior,
+        const gd::String& codeNamespace) {
+  return gd::String(R"jscode_template(
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.onDestroy = function() {
+  // Redirect call to onOwnerRemovedFromScene (the old name of onDestroy)
+  if (this.onOwnerRemovedFromScene) this.onOwnerRemovedFromScene();
+};)jscode_template")
+      .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace("CODE_NAMESPACE", codeNamespace);
+}
+
+gd::String BehaviorCodeGenerator::GenerateDefaultDoStepPreEventsFunctionCode(
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& codeNamespace) {
+  return gd::String(R"jscode_template(
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype.doStepPreEvents = function() {
+  PRELUDE_CODE
+};)jscode_template")
+      .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace("CODE_NAMESPACE", codeNamespace)
+      .FindAndReplace("PRELUDE_CODE", GenerateDoStepPreEventsPreludeCode());
+}
+
+gd::String BehaviorCodeGenerator::GenerateDoStepPreEventsPreludeCode() {
+  return "this._onceTriggers.startNewFrame();";
 }
 
 }  // namespace gdjs

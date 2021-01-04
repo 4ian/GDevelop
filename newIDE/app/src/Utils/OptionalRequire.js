@@ -6,6 +6,9 @@ const nodeRequire = require('node-require-function')(); //TODO
  * This means that this module will only be available when running on Electron or Node.js.
  * When running without Electron or Node.js, `null` will be returned.
  *
+ * Note: **in most cases**, prefer `optionalLazyRequire` to avoid loading too many modules
+ * at the app startup. Only use optionalRequire for "well-known" Node.js modules (fs, path...)
+ *
  * @param {string} moduleName The name of the module. For example: `fs`.
  */
 const optionalRequire = (
@@ -31,10 +34,6 @@ const optionalRequire = (
   } catch (ex) {
     if (config.rethrowException) throw ex;
 
-    console.error(
-      'Exception while requiring module (from optionalRequire):',
-      ex
-    );
     return null;
   }
 };

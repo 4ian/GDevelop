@@ -1,21 +1,35 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
-import Subheader from 'material-ui/Subheader';
-import FlatButton from 'material-ui/FlatButton';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import Edit from 'material-ui/svg-icons/image/edit';
-import IconButton from 'material-ui/IconButton';
+import Subheader from '../UI/Subheader';
+import FlatButton from '../UI/FlatButton';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import Edit from '@material-ui/icons/Edit';
+import ColorField from '../UI/ColorField';
+import { MarkdownText } from '../UI/MarkdownText';
+import { hexToRGBColor } from '../Utils/ColorTransformer';
+import FormHelperText from '@material-ui/core/FormHelperText';
+
 import {
   type ResourceKind,
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import {
+  TextFieldWithButtonLayout,
+  ResponsiveLineStackLayout,
+  ColumnStackLayout,
+} from '../UI/Layout';
+import RaisedButton from '../UI/RaisedButton';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../MainFrame/UnsavedChangesContext';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -25,6 +39,8 @@ export type Instances = Array<Instance>;
 export type ValueFieldCommonProperties = {|
   name: string,
   getLabel?: Instance => string,
+  getDescription?: Instance => string,
+  getExtraDescription?: Instance => string,
   disabled?: boolean,
   onEditButtonClick?: Instance => void,
   onClick?: Instance => void,
@@ -49,6 +65,18 @@ export type PrimitiveValueField =
       valueType: 'boolean',
       getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'color',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'textarea',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |};
 
@@ -83,6 +111,11 @@ type MandatoryProps = {|
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
+
+  // If set, render the "extra" description content from fields
+  // (see getExtraDescription).
+  renderExtraDescriptionText?: (extraDescription: string) => string,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type Props =
@@ -101,11 +134,6 @@ const styles = {
   columnContainer: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  rowContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'baseline',
   },
   fieldContainer: {
     flex: 1,
@@ -166,9 +194,31 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     // This properties editor is dealing with fields that are
     // responsible to update their state (see field.setValue).
 
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
     else this.forceUpdate();
+  };
+
+  _getFieldDescription = (instances: Instances, field: ValueField): ?string => {
+    const { renderExtraDescriptionText } = this.props;
+    if (!instances[0]) {
+      console.log(
+        'PropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+      );
+      return undefined;
+    }
+
+    const descriptions: Array<string> = [];
+    if (field.getDescription)
+      descriptions.push(field.getDescription(instances[0]));
+    if (renderExtraDescriptionText && field.getExtraDescription)
+      descriptions.push(
+        renderExtraDescriptionText(field.getExtraDescription(instances[0]))
+      );
+
+    return descriptions.join('\n') || undefined;
   };
 
   _renderInputField = (field: ValueField) => {
@@ -176,9 +226,25 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
 
     if (field.valueType === 'boolean') {
       const { setValue } = field;
+      const description = this._getFieldDescription(
+        this.props.instances,
+        field
+      );
+
       return (
         <InlineCheckbox
-          label={getFieldLabel(this.props.instances, field)}
+          label={
+            !description ? (
+              getFieldLabel(this.props.instances, field)
+            ) : (
+              <React.Fragment>
+                {getFieldLabel(this.props.instances, field)}{' '}
+                <FormHelperText style={{ display: 'inline' }}>
+                  <MarkdownText source={description} />
+                </FormHelperText>
+              </React.Fragment>
+            )
+          }
           key={field.name}
           checked={getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
@@ -197,6 +263,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           id={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
+          helperMarkdownText={this._getFieldDescription(
+            this.props.instances,
+            field
+          )}
           onChange={newValue => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
@@ -208,35 +278,89 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           disabled={field.disabled}
         />
       );
+    } else if (field.valueType === 'color') {
+      const { setValue } = field;
+      return (
+        <ColorField
+          key={field.name}
+          id={field.name}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          helperMarkdownText={this._getFieldDescription(
+            this.props.instances,
+            field
+          )}
+          disableAlpha
+          fullWidth
+          color={hexToRGBColor(getFieldValue(this.props.instances, field))}
+          onChangeComplete={color => {
+            this.props.instances.forEach(i =>
+              setValue(i, color.hex || '#000000')
+            );
+            this._onInstancesModified(this.props.instances);
+          }}
+        />
+      );
+    } else if (field.valueType === 'textarea') {
+      const { setValue } = field;
+      return (
+        <SemiControlledTextField
+          key={field.name}
+          id={field.name}
+          onChange={text => {
+            this.props.instances.forEach(i => setValue(i, text || ''));
+            this._onInstancesModified(this.props.instances);
+          }}
+          value={getFieldValue(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          floatingLabelFixed
+          helperMarkdownText={this._getFieldDescription(
+            this.props.instances,
+            field
+          )}
+          multiline
+          style={styles.field}
+        />
+      );
     } else {
       const { onEditButtonClick, setValue } = field;
       return (
-        <div style={styles.fieldContainer} key={field.name}>
-          <SemiControlledTextField
-            value={getFieldValue(
-              this.props.instances,
-              field,
-              '(Multiple values)'
-            )}
-            id={field.name}
-            floatingLabelText={getFieldLabel(this.props.instances, field)}
-            floatingLabelFixed
-            onChange={newValue => {
-              this.props.instances.forEach(i => setValue(i, newValue || ''));
-              this._onInstancesModified(this.props.instances);
-            }}
-            style={styles.field}
-            disabled={field.disabled}
-          />
-          {onEditButtonClick && (
-            <IconButton
-              disabled={this.props.instances.length !== 1}
-              onClick={() => onEditButtonClick(this.props.instances[0])}
-            >
-              <Edit />
-            </IconButton>
+        <TextFieldWithButtonLayout
+          key={field.name}
+          renderTextField={() => (
+            <SemiControlledTextField
+              value={getFieldValue(
+                this.props.instances,
+                field,
+                '(Multiple values)'
+              )}
+              id={field.name}
+              floatingLabelText={getFieldLabel(this.props.instances, field)}
+              floatingLabelFixed
+              helperMarkdownText={this._getFieldDescription(
+                this.props.instances,
+                field
+              )}
+              onChange={newValue => {
+                this.props.instances.forEach(i => setValue(i, newValue || ''));
+                this._onInstancesModified(this.props.instances);
+              }}
+              style={styles.field}
+              disabled={field.disabled}
+            />
           )}
-        </div>
+          renderButton={style =>
+            onEditButtonClick ? (
+              <RaisedButton
+                style={style}
+                primary
+                disabled={this.props.instances.length !== 1}
+                icon={<Edit />}
+                label={<Trans>Edit</Trans>}
+                onClick={() => onEditButtonClick(this.props.instances[0])}
+              />
+            ) : null
+          }
+        />
       );
     }
   };
@@ -247,7 +371,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     const children = field
       .getChoices()
       .map(({ value, label }) => (
-        <MenuItem key={value} value={value} primaryText={label} />
+        <SelectOption key={value} value={value} primaryText={label} />
       ));
 
     if (field.valueType === 'number') {
@@ -257,8 +381,11 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={getFieldValue(this.props.instances, field)}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
-          onChange={(event, index, newValue) => {
+          helperMarkdownText={this._getFieldDescription(
+            this.props.instances,
+            field
+          )}
+          onChange={(event, index, newValue: string) => {
             this.props.instances.forEach(i =>
               setValue(i, parseFloat(newValue) || 0)
             );
@@ -270,7 +397,8 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           {children}
         </SelectField>
       );
-    } else {
+    } else if (field.valueType === 'string') {
+      const { setValue } = field;
       return (
         <SelectField
           value={getFieldValue(
@@ -280,11 +408,12 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           key={field.name}
           floatingLabelText={getFieldLabel(this.props.instances, field)}
-          floatingLabelFixed
-          onChange={(event, index, newValue) => {
-            this.props.instances.forEach(i =>
-              field.setValue(i, newValue || '')
-            );
+          helperMarkdownText={this._getFieldDescription(
+            this.props.instances,
+            field
+          )}
+          onChange={(event, index, newValue: string) => {
+            this.props.instances.forEach(i => setValue(i, newValue || ''));
             this._onInstancesModified(this.props.instances);
           }}
           style={styles.field}
@@ -340,6 +469,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           this._onInstancesModified(this.props.instances);
         }}
         floatingLabelText={getFieldLabel(this.props.instances, field)}
+        helperMarkdownText={this._getFieldDescription(
+          this.props.instances,
+          field
+        )}
       />
     );
   };
@@ -347,47 +480,58 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   render() {
     const { mode } = this.props;
 
-    return (
-      <div
-        style={mode === 'row' ? styles.rowContainer : styles.columnContainer}
-      >
-        {this.props.schema.map(field => {
-          if (field.children) {
-            if (field.type === 'row') {
-              return (
-                <PropertiesEditor
-                  key={field.name}
-                  schema={field.children}
-                  instances={this.props.instances}
-                  mode="row"
-                />
-              );
-            }
+    const renderContainer =
+      mode === 'row'
+        ? (fields: React.Node) => (
+            <ResponsiveLineStackLayout noMargin>
+              {fields}
+            </ResponsiveLineStackLayout>
+          )
+        : (fields: React.Node) => (
+            <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
+          );
 
+    return renderContainer(
+      this.props.schema.map(field => {
+        if (field.children) {
+          if (field.type === 'row') {
             return (
-              <div key={field.name}>
-                <Subheader style={styles.subHeader}>{field.name}</Subheader>
-                <div style={styles.subPropertiesEditorContainer}>
+              <UnsavedChangesContext.Consumer key={field.name}>
+                {unsavedChanges => (
                   <PropertiesEditor
                     schema={field.children}
                     instances={this.props.instances}
-                    mode="column"
+                    mode="row"
+                    unsavedChanges={unsavedChanges}
                   />
-                </div>
-              </div>
+                )}
+              </UnsavedChangesContext.Consumer>
             );
-          } else if (field.valueType === 'resource') {
-            return this._renderResourceField(field);
-          } else {
-            if (field.getChoices && field.getValue)
-              return this._renderSelectField(field);
-            if (field.getValue) return this._renderInputField(field);
-            if (field.onClick) return this._renderButton(field);
           }
 
-          return null;
-        })}
-      </div>
+          return (
+            <div key={field.name}>
+              <Subheader>{field.name}</Subheader>
+              <div style={styles.subPropertiesEditorContainer}>
+                <PropertiesEditor
+                  schema={field.children}
+                  instances={this.props.instances}
+                  mode="column"
+                />
+              </div>
+            </div>
+          );
+        } else if (field.valueType === 'resource') {
+          return this._renderResourceField(field);
+        } else {
+          if (field.getChoices && field.getValue)
+            return this._renderSelectField(field);
+          if (field.getValue) return this._renderInputField(field);
+          if (field.onClick) return this._renderButton(field);
+        }
+
+        return null;
+      })
     );
   }
 }

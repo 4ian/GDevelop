@@ -1,6 +1,6 @@
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '../TextField';
 import ColorPicker from './ColorPicker';
 
 const styles = {
@@ -11,7 +11,7 @@ const styles = {
   picker: {
     position: 'absolute',
     right: '8px',
-    bottom: '12px',
+    top: '19px',
   },
 };
 
@@ -33,8 +33,9 @@ export default class ColorField extends Component {
           fullWidth
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
+          helperMarkdownText={this.props.helperMarkdownText}
           type="text"
-          hintText={<Trans>Click to choose</Trans>}
+          hintText={t`Click to choose`}
           onClick={this.onClick}
           onFocus={this.onClick}
           value=""

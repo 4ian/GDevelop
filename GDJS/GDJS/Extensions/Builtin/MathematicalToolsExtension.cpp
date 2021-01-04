@@ -4,10 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "MathematicalToolsExtension.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Tools/Localization.h"
@@ -17,6 +13,7 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
+  GetAllExpressions()["clamp"].SetFunctionName("gdjs.evtTools.common.clamp");
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");
   GetAllExpressions()["sin"].SetFunctionName("Math.sin");
   GetAllExpressions()["tan"].SetFunctionName("Math.tan");
@@ -52,6 +49,10 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["mod"].SetFunctionName("gdjs.evtTools.common.mod");
   GetAllExpressions()["AngleDifference"].SetFunctionName(
       "gdjs.evtTools.common.angleDifference");
+  GetAllExpressions()["AngleBetweenPositions"].SetFunctionName(
+      "gdjs.evtTools.common.angleBetweenPositions");
+  GetAllExpressions()["DistanceBetweenPositions"].SetFunctionName(
+      "gdjs.evtTools.common.distanceBetweenPositions");
   GetAllExpressions()["int"].SetFunctionName("Math.round");
   GetAllExpressions()["rint"].SetFunctionName("Math.round");
   GetAllExpressions()["round"].SetFunctionName("Math.round");

@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/objects-timers/objects-timers.json",
+    "projectUuid": "48bb4899-a2ea-4796-a61d-5782d5d88daa",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/player.png",
+        "file": "https://resources.gdevelop-app.com/examples/objects-timers/player.png",
         "kind": "image",
         "metadata": "",
         "name": "player.png",
@@ -114,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/Pea-Happy.png",
+        "file": "https://resources.gdevelop-app.com/examples/objects-timers/Pea-Happy.png",
         "kind": "image",
         "metadata": "",
         "name": "Pea-Happy.png",
@@ -164,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "82a52365-e751-4897-8e05-fe31d94f74e3",
           "width": 0,
           "x": 556.402,
           "y": 101.694,
@@ -184,6 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "681fd1aa-760d-4579-8dab-66fd527278cf",
           "width": 0,
           "x": 65.3582,
           "y": 100.513,
@@ -204,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite",
+          "persistentUuid": "161806c3-34b2-4f47-ba1c-e7bfd64acdc5",
           "width": 0,
           "x": 319.143,
           "y": 99.333,
@@ -224,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "01b69293-b95f-4b66-afad-82baaa75164b",
           "width": 0,
           "x": 568.206,
           "y": 396.792,
@@ -244,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "6d053ac0-7dad-470a-8a80-796481920617",
           "width": 0,
           "x": 87.7857,
           "y": 395.612,
@@ -264,6 +267,7 @@
           "layer": "",
           "locked": false,
           "name": "Sprite2",
+          "persistentUuid": "41e399b2-6bda-43f8-8336-653f91ad2132",
           "width": 0,
           "x": 323.865,
           "y": 394.431,
@@ -284,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "aba99573-ff09-4bdf-88e6-eb12683a7648",
           "width": 0,
           "x": 598.896,
           "y": 327.149,
@@ -304,6 +309,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "d299780a-6695-41a0-a255-0fda72775f9c",
           "width": 0,
           "x": 116.115,
           "y": 322.427,
@@ -324,6 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter2",
+          "persistentUuid": "2a109e4c-a5b4-4ed8-9772-c0e519344856",
           "width": 0,
           "x": 351.014,
           "y": 325.969,
@@ -344,6 +351,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "87b7579b-e156-46bf-8911-57156d1c650d",
           "width": 0,
           "x": 604.798,
           "y": 52.1173,
@@ -364,6 +372,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "02635378-a848-4d2f-8c6f-abf3a25c4672",
           "width": 0,
           "x": 111.394,
           "y": 43.8546,
@@ -384,6 +393,7 @@
           "layer": "",
           "locked": false,
           "name": "Counter",
+          "persistentUuid": "8484de42-3fbd-4208-86b6-05d73e16858b",
           "width": 0,
           "x": 367.539,
           "y": 48.5762,
@@ -1007,6 +1017,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

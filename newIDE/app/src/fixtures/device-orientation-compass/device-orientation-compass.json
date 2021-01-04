@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/GD/newIDE/app/resources/examples/device-orientation-compass/device-orientation-compass.json",
+    "projectUuid": "f15ba2cc-a78b-4c40-99f1-0c4ae6f4e7a1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/compass.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-compass/img/compass.png",
         "kind": "image",
         "metadata": "",
         "name": "compass.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/needle.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-compass/img/needle.png",
         "kind": "image",
         "metadata": "",
         "name": "needle.png",
@@ -161,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "compass",
+          "persistentUuid": "32aa2304-9e98-4f34-99d8-ec93dea69378",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -176,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "needle",
+          "persistentUuid": "4d3da07a-16bc-4644-80ed-4924ad45a5d0",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -333,6 +333,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

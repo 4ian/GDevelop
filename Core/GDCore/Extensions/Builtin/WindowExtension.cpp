@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           _("De/activate fullscreen"),
           _("This action activates or deactivates fullscreen."),
           _("Activate fullscreen: _PARAM1_ (keep aspect ratio: _PARAM2_)"),
-          _("Game's window"),
+          _("Game's window and resolution"),
           "res/actions/fullscreen24.png",
           "res/actions/fullscreen.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -39,13 +39,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       .SetDefaultValue("yes");
 
   extension
+      .AddCondition(
+          "IsFullScreen",
+          _("Fullscreen activated?"),
+          _("Check if the game is currently in fullscreen."),
+          _("The game is in fullscreen"),
+          _("Game's window and resolution"),
+          "res/actions/fullscreen24.png",
+          "res/actions/fullscreen.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
       .AddAction("SetWindowMargins",
                  _("Change the window's margins"),
-                 _("This action changes the margins, in pixels, of the game's "
-                   "window."),
+                 _("This action changes the margins, in pixels, between the "
+                   "game frame and the window borders."),
                  _("Set margins of game window to "
                    "_PARAM1_;_PARAM2_;_PARAM3_;_PARAM4_"),
-                 _("Game's window"),
+                 _("Game's window and resolution"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -55,28 +66,93 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       .AddParameter("expression", _("Left"));
 
   extension
-      .AddAction("SetWindowSize",
-                 _("Change the size of the window"),
-                 _("This action changes the size of the game's window."),
-                 _("Change window size: _PARAM1_x_PARAM2_"),
-                 _("Game's window"),
+      .AddAction("SetGameResolutionSize",
+                 _("Change the resolution of the game"),
+                 _("Changes the resolution of the game, effectively changing "
+                   "the game area size. This won't change the size of the "
+                   "window in which the game is running."),
+                 _("Set game resolution to _PARAM1_x_PARAM2_"),
+                 _("Game's window and resolution"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Width"))
+      .AddParameter("expression", _("Height"));
+
+  extension
+      .AddAction(
+          "SetWindowSize",
+          _("Change the size of the game window"),
+          _("This action changes the size of the game window. Note that this "
+            "will only work on platform supporting this operation: games "
+            "running in browsers or on mobile phones can not update their "
+            "window size. Game resolution can still be updated."),
+          _("Set game window size to _PARAM1_x_PARAM2_ (also update game "
+            "resolution: _PARAM3_)"),
+          _("Game's window and resolution"),
+          "res/actions/window24.png",
+          "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .AddParameter(
-          "yesorno",
-          _("Do you want to use this size as the default size for new scene "
-            "cameras\?\n(Yes to change the size of the game's viewable "
-            "area,\nNo to stretch the game to the window's size)."));
+      .AddParameter("yesorno",
+                    _("Also update the game resolution? If not, the game will "
+                      "be stretched or reduced to fit in the window."));
+
+  extension
+      .AddAction("CenterWindow",
+                 _("Center the game window on the screen"),
+                 _("This action centers the game window on the screen. This "
+                   "only works on Windows, macOS and Linux (not when the game "
+                   "is executed in a web-browser or on iOS/Android)."),
+                 _("Center the game window"),
+                 _("Game's window and resolution"),
+                 "res/actions/window24.png",
+                 "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddAction("SetGameResolutionResizeMode",
+                 _("Change the game resolution resize mode"),
+                 _("Set if the width or the height of the game resolution "
+                   "should be changed to fit the game window - or if the game "
+                   "resolution should not be updated automatically."),
+                 _("Set game resolution resize mode to _PARAM1_"),
+                 _("Game's window and resolution"),
+                 "res/actions/window24.png",
+                 "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("stringWithSelector",
+                    _("Resize mode"),
+                    "[\"adaptWidth\", \"adaptHeight\", \"\"]",
+                    false)
+      .SetParameterLongDescription(
+          _("Empty to disable resizing. \"adaptWidth\" will update the game "
+            "width to fit in the window or screen. \"adaptHeight\" will do the "
+            "same but with the game height."));
+
+  extension
+      .AddAction("SetAdaptGameResolutionAtRuntime",
+                 _("Automatically adapt the game resolution"),
+                 _("Set if the game resolution should be automatically adapted "
+                   "when the game window or screen size change. This will only "
+                   "be the case if the game resolution resize mode is "
+                   "configured to adapt the width or the height of the game."),
+                 _("Automatically adapt the game resolution: _PARAM1_"),
+                 _("Game's window and resolution"),
+                 "res/actions/window24.png",
+                 "res/actions/window.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("yesorno",
+                    _("Update resolution during the game to fit the screen or "
+                      "window size?"));
 
   extension
       .AddAction("SetWindowIcon",
                  _("Change the window's icon"),
                  _("This action changes the icon of the game's window."),
                  _("Use _PARAM1_ as the icon for the game's window."),
-                 _("Game's window"),
+                 _("Game's window and resolution"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -87,7 +163,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                  _("Change the window's title"),
                  _("This action changes the title of the game's window."),
                  _("Change window title to _PARAM1_"),
-                 _("Game's window"),
+                 _("Game's window and resolution"),
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")

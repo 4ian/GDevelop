@@ -7,15 +7,21 @@ import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
+import { getStartupTimesSummary } from '../StartupTimes';
+import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 
 const isDev = Window.isDev();
 let client = null;
+let startupTimesSummary = null;
 
 export const installAnalyticsEvents = (authentification: Authentification) => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
   }
+
+  const version = getIDEVersion();
+  const versionWithHash = getIDEVersionWithHash();
 
   const sessionCookie = Keen.utils.cookie('visitor-stats');
   const sessionTimer = Keen.utils.timer();
@@ -28,7 +34,11 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
   });
 
   client.extendEvents(function() {
+    // Include the user public profile.
     const userProfile = authentification.getUserProfileSync();
+
+    // Compute the startup times (only once to avoid doing this for every event).
+    startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
 
     return {
       user: {
@@ -41,6 +51,11 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
       localStats: {
         programOpeningCount: getProgramOpeningCount(),
       },
+      versionMetadata: {
+        version,
+        versionWithHash,
+      },
+      startupTimesSummary,
       page: {
         title: document.title,
         url: document.location.href,
@@ -149,16 +164,18 @@ export const sendHelpSearch = (searchText: string) => {
 };
 
 export const sendErrorMessage = (
-  errorMessage: string,
-  type: string,
-  rawError: any
+  message: string,
+  type: 'error' | 'error-boundary',
+  rawError: any,
+  errorId: string
 ) => {
   if (isDev || !client) return;
 
   client.recordEvent('error_message', {
-    message: errorMessage,
+    message,
     type,
     rawError,
+    errorId,
   });
 };
 
@@ -195,6 +212,36 @@ export const sendSubscriptionDialogShown = () => {
   if (isDev || !client) return;
 
   client.recordEvent('subscription-dialog-shown', {});
+};
+
+export const sendAssetOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-opened', { id, name });
+};
+
+export const sendAssetAddedToProject = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-added-to-project', { id, name });
+};
+
+export const sendNewObjectCreated = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('new-object-created', { name });
 };
 
 export const sendChoosePlanClicked = (planId: string | null) => {

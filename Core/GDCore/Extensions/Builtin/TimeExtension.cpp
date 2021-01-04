@@ -38,15 +38,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddCondition("TimeScale",
                     _("Time scale"),
                     _("Test the time scale."),
-                    _("The time scale is _PARAM1__PARAM2_"),
+                    _("the time scale"),
                     _("Timers and time"),
                     "res/conditions/time24.png",
                     "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition("TimerPaused",
@@ -123,16 +121,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddExpression("TimeDelta",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddExpression("TempsFrame",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .SetHidden()
@@ -140,8 +138,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddExpression("ElapsedTime",
-                     _("Time elapsed since the last image"),
-                     _("Time elapsed since the last image"),
+                     _("Time elapsed since the last frame"),
+                     _("Time elapsed since the last frame rendered on screen"),
                      _("Time"),
                      "res/actions/time.png")
       .SetHidden()

@@ -7,9 +7,12 @@ import {
   largeSelectableArea,
   executableEventContainer,
   disabledText,
+  conditionsContainer,
 } from '../ClassNames';
-import { type EventRendererProps } from './EventRenderer.flow';
-const gd = global.gd;
+import { type EventRendererProps } from './EventRenderer';
+import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import { Trans } from '@lingui/macro';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -31,10 +34,6 @@ export default class ForEachEvent extends React.Component<
   render() {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
-    const conditionsListSyle = {
-      width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
-    };
-
     return (
       <div
         style={styles.container}
@@ -49,13 +48,14 @@ export default class ForEachEvent extends React.Component<
             [disabledText]: this.props.disabled,
           })}
         >
-          While these conditions are true:
+          <Trans>While these conditions are true:</Trans>
         </div>
         <InstructionsList
           instrsList={whileEvent.getWhileConditions()}
           style={
             {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
           }
+          className={conditionsContainer}
           selection={this.props.selection}
           areConditions
           onAddNewInstruction={this.props.onAddNewInstruction}
@@ -65,64 +65,76 @@ export default class ForEachEvent extends React.Component<
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
-          onInstructionsListContextMenu={
-            this.props.onInstructionsListContextMenu
-          }
+          onAddInstructionContextMenu={this.props.onAddInstructionContextMenu}
           onParameterClick={this.props.onParameterClick}
           disabled={this.props.disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
+          screenType={this.props.screenType}
+          windowWidth={this.props.windowWidth}
         />
         <div
           className={classNames({
             [disabledText]: this.props.disabled,
           })}
         >
-          Repeat these:
+          <Trans>Repeat these:</Trans>
         </div>
-        <div style={styles.instructionsContainer}>
-          <InstructionsList
-            instrsList={whileEvent.getConditions()}
-            style={conditionsListSyle}
-            selection={this.props.selection}
-            areConditions
-            onAddNewInstruction={this.props.onAddNewInstruction}
-            onPasteInstructions={this.props.onPasteInstructions}
-            onMoveToInstruction={this.props.onMoveToInstruction}
-            onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-            onInstructionClick={this.props.onInstructionClick}
-            onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-            onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={
-              this.props.onInstructionsListContextMenu
-            }
-            onParameterClick={this.props.onParameterClick}
-            disabled={this.props.disabled}
-            renderObjectThumbnail={this.props.renderObjectThumbnail}
-          />
-          <InstructionsList
-            instrsList={whileEvent.getActions()}
-            style={
-              {
-                ...styles.actionsList,
-              } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
-            }
-            selection={this.props.selection}
-            areConditions={false}
-            onAddNewInstruction={this.props.onAddNewInstruction}
-            onPasteInstructions={this.props.onPasteInstructions}
-            onMoveToInstruction={this.props.onMoveToInstruction}
-            onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-            onInstructionClick={this.props.onInstructionClick}
-            onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-            onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={
-              this.props.onInstructionsListContextMenu
-            }
-            onParameterClick={this.props.onParameterClick}
-            disabled={this.props.disabled}
-            renderObjectThumbnail={this.props.renderObjectThumbnail}
-          />
-        </div>
+        <ConditionsActionsColumns
+          leftIndentWidth={this.props.leftIndentWidth}
+          windowWidth={this.props.windowWidth}
+          renderConditionsList={({ style, className }) => (
+            <InstructionsList
+              instrsList={whileEvent.getConditions()}
+              style={style}
+              className={className}
+              selection={this.props.selection}
+              areConditions
+              onAddNewInstruction={this.props.onAddNewInstruction}
+              onPasteInstructions={this.props.onPasteInstructions}
+              onMoveToInstruction={this.props.onMoveToInstruction}
+              onMoveToInstructionsList={this.props.onMoveToInstructionsList}
+              onInstructionClick={this.props.onInstructionClick}
+              onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+              onInstructionContextMenu={this.props.onInstructionContextMenu}
+              onAddInstructionContextMenu={
+                this.props.onAddInstructionContextMenu
+              }
+              onParameterClick={this.props.onParameterClick}
+              disabled={this.props.disabled}
+              renderObjectThumbnail={this.props.renderObjectThumbnail}
+              screenType={this.props.screenType}
+              windowWidth={this.props.windowWidth}
+            />
+          )}
+          renderActionsList={({ className }) => (
+            <InstructionsList
+              instrsList={whileEvent.getActions()}
+              style={
+                {
+                  ...styles.actionsList,
+                } /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+              }
+              className={className}
+              selection={this.props.selection}
+              areConditions={false}
+              onAddNewInstruction={this.props.onAddNewInstruction}
+              onPasteInstructions={this.props.onPasteInstructions}
+              onMoveToInstruction={this.props.onMoveToInstruction}
+              onMoveToInstructionsList={this.props.onMoveToInstructionsList}
+              onInstructionClick={this.props.onInstructionClick}
+              onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+              onInstructionContextMenu={this.props.onInstructionContextMenu}
+              onAddInstructionContextMenu={
+                this.props.onAddInstructionContextMenu
+              }
+              onParameterClick={this.props.onParameterClick}
+              disabled={this.props.disabled}
+              renderObjectThumbnail={this.props.renderObjectThumbnail}
+              screenType={this.props.screenType}
+              windowWidth={this.props.windowWidth}
+            />
+          )}
+        />
       </div>
     );
   }

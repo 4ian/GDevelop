@@ -3,8 +3,9 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
+import FlatButton from '../../../UI/FlatButton';
+import TextField from '../../../UI/TextField';
+import Text from '../../../UI/Text';
 import { Line } from '../../../UI/Grid';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
@@ -53,34 +54,40 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
             onClick={onRunPreviewLocally}
           />,
         ]}
-        modal
+        cannotBeDismissed={true}
         open={open}
         onRequestClose={onClose}
       >
         {error && (
           <Line>
-            <Trans>
-              Unable to start the server for the preview! Make sure that you are
-              authorized to run servers on this computer. Otherwise, use classic
-              preview to test your game.
-            </Trans>
+            <Text>
+              <Trans>
+                Unable to start the server for the preview! Make sure that you
+                are authorized to run servers on this computer. Otherwise, use
+                classic preview to test your game.
+              </Trans>
+            </Text>
           </Line>
         )}
         {!error && !url && <PlaceholderLoader />}
         {!error && url && (
           <div>
             <Line>
-              <Trans>
-                Your preview is ready! On your mobile or tablet, open your
-                browser and enter in the address bar:
-              </Trans>
+              <Text>
+                <Trans>
+                  Your preview is ready! On your mobile or tablet, open your
+                  browser and enter in the address bar:
+                </Trans>
+              </Text>
             </Line>
             <TextField value={url} fullWidth />
             <Line>
-              <Trans>
-                Please note that your device should be connected on the same
-                network as this computer.
-              </Trans>
+              <Text>
+                <Trans>
+                  Please note that your device should be connected on the same
+                  network as this computer.
+                </Trans>
+              </Text>
             </Line>
           </div>
         )}

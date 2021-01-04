@@ -1,13 +1,21 @@
 import React from 'react';
-import { ToolbarSeparator } from 'material-ui/Toolbar';
+import ThemeConsumer from './Theme/ThemeConsumer';
 
 export default props => {
   return (
-    <ToolbarSeparator
-      style={{
-        marginLeft: 0,
-      }}
-      {...props}
-    />
+    <ThemeConsumer>
+      {muiTheme => (
+        <span
+          style={{
+            height: 32,
+            marginLeft: 3,
+            marginRight: 3,
+            borderLeftStyle: 'solid',
+            borderLeftWidth: 1,
+            borderColor: muiTheme.toolbar.separatorColor,
+          }}
+        />
+      )}
+    </ThemeConsumer>
   );
 };

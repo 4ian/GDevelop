@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\drop-collect-items-from-storage\\game.json",
+    "projectUuid": "7177c4bd-2a29-4fcd-888e-fc17ec929d48",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/coinGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/coinGold.png",
         "kind": "image",
         "metadata": "",
         "name": "coinGold.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/swordGold.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/swordGold.png",
         "kind": "image",
         "metadata": "",
         "name": "swordGold.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/shieldBronze.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/shieldBronze.png",
         "kind": "image",
         "metadata": "",
         "name": "shieldBronze.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/raygunBig.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/raygunBig.png",
         "kind": "image",
         "metadata": "",
         "name": "raygunBig.png",
@@ -138,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/items/umbrellaClosed.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/items/umbrellaClosed.png",
         "kind": "image",
         "metadata": "",
         "name": "umbrellaClosed.png",
@@ -147,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "box-complete.png",
@@ -156,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "box-broken.png",
@@ -165,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/box-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/box-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "box-empty.png",
@@ -174,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-complete.png",
@@ -183,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-broken.png",
@@ -192,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/barrel-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/barrel-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "barrel-empty.png",
@@ -201,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-complete.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-complete.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-complete.png",
@@ -210,7 +208,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-broken.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-broken.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-broken.png",
@@ -219,7 +217,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/drop-collect-items-from-storage/images/storages/jug-empty.png",
+        "file": "https://resources.gdevelop-app.com/examples/drop-collect-items-from-storage/images/storages/jug-empty.png",
         "kind": "image",
         "metadata": "",
         "name": "jug-empty.png",
@@ -284,6 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "fd5a959a-ee75-493a-b192-b4f1b9be4b25",
           "width": 0,
           "x": 56,
           "y": 334,
@@ -316,6 +315,7 @@
           "layer": "",
           "locked": false,
           "name": "XButton",
+          "persistentUuid": "3e602ffd-a520-4497-b37d-ffa474824898",
           "width": 0,
           "x": 456,
           "y": 443,
@@ -331,6 +331,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "4065fed3-b535-4fe0-9ba2-3837d5bc9caf",
           "width": 0,
           "x": 4,
           "y": 559,
@@ -346,6 +347,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "92bbf408-5a24-495c-8cb8-e5f9d08bd541",
           "width": 0,
           "x": 56,
           "y": 256,
@@ -378,6 +380,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "ac2e2994-5bb1-4a5f-aa0c-473ef44069b7",
           "width": 0,
           "x": 55,
           "y": 183,
@@ -410,6 +413,7 @@
           "layer": "",
           "locked": false,
           "name": "Barrel",
+          "persistentUuid": "cf0d0921-a91c-429e-8650-98fb224a12cc",
           "width": 0,
           "x": 57,
           "y": 418,
@@ -442,6 +446,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "d6898455-c0b5-490e-8339-3c7e629b5a95",
           "width": 0,
           "x": 446,
           "y": 364,
@@ -474,6 +479,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "c14f0c53-e6c7-4a89-84a0-e4623f65bb7c",
           "width": 0,
           "x": 446,
           "y": 295,
@@ -506,6 +512,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "d307e383-7b48-46e4-9f50-7458975ee97c",
           "width": 0,
           "x": 446,
           "y": 226,
@@ -538,6 +545,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "10e76dcb-4eae-4537-81f2-3ea1e8165458",
           "width": 0,
           "x": 230,
           "y": 225,
@@ -570,6 +578,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "36685575-5d91-4c58-a919-c602f4a505d4",
           "width": 0,
           "x": 231,
           "y": 305,
@@ -602,6 +611,7 @@
           "layer": "",
           "locked": false,
           "name": "Jug",
+          "persistentUuid": "5c2452ae-2779-427c-aece-55bcb58f5686",
           "width": 0,
           "x": 229,
           "y": 378,
@@ -634,6 +644,7 @@
           "layer": "",
           "locked": false,
           "name": "ExampleDescription",
+          "persistentUuid": "ee0a055c-9bd8-4992-9bf2-5d25cc9b0f95",
           "width": 0,
           "x": 17,
           "y": 15,
@@ -2537,6 +2548,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

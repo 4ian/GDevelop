@@ -15,8 +15,8 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
 /**
  * Keep only the specified object in the lists of picked objects.
  *
- * @param objectsLists The lists of objects to trim
- * @param runtimeObject {gdjs.RuntimeObject} The object to keep in the lists
+ * @param  {Hashtable} objectsLists The lists of objects to trim
+ * @param  {gdjs.RuntimeObject} runtimeObject The object to keep in the lists
  */
 gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
     for (var listName in objectsLists.items) {
@@ -34,8 +34,16 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
 };
 
 /**
+ * A predicate to be passed to `gdjs.evtTools.object.twoListsTest`.
+ * @callback gdjsTwoListsTestPredicate
+ * @param {gdjs.RuntimeObject} object1 First object
+ * @param {gdjs.RuntimeObject} object2 Second object
+ * @param {*} extraArg An optional extra argument
+ * @return {boolean} true if the pair satisfy the predicate (for example,there is a collision), meaning that the objects will be picked, false otherwise (no collision).
+ */
+
+/**
  * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
- * If inverted == true, only the objects of the first table are filtered.
  *
  * Note that the predicate method is not called stricly for each pair: When considering a pair of objects, if
  * these objects have already been marked as picked, the predicate method won't be called again.
@@ -51,9 +59,12 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  *  + Cost(predicate)*(NbObjList1+NbObjList2)
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *
- * Note: predicate is called with the two objects to compare, and an optional argument `extraArg`.
- * This should be used to avoid declaring the predicate as a closure that would be created and destroyed
- * at each call to twoListsTest (potentially multiple time per frame).
+ *
+ * @param  {gdjsTwoListsTestPredicate} predicate The predicate function is called with the two objects to compare, and an optional argument `extraArg`
+ * @param  {Hashtable} objectsLists1 e.g. Hashtable.newFrom({ A: objects1 });
+ * @param  {Hashtable} objectsLists2 e.g. Hashtable.newFrom({ B: objects2 });
+ * @param  {boolean} inverted If `inverted` == true, only the objects of the first table are filtered.
+ * @param  {*} extraArg (optional) This argument should be used to avoid declaring the predicate as a closure that would be created and destroyed at each call to twoListsTest (potentially multiple time per frame).
  */
 gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraArg) {
 
@@ -151,53 +162,57 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  *
  * Objects that do not fullfil the predicate are removed from objects lists.
  *
- * @param predicate The function applied to each object: must return true if the object fulfill the predicate.
- * @param objectsLists The lists of objects to trim
- * @param negatePredicate If set to true, the result of the predicate is negated.
- * @param extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
- * @return true if at least one object fulfill the predicate.
+ * @param  {Function} predicate The function applied to each object: must return true if the object fulfill the predicate.
+ * @param  {Hashtable} objectsLists The lists of objects to trim
+ * @param  {boolean} negatePredicate If set to true, the result of the predicate is negated.
+ * @param  {*} extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
+ * @return {boolean} true if at least one object fulfill the predicate.
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {
     var isTrue = false;
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
     objectsLists.values(lists);
 
-    //Create a boolean for each object
-    for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            arr[k].pick = false;
-        }
-    }
-
-    //Pick only objects that are fulfilling the predicate
+    // Pick only objects that are fulfilling the predicate.
     for(var i = 0, leni = lists.length;i<leni;++i) {
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            if (negatePredicate ^ predicate(arr[k], extraArg)) {
+            var object = arr[k];
+            if (negatePredicate ^ predicate(object, extraArg)) {
                 isTrue = true;
-                arr[k].pick = true; //Pick the objects
+                object.pick = true;
+            } else {
+                object.pick = false;
             }
         }
     }
 
-    //Trim not picked objects from lists.
+    // Trim not picked objects from lists.
     for(var i = 0, leni = lists.length;i<leni;++i) {
-        var arr = lists[i];
-        var finalSize = 0;
-
-        for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            var obj = arr[k];
-            if ( arr[k].pick ) {
-                arr[finalSize] = obj;
-                finalSize++;
-            }
-        }
-        arr.length = finalSize;
+        gdjs.evtTools.object.filterPickedObjectsList(lists[i]);
     }
 
     return isTrue;
+};
+
+/**
+ * Filter in-place the specified array to remove objects for which
+ * `pick` property is set to false.
+ * @param {gdjs.RuntimeObject[]} arr
+ */
+gdjs.evtTools.object.filterPickedObjectsList = function (arr) {
+    var finalSize = 0;
+
+    for (var k = 0, lenk = arr.length; k < lenk; ++k) {
+        var obj = arr[k];
+        if (obj.pick) {
+            arr[finalSize] = obj;
+            finalSize++;
+        }
+    }
+
+    arr.length = finalSize;
 };
 
 gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
@@ -217,8 +232,8 @@ gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, dista
 gdjs.evtTools.object._movesToward = function(obj1, obj2, tolerance) {
     if ( obj1.hasNoForces() ) return false;
 
-    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    var objAngle = Math.atan2(obj2.getDrawableY()+obj2.getCenterY() - (obj1.getDrawableY()+obj1.getCenterY()),
+                              obj2.getDrawableX()+obj2.getCenterX() - (obj1.getDrawableX()+obj1.getCenterX()));
     objAngle *= 180/3.14159;
 
     return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAverageForce().getAngle(), objAngle)) <= tolerance/2;
@@ -230,8 +245,8 @@ gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, to
 };
 
 gdjs.evtTools.object._turnedToward = function(obj1, obj2, tolerance) {
-    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    var objAngle = Math.atan2(obj2.getDrawableY()+obj2.getCenterY() - (obj1.getDrawableY()+obj1.getCenterY()),
+                              obj2.getDrawableX()+obj2.getCenterX() - (obj1.getDrawableX()+obj1.getCenterX()));
     objAngle *= 180/3.14159;
 
     return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAngle(), objAngle)) <= tolerance/2;
@@ -265,10 +280,10 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
             objectsCount += list.length;
         }
     }
-    
-    if (objectsCount === 0) 
+
+    if (objectsCount === 0)
         return false;
-    
+
     // Pick one random object
     var index = Math.floor(Math.random()*objectsCount);
     if (index >= objectsCount) index = objectsCount-1; //Should never happen.
@@ -288,7 +303,7 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
             startIndex += list.length;
         }
     }
-    
+
     gdjs.evtTools.object.pickOnly(objectsLists, theChosenOne);
     return true;
 };
@@ -304,7 +319,7 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
-            var distance = object.getSqDistanceTo(x, y);
+            var distance = object.getSqDistanceToPosition(x, y);
             if( first || (distance < best ^ inverted)) {
                 best = distance;
                 bestObject = object;
@@ -344,7 +359,7 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
         for (var j = 0; j < list.length; j++) {
             var object = list[j];
             var result = object.raycastTest(x, y, endX, endY, !inverted);
-            
+
             if( result.collision ) {
                 if ( !inverted && (result.closeSqDist <= testSqDist) ) {
                     testSqDist = result.closeSqDist;
@@ -374,18 +389,26 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
 /**
  * Do the work of creating a new object
  * @private
+ * @param {EventsFunctionContext | gdjs.RuntimeScene} objectsContext
+ * @param {string} objectName
+ * @param {Hashtable} objectsLists
+ * @param {x} number
+ * @param {y} number
+ * @param {string} layerName
  */
-gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layer) {
+gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layerName) {
     // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
     // eventsFunctionContext. We can't directly use runtimeScene because the object name could
     // be different than the real object name (this is the case in a function. The eventsFunctionContext
     // will take care of this in createObject).
     var obj = objectsContext.createObject(objectName);
+    var layer = objectsContext.getLayer(layerName);
 
     if ( obj !== null ) {
         //Do some extra setup
         obj.setPosition(x,y);
-        obj.setLayer(layer);
+        obj.setLayer(layerName);
+        obj.setZOrder(layer.getDefaultZOrder());
 
         //Let the new object be picked by next actions/conditions.
         if ( objectsLists.containsKey(objectName) ) {

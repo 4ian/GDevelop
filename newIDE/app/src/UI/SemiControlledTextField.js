@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from './TextField';
 
 type State = {|
   focused: boolean,
-  text: ?string,
+  text: ?any,
 |};
 
 type Props = {|
@@ -22,24 +22,32 @@ type Props = {|
       value: string,
     },
   }) => void,
+  type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
+  onClick?: () => void,
+  onKeyPress?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  margin?: 'none' | 'dense',
   disabled?: boolean,
   errorText?: React.Node,
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
   hintText?: React.Node,
+  helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
   max?: number,
   min?: number,
-  multiLine?: boolean,
+  multiline?: boolean,
   name?: string,
   step?: number,
   style?: Object,
-  type?: string,
   rows?: number,
+  rowsMax?: number,
+  autoFocus?: boolean,
 |};
 
 /**
@@ -57,13 +65,25 @@ export default class SemiControlledTextField extends React.Component<
     text: null,
   };
 
-  _field: ?any = null;
+  _field: ?TextField = null;
+
+  forceSetValue(text: string) {
+    this.setState({ text });
+  }
+
+  forceSetSelection(selectionStart: number, selectionEnd: number) {
+    const input = this.getInputNode();
+    if (input) {
+      input.selectionStart = selectionStart;
+      input.selectionEnd = selectionEnd;
+    }
+  }
 
   focus() {
     if (this._field) this._field.focus();
   }
 
-  getInputNode() {
+  getInputNode(): ?HTMLInputElement {
     if (this._field) return this._field.getInputNode();
   }
 
@@ -74,12 +94,15 @@ export default class SemiControlledTextField extends React.Component<
       commitOnBlur,
       onFocus,
       onBlur,
+      type,
       ...otherProps
     } = this.props;
 
     return (
+      // $FlowFixMe
       <TextField
         {...otherProps}
+        type={type || 'text'}
         ref={field => (this._field = field)}
         value={this.state.focused ? this.state.text : value}
         onFocus={event => {

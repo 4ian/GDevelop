@@ -1,14 +1,29 @@
 /* This overwrite the default react-sortable-tree css to display events list */
 
 /**
+ * Remove the outline visible on the events sheet (contrary to most
+ * controls on screen, we don't want a visible focus there).
+ */
+.gd-events-sheet:focus { outline: none; }
+
+/**
  * Draggable handle on the left of an event
  */
 .gd-events-sheet .rst__moveHandle {
     width: 10px;
-    background: #4ab0e4;
-    border: 1px solid #49AFE4;
+    border: none;
     box-shadow: none;
     border-radius: 0;
+}
+
+@media only screen and (max-width: 750px) {
+    /**
+     * Slightly reduce the size of the handle on small screens
+     * and phones (where drag'n'drop is not supported anyway).
+     */
+    .gd-events-sheet .rst__moveHandle {
+        width: 4px;
+    }
 }
 
 .gd-events-sheet .events-tree {
@@ -140,7 +155,17 @@
     opacity: 0.6;
 }
 
+/**
+ * Icon (variable, object icon...)
+ */
 .gd-events-sheet .icon {
     vertical-align: sub;
     object-fit: contain;
+}
+
+/**
+ * Container having an icon next to the associated name
+ */
+.gd-events-sheet .name-and-icon-container {
+    white-space: nowrap;
 }

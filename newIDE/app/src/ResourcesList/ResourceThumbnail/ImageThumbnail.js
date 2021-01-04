@@ -1,6 +1,8 @@
 import React from 'react';
-import Checkbox from 'material-ui/Checkbox';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import Checkbox from '../../UI/Checkbox';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import { useLongTouch } from '../../Utils/UseLongTouch';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -30,13 +32,14 @@ const styles = {
   checkboxContainer: {
     textAlign: 'initial',
     position: 'absolute',
-    width: 24, // Used to position the checkbox near the right border with a proper margin
+    width: 34, // Used to position the checkbox near the right border with a proper margin
+    height: 64,
     bottom: 0,
     right: 0,
   },
 };
 
-const ThemableImageThumbnail = ({
+const ImageThumbnail = ({
   project,
   resourceName,
   resourcesLoader,
@@ -47,38 +50,51 @@ const ThemableImageThumbnail = ({
   onContextMenu,
   muiTheme,
 }) => {
+  // Allow a long press to show the context menu
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      event => {
+        if (onContextMenu) onContextMenu(event.clientX, event.clientY);
+      },
+      [onContextMenu]
+    )
+  );
+
   return (
-    <div
-      title={resourceName}
-      style={{
-        ...styles.spriteThumbnail,
-        borderColor: selected
-          ? muiTheme.imageThumbnail.selectedBorderColor
-          : undefined,
-        ...style,
-      }}
-      onContextMenu={e => {
-        e.stopPropagation();
-        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
-      }}
-    >
-      <img
-        style={styles.spriteThumbnailImage}
-        alt={resourceName}
-        src={resourcesLoader.getResourceFullUrl(project, resourceName)}
-        crossOrigin="anonymous"
-      />
-      {selectable && (
-        <div style={styles.checkboxContainer}>
-          <Checkbox
-            checked={selected}
-            onCheck={(e, check) => onSelect(check)}
+    <ThemeConsumer>
+      {muiTheme => (
+        <div
+          title={resourceName}
+          style={{
+            ...styles.spriteThumbnail,
+            borderColor: selected
+              ? muiTheme.imageThumbnail.selectedBorderColor
+              : undefined,
+            ...style,
+          }}
+          onContextMenu={e => {
+            e.stopPropagation();
+            if (onContextMenu) onContextMenu(e.clientX, e.clientY);
+          }}
+          {...longTouchForContextMenuProps}
+        >
+          <CorsAwareImage
+            style={styles.spriteThumbnailImage}
+            alt={resourceName}
+            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
           />
+          {selectable && (
+            <div style={styles.checkboxContainer}>
+              <Checkbox
+                checked={selected}
+                onCheck={(e, check) => onSelect(check)}
+              />
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </ThemeConsumer>
   );
 };
 
-const ImageThumbnail = muiThemeable()(ThemableImageThumbnail);
 export default ImageThumbnail;

@@ -1,11 +1,11 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+
 #include <algorithm>
 #include <utility>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/Parsers/ExpressionParser.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -630,7 +630,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
     argOutput = "\"" + argOutput + "\"";
   } else if (ParameterMetadata::IsBehavior(metadata.type)) {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+    argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "password" || metadata.type == "musicfile" ||
@@ -662,7 +662,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     if (argOutput.empty()) {
       if (!metadata.type.empty())
         cout << "Warning: Unknown type of parameter \"" << metadata.type
-             << "\".";
+             << "\"." << std::endl;
       argOutput += "\"" + ConvertToString(parameter) + "\"";
     }
   }
@@ -1111,6 +1111,33 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   }
 }
 
+size_t EventsCodeGenerator::GenerateSingleUsageUniqueIdForEventsList() {
+  return eventsListNextUniqueId++;
+}
+
+size_t EventsCodeGenerator::GenerateSingleUsageUniqueIdFor(
+    const Instruction* instruction) {
+  if (!instruction) {
+    std::cout << "ERROR: During code generation, a null pointer was passed to "
+                 "GenerateSingleUsageUniqueIdFor."
+              << std::endl;
+  }
+
+  // Base the unique id on the adress in memory so that the same instruction
+  // in memory will get the same id across different code generations.
+  size_t uniqueId = (size_t)instruction;
+
+  // While in most case this function is called a single time for each instruction,
+  // it's possible for an instruction to be appearing more than once in the events,
+  // if we used links. In this case, simply increment the unique id to be sure that
+  // ids are effectively uniques, and stay stable (given the same order of links).
+  while (instructionUniqueIds.find(uniqueId) != instructionUniqueIds.end()) {
+    uniqueId++;
+  }
+  instructionUniqueIds.insert(uniqueId);
+  return uniqueId;
+}
+
 gd::String EventsCodeGenerator::GetObjectListName(
     const gd::String& name, const gd::EventsCodeGenerationContext& context) {
   return ManObjListName(name);
@@ -1139,7 +1166,8 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
       errorOccurred(false),
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
-      maxConditionsListsSize(0){};
+      maxConditionsListsSize(0),
+      eventsListNextUniqueId(0){};
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
@@ -1154,6 +1182,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       errorOccurred(false),
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),
-      maxConditionsListsSize(0){};
+      maxConditionsListsSize(0),
+      eventsListNextUniqueId(0){};
 
 }  // namespace gd

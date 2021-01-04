@@ -41,6 +41,7 @@ export default class ExternalEventsField extends React.Component<
     const {
       value,
       onChange,
+      onRequestClose,
       isInline,
       project,
       parameterMetadata,
@@ -48,12 +49,18 @@ export default class ExternalEventsField extends React.Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
+        fullWidth
         id="external-events-field"
         value={value}
         onChange={onChange}
+        onRequestClose={onRequestClose}
         dataSource={getList(project)}
         openOnFocus={!isInline}
         ref={field => (this._field = field)}

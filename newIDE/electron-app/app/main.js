@@ -1,5 +1,5 @@
-require('dotenv').config({ path: __dirname + '/.env' });
 const electron = require('electron');
+const path = require('path');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -10,20 +10,16 @@ const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
-const {
-  uploadGameFolderToBucket,
-  uploadArchiveToBucket,
-} = require('./S3Upload');
-const {
-  serveFolder,
-  stopServer,
-  getLocalNetworkIps,
-} = require('./ServeFolder');
+const { uploadLocalFile } = require('./LocalFileUploader');
+const { serveFolder, stopServer } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor, buildPlaceholderMainMenu } = require('./MainMenu');
 const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
+const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
+const setUpDiscordRichPresence = require('./DiscordRichPresence');
+const { downloadLocalFile } = require('./LocalFileDownloader');
 
 log.info('GDevelop Electron app starting...');
 
@@ -48,7 +44,14 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 });
 
 // See registerGdideProtocol (used for HTML modules support)
-protocol.registerStandardSchemes(['gdide']);
+protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+
+// Should be set to true, which will be the default value in future Electron
+// versions, but then causes an issue on Windows where the `fs` module stops
+// working in the renderer process.
+// See https://github.com/electron/electron/issues/22119
+// For now, disable this as we rely heavily on `fs` in the renderer process.
+app.allowRendererProcessReuse = false;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -74,7 +77,8 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     webPreferences: {
-      webSecurity: false, // Allow to access to local files
+      webSecurity: false, // Allow to access to local files,
+      nodeIntegration: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#f0f0f0',
@@ -91,6 +95,11 @@ app.on('ready', function() {
     options.fullscreenable = false;
     options.show = false;
   }
+
+  if (isDev)
+    BrowserWindow.addDevToolsExtension(
+      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
+    );
 
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();
@@ -190,34 +199,57 @@ app.on('ready', function() {
     );
   });
 
-  // S3Upload events:
-  ipcMain.on('s3-folder-upload', (event, localDir) => {
-    log.info('Received event s3-upload with localDir=', localDir);
+  // Yarn Dialogue Tree Editor
+  ipcMain.on('yarn-create-json', (event, externalEditorData) => {
+    loadModalWindow({
+      parentWindow: mainWindow,
+      devTools,
+      readyChannelName: 'yarn-ready',
+      indexSubPath: 'yarn/yarn-index.html',
+      relativeWidth: 0.8,
+      relativeHeight: 0.9,
+      backgroundColor: '#000000',
+      onReady: yarnWindow => {
+        yarnWindow.webContents.send('yarn-open', externalEditorData);
+        yarnWindow.show();
+      },
+    });
+  });
 
-    uploadGameFolderToBucket(
-      localDir,
+  ipcMain.on('yarn-changes-saved', (event, newFilePath) => {
+    mainWindow.webContents.send('yarn-changes-saved', newFilePath);
+  });
+
+  // LocalFileUploader events:
+  ipcMain.on('local-file-upload', (event, localFilePath, uploadOptions) => {
+    log.info(
+      'Received event local-file-upload with localFilePath=',
+      localFilePath
+    );
+
+    uploadLocalFile(
+      localFilePath,
+      uploadOptions,
       throttle((current, max) => {
-        event.sender.send('s3-folder-upload-progress', current, max);
-      }, 200),
-      (err, prefix) => {
-        event.sender.send('s3-folder-upload-done', err, prefix);
+        event.sender.send('local-file-upload-progress', current, max);
+      }, 300)
+    ).then(
+      () => {
+        log.info('Local file upload succesfully done');
+        event.sender.send('local-file-upload-done', null);
+      },
+      uploadError => {
+        log.error('Local file upload errored', uploadError);
+        event.sender.send('local-file-upload-done', uploadError);
       }
     );
   });
 
-  ipcMain.on('s3-file-upload', (event, localFile) => {
-    log.info('Received event s3-file-upload with localFile=', localFile);
-
-    uploadArchiveToBucket(
-      localFile,
-      throttle((current, max) => {
-        event.sender.send('s3-file-upload-progress', current, max);
-      }, 300),
-      (err, prefix) => {
-        event.sender.send('s3-file-upload-done', err, prefix);
-      }
-    );
-  });
+  // LocalFileDownloader events:
+  ipcMain.handle('local-file-download', async (event, url, outputPath) => {
+    const result = await downloadLocalFile(url, outputPath);
+    return result;
+  })
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {
@@ -236,8 +268,8 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('get-local-network-ips', event => {
-    event.sender.send('local-network-ips', getLocalNetworkIps());
+  ipcMain.on('get-local-network-ip', event => {
+    event.sender.send('local-network-ip', findLocalIp());
   });
 
   // DebuggerServer events:
@@ -252,7 +284,8 @@ app.on('ready', function() {
         event.sender.send('debugger-connection-closed', { id }),
       onConnectionOpen: ({ id }) =>
         event.sender.send('debugger-connection-opened', { id }),
-      onListening: () => event.sender.send('debugger-start-server-done'),
+      onListening: ({ address }) =>
+        event.sender.send('debugger-start-server-done', { address }),
     });
   });
 
@@ -331,4 +364,6 @@ app.on('ready', function() {
       info,
     });
   });
+
+  setUpDiscordRichPresence(ipcMain);
 });

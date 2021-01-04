@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
@@ -34,6 +35,7 @@ export default class SceneVariableField extends React.Component<
           value={this.props.value}
           onChange={this.props.onChange}
           isInline={this.props.isInline}
+          onRequestClose={this.props.onRequestClose}
           ref={field => (this._field = field)}
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}
@@ -42,14 +44,25 @@ export default class SceneVariableField extends React.Component<
         />
         {this.state.editorOpen && layout && (
           <VariablesEditorDialog
-            open={this.state.editorOpen}
+            title={<Trans>Scene Variables</Trans>}
+            open
             variablesContainer={layout.getVariables()}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
             }}
-            emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-            emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
+            emptyExplanationMessage={
+              <Trans>
+                Scene variables can be used to store any value or text during
+                the game.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Score representing
+                the current score of the player.
+              </Trans>
+            }
           />
         )}
       </React.Fragment>
@@ -57,11 +70,11 @@ export default class SceneVariableField extends React.Component<
   }
 }
 
-export const renderInlineSceneVariable = ({
-  value,
-}: ParameterInlineRendererProps) => {
+export const renderInlineSceneVariable = (
+  props: ParameterInlineRendererProps
+) => {
   return renderVariableWithIcon(
-    value,
+    props,
     'res/types/scenevar.png',
     'scene variable'
   );

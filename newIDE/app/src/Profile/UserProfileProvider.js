@@ -19,6 +19,7 @@ import UserProfileContext, {
   initialUserProfile,
   type UserProfile,
 } from './UserProfileContext';
+import CreateAccountDialog from './CreateAccountDialog';
 
 type Props = {
   authentification: Authentification,
@@ -28,6 +29,7 @@ type Props = {
 type State = {|
   userProfile: UserProfile,
   loginDialogOpen: boolean,
+  createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
   loginError: ?LoginError,
@@ -39,6 +41,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
   state = {
     userProfile: initialUserProfile,
     loginDialogOpen: false,
+    createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
     loginError: null,
@@ -56,7 +59,8 @@ export default class UserProfileProvider extends React.Component<Props, State> {
       userProfile: {
         ...initialUserProfile,
         onLogout: this._doLogout,
-        onLogin: () => this.openLogin(true),
+        onLogin: () => this.openLoginDialog(true),
+        onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         getAuthorizationHeader: () =>
           this.props.authentification.getAuthorizationHeader(),
@@ -146,7 +150,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
       authentification.login(form).then(
         () => {
           this._fetchUserProfile();
-          this.openLogin(false);
+          this.openLoginDialog(false);
         },
         (loginError: LoginError) => {
           this.setState({
@@ -165,7 +169,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
       authentification.createAccount(form).then(
         () => {
           this._fetchUserProfile();
-          this.openLogin(false);
+          this.openLoginDialog(false);
           sendSignupDone(form.email);
         },
         (loginError: LoginError) => {
@@ -204,9 +208,17 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     });
   };
 
-  openLogin = (open: boolean = true) => {
+  openLoginDialog = (open: boolean = true) => {
     this.setState({
       loginDialogOpen: open,
+      createAccountDialogOpen: false,
+    });
+  };
+
+  openCreateAccountDialog = (open: boolean = true) => {
+    this.setState({
+      loginDialogOpen: false,
+      createAccountDialogOpen: open,
     });
   };
 
@@ -218,17 +230,24 @@ export default class UserProfileProvider extends React.Component<Props, State> {
         </UserProfileContext.Provider>
         {this.state.loginDialogOpen && (
           <LoginDialog
-            open={this.state.loginDialogOpen}
-            onClose={() => this.openLogin(false)}
+            onClose={() => this.openLoginDialog(false)}
+            onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
             onLogin={this._doLogin}
-            onCreateAccount={this._doCreateAccount}
             loginInProgress={this.state.loginInProgress}
-            createAccountInProgress={this.state.createAccountInProgress}
             error={this.state.loginError}
             onForgotPassword={this._doForgotPassword}
             resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
             onCloseResetPasswordDialog={() => this.openResetPassword(false)}
             forgotPasswordInProgress={this.state.forgotPasswordInProgress}
+          />
+        )}
+        {this.state.createAccountDialogOpen && (
+          <CreateAccountDialog
+            onClose={() => this.openCreateAccountDialog(false)}
+            onGoToLogin={() => this.openLoginDialog(true)}
+            onCreateAccount={this._doCreateAccount}
+            createAccountInProgress={this.state.createAccountInProgress}
+            error={this.state.loginError}
           />
         )}
       </React.Fragment>

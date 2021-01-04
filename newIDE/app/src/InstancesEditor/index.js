@@ -1,7 +1,7 @@
+// @flow
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
-import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
+import DeprecatedKeyboardShortcuts from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -13,30 +13,93 @@ import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
-import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
 import CanvasCursor from './CanvasCursor';
+import InstancesAdder from './InstancesAdder';
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import { objectWithContextReactDndType } from '../ObjectsList';
+import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
+import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import InstancesSelection from './InstancesSelection';
+import LongTouchHandler from './LongTouchHandler';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
   dropCursor: { cursor: 'copy' },
 };
 
-export default class InstancesEditorContainer extends Component {
-  constructor() {
-    super();
+const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
-    this.lastContextMenuX = 0;
-    this.lastContextMenuY = 0;
-    this.lastCursorX = 0;
-    this.lastCursorY = 0;
+export type InstancesEditorPropsWithoutSizeAndScroll = {|
+  project: gdProject,
+  layout: gdLayout,
+  initialInstances: gdInitialInstancesContainer,
+  options: Object,
+  onChangeOptions: (uiSettings: Object) => void,
+  instancesSelection: InstancesSelection,
+  onDeleteSelection: () => void,
+  onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
+  onInstancesSelected: (instances: Array<gdInitialInstance>) => void,
+  onInstanceDoubleClicked: (instance: gdInitialInstance) => void,
+  onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
+  onInstancesResized: (instances: Array<gdInitialInstance>) => void,
+  onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  selectedObjectNames: Array<string>,
+  onContextMenu: (x: number, y: number) => void,
+  onCopy: () => void,
+  onCut: () => void,
+  onPaste: () => void,
+  onUndo: () => void,
+  onRedo: () => void,
+  onZoomOut: () => void,
+  onZoomIn: () => void,
+  pauseRendering: boolean,
+|};
 
-    this.fpsLimiter = new FpsLimiter(28);
-  }
+type Props = {|
+  ...InstancesEditorPropsWithoutSizeAndScroll,
+  width: number,
+  height: number,
+  onViewPositionChanged: ViewPosition => void,
+  screenType: ScreenType,
+|};
+
+export default class InstancesEditor extends Component<Props> {
+  lastContextMenuX = 0;
+  lastContextMenuY = 0;
+  lastCursorX = 0;
+  lastCursorY = 0;
+  fpsLimiter = new FpsLimiter(28);
+  canvasArea: ?HTMLDivElement;
+  pixiRenderer: any;
+  keyboardShortcuts: DeprecatedKeyboardShortcuts;
+  pinchHandler: PinchHandler;
+  canvasCursor: CanvasCursor;
+  _instancesAdder: InstancesAdder;
+  selectionRectangle: SelectionRectangle;
+  selectedInstances: SelectedInstances;
+  highlightedInstance: HighlightedInstance;
+  instancesResizer: InstancesResizer;
+  instancesRotator: InstancesRotator;
+  instancesMover: InstancesMover;
+  windowBorder: WindowBorder;
+  windowMask: WindowMask;
+  statusBar: StatusBar;
+  pixiContainer: PIXI.Container;
+  backgroundArea: PIXI.Container;
+  backgroundColor: BackgroundColor;
+  instancesRenderer: InstancesRenderer;
+  viewPosition: ViewPosition;
+  longTouchHandler: LongTouchHandler;
+  grid: Grid;
+  _unmounted = false;
+  _renderingPaused = false;
+  nextFrame: AnimationFrameID;
+  contextMenuLongTouchTimeoutID: TimeoutID;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -55,17 +118,33 @@ export default class InstancesEditorContainer extends Component {
   }
 
   _initializeCanvasAndRenderer() {
+    const { canvasArea } = this;
+    if (!canvasArea) return;
+
     // project can be used here for initializing stuff, but don't keep references to it.
     // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
     // if the project changes).
     const { project } = this.props;
 
+    //Create the renderer and setup the rendering area for scene editor.
+    //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this.pixiRenderer = PIXI.autoDetectRenderer(
-      this.props.width,
-      this.props.height,
-      { antialias: true } //fixes jaggy edges
+      {
+        width: this.props.width,
+        height: this.props.height,
+        preserveDrawingBuffer: true,
+        antialias: false,
+      }
+      // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
-    this.canvasArea.appendChild(this.pixiRenderer.view);
+    canvasArea.appendChild(this.pixiRenderer.view);
+
+    this.longTouchHandler = new LongTouchHandler({
+      canvas: this.pixiRenderer.view,
+      onLongTouch: event =>
+        this.props.onContextMenu(event.clientX, event.clientY),
+    });
+
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
 
@@ -76,15 +155,7 @@ export default class InstancesEditorContainer extends Component {
 
       return false;
     });
-    this.pixiRenderer.view.addEventListener('pointerup', event => {
-      this.props.onPointerUp();
-    });
-    this.pixiRenderer.view.addEventListener('pointerover', event => {
-      this.props.onPointerOver();
-    });
-    this.pixiRenderer.view.addEventListener('pointerout', event => {
-      this.props.onPointerOut();
-    });
+
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomBy(event.wheelDelta / 5000);
@@ -126,9 +197,13 @@ export default class InstancesEditorContainer extends Component {
     this.backgroundArea.on('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );
-    this.backgroundArea.on('touchstart', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
-    );
+    this.backgroundArea.on('touchstart', event => {
+      if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+        return;
+      }
+
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y);
+    });
     this.backgroundArea.on('mousemove', event =>
       this._onMouseMove(event.data.global.x, event.data.global.y)
     );
@@ -144,8 +219,8 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
-      initialViewX: project ? project.getMainWindowDefaultWidth() / 2 : 0,
-      initialViewY: project ? project.getMainWindowDefaultHeight() / 2 : 0,
+      initialViewX: project ? project.getGameResolutionWidth() / 2 : 0,
+      initialViewY: project ? project.getGameResolutionHeight() / 2 : 0,
       width: this.props.width,
       height: this.props.height,
       options: this.props.options,
@@ -158,7 +233,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
-    this.keyboardShortcuts = new KeyboardShortcuts({
+    this.keyboardShortcuts = new DeprecatedKeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
       onCopy: this.props.onCopy,
@@ -170,14 +245,21 @@ export default class InstancesEditorContainer extends Component {
       onZoomIn: this.props.onZoomIn,
     });
 
-    this.dropHandler = new DropHandler({
-      canvas: this.canvasArea,
-      onDrop: this._onDrop,
+    this.pinchHandler = new PinchHandler({
+      canvas: this.pixiRenderer.view,
+      setZoomFactor: this.setZoomFactor,
+      getZoomFactor: this.getZoomFactor,
+      viewPosition: this.viewPosition,
     });
 
     this.canvasCursor = new CanvasCursor({
-      canvas: this.canvasArea,
+      canvas: canvasArea,
       shouldMoveView: () => this.keyboardShortcuts.shouldMoveView(),
+    });
+
+    this._instancesAdder = new InstancesAdder({
+      instances: this.props.initialInstances,
+      options: this.props.options,
     });
 
     this._mountEditorComponents(this.props);
@@ -194,7 +276,7 @@ export default class InstancesEditorContainer extends Component {
     this._mountEditorComponents(this.props);
   }
 
-  _mountEditorComponents(props) {
+  _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
     if (this.highlightedInstance) {
       this.pixiContainer.removeChild(this.highlightedInstance.getPixiObject());
@@ -237,6 +319,7 @@ export default class InstancesEditorContainer extends Component {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
+      onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: props.initialInstances,
@@ -251,6 +334,7 @@ export default class InstancesEditorContainer extends Component {
       onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      screenType: this.props.screenType,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
@@ -278,7 +362,7 @@ export default class InstancesEditorContainer extends Component {
     this.statusBar = new StatusBar({
       width: this.props.width,
       height: this.props.height,
-      getLastCursorPosition: this.getLastCursorPosition,
+      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
@@ -300,11 +384,14 @@ export default class InstancesEditorContainer extends Component {
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
+    this._instancesAdder.unmount();
+    this.pinchHandler.unmount();
+    this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height
@@ -330,6 +417,11 @@ export default class InstancesEditorContainer extends Component {
       this.instancesResizer.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
+      this._instancesAdder.setOptions(nextProps.options);
+    }
+
+    if (nextProps.screenType !== this.props.screenType) {
+      this.selectedInstances.setScreenType(this.props.screenType);
     }
 
     if (
@@ -356,34 +448,54 @@ export default class InstancesEditorContainer extends Component {
    * See also ResourcesLoader and PixiResourcesLoader.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetRenderersFor(objectName) {
+  resetRenderersFor(objectName: string) {
     if (this.instancesRenderer)
       this.instancesRenderer.resetRenderersFor(objectName);
   }
 
-  zoomBy(value) {
+  zoomBy(value: number) {
     this.setZoomFactor(this.getZoomFactor() + value);
   }
 
-  getZoomFactor() {
+  getZoomFactor = () => {
     return this.props.options.zoomFactor;
-  }
+  };
 
-  setZoomFactor(zoomFactor) {
+  setZoomFactor = (zoomFactor: number) => {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });
-  }
+  };
 
-  _onMouseMove = (x, y) => {
+  /**
+   * Immediately add instances for the specified objects at the given
+   * position (in scene coordinates).
+   */
+  addInstances = (
+    pos /*: [number, number] */,
+    objectNames /*: Array<string> */
+  ): Array<gdInitialInstance> => {
+    return this._instancesAdder.addInstances(pos, objectNames);
+  };
+
+  _onMouseMove = (x: number, y: number) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x, y) => {
+  _onBackgroundClicked = (x: number, y: number) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
+
+    // Selection rectangle is only drawn in _onPanMove,
+    // which can happen a few milliseconds after a background
+    // click/touch - enough to have the selection rectangle being
+    // offset from the first click - which looks laggy. Set
+    // the start position now.
+    if (!this.keyboardShortcuts.shouldMoveView()) {
+      this.selectionRectangle.startSelectionRectangle(x, y);
+    }
 
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
@@ -394,7 +506,7 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
-  _onPanMove = (deltaX, deltaY, x, y) => {
+  _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
     if (this.keyboardShortcuts.shouldMoveView()) {
       const sceneDeltaX = deltaX / this.getZoomFactor();
       const sceneDeltaY = deltaY / this.getZoomFactor();
@@ -405,7 +517,7 @@ export default class InstancesEditorContainer extends Component {
         this.props.onViewPositionChanged(this.viewPosition);
       }
     } else {
-      this.selectionRectangle.makeSelectionRectangle(x, y);
+      this.selectionRectangle.updateSelectionRectangle(x, y);
     }
   };
 
@@ -436,15 +548,19 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
-  _onInstanceClicked = instance => {
+  _onInstanceClicked = (instance: gdInitialInstance) => {
     this.pixiRenderer.view.focus();
   };
 
-  _onOverInstance = instance => {
+  _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
+    this.props.onInstanceDoubleClicked(instance);
+  };
+
+  _onOverInstance = (instance: gdInitialInstance) => {
     this.highlightedInstance.setInstance(instance);
   };
 
-  _onDownInstance = instance => {
+  _onDownInstance = (instance: gdInitialInstance) => {
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
       // it's just the beginning of the user panning the view.
@@ -455,7 +571,9 @@ export default class InstancesEditorContainer extends Component {
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
       for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
-        this.props.initialInstances.insertInitialInstance(instance);
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
       }
     } else {
       this.props.instancesSelection.selectInstance(
@@ -472,12 +590,16 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
-  _onOutInstance = instance => {
+  _onOutInstance = (instance: gdInitialInstance) => {
     if (instance === this.highlightedInstance.getInstance())
       this.highlightedInstance.setInstance(null);
   };
 
-  _onMoveInstance = (instance, deltaX, deltaY) => {
+  _onMoveInstance = (
+    instance: gdInitialInstance,
+    deltaX: number,
+    deltaY: number
+  ) => {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -514,16 +636,20 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX, deltaY) => {
-    const sceneDeltaX = deltaX / this.getZoomFactor();
-    const sceneDeltaY = deltaY / this.getZoomFactor();
+  _onResize = (deltaX: number | null, deltaY: number | null) => {
+    const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
+    const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const forceProportional =
+      this.props.screenType === 'touch' && deltaX !== null && deltaY !== null;
+    const proportional =
+      forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
-      this.keyboardShortcuts.shouldResizeProportionally()
+      proportional
     );
   };
 
@@ -534,7 +660,7 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesResized(selectedInstances);
   };
 
-  _onRotate = (deltaX, deltaY) => {
+  _onRotate = (deltaX: number, deltaY: number) => {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -554,18 +680,11 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesRotated(selectedInstances);
   };
 
-  _onDrop = (x, y, objectName) => {
-    const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    if (this.props.onAddInstance) {
-      this.props.onAddInstance(newPos[0], newPos[1], objectName);
-    }
-  };
-
   clearHighlightedInstance = () => {
     this.highlightedInstance.setInstance(null);
   };
 
-  moveSelection = (x, y) => {
+  moveSelection = (x: number, y: number) => {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     selectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
@@ -574,11 +693,17 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  scrollTo(x, y) {
+  scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);
   }
 
-  centerViewOn(instances) {
+  centerView() {
+    const x = this.props.project.getGameResolutionWidth() / 2;
+    const y = this.props.project.getGameResolutionHeight() / 2;
+    this.viewPosition.scrollTo(x, y);
+  }
+
+  centerViewOn(instances: Array<gdInitialInstance>) {
     if (!instances.length) return;
 
     this.viewPosition.scrollToInstance(instances[instances.length - 1]);
@@ -587,14 +712,14 @@ export default class InstancesEditorContainer extends Component {
     }
   }
 
-  getLastContextMenuPosition = () => {
+  getLastContextMenuSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
     );
   };
 
-  getLastCursorPosition = () => {
+  getLastCursorSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
@@ -646,15 +771,63 @@ export default class InstancesEditorContainer extends Component {
     if (!this.props.project) return null;
 
     return (
-      <SimpleDropTarget>
-        <div
-          ref={canvasArea => (this.canvasArea = canvasArea)}
-          style={{
-            ...styles.canvasArea,
-            ...(this.props.showDropCursor ? styles.dropCursor : undefined),
-          }}
-        />
-      </SimpleDropTarget>
+      <DropTarget
+        canDrop={() => true}
+        hover={monitor => {
+          const { _instancesAdder, viewPosition, canvasArea } = this;
+          if (!_instancesAdder || !canvasArea || !viewPosition) return;
+
+          const { x, y } = monitor.getClientOffset();
+          const canvasRect = canvasArea.getBoundingClientRect();
+          const pos = viewPosition.toSceneCoordinates(
+            x - canvasRect.left,
+            y - canvasRect.top
+          );
+          _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
+            pos,
+            this.props.selectedObjectNames
+          );
+        }}
+        drop={monitor => {
+          const { _instancesAdder, viewPosition, canvasArea } = this;
+          if (!_instancesAdder || !canvasArea || !viewPosition) return;
+
+          if (monitor.didDrop()) {
+            // Drop was done somewhere else (in a child of the canvas:
+            // should not happen, but still handling this case).
+            _instancesAdder.deleteTemporaryInstances();
+            return;
+          }
+
+          const { x, y } = monitor.getClientOffset();
+          const canvasRect = canvasArea.getBoundingClientRect();
+          const pos = viewPosition.toSceneCoordinates(
+            x - canvasRect.left,
+            y - canvasRect.top
+          );
+          const instances = _instancesAdder.updateTemporaryInstancePositions(
+            pos
+          );
+          _instancesAdder.commitTemporaryInstances();
+          this.props.onInstancesAdded(instances);
+        }}
+      >
+        {({ connectDropTarget, isOver }) => {
+          // The children are re-rendered when isOver change:
+          // take this opportunity to delete any temporary instances
+          // if the dragging is not done anymore over the canvas.
+          if (this._instancesAdder && !isOver) {
+            this._instancesAdder.deleteTemporaryInstances();
+          }
+
+          return connectDropTarget(
+            <div
+              ref={canvasArea => (this.canvasArea = canvasArea)}
+              style={styles.canvasArea}
+            />
+          );
+        }}
+      </DropTarget>
     );
   }
 }

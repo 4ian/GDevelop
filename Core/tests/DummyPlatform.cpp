@@ -14,6 +14,9 @@
 
 void SetupProjectWithDummyPlatform(gd::Project &project,
                                    gd::Platform &platform) {
+  // Don't show extension loading logs for tests (too verbose).
+  platform.EnableExtensionLoadingLogs(false);
+
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   baseObjectExtension->SetExtensionInformation(
@@ -81,6 +84,18 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("string", "")
       .AddParameter("expression", "", "", true)
       .SetFunctionName("getNumberWith3Params");
+  extension
+      ->AddStrExpression("GetStringWith2ObjectParamAnd2ObjectVarParam",
+                        "Get string with twice an object param and an objectvar param",
+                        "",
+                        "",
+                        "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("objectvar", _("Variable for object 1"))
+      .AddParameter("object", _("Object 2 parameter"))
+      .AddParameter("objectvar", _("Variable for object 2"))
+      .SetFunctionName("getStringWith2ObjectParamAnd2ObjectVarParam");
+
   auto &object = extension->AddObject<gd::Object>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object

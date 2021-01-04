@@ -7,6 +7,19 @@ const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
 
+export type AppArguments = { [string]: any };
+
+/**
+ * The name of the key, in AppArguments, containing the array of
+ * positional arguments (i.e: `["file1", "file2"]` in `ls file1 file2`).
+ */
+export const POSITIONAL_ARGUMENTS_KEY = '_';
+
+let currentTitleBarColor: ?string = null;
+
+/**
+ * Various utilities related to the app window management.
+ */
 export default class Window {
   static setTitle(title: string) {
     if (electron) {
@@ -23,6 +36,24 @@ export default class Window {
       }
     } else {
       document.title = title;
+    }
+  }
+
+  static setTitleBarColor(newColor: string) {
+    if (electron) {
+      // Nothing to do, the title bar is using the system window management.
+      return;
+    }
+
+    if (currentTitleBarColor === newColor) {
+      // Avoid potentially expensive DOM query/modification if no changes needed.
+      return;
+    }
+
+    const metaElement = document.querySelector('meta[name="theme-color"]');
+    if (metaElement) {
+      metaElement.setAttribute('content', newColor);
+      currentTitleBarColor = newColor;
     }
   }
 
@@ -50,6 +81,13 @@ export default class Window {
       console.warn('Unable to change window bounds', err);
     }
     this.show();
+  }
+
+  static quit() {
+    if (!electron) return;
+
+    const electronApp = electron.remote.app;
+    electronApp.quit();
   }
 
   static show() {
@@ -95,7 +133,7 @@ export default class Window {
    * didn't have an option associated with them (see https://github.com/substack/minimist).
    * (On the web-app, this is emulated using the "project" argument).
    */
-  static getArguments(): { [string]: any } {
+  static getArguments(): AppArguments {
     if (electron) {
       return electron.remote.getGlobal('args');
     }
@@ -104,9 +142,9 @@ export default class Window {
     const params = new URLSearchParams(window.location.search);
     params.forEach((value, name) => (argumentsObject[name] = value));
 
-    // Emulate the minimist behavior of putting the arguments without option
+    // Emulate the minimist behavior of putting the positional arguments
     // in "_".
-    argumentsObject._ = argumentsObject.project
+    argumentsObject[POSITIONAL_ARGUMENTS_KEY] = argumentsObject.project
       ? [argumentsObject.project]
       : [];
 
@@ -123,11 +161,29 @@ export default class Window {
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showMessageBox(browserWindow, {
+    dialog.showMessageBoxSync(browserWindow, {
       message,
       type,
       buttons: ['OK'],
     });
+  }
+
+  static showConfirmDialog(
+    message: string,
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning'
+  ) {
+    if (!dialog || !electron) {
+      // eslint-disable-next-line
+      return confirm(message);
+    }
+
+    const browserWindow = electron.remote.getCurrentWindow();
+    const answer = dialog.showMessageBoxSync(browserWindow, {
+      message,
+      type,
+      buttons: ['OK', 'Cancel'],
+    });
+    return answer === 0;
   }
 
   static setUpContextMenu() {
@@ -166,6 +222,8 @@ export default class Window {
   }
 
   static openExternalURL(url: string) {
+    if (!url) return;
+
     if (electron) {
       if (shell) shell.openExternal(url);
       return;
@@ -178,10 +236,21 @@ export default class Window {
     return !!electron;
   }
 
-  static isDev() {
+  static isDev(): boolean {
     if (!electron)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
-    return electron.remote.require('electron-is').dev();
+    try {
+      const isDev = electron.remote.require('electron-is').dev();
+      return isDev;
+    } catch (err) {
+      // This rarely, but sometimes happen that require throw ("missing remote object").
+      // Catch the error in the hope that things will continue to work.
+      console.error(
+        "Caught an error while calling electron.remote.require('electron-is').dev",
+        err
+      );
+      return false; // Assume we're not in development mode. Might be incorrect but better not consider production as development.
+    }
   }
 }

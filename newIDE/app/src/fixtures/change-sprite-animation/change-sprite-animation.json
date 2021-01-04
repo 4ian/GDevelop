@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\change-sprite-animation\\game.json",
+    "projectUuid": "6b560972-6cd6-4328-a017-2b4896383fc6",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_cheer1.png",
+        "file": "https://resources.gdevelop-app.com/examples/change-sprite-animation/images/player_cheer1.png",
         "kind": "image",
         "metadata": "",
         "name": "player_cheer1.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_duck.png",
+        "file": "https://resources.gdevelop-app.com/examples/change-sprite-animation/images/player_duck.png",
         "kind": "image",
         "metadata": "",
         "name": "player_duck.png",
@@ -166,6 +164,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "b4dd205b-e653-480e-91c2-a4d7e65187ec",
           "width": 0,
           "x": 338.011,
           "y": 257.511,
@@ -181,6 +180,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "eeb3fba9-eef9-4621-baf0-774cacd407a1",
           "width": 0,
           "x": 144.894,
           "y": 28.0707,
@@ -678,6 +678,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -6,14 +6,15 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../../../../UI/Table';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../../../../Utils/NewNameGenerator';
 import { mapVector } from '../../../../Utils/MapFor';
+import Window from '../../../../Utils/Window';
 import styles from './styles';
 import PointRow from './PointRow';
 import AddPointRow from './AddPointRow';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const SortableAddPointRow = SortableElement(AddPointRow);
 const SortablePointRow = SortableElement(PointRow);
@@ -95,8 +96,7 @@ class PointsListBody extends Component {
             });
           }}
           onRemove={() => {
-            //eslint-disable-next-line
-            const answer = confirm(
+            const answer = Window.showConfirmDialog(
               "Are you sure you want to remove this point? This can't be undone."
             );
             if (!answer) return;
@@ -171,13 +171,7 @@ class PointsListBody extends Component {
     );
 
     return (
-      <TableBody
-        displayRowCheckbox={false}
-        deselectOnClickaway={true}
-        showRowHover={true}
-      >
-        {[originRow, centerRow, ...pointsRows, addRow]}
-      </TableBody>
+      <TableBody>{[originRow, centerRow, ...pointsRows, addRow]}</TableBody>
     );
   }
 }
@@ -188,8 +182,8 @@ SortablePointsListBody.muiName = 'TableBody';
 export default class PointsList extends Component {
   render() {
     return (
-      <Table selectable={false}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+      <Table>
+        <TableHeader>
           <TableRow>
             <TableHeaderColumn style={styles.handleColumn} />
             <TableHeaderColumn>Point name</TableHeaderColumn>

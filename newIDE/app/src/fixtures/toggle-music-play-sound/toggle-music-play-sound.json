@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\toggle-music-play-sound\\game.json",
+    "projectUuid": "0382871a-d068-4892-9d0e-bb3ed1f6585c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/play.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/play.png",
         "kind": "image",
         "metadata": "",
         "name": "play.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/pause.png",
         "kind": "image",
         "metadata": "",
         "name": "pause.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_on.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/sound_on.png",
         "kind": "image",
         "metadata": "",
         "name": "sound_on.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_off.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/sound_off.png",
         "kind": "image",
         "metadata": "",
         "name": "sound_off.png",
@@ -138,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_play (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/music_play (1).png",
         "kind": "image",
         "metadata": "",
         "name": "music_play (1).png",
@@ -147,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/music_pause.png",
         "kind": "image",
         "metadata": "",
         "name": "music_pause.png",
@@ -156,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_background.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/volume_background.png",
         "kind": "image",
         "metadata": "",
         "name": "volume_background.png",
@@ -165,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_slider.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/volume_slider.png",
         "kind": "image",
         "metadata": "",
         "name": "volume_slider.png",
@@ -174,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/slider_button.png",
+        "file": "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/slider_button.png",
         "kind": "image",
         "metadata": "",
         "name": "slider_button.png",
@@ -239,6 +237,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
+          "persistentUuid": "d6444935-dfb7-4e2d-82a7-58d4610c0dfe",
           "width": 0,
           "x": 288,
           "y": 224,
@@ -254,6 +253,7 @@
           "layer": "",
           "locked": false,
           "name": "play",
+          "persistentUuid": "04d2cfb7-0ea4-4fb8-be1b-c31eea3e8f08",
           "width": 0,
           "x": 384,
           "y": 320,
@@ -269,6 +269,7 @@
           "layer": "",
           "locked": false,
           "name": "pause",
+          "persistentUuid": "cbeb2ed6-faa8-4ce5-97b5-db01a3f7f710",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -284,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "mute",
+          "persistentUuid": "6a560086-9043-400f-b09d-51111c767acd",
           "width": 0,
           "x": 320,
           "y": 320,
@@ -299,6 +301,7 @@
           "layer": "",
           "locked": false,
           "name": "track_info",
+          "persistentUuid": "4d462ef5-738e-4c27-a835-d1e2e61cf7a6",
           "width": 0,
           "x": 341.773,
           "y": 224,
@@ -314,6 +317,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_background",
+          "persistentUuid": "85d5d913-02ee-47a7-b2d5-c7510992b043",
           "width": 0,
           "x": 307,
           "y": 293,
@@ -329,6 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "volume_slider",
+          "persistentUuid": "8e6aeb05-ce63-42b8-9746-4683e6ed49de",
           "width": 0,
           "x": 307,
           "y": 278,
@@ -344,6 +349,7 @@
           "layer": "",
           "locked": false,
           "name": "slider_button",
+          "persistentUuid": "aeda3e22-d260-4c3d-80f3-763e3a63792a",
           "width": 0,
           "x": 538,
           "y": 273,
@@ -1140,7 +1146,7 @@
                   },
                   "parameters": [
                     "",
-                    "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/click.ogg",
+                    "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/click.ogg",
                     "",
                     "100",
                     "1"
@@ -1573,7 +1579,7 @@
                           },
                           "parameters": [
                             "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/Castle-of-Despair.ogg",
+                            "https://resources.gdevelop-app.com/examples/toggle-music-play-sound/Castle-of-Despair.ogg",
                             "1",
                             "yes",
                             "100",
@@ -1928,6 +1934,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

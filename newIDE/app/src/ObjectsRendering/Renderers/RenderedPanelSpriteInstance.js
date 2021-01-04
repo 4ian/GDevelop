@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
-const gd = global.gd;
+import * as PIXI from 'pixi.js-legacy';
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for gd.PanelSpriteObject
@@ -80,7 +80,7 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   );
 
   this._tiled = panelSprite.isTiled();
-  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
+  var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.TilingSprite;
 
   if (!this._pixiObject) {
     this._pixiObject = new PIXI.Container();
@@ -116,39 +116,47 @@ RenderedPanelSpriteInstance.prototype.updatePosition = function() {
 
 RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
-  var extraPixels = panelSprite.isTiled() ? 1 : 0;
 
   this._centerSprite.position.x = panelSprite.getLeftMargin();
   this._centerSprite.position.y = panelSprite.getTopMargin();
+
+  //Right
   this._borderSprites[0].position.x =
-    this._width - panelSprite.getRightMargin() - extraPixels * 2;
+    this._width - panelSprite.getRightMargin();
   this._borderSprites[0].position.y = panelSprite.getTopMargin();
 
+  //Top-right
   this._borderSprites[1].position.x =
-    this._width - this._borderSprites[1].width - extraPixels * 2;
+    this._width - this._borderSprites[1].width;
   this._borderSprites[1].position.y = 0;
 
+  //Top
   this._borderSprites[2].position.x = panelSprite.getLeftMargin();
   this._borderSprites[2].position.y = 0;
 
+  //Top-Left
   this._borderSprites[3].position.x = 0;
   this._borderSprites[3].position.y = 0;
 
+  //Left
   this._borderSprites[4].position.x = 0;
   this._borderSprites[4].position.y = panelSprite.getTopMargin();
 
+  //Bottom-Left
   this._borderSprites[5].position.x = 0;
   this._borderSprites[5].position.y =
-    this._height - this._borderSprites[5].height - extraPixels * 2;
+    this._height - this._borderSprites[5].height;
 
+  //Bottom
   this._borderSprites[6].position.x = panelSprite.getLeftMargin();
   this._borderSprites[6].position.y =
-    this._height - panelSprite.getBottomMargin() - extraPixels * 3; //FIXME: 1 more extra pixel is somewhat needed for pixel perfect alignment
+    this._height - panelSprite.getBottomMargin();
 
+  //Bottom-Right
   this._borderSprites[7].position.x =
-    this._width - this._borderSprites[7].width - extraPixels * 2;
+    this._width - this._borderSprites[7].width;
   this._borderSprites[7].position.y =
-    this._height - this._borderSprites[7].height - extraPixels * 2;
+    this._height - this._borderSprites[7].height;
 };
 
 RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function() {
@@ -162,25 +170,28 @@ RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function()
     0
   );
 
-  //Top, Bottom, Right, Left borders:
+  //Right
   this._borderSprites[0].width = panelSprite.getRightMargin();
   this._borderSprites[0].height = Math.max(
     this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
     0
   );
 
+  //Top
   this._borderSprites[2].height = panelSprite.getTopMargin();
   this._borderSprites[2].width = Math.max(
     this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
     0
   );
 
+  //Left
   this._borderSprites[4].width = panelSprite.getLeftMargin();
   this._borderSprites[4].height = Math.max(
     this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
     0
   );
 
+  //Bottom
   this._borderSprites[6].height = panelSprite.getBottomMargin();
   this._borderSprites[6].width = Math.max(
     this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
@@ -199,7 +210,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     this._textureName
   );
 
-  if (texture.noFrame) {
+  if (!texture.baseTexture.valid) {
     //Post pone texture update if texture is not loaded
     const renderer = this;
     texture.on('update', function() {
@@ -242,20 +253,35 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     )
   );
 
-  //Top, Bottom, Right, Left borders:
+  //Right
   this._borderSprites[0].texture = new PIXI.Texture(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        texture.width - panelSprite.getRightMargin() - 1,
+        texture.width - panelSprite.getRightMargin(),
         panelSprite.getTopMargin(),
-        panelSprite.getRightMargin() + 1,
+        panelSprite.getRightMargin(),
         texture.height -
           panelSprite.getTopMargin() -
           panelSprite.getBottomMargin()
       )
     )
   );
+
+  //Top-right
+  this._borderSprites[1].texture = new PIXI.Texture(
+    texture,
+    makeInsideTexture(
+      new PIXI.Rectangle(
+        texture.width - panelSprite.getRightMargin(),
+        0,
+        panelSprite.getRightMargin(),
+        panelSprite.getTopMargin()
+      )
+    )
+  );
+
+  //Top
   this._borderSprites[2].texture = new PIXI.Texture(
     texture,
     makeInsideTexture(
@@ -265,48 +291,12 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
         texture.width -
           panelSprite.getLeftMargin() -
           panelSprite.getRightMargin(),
-        panelSprite.getTopMargin() + 1
-      )
-    )
-  );
-  this._borderSprites[4].texture = new PIXI.Texture(
-    texture,
-    makeInsideTexture(
-      new PIXI.Rectangle(
-        0,
-        panelSprite.getTopMargin(),
-        panelSprite.getLeftMargin() + 1,
-        texture.height -
-          panelSprite.getTopMargin() -
-          panelSprite.getBottomMargin()
-      )
-    )
-  );
-  this._borderSprites[6].texture = new PIXI.Texture(
-    texture,
-    makeInsideTexture(
-      new PIXI.Rectangle(
-        panelSprite.getLeftMargin(),
-        texture.height - panelSprite.getBottomMargin() - 1,
-        texture.width -
-          panelSprite.getLeftMargin() -
-          panelSprite.getRightMargin(),
-        panelSprite.getBottomMargin() + 1
-      )
-    )
-  );
-
-  this._borderSprites[1].texture = new PIXI.Texture(
-    texture,
-    makeInsideTexture(
-      new PIXI.Rectangle(
-        this._borderSprites[1].width - panelSprite.getRightMargin(),
-        0,
-        panelSprite.getRightMargin(),
         panelSprite.getTopMargin()
       )
     )
   );
+
+  //Top-Left
   this._borderSprites[3].texture = new PIXI.Texture(
     texture,
     makeInsideTexture(
@@ -318,23 +308,57 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
       )
     )
   );
+
+  //Left
+  this._borderSprites[4].texture = new PIXI.Texture(
+    texture,
+    makeInsideTexture(
+      new PIXI.Rectangle(
+        0,
+        panelSprite.getTopMargin(),
+        panelSprite.getLeftMargin(),
+        texture.height -
+          panelSprite.getTopMargin() -
+          panelSprite.getBottomMargin()
+      )
+    )
+  );
+
+  //Bottom-Left
   this._borderSprites[5].texture = new PIXI.Texture(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
         0,
-        this._borderSprites[5].height - panelSprite.getBottomMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getLeftMargin(),
         panelSprite.getBottomMargin()
       )
     )
   );
+
+  //Bottom
+  this._borderSprites[6].texture = new PIXI.Texture(
+    texture,
+    makeInsideTexture(
+      new PIXI.Rectangle(
+        panelSprite.getLeftMargin(),
+        texture.height - panelSprite.getBottomMargin(),
+        texture.width -
+          panelSprite.getLeftMargin() -
+          panelSprite.getRightMargin(),
+        panelSprite.getBottomMargin()
+      )
+    )
+  );
+
+  //Bottom-Right
   this._borderSprites[7].texture = new PIXI.Texture(
     texture,
     makeInsideTexture(
       new PIXI.Rectangle(
-        this._borderSprites[7].width - panelSprite.getRightMargin(),
-        this._borderSprites[7].height - panelSprite.getBottomMargin(),
+        texture.width - panelSprite.getRightMargin(),
+        texture.height - panelSprite.getBottomMargin(),
         panelSprite.getRightMargin(),
         panelSprite.getBottomMargin()
       )
@@ -374,7 +398,11 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.getResourceFullUrl(project, panelSprite.getTexture());
+  return resourcesLoader.getResourceFullUrl(
+    project,
+    panelSprite.getTexture(),
+    {}
+  );
 };
 
 export default RenderedPanelSpriteInstance;

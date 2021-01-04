@@ -9,7 +9,7 @@ import {
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
-} from 'material-ui/Table';
+} from '../UI/Table';
 import { type Usages } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -28,18 +28,18 @@ export default ({ usages }: Props) => (
           <Trans>You don't have any usage of the online services for now</Trans>
         </EmptyMessage>
       ) : (
-        <Table selectable={false}>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+        <Table>
+          <TableHeader>
             <TableRow>
               <TableHeaderColumn>Date</TableHeaderColumn>
               <TableHeaderColumn>Type</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody displayRowCheckbox={false}>
+          <TableBody>
             {usages.map(usage => (
               <TableRow key={usage.id}>
                 <TableRowColumn>
-                  {format(usage.createdAt, 'YYYY-MM-DD HH:mm:ss')}
+                  {format(usage.createdAt, 'yyyy-MM-dd HH:mm:ss')}
                 </TableRowColumn>
                 <TableRowColumn>{usage.type}</TableRowColumn>
               </TableRow>

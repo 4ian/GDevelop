@@ -1,57 +1,70 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import React from 'react';
+import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import Dialog from '../UI/Dialog';
-import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
-const gd = global.gd;
+import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
-export class ObjectGroupEditorDialog extends Component {
-  render() {
-    const { project, group } = this.props;
-    if (!group) return null;
+type Props = {|
+  project: gdProject,
+  group: gdObjectGroup,
+  onApply: () => void,
+  onCancel: () => void,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+|};
 
-    const actions = [
-      <FlatButton
-        label={<Trans>Cancel</Trans>}
-        keyboardFocused
-        onClick={this.props.onCancel}
-      />,
-      <FlatButton
-        label={<Trans>Apply</Trans>}
-        primary
-        keyboardFocused
-        onClick={this.props.onApply}
-      />,
-    ];
+const ObjectGroupEditorDialog = ({
+  project,
+  group,
+  onApply,
+  onCancel,
+  globalObjectsContainer,
+  objectsContainer,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+  const onCancelChanges = useSerializableObjectCancelableEditor({
+    serializableObject: group,
+    onCancel,
+  });
 
-    return (
-      <Dialog
-        key={group.ptr}
-        actions={actions}
-        autoScrollBodyContent
-        noMargin
-        modal
-        onRequestClose={this.props.onCancel}
-        open={this.props.open}
-        title={`Edit ${group.getName()} group`}
-      >
-        <ObjectGroupEditor
-          project={project}
-          group={group}
-          globalObjectsContainer={this.props.globalObjectsContainer}
-          objectsContainer={this.props.objectsContainer}
-          onSizeUpdated={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
-          }
-        />
-      </Dialog>
-    );
-  }
-}
+  return (
+    <Dialog
+      key={group.ptr}
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          keyboardFocused
+          onClick={onCancelChanges}
+        />,
+        <FlatButton
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          primary
+          keyboardFocused
+          onClick={onApply}
+        />,
+      ]}
+      noMargin
+      cannotBeDismissed={true}
+      onRequestClose={onCancelChanges}
+      open
+      title={`Edit ${group.getName()} group`}
+    >
+      <ObjectGroupEditor
+        project={project}
+        group={group}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
+        onSizeUpdated={
+          forceUpdate /*Force update to ensure dialog is properly positionned*/
+        }
+      />
+    </Dialog>
+  );
+};
 
-export default withSerializableObject(ObjectGroupEditorDialog, {
-  newObjectCreator: () => new gd.ObjectGroup(),
-  propName: 'group',
-});
+export default ObjectGroupEditorDialog;

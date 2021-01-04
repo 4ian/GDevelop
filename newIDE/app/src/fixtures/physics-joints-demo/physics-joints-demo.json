@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PhysikTests\\Physics2JointsTest\\game.json",
+    "projectUuid": "42ce8ab7-faba-41e6-be7e-1e4d8f1aee74",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Wall.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Wall.png",
         "kind": "image",
         "metadata": "",
         "name": "Wall.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Box.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Box.png",
         "kind": "image",
         "metadata": "",
         "name": "Box.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/physics-joints-demo/Circle.png",
+        "file": "https://resources.gdevelop-app.com/examples/physics-joints-demo/Circle.png",
         "kind": "image",
         "metadata": "",
         "name": "Circle.png",
@@ -263,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "b8a353a4-e1b5-411f-b75c-96344fe0839d",
           "width": 600,
           "x": 500,
           "y": 300,
@@ -278,6 +277,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "075f2425-69d4-480e-973e-a03f53b8b753",
           "width": 800,
           "x": 0,
           "y": 600,
@@ -293,6 +293,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "7fadf9f6-be7d-4df4-b16d-1b045608c28c",
           "width": 600,
           "x": -33,
           "y": 300,
@@ -308,6 +309,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "ed3a5607-170b-43b4-a77f-23006e455823",
           "width": 800,
           "x": 0,
           "y": 450,
@@ -323,6 +325,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "bd7de6be-544c-4b95-b2b1-ba92c8b7a00d",
           "width": 600,
           "x": -300,
           "y": 300,
@@ -338,6 +341,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "b1ed027a-9c5a-4536-a1e5-f629b3b3f228",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -353,6 +357,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceBox",
+          "persistentUuid": "5b7ea788-f0f6-42d1-a63e-4c3513859bb7",
           "width": 0,
           "x": 49,
           "y": 29,
@@ -368,6 +373,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceCircle",
+          "persistentUuid": "324f9389-aa47-4089-8773-66711d4051ed",
           "width": 0,
           "x": 170,
           "y": 93,
@@ -383,6 +389,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteBox",
+          "persistentUuid": "9db69bae-7bf0-4d73-aabd-834560aa50a7",
           "width": 0,
           "x": 299,
           "y": 63,
@@ -398,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteCircle",
+          "persistentUuid": "da6e93d7-971d-49a0-b81c-eb8373e05862",
           "width": 0,
           "x": 342,
           "y": 107,
@@ -413,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceDraw",
+          "persistentUuid": "46177229-c628-40c2-b868-6b09d9f367a0",
           "width": 0,
           "x": 126,
           "y": 20,
@@ -428,6 +437,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteDraw",
+          "persistentUuid": "afa4c350-2f26-4cdc-b355-b1b3654c01ec",
           "width": 0,
           "x": 393,
           "y": 13,
@@ -443,6 +453,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteBox2",
+          "persistentUuid": "6793bf66-f35c-47c1-a48a-b8e3663ff686",
           "width": 0,
           "x": 468,
           "y": 48,
@@ -458,6 +469,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticBox",
+          "persistentUuid": "88b8805e-0ae9-4bfb-87af-14680ab2273c",
           "width": 0,
           "x": 46,
           "y": 254,
@@ -473,6 +485,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticCircle",
+          "persistentUuid": "b5a154e5-550e-49bb-a7c9-a375a9537c9d",
           "width": 0,
           "x": 169,
           "y": 214,
@@ -488,6 +501,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticDraw",
+          "persistentUuid": "038951c8-9bdd-4008-b8c1-e5f743b18452",
           "width": 0,
           "x": 120,
           "y": 165,
@@ -503,6 +517,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "d320b876-f0ac-45a6-b310-32d8491afeb6",
           "width": 800,
           "x": 0,
           "y": 150,
@@ -518,6 +533,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyBox",
+          "persistentUuid": "0ab726b2-93cc-4d2d-bbb0-21e5571c46ef",
           "width": 0,
           "x": 315,
           "y": 195,
@@ -533,6 +549,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyCircle",
+          "persistentUuid": "0eeb6a10-292a-4d0b-bdf9-2b63fab5d823",
           "width": 0,
           "x": 452,
           "y": 209,
@@ -548,6 +565,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyDraw",
+          "persistentUuid": "c681338c-3b2e-44c1-a20c-26bf3b9dc865",
           "width": 0,
           "x": 389,
           "y": 159,
@@ -563,6 +581,7 @@
           "layer": "",
           "locked": false,
           "name": "GearBox2",
+          "persistentUuid": "0b01fd74-b6cd-4f98-80bc-b8e7dbe0295c",
           "width": 0,
           "x": 191,
           "y": 408,
@@ -578,6 +597,7 @@
           "layer": "",
           "locked": false,
           "name": "GearDraw",
+          "persistentUuid": "7630524e-fdfa-4079-bc2f-43f2ffbfec8d",
           "width": 0,
           "x": 119,
           "y": 314,
@@ -593,6 +613,7 @@
           "layer": "",
           "locked": false,
           "name": "GearBox1",
+          "persistentUuid": "0afaca89-1f3d-409c-8c00-4e6eb18685ac",
           "width": 0,
           "x": 194,
           "y": 315,
@@ -608,6 +629,7 @@
           "layer": "",
           "locked": false,
           "name": "GearCircle1",
+          "persistentUuid": "89282b1b-3da0-456c-a20e-aef28797ec41",
           "width": 0,
           "x": 192,
           "y": 408,
@@ -623,6 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "GearCircle2",
+          "persistentUuid": "72cf8965-6319-48b3-ab9a-93e249bc2083",
           "width": 0,
           "x": 28,
           "y": 328,
@@ -638,6 +661,7 @@
           "layer": "",
           "locked": false,
           "name": "MouseBox",
+          "persistentUuid": "f5261b5b-1e1e-4304-8ceb-d21ca6978590",
           "width": 0,
           "x": 384,
           "y": 371,
@@ -653,6 +677,7 @@
           "layer": "",
           "locked": false,
           "name": "MouseDraw",
+          "persistentUuid": "9297b6df-52e2-4d6c-9c05-c3aa69ac4e42",
           "width": 0,
           "x": 389,
           "y": 311,
@@ -668,6 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "d64e5c9d-cbab-4751-94c2-787636452448",
           "width": 600,
           "x": 233,
           "y": 300,
@@ -683,6 +709,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelBox",
+          "persistentUuid": "b439611c-593f-421b-8a69-bdc7ff10c700",
           "width": 64,
           "x": 628,
           "y": 64,
@@ -698,6 +725,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelCircle1",
+          "persistentUuid": "b2c5f09b-c429-4cb5-8bc5-80e8e86b4917",
           "width": 0,
           "x": 614,
           "y": 102,
@@ -713,6 +741,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelDraw",
+          "persistentUuid": "92fdb04b-7b3b-43dd-b136-f649b3824cf5",
           "width": 0,
           "x": 648,
           "y": 11,
@@ -728,6 +757,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldBox",
+          "persistentUuid": "414a9b9e-ff05-47b3-88d1-0695b32a21aa",
           "width": 0,
           "x": 645,
           "y": 220,
@@ -743,6 +773,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldCircle2",
+          "persistentUuid": "6c3497dd-8202-42e0-b76f-0e766a8e5d85",
           "width": 0,
           "x": 605,
           "y": 251,
@@ -758,6 +789,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldCircle1",
+          "persistentUuid": "98eb97d3-7651-4aa5-a9c8-4bbac60fc3e9",
           "width": 0,
           "x": 687,
           "y": 250,
@@ -773,6 +805,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldDraw",
+          "persistentUuid": "2aaa3e24-7a2d-42c6-8db4-bf470cf85425",
           "width": 0,
           "x": 650,
           "y": 165,
@@ -788,6 +821,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelCircle2",
+          "persistentUuid": "4b085766-3362-4717-9361-58f8ef796b74",
           "width": 0,
           "x": 673,
           "y": 102,
@@ -803,6 +837,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "db236f91-379d-49c3-9fc4-c3213f748b33",
           "width": 800,
           "x": 0,
           "y": 300,
@@ -818,6 +853,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorDraw",
+          "persistentUuid": "9ba0a2dd-ccc1-41d4-8c8c-b8e9a2aa028c",
           "width": 0,
           "x": 383,
           "y": 465,
@@ -833,6 +869,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorBox1",
+          "persistentUuid": "00f66e2f-93d5-4665-af6f-fae9a9dbbd7d",
           "width": 0,
           "x": 293,
           "y": 474,
@@ -848,6 +885,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorBox2",
+          "persistentUuid": "13b11896-c49b-4e47-9975-af69fcc63e3d",
           "width": 0,
           "x": 358,
           "y": 515,
@@ -863,6 +901,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorCircle",
+          "persistentUuid": "7d4c0e5c-d303-43e0-a1c7-486650a387ac",
           "width": 0,
           "x": 469,
           "y": 547,
@@ -878,6 +917,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeDraw",
+          "persistentUuid": "d20549aa-1ec5-46b6-aadc-96d952881291",
           "width": 0,
           "x": 650,
           "y": 315,
@@ -893,6 +933,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeBox",
+          "persistentUuid": "363c7f51-c987-4544-8909-ed95a272527e",
           "width": 0,
           "x": 575,
           "y": 333,
@@ -908,6 +949,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeCircle",
+          "persistentUuid": "add2ff61-5eab-428f-8218-3e0c11703c32",
           "width": 0,
           "x": 714,
           "y": 400,
@@ -923,6 +965,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionBox",
+          "persistentUuid": "ad044eee-a746-4d20-b451-d3decbce0026",
           "width": 100,
           "x": 82,
           "y": 480,
@@ -938,6 +981,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionDraw",
+          "persistentUuid": "04052939-814a-482c-bceb-376c5008341b",
           "width": 0,
           "x": 114,
           "y": 465,
@@ -953,6 +997,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionCircle",
+          "persistentUuid": "891a5ef2-bcae-473c-8280-b970bc6ce42d",
           "width": 0,
           "x": 25,
           "y": 491,
@@ -968,6 +1013,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableBox1",
+          "persistentUuid": "75c39403-cc58-413a-9339-d015e410a5fd",
           "width": 96,
           "x": 570,
           "y": 535,
@@ -983,6 +1029,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableBox2",
+          "persistentUuid": "b32443a1-b51e-40a6-a2be-9f2152297a4a",
           "width": 96,
           "x": 654,
           "y": 535,
@@ -998,6 +1045,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle1",
+          "persistentUuid": "4b9da5a2-830c-4c31-b0cb-88898388fdb2",
           "width": 16,
           "x": 570,
           "y": 576,
@@ -1013,6 +1061,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle2",
+          "persistentUuid": "37784e5d-101b-42fc-9fee-2d821ca17fcd",
           "width": 24,
           "x": 625,
           "y": 567,
@@ -1028,6 +1077,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle3",
+          "persistentUuid": "4305d781-3857-4543-aca2-538180306907",
           "width": 0,
           "x": 688,
           "y": 561,
@@ -1043,6 +1093,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableDraw",
+          "persistentUuid": "d7d8a89c-c1f6-4c54-a6b4-ed56c1160084",
           "width": 0,
           "x": 651,
           "y": 461,
@@ -1264,7 +1315,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RevoluteBox",
@@ -1483,7 +1535,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PrismaticBox",
@@ -1636,7 +1689,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PulleyBox",
@@ -1789,7 +1843,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "GearBox1",
@@ -2074,7 +2129,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MouseBox",
@@ -2161,7 +2217,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WheelBox",
@@ -2385,7 +2442,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WeldBox",
@@ -2609,7 +2667,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RopeBox",
@@ -2762,7 +2821,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "FrictionBox",
@@ -2920,7 +2980,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MotorBox1",
@@ -3149,7 +3210,8 @@
             "g": 255,
             "r": 255
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "BreakableBox1",
@@ -3510,7 +3572,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         }
       ],
       "events": [
@@ -5588,6 +5651,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

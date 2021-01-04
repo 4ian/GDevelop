@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json",
+    "projectUuid": "8385f5eb-8e5e-4196-928b-4fd2b2b7cdc8",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -108,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another-multiple-parents/parent.png",
+        "file": "https://resources.gdevelop-app.com/examples/pin-object-to-another-multiple-parents/parent.png",
         "kind": "image",
         "metadata": "",
         "name": "parent.png",
@@ -117,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another-multiple-parents/child.png",
+        "file": "https://resources.gdevelop-app.com/examples/pin-object-to-another-multiple-parents/child.png",
         "kind": "image",
         "metadata": "",
         "name": "child.png",
@@ -167,6 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "c5fbe9f0-8e6c-49a5-8bda-5f35d5199ca6",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -182,6 +181,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "4f28cc82-97de-42b9-bff8-a7a720e262b9",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -202,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "bf02edf5-082c-46a4-93e0-4144dd826f88",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -222,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "3980b96a-8f97-41c4-83dd-bc82cccf99dd",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -242,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "da8e3b81-5cf8-4831-b6a4-1fc9536266b6",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -262,6 +265,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "6df227f2-c673-485f-a5e8-f4b78f4ba8cf",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -282,6 +286,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "300c5f7c-06dd-4548-8bc2-5a8be5817730",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -302,6 +307,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "dfd71bc0-5b76-40f8-b0ce-d47e59dc47bd",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -322,6 +328,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "5106ec13-e9fd-4c44-ad51-6b46414d29b9",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -813,6 +820,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\advanced-shape-based-painter\\advanced-shape-based-painter.json",
+    "projectUuid": "d6437651-bf85-4831-b7c0-5c8550a55bd2",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircle.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeCircle.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeCircle.png",
@@ -114,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircleBorder.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeCircleBorder.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeCircleBorder.png",
@@ -123,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRect.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeRect.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeRect.png",
@@ -132,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRectBorder.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeRectBorder.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeRectBorder.png",
@@ -141,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeLine.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/ShapeLine.png",
         "kind": "image",
         "metadata": "",
         "name": "ShapeLine.png",
@@ -150,7 +148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/BarSelector.png",
+        "file": "https://resources.gdevelop-app.com/examples/advanced-shape-based-painter/BarSelector.png",
         "kind": "image",
         "metadata": "",
         "name": "BarSelector.png",
@@ -321,6 +319,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "f0dc8365-f103-4423-bba4-7a5acd740cdc",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -341,6 +340,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "feec3f6a-3868-41da-974b-a50c33c563ec",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -361,6 +361,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "40735708-babc-4921-a94a-b7fbd4176b98",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -381,6 +382,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "4800caf1-876b-4654-b140-01fe67cf383c",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -401,6 +403,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "bcf77b07-ab01-4478-8bf1-b245cb432e8e",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -421,6 +424,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "379b4b28-ade6-45e9-9bef-ecca8af77e83",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -471,7 +475,8 @@
             "g": 232,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Shapes",
@@ -2619,6 +2624,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

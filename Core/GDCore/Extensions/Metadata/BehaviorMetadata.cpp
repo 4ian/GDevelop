@@ -59,7 +59,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddCondition(
                                                            group,
                                                            icon,
                                                            smallicon)
-                                           .SetHelpPath(GetHelpPath());
+                                           .SetHelpPath(GetHelpPath())
+                                           .SetIsBehaviorInstruction();
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -83,7 +84,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
                                                         group,
                                                         icon,
                                                         smallicon)
-                                        .SetHelpPath(GetHelpPath());
+                                        .SetHelpPath(GetHelpPath())
+                                        .SetIsBehaviorInstruction();
   return actionsInfos[nameWithNamespace];
 #endif
 }
@@ -107,7 +109,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
                                                            group,
                                                            icon,
                                                            smallicon)
-                                           .SetHelpPath(GetHelpPath());
+                                           .SetHelpPath(GetHelpPath())
+                                           .SetIsBehaviorInstruction();
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -131,7 +134,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
                                                         group,
                                                         icon,
                                                         smallicon)
-                                        .SetHelpPath(GetHelpPath());
+                                        .SetHelpPath(GetHelpPath())
+                                        .SetIsBehaviorInstruction();
   return actionsInfos[nameWithNamespace];
 #endif
 }

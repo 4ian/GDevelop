@@ -1,20 +1,26 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
-import IconButton from 'material-ui/IconButton';
-import Add from 'material-ui/svg-icons/content/add';
-import Brush from 'material-ui/svg-icons/image/brush';
+import SemiControlledAutoComplete, {
+  type DataSource,
+  type SemiControlledAutoCompleteInterface,
+} from '../UI/SemiControlledAutoComplete';
+import BackspaceIcon from '@material-ui/icons/Backspace';
+import Add from '@material-ui/icons/Add';
+import Brush from '@material-ui/icons/Brush';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
-import SemiControlledAutoComplete, {
-  type DataSource,
-} from '../UI/SemiControlledAutoComplete';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import { TextFieldWithButtonLayout } from '../UI/Layout';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   project: gdProject,
@@ -24,20 +30,21 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fullWidth?: boolean,
+  canBeReset?: boolean,
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
-  hintText?: React.Node,
+  helperMarkdownText?: ?string,
+  hintText?: MessageDescriptor,
+  onRequestClose?: () => void,
+  margin?: 'none' | 'dense',
+  style?: {| alignSelf?: 'center' |},
 |};
 
 type State = {|
   notExistingError: boolean,
   resourceName: string,
 |};
-
-const styles = {
-  container: { display: 'flex', flex: 1, alignItems: 'baseline' },
-};
 
 export default class ResourceSelector extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -56,7 +63,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
   allResourcesNames: Array<string>;
   autoCompleteData: DataSource;
-  _autoComplete: ?SemiControlledAutoComplete;
+  _autoComplete: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._autoComplete) this._autoComplete.focus();
@@ -78,7 +85,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         .map(source => ({
           text: '',
           value: source.displayName,
-          renderRightIcon: () => <Add />,
+          renderIcon: () => <Add />,
           onClick: () => this._addFrom(source),
         })),
       {
@@ -120,7 +127,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
         project.getResourcesManager().addResource(resource);
 
         this._loadFrom(project.getResourcesManager());
-        this._onChangeResourceName(resource.getName());
+        const resourceName: string = resource.getName();
+        this._onChangeResourceName(resourceName);
+
+        // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
+        // still focused. This means that when it's then getting blurred, the value we
+        // set for the resource name would get erased by the one that was getting entered.
+        if (this._autoComplete)
+          this._autoComplete.forceInputValueTo(resourceName);
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
@@ -132,7 +146,23 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
   };
 
+  _onResetResourceName = () => {
+    this.setState(
+      {
+        resourceName: '',
+        notExistingError: false,
+      },
+      () => {
+        if (this.props.onChange) this.props.onChange(this.state.resourceName);
+      }
+    );
+  };
+
   _onChangeResourceName = (resourceName: string) => {
+    if (resourceName === '') {
+      this._onResetResourceName();
+      return;
+    }
     this.setState(
       {
         resourceName,
@@ -142,10 +172,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
         if (!this.state.notExistingError) {
           if (this.props.onChange) this.props.onChange(resourceName);
         }
-
-        // Keep focusing the field after choosing something (won't do anything
-        // if we're just typing text).
-        this.focus();
       }
     );
   };
@@ -155,7 +181,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
-
     let initialResourceMetadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
     if (initialResourceMetadataRaw) {
@@ -182,14 +207,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
           externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: resources => {
-          if (!resources.length) return;
+        onChangesSaved: newResourceData => {
+          if (!newResourceData.length) return;
 
           // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
           resourcesLoader.burstUrlsCacheForResources(project, [
-            resources[0].name,
+            newResourceData[0].name,
           ]);
-          this.props.onChange(resources[0].name);
+          this.props.onChange(newResourceData[0].name);
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);
@@ -199,14 +224,27 @@ export default class ResourceSelector extends React.Component<Props, State> {
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
-          initialResourceMetadata,
+          externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: (newResourceData, newResourceName) => {
+        onChangesSaved: newResourceData => {
           // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
           resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceName,
+            newResourceData[0].name,
           ]);
-          this.props.onChange(newResourceName);
+          this.props.onChange(newResourceData[0].name);
+        },
+      };
+      resourceExternalEditor.edit(externalEditorOptions);
+    } else if (resourceKind === 'json') {
+      const externalEditorOptions = {
+        project,
+        resourcesLoader,
+        resourceNames: [resourceName],
+        extraOptions: {
+          initialResourceMetadata,
+        },
+        onChangesSaved: newResourceData => {
+          this.props.onChange(newResourceData[0].name);
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);
@@ -221,36 +259,62 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const externalEditors = this.props.resourceExternalEditors.filter(
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
-
     return (
-      <div style={styles.container}>
-        <SemiControlledAutoComplete
-          floatingLabelText={this.props.floatingLabelText}
-          hintText={this.props.hintText}
-          openOnFocus
-          dataSource={this.autoCompleteData || []}
-          value={this.state.resourceName}
-          onChange={this._onChangeResourceName}
-          errorText={errorText}
-          fullWidth={this.props.fullWidth}
-          ref={autoComplete => (this._autoComplete = autoComplete)}
-        />
-        {!!externalEditors.length && (
-          <IconMenu
-            iconButtonElement={
-              <IconButton>
-                <Brush />
-              </IconButton>
-            }
-            buildMenuTemplate={() =>
-              externalEditors.map(externalEditor => ({
-                label: externalEditor.displayName,
-                click: () => this._editWith(externalEditor),
-              }))
-            }
+      <TextFieldWithButtonLayout
+        noFloatingLabelText={!this.props.floatingLabelText}
+        margin={this.props.margin}
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            style={this.props.style}
+            floatingLabelText={this.props.floatingLabelText}
+            helperMarkdownText={this.props.helperMarkdownText}
+            hintText={this.props.hintText}
+            openOnFocus
+            dataSource={this.autoCompleteData || []}
+            value={this.state.resourceName}
+            onChange={this._onChangeResourceName}
+            errorText={errorText}
+            fullWidth={this.props.fullWidth}
+            margin={this.props.margin}
+            onRequestClose={this.props.onRequestClose}
+            ref={autoComplete => (this._autoComplete = autoComplete)}
           />
         )}
-      </div>
+        renderButton={style => (
+          <React.Fragment>
+            {this.props.canBeReset && (
+              <IconButton
+                size="small"
+                onClick={() => {
+                  this._onResetResourceName();
+                }}
+              >
+                <BackspaceIcon />
+              </IconButton>
+            )}
+            {!!externalEditors.length ? (
+              <RaisedButtonWithMenu
+                style={style}
+                icon={<Brush />}
+                label={
+                  this.state.resourceName ? (
+                    <Trans>Edit</Trans>
+                  ) : (
+                    <Trans>Create</Trans>
+                  )
+                }
+                primary
+                buildMenuTemplate={() =>
+                  externalEditors.map(externalEditor => ({
+                    label: externalEditor.displayName,
+                    click: () => this._editWith(externalEditor),
+                  }))
+                }
+              />
+            ) : null}
+          </React.Fragment>
+        )}
+      />
     );
   }
 }

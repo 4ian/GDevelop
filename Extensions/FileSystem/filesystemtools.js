@@ -1,11 +1,58 @@
+// @ts-check
 /**
  * @memberof gdjs
- * @class fileSystem
- * @static
+ * @namespace fileSystem
  * @private
  */
 
-gdjs.fileSystem = {};
+gdjs.fileSystem = {
+  _path: null, // The Node.js path module, or null if it can't be loaded.
+  _fs: null, // The Node.js fs module, or null if it can't be loaded.
+};
+
+/** Get the Node.js path module, or null if it can't be loaded */
+gdjs.fileSystem._getPath = function() {
+  if (!gdjs.fileSystem._path) {
+    // @ts-ignore
+    gdjs.fileSystem._path = typeof require !== 'undefined' ? require('path') : null;
+  }
+
+  return gdjs.fileSystem._path;
+}
+
+/** Get the Node.js fs module, or null if it can't be loaded */
+gdjs.fileSystem._getFs = function() {
+  if (!gdjs.fileSystem._fs) {
+    // @ts-ignore
+    gdjs.fileSystem._fs = typeof require !== 'undefined' ? require('fs') : null;
+  }
+
+  return gdjs.fileSystem._fs;
+}
+
+/** @param {string} fileOrFolderPath */
+gdjs.fileSystem.getDirectoryName = function(fileOrFolderPath) {
+  const path = gdjs.fileSystem._getPath();
+  if (!path) return '';
+
+  return path.dirname(fileOrFolderPath);
+}
+
+/** @param {string} filePath */
+gdjs.fileSystem.getFileName = function(filePath) {
+  const path = gdjs.fileSystem._getPath();
+  if (!path) return '';
+
+  return path.basename(filePath);
+}
+
+/** @param {string} filePath */
+gdjs.fileSystem.getExtensionName = function(filePath) {
+  const path = gdjs.fileSystem._getPath();
+  if (!path) return '';
+
+  return path.extname(filePath);
+}
 
 /**
  * Get the path to 'Desktop' folder.
@@ -62,9 +109,9 @@ gdjs.fileSystem.getPicturesPath = function(runtimeScene) {
 };
 
 /**
- * Get the path to this application 'Executable' folder.
+ * Get the path to this application 'Executable' file.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
- * @return {string} The path to this applications executable folder
+ * @return {string} The path to this applications executable file
  */
 gdjs.fileSystem.getExecutablePath = function(runtimeScene) {
   const electron = runtimeScene
@@ -80,6 +127,22 @@ gdjs.fileSystem.getExecutablePath = function(runtimeScene) {
 };
 
 /**
+ * Get the path to this application 'Executable' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @return {string} The path to this applications executable folder
+ */
+gdjs.fileSystem.getExecutableFolderPath = function(runtimeScene) {
+  const path = gdjs.fileSystem._getPath();
+  const executablePath = gdjs.fileSystem.getExecutablePath(runtimeScene);
+
+  if (!path) {
+    return '';
+  }
+
+  return path.dirname(executablePath);
+};
+
+/**
  * Get the path to 'UserData' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to userdata folder
@@ -92,6 +155,23 @@ gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
 
   if (electron) {
     return electron.remote.app.getPath('userData') || '';
+  } else {
+    return '';
+  }
+};
+
+/**
+ * Get the path to the user's home folder (on Windows `C:\Users\<USERNAME>\` for example).
+ * @return {string} The path to user's "home" folder
+ */
+gdjs.fileSystem.getUserHomePath = function(runtimeScene) {
+  const electron = runtimeScene
+    .getGame()
+    .getRenderer()
+    .getElectron();
+
+  if (electron) {
+    return electron.remote.app.getPath('home') || '';
   } else {
     return '';
   }
@@ -120,7 +200,7 @@ gdjs.fileSystem.getTempPath = function(runtimeScene) {
  * @return {string} The path delimiter
  */
 gdjs.fileSystem.getPathDelimiter = function() {
-  const path = typeof require !== 'undefined' ? require('path') : null;
+  const path = gdjs.fileSystem._getPath();
 
   if (path) {
     return path.sep || '/';
@@ -135,7 +215,7 @@ gdjs.fileSystem.getPathDelimiter = function() {
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.makeDirectory = function(directory, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   let result = 'error';
 
   if (fileSystem) {
@@ -159,7 +239,7 @@ gdjs.fileSystem.makeDirectory = function(directory, resultVar) {
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.saveStringToFileAsync = function(text, savePath, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
 
   if (fileSystem) {
     fileSystem.writeFile(savePath, text, 'utf8', err => {
@@ -182,7 +262,7 @@ gdjs.fileSystem.saveStringToFileAsync = function(text, savePath, resultVar) {
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.saveStringToFile = function(text, savePath, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   let result = 'error';
 
   if (fileSystem) {
@@ -210,7 +290,7 @@ gdjs.fileSystem.saveVariableToJSONFile = function(
   savePath,
   resultVar
 ) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   const network = gdjs.evtTools.network;
   let result = 'error';
 
@@ -234,7 +314,7 @@ gdjs.fileSystem.saveVariableToJSONFile = function(
 
 /**
  * Save a variable into a file in JSON format, asynchronously.
- * @param {string} text The variable to be saved
+ * @param {gdjs.Variable} variable The variable to be saved
  * @param {string} savePath Path to the file
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
@@ -243,7 +323,7 @@ gdjs.fileSystem.saveVariableToJSONFileAsync = function(
   savePath,
   resultVar
 ) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   const network = gdjs.evtTools.network;
 
   if (fileSystem && network) {
@@ -272,7 +352,7 @@ gdjs.fileSystem.saveVariableToJSONFileAsync = function(
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.loadStringFromFile = function(stringVar, loadPath, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   let result = 'error';
 
   if (fileSystem) {
@@ -304,7 +384,7 @@ gdjs.fileSystem.loadVariableFromJSONFile = function(
   loadPath,
   resultVar
 ) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   const network = gdjs.evtTools.network;
   let result = 'error';
 
@@ -336,7 +416,7 @@ gdjs.fileSystem.loadVariableFromJSONFileAsync = function(
   loadPath,
   resultVar
 ) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   const network = gdjs.evtTools.network;
 
   if (fileSystem && network) {
@@ -367,7 +447,7 @@ gdjs.fileSystem.loadStringFromFileAsync = function(
   loadPath,
   resultVar
 ) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
 
   if (fileSystem) {
     fileSystem.readFile(loadPath, 'utf8', (err, data) => {
@@ -392,7 +472,7 @@ gdjs.fileSystem.loadStringFromFileAsync = function(
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.deleteFile = function(filePath, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
   let result = 'error';
 
   if (fileSystem) {
@@ -413,7 +493,7 @@ gdjs.fileSystem.deleteFile = function(filePath, resultVar) {
  * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
 gdjs.fileSystem.deleteFileAsync = function(filePath, resultVar) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
 
   if (fileSystem) {
     fileSystem.unlink(filePath, err => {
@@ -432,7 +512,7 @@ gdjs.fileSystem.deleteFileAsync = function(filePath, resultVar) {
  * @return {boolean} true if fhe file or directory exists
  */
 gdjs.fileSystem.pathExists = function(filePath) {
-  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  const fileSystem = gdjs.fileSystem._getFs();
 
   if (fileSystem) {
     return fileSystem.existsSync(filePath);

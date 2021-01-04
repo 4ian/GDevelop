@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 
 export type InvalidParameterValueProps = {|
   children: React.Node,
@@ -13,6 +14,8 @@ export type ParameterInlineRendererProps = {|
   value: string,
   renderObjectThumbnail: string => React.Node,
   InvalidParameterValue: InvalidParameterValueProps => React.Node,
+  MissingParameterValue: () => React.Node,
+  useAssignmentOperators: boolean,
 |};
 
 /**

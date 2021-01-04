@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\buttons\\game.json",
+    "projectUuid": "e6569bdd-c84e-42c4-9709-278194b1a28f",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/NormalBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/NormalBt.png",
         "kind": "image",
         "metadata": "",
         "name": "NormalBt.png",
@@ -114,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/HoveredBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/HoveredBt.png",
         "kind": "image",
         "metadata": "",
         "name": "HoveredBt.png",
@@ -123,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/buttons/PressedBt.png",
+        "file": "https://resources.gdevelop-app.com/examples/buttons/PressedBt.png",
         "kind": "image",
         "metadata": "",
         "name": "PressedBt.png",
@@ -173,6 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a8777491-a17a-4a43-9468-48ee8bb23a04",
           "width": 0,
           "x": 186,
           "y": 274.5,
@@ -188,6 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "030be58b-23a1-4e35-994d-a062e4c79e59",
           "width": 0,
           "x": 171,
           "y": 369.5,
@@ -570,6 +570,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -640,6 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "Button1",
+          "persistentUuid": "eb72d6dc-b7ad-4b84-bc1b-d0e9daffb9a9",
           "width": 0,
           "x": 186,
           "y": 135.5,
@@ -655,6 +661,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "929662a7-7615-4d39-a710-936a4e4bd85a",
           "width": 0,
           "x": 172,
           "y": 383.5,
@@ -670,6 +677,7 @@
           "layer": "",
           "locked": false,
           "name": "Button2",
+          "persistentUuid": "81e98a8c-583b-4f77-8e06-e3b752f39861",
           "width": 0,
           "x": 184,
           "y": 199.5,
@@ -685,6 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "Button3",
+          "persistentUuid": "7945ca6d-384c-4ebe-9975-9d35f8e632b5",
           "width": 0,
           "x": 187,
           "y": 265.5,
@@ -1466,6 +1475,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

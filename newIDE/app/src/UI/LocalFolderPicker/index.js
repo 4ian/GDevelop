@@ -5,8 +5,8 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { PureComponent } from 'react';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import TextField from '../TextField';
+import RaisedButton from '../RaisedButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -31,7 +31,6 @@ type Props = {|
   onChange: string => void,
   defaultPath?: string,
   fullWidth?: boolean,
-  floatingLabelText?: string,
 |};
 
 type TitleAndMessage = {|
@@ -44,20 +43,17 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
-      browserWindow,
-      {
+    dialog
+      .showOpenDialog(browserWindow, {
         title,
         properties: ['openDirectory', 'createDirectory'],
         message,
         defaultPath: this.props.defaultPath,
-      },
-      paths => {
-        if (!paths || !paths.length) return;
-
-        this.props.onChange(paths[0]);
-      }
-    );
+      })
+      .then(({ filePaths }) => {
+        if (!filePaths || !filePaths.length) return;
+        this.props.onChange(filePaths[0]);
+      });
   };
 
   _getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
@@ -83,31 +79,32 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
   render() {
     return (
       <I18n>
-        {({ i18n }) => (
-          <div
-            style={{
-              ...styles.container,
-              width: this.props.fullWidth ? '100%' : undefined,
-            }}
-          >
-            <TextField
-              style={styles.textField}
-              floatingLabelText={this.props.floatingLabelText}
-              floatingLabelFixed
-              type="text"
-              hintText={<Trans>Click to choose</Trans>}
-              value={this.props.value}
-              onChange={(event, value) => this.props.onChange(value)}
-            />
-            <FlatButton
-              label={<Trans>Choose folder</Trans>}
-              style={styles.button}
-              onClick={() =>
-                this._onChooseFolder(this._getTitleAndMessage(i18n))
-              }
-            />
-          </div>
-        )}
+        {({ i18n }) => {
+          const titleAndMessage = this._getTitleAndMessage(i18n);
+          return (
+            <div
+              style={{
+                ...styles.container,
+                width: this.props.fullWidth ? '100%' : undefined,
+              }}
+            >
+              <TextField
+                margin="dense"
+                style={styles.textField}
+                type="text"
+                hintText={titleAndMessage.title}
+                value={this.props.value}
+                onChange={(event, value) => this.props.onChange(value)}
+              />
+              <RaisedButton
+                label={<Trans>Choose folder</Trans>}
+                primary={false}
+                style={styles.button}
+                onClick={() => this._onChooseFolder(titleAndMessage)}
+              />
+            </div>
+          );
+        }}
       </I18n>
     );
   }

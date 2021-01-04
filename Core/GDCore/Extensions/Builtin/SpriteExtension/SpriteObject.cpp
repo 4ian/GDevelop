@@ -107,8 +107,7 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   }
 }
 
-std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties(
-    gd::Project& project) const {
+std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Animate even if hidden or far from the screen")]
       .SetValue(updateIfNotVisible ? "true" : "false")
@@ -119,8 +118,7 @@ std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties(
 }
 
 bool SpriteObject::UpdateProperty(const gd::String& name,
-                                  const gd::String& value,
-                                  gd::Project& project) {
+                                  const gd::String& value) {
   if (name == _("Animate even if hidden or far from the screen"))
     updateIfNotVisible = value == "1";
 

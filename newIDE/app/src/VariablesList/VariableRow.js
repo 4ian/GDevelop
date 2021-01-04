@@ -1,40 +1,38 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import Checkbox from 'material-ui/Checkbox';
-import AddCircle from 'material-ui/svg-icons/content/add-circle';
-import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
-import TextField from 'material-ui/TextField';
-import IconButton from 'material-ui/IconButton';
-import Reset from 'material-ui/svg-icons/av/replay';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import Checkbox from '../UI/Checkbox';
+import AddCircle from '@material-ui/icons/AddCircle';
+import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
+import TextField from '../UI/TextField';
+import IconButton from '../UI/IconButton';
+import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
 import { type VariableOrigin } from './VariablesList.flow';
+import Text from '../UI/Text';
 
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
   <div style={{ ...styles.indent, width }}>
-    <SubdirectoryArrowRight color={styles.indentIconColor} />
+    <SubdirectoryArrowRight htmlColor={styles.indentIconColor} />
   </div>
 );
-
-const InlineCheckbox = props => <Checkbox {...props} style={{ width: 32 }} />;
 
 type Props = {|
   name: string,
   variable: gdVariable,
   depth: number,
   errorText?: ?string,
+  commitVariableValueOnBlur: boolean,
   onBlur: () => void,
   onRemove: () => void,
   onAddChild: () => void,
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
-  muiTheme: Object,
   showHandle: boolean,
   showSelectionCheckbox: boolean,
   isSelected: boolean,
@@ -42,18 +40,18 @@ type Props = {|
   origin: VariableOrigin,
 |};
 
-const ThemableVariableRow = ({
+const VariableRow = ({
   name,
   variable,
   depth,
   errorText,
   onBlur,
+  commitVariableValueOnBlur,
   onRemove,
   onAddChild,
   onChangeValue,
   onResetToDefaultValue,
   children,
-  muiTheme,
   showHandle,
   showSelectionCheckbox,
   isSelected,
@@ -66,18 +64,19 @@ const ThemableVariableRow = ({
   const limitEditing = origin === 'parent' || origin === 'inherited';
 
   const columns = [
-    <TreeTableCell key="name">
+    <TreeTableCell key="name" expand>
       {depth > 0 && (
         <Indent width={(depth + 1) * styles.tableChildIndentation} />
       )}
       {depth === 0 && showHandle && <DragHandle />}
       {showSelectionCheckbox && !limitEditing && (
-        <InlineCheckbox
+        <Checkbox
           checked={isSelected}
           onCheck={(e, checked) => onSelect(checked)}
         />
       )}
       <TextField
+        margin="none"
         style={{
           fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
         }}
@@ -92,9 +91,10 @@ const ThemableVariableRow = ({
   ];
   if (!isStructure) {
     columns.push(
-      <TreeTableCell key="value">
+      <TreeTableCell key="value" expand>
         <SemiControlledTextField
-          commitOnBlur
+          margin="none"
+          commitOnBlur={commitVariableValueOnBlur}
           fullWidth
           name={key + 'value'}
           value={variable.getString()}
@@ -103,7 +103,7 @@ const ThemableVariableRow = ({
               onChangeValue(text);
             }
           }}
-          multiLine
+          multiline
           disabled={origin === 'parent' && depth !== 0}
         />
       </TreeTableCell>
@@ -111,10 +111,11 @@ const ThemableVariableRow = ({
   } else {
     columns.push(
       <TreeTableCell
+        expand
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        (Structure)
+        <Text noMargin>(Structure)</Text>
       </TreeTableCell>
     );
   }
@@ -122,19 +123,20 @@ const ThemableVariableRow = ({
     <TreeTableCell key="tools" style={styles.toolColumn}>
       {origin === 'inherited' && depth === 0 && (
         <IconButton
+          size="small"
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={<Trans>Reset</Trans>}
+          tooltip={t`Reset`}
         >
-          <Reset />
+          <Replay />
         </IconButton>
       )}
       {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
+          size="small"
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={<Trans>Add child variable</Trans>}
-          tooltipPosition="bottom-left"
+          tooltip={t`Add child variable`}
         >
           <AddCircle />
         </IconButton>
@@ -144,15 +146,10 @@ const ThemableVariableRow = ({
 
   return (
     <div>
-      <TreeTableRow
-        style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
-      >
-        {columns}
-      </TreeTableRow>
+      <TreeTableRow>{columns}</TreeTableRow>
       {children}
     </div>
   );
 };
 
-const VariableRow = muiThemeable()(ThemableVariableRow);
 export default VariableRow;

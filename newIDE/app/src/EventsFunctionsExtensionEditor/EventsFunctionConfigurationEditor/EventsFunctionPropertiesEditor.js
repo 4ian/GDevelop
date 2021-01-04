@@ -6,16 +6,22 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsFunction: gdEventsFunction,
@@ -30,9 +36,9 @@ type State = {||};
 
 const styles = {
   icon: {
-    width: 32,
     height: 32,
     marginRight: 8,
+    flexSrink: 0,
   },
 };
 
@@ -73,6 +79,30 @@ const getSentenceErrorText = (
   return undefined;
 };
 
+const getFullNameHintText = (type: any): MessageDescriptor => {
+  if (type === gd.EventsFunction.Condition) {
+    return t`Example: Is flashing?`;
+  } else if (type === gd.EventsFunction.Expression) {
+    return t`Example: Life remaining`;
+  } else if (type === gd.EventsFunction.StringExpression) {
+    return t`Example: Equipped shield name`;
+  }
+
+  return t`Example: Flash the object`;
+};
+
+const getDescriptionHintText = (type: any): MessageDescriptor => {
+  if (type === gd.EventsFunction.Condition) {
+    return t`Example: Check if the object is flashing.`;
+  } else if (type === gd.EventsFunction.Expression) {
+    return t`Example: Life remaining for the player.`;
+  } else if (type === gd.EventsFunction.StringExpression) {
+    return t`Example: Name of the shield equipped by the player.`;
+  }
+
+  return t`Example: Make the object flash for 5 seconds.`;
+};
+
 export default class EventsFunctionPropertiesEditor extends React.Component<
   Props,
   State
@@ -88,74 +118,110 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
-    const isABehaviorLifecycleFunction =
+    const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleFunction(eventsFunction.getName());
-    if (isABehaviorLifecycleFunction) {
+      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine.
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine for each instance living on the scene having the
+            behavior.
+          </Trans>
         </EmptyMessage>
+      );
+    }
+
+    const isAnExtensionLifecycleEventsFunction =
+      !eventsBasedBehavior &&
+      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnExtensionLifecycleEventsFunction) {
+      return (
+        <Column>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters. Only global objects can be
+              used as the events will be run for all scenes in your game.
+            </Trans>
+          </EmptyMessage>
+        </Column>
       );
     }
 
     return (
       <I18n>
         {({ i18n }) => (
-          <Column>
+          <ColumnStackLayout expand>
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
-            <Line alignItems="center">
-              <img src="res/function32.png" alt="" style={styles.icon} />
-              <Column expand>
+            <ResponsiveLineStackLayout alignItems="center" noMargin>
+              <Line alignItems="center" noMargin>
+                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
+                  floatingLabelText={<Trans>Function type</Trans>}
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
-                  onChange={(e, i, value) => {
+                  onChange={(e, i, value: string) => {
+                    // $FlowFixMe
                     eventsFunction.setFunctionType(value);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();
                   }}
                 >
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Action}
-                    primaryText={<Trans>Action</Trans>}
+                    primaryText={t`Action`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Condition}
-                    primaryText={<Trans>Condition</Trans>}
+                    primaryText={t`Condition`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.Expression}
-                    primaryText={<Trans>Expression</Trans>}
+                    primaryText={t`Expression`}
                   />
-                  <MenuItem
+                  <SelectOption
                     value={gd.EventsFunction.StringExpression}
-                    primaryText={<Trans>String Expression</Trans>}
+                    primaryText={t`String Expression`}
                   />
                 </SelectField>
-              </Column>
-              <Column expand>
-                <SemiControlledTextField
-                  commitOnBlur
-                  hintText={<Trans>Full name displayed in editor</Trans>}
-                  value={eventsFunction.getFullName()}
-                  onChange={text => {
-                    eventsFunction.setFullName(text);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                  fullWidth
-                />
-              </Column>
-            </Line>
+              </Line>
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={<Trans>Full name displayed in editor</Trans>}
+                hintText={getFullNameHintText(type)}
+                value={eventsFunction.getFullName()}
+                onChange={text => {
+                  eventsFunction.setFullName(text);
+                  if (onConfigurationUpdated) onConfigurationUpdated();
+                  this.forceUpdate();
+                }}
+                fullWidth
+              />
+            </ResponsiveLineStackLayout>
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={<Trans>Description, displayed in editor</Trans>}
+                floatingLabelText={
+                  <Trans>Description, displayed in editor</Trans>
+                }
+                hintText={getDescriptionHintText(type)}
                 fullWidth
-                multiLine
+                multiline
                 value={eventsFunction.getDescription()}
                 onChange={text => {
                   eventsFunction.setDescription(text);
@@ -164,17 +230,13 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 }}
               />
             </Line>
-            <Line>
+            <Line noMargin>
               {type === gd.EventsFunction.Action ||
               type === gd.EventsFunction.Condition ? (
                 <SemiControlledTextField
                   commitOnBlur
-                  hintText={
-                    <Trans>
-                      Sentence in Events Sheet (write _PARAMx_ for parameters,
-                      e.g: _PARAM1_)
-                    </Trans>
-                  }
+                  floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
+                  hintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={text => {
@@ -191,13 +253,13 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               ) : null}
             </Line>
             {helpPagePath ? (
-              <Line>
+              <Line noMargin>
                 <HelpButton helpPagePath={helpPagePath} />
               </Line>
             ) : (
               <Spacer />
             )}
-          </Column>
+          </ColumnStackLayout>
         )}
       </I18n>
     );

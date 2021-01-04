@@ -1,36 +1,43 @@
 // @flow
 import React, { Component } from 'react';
 import InstructionOrExpressionSelector from './index';
-import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
-import { enumerateInstructions } from './EnumerateInstructions';
 import {
-  type EnumeratedInstructionOrExpressionMetadata,
+  createTree,
+  type InstructionTreeNode,
+} from '../../../InstructionOrExpression/CreateTree';
+import { enumerateAllInstructions } from '../../../InstructionOrExpression/EnumerateInstructions';
+import {
+  type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
-import { type EventsScope } from '../../EventsScope.flow';
+} from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   isCondition: boolean,
   focusOnMount?: boolean,
   selectedType: string,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, EnumeratedInstructionMetadata) => void,
   scope: EventsScope,
-  style?: Object,
 |};
 
+const style = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
 export default class InstructionSelector extends Component<Props, {||}> {
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateInstructions(this.props.isCondition),
+  instructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateAllInstructions(this.props.isCondition),
     this.props.scope
   );
-  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.instructionsInfo
-  );
+  instructionsInfoTree: InstructionTreeNode = createTree(this.instructionsInfo);
 
   render() {
     const { isCondition, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
+        style={style}
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={24}

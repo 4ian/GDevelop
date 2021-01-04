@@ -1,12 +1,17 @@
 // @flow
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
+
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import Window from '../Utils/Window';
 import {
   createOrUpdateResource,
   getLocalResourceFullPath,
@@ -14,19 +19,22 @@ import {
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
+import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 
+const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
-const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
     flex: 1,
   },
 };
+
+const getResourceName = (resource: gdResource) => resource.getName();
 
 type State = {|
   renamedResource: ?gdResource,
@@ -37,13 +45,15 @@ type State = {|
 type Props = {|
   project: gdProject,
   selectedResource: ?gdResource,
-  onSelectResource: (resource: gdResource) => void,
+  onSelectResource: (resource: ?gdResource) => void,
   onDeleteResource: (resource: gdResource) => void,
   onRenameResource: (
     resource: gdResource,
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveAllResourcesWithInvalidPath: () => void,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -108,6 +118,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     extensions: string,
     createResource: () => gdResource
   ) => {
+    const glob = lazyRequireGlob();
+    if (!glob) return;
+
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
@@ -131,40 +144,14 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _removeUnusedResources = (resourceType: ResourceKind) => {
-    const { project } = this.props;
-    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
-      .toJSArray()
-      .forEach(resourceName => {
-        console.info(
-          `Removing unused` + resourceType + ` resource: ${resourceName}`
-        );
-      });
-    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
-    this.forceUpdate();
-  };
-
-  _removeAllResourcesWithInvalidPath = () => {
-    const { project } = this.props;
-    const resourcesManager = project.getResourcesManager();
-    resourcesManager
-      .getAllResourceNames()
-      .toJSArray()
-      .forEach(resourceName => {
-        if (getResourceFilePathStatus(project, resourceName) === 'error') {
-          resourcesManager.removeResource(resourceName);
-          console.info('Removed due to invalid path: ' + resourceName);
-        }
-      });
-    this.forceUpdate();
-  };
-
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
         renamedResource: resource,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -177,12 +164,13 @@ export default class ResourcesList extends React.Component<Props, State> {
     if (resource.getName() === newName) return;
 
     if (project.getResourcesManager().hasResource(newName)) {
-      showWarningBox('Another resource with this name already exists');
+      showWarningBox('Another resource with this name already exists', {
+        delayToNextTick: true,
+      });
       return;
     }
 
-    // eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
     );
     if (!answer) return;
@@ -194,47 +182,55 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    const { project } = this.props;
+  _moveSelectionTo = (destinationResource: gdResource) => {
+    const { project, selectedResource } = this.props;
+    if (!selectedResource) return;
 
-    project.getResourcesManager().moveResource(oldIndex, newIndex);
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager.moveResource(
+      resourcesManager.getResourcePosition(selectedResource.getName()),
+      resourcesManager.getResourcePosition(destinationResource.getName())
+    );
     this.forceUpdateList();
   };
 
   forceUpdateList = () => {
     this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderResourceMenuTemplate = (resource: gdResource, _index: number) => {
+  _renderResourceMenuTemplate = (i18n: I18nType) => (
+    resource: gdResource,
+    _index: number
+  ) => {
     return [
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(resource),
       },
       {
-        label: 'Remove',
+        label: i18n._(t`Remove`),
         click: () => this._deleteResource(resource),
       },
       { type: 'separator' },
       {
-        label: 'Open File',
+        label: i18n._(t`Open File`),
         click: () => this._openResourceFile(resource),
         enabled: hasElectron,
       },
       {
-        label: 'Locate File',
+        label: i18n._(t`Locate File`),
         click: () => this._locateResourceFile(resource),
         enabled: hasElectron,
       },
       {
-        label: 'Copy File Path',
+        label: i18n._(t`Copy File Path`),
         click: () => this._copyResourceFilePath(resource),
         enabled: hasElectron,
       },
       { type: 'separator' },
       {
-        label: 'Scan for Images',
+        label: i18n._(t`Scan for Images`),
         click: () => {
           this._scanForNewResources(
             RESOURCE_EXTENSIONS.image,
@@ -244,7 +240,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         enabled: hasElectron,
       },
       {
-        label: 'Scan for Audio',
+        label: i18n._(t`Scan for Audio`),
         click: () => {
           this._scanForNewResources(
             RESOURCE_EXTENSIONS.audio,
@@ -254,7 +250,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         enabled: hasElectron,
       },
       {
-        label: 'Scan for Fonts',
+        label: i18n._(t`Scan for Fonts`),
         click: () => {
           this._scanForNewResources(
             RESOURCE_EXTENSIONS.font,
@@ -264,7 +260,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         enabled: hasElectron,
       },
       {
-        label: 'Scan for Videos',
+        label: i18n._(t`Scan for Videos`),
         click: () => {
           this._scanForNewResources(
             RESOURCE_EXTENSIONS.video,
@@ -275,27 +271,27 @@ export default class ResourcesList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
-        label: 'Remove Unused Images',
+        label: i18n._(t`Remove Unused Images`),
         click: () => {
-          this._removeUnusedResources('image');
+          this.props.onRemoveUnusedResources('image');
         },
       },
       {
-        label: 'Remove Unused Audio',
+        label: i18n._(t`Remove Unused Audio`),
         click: () => {
-          this._removeUnusedResources('audio');
+          this.props.onRemoveUnusedResources('audio');
         },
       },
       {
-        label: 'Remove Unused Fonts',
+        label: i18n._(t`Remove Unused Fonts`),
         click: () => {
-          this._removeUnusedResources('font');
+          this.props.onRemoveUnusedResources('font');
         },
       },
       {
-        label: 'Remove Resources with Invalid Path',
+        label: i18n._(t`Remove Resources with Invalid Path`),
         click: () => {
-          this._removeAllResourcesWithInvalidPath();
+          this.props.onRemoveAllResourcesWithInvalidPath();
         },
         enabled: hasElectron,
       },
@@ -342,24 +338,26 @@ export default class ResourcesList extends React.Component<Props, State> {
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={filteredList}
-                width={width}
-                height={height}
-                selectedItem={selectedResource}
-                onItemSelected={onSelectResource}
-                renamedItem={this.state.renamedResource}
-                onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)
-                }
-                buildMenuTemplate={this._renderResourceMenuTemplate}
-                helperClass="sortable-helper"
-                distance={20}
-                erroredItems={this.state.resourcesWithErrors}
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={filteredList}
+                    width={width}
+                    height={height}
+                    getItemName={getResourceName}
+                    selectedItems={selectedResource ? [selectedResource] : []}
+                    onItemSelected={onSelectResource}
+                    renamedItem={this.state.renamedResource}
+                    onRename={this._rename}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    buildMenuTemplate={this._renderResourceMenuTemplate(i18n)}
+                    erroredItems={this.state.resourcesWithErrors}
+                    reactDndType="GD_RESOURCE"
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>

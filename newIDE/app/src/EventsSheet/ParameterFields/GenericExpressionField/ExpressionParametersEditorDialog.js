@@ -1,22 +1,33 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { type EventsScope } from '../../EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog from '../../../UI/Dialog';
+import Text from '../../../UI/Text';
+import { Column } from '../../../UI/Grid';
 
 export type ParameterValues = Array<string>;
+
+const styles = {
+  minHeightContainer: {
+    // Use a minimum height that is large enough so that ExpressionSelector in
+    // GenericExpressionField can fit and display entirely.
+    minHeight: 300,
+    flex: 1,
+    flexDirection: 'column',
+  },
+};
 
 type Props = {
   project?: gdProject,
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  expressionMetadata: Object,
+  expressionMetadata: gdExpressionMetadata,
   onDone: ParameterValues => void,
   onRequestClose: () => void,
-  open: boolean,
   parameterRenderingService?: {
     components: any,
     getParameterComponent: (type: string) => any,
@@ -32,16 +43,10 @@ export default class ExpressionParametersEditorDialog extends Component<
   State
 > {
   state = {
-    parameterValues: [],
+    parameterValues: Array(
+      this.props.expressionMetadata.getParametersCount()
+    ).fill(''),
   };
-
-  componentWillMount() {
-    this.setState({
-      parameterValues: Array(
-        this.props.expressionMetadata.getParametersCount()
-      ).fill(''),
-    });
-  }
 
   render() {
     const {
@@ -55,7 +60,9 @@ export default class ExpressionParametersEditorDialog extends Component<
 
     return (
       <Dialog
-        open={this.props.open}
+        title={<Trans>Enter the expression parameters</Trans>}
+        cannotBeDismissed={true}
+        open
         actions={
           <FlatButton
             key="apply"
@@ -64,26 +71,31 @@ export default class ExpressionParametersEditorDialog extends Component<
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />
         }
-        modal
+        noMargin
         onRequestClose={this.props.onRequestClose}
-        autoScrollBodyContent
       >
-        <ExpressionParametersEditor
-          project={project}
-          scope={scope}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          expressionMetadata={expressionMetadata}
-          parameterValues={this.state.parameterValues}
-          onChangeParameter={(editedIndex, value) => {
-            this.setState({
-              parameterValues: this.state.parameterValues.map(
-                (oldValue, index) => (index === editedIndex ? value : oldValue)
-              ),
-            });
-          }}
-          parameterRenderingService={parameterRenderingService}
-        />
+        <Column>
+          <div style={styles.minHeightContainer}>
+            <Text>{expressionMetadata.getDescription()}</Text>
+            <ExpressionParametersEditor
+              project={project}
+              scope={scope}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
+              expressionMetadata={expressionMetadata}
+              parameterValues={this.state.parameterValues}
+              onChangeParameter={(editedIndex, value) => {
+                this.setState({
+                  parameterValues: this.state.parameterValues.map(
+                    (oldValue, index) =>
+                      index === editedIndex ? value : oldValue
+                  ),
+                });
+              }}
+              parameterRenderingService={parameterRenderingService}
+            />
+          </div>
+        </Column>
       </Dialog>
     );
   }

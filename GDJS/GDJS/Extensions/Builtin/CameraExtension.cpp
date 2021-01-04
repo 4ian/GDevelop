@@ -51,6 +51,8 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.getCameraY");
   GetAllExpressions()["CameraRotation"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
+  GetAllExpressions()["CameraZoom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraZoom");
   GetAllExpressions()["VueRotation"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraWidth"].SetFunctionName(
@@ -64,7 +66,15 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.centerCamera");
 
   GetAllActions()["SetLayerEffectParameter"].SetFunctionName(
-      "gdjs.evtTools.camera.setLayerEffectParameter");
+      "gdjs.evtTools.camera.setLayerEffectDoubleParameter");
+  GetAllActions()["SetLayerEffectStringParameter"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerEffectStringParameter");
+  GetAllActions()["SetLayerEffectBooleanParameter"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerEffectBooleanParameter");
+  GetAllActions()["EnableLayerEffect"].SetFunctionName(
+      "gdjs.evtTools.camera.enableLayerEffect");
+  GetAllConditions()["LayerEffectEnabled"].SetFunctionName(
+      "gdjs.evtTools.camera.layerEffectEnabled");
 
   GetAllConditions()["LayerTimeScale"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerTimeScale");
@@ -72,6 +82,16 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.setLayerTimeScale");
   GetAllExpressions()["LayerTimeScale"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerTimeScale");
+
+  GetAllConditions()["LayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.getLayerDefaultZOrder");
+  GetAllActions()["SetLayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerDefaultZOrder");
+  GetAllExpressions()["LayerDefaultZOrder"].SetFunctionName(
+      "gdjs.evtTools.camera.getLayerDefaultZOrder");
+    
+  GetAllActions()["SetLayerAmbientLightColor"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerAmbientLightColor");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

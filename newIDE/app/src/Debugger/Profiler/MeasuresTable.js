@@ -6,9 +6,9 @@ import { AutoSizer, Table, Column } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
-import IconButton from 'material-ui/IconButton';
-import ExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import IconButton from '../../UI/IconButton';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ChevronRight from '@material-ui/icons/ChevronRight';
 
 const styles = {
   indent: {
@@ -136,7 +136,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
               <Table
                 headerHeight={30}
                 height={height}
-                className={muiTheme.tableRootClassName}
+                className={`gd-table ${muiTheme.tableRootClassName}`}
                 headerClassName={'tableHeaderColumn'}
                 rowCount={dataRows.length}
                 rowGetter={({ index }) => dataRows[index]}

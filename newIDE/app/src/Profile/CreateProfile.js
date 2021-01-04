@@ -2,37 +2,41 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import { Column, Line } from '../UI/Grid';
-
-const styles = {
-  orDivider: {
-    marginLeft: 15,
-    marginTop: 2,
-  },
-};
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
+import { Column, Line, Spacer } from '../UI/Grid';
+import Text from '../UI/Text';
+import BackgroundText from '../UI/BackgroundText';
 
 type Props = {
-  message?: string,
-  onLogin: Function,
+  message?: React.Node,
+  onLogin: () => void,
+  onCreateAccount: () => void,
 };
 
-export default ({ message, onLogin }: Props) => (
+export default ({ message, onLogin, onCreateAccount }: Props) => (
   <Column noMargin>
     <Line>
-      <p>
-        {message ||
-          'You are not connected. Create an account and connect to access to GDevelop online services, like building your game for Android in one click!'}
-      </p>
+      <Text>
+        {message || (
+          <Trans>
+            You are not connected. Create an account to build your game for
+            Android, Windows, macOS and Linux in one click, and get access to
+            metrics for your game.
+          </Trans>
+        )}
+      </Text>
     </Line>
-    <Line justifyContent="center" alignItems="center">
+    <Line justifyContent="center" alignItems="baseline">
       <RaisedButton
         label={<Trans>Create my account</Trans>}
-        onClick={onLogin}
+        onClick={onCreateAccount}
         primary
       />
-      <span style={styles.orDivider}>or</span>
+      <Spacer />
+      <Spacer />
+      <BackgroundText>or</BackgroundText>
+      <Spacer />
       <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
     </Line>
   </Column>

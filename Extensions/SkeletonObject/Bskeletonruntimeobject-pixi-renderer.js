@@ -11,18 +11,25 @@ gdjs.sk.PixiDataLoader = function()
 };
 gdjs.sk.DataLoader = gdjs.sk.PixiDataLoader;
 
-gdjs.sk.PixiDataLoader.prototype.getData = function(dataName){
-    if(PIXI.loader.resources[dataName]){
-        return PIXI.loader.resources[dataName].data;
-    }
-    return null;
-};
-
+/**
+ * Load the textures from DragonBones data
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {Object} objectData
+ */
 gdjs.sk.PixiDataLoader.prototype.loadDragonBones = function(runtimeScene, objectData){
-    var textureData = this.getData(objectData.textureDataFilename);
+    var jsonManager = runtimeScene.getGame().getJsonManager();
+    if (!jsonManager.isJsonLoaded(objectData.textureDataFilename)) {
+        console.error("Tried to load DragonBones textures from \"" + objectData.textureDataFilename + "\" but this resource is not loaded.");
+        return;
+    }
+
+    var textureData = jsonManager.getLoadedJson(objectData.textureDataFilename);
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.textureName);
-    if(!textureData || !texture.valid) return;
-    
+    if(!textureData || !texture.valid) {
+        console.error("Tried to load DragonBones textures from \"" + objectData.textureDataFilename + "\" resource but the texture or the texture data could not be loaded properly.");
+        return;
+    }
+
     for(var i=0; i<textureData.SubTexture.length; i++){
         var subTex = textureData.SubTexture[i];
         var frame = new PIXI.Rectangle(subTex.x, subTex.y, subTex.width, subTex.height);
@@ -37,7 +44,7 @@ gdjs.sk.PixiDataLoader.prototype.loadDragonBones = function(runtimeScene, object
         if(frame.y > texture.height) frame.y = 0;
         if(frame.x + frame.width > texture.width) frame.width = texture.width - frame.x;
         if(frame.y + frame.height > texture.height) frame.height = texture.height - frame.y;
-        
+
         this.textures[subTex.name] = new PIXI.Texture(texture.baseTexture, frame=frame);
     }
 };
@@ -97,11 +104,11 @@ gdjs.sk.SlotPixiRenderer.prototype.loadAsSprite = function(texture){
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
-    this.renderer = new PIXI.mesh.Mesh(texture,
+    this.renderer = new PIXI.SimpleMesh(texture,
                                        new Float32Array(vertices),
                                        new Float32Array(uvs),
                                        new Uint16Array(triangles),
-                                       PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
+                                       PIXI.DRAW_MODES.TRIANGLES);
 
     this.renderer.uploadUvTransform = true;
     this.renderer.z = 0;

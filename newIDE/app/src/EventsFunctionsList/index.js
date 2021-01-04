@@ -1,10 +1,13 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import SearchBar from 'material-ui-search-bar';
+import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -13,10 +16,12 @@ import {
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
 import Clipboard from '../Utils/Clipboard';
+import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
@@ -25,6 +30,14 @@ const styles = {
     flex: 1,
   },
 };
+
+export type EventsFunctionCreationParameters = {|
+  functionType: 0 | 1 | 2,
+  name: ?string,
+|};
+
+const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
+  eventsFunction.getName();
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -46,9 +59,12 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  onAddEventsFunction: ((doAdd: boolean, name: ?string) => void) => void,
+  onAddEventsFunction: (
+    (parameters: ?EventsFunctionCreationParameters) => void
+  ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   renderHeader?: () => React.Node,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -77,8 +93,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const { eventsFunctionsContainer } = this.props;
 
     if (askForConfirmation) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Are you sure you want to remove this function? This can't be undone."
       );
       if (!answer) return;
@@ -88,7 +103,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
-      this.forceUpdate();
+      this._onEventsFunctionModified();
     });
   };
 
@@ -97,7 +112,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         renamedEventsFunction: eventsFunction,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
   };
 
@@ -110,27 +127,38 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     if (eventsFunction.getName() === newName) return;
 
     if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
-      showWarningBox('Another function with this name already exists.');
+      showWarningBox('Another function with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 
     this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
       if (!doRename) return;
       eventsFunction.setName(newName);
-      this.forceUpdate();
+      this._onEventsFunctionModified();
     });
   };
 
-  _move = (oldIndex: number, newIndex: number) => {
-    const { eventsFunctionsContainer } = this.props;
-    eventsFunctionsContainer.moveEventsFunction(oldIndex, newIndex);
+  _moveSelectionTo = (destinationEventsFunction: gdEventsFunction) => {
+    const { eventsFunctionsContainer, selectedEventsFunction } = this.props;
+    if (!selectedEventsFunction) return;
+
+    eventsFunctionsContainer.moveEventsFunction(
+      eventsFunctionsContainer.getEventsFunctionPosition(
+        selectedEventsFunction
+      ),
+      eventsFunctionsContainer.getEventsFunctionPosition(
+        destinationEventsFunction
+      )
+    );
 
     this.forceUpdateList();
   };
 
   forceUpdateList = () => {
-    this.forceUpdate();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
+    this._onEventsFunctionModified();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
   _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
@@ -171,21 +199,27 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     newEventsFunction.setName(newName);
     this.props.onEventsFunctionAdded(newEventsFunction);
 
-    this.forceUpdate();
+    this._onEventsFunctionModified();
   };
 
-  _renderEventsFunctionMenuTemplate = (
+  _onEventsFunctionModified() {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
+  }
+
+  _renderEventsFunctionMenuTemplate = (i18n: I18nType) => (
     eventsFunction: gdEventsFunction,
     index: number
   ) => {
     return [
       {
-        label: 'Rename',
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsFunction),
         enabled: this.props.canRename(eventsFunction),
       },
       {
-        label: 'Remove',
+        label: i18n._(t`Remove`),
         click: () =>
           this._deleteEventsFunction(eventsFunction, {
             askForConfirmation: true,
@@ -195,15 +229,15 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         type: 'separator',
       },
       {
-        label: 'Copy',
+        label: i18n._(t`Copy`),
         click: () => this._copyEventsFunction(eventsFunction),
       },
       {
-        label: 'Cut',
+        label: i18n._(t`Cut`),
         click: () => this._cutEventsFunction(eventsFunction),
       },
       {
-        label: 'Paste',
+        label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
         click: () => this._pasteEventsFunction(index),
       },
@@ -213,24 +247,27 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _addNewEventsFunction = () => {
     const { eventsFunctionsContainer } = this.props;
 
-    this.props.onAddEventsFunction((doAdd: boolean, name: ?string) => {
-      if (!doAdd) {
-        return;
-      }
+    this.props.onAddEventsFunction(
+      (parameters: ?EventsFunctionCreationParameters) => {
+        if (!parameters) {
+          return;
+        }
 
-      const eventsFunctionName =
-        name ||
-        newNameGenerator('Function', name =>
-          eventsFunctionsContainer.hasEventsFunctionNamed(name)
+        const eventsFunctionName =
+          parameters.name ||
+          newNameGenerator('Function', name =>
+            eventsFunctionsContainer.hasEventsFunctionNamed(name)
+          );
+
+        const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+          eventsFunctionName,
+          eventsFunctionsContainer.getEventsFunctionsCount()
         );
-
-      const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
-        eventsFunctionName,
-        eventsFunctionsContainer.getEventsFunctionsCount()
-      );
-      this.props.onEventsFunctionAdded(eventsFunction);
-      this.forceUpdate();
-    });
+        eventsFunction.setFunctionType(parameters.functionType);
+        this.props.onEventsFunctionAdded(eventsFunction);
+        this._onEventsFunctionModified();
+      }
+    );
   };
 
   render() {
@@ -243,15 +280,10 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     } = this.props;
     const { searchText } = this.state;
 
-    const list = [
-      ...filterEventFunctionsList(
-        enumerateEventsFunctions(eventsFunctionsContainer),
-        searchText
-      ),
-      {
-        key: 'add-item-row',
-      },
-    ];
+    const list = filterEventFunctionsList(
+      enumerateEventsFunctions(eventsFunctionsContainer),
+      searchText
+    );
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -264,25 +296,31 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableVirtualizedItemList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={list}
-                width={width}
-                height={height}
-                onAddNewItem={this._addNewEventsFunction}
-                addNewItemLabel={<Trans>Add a new function</Trans>}
-                selectedItem={selectedEventsFunction}
-                onItemSelected={onSelectEventsFunction}
-                renamedItem={this.state.renamedEventsFunction}
-                onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)
-                }
-                buildMenuTemplate={this._renderEventsFunctionMenuTemplate}
-                helperClass="sortable-helper"
-                distance={20}
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={list}
+                    width={width}
+                    height={height}
+                    onAddNewItem={this._addNewEventsFunction}
+                    addNewItemLabel={<Trans>Add a new function</Trans>}
+                    getItemName={getEventsFunctionName}
+                    selectedItems={
+                      selectedEventsFunction ? [selectedEventsFunction] : []
+                    }
+                    onItemSelected={onSelectEventsFunction}
+                    renamedItem={this.state.renamedEventsFunction}
+                    onRename={this._rename}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    buildMenuTemplate={this._renderEventsFunctionMenuTemplate(
+                      i18n
+                    )}
+                    reactDndType="GD_EVENTS_FUNCTION"
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>

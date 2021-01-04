@@ -1,23 +1,16 @@
 // @flow
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
-import { icon } from '../EventsTree/ClassNames';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
-
-const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'baseline',
-  },
-  moreButton: {
-    marginLeft: 10,
-  },
-};
+import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
 type Props = {
   ...ParameterFieldProps,
@@ -26,7 +19,7 @@ type Props = {
 };
 
 export default class VariableField extends Component<Props, {||}> {
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._field) this._field.focus();
@@ -40,46 +33,74 @@ export default class VariableField extends Component<Props, {||}> {
       onOpenDialog,
       parameterMetadata,
       variablesContainer,
+      onRequestClose,
     } = this.props;
 
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
-      <div style={styles.container}>
-        <SemiControlledAutoComplete
-          floatingLabelText={
-            parameterMetadata ? parameterMetadata.getDescription() : undefined
-          }
-          value={value}
-          onChange={onChange}
-          dataSource={enumerateVariables(variablesContainer).map(
-            variableName => ({
-              text: variableName,
-              value: variableName,
-            })
-          )}
-          openOnFocus={!isInline}
-          ref={field => (this._field = field)}
-        />
-        {onOpenDialog && !isInline && (
-          <RaisedButton
-            icon={<OpenInNew />}
-            disabled={!this.props.variablesContainer}
-            primary
-            style={styles.moreButton}
-            onClick={onOpenDialog}
+      <TextFieldWithButtonLayout
+        renderTextField={() => (
+          <SemiControlledAutoComplete
+            margin={this.props.isInline ? 'none' : 'dense'}
+            floatingLabelText={description}
+            helperMarkdownText={
+              parameterMetadata
+                ? parameterMetadata.getLongDescription()
+                : undefined
+            }
+            fullWidth
+            value={value}
+            onChange={onChange}
+            onRequestClose={onRequestClose}
+            dataSource={enumerateVariables(variablesContainer).map(
+              variableName => ({
+                text: variableName,
+                value: variableName,
+              })
+            )}
+            openOnFocus={!isInline}
+            ref={field => (this._field = field)}
           />
         )}
-      </div>
+        renderButton={style =>
+          onOpenDialog && !isInline ? (
+            <RaisedButton
+              icon={<OpenInNew />}
+              disabled={!this.props.variablesContainer}
+              primary
+              style={style}
+              onClick={onOpenDialog}
+            />
+          ) : null
+        }
+      />
     );
   }
 }
 
 export const renderVariableWithIcon = (
-  value: string,
+  {
+    value,
+    parameterMetadata,
+    MissingParameterValue,
+  }: ParameterInlineRendererProps,
   iconPath: string,
-  tooltip: string = ''
+  tooltip: string
 ) => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+
   return (
-    <span title={tooltip}>
+    <span
+      title={tooltip}
+      className={classNames({
+        [nameAndIconContainer]: true,
+      })}
+    >
       <img
         className={classNames({
           [icon]: true,

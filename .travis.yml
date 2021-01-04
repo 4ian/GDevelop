@@ -13,20 +13,24 @@ env:
   global:
     - GCC_VERSION="4.8"
 
+services:
+  # Virtual Framebuffer 'fake' X server for SFML
+  - xvfb
+
 addons:
   artifacts:
     s3_region: "us-east-1"
     target_paths:
-    - /$(git rev-parse HEAD)
+    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/commit/$(git rev-parse HEAD)
+    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/latest
     paths:
-    - Binaries/Output/libGD.js/Release
+    - Binaries/embuild/GDevelop.js
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
     # Build dependencies:
-    # (Cmake 3+ is required by Emscripten)
-    - cmake3
+    - cmake
     - p7zip-full
     - g++-4.8
     # SFML dependencies:
@@ -43,9 +47,8 @@ before_install:
   #Activate X Virtual Framebuffer to allow tests to
   #use SFML.
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   # This workaround is required to avoid libstdc++ errors (Emscripten requires a recent version of libstdc++)
-  - wget -q -O libstdc++6 http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.10_amd64.deb
+  - wget -q -O libstdc++6 http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.12_amd64.deb
   - sudo dpkg --force-all -i libstdc++6
 
 install:
@@ -60,8 +63,8 @@ install:
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk
-  - ./emsdk install sdk-1.37.37-64bit
-  - ./emsdk activate sdk-1.37.37-64bit
+  - ./emsdk install 1.39.6
+  - ./emsdk activate 1.39.6
   - source ./emsdk_env.sh
   - cd ..
 # Install GDevelop.js dependencies and compile it

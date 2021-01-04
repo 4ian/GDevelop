@@ -1,53 +1,75 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
-import { List, ListItem, makeSelectable } from 'material-ui/List';
-import ListIcon from '../../../UI/ListIcon';
-import SearchBar from 'material-ui-search-bar';
-import { type EnumeratedInstructionOrExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
-import { type InstructionOrExpressionTreeNode } from './CreateTree';
+import { List, type ListItemRefType } from '../../../UI/List';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import {
+  type TreeNode,
+  findInTree,
+} from '../../../InstructionOrExpression/CreateTree';
+import { filterInstructionsList } from '../../../InstructionOrExpression/EnumerateInstructions';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
-import { Subheader } from 'material-ui';
-
-const SelectableList = makeSelectable(List);
+import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
+import { renderInstructionOrExpressionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
+import EmptyMessage from '../../../UI/EmptyMessage';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
+import { Line } from '../../../UI/Grid';
+import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 
 const styles = {
   searchBar: {
-    margin: '0 auto',
     backgroundColor: 'transparent',
-  },
-  groupListItemNestedList: {
-    padding: 0,
+    flexShrink: 0,
+    zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
   },
 };
 
-type Props = {|
+type Props<T> = {|
   focusOnMount?: boolean,
-  instructionsInfo: Array<EnumeratedInstructionOrExpressionMetadata>,
-  instructionsInfoTree: InstructionOrExpressionTreeNode,
+  instructionsInfo: Array<T>,
+  instructionsInfoTree: TreeNode<T>,
   selectedType: string,
-  onChoose: (type: string, EnumeratedInstructionOrExpressionMetadata) => void,
+  onChoose: (type: string, T) => void,
   iconSize: number,
-  style?: Object,
   useSubheaders?: boolean,
+  searchPlaceholderObjectName?: ?string,
+  searchPlaceholderIsCondition?: ?boolean,
+  helpPagePath?: ?string,
+  style?: Object,
 |};
-type State = {|
-  search: string,
-  searchResults: Array<EnumeratedInstructionOrExpressionMetadata>,
+type State<T> = {|
+  searchText: string,
+  searchResults: Array<T>,
 |};
 
-export default class InstructionOrExpressionSelector extends React.Component<
-  Props,
-  State
-> {
-  state = {
-    search: '',
+export default class InstructionOrExpressionSelector<
+  T: EnumeratedInstructionOrExpressionMetadata
+> extends React.PureComponent<Props<T>, State<T>> {
+  state: State<T> = {
+    searchText: '',
     searchResults: [],
   };
   _searchBar: ?SearchBar;
+  _scrollView = React.createRef<ScrollViewInterface>();
+  _selectedItem = React.createRef<ListItemRefType>();
+
+  initialInstructionTypePath = findInTree(
+    this.props.instructionsInfoTree,
+    this.props.selectedType
+  );
 
   componentDidMount() {
-    if (this.props.focusOnMount && this._searchBar) {
+    if (
+      this.props.focusOnMount &&
+      useShouldAutofocusSearchbar() &&
+      this._searchBar
+    ) {
       this._searchBar.focus();
+    }
+    if (this._selectedItem.current && this._scrollView.current) {
+      this._scrollView.current.scrollTo(this._selectedItem.current);
     }
   }
 
@@ -55,134 +77,29 @@ export default class InstructionOrExpressionSelector extends React.Component<
     if (this._searchBar) this._searchBar.focus();
   };
 
-  _matchCritera(
-    instructionInfo: EnumeratedInstructionOrExpressionMetadata,
-    lowercaseSearch: string
-  ) {
-    const { displayedName, fullGroupName } = instructionInfo;
-    return (
-      displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
-      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1
-    );
-  }
-
-  _computeSearchResults = (
-    search: string
-  ): Array<EnumeratedInstructionOrExpressionMetadata> => {
-    const lowercaseSearch = this.state.search.toLowerCase();
-    return this.props.instructionsInfo.filter(instructionInfo =>
-      this._matchCritera(instructionInfo, lowercaseSearch)
-    );
-  };
-
-  _onSubmitSearch = () => {
-    const { searchResults } = this.state;
-    if (!searchResults.length) return;
-
-    this.props.onChoose(searchResults[0].type, searchResults[0]);
-  };
-
-  _renderTree(
-    muiTheme: any,
-    instructionInfoTree: InstructionOrExpressionTreeNode,
-    depth: number = 0
-  ): Array<React.Node> {
-    return Object.keys(instructionInfoTree).map(key => {
-      // $FlowFixMe - in theory, we should have a way to distinguish
-      // between instruction (leaf nodes) and group (nodes). We use
-      // the "type" properties, but this will fail if a group is called "type"
-      // (hence the flow errors, which are valid warnings)
-      const instructionOrGroup = instructionInfoTree[key];
-      if (!instructionOrGroup) return null;
-
-      if (typeof instructionOrGroup.type === 'string') {
-        // $FlowFixMe - see above
-        const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
-        return (
-          <ListItem
-            key={key}
-            primaryText={key}
-            value={instructionOrGroup.type}
-            leftIcon={
-              <ListIcon
-                iconSize={this.props.iconSize}
-                src={instructionInformation.iconFilename}
-              />
-            }
-            onClick={() => {
-              this.props.onChoose(
-                instructionInformation.type,
-                instructionInformation
-              );
-            }}
-          />
-        );
-      } else {
-        // $FlowFixMe - see above
-        const groupOfInstructionInformation = (instructionOrGroup: InstructionOrExpressionTreeNode);
-        const isDeprecated = key.indexOf('(deprecated)') !== -1;
-        if (this.props.useSubheaders && depth === 0) {
-          return (
-            <React.Fragment key={key}>
-              <Subheader>{key}</Subheader>
-              {this._renderTree(
-                muiTheme,
-                groupOfInstructionInformation,
-                depth + 1
-              )}
-            </React.Fragment>
-          );
-        } else {
-          return (
-            <ListItem
-              key={key}
-              style={{
-                borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-              }}
-              nestedListStyle={styles.groupListItemNestedList}
-              primaryText={
-                <div
-                  style={{
-                    color: isDeprecated
-                      ? muiTheme.listItem.deprecatedGroupTextColor
-                      : muiTheme.listItem.groupTextColor,
-                  }}
-                >
-                  {key}
-                </div>
-              }
-              primaryTogglesNestedList={true}
-              autoGenerateNestedIndicator={true}
-              nestedItems={this._renderTree(
-                muiTheme,
-                groupOfInstructionInformation,
-                depth + 1
-              )}
-            />
-          );
-        }
-      }
-    });
-  }
-
-  _renderSearchResults = (): Array<React.Node> => {
-    return this.state.searchResults.map(instructionInfo => {
-      return (
-        <ListItem
-          key={instructionInfo.type}
-          primaryText={instructionInfo.displayedName}
-          secondaryText={instructionInfo.fullGroupName}
-          value={instructionInfo.type}
-          onClick={() => {
-            this.props.onChoose(instructionInfo.type, instructionInfo);
-          }}
-        />
-      );
-    });
-  };
-
   render() {
-    const { selectedType, instructionsInfoTree, style } = this.props;
+    const {
+      selectedType,
+      iconSize,
+      instructionsInfoTree,
+      onChoose,
+      searchPlaceholderObjectName,
+      searchPlaceholderIsCondition,
+      useSubheaders,
+      helpPagePath,
+      style,
+    } = this.props;
+    const { searchText } = this.state;
+    const displayedInstructionsList: Array<T> = searchText
+      ? filterInstructionsList(this.props.instructionsInfo, { searchText })
+      : [];
+    const hasResults = !searchText || !!displayedInstructionsList.length;
+
+    const onSubmitSearch = () => {
+      if (!displayedInstructionsList.length) return;
+
+      onChoose(displayedInstructionsList[0].type, displayedInstructionsList[0]);
+    };
 
     return (
       <ThemeConsumer>
@@ -194,21 +111,72 @@ export default class InstructionOrExpressionSelector extends React.Component<
             }}
           >
             <SearchBar
-              onChange={text =>
+              value={searchText}
+              onChange={searchText =>
                 this.setState({
-                  search: text,
-                  searchResults: this._computeSearchResults(text),
+                  searchText,
                 })
               }
-              onRequestSearch={this._onSubmitSearch}
+              onRequestSearch={onSubmitSearch}
               style={styles.searchBar}
+              placeholder={
+                searchPlaceholderObjectName
+                  ? searchPlaceholderIsCondition
+                    ? t`Search ${searchPlaceholderObjectName} conditions`
+                    : t`Search ${searchPlaceholderObjectName} actions`
+                  : undefined
+              }
+              helpPagePath={helpPagePath}
               ref={searchBar => (this._searchBar = searchBar)}
             />
-            <SelectableList value={selectedType}>
-              {this.state.search
-                ? this._renderSearchResults()
-                : this._renderTree(muiTheme, instructionsInfoTree)}
-            </SelectableList>
+            <ScrollView
+              ref={
+                // $FlowFixMe - improper typing of ScrollView?
+                this._scrollView
+              }
+            >
+              {hasResults && (
+                <List>
+                  {searchText
+                    ? displayedInstructionsList.map(
+                        enumeratedInstructionOrExpressionMetadata =>
+                          renderInstructionOrExpressionListItem({
+                            instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                            iconSize: iconSize,
+                            onClick: () =>
+                              onChoose(
+                                enumeratedInstructionOrExpressionMetadata.type,
+                                enumeratedInstructionOrExpressionMetadata
+                              ),
+                            selectedValue: getInstructionListItemValue(
+                              selectedType
+                            ),
+                          })
+                      )
+                    : renderInstructionOrExpressionTree({
+                        instructionTreeNode: instructionsInfoTree,
+                        iconSize,
+                        onChoose,
+                        useSubheaders,
+                        selectedValue: getInstructionListItemValue(
+                          selectedType
+                        ),
+                        initiallyOpenedPath: this.initialInstructionTypePath,
+                        selectedItemRef: this._selectedItem,
+                      })}
+                </List>
+              )}
+              {!hasResults && (
+                <Line>
+                  <EmptyMessage>
+                    <Trans>
+                      Nothing corresponding to your search. Try browsing the
+                      list instead.
+                    </Trans>
+                  </EmptyMessage>
+                </Line>
+              )}
+            </ScrollView>
           </div>
         )}
       </ThemeConsumer>

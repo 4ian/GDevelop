@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.dom.tom",
-    "projectFile": "G:\\Games\\Rope Example\\game.json",
+    "projectUuid": "8738a2b1-098b-4cbf-8361-bc19e532bfa3",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Rope Example",
     "author": "Zatapov",
     "windowWidth": 800,
@@ -56,6 +53,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -126,7 +124,7 @@
     "resources": [
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Finish.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Finish.png",
         "kind": "image",
         "metadata": "",
         "name": "Finish.png",
@@ -135,7 +133,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/GDevelop.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/GDevelop.png",
         "kind": "image",
         "metadata": "",
         "name": "GDevelop.png",
@@ -144,7 +142,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Back.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Back.jpg",
         "kind": "image",
         "metadata": "",
         "name": "Back.jpg",
@@ -153,7 +151,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Peg.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Peg.png",
         "kind": "image",
         "metadata": "",
         "name": "Peg.png",
@@ -162,7 +160,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Shelf.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Shelf.png",
         "kind": "image",
         "metadata": "",
         "name": "Shelf.png",
@@ -171,16 +169,16 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Ball.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Ball.png",
         "kind": "image",
         "metadata": "",
         "name": "Ball.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": false
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/Shadow.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/Shadow.png",
         "kind": "image",
         "metadata": "",
         "name": "Shadow.png",
@@ -189,11 +187,11 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/bouncing-ball-and-rope/BoundsLine.png",
+        "file": "https://resources.gdevelop-app.com/examples/bouncing-ball-and-rope/BoundsLine.png",
         "kind": "image",
         "metadata": "",
         "name": "BoundsLine.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": true
       }
     ],
@@ -239,8 +237,9 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
+          "persistentUuid": "a2298a3e-d37a-46ab-8503-0081a38160ae",
           "width": 562,
-          "x": 164,
+          "x": 139,
           "y": 187,
           "zOrder": 1,
           "numberProperties": [],
@@ -254,8 +253,9 @@
           "layer": "",
           "locked": false,
           "name": "Logo",
+          "persistentUuid": "0f96dba6-c495-4331-99a3-edbd3aff1dfc",
           "width": 355,
-          "x": 486,
+          "x": 427,
           "y": 446,
           "zOrder": 2,
           "numberProperties": [],
@@ -269,8 +269,9 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "9d18d5e0-e031-4bbb-abc3-b14ed4e4f4dd",
           "width": 0,
-          "x": 76,
+          "x": 51,
           "y": 33,
           "zOrder": 3,
           "numberProperties": [],
@@ -284,6 +285,7 @@
           "layer": "Back",
           "locked": true,
           "name": "Back",
+          "persistentUuid": "41f48351-7a12-4ffd-8684-26d4355b4ac5",
           "width": 1908,
           "x": -563,
           "y": -493,
@@ -478,12 +480,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Back",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -527,7 +539,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.496
       },
       "objectsGroups": [
         {
@@ -573,6 +585,7 @@
           "layer": "",
           "locked": false,
           "name": "MainChar",
+          "persistentUuid": "44a5c1c4-82ee-4248-bc7b-5a5894039360",
           "width": 0,
           "x": 190,
           "y": 65,
@@ -588,6 +601,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "a7fcc013-bfc0-4563-beed-bc6c90300dec",
           "width": 0,
           "x": 707,
           "y": 1222,
@@ -603,6 +617,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "4b87c193-4c95-4b5d-a52d-67ec743aa20b",
           "width": 0,
           "x": 1083,
           "y": 915,
@@ -618,6 +633,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "0bcca488-a063-40c3-ba25-46118932fb6c",
           "width": 0,
           "x": 3899,
           "y": 340,
@@ -633,6 +649,7 @@
           "layer": "",
           "locked": false,
           "name": "Rope",
+          "persistentUuid": "1115511f-ddb3-4e17-b493-9099b24ec4d1",
           "width": 130,
           "x": 2971,
           "y": 1150,
@@ -648,6 +665,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "8c3a822b-2be5-4141-802c-6beb5f4ff722",
           "width": 0,
           "x": 2082,
           "y": 1068,
@@ -663,6 +681,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "f4eb12de-8324-40ec-b42c-da6e96b69bde",
           "width": 0,
           "x": 3190,
           "y": 189,
@@ -678,6 +697,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "acaa0624-73c5-4ed0-8876-38d83c8f1afa",
           "width": 0,
           "x": 1593,
           "y": 1134,
@@ -693,6 +713,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "5856dc4e-9ee6-4aab-a6b3-da325e10c27a",
           "width": 0,
           "x": 4691,
           "y": 1362,
@@ -708,6 +729,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "75e1f285-3999-464d-adcf-2bc1f5a37903",
           "width": 0,
           "x": 4446,
           "y": 608,
@@ -723,6 +745,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "86038218-7814-4ac9-83f3-e8bcf128a557",
           "width": 0,
           "x": 562,
           "y": 673,
@@ -738,6 +761,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "9ca2db4e-cf4c-4adf-9f9b-8fef5b9d7f2f",
           "width": 0,
           "x": 3068,
           "y": 1399,
@@ -753,6 +777,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "f1aab5de-fa38-4001-bd90-e0021945e086",
           "width": 0,
           "x": 3431,
           "y": 1102,
@@ -768,6 +793,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "e6222955-ad64-47a5-a5b9-2a15663781bc",
           "width": 0,
           "x": 2633,
           "y": 518,
@@ -783,6 +809,7 @@
           "layer": "",
           "locked": false,
           "name": "Follow",
+          "persistentUuid": "c6f68a65-9185-4392-94ba-ae7786b88f7a",
           "width": 0,
           "x": 168,
           "y": 42,
@@ -798,6 +825,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "19b774a6-072c-42df-b1c1-43686f0cb85e",
           "width": 312,
           "x": 67,
           "y": 854,
@@ -813,6 +841,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "9fb39de1-9bcb-47b7-8051-7441cf8eaa8a",
           "width": 626,
           "x": 544,
           "y": 1573,
@@ -828,6 +857,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "5f9d41d7-0443-4940-a05c-48efc2c100fc",
           "width": 46,
           "x": 61,
           "y": -2500,
@@ -843,6 +873,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "fefb2dd2-a58c-4214-8ff9-eb22834d8ab5",
           "width": 183,
           "x": 1556,
           "y": 1631,
@@ -858,6 +889,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ed6dffb0-fc5a-4018-b5b8-198d7796e03e",
           "width": 359,
           "x": 3289,
           "y": 800,
@@ -873,6 +905,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "ed84b462-700f-4173-8fd9-e799276c2f22",
           "width": 215,
           "x": 2432,
           "y": 1008,
@@ -888,6 +921,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "8c2bc4d7-db09-45c7-bdee-e2c22981dd9d",
           "width": 366,
           "x": 2272,
           "y": 1661,
@@ -903,6 +937,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "8c46638b-c91a-4496-816f-1416602b22e7",
           "width": 350,
           "x": 3743,
           "y": 1376,
@@ -918,6 +953,7 @@
           "layer": "",
           "locked": false,
           "name": "Finish",
+          "persistentUuid": "3f10d407-1ef9-4c57-a543-27f6417c56de",
           "width": 27,
           "x": 5225,
           "y": -2500,
@@ -933,6 +969,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "77126164-5a52-4cf5-ab52-7c2710781c21",
           "width": 0,
           "x": 1306,
           "y": 251,
@@ -948,6 +985,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "73bb0802-90e5-4293-9736-b07ae8733965",
           "width": 0,
           "x": 2220,
           "y": 154,
@@ -963,6 +1001,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "8876fbd5-986d-4bf6-8919-2098cd28ff30",
           "width": 148,
           "x": 4691,
           "y": 970,
@@ -978,6 +1017,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "9e050182-1889-413f-9145-5c3e95e8f775",
           "width": 428,
           "x": 1369,
           "y": 680,
@@ -993,6 +1033,7 @@
           "layer": "",
           "locked": true,
           "name": "Background",
+          "persistentUuid": "156fad8b-5b68-4ad3-93ce-27f542f85cad",
           "width": 7064,
           "x": -1080,
           "y": -2806,
@@ -1008,6 +1049,7 @@
           "layer": "",
           "locked": false,
           "name": "MainShaow",
+          "persistentUuid": "b6a95507-2f8e-41d1-bca2-39cace81a7fe",
           "width": 0,
           "x": 140,
           "y": 13,
@@ -1023,6 +1065,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "c75931c8-4c69-4228-a716-39896690c1b5",
           "width": 0,
           "x": 4085,
           "y": 961,
@@ -1038,6 +1081,7 @@
           "layer": "",
           "locked": false,
           "name": "BoundsLine",
+          "persistentUuid": "7b328dfc-3c25-4fcc-8ec4-168b67ab5c7a",
           "width": 5163,
           "x": 79,
           "y": 2200,
@@ -1053,6 +1097,7 @@
           "layer": "",
           "locked": false,
           "name": "SwingBox",
+          "persistentUuid": "cf91e77b-346b-455c-93ba-c3626e12b3bb",
           "width": 0,
           "x": 4025,
           "y": 1598,
@@ -1076,7 +1121,7 @@
               "bullet": false,
               "fixedRotation": true,
               "canSleep": true,
-              "shape": "Polygon",
+              "shape": "Circle",
               "shapeDimensionA": 0,
               "shapeDimensionB": 0,
               "shapeOffsetX": 0,
@@ -1244,7 +1289,8 @@
             "g": 249,
             "r": 249
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Follow",
@@ -1369,7 +1415,7 @@
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "NewObject-1.png",
+                      "image": "BoundsLine.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -1479,18 +1525,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Toujours"
-                  },
-                  "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -2088,12 +2123,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Back",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

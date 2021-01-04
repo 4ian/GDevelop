@@ -5,8 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import Divider from 'material-ui/Divider';
-import Toggle from 'material-ui/Toggle';
+import Toggle from '../../UI/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
@@ -16,21 +15,34 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { Line } from '../../UI/Grid';
+import { Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
-import { getExtraInstructionInformation } from '../../Hints';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import Window from '../../Utils/Window';
+import {
+  getExtraInstructionInformation,
+  getInstructionTutorialHints,
+} from '../../Hints';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
-import { type EventsScope } from '../EventsScope.flow';
-const gd = global.gd;
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import IconButton from '../../UI/IconButton';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
+import Text from '../../UI/Text';
+import { getInstructionMetadata } from './NewInstructionEditor';
+import { ColumnStackLayout } from '../../UI/Layout';
+import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
+const gd: libGDevelop = global.gd;
 
 const styles = {
+  // When displaying parameters, take all the height:
   container: {
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
   },
+  // When displaying the empty message, center the message:
   emptyContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -44,10 +56,14 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
+    paddingTop: 12,
     flexShrink: 0,
   },
   invertToggle: {
     marginTop: 8,
+  },
+  description: {
+    whiteSpace: 'pre-wrap',
   },
 };
 
@@ -74,38 +90,16 @@ type State = {|
   isDirty: boolean,
 |};
 
-const setupInstruction = (
-  instruction: gdInstruction,
-  instructionMetadata: gdInstructionMetadata,
-  objectName: ?string
-) => {
-  instruction.setParametersCount(instructionMetadata.getParametersCount());
-
-  if (objectName) {
-    if (
-      instructionMetadata.getParametersCount() === 0 ||
-      instructionMetadata.getParameter(0).getType() !== 'object'
-    ) {
-      console.error(
-        `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
-      );
-      return;
-    }
-
-    instruction.setParameter(0, objectName);
-  }
-};
-
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
   parameterIndex: number,
-  objectName: ?string
+  objectParameterIndex: ?number
 ) => {
   // Hide parameters that are used only for code generation
   if (parameterMetadata.isCodeOnly()) return false;
 
-  // For objects, hide the first parameter, which is by convention the object name.
-  if (objectName && parameterIndex === 0) return false;
+  // For objects, hide the first object parameter, which is by convention the object name.
+  if (parameterIndex === objectParameterIndex) return false;
 
   return true;
 };
@@ -128,10 +122,16 @@ export default class InstructionParametersEditor extends React.Component<
   }
 
   focus() {
+    const { instruction, isCondition, project } = this.props;
+
     // Verify that there is a field to focus.
     if (
       this._getVisibleParametersCount(
-        this._getInstructionMetadata(),
+        getInstructionMetadata({
+          instructionType: instruction.getType(),
+          isCondition,
+          project,
+        }),
         this.props.objectName
       ) !== 0
     ) {
@@ -147,34 +147,21 @@ export default class InstructionParametersEditor extends React.Component<
   ) {
     if (!instructionMetadata) return 0;
 
+    const objectParameterIndex = objectName
+      ? getObjectParameterIndex(instructionMetadata)
+      : -1;
+
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
       if (!instructionMetadata) return false;
       const parameterMetadata = instructionMetadata.getParameter(i);
 
-      return isParameterVisible(parameterMetadata, i, objectName);
+      return isParameterVisible(parameterMetadata, i, objectParameterIndex);
     }).filter(isVisible => isVisible).length;
   }
 
-  _getInstructionMetadata = (): ?gdInstructionMetadata => {
-    const { instruction, isCondition, project } = this.props;
-    const type = instruction.getType();
-    if (!type) return null;
-
-    return isCondition
-      ? gd.MetadataProvider.getConditionMetadata(
-          project.getCurrentPlatform(),
-          type
-        )
-      : gd.MetadataProvider.getActionMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
-  };
-
   _openExtension = (i18n: I18nType) => {
     if (this.state.isDirty) {
-      //eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         i18n._(
           t`You've made some changes here. Are you sure you want to discard them and open the function?`
         )
@@ -183,29 +170,35 @@ export default class InstructionParametersEditor extends React.Component<
     }
 
     const { instruction, isCondition, project } = this.props;
-    const type = instruction.getType();
-    if (!type) return null;
+    const instructionType = instruction.getType();
+    if (!instructionType) return null;
 
     const extension = isCondition
       ? gd.MetadataProvider.getExtensionAndConditionMetadata(
           project.getCurrentPlatform(),
-          type
+          instructionType
         ).getExtension()
       : gd.MetadataProvider.getExtensionAndActionMetadata(
           project.getCurrentPlatform(),
-          type
+          instructionType
         ).getExtension();
 
-    this.props.openInstructionOrExpression(extension, type);
+    this.props.openInstructionOrExpression(extension, instructionType);
   };
 
   _renderEmpty() {
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
-          {this.props.isCondition
-            ? 'Choose a condition on the left'
-            : 'Choose an action on the left'}
+          {this.props.isCondition ? (
+            <Trans>
+              Choose a condition (or an object then a condition) on the left
+            </Trans>
+          ) : (
+            <Trans>
+              Choose an action (or an object then an action) on the left
+            </Trans>
+          )}
         </EmptyMessage>
       </div>
     );
@@ -219,92 +212,147 @@ export default class InstructionParametersEditor extends React.Component<
       objectsContainer,
       noHelpButton,
       objectName,
+      isCondition,
       scope,
     } = this.props;
 
-    const type = instruction.getType();
-    const instructionMetadata = this._getInstructionMetadata();
+    const instructionType = instruction.getType();
+    const instructionMetadata = getInstructionMetadata({
+      instructionType,
+      isCondition,
+      project,
+    });
     if (!instructionMetadata) return this._renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
-    const instructionExtraInformation = getExtraInstructionInformation(type);
+    const instructionExtraInformation = getExtraInstructionInformation(
+      instructionType
+    );
+    const tutorialHints = getInstructionTutorialHints(instructionType);
+    const objectParameterIndex = objectName
+      ? getObjectParameterIndex(instructionMetadata)
+      : -1;
 
-    setupInstruction(instruction, instructionMetadata, objectName);
+    setupInstructionParameters(
+      globalObjectsContainer,
+      objectsContainer,
+      instruction,
+      instructionMetadata,
+      objectName
+    );
 
     let parameterFieldIndex = 0;
     return (
       <I18n>
         {({ i18n }) => (
           <div style={styles.container}>
-            <Line alignItems="center">
+            <Line alignItems="flex-start">
               <img
                 src={instructionMetadata.getIconFilename()}
                 alt=""
                 style={styles.icon}
               />
-              <p>{instructionMetadata.getDescription()}</p>
+              <Text style={styles.description}>
+                {instructionMetadata.getDescription()}
+              </Text>
               {isAnEventFunctionMetadata(instructionMetadata) && (
-                <IconButton onClick={() => this._openExtension(i18n)}>
+                <IconButton
+                  onClick={() => {
+                    this._openExtension(i18n);
+                  }}
+                >
                   <OpenInNew />
                 </IconButton>
               )}
             </Line>
             {instructionExtraInformation && (
               <Line>
-                <AlertMessage kind={instructionExtraInformation.kind}>
-                  {i18n._(instructionExtraInformation.message)}
-                </AlertMessage>
+                {instructionExtraInformation.identifier === undefined ? (
+                  <AlertMessage kind={instructionExtraInformation.kind}>
+                    {i18n._(instructionExtraInformation.message)}
+                  </AlertMessage>
+                ) : (
+                  <DismissableAlertMessage
+                    kind={instructionExtraInformation.kind}
+                    identifier={instructionExtraInformation.identifier}
+                  >
+                    {i18n._(instructionExtraInformation.message)}
+                  </DismissableAlertMessage>
+                )}
               </Line>
             )}
-            <Divider />
-            <div key={type} style={styles.parametersContainer}>
-              {mapFor(0, instructionMetadata.getParametersCount(), i => {
-                const parameterMetadata = instructionMetadata.getParameter(i);
-                if (!isParameterVisible(parameterMetadata, i, objectName))
-                  return null;
+            {tutorialHints.length ? (
+              <Line>
+                <ColumnStackLayout expand>
+                  {tutorialHints.map(tutorialHint => (
+                    <DismissableTutorialMessage
+                      key={tutorialHint.identifier}
+                      tutorialHint={tutorialHint}
+                    />
+                  ))}
+                </ColumnStackLayout>
+              </Line>
+            ) : null}
+            <Spacer />
+            <div key={instructionType} style={styles.parametersContainer}>
+              <ColumnStackLayout noMargin>
+                {mapFor(0, instructionMetadata.getParametersCount(), i => {
+                  const parameterMetadata = instructionMetadata.getParameter(i);
+                  if (
+                    !isParameterVisible(
+                      parameterMetadata,
+                      i,
+                      objectParameterIndex
+                    )
+                  )
+                    return null;
 
-                const parameterMetadataType = parameterMetadata.getType();
-                const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                  parameterMetadataType
-                );
+                  const parameterMetadataType = parameterMetadata.getType();
+                  const ParameterComponent = ParameterRenderingService.getParameterComponent(
+                    parameterMetadataType
+                  );
 
-                // Track the field count on screen, to affect the ref to the
-                // first visible field.
-                const isFirstVisibleParameterField = parameterFieldIndex === 0;
-                parameterFieldIndex++;
+                  // Track the field count on screen, to affect the ref to the
+                  // first visible field.
+                  const isFirstVisibleParameterField =
+                    parameterFieldIndex === 0;
+                  parameterFieldIndex++;
 
-                return (
-                  <ParameterComponent
-                    instructionMetadata={instructionMetadata}
-                    instruction={instruction}
-                    parameterMetadata={parameterMetadata}
-                    parameterIndex={i}
-                    value={instruction.getParameter(i)}
-                    onChange={value => {
-                      if (instruction.getParameter(i) !== value) {
-                        instruction.setParameter(i, value);
-                        this.setState({
-                          isDirty: true,
-                        });
+                  return (
+                    <ParameterComponent
+                      instructionMetadata={instructionMetadata}
+                      instruction={instruction}
+                      parameterMetadata={parameterMetadata}
+                      parameterIndex={i}
+                      value={instruction.getParameter(i)}
+                      onChange={value => {
+                        if (instruction.getParameter(i) !== value) {
+                          instruction.setParameter(i, value);
+                          this.setState({
+                            isDirty: true,
+                          });
+                        }
+                      }}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      key={i}
+                      parameterRenderingService={ParameterRenderingService}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
                       }
-                    }}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    key={i}
-                    parameterRenderingService={ParameterRenderingService}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                    ref={field => {
-                      if (isFirstVisibleParameterField) {
-                        this._firstVisibleField = field;
-                      }
-                    }}
-                  />
-                );
-              })}
+                      ref={field => {
+                        if (isFirstVisibleParameterField) {
+                          this._firstVisibleField = field;
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </ColumnStackLayout>
               {this._getVisibleParametersCount(
                 instructionMetadata,
                 objectName

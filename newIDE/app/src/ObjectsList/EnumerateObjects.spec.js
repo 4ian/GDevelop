@@ -1,11 +1,10 @@
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 import { makeTestProject } from '../fixtures/TestProject';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 describe('EnumerateObjects', () => {
-  const { project, testLayout } = makeTestProject(gd);
-
   it('can enumerate objects from a project and scene', () => {
+    const { project, testLayout } = makeTestProject(gd);
     const {
       containerObjectsList,
       projectObjectsList,
@@ -18,6 +17,7 @@ describe('EnumerateObjects', () => {
   });
 
   it('can do a case-insensitive search in the lists of objects', () => {
+    const { project, testLayout } = makeTestProject(gd);
     const {
       containerObjectsList,
       projectObjectsList,

@@ -2,9 +2,10 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import Subheader from 'material-ui/Subheader';
-import { List, ListItem } from 'material-ui/List';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList';
+import FlatButton from '../UI/FlatButton';
+import Subheader from '../UI/Subheader';
+import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';
@@ -13,11 +14,12 @@ import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
 import Function from '../UI/CustomSvgIcons/Behaviors/Function';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   onCancel: () => void,
-  onChoose: (functionName: ?string) => void,
+  onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
 type State = {||};
 
@@ -35,7 +37,7 @@ const MethodListItem = ({
 }: {|
   icon: React.Node,
   disabled: boolean,
-  onChoose: string => void,
+  onChoose: EventsFunctionCreationParameters => void,
   name: string,
   description: React.Node,
 |}) => {
@@ -43,9 +45,14 @@ const MethodListItem = ({
     <ListItem
       leftIcon={icon}
       primaryText={name}
-      secondaryText={<p>{description}</p>}
+      secondaryText={description}
       secondaryTextLines={2}
-      onClick={() => onChoose(name)}
+      onClick={() =>
+        onChoose({
+          functionType: gd.EventsFunction.Action,
+          name,
+        })
+      }
       style={disabled ? styles.disabledItem : undefined}
       disabled={disabled}
     />
@@ -78,11 +85,11 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
           />,
         ]}
         actions={actions}
+        cannotBeDismissed={false}
         open
         noMargin
         title={<Trans>Choose a new behavior function ("method")</Trans>}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
       >
         <List>
           <Subheader>
@@ -115,10 +122,12 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
           />
           <MethodListItem
             icon={<Destroy style={styles.icon} />}
-            name={'onOwnerRemovedFromScene'}
-            disabled={eventsFunctions.hasEventsFunctionNamed(
-              'onOwnerRemovedFromScene'
-            )}
+            name={'onDestroy'}
+            disabled={
+              eventsFunctions.hasEventsFunctionNamed(
+                'onOwnerRemovedFromScene'
+              ) || eventsFunctions.hasEventsFunctionNamed('onDestroy')
+            }
             onChoose={onChoose}
             description={
               <Trans>
@@ -137,9 +146,9 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             onChoose={onChoose}
             description={
               <Trans>
-                Events that will be run when the behavior is deactivated on an
-                object (step events won't be run until the behavior is activated
-                again).
+                Events that will be run once when the behavior is deactivated on
+                an object (step events won't be run until the behavior is
+                activated again).
               </Trans>
             }
           />
@@ -150,8 +159,8 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             onChoose={onChoose}
             description={
               <Trans>
-                Events that will be run when the behavior is re-activated on an
-                object (after it was previously deactivated).
+                Events that will be run once when the behavior is re-activated
+                on an object (after it was previously deactivated).
               </Trans>
             }
           />
@@ -179,16 +188,19 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               <Trans>Custom (action, condition or expression)</Trans>
             }
             secondaryText={
-              <p>
-                <Trans>
-                  An action, condition or expression that can be used on objects
-                  that have the behavior attached to them. Use it from the
-                  events sheet as any other action/condition/expression.
-                </Trans>
-              </p>
+              <Trans>
+                An action, condition or expression that can be used on objects
+                that have the behavior attached to them. Use it from the events
+                sheet as any other action/condition/expression.
+              </Trans>
             }
             secondaryTextLines={2}
-            onClick={() => onChoose(null)}
+            onClick={() =>
+              onChoose({
+                functionType: gd.EventsFunction.Action,
+                name: null,
+              })
+            }
           />
         </List>
       </Dialog>

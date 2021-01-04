@@ -1,72 +1,99 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import * as React from 'react';
+import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
+import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import VariablesList from './index';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import HotReloadPreviewButton, {
+  type HotReloadPreviewButtonProps,
+} from '../HotReload/HotReloadPreviewButton';
 
-const gd = global.gd;
+type Props = {|
+  onCancel: () => void,
+  onApply: () => void,
+  open: boolean,
+  onEditObjectVariables?: () => void,
+  title: React.Node,
+  emptyExplanationMessage?: React.Node,
+  emptyExplanationSecondMessage?: React.Node,
+  variablesContainer: gdVariablesContainer,
+  hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+|};
 
-export class VariablesEditorDialog extends Component {
-  render() {
-    const {
-      onCancel,
-      onApply,
-      open,
-      onEditObjectVariables,
-      title,
-      emptyExplanationMessage,
-      emptyExplanationSecondMessage,
-      variablesContainer,
-    } = this.props;
-    const actions = [
-      <FlatButton
-        label={<Trans>Cancel</Trans>}
-        onClick={this.props.onCancel}
-        key={'Cancel'}
-      />,
-      <FlatButton
-        label={<Trans>Apply</Trans>}
-        primary
-        keyboardFocused
-        onClick={onApply}
-        key={'Apply'}
-      />,
-    ];
-    const secondaryActions = onEditObjectVariables ? (
-      <FlatButton
-        label={<Trans>Edit Object Variables</Trans>}
-        primary={false}
-        onClick={onEditObjectVariables}
+const VariablesEditorDialog = ({
+  onCancel,
+  onApply,
+  open,
+  onEditObjectVariables,
+  title,
+  emptyExplanationMessage,
+  emptyExplanationSecondMessage,
+  variablesContainer,
+  hotReloadPreviewButtonProps,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+  const onCancelChanges = useSerializableObjectCancelableEditor({
+    serializableObject: variablesContainer,
+    onCancel,
+  });
+
+  return (
+    <Dialog
+      noMargin
+      actions={[
+        <FlatButton
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancelChanges}
+          key={'Cancel'}
+        />,
+        <FlatButton
+          label={<Trans>Apply</Trans>}
+          primary
+          keyboardFocused
+          onClick={onApply}
+          key={'Apply'}
+        />,
+      ]}
+      open={open}
+      cannotBeDismissed={true}
+      onRequestClose={onCancelChanges}
+      secondaryActions={[
+        onEditObjectVariables ? (
+          <FlatButton
+            key="edit-object-variables"
+            label={<Trans>Edit Object Variables</Trans>}
+            primary={false}
+            onClick={onEditObjectVariables}
+          />
+        ) : null,
+        hotReloadPreviewButtonProps ? (
+          <HotReloadPreviewButton
+            key="hot-reload-preview-button"
+            {...hotReloadPreviewButtonProps}
+          />
+        ) : null,
+      ]}
+      title={title}
+    >
+      <VariablesList
+        commitVariableValueOnBlur={
+          // Reduce the number of re-renders by saving the variable value only when the field is blurred.
+          // We don't do that by default because the VariablesList can be used in a component like
+          // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
+          // chance to be blurred.
+          true
+        }
+        variablesContainer={variablesContainer}
+        emptyExplanationMessage={emptyExplanationMessage}
+        emptyExplanationSecondMessage={emptyExplanationSecondMessage}
+        onSizeUpdated={
+          forceUpdate /*Force update to ensure dialog is properly positionned*/
+        }
       />
-    ) : null;
+    </Dialog>
+  );
+};
 
-    return (
-      <Dialog
-        noMargin
-        actions={actions}
-        modal
-        open={open}
-        onRequestClose={onCancel}
-        autoScrollBodyContent
-        secondaryActions={secondaryActions}
-        title={title}
-      >
-        <VariablesList
-          variablesContainer={variablesContainer}
-          emptyExplanationMessage={emptyExplanationMessage}
-          emptyExplanationSecondMessage={emptyExplanationSecondMessage}
-          onSizeUpdated={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
-          }
-        />
-      </Dialog>
-    );
-  }
-}
-
-export default withSerializableObject(VariablesEditorDialog, {
-  newObjectCreator: () => new gd.VariablesContainer(),
-  propName: 'variablesContainer',
-});
+export default VariablesEditorDialog;

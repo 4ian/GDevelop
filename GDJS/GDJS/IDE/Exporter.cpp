@@ -3,11 +3,14 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+#include "GDJS/IDE/Exporter.h"
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <streambuf>
 #include <string>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -22,7 +25,6 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/IDE/Exporter.h"
 #include "GDJS/IDE/ExporterHelper.h"
 #undef CopyFile  // Disable an annoying macro
 
@@ -35,24 +37,10 @@ Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
 
 Exporter::~Exporter() {}
 
-bool Exporter::ExportLayoutForPixiPreview(gd::Project& project,
-                                          gd::Layout& layout,
-                                          gd::String exportDir) {
+bool Exporter::ExportProjectForPixiPreview(
+    const PreviewExportOptions& options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportLayoutForPixiPreview(project, layout, exportDir, "");
-}
-
-bool Exporter::ExportExternalLayoutForPixiPreview(
-    gd::Project& project,
-    gd::Layout& layout,
-    gd::ExternalLayout& externalLayout,
-    gd::String exportDir) {
-  gd::SerializerElement options;
-  options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
-
-  ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportLayoutForPixiPreview(
-      project, layout, exportDir, gd::Serializer::ToJSON(options));
+  return helper.ExportProjectForPixiPreview(options);
 }
 
 bool Exporter::ExportWholePixiProject(
@@ -64,7 +52,6 @@ bool Exporter::ExportWholePixiProject(
 
   auto exportProject = [this, &exportedProject, &exportOptions, &helper](
                            gd::String exportDir) {
-    bool minify = exportOptions["minify"];
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -73,18 +60,30 @@ bool Exporter::ExportWholePixiProject(
     if (exportForFacebookInstantGames)
       exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
-    wxProgressDialog* progressDialogPtr = NULL;
-
     // Prepare the export directory
     fs.MkDir(exportDir);
     std::vector<gd::String> includesFiles;
 
     // Export the resources (before generating events as some resources
     // filenames may be updated)
-    helper.ExportResources(fs, exportedProject, exportDir, progressDialogPtr);
+    helper.ExportResources(fs, exportedProject, exportDir);
+
+    // Compatibility with GD <= 5.0-beta56
+    // Stay compatible with text objects declaring their font as just a filename
+    // without a font resource - by manually adding these resources.
+    helper.AddDeprecatedFontFilesToFontResources(
+        fs, exportedProject.GetResourcesManager(), exportDir);
+    // end of compatibility code
 
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
+
+    // Export files for object and behaviors
+    helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
+    // Export effects (after engine libraries as they auto-register themselves
+    // to the engine)
+    helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
     if (!helper.ExportEventsCode(
@@ -108,13 +107,14 @@ bool Exporter::ExportWholePixiProject(
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
-    helper.ExportToJSON(
-        fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+    gd::SerializerElement noRuntimeGameOptions;
+    helper.ExportProjectData(
+        fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
-    helper.ExportIncludesAndLibs(includesFiles, exportDir, minify);
+    helper.ExportIncludesAndLibs(includesFiles, exportDir);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
@@ -122,8 +122,12 @@ bool Exporter::ExportWholePixiProject(
     else if (exportForFacebookInstantGames)
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
-    if (!helper.ExportPixiIndexFile(
-            exportedProject, source, exportDir, includesFiles, "")) {
+    if (!helper.ExportPixiIndexFile(exportedProject,
+                                    source,
+                                    exportDir,
+                                    includesFiles,
+                                    /*nonRuntimeScriptsCacheBurst=*/0,
+                                    "")) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }
@@ -137,8 +141,7 @@ bool Exporter::ExportWholePixiProject(
 
     if (!exportProject(exportDir + "/www")) return false;
 
-    if (!helper.ExportCordovaConfigFile(exportedProject, exportDir))
-      return false;
+    if (!helper.ExportCordovaFiles(exportedProject, exportDir)) return false;
   } else if (exportOptions["exportForElectron"]) {
     fs.MkDir(exportDir);
 
@@ -172,11 +175,24 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   // Export the resources (before generating events as some resources filenames
   // may be updated)
-  helper.ExportResources(
-      fs, exportedProject, exportDir + "/res", progressDialogPtr);
+  helper.ExportResources(fs, exportedProject, exportDir + "/res");
+
+  // Compatibility with GD <= 5.0-beta56
+  // Stay compatible with text objects declaring their font as just a filename
+  // without a font resource - by manually adding these resources.
+  helper.AddDeprecatedFontFilesToFontResources(
+      fs, exportedProject.GetResourcesManager(), exportDir + "/res", "res/");
+  // end of compatibility code
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);
+
+  // Export files for object and behaviors
+  helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+
+  // Export effects (after engine libraries as they auto-register themselves to
+  // the engine)
+  helper.ExportEffectIncludes(exportedProject, includesFiles);
 
   // Export events
   if (!helper.ExportEventsCode(
@@ -199,13 +215,14 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   gd::ProjectStripper::StripProjectForExport(exportedProject);
 
   //...and export it
-  helper.ExportToJSON(
-      fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+  gd::SerializerElement noRuntimeGameOptions;
+  helper.ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
+  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src");
 
   if (!helper.ExportCocos2dFiles(
           project, exportDir, debugMode, includesFiles)) {

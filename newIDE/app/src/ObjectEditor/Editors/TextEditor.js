@@ -1,15 +1,16 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
-import TextField from 'material-ui/TextField';
+import Checkbox from '../../UI/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 const gd = global.gd;
 
 const toolbarItemStyle = {
@@ -21,11 +22,9 @@ const styles = {
     width: 90,
     ...toolbarItemStyle,
   },
+  resourcesSelector: { alignSelf: 'center' },
   toolbarItem: toolbarItemStyle,
-  checkbox: {
-    width: 'auto',
-    ...toolbarItemStyle,
-  },
+  checkbox: toolbarItemStyle,
 };
 
 export default class TextEditor extends React.Component<EditorProps, void> {
@@ -45,12 +44,14 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           <MiniToolbarText>
             <Trans>Size:</Trans>
           </MiniToolbarText>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             type="number"
+            margin="none"
             style={styles.sizeTextField}
             value={textObject.getCharacterSize()}
-            onChange={(e, value) => {
-              textObject.setCharacterSize(parseInt(value, 10));
+            onChange={value => {
+              textObject.setCharacterSize(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -58,7 +59,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             <Trans>Color:</Trans>
           </MiniToolbarText>
           <ColorPicker
-            style={styles.sizeTextField}
+            style={styles.toolbarItem}
             disableAlpha
             color={{
               r: textObject.getColorR(),
@@ -89,7 +90,11 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
+          <MiniToolbarText>
+            <Trans>Font:</Trans>
+          </MiniToolbarText>
           <ResourceSelector
+            margin="none"
             project={project}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
@@ -97,27 +102,30 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             resourcesLoader={ResourcesLoader}
             resourceKind="font"
             fullWidth
+            canBeReset
             initialResourceName={textObject.getFontName()}
             onChange={resourceName => {
               textObject.setFontName(resourceName);
               this.forceUpdate();
             }}
             hintText={<Trans>Choose a font</Trans>}
+            style={styles.resourcesSelector}
           />
         </MiniToolbar>
         <Line noMargin>
           <Column expand>
             <Line>
-              <TextField
-                hintText={
-                  <Trans>Enter the text to be displayed by the object</Trans>
-                }
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Initial text to display</Trans>}
+                floatingLabelFixed
+                commitOnBlur
+                hintText={t`Enter the text to be displayed by the object`}
                 fullWidth
-                multiLine
+                multiline
                 rows={8}
                 rowsMax={8}
                 value={textObject.getString()}
-                onChange={(e, value) => {
+                onChange={value => {
                   textObject.setString(value);
                   this.forceUpdate();
                   this.props.onSizeUpdated();

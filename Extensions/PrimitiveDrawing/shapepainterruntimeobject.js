@@ -4,39 +4,127 @@
  */
 
 /**
+ * @typedef {Object} RGBColor Represents a color in RGB Format
+ * @property {number} r The Red component of the color, from 0 to 255.
+ * @property {number} g The Green component of the color, from 0 to 255.
+ * @property {number} b The Blue component of the color, from 0 to 255.
+ */
+
+/**
+ * @typedef {Object} ShapePainterObjectDataType Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}.
+ * @property {RGBColor} fillColor The color (in RGB format) of the inner part of the painted shape
+ * @property {RGBColor} outlineColor The color (in RGB format) of the outline of the painted shape
+ * @property {number} fillOpacity The opacity of the inner part of the painted shape
+ * @property {number} outlineOpacity The opacity of the outline of the painted shape
+ * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
+ * @property {boolean} absoluteCoordinates Use absolute coordinates?
+ * @property {boolean} clearBetweenFrames Clear the previous render before the next draw?
+ */
+
+/**
+ * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
+ */
+
+/**
  * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
  *
  * @class ShapePainterRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ShapePainterObjectData} shapePainterObjectData The initial properties of the object
  */
-gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
+gdjs.ShapePainterRuntimeObject = function(runtimeScene, shapePainterObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, shapePainterObjectData);
 
-    this._fillColor = parseInt(gdjs.rgbToHex(objectData.fillColor.r, objectData.fillColor.g, objectData.fillColor.b), 16);
-    this._outlineColor = parseInt(gdjs.rgbToHex(objectData.outlineColor.r, objectData.outlineColor.g, objectData.outlineColor.b), 16);
-    this._fillOpacity = objectData.fillOpacity;
-    this._outlineOpacity = objectData.outlineOpacity;
-    this._outlineSize = objectData.outlineSize;
-    this._absoluteCoordinates = objectData.absoluteCoordinates;
+    /** @type {number} */
+    this._fillColor = parseInt(gdjs.rgbToHex(shapePainterObjectData.fillColor.r, shapePainterObjectData.fillColor.g, shapePainterObjectData.fillColor.b), 16);
+
+    /** @type {number} */
+    this._outlineColor = parseInt(gdjs.rgbToHex(shapePainterObjectData.outlineColor.r, shapePainterObjectData.outlineColor.g, shapePainterObjectData.outlineColor.b), 16);
+
+    /** @type {number} */
+    this._fillOpacity = shapePainterObjectData.fillOpacity;
+
+    /** @type {number} */
+    this._outlineOpacity = shapePainterObjectData.outlineOpacity;
+
+    /** @type {number} */
+    this._outlineSize = shapePainterObjectData.outlineSize;
+
+    /** @type {boolean} */
+    this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
+
+    /** @type {boolean} */
+    this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
 
     if (this._renderer)
         gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.ShapePainterRuntimeObjectRenderer} */
         this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.ShapePainterRuntimeObject.thisIsARuntimeObjectConstructor = "PrimitiveDrawing::Drawer";
+gdjs.registerObject("PrimitiveDrawing::Drawer", gdjs.ShapePainterRuntimeObject);
 
 gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
+/**
+ * @param {ShapePainterObjectData} oldObjectData
+ * @param {ShapePainterObjectData} newObjectData
+ */
+gdjs.ShapePainterRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.fillColor.r !== newObjectData.fillColor.r ||
+        oldObjectData.fillColor.g !== newObjectData.fillColor.g ||
+        oldObjectData.fillColor.b !== newObjectData.fillColor.b) {
+        this.setFillColor(
+            '' + newObjectData.fillColor.r + ';' +
+            newObjectData.fillColor.g  + ';' +
+            newObjectData.fillColor.b
+        );
+    }
+    if (oldObjectData.outlineColor.r !== newObjectData.outlineColor.r ||
+        oldObjectData.outlineColor.g !== newObjectData.outlineColor.g ||
+        oldObjectData.outlineColor.b !== newObjectData.outlineColor.b) {
+        this.setOutlineColor(
+            '' + newObjectData.outlineColor.r + ';' +
+            newObjectData.outlineColor.g  + ';' +
+            newObjectData.outlineColor.b
+        );
+    }
+    if (oldObjectData.fillOpacity !== newObjectData.fillOpacity) {
+        this.setFillOpacity(newObjectData.fillOpacity);
+    }
+    if (oldObjectData.outlineOpacity !== newObjectData.outlineOpacity) {
+        this.setOutlineOpacity(newObjectData.outlineOpacity);
+    }
+    if (oldObjectData.outlineSize !== newObjectData.outlineSize) {
+        this.setOutlineSize(newObjectData.outlineSize);
+    }
+    if (oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates) {
+        this._absoluteCoordinates = newObjectData.absoluteCoordinates;
+        this._renderer.updateXPosition();
+        this._renderer.updateYPosition();
+    }
+    if (oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames) {
+        this._clearBetweenFrames = newObjectData.clearBetweenFrames
+    }
+
+    return true;
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
     //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
-    this._renderer.clear();
+    if(this._clearBetweenFrames){
+        this._renderer.clear();
+    }
 
     gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };
@@ -55,6 +143,75 @@ gdjs.ShapePainterRuntimeObject.prototype.drawCircle = function(x, y, radius) {
 
 gdjs.ShapePainterRuntimeObject.prototype.drawLine = function(x1, y1, x2, y2, thickness) {
     this._renderer.drawLine(x1, y1, x2, y2, thickness);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawLineV2 = function(x1, y1, x2, y2, thickness) {
+    this._renderer.drawLineV2(x1, y1, x2, y2, thickness);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawEllipse = function(centerX, centerY, width, height) {
+    this._renderer.drawEllipse(centerX, centerY, width, height);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawRoundedRectangle = function(startX1, startY1, endX2, endY2, radius) {
+    this._renderer.drawRoundedRectangle(startX1, startY1, endX2, endY2, radius);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawStar = function(centerX, centerY, points, radius, innerRadius, rotation) {
+    this._renderer.drawStar(centerX, centerY, points, radius, innerRadius, rotation);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawArc = function(centerX, centerY, radius, startAngle, endAngle, anticlockwise, closePath) {
+    this._renderer.drawArc(centerX, centerY, radius, startAngle, endAngle, anticlockwise, closePath);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawBezierCurve = function(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
+    this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawQuadraticCurve = function(x1, y1, cpX, cpY, x2, y2) {
+    this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.beginFillPath = function(x1, y1) {
+    this._renderer.beginFillPath();
+    this._renderer.drawPathMoveTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.endFillPath = function() {
+    this._renderer.endFillPath();
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawPathMoveTo = function(x1, y1) {
+    this._renderer.drawPathMoveTo(x1, y1);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawPathLineTo = function(x1, y1) {
+    this._renderer.drawPathLineTo(x1, y1, this._outlineSize);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawPathBezierCurveTo = function(cpX, cpY, cpX2, cpY2, toX, toY) {
+    this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawPathArc = function(cx, cy, radius, startAngle, endAngle, anticlockwise) {
+    this._renderer.drawPathArc(cx, cy, radius, startAngle, endAngle, anticlockwise);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.drawPathQuadraticCurveTo = function(cpX, cpY, toX, toY) {
+    this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.closePath = function() {
+    this._renderer.closePath();
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.setClearBetweenFrames = function(value) {
+    this._clearBetweenFrames = value;
+};
+
+gdjs.ShapePainterRuntimeObject.prototype.isClearedBetweenFrames = function() {
+    return this._clearBetweenFrames;
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {

@@ -54,5 +54,6 @@ ExtensionBase::GetBehaviorsRuntimeSharedDataFunctionPtr(
 // compilation unit when compiling for runtime:
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.cpp"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.cpp"
+#include "GDCore/Extensions/Metadata/EffectMetadata.cpp"
 #include "GDCore/Extensions/PlatformExtension.cpp"
 #endif

@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "GDCore/Project/EventsBasedBehavior.h"
 namespace gd {
 class NamedPropertyDescriptor;
@@ -17,7 +18,7 @@ class NamedPropertyDescriptor;
 namespace gdjs {
 
 /**
- * \brief The class being responsible for generating Javascript code for
+ * \brief The class being responsible for generating JavaScript code for
  * EventsBasedBhavior.
  *
  * See also gd::EventsCodeGenerator.
@@ -63,7 +64,8 @@ class BehaviorCodeGenerator {
       const gd::String& codeNamespace,
       std::function<gd::String()> generateInitializePropertiesCode,
       std::function<gd::String()> generateMethodsCode,
-      std::function<gd::String()> generatePropertiesCode);
+      std::function<gd::String()> generatePropertiesCode,
+      std::function<gd::String()> generateUpdateFromBehaviorDataCode);
   gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace,
@@ -73,8 +75,21 @@ class BehaviorCodeGenerator {
   gd::String GenerateInitializePropertyFromDefaultValueCode(
       const gd::NamedPropertyDescriptor& property);
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+  gd::String GenerateUpdatePropertyFromBehaviorDataCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace,
+      const gd::NamedPropertyDescriptor& property);
+  gd::String GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace);
+  gd::String GenerateDefaultDoStepPreEventsFunctionCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& codeNamespace);
+  gd::String GenerateDoStepPreEventsPreludeCode();
 
   gd::Project& project;
+
+  static gd::String doStepPreEventsFunctionName;
 };
 
 }  // namespace gdjs

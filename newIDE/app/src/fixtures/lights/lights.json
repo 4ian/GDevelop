@@ -1,0 +1,995 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.lights",
+    "projectUuid": "97d4d4c9-4084-4e95-92f3-c0d42cf8c081",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Lights Example",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "TiledSpriteObject"
+      },
+      {
+        "name": "PlatformBehavior"
+      },
+      {
+        "name": "TextObject"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/lights/brickWall.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "brickWall.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/lights/castleCenter.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "castleCenter.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/lights/Grass.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "grass.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 235,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "New_32scene",
+      "name": "New scene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 235,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 235,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 70,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 70,
+        "snap": true,
+        "windowMask": true,
+        "zoomFactor": 0.6042
+      },
+      "objectsGroups": [
+        {
+          "name": "Enemy",
+          "objects": []
+        },
+        {
+          "name": "VirtualControls",
+          "objects": []
+        }
+      ],
+      "variables": [
+        {
+          "name": "Score",
+          "value": "0"
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "2d539651-6fea-4a1e-a9b5-54def8fcf684",
+          "width": 0,
+          "x": 283,
+          "y": 111,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "9467f9a6-beca-4536-801a-1cd5290f03ce",
+          "width": 0,
+          "x": 55,
+          "y": 71,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 84,
+          "layer": "",
+          "locked": false,
+          "name": "TiledCastlePlatform",
+          "persistentUuid": "6977e3ce-41eb-41fd-8bf4-83031b4eed33",
+          "width": 503,
+          "x": 434,
+          "y": 258,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "99673285-6b8b-4b4a-8e4a-a6d5a9462618",
+          "width": 0,
+          "x": 584,
+          "y": 95,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "f19dd41d-7f40-4fdf-b752-17a34657f6e0",
+          "width": 0,
+          "x": 45,
+          "y": 262,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "bedfdf17-55fe-43ff-bc55-045f004bbcd2",
+          "width": 0,
+          "x": 337,
+          "y": 429,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Platform",
+          "persistentUuid": "b51d0eeb-d624-493e-8e03-ae9100bd6f6a",
+          "width": 0,
+          "x": 561,
+          "y": 379,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 487.462,
+          "layer": "",
+          "locked": false,
+          "name": "TiledCastlePlatform",
+          "persistentUuid": "6ea9f209-1b69-4f15-b3cf-ed7fa5d59c03",
+          "width": 502.923,
+          "x": -416,
+          "y": 401,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "YellowLight",
+          "persistentUuid": "ee48b329-eb32-4e69-a683-7fe955faab2d",
+          "width": 0,
+          "x": 158,
+          "y": 529,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "YellowLight",
+          "persistentUuid": "051c32ab-86e7-4d76-936c-46630f418da2",
+          "width": 0,
+          "x": 502,
+          "y": 189,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "BlueLight",
+          "persistentUuid": "2e5c0daa-de88-41e8-b1e2-9449e2888d7d",
+          "width": 0,
+          "x": 193,
+          "y": 221,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "BlueLight",
+          "persistentUuid": "062463af-f0d6-4c11-86ce-b0f60a5c70d7",
+          "width": 0,
+          "x": 770,
+          "y": 629,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "GreenLight",
+          "persistentUuid": "a6fb24e8-34be-41da-8a35-e17b8362c3f9",
+          "width": 0,
+          "x": 473,
+          "y": 502,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "RedLight",
+          "persistentUuid": "779d1504-636b-4fe7-ab22-4c79ed5c71c3",
+          "width": 0,
+          "x": 750,
+          "y": 170,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Lighting",
+          "locked": false,
+          "name": "RedLight",
+          "persistentUuid": "b94e78dd-8b31-49f6-b84c-a4e11986ab64",
+          "width": 0,
+          "x": 33,
+          "y": 44,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Platform",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "LightObstacleBehavior",
+              "type": "Lighting::LightObstacleBehavior"
+            },
+            {
+              "name": "Platform",
+              "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
+              "yGrabOffset": 0
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "brickWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grass.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "height": 70,
+          "name": "TiledCastlePlatform",
+          "tags": "",
+          "texture": "castleCenter.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 70,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "LightObstacleBehavior",
+              "type": "Lighting::LightObstacleBehavior"
+            },
+            {
+              "name": "Platform",
+              "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
+              "yGrabOffset": 0
+            }
+          ]
+        },
+        {
+          "name": "YellowLight",
+          "tags": "",
+          "type": "Lighting::LightObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "radius": 350,
+            "color": "#aec200",
+            "debugMode": false,
+            "texture": ""
+          }
+        },
+        {
+          "name": "BlueLight",
+          "tags": "",
+          "type": "Lighting::LightObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "radius": 342,
+            "color": "#0005c9",
+            "debugMode": false,
+            "texture": ""
+          }
+        },
+        {
+          "name": "GreenLight",
+          "tags": "",
+          "type": "Lighting::LightObject",
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "SineMovement",
+              "type": "SineMovement::SineMovement",
+              "SineSpeed": 60,
+              "AmplitudeX": 30,
+              "AmplitudeY": 30,
+              "InitialX": 0,
+              "InitialY": 0,
+              "SineProgress": 0
+            }
+          ],
+          "content": {
+            "radius": 350,
+            "color": "#70ee3d",
+            "debugMode": false,
+            "texture": ""
+          }
+        },
+        {
+          "name": "RedLight",
+          "tags": "",
+          "type": "Lighting::LightObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "radius": 200,
+            "color": "#e93131",
+            "debugMode": false,
+            "texture": ""
+          }
+        }
+      ],
+      "events": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "GUI",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 128,
+          "ambientLightColorG": 128,
+          "ambientLightColorR": 128,
+          "followBaseLayerCamera": true,
+          "isLightingLayer": true,
+          "name": "Lighting",
+          "visibility": true,
+          "cameras": [],
+          "effects": [
+            {
+              "effectType": "KawaseBlur",
+              "name": "Effect",
+              "doubleParameters": {
+                "blur": 0.2,
+                "pixelizeX": 0,
+                "pixelizeY": 0,
+                "quality": 10
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "LightObstacleBehavior",
+          "type": "Lighting::LightObstacleBehavior"
+        },
+        {
+          "name": "Platform",
+          "type": "PlatformBehavior::PlatformBehavior"
+        },
+        {
+          "name": "SineMovement",
+          "type": "SineMovement::SineMovement"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "@4ian",
+      "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
+      "extensionNamespace": "",
+      "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "SineMovement",
+      "previewIconUrl": "",
+      "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
+      "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave.",
+          "fullName": "Sine Movement",
+          "name": "SineMovement",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::PropertyInitialX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::PropertyInitialY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::SetPropertyInitialX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.X()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::SetPropertyInitialY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::PropertyAmplitudeX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Behavior::PropertyInitialX() + cos(ToRad(Object.Behavior::PropertySineProgress())) * Object.Behavior::PropertyAmplitudeX()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::PropertyAmplitudeY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Behavior::PropertyInitialY() + sin(ToRad(Object.Behavior::PropertySineProgress())) * Object.Behavior::PropertyAmplitudeY()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SineMovement::SineMovement::SetPropertySineProgress"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "Object.Behavior::PropertySineSpeed() * TimeDelta()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "SineMovement::SineMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "60",
+              "type": "Number",
+              "label": "Speed, in degrees per second",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "SineSpeed"
+            },
+            {
+              "value": "100",
+              "type": "Number",
+              "label": "Amplitude of the movement on X axis (0 to deactivate)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AmplitudeX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Amplitude of the movement on Y axis (0 to deactivate)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AmplitudeY"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "InitialX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "InitialY"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "SineProgress"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

@@ -1,14 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../../../UI/SelectField';
+import SelectOption from '../../../../UI/SelectOption';
 
-import Toggle from 'material-ui/Toggle';
-import { Line } from '../../../../UI/Grid';
+import Toggle from '../../../../UI/Toggle';
 import { mapFor } from '../../../../Utils/MapFor';
 import { getCurrentElements } from './SpriteObjectHelper';
+import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
   spriteObject: gdSpriteObject,
@@ -25,7 +26,7 @@ type Props = {|
   sameForAllSprites: boolean,
 
   setSameForAllAnimations: boolean => void,
-  setSameForAllSprites: number => void,
+  setSameForAllSprites: boolean => void,
 
   setSameForAllAnimationsLabel: string,
   setSameForAllSpritesLabel: string,
@@ -69,50 +70,67 @@ export default class SpriteSelector extends React.Component<Props, void> {
 
     return (
       <React.Fragment>
-        <Line>
+        <ResponsiveLineStackLayout>
           <SelectField
+            fullWidth
             floatingLabelText={<Trans>Animation</Trans>}
             value={this.props.animationIndex}
-            onChange={(e, i, value) => chooseAnimation(value)}
+            onChange={(e, i, value: string) =>
+              chooseAnimation(parseInt(value, 10) || 0)
+            }
           >
             {mapFor(0, spriteObject.getAnimationsCount(), i => {
               const animation = spriteObject.getAnimation(i);
               return (
-                <MenuItem
+                <SelectOption
                   key={i}
                   value={i}
-                  primaryText={`Animation #${i} ${animation.getName()}`}
+                  primaryText={t`Animation #${i} ${animation.getName()}`}
                 />
               );
             })}
           </SelectField>
           {hasValidAnimation && animation.getDirectionsCount() > 1 && (
             <SelectField
+              fullWidth
               floatingLabelText={<Trans>Direction</Trans>}
               value={this.props.directionIndex}
-              onChange={(e, i, value) => chooseDirection(value)}
+              onChange={(e, i, value: string) =>
+                chooseDirection(parseInt(value, 10) || 0)
+              }
             >
               {mapFor(0, animation.getDirectionsCount(), i => {
                 return (
-                  <MenuItem value={i} key={i} primaryText={`Direction #${i}`} />
+                  <SelectOption
+                    value={i}
+                    key={i}
+                    primaryText={t`Direction #${i}`}
+                  />
                 );
               })}
             </SelectField>
           )}
           {hasValidDirection && (
             <SelectField
+              fullWidth
               floatingLabelText={<Trans>Frame</Trans>}
               value={this.props.spriteIndex}
-              onChange={(e, i, value) => chooseSprite(value)}
+              onChange={(e, i, value: string) =>
+                chooseSprite(parseInt(value, 10) || 0)
+              }
             >
               {mapFor(0, direction.getSpritesCount(), i => {
                 return (
-                  <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
+                  <SelectOption
+                    value={i}
+                    key={i}
+                    primaryText={t`Frame #${i}`}
+                  />
                 );
               })}
             </SelectField>
           )}
-        </Line>
+        </ResponsiveLineStackLayout>
         <Toggle
           label={setSameForAllAnimationsLabel}
           labelPosition="right"

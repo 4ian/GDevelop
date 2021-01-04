@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="left-up" compressionlevel="0" width="24" height="20" tilewidth="42" tileheight="42" infinite="0" nextlayerid="20" nextobjectid="328">
+ <editorsettings>
+  <export target="."/>
+ </editorsettings>
+ <tileset firstgid="1" name="tile_vikings1" tilewidth="42" tileheight="42" tilecount="312" columns="12">
+  <image source="Viking3.png" width="504" height="1092"/>
+  <terraintypes>
+   <terrain name="woda" tile="69"/>
+   <terrain name="bruk" tile="72"/>
+   <terrain name="ziemia" tile="200"/>
+  </terraintypes>
+  <tile id="61" terrain="1,1,1,"/>
+  <tile id="62" terrain="1,1,,1"/>
+  <tile id="69" terrain="0,0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" type="woda" x="0" y="0">
+     <polygon points="0,0 42,0 42,42 0,42"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="70" terrain=",,,0">
+   <objectgroup draworder="index">
+    <object id="1" x="21" y="42">
+     <polygon points="6,0 7,-16 21,-27 21,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="71" terrain=",,0,">
+   <objectgroup draworder="index">
+    <object id="1" x="21" y="42">
+     <polygon points="-6,0 -8,-16 -21,-27 -21,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="73" terrain="1,,1,1"/>
+  <tile id="74" terrain=",1,1,1"/>
+  <tile id="81" terrain="0,0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" type="woda" x="0" y="0">
+     <polygon points="0,0 42,0 42,42 0,42"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="82" terrain=",0,,">
+   <objectgroup draworder="index">
+    <object id="1" x="21" y="0">
+     <polygon points="6,0 7,16 21,29 21,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="83" terrain="0,,,">
+   <objectgroup draworder="index">
+    <object id="2" x="0" y="32">
+     <polygon points="0,-3 13,-14.5 15,-32 0,-32"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="84" terrain=",,,1"/>
+  <tile id="85" terrain=",,1,1"/>
+  <tile id="86" terrain=",,1,"/>
+  <tile id="93" terrain="0,0,0,">
+   <objectgroup draworder="index">
+    <object id="1" x="0" y="0">
+     <polygon points="0,0 21,0 42,0 42,29 15,42 0,42 0,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="94" terrain="0,0,,">
+   <objectgroup draworder="index">
+    <object id="1" x="42" y="0">
+     <polygon points="0,0 0,29 -42,29 -42,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="95" terrain="0,0,,0">
+   <objectgroup draworder="index">
+    <object id="5" x="0" y="0">
+     <polygon points="0,0 0,29 27,42 42,42 42,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="96" terrain=",1,,1"/>
+  <tile id="97" terrain="1,1,1,1"/>
+  <tile id="98" terrain="1,,1,"/>
+  <tile id="99">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="100">
+   <objectgroup draworder="index">
+    <object id="1" name="Stone1_collider" x="8" y="5" width="29" height="29">
+     <ellipse/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="105" terrain="0,,0,">
+   <objectgroup draworder="index">
+    <object id="2" type="woda" x="0" y="0">
+     <polygon points="0,0 15,0 15,42 0,42"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="107" terrain=",0,,0">
+   <objectgroup draworder="index">
+    <object id="2" type="woda" x="0" y="0">
+     <polygon points="27,0 42,0 42,42 27,42"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="108" terrain=",1,,"/>
+  <tile id="109" terrain="1,1,,"/>
+  <tile id="110" terrain="1,,,"/>
+  <tile id="117" terrain="0,,0,0">
+   <objectgroup draworder="index">
+    <object id="2" type="woda" x="0" y="0">
+     <polygon points="15,0 42,15 42,42 0,42 0,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="118" terrain=",,0,0">
+   <objectgroup draworder="index">
+    <object id="2" x="0" y="42">
+     <polygon points="0,0 0,-27 42,-27 42,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="119" terrain=",0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" type="woda" x="0" y="0">
+     <polygon points="27,0 0,15 0,42 42,42 42,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="120" terrain="1,1,1,1"/>
+  <tile id="121" terrain="1,1,1,1"/>
+  <tile id="122" terrain="1,1,1,1"/>
+  <tile id="124">
+   <objectgroup draworder="index">
+    <object id="1" name="Stone2_collider" x="8" y="19" width="25" height="25">
+     <ellipse/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="129" terrain="0,0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" x="0" y="0" width="42" height="42"/>
+   </objectgroup>
+  </tile>
+  <tile id="130" terrain="0,0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" x="1" y="0" width="42" height="42"/>
+   </objectgroup>
+  </tile>
+  <tile id="131" terrain="0,0,0,0">
+   <objectgroup draworder="index">
+    <object id="1" x="0" y="0" width="42" height="42"/>
+   </objectgroup>
+  </tile>
+  <tile id="151">
+   <animation>
+    <frame tileid="152" duration="100"/>
+    <frame tileid="151" duration="200"/>
+    <frame tileid="152" duration="200"/>
+    <frame tileid="151" duration="100"/>
+    <frame tileid="152" duration="100"/>
+    <frame tileid="153" duration="100"/>
+   </animation>
+  </tile>
+  <tile id="154">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="155">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="164" terrain="2,2,2,"/>
+  <tile id="165" terrain="2,2,,2"/>
+  <tile id="176" terrain="2,,2,2"/>
+  <tile id="177" terrain=",2,2,2"/>
+  <tile id="187" terrain=",,,2"/>
+  <tile id="188" terrain=",,2,2"/>
+  <tile id="189" terrain=",,2,"/>
+  <tile id="199" terrain=",2,,2"/>
+  <tile id="200" terrain="2,2,2,2"/>
+  <tile id="201" terrain="2,,2,"/>
+  <tile id="211" terrain=",2,,"/>
+  <tile id="212" terrain="2,2,,"/>
+  <tile id="213" terrain="2,,,"/>
+  <tile id="216">
+   <animation>
+    <frame tileid="216" duration="100"/>
+    <frame tileid="219" duration="100"/>
+   </animation>
+  </tile>
+  <tile id="217">
+   <animation>
+    <frame tileid="217" duration="100"/>
+    <frame tileid="220" duration="100"/>
+   </animation>
+  </tile>
+  <tile id="221">
+   <animation>
+    <frame tileid="218" duration="100"/>
+    <frame tileid="221" duration="100"/>
+   </animation>
+  </tile>
+  <tile id="228">
+   <animation>
+    <frame tileid="228" duration="100"/>
+    <frame tileid="231" duration="100"/>
+   </animation>
+  </tile>
+  <tile id="233">
+   <animation>
+    <frame tileid="230" duration="100"/>
+    <frame tileid="233" duration="100"/>
+   </animation>
+  </tile>
+ </tileset>
+ <layer id="1" name="teren" width="24" height="20">
+  <data encoding="csv">
+70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,70,70,70,70,94,95,95,95,95,96,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,94,95,95,95,84,188,190,176,133,83,95,95,95,95,96,70,70,70,70,
+70,70,70,70,94,84,164,133,133,188,178,202,133,164,133,85,87,87,133,83,96,70,70,70,
+70,70,70,94,84,176,85,86,87,200,165,214,133,133,176,97,74,86,87,133,108,70,70,70,
+70,70,70,106,133,214,97,122,99,212,214,85,86,87,164,109,63,122,99,71,120,70,70,70,
+70,70,70,106,97,74,75,62,111,164,133,97,122,74,86,86,75,62,111,83,96,70,70,70,
+70,70,70,106,109,63,98,74,87,133,176,97,62,110,110,110,110,111,133,133,108,70,70,70,
+70,70,70,106,164,109,110,63,74,86,86,75,74,86,86,87,164,176,97,99,108,70,70,70,
+70,70,70,106,164,97,85,75,62,63,98,98,122,98,122,74,86,87,109,111,108,70,70,70,
+70,70,70,118,72,97,75,62,111,109,110,63,62,63,98,62,110,111,61,71,120,70,70,70,
+70,70,70,70,106,109,110,111,164,133,133,97,99,109,110,111,85,87,71,120,70,70,70,70,
+70,70,70,70,118,72,176,133,71,119,72,109,111,164,71,72,109,111,83,96,70,70,70,70,
+70,70,70,70,70,106,176,71,120,70,118,72,73,71,120,118,72,133,176,108,70,70,70,70,
+70,70,70,70,70,118,119,120,70,70,94,84,133,108,70,70,118,119,119,120,70,70,70,70,
+70,70,70,70,70,70,70,70,70,70,106,133,73,108,70,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,70,70,70,70,70,118,119,119,120,70,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,
+70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70
+</data>
+ </layer>
+ <layer id="2" name="obiekty" width="24" height="20">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,152,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,152,152,152,152,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,152,152,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="3" name="Domek1">
+  <object id="230" name="Domek_graf_6" gid="89" x="210" y="336" width="42" height="42"/>
+  <object id="233" name="Domek_graf_5" gid="88" x="168" y="336" width="42" height="42"/>
+  <object id="234" name="Domek_graf_4" gid="77" x="210" y="294" width="42" height="42"/>
+  <object id="235" name="Domek_graf_3" gid="76" x="168" y="294" width="42" height="42"/>
+  <object id="236" name="Domek_graf_2" gid="65" x="210" y="252" width="42" height="42"/>
+  <object id="237" name="Domek_graf_1" gid="64" x="168" y="252" width="42" height="42"/>
+  <object id="239" name="Domek_collider_wall" x="176" y="252" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="4" name="Domek2">
+  <object id="254" name="Domek_graf_6" gid="89" x="253" y="504" width="42" height="42"/>
+  <object id="255" name="Domek_graf_5" gid="88" x="211" y="504" width="42" height="42"/>
+  <object id="256" name="Domek_graf_4" gid="77" x="253" y="462" width="42" height="42"/>
+  <object id="257" name="Domek_graf_3" gid="76" x="211" y="462" width="42" height="42"/>
+  <object id="258" name="Domek_graf_2" gid="65" x="253" y="420" width="42" height="42"/>
+  <object id="259" name="Domek_graf_1" gid="64" x="211" y="420" width="42" height="42"/>
+  <object id="260" name="Domek_collider_wall" x="219" y="420" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="5" name="Domek3">
+  <object id="261" name="Domek_graf_6" gid="89" x="336" y="252" width="42" height="42"/>
+  <object id="262" name="Domek_graf_5" gid="88" x="294" y="252" width="42" height="42"/>
+  <object id="263" name="Domek_graf_4" gid="77" x="336" y="210" width="42" height="42"/>
+  <object id="264" name="Domek_graf_3" gid="76" x="294" y="210" width="42" height="42"/>
+  <object id="265" name="Domek_graf_2" gid="65" x="336" y="168" width="42" height="42"/>
+  <object id="266" name="Domek_graf_1" gid="64" x="294" y="168" width="42" height="42"/>
+  <object id="267" name="Domek_collider_wall" x="302" y="168" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="6" name="Domek4">
+  <object id="268" name="Domek_graf_6" gid="89" x="546" y="294" width="42" height="42"/>
+  <object id="269" name="Domek_graf_5" gid="88" x="504" y="294" width="42" height="42"/>
+  <object id="270" name="Domek_graf_4" gid="77" x="546" y="252" width="42" height="42"/>
+  <object id="271" name="Domek_graf_3" gid="76" x="504" y="252" width="42" height="42"/>
+  <object id="272" name="Domek_graf_2" gid="65" x="546" y="210" width="42" height="42"/>
+  <object id="273" name="Domek_graf_1" gid="64" x="504" y="210" width="42" height="42"/>
+  <object id="274" name="Domek_collider_wall" x="512" y="210" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="7" name="Domek5">
+  <object id="282" name="Domek_graf_6" gid="89" x="798" y="462" width="42" height="42"/>
+  <object id="283" name="Domek_graf_5" gid="88" x="756" y="462" width="42" height="42"/>
+  <object id="284" name="Domek_graf_4" gid="77" x="798" y="420" width="42" height="42"/>
+  <object id="285" name="Domek_graf_3" gid="76" x="756" y="420" width="42" height="42"/>
+  <object id="286" name="Domek_graf_2" gid="65" x="798" y="378" width="42" height="42"/>
+  <object id="287" name="Domek_graf_1" gid="64" x="756" y="378" width="42" height="42"/>
+  <object id="288" name="Domek_collider_wall" x="764" y="378" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="8" name="Domek6">
+  <object id="289" name="Domek_graf_6" gid="89" x="714" y="252" width="42" height="42"/>
+  <object id="290" name="Domek_graf_5" gid="88" x="672" y="252" width="42" height="42"/>
+  <object id="291" name="Domek_graf_4" gid="77" x="714" y="210" width="42" height="42"/>
+  <object id="292" name="Domek_graf_3" gid="76" x="672" y="210" width="42" height="42"/>
+  <object id="293" name="Domek_graf_2" gid="65" x="714" y="168" width="42" height="42"/>
+  <object id="294" name="Domek_graf_1" gid="64" x="672" y="168" width="42" height="42"/>
+  <object id="295" name="Domek_collider_wall" x="680" y="168" width="68" height="75"/>
+ </objectgroup>
+ <objectgroup id="9" name="krzesla">
+  <object id="34" gid="112" x="544" y="480" width="42" height="42"/>
+  <object id="37" gid="112" x="420.5" y="523.5" width="42" height="42"/>
+  <object id="39" gid="112" x="391" y="485.5" width="42" height="42"/>
+  <object id="40" gid="112" x="435.5" y="484.5" width="42" height="42"/>
+  <object id="42" gid="113" x="526.5" y="524.5" width="42" height="42"/>
+  <object id="43" gid="113" x="513.5" y="502.5" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="10" name="Scena">
+  <object id="299" name="Scena4" gid="138" x="546" y="420" width="42" height="42"/>
+  <object id="298" name="Scena3" gid="137" x="504" y="420" width="42" height="42"/>
+  <object id="297" name="Scena2" gid="137" x="462" y="420" width="42" height="42"/>
+  <object id="300" name="Scena1" gid="136" x="420" y="420" width="42" height="42"/>
+  <object id="302" name="Scena_collider_wall" x="421" y="384" width="165" height="36"/>
+ </objectgroup>
+ <objectgroup id="11" name="Lawki">
+  <object id="303" name="Lawka" gid="124" x="420" y="504" width="42" height="42"/>
+  <object id="305" name="Lawka_collider_wall" x="423" y="479" width="34" height="14"/>
+  <object id="304" name="Lawka_1" gid="124" x="546" y="504" width="42" height="42"/>
+  <object id="307" name="Lawka_collider_wall_1" x="549" y="479" width="34" height="14"/>
+  <object id="324" name="Lawka_collider_wall_2" x="801" y="227" width="34" height="14"/>
+  <object id="325" name="Lawka_2" gid="124" x="798" y="252" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="12" name="Kamienie">
+  <object id="310" name="Kamien" gid="101" x="336" y="336" width="42" height="42"/>
+  <object id="312" name="Kamien_collider_wall" x="344" y="300" width="25" height="25">
+   <ellipse/>
+  </object>
+  <object id="311" name="Kamien_1" gid="125" x="672" y="378" width="42" height="42"/>
+  <object id="314" name="Kamien_collider_wall_1" x="681" y="356" width="23" height="23">
+   <ellipse/>
+  </object>
+  <object id="326" name="Kamien_1" gid="125" x="462" y="630" width="42" height="42"/>
+  <object id="327" name="Kamien_collider_wall_1" x="471" y="608" width="23" height="23">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="13" name="beczki">
+  <object id="44" gid="102" x="735" y="265" width="42" height="42"/>
+  <object id="45" gid="102" x="740.333" y="249.333" width="42" height="42"/>
+  <object id="46" gid="102" x="647" y="248.333" width="42" height="42"/>
+  <object id="47" gid="102" x="568" y="311.5" width="42" height="42"/>
+  <object id="48" gid="102" x="477" y="302" width="42" height="42"/>
+  <object id="49" gid="102" x="468.5" y="285" width="42" height="42"/>
+  <object id="50" gid="102" x="731.833" y="478.667" width="42" height="42"/>
+  <object id="51" gid="102" x="717" y="460.333" width="42" height="42"/>
+  <object id="53" gid="102" x="726" y="444.333" width="42" height="42"/>
+  <object id="54" gid="102" x="361.333" y="263.833" width="42" height="42"/>
+  <object id="55" gid="102" x="262" y="245.667" width="42" height="42"/>
+  <object id="56" gid="102" x="266.167" y="265.5" width="42" height="42"/>
+  <object id="57" gid="102" x="135.833" y="355" width="42" height="42"/>
+  <object id="58" gid="102" x="153.5" y="359.667" width="42" height="42"/>
+  <object id="59" gid="102" x="137.167" y="339.667" width="42" height="42"/>
+  <object id="60" gid="102" x="189.333" y="517.667" width="42" height="42"/>
+  <object id="61" gid="102" x="202.333" y="524.333" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="14" name="krzaki">
+  <object id="64" gid="179" x="815" y="345.333" width="42" height="42"/>
+  <object id="65" gid="179" x="827.333" y="364.167" width="42" height="42"/>
+  <object id="67" gid="179" x="130.833" y="456.333" width="42" height="42"/>
+  <object id="68" gid="179" x="135.833" y="473.333" width="42" height="42"/>
+  <object id="69" gid="179" x="159.333" y="457.333" width="42" height="42"/>
+  <object id="70" gid="179" x="150.833" y="435.333" width="42" height="42"/>
+  <object id="72" gid="179" x="129.333" y="432.333" width="42" height="42"/>
+  <object id="75" gid="179" x="589.333" y="152.333" width="42" height="42"/>
+  <object id="76" gid="179" x="574.333" y="132.833" width="42" height="42"/>
+  <object id="77" gid="179" x="547.333" y="130.833" width="42" height="42"/>
+  <object id="78" gid="179" x="561.583" y="150.083" width="42" height="42"/>
+  <object id="79" gid="179" x="561.333" y="171.583" width="42" height="42"/>
+  <object id="80" gid="179" x="220.333" y="642.833" width="42" height="42"/>
+  <object id="81" gid="179" x="213.833" y="618.333" width="42" height="42"/>
+  <object id="82" gid="179" x="440.833" y="671.083" width="42" height="42"/>
+  <object id="83" gid="179" x="279.833" y="620.083" width="42" height="42"/>
+  <object id="84" gid="179" x="254.333" y="646.333" width="42" height="42"/>
+  <object id="85" gid="179" x="138.667" y="396.667" width="42" height="42"/>
+  <object id="87" gid="179" x="821" y="215" width="42" height="42"/>
+  <object id="100" name="collide2" x="146.583" y="367.833">
+   <polygon points="0,0 22.5,-1 30.5,13 26.75,23.75 -0.5,25 -5.75,13.75"/>
+  </object>
+  <object id="104" name="collider1" x="142.583" y="466.583">
+   <polygon points="0,0 27.75,1.75 35.75,-14 54.75,-16.5 40.75,-61.75 -7.5,-63.75 -7.25,-22.75"/>
+  </object>
+  <object id="107" name="collider4" x="549.333" y="117.833">
+   <polygon points="-49,15.75 -46.75,-12.75 55.5,-14.75 79,19.75 73,44 26.5,47.75 3.5,35.5 -20.75,15.5"/>
+  </object>
+  <object id="114" gid="179" x="517.833" y="123.833" width="42" height="42"/>
+  <object id="115" gid="179" x="435.333" y="132.583" width="42" height="42"/>
+  <object id="116" gid="179" x="407.083" y="127.833" width="42" height="42"/>
+  <object id="117" gid="179" x="535.583" y="158.083" width="42" height="42"/>
+  <object id="118" gid="179" x="526.333" y="143.833" width="42" height="42"/>
+  <object id="121" gid="179" x="495.083" y="137.583" width="42" height="42"/>
+  <object id="122" gid="179" x="423.833" y="146.833" width="42" height="42"/>
+  <object id="123" gid="179" x="387.083" y="142.083" width="42" height="42"/>
+  <object id="125" gid="179" x="397.583" y="159.083" width="42" height="42"/>
+  <object id="126" gid="179" x="591.833" y="166.583" width="42" height="42"/>
+  <object id="129" gid="179" x="213.583" y="597.833" width="42" height="42"/>
+  <object id="130" gid="179" x="279.333" y="637.083" width="42" height="42"/>
+  <object id="131" gid="179" x="301.333" y="608.333" width="42" height="42"/>
+  <object id="132" gid="179" x="246.333" y="625.333" width="42" height="42"/>
+  <object id="133" gid="179" x="535.083" y="637.333" width="42" height="42"/>
+  <object id="134" gid="179" x="422.083" y="704.583" width="42" height="42"/>
+  <object id="135" gid="179" x="537.833" y="657.083" width="42" height="42"/>
+  <object id="136" gid="179" x="806.333" y="360.333" width="42" height="42"/>
+  <object id="137" gid="179" x="828.833" y="384.583" width="42" height="42"/>
+  <object id="138" gid="179" x="789.583" y="333.333" width="42" height="42"/>
+  <object id="143" name="collider8" x="309.667" y="578">
+   <polygon points="0,0 25,-2 30,20.3333 9.33333,31.3333 6.33333,52 -23,63.3333 -81.6667,59.3333 -89.6667,32.6667 -89.6667,-9.66667 -64.6667,-11.6667 -54.3333,17 -9.66667,11.3333"/>
+  </object>
+  <object id="145" name="collider7" x="472.333" y="123.333">
+   <polygon points="0,0 -12.6667,17.3333 -55.6667,32.6667 -83,3 -53.3333,-27.3333 -0.666667,-20"/>
+  </object>
+  <object id="146" name="collider3" x="549.742" y="606.742">
+   <polygon points="0,0 -9.27273,8.72727 -6.90909,42.1818 19.6364,45.8182 26.9091,34.9091 19.8182,2"/>
+  </object>
+  <object id="147" name="collider9" x="479.242" y="653.379">
+   <polygon points="0,0 -3.63636,11.6364 -30,28.3636 -48.1818,24.7273 -50.5455,4.72727 -36.7273,-0.909091 -26.9091,-13.6364 -7.27273,-13.6364"/>
+  </object>
+  <object id="148" name="collider6" x="818.879" y="302.242">
+   <polygon points="0,0 12.7273,13.8182 33.0909,16.7273 47.6364,43.6364 47.8182,73.6364 37.2727,78.9091 18.7273,76.3636 13.2727,53.0909 -4.90909,52.5455 -11.8182,24.7273 -27.2727,16.7273 -21.0909,-0.909091"/>
+  </object>
+  <object id="153" gid="179" x="777.833" y="642.083" width="42" height="42"/>
+  <object id="154" gid="179" x="748" y="644" width="42" height="42"/>
+  <object id="158" gid="179" x="786.833" y="619.417" width="42" height="42"/>
+  <object id="159" name="collider10" x="796.333" y="587.833">
+   <polygon points="0.00033,-17.4997 26.0003,-15.4997 28,19 13.25,50 -74.9997,54.5003 -72.9997,29.5003 -51.9997,12.5003 -25.9997,5.50033"/>
+  </object>
+  <object id="173" gid="179" x="423" y="683.5" width="42" height="42"/>
+  <object id="174" gid="179" x="460.5" y="651" width="42" height="42"/>
+  <object id="175" gid="179" x="568" y="602.5" width="42" height="42"/>
+  <object id="177" gid="179" x="524" y="645" width="42" height="42"/>
+  <object id="178" gid="179" x="542.5" y="614.5" width="42" height="42"/>
+  <object id="179" gid="179" x="728.25" y="628.75" width="42" height="42"/>
+  <object id="180" gid="179" x="716" y="645" width="42" height="42"/>
+  <object id="181" gid="179" x="756.75" y="620" width="42" height="42"/>
+  <object id="182" gid="179" x="785.25" y="597" width="42" height="42"/>
+  <object id="183" gid="179" x="630" y="586" width="42" height="42"/>
+  <object id="184" gid="179" x="637" y="601" width="42" height="42"/>
+  <object id="185" gid="179" x="798" y="199.5" width="42" height="42"/>
+  <object id="186" gid="179" x="787.5" y="178.5" width="42" height="42"/>
+  <object id="187" gid="179" x="766.5" y="168" width="42" height="42"/>
+  <object id="188" gid="179" x="766.5" y="189" width="42" height="42"/>
+  <object id="189" gid="179" x="745.5" y="168" width="42" height="42"/>
+  <object id="192" name="collider11" x="634" y="566">
+   <polygon points="0,0 5,24 19,34 40,28 38,7 26,-10"/>
+  </object>
+  <object id="193" x="793" y="141">
+   <polygon points="0,0 28,13 41,41 64,51 63,69 34,68 4,43 -22,41 -32,20 -44,13 -40,-4"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="15" name="ThorPU">
+  <object id="211" name="Thor_graph" gid="100" x="504" y="672" width="42" height="42"/>
+  <object id="212" name="Thor_light" gid="180" x="504" y="672" width="42" height="42"/>
+  <object id="213" name="Thor_collider_punch" x="504" y="640" width="42" height="42">
+   <ellipse/>
+  </object>
+  <object id="214" name="Thor_collider_wall" x="515" y="651" width="19" height="19">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="16" name="MeatPU">
+  <object id="215" name="Meat_graph" gid="156" x="252" y="588" width="42" height="42"/>
+  <object id="216" name="Meat_collider_punch" x="252" y="550" width="42" height="42">
+   <ellipse/>
+  </object>
+  <object id="217" name="Meat_collider_wall" x="261" y="558" width="25" height="25">
+   <ellipse/>
+  </object>
+  <object id="218" name="Meat_eat" gid="168" x="252" y="588" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="17" name="BeesPU">
+  <object id="219" name="Bees_graph" gid="155" x="462" y="168" width="42" height="42"/>
+  <object id="220" name="Bees_collider_wall" x="474.5" y="145.5" width="21" height="21">
+   <ellipse/>
+  </object>
+  <object id="221" name="Bees_collider_punch" x="464" y="135" width="42" height="42">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="18" name="Spawny">
+  <object id="315" gid="2" x="315" y="264" width="42" height="42"/>
+  <object id="316" gid="2" x="187" y="348" width="42" height="42"/>
+  <object id="317" gid="2" x="524" y="307" width="42" height="42"/>
+  <object id="318" gid="2" x="692" y="264" width="42" height="42"/>
+  <object id="319" gid="2" x="777" y="473" width="42" height="42"/>
+  <object id="320" gid="2" x="232" y="516" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="19" name="Baby">
+  <object id="321" gid="147" x="706" y="601" width="42" height="42"/>
+  <object id="322" gid="147" x="341" y="396" width="42" height="42"/>
+  <object id="323" gid="147" x="615" y="290" width="42" height="42"/>
+ </objectgroup>
+</map>

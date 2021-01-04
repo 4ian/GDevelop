@@ -11,6 +11,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -23,6 +24,39 @@
 #include "catch.hpp"
 
 namespace {
+
+gd::StandardEvent &EnsureStandardEvent(gd::BaseEvent &baseEvent) {
+  gd::StandardEvent *standardEvent =
+      dynamic_cast<gd::StandardEvent *>(&baseEvent);
+  INFO("The inspected event is "
+       << (standardEvent ? "a standard event" : "not a standard event"));
+  REQUIRE(standardEvent != nullptr);
+
+  return *standardEvent;
+}
+
+const gd::String &GetEventFirstActionFirstParameterString(
+    gd::BaseEvent &event) {
+  auto &actions = EnsureStandardEvent(event).GetActions();
+  REQUIRE(actions.IsEmpty() == false);
+  REQUIRE(actions.Get(0).GetParametersCount() != 0);
+
+  return actions.Get(0).GetParameter(0).GetPlainString();
+}
+
+const gd::String &GetEventFirstConditionType(gd::BaseEvent &event) {
+  auto &conditions = EnsureStandardEvent(event).GetConditions();
+  REQUIRE(conditions.IsEmpty() == false);
+
+  return conditions.Get(0).GetType();
+}
+
+const gd::String &GetEventFirstActionType(gd::BaseEvent &event) {
+  auto &actions = EnsureStandardEvent(event).GetActions();
+  REQUIRE(actions.IsEmpty() == false);
+
+  return actions.Get(0).GetType();
+}
 
 gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     gd::Project &project) {
@@ -47,6 +81,10 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType("MyEventsExtension::MyEventsFunction");
+      instruction.SetParametersCount(3);
+      instruction.SetParameter(0, gd::Expression("First parameter"));
+      instruction.SetParameter(1, gd::Expression("Second parameter"));
+      instruction.SetParameter(2, gd::Expression("Third parameter"));
       event.GetActions().Insert(instruction);
       layout.GetEvents().InsertEvent(event);
     }
@@ -61,7 +99,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       instruction.SetParameter(
           0,
           gd::Expression(
-              "1 + MyEventsExtension::MyEventsFunctionExpression(123)"));
+              "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
       event.GetActions().Insert(instruction);
       externalEvents.GetEvents().InsertEvent(event);
     }
@@ -113,12 +151,15 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
+      instruction.SetParametersCount(3);
+      instruction.SetParameter(0, gd::Expression("First parameter"));
+      instruction.SetParameter(1, gd::Expression("Second parameter"));
+      instruction.SetParameter(2, gd::Expression("Third parameter"));
       event.GetActions().Insert(instruction);
       layout.GetEvents().InsertEvent(event);
     }
 
-    // Create an event in the layout referring to
-    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction
+    // Create an event in the layout using "MyProperty" action
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
@@ -129,8 +170,35 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       layout.GetEvents().InsertEvent(event);
     }
 
+    // Create an event in the layout using "MyProperty" condition
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedBehavior::" +
+          gd::EventsBasedBehavior::GetPropertyConditionName("MyProperty"));
+      event.GetConditions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in the layout using "MyProperty" expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression(
+              "ObjectWithMyBehavior.MyBehavior::" +
+              gd::EventsBasedBehavior::GetPropertyExpressionName("MyProperty") +
+              "()"));
+      event.GetActions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
     // Create an event in ExternalEvents1 referring to
-    // MyEventsExtension::MyEventsFunctionExpression
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
@@ -139,8 +207,59 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       instruction.SetParameter(
           0,
           gd::Expression("1 + "
+                         "ObjectWithMyBehavior.MyBehavior::"
+                         "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("2 + "
                          "ObjectWithMyBehavior::MyBehavior."
-                         "MyBehaviorEventsFunctionExpression(123)"));
+                         "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // function name without calling the function.
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("3 + "
+                         "ObjectWithMyBehavior.MyBehavior::"
+                         "MyBehaviorEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // function name without calling the function (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("4 + "
+                         "ObjectWithMyBehavior::MyBehavior."
+                         "MyBehaviorEventsFunctionExpression"));
       event.GetActions().Insert(instruction);
       externalEvents.GetEvents().InsertEvent(event);
     }
@@ -151,7 +270,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
 }  // namespace
 
 TEST_CASE("WholeProjectRefactorer", "[common]") {
-  SECTION("Object deleted") {
+  SECTION("Object deleted (in layout)") {
     SECTION("Groups") {
       gd::Project project;
       gd::Platform platform;
@@ -168,9 +287,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
       REQUIRE(layout1.GetObjectGroups()[0].Find("NotExistingObject") == true);
@@ -196,9 +316,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object1") ==
               false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object2") ==
@@ -237,9 +358,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRemovedInLayout(
-          project, layout1, "Object1");
-      gd::WholeProjectRefactorer::GlobalObjectRemoved(project, "GlobalObject1");
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout1, "Object1", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
+          project, "GlobalObject1", /* isObjectGroup =*/false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
@@ -255,7 +377,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("Object renamed") {
+  SECTION("Object renamed (in layout)") {
     SECTION("Groups") {
       gd::Project project;
       gd::Platform platform;
@@ -272,10 +394,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object1") == false);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object2") == true);
       REQUIRE(layout1.GetObjectGroups()[0].Find("Object3") == true);
@@ -302,10 +424,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       layout1.GetInitialInstances().InsertInitialInstance(instance2);
       layout1.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object1") ==
               false);
       REQUIRE(layout1.GetInitialInstances().HasInstancesOfObject("Object3") ==
@@ -346,10 +468,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance2);
       externalLayout2.GetInitialInstances().InsertInitialInstance(instance3);
 
-      gd::WholeProjectRefactorer::ObjectRenamedInLayout(
-          project, layout1, "Object1", "Object3");
-      gd::WholeProjectRefactorer::GlobalObjectRenamed(
-          project, "GlobalObject1", "GlobalObject3");
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout1, "Object1", "Object3", /* isObjectGroup =*/false);
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject1", "GlobalObject3", /* isObjectGroup =*/false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(externalLayout1.GetInitialInstances().HasInstancesOfObject(
@@ -372,6 +494,89 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   "GlobalObject3") == true);
     }
   }
+
+  SECTION("Object renamed (in events function)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    // Add a (free) function with an object group
+    gd::EventsFunction &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    gd::ObjectGroup &objectGroup =
+        eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
+    objectGroup.AddObject("Object1");
+    objectGroup.AddObject("Object2");
+    // In theory, we would add the object parameters, but we're not testing
+    // events in this test.
+
+    // Create the objects container for the events function
+    gd::ObjectsContainer globalObjectsContainer;
+    gd::ObjectsContainer objectsContainer;
+    gd::ParameterMetadataTools::ParametersToObjectsContainer(
+        project, eventsFunction.GetParameters(), objectsContainer);
+    // (this is strictly not necessary because we're not testing events in this
+    // test)
+
+    // Trigger the refactoring after the renaming of an object
+    gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+        project,
+        eventsFunction,
+        globalObjectsContainer,
+        objectsContainer,
+        "Object1",
+        "RenamedObject1",
+        /* isObjectGroup=*/false);
+
+    REQUIRE(objectGroup.Find("Object1") == false);
+    REQUIRE(objectGroup.Find("RenamedObject1") == true);
+    REQUIRE(objectGroup.Find("Object2") == true);
+
+    // Events are not tested
+  }
+
+  SECTION("Object deleted (in events function)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    // Add a (free) function with an object group
+    gd::EventsFunction &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    gd::ObjectGroup &objectGroup =
+        eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
+    objectGroup.AddObject("Object1");
+    objectGroup.AddObject("Object2");
+    // In theory, we would add the object parameters, but we're not testing
+    // events in this test.
+
+    // Create the objects container for the events function
+    gd::ObjectsContainer globalObjectsContainer;
+    gd::ObjectsContainer objectsContainer;
+    gd::ParameterMetadataTools::ParametersToObjectsContainer(
+        project, eventsFunction.GetParameters(), objectsContainer);
+    // (this is strictly not necessary because we're not testing events in this
+    // test)
+
+    // Trigger the refactoring after the renaming of an object
+    gd::WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+        project,
+        eventsFunction,
+        globalObjectsContainer,
+        objectsContainer,
+        "Object1",
+        /* isObjectGroup=*/false);
+
+    REQUIRE(objectGroup.Find("Object1") == false);
+    REQUIRE(objectGroup.Find("Object2") == true);
+
+    // Events are not tested
+  }
+
   SECTION("Events extension renamed") {
     gd::Project project;
     gd::Platform platform;
@@ -382,24 +587,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         project, eventsExtension, "MyEventsExtension", "MyRenamedExtension");
 
     // Check that events function calls in instructions have been renamed
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithFreeFunctions")
-                    .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetType() == "MyRenamedExtension::MyEventsFunction");
+    REQUIRE(GetEventFirstActionType(project.GetLayout("LayoutWithFreeFunctions")
+                                        .GetEvents()
+                                        .GetEvent(0)) ==
+            "MyRenamedExtension::MyEventsFunction");
 
     // Check that events function calls in expressions have been renamed
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithFreeFunctions")
                     .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetParameter(0)
-                .GetPlainString() ==
-            "1 + MyRenamedExtension::MyEventsFunctionExpression(123)");
+                    .GetEvent(0)) ==
+            "1 + MyRenamedExtension::MyEventsFunctionExpression(123, 456)");
 
     // Check that the type of the behavior was changed in the behaviors of
     // objects. Name is *not* changed.
@@ -411,43 +609,41 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .GetBehavior("MyBehavior")
                 .GetTypeName() == "MyRenamedExtension::MyEventsBasedBehavior");
 
-    // Check if events based behaviors functions have been renamed in
+    // Check if events-based behavior methods have been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithBehaviorFunctions")
-                    .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
-            "MyRenamedExtension::MyEventsBasedBehavior::"
-            "MyBehaviorEventsFunction");
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(0)) ==
+        "MyRenamedExtension::MyEventsBasedBehavior::"
+        "MyBehaviorEventsFunction");
 
-    // Check if events based behaviors properties have been renamed in
+    // Check if events-based behaviors properties have been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithBehaviorFunctions")
-                    .GetEvents()
-                    .GetEvent(1))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
-            "MyRenamedExtension::MyEventsBasedBehavior::"
-            "SetPropertyMyProperty");
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(1)) ==
+        "MyRenamedExtension::MyEventsBasedBehavior::"
+        "SetPropertyMyProperty");
 
-    // Check events based behaviors functions have *not* been renamed in
+    // Check events-based behavior methods have *not* been renamed in
     // expressions
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
                     .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetParameter(0)
-                .GetPlainString() ==
+                    .GetEvent(0)) ==
             "1 + "
-            "ObjectWithMyBehavior::MyBehavior."
-            "MyBehaviorEventsFunctionExpression(123)");
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyBehaviorEventsFunctionExpression(123, 456, 789)");
+
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(2)) ==
+            "3 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyBehaviorEventsFunctionExpression");
   }
   SECTION("(Free) events function renamed") {
     gd::Project project;
@@ -466,24 +662,46 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "MyRenamedFunctionExpression");
 
     // Check that events function calls in instructions have been renamed
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithFreeFunctions")
-                    .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetType() == "MyEventsExtension::MyRenamedEventsFunction");
+    REQUIRE(GetEventFirstActionType(project.GetLayout("LayoutWithFreeFunctions")
+                                        .GetEvents()
+                                        .GetEvent(0)) ==
+            "MyEventsExtension::MyRenamedEventsFunction");
 
     // Check that events function calls in expressions have been renamed
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithFreeFunctions")
                     .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetParameter(0)
-                .GetPlainString() ==
-            "1 + MyEventsExtension::MyRenamedFunctionExpression(123)");
+                    .GetEvent(0)) ==
+            "1 + MyEventsExtension::MyRenamedFunctionExpression(123, 456)");
+  }
+  SECTION("(Free) events function parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
+        project, eventsExtension, "MyEventsFunction", 0, 2);
+    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
+        project, eventsExtension, "MyEventsFunctionExpression", 0, 1);
+
+    // Check that events function calls in instructions have been updated
+    auto &action = static_cast<gd::StandardEvent &>(
+                       project.GetLayout("LayoutWithFreeFunctions")
+                           .GetEvents()
+                           .GetEvent(0))
+                       .GetActions()
+                       .Get(0);
+    REQUIRE(action.GetParameter(0).GetPlainString() == "Second parameter");
+    REQUIRE(action.GetParameter(1).GetPlainString() == "Third parameter");
+    REQUIRE(action.GetParameter(2).GetPlainString() == "First parameter");
+
+    // Check that events function calls in expressions have been updated
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithFreeFunctions")
+                    .GetEvents()
+                    .GetEvent(0)) ==
+            "1 + MyEventsExtension::MyEventsFunctionExpression(456, 123)");
   }
   SECTION("Events based Behavior type renamed") {
     gd::Project project;
@@ -511,43 +729,33 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .GetTypeName() ==
             "MyEventsExtension::MyRenamedEventsBasedBehavior");
 
-    // Check if events based behaviors functions have been renamed in
+    // Check if events-based behavior methods have been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithBehaviorFunctions")
-                    .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
-            "MyEventsExtension::MyRenamedEventsBasedBehavior::"
-            "MyBehaviorEventsFunction");
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(0)) ==
+        "MyEventsExtension::MyRenamedEventsBasedBehavior::"
+        "MyBehaviorEventsFunction");
 
-    // Check if events based behaviors properties have been renamed in
+    // Check if events-based behaviors properties have been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithBehaviorFunctions")
-                    .GetEvents()
-                    .GetEvent(1))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
-            "MyEventsExtension::MyRenamedEventsBasedBehavior::"
-            "SetPropertyMyProperty");
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(1)) ==
+        "MyEventsExtension::MyRenamedEventsBasedBehavior::"
+        "SetPropertyMyProperty");
 
-    // Check events based behaviors functions have *not* been renamed in
+    // Check events-based behavior methods have *not* been renamed in
     // expressions
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
                     .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetParameter(0)
-                .GetPlainString() ==
+                    .GetEvent(0)) ==
             "1 + "
-            "ObjectWithMyBehavior::MyBehavior."
-            "MyBehaviorEventsFunctionExpression(123)");
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyBehaviorEventsFunctionExpression(123, 456, 789)");
   }
   SECTION("(Events based Behavior) events function renamed") {
     gd::Project project;
@@ -570,31 +778,109 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "MyBehaviorEventsFunctionExpression",
         "MyRenamedBehaviorEventsFunctionExpression");
 
-    // Check if events based behaviors functions have been renamed in
+    // Check if events-based behavior methods have been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
-                project.GetLayout("LayoutWithBehaviorFunctions")
-                    .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
-            "MyEventsExtension::MyEventsBasedBehavior::"
-            "MyRenamedBehaviorEventsFunction");
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(0)) ==
+        "MyEventsExtension::MyEventsBasedBehavior::"
+        "MyRenamedBehaviorEventsFunction");
 
-    // Check events based behaviors functions have been renamed in
+    // Check events-based behavior methods have been renamed in
     // expressions
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
                     .GetEvents()
-                    .GetEvent(0))
-                .GetActions()
-                .Get(0)
-                .GetParameter(0)
-                .GetPlainString() ==
+                    .GetEvent(0)) ==
             "1 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyRenamedBehaviorEventsFunctionExpression(123, 456, 789)");
+
+    // Check that a ill-named function that looks a bit like a behavior method
+    // (but which is actually an object function) is *not* renamed.
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(1)) ==
+            "2 + "
             "ObjectWithMyBehavior::MyBehavior."
-            "MyRenamedBehaviorEventsFunctionExpression(123)");
+            "MyBehaviorEventsFunctionExpression(123, 456, 789)");
+
+    // Check events based behaviors functions have been renamed in
+    // expressions referring to the function with just its name
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(2)) ==
+            "3 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyRenamedBehaviorEventsFunctionExpression");
+
+    // Check that a ill-named function that looks a bit like a behavior method
+    // (but which is actually an object function) is *not* renamed.
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(3)) ==
+            "4 + "
+            "ObjectWithMyBehavior::MyBehavior."
+            "MyBehaviorEventsFunctionExpression");
+  }
+  SECTION("(Events based Behavior) events function parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunction",
+        0,
+        2);
+    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpression",
+        0,
+        2);
+
+    // Check if parameters of events-based behavior methods have been moved in
+    // instructions
+    auto &action = static_cast<gd::StandardEvent &>(
+                       project.GetLayout("LayoutWithBehaviorFunctions")
+                           .GetEvents()
+                           .GetEvent(0))
+                       .GetActions()
+                       .Get(0);
+    REQUIRE(action.GetParameter(0).GetPlainString() == "Second parameter");
+    REQUIRE(action.GetParameter(1).GetPlainString() == "Third parameter");
+    REQUIRE(action.GetParameter(2).GetPlainString() == "First parameter");
+
+    // Check parameters of events-based behavior methods have been moved in
+    // expressions
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(0)) ==
+            "1 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyBehaviorEventsFunctionExpression(456, 789, 123)");
+
+    // Check that a ill-named function that looks a bit like a behavior method
+    // (but which is actually a free function) has its parameter *not* moved.
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(1)) ==
+            "2 + "
+            "ObjectWithMyBehavior::MyBehavior."
+            "MyBehaviorEventsFunctionExpression(123, 456, 789)");
   }
   SECTION("(Events based Behavior) property renamed") {
     gd::Project project;
@@ -604,23 +890,32 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
-    gd::WholeProjectRefactorer::RenameBehaviorProperty(
-        project,
-        eventsExtension,
-        eventsBasedBehavior,
-        "MyProperty",
-        "MyRenamedProperty");
+    gd::WholeProjectRefactorer::RenameBehaviorProperty(project,
+                                                       eventsExtension,
+                                                       eventsBasedBehavior,
+                                                       "MyProperty",
+                                                       "MyRenamedProperty");
 
-    // Check if events based behaviors property has been renamed in
+    // Check if events-based behaviors property has been renamed in
     // instructions
-    REQUIRE(static_cast<gd::StandardEvent &>(
+    REQUIRE(
+        GetEventFirstActionType(project.GetLayout("LayoutWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(1)) ==
+        "MyEventsExtension::MyEventsBasedBehavior::"
+        "SetPropertyMyRenamedProperty");
+
+    REQUIRE(GetEventFirstConditionType(
                 project.GetLayout("LayoutWithBehaviorFunctions")
                     .GetEvents()
-                    .GetEvent(1))
-                .GetActions()
-                .Get(0)
-                .GetType() ==
+                    .GetEvent(2)) ==
             "MyEventsExtension::MyEventsBasedBehavior::"
-            "SetPropertyMyRenamedProperty");
+            "PropertyMyRenamedProperty");
+
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetLayout("LayoutWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(3)) ==
+            "ObjectWithMyBehavior.MyBehavior::PropertyMyRenamedProperty()");
   }
 }

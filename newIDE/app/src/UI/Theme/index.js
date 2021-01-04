@@ -1,14 +1,93 @@
-import DarkTheme from './DarkTheme';
-import DefaultTheme from './DefaultTheme';
+// @flow
+import { createMuiTheme } from '@material-ui/core/styles';
+import { isLtr } from '../../Utils/i18n/RtlLanguages';
+import memoize from '../../Utils/Memoize';
 
-// To add a new theme:
-// * copy the folder of an existing one (DefaultTheme for example),
-// * import it at the top of the file
-// * add it below:
-export const themes = {
-  'GDevelop default': DefaultTheme,
-  Dark: DarkTheme,
+import DefaultTheme from './DefaultTheme';
+import { themes as themeList } from './ThemeRegistry';
+
+import 'react-virtualized/styles.css';
+// Styles
+import './Global/Animation.css';
+import './Global/EventsSheet.css';
+import './Global/Markdown.css';
+import './Global/Scrollbar.css';
+import './Global/Mosaic.css';
+import './Global/Table.css';
+
+export type Theme = $Exact<typeof DefaultTheme>;
+export const themes = themeList;
+
+export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
+type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
+type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
+const defaultThemeName = 'GDevelop default';
+
+export function getTheme({
+  themeName,
+  language,
+}: {|
+  themeName: string,
+  language: string,
+|}): ActualTheme {
+  let theme: Theme = themes[themeName];
+
+  if (!theme) {
+    console.warn(
+      `Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`
+    );
+    theme = themes[defaultThemeName];
+  }
+
+  const ltr = isLtr(language);
+  const { gdevelopTheme, muiThemeOptions } = theme;
+  return {
+    gdevelopTheme,
+    muiTheme: ltr
+      ? createLtrTheme(muiThemeOptions)
+      : createRtlTheme(muiThemeOptions),
+  };
+}
+
+const createLtrTheme = memoize(
+  (muiThemeOptions: MuiThemeOptions): Object => {
+    return createMuiTheme(muiThemeOptions);
+  }
+);
+
+const createRtlTheme = memoize(
+  (muiThemeOptions: MuiThemeOptions): Object => {
+    return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
+  }
+);
+
+const rtlDirection = { direction: 'rtl' };
+const rtlOrder = { order: 100 };
+const rtlOverrides = {
+  MuiTypography: {
+    root: rtlDirection,
+  },
+  MuiInput: {
+    root: rtlDirection,
+  },
+  MuiTab: {
+    root: rtlDirection,
+  },
+  MuiButton: {
+    label: rtlDirection,
+  },
+  MuiSvgIcon: {
+    root: rtlOrder,
+  },
+  MuiFormControlLabel: {
+    root: rtlDirection,
+  },
+  MuiTextField: {
+    root: rtlDirection,
+  },
 };
 
-export const getTheme = themeName =>
-  themes[themeName] || themes['GDevelop default'];
+export const defaultTheme: ActualTheme = {
+  ...DefaultTheme,
+  muiThemeOptions: createLtrTheme(DefaultTheme.muiThemeOptions),
+};

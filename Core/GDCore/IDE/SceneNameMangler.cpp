@@ -10,34 +10,49 @@
 
 namespace gd {
 
-gd::String SceneNameMangler::GetMangledSceneName(gd::String sceneName) {
-  static const gd::String allowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  static const gd::String allowedExceptFirst = "0123456789";
+SceneNameMangler *SceneNameMangler::_singleton = nullptr;
 
-  std::size_t i = 0;
-  for (auto it = sceneName.begin(); it != sceneName.end(); ++it) {
-    char32_t character = *it;
-    if (allowedCharacters.find(character) == gd::String::npos &&
-        (allowedExceptFirst.find(character) == gd::String::npos ||
-         i == 0))  // Also disallow some characters to be in first position
-    {
-      // Replace the character by an underscore and its unicode codepoint (in
-      // base 10)
-      auto it2 = it;
-      ++it2;
-      sceneName.replace(it, it2, "_" + gd::String::From(character));
-
-      // The iterator it may have been invalidated:
-      // re-assign it with a new iterator pointing to the same position.
-      it = sceneName.begin();
-      std::advance(it, i);
-    }
-
-    ++i;
+const gd::String &SceneNameMangler::GetMangledSceneName(
+    const gd::String &sceneName) {
+  auto it = mangledSceneNames.find(sceneName);
+  if (it != mangledSceneNames.end()) {
+    return it->second;
   }
 
-  return sceneName;
+  gd::String partiallyMangledName = sceneName;
+  static const gd::String alwaysAllowedCharacters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  static const gd::String allowedExceptFirstCharacters = "0123456789";
+
+  for (size_t i = 0; i < partiallyMangledName.size();
+       ++i)  // Replace all unallowed letter by an underscore and the unicode
+             // code point of the letter
+  {
+    if (alwaysAllowedCharacters.find_first_of(
+            std::u32string(1, partiallyMangledName[i])) == gd::String::npos &&
+        (i == 0 ||
+         allowedExceptFirstCharacters.find(
+             std::u32string(1, partiallyMangledName[i])) == gd::String::npos)) {
+      char32_t unallowedChar = partiallyMangledName[i];
+      partiallyMangledName.replace(i, 1, "_" + gd::String::From(unallowedChar));
+    }
+  }
+
+  mangledSceneNames[sceneName] = partiallyMangledName;
+  return mangledSceneNames[sceneName];
+}
+
+SceneNameMangler *SceneNameMangler::Get() {
+  if (nullptr == _singleton) _singleton = new SceneNameMangler;
+
+  return (static_cast<SceneNameMangler *>(_singleton));
+}
+
+void SceneNameMangler::DestroySingleton() {
+  if (nullptr != _singleton) {
+    delete _singleton;
+    _singleton = nullptr;
+  }
 }
 
 }  // namespace gd

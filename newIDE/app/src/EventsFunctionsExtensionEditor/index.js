@@ -6,10 +6,12 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsSheet from '../EventsSheet';
-import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EditorMosaic from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
-import EventsFunctionsList from '../EventsFunctionsList';
+import EventsFunctionsList, {
+  type EventsFunctionCreationParameters,
+} from '../EventsFunctionsList';
 import EventsBasedBehaviorsList from '../EventsBasedBehaviorsList';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
@@ -21,11 +23,25 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
-import { isBehaviorLifecycleFunction } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import FlatButton from 'material-ui/FlatButton';
+import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
-import Divider from 'material-ui/Divider';
-const gd = global.gd;
+import Divider from '@material-ui/core/Divider';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import EditorNavigator, {
+  type EditorNavigatorInterface,
+} from '../UI/EditorMosaic/EditorNavigator';
+import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
+import Check from '@material-ui/icons/Check';
+import Tune from '@material-ui/icons/Tune';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -45,6 +61,7 @@ type Props = {|
   onBehaviorEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -53,8 +70,28 @@ type State = {|
   editedEventsBasedBehavior: ?gdEventsBasedBehavior,
   editOptionsDialogOpen: boolean,
   behaviorMethodSelectorDialogOpen: boolean,
-  onAddEventsFunctionCb: ?(doAdd: boolean, name: ?string) => void,
+  extensionFunctionSelectorDialogOpen: boolean,
+  onAddEventsFunctionCb: ?(
+    parameters: ?EventsFunctionCreationParameters
+  ) => void,
 |};
+
+const initialMosaicEditorNodes = {
+  direction: 'row',
+  first: {
+    direction: 'column',
+    first: 'free-functions-list',
+    second: 'behaviors-list',
+    splitPercentage: 50,
+  },
+  second: {
+    direction: 'column',
+    first: 'parameters',
+    second: 'events-sheet',
+    splitPercentage: 25,
+  },
+  splitPercentage: 25,
+};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -66,10 +103,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     editedEventsBasedBehavior: null,
     editOptionsDialogOpen: false,
     behaviorMethodSelectorDialogOpen: false,
+    extensionFunctionSelectorDialogOpen: false,
     onAddEventsFunctionCb: null,
   };
   editor: ?EventsSheet;
-  _editors: ?EditorMosaic;
+  _editorMosaic: ?EditorMosaic;
+  _editorNavigator: ?EditorNavigatorInterface;
   _globalObjectsContainer: ?gdObjectsContainer;
   _objectsContainer: ?gdObjectsContainer;
 
@@ -113,13 +152,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  updateToolbar() {
+  updateToolbar = () => {
     if (this.editor) {
       this.editor.updateToolbar();
     } else {
       this.props.setToolbar(<div />);
     }
-  }
+  };
 
   selectEventsFunctionByName = (
     functionName: string,
@@ -172,7 +211,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         selectedEventsFunction,
         selectedEventsBasedBehavior,
       },
-      () => this.updateToolbar()
+      () => {
+        this.updateToolbar();
+
+        if (this._editorNavigator) {
+          // Open the parameters of the function if it's a new, empty function.
+          if (
+            selectedEventsFunction &&
+            !selectedEventsFunction.getEvents().getEventsCount()
+          ) {
+            this._editorNavigator.openEditor('parameters');
+          } else {
+            this._editorNavigator.openEditor('events-sheet');
+          }
+        }
+      }
     );
   };
 
@@ -181,13 +234,23 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return;
+    }
+    if (isExtensionLifecycleEventsFunction(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name is reserved for a lifecycle function of the extension. Choose another name for your function.`
+        ),
+        { delayToNextTick: true }
+      );
+      return done(false);
     }
 
     const { project, eventsFunctionsExtension } = this.props;
@@ -207,19 +270,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
-    if (isBehaviorLifecycleFunction(newName)) {
+    if (isBehaviorLifecycleEventsFunction(newName)) {
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
-        )
+        ),
+        { delayToNextTick: true }
       );
       return done(false);
     }
@@ -303,8 +368,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
-          if (this._editors)
-            this._editors.openEditor('behavior-functions-list');
+          if (this._editorMosaic)
+            this._editorMosaic.openEditor(
+              'behavior-functions-list',
+              'end',
+              75,
+              'column'
+            );
+          if (this._editorNavigator)
+            this._editorNavigator.openEditor('behavior-functions-list');
         }
       }
     );
@@ -315,11 +387,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateObjectName(newName)) {
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
-          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
-        )
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
+        { delayToNextTick: true }
       );
       return;
     }
@@ -366,12 +439,36 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
-  _onAddFreeEventsFunction = (cb: (doAdd: boolean, name: ?string) => void) => {
-    cb(true, null); // Proceed with the an autogenerated name
+  _onAddFreeEventsFunction = (
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
+  ) => {
+    this.setState({
+      extensionFunctionSelectorDialogOpen: true,
+      onAddEventsFunctionCb,
+    });
+  };
+
+  _onCloseExtensionFunctionSelectorDialog = (
+    parameters: ?EventsFunctionCreationParameters
+  ) => {
+    const { onAddEventsFunctionCb } = this.state;
+    this.setState(
+      {
+        extensionFunctionSelectorDialogOpen: false,
+        onAddEventsFunctionCb: null,
+      },
+      () => {
+        if (onAddEventsFunctionCb) onAddEventsFunctionCb(parameters);
+      }
+    );
   };
 
   _onAddBehaviorEventsFunction = (
-    onAddEventsFunctionCb: (doAdd: boolean, name: ?string) => void
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
   ) => {
     this.setState({
       behaviorMethodSelectorDialogOpen: true,
@@ -379,7 +476,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _onCloseBehaviorMethodSelectorDialog = (doAdd: boolean, name: ?string) => {
+  _onCloseBehaviorMethodSelectorDialog = (
+    parameters: ?EventsFunctionCreationParameters
+  ) => {
     const { onAddEventsFunctionCb } = this.state;
     this.setState(
       {
@@ -387,7 +486,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         onAddEventsFunctionCb: null,
       },
       () => {
-        if (onAddEventsFunctionCb) onAddEventsFunctionCb(doAdd, name);
+        if (onAddEventsFunctionCb) onAddEventsFunctionCb(parameters);
       }
     );
   };
@@ -442,12 +541,53 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         };
       },
       () => {
-        // If we're closing the properties of a behavior, notify parent
-        // that a behavior was edited (to trigger reload of extensions)
-        if (!editedEventsBasedBehavior && this.props.onBehaviorEdited)
-          this.props.onBehaviorEdited();
+        if (!editedEventsBasedBehavior) {
+          // If we're closing the properties of a behavior, notify parent
+          // that a behavior was edited (to trigger reload of extensions)
+          if (this.props.onBehaviorEdited) {
+            this.props.onBehaviorEdited();
+          }
+
+          // Reload the selected events function, if any, as the behavior was
+          // changed so objects containers need to be re-created. Notably, the
+          // type of the object that is handled by the behavior may have changed.
+          if (this.state.selectedEventsFunction) {
+            this._loadEventsFunctionFrom(
+              this.props.project,
+              this.state.selectedEventsFunction
+            );
+          }
+        }
       }
     );
+  };
+
+  _openFreeFunctionsListEditor = () => {
+    if (this._editorNavigator)
+      this._editorNavigator.openEditor('free-functions-list');
+  };
+
+  _openBehaviorsListEditor = () => {
+    if (this._editorNavigator)
+      this._editorNavigator.openEditor('behaviors-list');
+  };
+
+  _onEditorNavigatorEditorChanged = (editorName: string) => {
+    // It's important that this method is the same across renders,
+    // to avoid confusing EditorNavigator into thinking it's changed
+    // and immediately calling it, which would trigger an infinite loop.
+    // Search for "callback-prevent-infinite-rerendering" in the codebase.
+
+    this.updateToolbar();
+
+    if (editorName === 'behaviors-list') {
+      this._selectEventsBasedBehavior(null);
+    } else if (
+      editorName === 'free-functions-list' ||
+      editorName === 'behavior-functions-list'
+    ) {
+      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
+    }
   };
 
   render() {
@@ -457,320 +597,365 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       selectedEventsBasedBehavior,
       editOptionsDialogOpen,
       behaviorMethodSelectorDialogOpen,
+      extensionFunctionSelectorDialogOpen,
       editedEventsBasedBehavior,
     } = this.state;
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <React.Fragment>
-            <EditorMosaic
-              ref={editors => (this._editors = editors)}
-              editors={{
-                parameters: (
-                  <MosaicWindow
-                    title={<Trans>Function Configuration</Trans>}
-                    toolbarControls={[]}
-                    // /!\ Force re-rendering if selectedEventsFunction, globalObjectsContainer
-                    // or objectsContainer change,
-                    // otherwise we risk using deleted objects (because of the shouldComponentUpdate
-                    // optimization in MosaicWindow).
-                    selectedEventsFunction={selectedEventsFunction}
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                    globalObjectsContainer={this._globalObjectsContainer}
-                    objectsContainer={this._objectsContainer}
-                  >
-                    <Background>
-                      {selectedEventsFunction &&
-                      this._globalObjectsContainer &&
-                      this._objectsContainer ? (
-                        <EventsFunctionConfigurationEditor
-                          project={project}
-                          eventsFunction={selectedEventsFunction}
-                          eventsBasedBehavior={selectedEventsBasedBehavior}
-                          globalObjectsContainer={this._globalObjectsContainer}
-                          objectsContainer={this._objectsContainer}
-                          makeMoveFreeEventsParameter={(
-                            eventsFunction: gdEventsFunction,
-                            oldIndex: number,
-                            newIndex: number,
-                            done: boolean => void
-                          ) =>
-                            this._makeMoveFreeEventsParameter(i18n)(
-                              selectedEventsFunction,
-                              oldIndex,
-                              newIndex,
-                              done
-                            )
-                          }
-                          makeMoveBehaviorEventsParameter={(
-                            eventsBasedBehavior: gdEventsBasedBehavior,
-                            eventsFunction: gdEventsFunction,
-                            oldIndex: number,
-                            newIndex: number,
-                            done: boolean => void
-                          ) =>
-                            this._makeMoveBehaviorEventsParameter(i18n)(
-                              selectedEventsBasedBehavior,
-                              selectedEventsFunction,
-                              oldIndex,
-                              newIndex,
-                              done
-                            )
-                          }
-                          helpPagePath={
-                            !!selectedEventsBasedBehavior
-                              ? '/behaviors/events-based-behaviors'
-                              : '/events/functions'
-                          }
-                          onParametersOrGroupsUpdated={() => {
-                            this._loadEventsFunctionFrom(
-                              project,
-                              selectedEventsFunction
-                            );
-                            this.forceUpdate();
-                          }}
-                        />
-                      ) : (
-                        <EmptyMessage>
-                          <Trans>
-                            Choose a function, or a function of a behavior, to
-                            set the parameters that it accepts.
-                          </Trans>
-                        </EmptyMessage>
-                      )}
-                    </Background>
-                  </MosaicWindow>
-                ),
-                'events-sheet':
-                  selectedEventsFunction &&
-                  this._globalObjectsContainer &&
-                  this._objectsContainer ? (
-                    <EventsSheet
-                      key={selectedEventsFunction.ptr}
-                      ref={editor => (this.editor = editor)}
-                      project={project}
-                      scope={{
-                        layout: null,
-                        eventsFunctionsExtension,
-                        eventsBasedBehavior: selectedEventsBasedBehavior,
-                        eventsFunction: selectedEventsFunction,
-                      }}
-                      globalObjectsContainer={this._globalObjectsContainer}
-                      objectsContainer={this._objectsContainer}
-                      events={selectedEventsFunction.getEvents()}
-                      showPreviewButton={false}
-                      onPreview={options => {}}
-                      showNetworkPreviewButton={false}
-                      onOpenExternalEvents={() => {}}
-                      onOpenLayout={() => {}}
-                      resourceSources={this.props.resourceSources}
-                      onChooseResource={this.props.onChooseResource}
-                      resourceExternalEditors={
-                        this.props.resourceExternalEditors
-                      }
-                      openInstructionOrExpression={
-                        this.props.openInstructionOrExpression
-                      }
-                      setToolbar={this.props.setToolbar}
-                      onOpenDebugger={() => {}}
-                      onCreateEventsFunction={this.props.onCreateEventsFunction}
-                      onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
-                    />
-                  ) : (
-                    <Background>
-                      <EmptyMessage>
-                        <Trans>
-                          Choose a function, or a function of a behavior, to
-                          edit its events.
-                        </Trans>
-                      </EmptyMessage>
-                    </Background>
-                  ),
-                'free-functions-list': (
-                  <MosaicWindow
-                    title={<Trans>Functions</Trans>}
-                    toolbarControls={[]}
-                    selectedEventsFunction={selectedEventsFunction}
-                  >
-                    <EventsFunctionsList
-                      project={project}
-                      eventsFunctionsContainer={eventsFunctionsExtension}
-                      selectedEventsFunction={selectedEventsFunction}
-                      onSelectEventsFunction={selectedEventsFunction =>
-                        this._selectEventsFunction(selectedEventsFunction, null)
-                      }
-                      onDeleteEventsFunction={this._onDeleteEventsFunction}
-                      canRename={() => true}
-                      onRenameEventsFunction={this._makeRenameFreeEventsFunction(
-                        i18n
-                      )}
-                      onAddEventsFunction={this._onAddFreeEventsFunction}
-                      onEventsFunctionAdded={() => {}}
-                      renderHeader={() => (
-                        <React.Fragment>
-                          <Line justifyContent="center">
-                            <FlatButton
-                              label={<Trans>Edit extension options</Trans>}
-                              primary
-                              onClick={() => this._editOptions()}
-                            />
-                          </Line>
-                          <Divider />
-                        </React.Fragment>
-                      )}
-                    />
-                  </MosaicWindow>
-                ),
-                'behavior-functions-list': selectedEventsBasedBehavior ? (
-                  <MosaicWindow
-                    title={<Trans>Behavior functions</Trans>}
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                    selectedEventsFunction={selectedEventsFunction}
-                  >
-                    <EventsFunctionsList
-                      project={project}
-                      eventsFunctionsContainer={selectedEventsBasedBehavior.getEventsFunctions()}
-                      selectedEventsFunction={selectedEventsFunction}
-                      onSelectEventsFunction={selectedEventsFunction =>
-                        this._selectEventsFunction(
-                          selectedEventsFunction,
-                          selectedEventsBasedBehavior
-                        )
-                      }
-                      onDeleteEventsFunction={this._onDeleteEventsFunction}
-                      canRename={(eventsFunction: gdEventsFunction) => {
-                        return !isBehaviorLifecycleFunction(
-                          eventsFunction.getName()
-                        );
-                      }}
-                      onRenameEventsFunction={(
-                        eventsFunction: gdEventsFunction,
-                        newName: string,
-                        done: boolean => void
-                      ) =>
-                        this._makeRenameBehaviorEventsFunction(i18n)(
-                          selectedEventsBasedBehavior,
-                          eventsFunction,
-                          newName,
-                          done
-                        )
-                      }
-                      onAddEventsFunction={this._onAddBehaviorEventsFunction}
-                      onEventsFunctionAdded={eventsFunction =>
-                        this._onBehaviorEventsFunctionAdded(
-                          selectedEventsBasedBehavior,
-                          eventsFunction
-                        )
-                      }
-                      renderHeader={() => (
-                        <React.Fragment>
-                          <Line justifyContent="center">
-                            <FlatButton
-                              label={<Trans>Edit behavior properties</Trans>}
-                              primary
-                              onClick={() =>
-                                this._editBehavior(selectedEventsBasedBehavior)
-                              }
-                            />
-                          </Line>
-                          <Divider />
-                        </React.Fragment>
-                      )}
-                    />
-                  </MosaicWindow>
-                ) : (
-                  <Background>
-                    <EmptyMessage>
-                      <Trans>
-                        Select a behavior to display the functions inside this
-                        behavior.
-                      </Trans>
-                    </EmptyMessage>
-                  </Background>
-                ),
-
-                'behaviors-list': (
-                  <MosaicWindow
-                    title={<Trans>Behaviors</Trans>}
-                    toolbarControls={[]}
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                  >
-                    <EventsBasedBehaviorsList
-                      project={project}
-                      eventsBasedBehaviorsList={eventsFunctionsExtension.getEventsBasedBehaviors()}
-                      selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                      onSelectEventsBasedBehavior={
-                        this._selectEventsBasedBehavior
-                      }
-                      onDeleteEventsBasedBehavior={
-                        this._onDeleteEventsBasedBehavior
-                      }
-                      onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
-                        i18n
-                      )}
-                      onEventsBasedBehaviorRenamed={
-                        this._onEventsBasedBehaviorRenamed
-                      }
-                      onEditProperties={this._editBehavior}
-                    />
-                  </MosaicWindow>
-                ),
-              }}
-              initialNodes={{
-                direction: 'row',
-                first: {
-                  direction: 'column',
-                  first: 'free-functions-list',
-                  second: 'behaviors-list',
-                  splitPercentage: 50,
-                },
-                second: {
-                  direction: 'column',
-                  first: 'parameters',
-                  second: 'events-sheet',
-                  splitPercentage: 25,
-                },
-                splitPercentage: 25,
-              }}
-            />
-            {editOptionsDialogOpen && (
-              <OptionsEditorDialog
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                open
-                onClose={() => this._editOptions(false)}
+    const editors = {
+      'choose-editor': {
+        type: 'primary',
+        noTitleBar: true,
+        renderEditor: () => (
+          <ChooseEventsFunctionsExtensionEditor
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onEditFreeFunctions={this._openFreeFunctionsListEditor}
+            onEditBehaviors={this._openBehaviorsListEditor}
+            onEditExtensionOptions={this._editOptions}
+          />
+        ),
+      },
+      parameters: {
+        type: 'primary',
+        title: t`Function Configuration`,
+        toolbarControls: [],
+        renderEditor: () => (
+          <Background>
+            {selectedEventsFunction &&
+            this._globalObjectsContainer &&
+            this._objectsContainer ? (
+              <EventsFunctionConfigurationEditor
+                project={project}
+                eventsFunction={selectedEventsFunction}
+                eventsBasedBehavior={selectedEventsBasedBehavior}
+                globalObjectsContainer={this._globalObjectsContainer}
+                objectsContainer={this._objectsContainer}
+                helpPagePath={
+                  !!selectedEventsBasedBehavior
+                    ? '/behaviors/events-based-behaviors'
+                    : '/events/functions'
+                }
+                onParametersOrGroupsUpdated={() => {
+                  this._loadEventsFunctionFrom(project, selectedEventsFunction);
+                  this.forceUpdate();
+                }}
+                unsavedChanges={this.props.unsavedChanges}
+              />
+            ) : (
+              <EmptyMessage>
+                <Trans>
+                  Choose a function, or a function of a behavior, to set the
+                  parameters that it accepts.
+                </Trans>
+              </EmptyMessage>
+            )}
+          </Background>
+        ),
+      },
+      'events-sheet': {
+        type: 'primary',
+        noTitleBar: true,
+        renderEditor: () =>
+          selectedEventsFunction &&
+          this._globalObjectsContainer &&
+          this._objectsContainer ? (
+            <Background>
+              <EventsSheet
+                key={selectedEventsFunction.ptr}
+                ref={editor => (this.editor = editor)}
+                project={project}
+                scope={{
+                  layout: null,
+                  eventsFunctionsExtension,
+                  eventsBasedBehavior: selectedEventsBasedBehavior,
+                  eventsFunction: selectedEventsFunction,
+                }}
+                globalObjectsContainer={this._globalObjectsContainer}
+                objectsContainer={this._objectsContainer}
+                events={selectedEventsFunction.getEvents()}
+                onOpenExternalEvents={() => {}}
+                onOpenLayout={() => {}}
+                resourceSources={this.props.resourceSources}
+                onChooseResource={this.props.onChooseResource}
+                resourceExternalEditors={this.props.resourceExternalEditors}
+                openInstructionOrExpression={
+                  this.props.openInstructionOrExpression
+                }
+                setToolbar={this.props.setToolbar}
+                onCreateEventsFunction={this.props.onCreateEventsFunction}
+                onOpenSettings={this._editOptions}
+                unsavedChanges={this.props.unsavedChanges}
+              />
+            </Background>
+          ) : (
+            <Background>
+              <EmptyMessage>
+                <Trans>
+                  Choose a function, or a function of a behavior, to edit its
+                  events.
+                </Trans>
+              </EmptyMessage>
+            </Background>
+          ),
+      },
+      'free-functions-list': {
+        type: 'primary',
+        title: t`Functions`,
+        toolbarControls: [],
+        renderEditor: () => (
+          <I18n>
+            {({ i18n }) => (
+              <EventsFunctionsList
+                project={project}
+                eventsFunctionsContainer={eventsFunctionsExtension}
+                selectedEventsFunction={selectedEventsFunction}
+                onSelectEventsFunction={selectedEventsFunction =>
+                  this._selectEventsFunction(selectedEventsFunction, null)
+                }
+                onDeleteEventsFunction={this._onDeleteEventsFunction}
+                canRename={(eventsFunction: gdEventsFunction) => {
+                  return !isExtensionLifecycleEventsFunction(
+                    eventsFunction.getName()
+                  );
+                }}
+                onRenameEventsFunction={this._makeRenameFreeEventsFunction(
+                  i18n
+                )}
+                onAddEventsFunction={this._onAddFreeEventsFunction}
+                onEventsFunctionAdded={() => {}}
+                renderHeader={() => (
+                  <React.Fragment>
+                    <Line justifyContent="center">
+                      <FlatButton
+                        label={<Trans>Edit extension options</Trans>}
+                        primary
+                        onClick={() => this._editOptions()}
+                      />
+                    </Line>
+                    <Divider />
+                  </React.Fragment>
+                )}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
-            {behaviorMethodSelectorDialogOpen &&
-              selectedEventsBasedBehavior && (
-                <BehaviorMethodSelectorDialog
-                  eventsBasedBehavior={selectedEventsBasedBehavior}
-                  onCancel={() =>
-                    this._onCloseBehaviorMethodSelectorDialog(false, null)
+          </I18n>
+        ),
+      },
+      'behavior-functions-list': {
+        type: 'primary',
+        title: t`Behavior functions`,
+        renderEditor: () =>
+          selectedEventsBasedBehavior ? (
+            <I18n>
+              {({ i18n }) => (
+                <EventsFunctionsList
+                  project={project}
+                  eventsFunctionsContainer={selectedEventsBasedBehavior.getEventsFunctions()}
+                  selectedEventsFunction={selectedEventsFunction}
+                  onSelectEventsFunction={selectedEventsFunction =>
+                    this._selectEventsFunction(
+                      selectedEventsFunction,
+                      selectedEventsBasedBehavior
+                    )
                   }
-                  onChoose={name =>
-                    this._onCloseBehaviorMethodSelectorDialog(true, name)
+                  onDeleteEventsFunction={this._onDeleteEventsFunction}
+                  canRename={(eventsFunction: gdEventsFunction) => {
+                    return !isBehaviorLifecycleEventsFunction(
+                      eventsFunction.getName()
+                    );
+                  }}
+                  onRenameEventsFunction={(
+                    eventsFunction: gdEventsFunction,
+                    newName: string,
+                    done: boolean => void
+                  ) =>
+                    this._makeRenameBehaviorEventsFunction(i18n)(
+                      selectedEventsBasedBehavior,
+                      eventsFunction,
+                      newName,
+                      done
+                    )
                   }
+                  onAddEventsFunction={this._onAddBehaviorEventsFunction}
+                  onEventsFunctionAdded={eventsFunction =>
+                    this._onBehaviorEventsFunctionAdded(
+                      selectedEventsBasedBehavior,
+                      eventsFunction
+                    )
+                  }
+                  renderHeader={() => (
+                    <React.Fragment>
+                      <Line justifyContent="center">
+                        <FlatButton
+                          label={<Trans>Edit behavior properties</Trans>}
+                          primary
+                          onClick={() =>
+                            this._editBehavior(selectedEventsBasedBehavior)
+                          }
+                        />
+                      </Line>
+                      <Divider />
+                    </React.Fragment>
+                  )}
+                  unsavedChanges={this.props.unsavedChanges}
                 />
               )}
-            {editedEventsBasedBehavior && (
-              <EventsBasedBehaviorEditorDialog
+            </I18n>
+          ) : (
+            <Background>
+              <EmptyMessage>
+                <Trans>
+                  Select a behavior to display the functions inside this
+                  behavior.
+                </Trans>
+              </EmptyMessage>
+            </Background>
+          ),
+      },
+
+      'behaviors-list': {
+        type: 'secondary',
+        title: t`Behaviors`,
+        toolbarControls: [],
+        renderEditor: () => (
+          <I18n>
+            {({ i18n }) => (
+              <EventsBasedBehaviorsList
                 project={project}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedBehavior={editedEventsBasedBehavior}
-                onApply={() => this._editBehavior(null)}
-                onRenameProperty={(oldName, newName) =>
-                  this._onBehaviorPropertyRenamed(
-                    editedEventsBasedBehavior,
-                    oldName,
-                    newName
-                  )
+                eventsBasedBehaviorsList={eventsFunctionsExtension.getEventsBasedBehaviors()}
+                selectedEventsBasedBehavior={selectedEventsBasedBehavior}
+                onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}
+                onDeleteEventsBasedBehavior={this._onDeleteEventsBasedBehavior}
+                onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
+                  i18n
+                )}
+                onEventsBasedBehaviorRenamed={
+                  this._onEventsBasedBehaviorRenamed
                 }
+                onEditProperties={this._editBehavior}
+                unsavedChanges={this.props.unsavedChanges}
               />
             )}
-          </React.Fragment>
+          </I18n>
+        ),
+      },
+    };
+
+    return (
+      <React.Fragment>
+        <ResponsiveWindowMeasurer>
+          {windowWidth =>
+            windowWidth === 'small' ? (
+              <EditorNavigator
+                ref={editorNavigator =>
+                  (this._editorNavigator = editorNavigator)
+                }
+                editors={editors}
+                initialEditorName={'choose-editor'}
+                transitions={{
+                  'behaviors-list': {
+                    previousEditor: 'choose-editor',
+                  },
+                  'behavior-functions-list': {
+                    previousEditor: 'behaviors-list',
+                  },
+                  'free-functions-list': {
+                    previousEditor: 'choose-editor',
+                  },
+                  'events-sheet': {
+                    nextIcon: <Tune />,
+                    nextLabel: <Trans>Parameters</Trans>,
+                    nextEditor: 'parameters',
+                    previousEditor: () => {
+                      if (selectedEventsBasedBehavior)
+                        return 'behavior-functions-list';
+                      return 'free-functions-list';
+                    },
+                  },
+                  parameters: {
+                    nextIcon: <Check />,
+                    nextLabel: <Trans>Validate these parameters</Trans>,
+                    nextEditor: 'events-sheet',
+                  },
+                }}
+                onEditorChanged={
+                  // It's important that this callback is the same across renders,
+                  // to avoid confusing EditorNavigator into thinking it's changed
+                  // and immediately calling it, which would trigger an infinite loop.
+                  // Search for "callback-prevent-infinite-rerendering" in the codebase.
+                  this._onEditorNavigatorEditorChanged
+                }
+              />
+            ) : (
+              <PreferencesContext.Consumer>
+                {({
+                  getDefaultEditorMosaicNode,
+                  setDefaultEditorMosaicNode,
+                }) => (
+                  <EditorMosaic
+                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    editors={editors}
+                    onPersistNodes={node =>
+                      setDefaultEditorMosaicNode(
+                        'events-functions-extension-editor',
+                        node
+                      )
+                    }
+                    initialNodes={
+                      getDefaultEditorMosaicNode(
+                        'events-functions-extension-editor'
+                      ) || initialMosaicEditorNodes
+                    }
+                  />
+                )}
+              </PreferencesContext.Consumer>
+            )
+          }
+        </ResponsiveWindowMeasurer>
+        {editOptionsDialogOpen && (
+          <OptionsEditorDialog
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            open
+            onClose={() => this._editOptions(false)}
+          />
         )}
-      </I18n>
+        {behaviorMethodSelectorDialogOpen && selectedEventsBasedBehavior && (
+          <BehaviorMethodSelectorDialog
+            eventsBasedBehavior={selectedEventsBasedBehavior}
+            onCancel={() => this._onCloseBehaviorMethodSelectorDialog(null)}
+            onChoose={parameters =>
+              this._onCloseBehaviorMethodSelectorDialog(parameters)
+            }
+          />
+        )}
+        {extensionFunctionSelectorDialogOpen && eventsFunctionsExtension && (
+          <ExtensionFunctionSelectorDialog
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onCancel={() => this._onCloseExtensionFunctionSelectorDialog(null)}
+            onChoose={parameters =>
+              this._onCloseExtensionFunctionSelectorDialog(parameters)
+            }
+          />
+        )}
+        {editedEventsBasedBehavior && (
+          <EventsBasedBehaviorEditorDialog
+            project={project}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedBehavior={editedEventsBasedBehavior}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._editBehavior(null);
+            }}
+            onRenameProperty={(oldName, newName) =>
+              this._onBehaviorPropertyRenamed(
+                editedEventsBasedBehavior,
+                oldName,
+                newName
+              )
+            }
+          />
+        )}
+      </React.Fragment>
     );
   }
 }

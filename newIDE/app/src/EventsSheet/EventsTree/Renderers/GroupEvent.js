@@ -1,17 +1,23 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField from 'material-ui/TextField';
+import TextField from '../../../UI/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
   disabledText,
 } from '../ClassNames';
-import { type EventRendererProps } from './EventRenderer.flow';
-const gd = global.gd;
+import { type EventRendererProps } from './EventRenderer';
+import {
+  shouldActivate,
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { Trans } from '@lingui/macro';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -23,6 +29,7 @@ const styles = {
   },
   title: {
     fontSize: 18,
+    width: '100%',
   },
 };
 
@@ -69,12 +76,18 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.edit();
+          }
+        }}
+        tabIndex={0}
       >
         {this.state.editing ? (
           <TextField
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
-            hintText={<Trans>&lt;Enter group name&gt;</Trans>}
+            hintText={t`<Enter group name>`}
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);
@@ -90,6 +103,16 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             }}
             fullWidth
             id="group-title"
+            onKeyUp={event => {
+              if (shouldCloseOrCancel(event)) {
+                this.endEditing();
+              }
+            }}
+            onKeyPress={event => {
+              if (shouldValidate(event)) {
+                this.endEditing();
+              }
+            }}
           />
         ) : (
           <span
@@ -99,7 +122,11 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             })}
             style={{ ...styles.title, color: textColor }}
           >
-            {groupEvent.getName() || '<Enter group name>'}
+            {groupEvent.getName() ? (
+              groupEvent.getName()
+            ) : (
+              <Trans>{`<Enter group name>`}</Trans>
+            )}
           </span>
         )}
       </div>

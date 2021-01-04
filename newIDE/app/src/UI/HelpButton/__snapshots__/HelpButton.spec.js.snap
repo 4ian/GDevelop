@@ -2,75 +2,35 @@
 
 exports[`HelpButton renders nothing if the helpPagePath is empty 1`] = `null`;
 
-exports[`HelpButton renders the button linking to a help page 1`] = `
+exports[`HelpButton renders nothing if the helpPagePath is not a valid URL or path 1`] = `null`;
+
+exports[`HelpButton renders the button linking to a GDevelop documentation help page 1`] = `
 <button
+  className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSizeSmall MuiButton-sizeSmall"
   disabled={false}
   onBlur={[Function]}
   onClick={[Function]}
+  onDragLeave={[Function]}
   onFocus={[Function]}
   onKeyDown={[Function]}
   onKeyUp={[Function]}
-  onMouseEnter={[Function]}
+  onMouseDown={[Function]}
   onMouseLeave={[Function]}
+  onMouseUp={[Function]}
+  onTouchEnd={[Function]}
+  onTouchMove={[Function]}
   onTouchStart={[Function]}
-  style={
-    Object {
-      "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
-      "backgroundColor": "rgba(0, 0, 0, 0)",
-      "border": 10,
-      "borderRadius": 2,
-      "boxSizing": "border-box",
-      "color": "rgba(0, 0, 0, 0.87)",
-      "cursor": "pointer",
-      "display": "inline-block",
-      "fontFamily": "Roboto, sans-serif",
-      "fontSize": "inherit",
-      "fontWeight": "inherit",
-      "height": 36,
-      "lineHeight": "36px",
-      "margin": 0,
-      "minWidth": 88,
-      "muiPrepared": true,
-      "outline": "none",
-      "overflow": "hidden",
-      "padding": 0,
-      "position": "relative",
-      "textAlign": "center",
-      "textDecoration": "none",
-      "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-      "userSelect": "none",
-      "verticalAlign": null,
-    }
-  }
   tabIndex={0}
   target="_blank"
   type="button"
 >
-  <div
-    onMouseDown={[Function]}
-    onMouseLeave={[Function]}
-    onMouseUp={[Function]}
-    onTouchEnd={[Function]}
-    onTouchStart={[Function]}
+  <span
+    className="MuiButton-label"
   >
     <svg
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      style={
-        Object {
-          "color": "rgba(0, 0, 0, 0.87)",
-          "display": "inline-block",
-          "fill": "rgba(0, 0, 0, 0.87)",
-          "height": 24,
-          "marginLeft": 12,
-          "marginRight": 0,
-          "muiPrepared": true,
-          "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-          "userSelect": "none",
-          "verticalAlign": "middle",
-          "width": 24,
-        }
-      }
+      aria-hidden={true}
+      className="MuiSvgIcon-root"
+      focusable="false"
       viewBox="0 0 24 24"
     >
       <path
@@ -80,20 +40,13 @@ exports[`HelpButton renders the button linking to a help page 1`] = `
     <span
       style={
         Object {
-          "fontSize": 14,
-          "fontWeight": 500,
-          "letterSpacing": 0,
-          "muiPrepared": true,
-          "paddingLeft": 8,
-          "paddingRight": 16,
-          "position": "relative",
-          "textTransform": "uppercase",
-          "verticalAlign": "middle",
+          "flexShrink": 0,
+          "height": 4,
+          "width": 4,
         }
       }
-    >
-      Help
-    </span>
-  </div>
+    />
+    Help
+  </span>
 </button>
 `;

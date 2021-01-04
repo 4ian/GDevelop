@@ -51,6 +51,7 @@ gdjs.Profiler.prototype.begin = function(sectionName) {
   this._currentSection.lastStartTime = this._getTimeNow();
 };
 
+/** @param {string=} sectionName */
 gdjs.Profiler.prototype.end = function(sectionName) {
   // Stop the timer
   var sectionTime = this._getTimeNow() - this._currentSection.lastStartTime;
@@ -144,8 +145,8 @@ gdjs.Profiler.prototype.getStats = function() {
  * Useful for ingame profiling.
  *
  * @param {string} sectionName The name of the section
- * @param {s} profilerSection The section measures
- * @param {*} outputs The array where to push the results
+ * @param {any} profilerSection The section measures
+ * @param {any} outputs The array where to push the results
  */
 gdjs.Profiler.getProfilerSectionTexts = function(
   sectionName,

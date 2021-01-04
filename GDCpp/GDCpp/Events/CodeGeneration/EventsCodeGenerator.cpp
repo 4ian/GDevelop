@@ -542,7 +542,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
   output += codeGenerator.GetCustomCodeOutsideMain() +
             "\n"
             "extern \"C\" int GDSceneEvents" +
-            gd::SceneNameMangler::GetMangledSceneName(scene.GetName()) +
+            gd::SceneNameMangler::Get()->GetMangledSceneName(scene.GetName()) +
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
             "runtimeContext->StartNewFrame();\n" + wholeEventsCode +

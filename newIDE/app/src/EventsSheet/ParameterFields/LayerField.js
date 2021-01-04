@@ -2,10 +2,12 @@
 import React, { Component } from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
 
 export default class LayerField extends Component<ParameterFieldProps, {||}> {
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   focus() {
     if (this._field) this._field.focus();
@@ -23,14 +25,20 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
+        fullWidth
         value={value}
         onChange={onChange}
+        onRequestClose={this.props.onRequestClose}
         openOnFocus={isInline}
         dataSource={layerNames.map(layerName => ({
-          text: layerName || '(Base layer)',
+          text: layerName ? `"${layerName}"` : '"" (Base layer)',
           value: `"${layerName}"`,
         }))}
         hintText={'""'}

@@ -1,0 +1,38 @@
+/* This is the styling applied to large tables (like the one used for InstancesList).
+ * It mimics the Material UI Tables style. */
+
+.gd-table {
+  /* Use the fonts provided by the operating system(s) as possible. */
+  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+  font-family: var(--gdevelop-font-family);
+  color: var(--table-text-color);
+}
+
+.gd-table .tableHeaderRow,
+.gd-table .tableEvenRow,
+.gd-table .tableSelectedRow,
+.gd-table .tableOddRow {
+  font-size: 13px;
+  border-bottom: 1px solid var(--table-border-color);
+}
+.gd-table .tableOddRow {
+  background-color: var(--table-row-odd-background-color);
+}
+.gd-table .tableEvenRow {
+  background-color: var(--table-row-even-background-color);
+}
+.gd-table .tableSelectedRow {
+  background-color: var(--table-row-selected-background-color); /*OS X selection*/
+  color: var(--table-row-selected-color);
+}
+.gd-table .tableHeaderColumn {
+  text-transform: none;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--table-text-color-header);
+}
+.gd-table .tableColumn {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

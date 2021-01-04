@@ -1,9 +1,10 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
-import Add from 'material-ui/svg-icons/content/add';
-import IconButton from 'material-ui/IconButton';
+import Add from '@material-ui/icons/Add';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import ImageThumbnail, {
@@ -22,7 +23,9 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
-const gd = global.gd;
+import FlatButton from '../../../UI/FlatButton';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+const gd: libGDevelop = global.gd;
 const path = require('path');
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -35,10 +38,6 @@ const styles = {
   thumbnailExtraStyle: {
     marginRight: 10,
   },
-  addSpriteButton: {
-    ...thumbnailContainerStyle,
-    background: '#FFF',
-  },
   spriteThumbnailImage: {
     maxWidth: SPRITE_SIZE,
     maxHeight: SPRITE_SIZE,
@@ -48,11 +47,22 @@ const styles = {
 
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
-    <div style={styles.addSpriteButton}>
-      <IconButton onClick={onAdd} style={styles.spriteThumbnailImage}>
-        <Add />
-      </IconButton>
-    </div>
+    <ThemeConsumer>
+      {muiTheme => (
+        <div
+          style={{
+            ...thumbnailContainerStyle,
+            backgroundColor: muiTheme.list.itemsBackgroundColor,
+          }}
+        >
+          <FlatButton
+            onClick={onAdd}
+            label={<Trans>Add</Trans>}
+            icon={<Add />}
+          />
+        </div>
+      )}
+    </ThemeConsumer>
   );
 });
 
@@ -255,7 +265,7 @@ export default class SpritesList extends Component<Props, void> {
         isLooping: direction.isLooping(),
         externalEditorData,
       },
-      onChangesSaved: (resources, newAnimationName, metadata) => {
+      onChangesSaved: resources => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -263,7 +273,10 @@ export default class SpritesList extends Component<Props, void> {
           const sprite = new gd.Sprite();
           sprite.setImageName(resource.name);
           // Restore collision masks and points
-          if (resource.originalIndex !== undefined) {
+          if (
+            resource.originalIndex !== undefined &&
+            resource.originalIndex !== null
+          ) {
             const originalSprite = direction.getSprite(resource.originalIndex);
             copySpritePoints(originalSprite, sprite);
             copySpritePolygons(originalSprite, sprite);
@@ -280,16 +293,16 @@ export default class SpritesList extends Component<Props, void> {
         });
 
         // set metadata if there is such on the direction
-        if (metadata) {
-          newDirection.setMetadata(JSON.stringify(metadata));
+        if (resources[0].metadata) {
+          newDirection.setMetadata(JSON.stringify(resources[0].metadata));
         }
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
         // Set optional animation name if the user hasn't done so
-        if (animationName.length === 0) {
-          onChangeName(newAnimationName);
+        if (resources[0].newAnimationName) {
+          onChangeName(resources[0].newAnimationName);
         }
         newDirection.delete();
       },

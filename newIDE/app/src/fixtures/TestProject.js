@@ -1,10 +1,44 @@
+// @flow
+
+/*::
+export type TestProject = {|
+  project: gdProject,
+  shapePainterObject: any,
+  textObject: any,
+  tiledSpriteObject: any,
+  panelSpriteObject: any,
+  spriteObject: gdSpriteObject,
+  spriteObjectWithBehaviors: gdSpriteObject,
+  testLayout: gdLayout,
+  group1: gdObjectGroup,
+  group2: gdObjectGroup,
+  testLayoutInstance1: gdInitialInstance,
+  testInstruction: gdInstruction,
+  testExternalEvents1: gdExternalEvents,
+  testExternalEvents2: gdExternalEvents,
+  emptyLayout: gdLayout,
+  emptyEventsList: gdEventsList,
+  testEventsFunction: gdEventsFunction,
+  testEventsFunctionsExtension: gdEventsFunctionsExtension,
+  testSerializedEvents: Object,
+  testSerializedEventsWithLotsOfObjects: Object,
+  testEventsBasedBehavior: gdEventsBasedBehavior,
+  testEmptyEventsBasedBehavior: gdEventsBasedBehavior,
+  testBehaviorEventsFunction: gdEventsFunction,
+  testBehaviorLifecycleEventsFunction: gdEventsFunction,
+  layerWithEffects: gdLayer,
+  layerWithEffectWithoutEffectType: gdLayer,
+  layerWithoutEffects: gdLayer,
+|};
+*/
+
 /**
  * Create a dummy project using libGD.js filled with a
  * few elements that can be used for testing.
  *
  * @param gd The GD instance to use to create the project.
  */
-export const makeTestProject = gd => {
+export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create and expose a game project
   const project = gd.ProjectHelper.createNewGDJSProject();
 
@@ -161,22 +195,22 @@ export const makeTestProject = gd => {
   var evt = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-  var evt2 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
-  var evt3 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 2);
-  var evt4 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::While', 3);
-  var evt5 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 4);
   var evt6 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Group', 5);
-  var evt7 = testLayout
+  testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 6);
   var evt8 = testLayout
@@ -315,6 +349,9 @@ export const makeTestProject = gd => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Empty events list
+  const emptyEventsList = new gd.EventsList();
+
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
     'TestExt',
@@ -443,6 +480,30 @@ export const makeTestProject = gd => {
     'This is a test events based behavior, without any functions.'
   );
 
+  // Create a layer with some effects
+  const layerWithEffects = new gd.Layer();
+
+  const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
+  const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
+  const effect3 = layerWithEffects.insertNewEffect('MyEffect3', 1);
+
+  effect1.setEffectType('FakeSepia');
+  effect1.setDoubleParameter('opacity', 0.6);
+  effect2.setEffectType('FakeNight');
+  effect2.setDoubleParameter('intensity', 0.1);
+  effect2.setDoubleParameter('opacity', 0.2);
+  effect3.setEffectType('FakeEffectWithVariousParameters');
+  effect3.setDoubleParameter('intensity', 0.1);
+  effect3.setStringParameter('image', 'my-image');
+
+  const layerWithEffectWithoutEffectType = new gd.Layer();
+  layerWithEffectWithoutEffectType.insertNewEffect(
+    'MyEffectWithoutEffectType',
+    0
+  );
+
+  const layerWithoutEffects = new gd.Layer();
+
   return {
     project,
     shapePainterObject,
@@ -459,6 +520,7 @@ export const makeTestProject = gd => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
+    emptyEventsList,
     testEventsFunction,
     testEventsFunctionsExtension,
     testSerializedEvents,
@@ -467,5 +529,8 @@ export const makeTestProject = gd => {
     testEmptyEventsBasedBehavior,
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
+    layerWithEffects,
+    layerWithEffectWithoutEffectType,
+    layerWithoutEffects,
   };
 };

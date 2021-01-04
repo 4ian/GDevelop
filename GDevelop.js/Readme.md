@@ -1,43 +1,39 @@
 # GDevelop.js
 
-This is a port of some parts of **GDevelop** to Javascript using **[Emscripten]**.
+This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
-GDevelop is a full featured, cross-platform, open-source game creator software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
+> 🎮 GDevelop is a full featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
 
 ## How to build
 
-- Make sure you have [CMake 3.5+](http://www.cmake.org/)
+> 👋 Usually if you're working on GDevelop editor or extensions in JavaScript, you don't need rebuilding GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
+
+- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](nodejs.org/) installed.
 
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
-```shell
-git clone https://github.com/juj/emsdk.git
-cd emsdk
-./emsdk update
-./emsdk install sdk-1.37.37-64bit
-./emsdk activate sdk-1.37.37-64bit
-source ./emsdk_env.sh
-```
-
-(on Windows run `emsdk` instead of `./emsdk`, and `emsdk_env.bat` instead of `source ./emsdk_env.sh`. For up-to-date information, check again [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)).
-
-- Make sure you have Node.js installed and grunt:
-
-```shell
-    npm install -g grunt-cli
-```
+| Linux/macOS                                  | Windows                                      |
+| -------------------------------------------- | -------------------------------------------- |
+| `git clone https://github.com/juj/emsdk.git` | `git clone https://github.com/juj/emsdk.git` |
+| `cd emsdk`                                   | `cd emsdk`                                   |
+| `./emsdk update`                             | `emsdk update`                               |
+| `./emsdk install 1.39.6`                     | `emsdk install 1.39.6`                       |
+| `./emsdk activate 1.39.6`                    | `emsdk activate 1.39.6`                      |
+| `source ./emsdk_env.sh`                      | `emsdk_env.bat`                              |
 
 - Launch the build from GDevelop.js folder:
 
 ```shell
     cd GDevelop.js
     npm install
-    npm run build
+    npm run build -- --dev
 ```
 
-Output is created in _/path/to/GD/Binaries/Output/libGD.js/_.
+> ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
 
-- You can then launch GDevelop 5 that will use your build of Gdevelop.js:
+> ⏱ The linking (last step) of the build can be very long when `-- --dev` is not specified, so be sure to include it. Only remove it if you are about to deploy a new version.
+
+- You can then launch GDevelop 5 that will use your build of GDevelop.js:
 
 ```shell
     cd ..
@@ -56,19 +52,16 @@ npm test
 
 ### About the internal steps of compilation
 
-The grunt _build_ task:
+The npm _build_ task:
 
-- create `Binaries/embuild` directory,
-- patch SFML `Config.hpp` file to make Emscripten recognized as a linux target,
-- launch CMake inside to compile GDevelop with _Emscripten toolchain file_,
-- update the glue.cpp and glue.js from Bindings.idl using _Emscripten WebIDL Binder_,
-- launch the compilation with _make_ and wrap the generated `libGD.js.raw` into the final `libGD.js` file.
+- Creates `Binaries/embuild` directory,
+- Launches CMake inside to compile GDevelop with _emconfigure_ to use Emscripten toolchain,
+- Updates the glue.cpp and glue.js from Bindings.idl using _Emscripten WebIDL Binder_,
+- Launches the compilation with `make` (or `ninja` on Windows with CMake 3.17+) (you can also compile using MinGW-32 using `npm run build-with-MinGW`).
 
-It also create a compressed `libGD.js.gz` file which is handy for distributing the library pre-compressed to web browsers.
+See the [CMakeLists.txt](./CMakeLists.txt) for the arguments passed to the Emscripten linker.
 
 ## Documentation
 
-- The file [Bindings.idl](https://github.com/4ian/GDevelop.js/blob/master/Bindings/Bindings.idl) describes all the classes available in GDevelop.js.
-- Refer to [GDevelop documentation](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/) for detailed documentation of the original C++ classes.
-
-[emscripten]: https://github.com/kripken/emscripten
+- The file [Bindings.idl](https://github.com/4ian/GDevelop/blob/master/GDevelop.js/Bindings/Bindings.idl) describes all the classes available in GDevelop.js.
+- Refer to [GDevelop documentation](https://docs.gdevelop-app.com/GDCore%20Documentation/) for detailed documentation of the original C++ classes.

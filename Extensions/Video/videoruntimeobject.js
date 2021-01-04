@@ -1,4 +1,17 @@
 /**
+ * @typedef {Object} VideoObjectDataType The initial properties for {@link gdjs.VideoRuntimeObject}
+ * @property {Object} content The base parameters of the video
+ * @property {number} content.opacity The opacity of the video
+ * @property {boolean} content.loop Does the video loops itself?
+ * @property {number} content.volume The volume of the video
+ * @property {string} content.videoResource Name of the resource corresponding to the video
+ */
+
+/**
+ * @typedef {ObjectData & VideoObjectDataType} VideoObjectData
+ */
+
+/**
  * An object displaying a video on screen.
  *
  * For the same video resource, only one video is being created in memory (
@@ -6,42 +19,71 @@
  * video will have the same state for this video (paused/playing, current time,
  * volume, etc...).
  *
- * @memberof gdjs
+ * @memberOf gdjs
  * @class VideoRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {VideoObjectData} videoObjectData The data defining the object
  */
-gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
-  gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+gdjs.VideoRuntimeObject = function(runtimeScene, videoObjectData) {
+  gdjs.RuntimeObject.call(this, runtimeScene, videoObjectData);
 
-  /** @type number */
-  this._opacity = objectData.content.opacity;
-  /** @type boolean */
-  this._loop = objectData.content.loop;
-  /** @type number */
-  this._volume = objectData.content.volume;
-  /** @type string */
-  this._videoResource = objectData.content.videoResource;
+  /** @type {number} */
+  this._opacity = videoObjectData.content.opacity;
+  /** @type {boolean} */
+  this._loop = videoObjectData.content.loop;
+  /** @type {number} */
+  this._volume = videoObjectData.content.volume;
+  /** @type {string} */
+  this._videoResource = videoObjectData.content.videoResource;
 
   // Use a boolean to track if the video was paused because we
   // navigated to another scene, and so should resume if we're back.
-  /** @type boolean */
+  /** @type {boolean} */
   this._pausedAsScenePaused = false;
 
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
-  else this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+  /** @type {gdjs.VideoRuntimeObjectRenderer} */ else
+    this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+
+  // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+  this.onCreated();
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject";
+gdjs.registerObject('Video::VideoObject', gdjs.VideoRuntimeObject);
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
 
 /**
+ * @param {VideoObjectData} oldObjectData
+ * @param {VideoObjectData} newObjectData
+ */
+gdjs.VideoRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+  if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
+    this.setOpacity(newObjectData.content.opacity);
+  }
+  if (oldObjectData.content.loop !== newObjectData.content.loop) {
+    this.setLoop(newObjectData.content.loop);
+  }
+  if (oldObjectData.content.volume !== newObjectData.content.volume) {
+    this.setVolume(newObjectData.content.volume);
+  }
+
+  if (oldObjectData.content.videoResource !== newObjectData.content.videoResource) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
  * Initialize the extra parameters that could be set for an instance.
  * @private
+ * @param {{customSize: {width: number, height: number}}} initialInstanceData The initial instance data
  */
 gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
@@ -52,10 +94,10 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
   }
 };
 
-gdjs.VideoRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-  gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.VideoRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+  gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-  this._renderer.onOwnerRemovedFromScene();
+  this._renderer.onDestroy();
 };
 
 gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
@@ -100,6 +142,7 @@ gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
 
 /**
  * Get object opacity.
+ * @returns {number} The current opacity
  */
 gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
   return this._opacity;
@@ -123,6 +166,7 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
 
 /**
  * Get the width of the video object.
+ * @returns {number} The current width of the object
  */
 gdjs.VideoRuntimeObject.prototype.getWidth = function() {
   return this._renderer.getWidth();
@@ -130,6 +174,7 @@ gdjs.VideoRuntimeObject.prototype.getWidth = function() {
 
 /**
  * Get the height of the video object.
+ * @returns {number} The current height of the object
  */
 gdjs.VideoRuntimeObject.prototype.getHeight = function() {
   return this._renderer.getHeight();
@@ -137,6 +182,7 @@ gdjs.VideoRuntimeObject.prototype.getHeight = function() {
 
 /**
  * Get if the video object is playing
+ * @returns {boolean} Is the current video playing?
  */
 gdjs.VideoRuntimeObject.prototype.play = function() {
   this._renderer.play();
@@ -144,6 +190,7 @@ gdjs.VideoRuntimeObject.prototype.play = function() {
 
 /**
  * Get if the video object is paused.
+ * @returns {boolean} Is the current video paused?
  */
 gdjs.VideoRuntimeObject.prototype.pause = function() {
   this._renderer.pause();
@@ -167,36 +214,36 @@ gdjs.VideoRuntimeObject.prototype.mute = function(enable) {
 
 /**
  * Return the state muted of video object.
+ * @returns {boolean} Is the video muted?
  */
 gdjs.VideoRuntimeObject.prototype.isMuted = function() {
   return this._renderer.isMuted();
 };
 
 /**
- * Normalize a value between 0 and 100 to a value between 0 and 1.
+ * Normalize a value between `min` and `max` to a value between 0 and 1.
+ * @param {number} val The value to normalize
+ * @param {number} max The maximum
+ * @param {number} min The minimum
+ * @returns {number} The normalized value
  */
 gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
   return (val - min) / (max - min);
 };
 
 /**
- * Restrict the value in the given interval
- */
-gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
-  return val <= min ? min : val >= max ? max : val;
-};
-
-/**
  * Set the volume of the video object.
- * @param {number} volume The new volume.
+ * @param {number} volume The new volume, between 0 and 100.
  */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
-  this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1) * 100;
+  this._volume =
+    gdjs.evtTools.common.clamp(this._normalize(volume, 0, 100), 0, 1) * 100;
   this._renderer.updateVolume();
 };
 
 /**
  * Get the volume of the video object.
+ * @returns {number} The current video's volume, betwenn 0 and 100.
  */
 gdjs.VideoRuntimeObject.prototype.getVolume = function() {
   return this._normalize(this._renderer.getVolume(), 0, 1) * 100;
@@ -204,6 +251,7 @@ gdjs.VideoRuntimeObject.prototype.getVolume = function() {
 
 /**
  * Check if the video is being played.
+ * @returns {boolean} Is the video being played?
  */
 gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
   return this._renderer.isPlayed();
@@ -211,6 +259,7 @@ gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
 
 /**
  * Check if the video is paused.
+ * @returns {boolean} Is the video being paused?
  */
 gdjs.VideoRuntimeObject.prototype.isPaused = function() {
   return !this._renderer.isPlayed();
@@ -218,6 +267,7 @@ gdjs.VideoRuntimeObject.prototype.isPaused = function() {
 
 /**
  * Check if the video is looping.
+ * @returns {boolean} Is the video looping?
  */
 gdjs.VideoRuntimeObject.prototype.isLooped = function() {
   return this._renderer.isLooped();
@@ -225,6 +275,7 @@ gdjs.VideoRuntimeObject.prototype.isLooped = function() {
 
 /**
  * Return the total time of the video.
+ * @returns {number} The duration of the video
  */
 gdjs.VideoRuntimeObject.prototype.getDuration = function() {
   return this._renderer.getDuration();
@@ -232,9 +283,10 @@ gdjs.VideoRuntimeObject.prototype.getDuration = function() {
 
 /**
  * Check if the video has ended.
+ * @returns {boolean} Has the video ended?
  */
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
-  return !this._renderer.isEnded();
+  return this._renderer.isEnded();
 };
 
 /**
@@ -247,6 +299,7 @@ gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(time) {
 
 /**
  * Get the current time of the video object.
+ * @returns {number} The current time of the video
  */
 gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
   return this._renderer.getCurrentTime();
@@ -257,12 +310,13 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
  * @param {number} playbackSpeed The new playback speed.
  */
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
-  this._playbackSpeed = this._clamp(playbackSpeed, 0.5, 2);
+  this._playbackSpeed = gdjs.evtTools.common.clamp(playbackSpeed, 0.5, 2);
   this._renderer.setPlaybackSpeed(this._playbackSpeed);
 };
 
 /**
  * Get the playback speed of the video object.
+ * @returns {number} The current playback speed of the video.
  */
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._renderer.getPlaybackSpeed();
@@ -271,12 +325,8 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
 /**
  * When a scene is unloaded, pause any video being run.
  * TODO: Investigate how to dispose the video source?
- *
- * @private
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(
-  runtimeScene
-) {
+gdjs.registerRuntimeSceneUnloadedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and pause them.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -288,15 +338,12 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(
       }
     }
   }
-};
+});
 
 /**
  * When a scene is paused, pause any video being run.
- * @private
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(
-  runtimeScene
-) {
+gdjs.registerRuntimeScenePausedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and pause them.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -309,15 +356,12 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(
       }
     }
   }
-};
+});
 
 /**
  * When a scene is resumed, resume any video previously paused.
- * @private
  */
-gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(
-  runtimeScene
-) {
+gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
   // Manually find all the gdjs.VideoRuntimeObject living on the scene,
   // and play them if they have been previously paused.
   var instances = runtimeScene.getAdhocListOfAllInstances();
@@ -329,4 +373,4 @@ gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(
       }
     }
   }
-};
+});

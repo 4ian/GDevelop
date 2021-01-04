@@ -5,23 +5,25 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 import { mapVector } from '../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
+import RaisedButton from '../UI/RaisedButton';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import IconMenu from '../UI/Menu/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from 'material-ui/svg-icons/action/visibility';
-import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Add from '@material-ui/icons/Add';
+import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -42,14 +44,17 @@ const validatePropertyName = (
   newName: string
 ) => {
   if (!newName) {
-    showWarningBox(i18n._(t`The name of a property cannot be empty.`));
+    showWarningBox(i18n._(t`The name of a property cannot be empty.`), {
+      delayToNextTick: true,
+    });
     return false;
   }
   if (newName === 'name' || newName === 'type') {
     showWarningBox(
       i18n._(
         t`The name of a property cannot be "name" or "type", as they are used by GDevelop internally.`
-      )
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -57,15 +62,17 @@ const validatePropertyName = (
     showWarningBox(
       i18n._(
         t`This name is already used by another property. Choose a unique name for each property.`
-      )
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
-  if (!gd.Project.validateObjectName(newName)) {
+  if (!gd.Project.validateName(newName)) {
     showWarningBox(
       i18n._(
-        t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your parameter name.`
-      )
+        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -124,8 +131,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                       <MiniToolbar>
                         <Column expand noMargin>
                           <SemiControlledTextField
+                            margin="none"
                             commitOnBlur
-                            hintText={<Trans>Enter the property name</Trans>}
+                            hintText={t`Enter the property name`}
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
@@ -163,13 +171,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
                         />
-                        <IconMenu
-                          iconButtonElement={
+                        <ElementWithMenu
+                          element={
                             <IconButton>
-                              <MoreVertIcon />
+                              <MoreVert />
                             </IconButton>
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
                               click: () =>
@@ -189,90 +197,83 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           ]}
                         />
                       </MiniToolbar>
-                      <Line expand noMargin>
-                        <Column expand>
-                          <SelectField
-                            floatingLabelText={<Trans>Type</Trans>}
-                            value={property.getType()}
-                            onChange={(e, i, value) => {
-                              property.setType(value);
-                              this.forceUpdate();
-                              this.props.onPropertiesUpdated();
-                            }}
-                            fullWidth
-                          >
-                            <MenuItem
-                              value="Number"
-                              primaryText={<Trans>Number</Trans>}
-                            />
-                            <MenuItem
-                              value="String"
-                              primaryText={<Trans>String</Trans>}
-                            />
-                            <MenuItem
-                              value="Boolean"
-                              primaryText={<Trans>Boolean (checkbox)</Trans>}
-                            />
-                          </SelectField>
-                        </Column>
-                        <Column expand>
-                          {(property.getType() === 'String' ||
-                            property.getType() === 'Number') && (
-                            <SemiControlledTextField
-                              commitOnBlur
-                              floatingLabelText={<Trans>Default value</Trans>}
-                              hintText={
-                                property.getType() === 'Number' ? '123' : 'ABC'
-                              }
-                              value={property.getValue()}
-                              onChange={newValue => {
-                                property.setValue(newValue);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated();
-                              }}
-                              fullWidth
-                            />
-                          )}
-                          {property.getType() === 'Boolean' && (
+                      <Line>
+                        <ColumnStackLayout expand>
+                          <ResponsiveLineStackLayout noMargin>
                             <SelectField
-                              floatingLabelText={<Trans>Default value</Trans>}
-                              value={
-                                property.getValue() === 'true'
-                                  ? 'true'
-                                  : 'false'
-                              }
-                              onChange={(e, i, value) => {
-                                property.setValue(value);
+                              floatingLabelText={<Trans>Type</Trans>}
+                              value={property.getType()}
+                              onChange={(e, i, value: string) => {
+                                property.setType(value);
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
                               }}
                               fullWidth
                             >
-                              <MenuItem
-                                value="true"
-                                primaryText={<Trans>True (checked)</Trans>}
+                              <SelectOption
+                                value="Number"
+                                primaryText={t`Number`}
                               />
-                              <MenuItem
-                                value="false"
-                                primaryText={<Trans>False (not checked)</Trans>}
+                              <SelectOption
+                                value="String"
+                                primaryText={t`String`}
+                              />
+                              <SelectOption
+                                value="Boolean"
+                                primaryText={t`Boolean (checkbox)`}
                               />
                             </SelectField>
-                          )}
-                        </Column>
-                      </Line>
-                      <Line expand noMargin>
-                        <Column expand>
+                            {(property.getType() === 'String' ||
+                              property.getType() === 'Number') && (
+                              <SemiControlledTextField
+                                commitOnBlur
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                hintText={
+                                  property.getType() === 'Number'
+                                    ? '123'
+                                    : 'ABC'
+                                }
+                                value={property.getValue()}
+                                onChange={newValue => {
+                                  property.setValue(newValue);
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              />
+                            )}
+                            {property.getType() === 'Boolean' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={
+                                  property.getValue() === 'true'
+                                    ? 'true'
+                                    : 'false'
+                                }
+                                onChange={(e, i, value) => {
+                                  property.setValue(value);
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="true"
+                                  primaryText={t`True (checked)`}
+                                />
+                                <SelectOption
+                                  value="false"
+                                  primaryText={t`False (not checked)`}
+                                />
+                              </SelectField>
+                            )}
+                          </ResponsiveLineStackLayout>
                           <SemiControlledTextField
                             commitOnBlur
                             floatingLabelText={
                               <Trans>Label, shown in the editor</Trans>
                             }
-                            hintText={
-                              <Trans>
-                                This should make the purpose of the property
-                                easy to understand
-                              </Trans>
-                            }
+                            hintText={t`This should make the purpose of the property easy to understand`}
                             floatingLabelFixed
                             value={property.getLabel()}
                             onChange={text => {
@@ -281,7 +282,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             }}
                             fullWidth
                           />
-                        </Column>
+                        </ColumnStackLayout>
                       </Line>
                     </React.Fragment>
                   )
@@ -295,13 +296,16 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                     </Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  <RaisedButton
-                    primary
-                    label={<Trans>Add a property</Trans>}
-                    onClick={this._addProperty}
-                  />
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    <RaisedButton
+                      primary
+                      label={<Trans>Add a property</Trans>}
+                      onClick={this._addProperty}
+                      icon={<Add />}
+                    />
+                  </Line>
+                </Column>
               </div>
             </Line>
           </Column>

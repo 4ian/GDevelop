@@ -10,8 +10,10 @@ export const executableEventContainer = 'executable-event-container';
 export const actionsContainer = 'actions-container';
 export const conditionsContainer = 'conditions-container';
 export const subInstructionsContainer = 'sub-instructions-container';
+export const smallWidthContainer = 'small-width-container';
 export const instructionParameter = 'instruction-parameter';
 export const instructionInvalidParameter = 'instruction-invalid-parameter';
+export const instructionMissingParameter = 'instruction-missing-parameter';
 export const disabledText = 'disabled-text';
 
 export const background = 'background';
@@ -23,3 +25,5 @@ export const dropIndicator = 'drop-indicator';
 export const cantDropIndicator = 'cant-drop-indicator';
 
 export const linkContainer = 'link-container';
+
+export const nameAndIconContainer = 'name-and-icon-container';

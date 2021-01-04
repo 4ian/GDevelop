@@ -1,8 +1,9 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
  *
  * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
@@ -10,8 +11,16 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -30,7 +39,7 @@ module.exports = {
         "SavePlayerData",
         _("Save player data"),
         _(
-          "Save the content of the given variable in the player data, stored on Facebook Instant Games servers"
+          "Save the content of the given scene variable in the player data, stored on Facebook Instant Games servers"
         ),
         _(
           "Save the content of _PARAM1_ in key _PARAM0_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
@@ -40,7 +49,7 @@ module.exports = {
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", 'Data key name (e.g: "Lives")', "", false)
-      .addParameter("scenevar", "Variable with the content to save", "", false)
+      .addParameter("scenevar", "Scene variable with the content to save", "", false)
       .addParameter(
         "scenevar",
         _("Variable where to store the success message (optional)"),
@@ -49,7 +58,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -80,7 +89,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -125,7 +134,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -173,7 +182,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -233,7 +242,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -255,7 +264,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -299,7 +308,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -321,7 +330,7 @@ module.exports = {
       )
       .addParameter(
         "scenevar",
-        _("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to store the error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -361,7 +370,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
     return [];
   }
 };

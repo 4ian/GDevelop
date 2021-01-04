@@ -2,12 +2,14 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import { makeNonBreakable } from '../../Utils/StringHelpers';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import BackgroundText from '../../UI/BackgroundText';
+import { focusButton } from '../../UI/Button';
+import Text from '../../UI/Text';
 
 type State = {|
   showDeprecatedNumericValue: boolean,
@@ -17,6 +19,7 @@ export default class ForceMultiplierField extends Component<
   ParameterFieldProps,
   State
 > {
+  _instantButton = React.createRef<RaisedButton>();
   state = {
     showDeprecatedNumericValue:
       this.props.value !== '' &&
@@ -24,7 +27,9 @@ export default class ForceMultiplierField extends Component<
       this.props.value !== '0',
   };
 
-  focus() {}
+  focus() {
+    focusButton(this._instantButton);
+  }
 
   render() {
     const { showDeprecatedNumericValue } = this.state;
@@ -36,16 +41,17 @@ export default class ForceMultiplierField extends Component<
               label={makeNonBreakable('Instant')}
               primary={this.props.value === '' || this.props.value === '0'}
               onClick={() => this.props.onChange('0')}
+              ref={this._instantButton}
             />
           </Column>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 The force will only push the object during the time of one
                 frame. Typically used in an event with no conditions or with
                 conditions that stay valid for a certain amount of time.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line expand alignItems="center">
@@ -57,14 +63,14 @@ export default class ForceMultiplierField extends Component<
             />
           </Column>
           <Column>
-            <p>
+            <Text>
               <Trans>
                 The force will push the object forever, unless you use the
                 action "Stop the object". Typically used in an event with
                 conditions that are only true once, or with a "Trigger Once"
                 condition.
               </Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         {showDeprecatedNumericValue && (

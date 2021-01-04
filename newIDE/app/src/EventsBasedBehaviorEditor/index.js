@@ -1,16 +1,17 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
-import { Column, Spacer } from '../UI/Grid';
+import TextField from '../UI/TextField';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import { Tabs, Tab } from 'material-ui/Tabs';
+import { Tabs, Tab } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';
-const gd = global.gd;
+import { ColumnStackLayout } from '../UI/Layout';
+const gd: libGDevelop = global.gd;
 
 type TabName = 'configuration' | 'properties';
 
@@ -57,16 +58,22 @@ export default class EventsBasedBehaviorEditor extends React.Component<
     const { eventsBasedBehavior, project } = this.props;
 
     return (
-      <Tabs value={currentTab} onChange={this._changeTab}>
-        <Tab label={<Trans>Configuration</Trans>} value="configuration">
-          <Column>
+      <React.Fragment>
+        <Tabs value={currentTab} onChange={this._changeTab}>
+          <Tab label={<Trans>Configuration</Trans>} value="configuration" />
+          <Tab label={<Trans>Properties</Trans>} value="properties" />
+        </Tabs>
+        {currentTab === 'configuration' && (
+          <ColumnStackLayout expand>
             <DismissableAlertMessage
               identifier="events-based-behavior-explanation"
               kind="info"
             >
-              This is the configuration of your behavior. Make sure to choose a
-              proper internal name as it's hard to change it later. Enter a
-              description explaining what the behavior is doing to the object.
+              <Trans>
+                This is the configuration of your behavior. Make sure to choose
+                a proper internal name as it's hard to change it later. Enter a
+                description explaining what the behavior is doing to the object.
+              </Trans>
             </DismissableAlertMessage>
             <TextField
               floatingLabelText={<Trans>Internal Name</Trans>}
@@ -88,18 +95,13 @@ export default class EventsBasedBehaviorEditor extends React.Component<
               commitOnBlur
               floatingLabelText={<Trans>Description</Trans>}
               floatingLabelFixed
-              hintText={
-                <Trans>
-                  The description of the behavior should explain what the
-                  behavior is doing to the object, and, briefly, how to use it.
-                </Trans>
-              }
+              hintText={t`The description of the behavior should explain what the behavior is doing to the object, and, briefly, how to use it.`}
               value={eventsBasedBehavior.getDescription()}
               onChange={text => {
                 eventsBasedBehavior.setDescription(text);
                 this.forceUpdate();
               }}
-              multiLine
+              multiline
               fullWidth
               rows={3}
             />
@@ -151,18 +153,17 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 </Trans>
               </DismissableAlertMessage>
             )}
-            <Spacer />
-          </Column>
-        </Tab>
-        <Tab label={<Trans>Properties</Trans>} value="properties">
+          </ColumnStackLayout>
+        )}
+        {currentTab === 'properties' && (
           <EventsBasedBehaviorPropertiesEditor
             project={project}
             eventsBasedBehavior={eventsBasedBehavior}
             onPropertiesUpdated={this.props.onPropertiesUpdated}
             onRenameProperty={this.props.onRenameProperty}
           />
-        </Tab>
-      </Tabs>
+        )}
+      </React.Fragment>
     );
   }
 }

@@ -1,45 +1,15 @@
 // @flow
-const awsS3 = require('aws-sdk/clients/s3');
 const isDev = process.env.NODE_ENV === 'development';
 
-export const GDevelopHostingApi = {
-  deployEndpoint:
-    'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy',
-  gamesHost: 'http://gd-games.s3-website-eu-west-1.amazonaws.com',
+export const GDevelopGamePreviews = {
+  baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
-const gdevelopGamesPreviewRegion = 'eu-west-1';
-const gdevelopGamesPreviewBucket = 'gd-games-preview';
-
-const gdevelopGamesPreviewOptions = {
-  destinationBucket: gdevelopGamesPreviewBucket,
-  accessKeyId: process.env.REACT_APP_PREVIEW_S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY,
-  region: gdevelopGamesPreviewRegion,
-  destinationBucketBaseUrl: `https://s3-${gdevelopGamesPreviewRegion}.amazonaws.com/${gdevelopGamesPreviewBucket}/`,
+export const GDevelopBuildApi = {
+  baseUrl: isDev
+    ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/build',
 };
-
-export const GDevelopGamesPreview = {
-  options: gdevelopGamesPreviewOptions,
-  awsS3Client: new awsS3({
-    accessKeyId: gdevelopGamesPreviewOptions.accessKeyId,
-    secretAccessKey: gdevelopGamesPreviewOptions.secretAccessKey,
-    region: gdevelopGamesPreviewOptions.region,
-    correctClockSkew: true,
-  }),
-};
-
-if (
-  !gdevelopGamesPreviewOptions.accessKeyId ||
-  !gdevelopGamesPreviewOptions.secretAccessKey
-) {
-  console.warn(
-    "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won't be working"
-  );
-  console.info(
-    'Copy .env.dist file to .env and fill the values to fix this warning.'
-  );
-}
 
 export const GDevelopFirebaseConfig = {
   apiKey: 'AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc',
@@ -56,20 +26,6 @@ export const GDevelopUsageApi = {
     : 'https://api.gdevelop-app.com/usage',
 };
 
-export const GDevelopBuildApi = {
-  baseUrl: isDev
-    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/build',
-};
-
-export const StripeCheckoutConfig = {
-  key: isDev
-    ? 'pk_test_4N7HfDWDds6ejCkxVM7fvvLr'
-    : 'pk_live_4N7H3nYlkZV4ylpKlzhmM8fN',
-  image:
-    'https://raw.githubusercontent.com/4ian/GDevelop/gh-pages/res/icon128linux.png',
-};
-
 export const GDevelopReleaseApi = {
   baseUrl: isDev
     ? 'https://c8cldf4iqh.execute-api.us-east-1.amazonaws.com/dev'
@@ -80,4 +36,22 @@ export const GDevelopExtensionApi = {
   baseUrl: isDev
     ? 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master'
     : 'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master',
+};
+
+export const GDevelopAssetApi = {
+  baseUrl: isDev
+    ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/asset',
+};
+
+export const GDevelopAnalyticsApi = {
+  baseUrl: isDev
+    ? 'https://fixpe96o0h.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/analytics',
+};
+
+export const GDevelopGameApi = {
+  baseUrl: isDev
+    ? 'https://we7eqjifc2.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/game',
 };

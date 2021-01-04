@@ -3,7 +3,7 @@ import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
@@ -42,7 +42,8 @@ export const getLocalResourceFullPath = (
 ) => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
-    resourceName
+    resourceName,
+    {}
   ).substring(7 /* Remove "file://" from the URL to get a local path */);
 
   if (resourcePath.indexOf('?cache=') !== -1) {
@@ -99,7 +100,7 @@ export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
-  if (!fs) return 0;
+  if (!fs) return '';
   const resourcePath = path.normalize(
     getLocalResourceFullPath(project, resourceName)
   );

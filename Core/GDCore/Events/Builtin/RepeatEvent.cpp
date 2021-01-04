@@ -5,9 +5,6 @@
  */
 
 #include "RepeatEvent.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
@@ -34,11 +31,15 @@ vector<gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() {
   return allActions;
 }
 
-vector<gd::Expression*> RepeatEvent::GetAllExpressions() {
-  vector<gd::Expression*> allExpressions;
-  allExpressions.push_back(&repeatNumberExpression);
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+    RepeatEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("expression");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&repeatNumberExpression, metadata));
 
-  return allExpressions;
+  return allExpressionsWithMetadata;
 }
 
 vector<const gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors()
@@ -56,11 +57,15 @@ vector<const gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() const {
   return allActions;
 }
 
-vector<const gd::Expression*> RepeatEvent::GetAllExpressions() const {
-  vector<const gd::Expression*> allExpressions;
-  allExpressions.push_back(&repeatNumberExpression);
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+    RepeatEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("expression");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&repeatNumberExpression, metadata));
 
-  return allExpressions;
+  return allExpressionsWithMetadata;
 }
 
 void RepeatEvent::SerializeTo(SerializerElement& element) const {

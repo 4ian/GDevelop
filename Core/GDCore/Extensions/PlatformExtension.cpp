@@ -4,9 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/PlatformExtension.h"
+
 #include <algorithm>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -117,6 +120,13 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
 #endif
 }
 
+#if defined(GD_IDE_ONLY)
+gd::DependencyMetadata& PlatformExtension::AddDependency() {
+  extensionDependenciesMetadata.push_back(DependencyMetadata());
+  return extensionDependenciesMetadata.back();
+}
+#endif
+
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
     const gd::String& fullname,
@@ -160,6 +170,13 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
                                                       sharedDatasInstance)
                                          .SetHelpPath(GetHelpPath());
   return behaviorsInfo[nameWithNamespace];
+}
+
+gd::EffectMetadata& PlatformExtension::AddEffect(const gd::String& name) {
+  gd::String nameWithNamespace =
+      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  effectsMetadata[nameWithNamespace] = EffectMetadata(nameWithNamespace);
+  return effectsMetadata[nameWithNamespace];
 }
 
 gd::EventMetadata& PlatformExtension::AddEvent(
@@ -207,6 +224,13 @@ std::vector<gd::String> PlatformExtension::GetExtensionObjectsTypes() const {
   return objects;
 }
 
+std::vector<gd::String> PlatformExtension::GetExtensionEffectTypes() const {
+  std::vector<gd::String> effectNames;
+  for (auto& it : effectsMetadata) effectNames.push_back(it.first);
+
+  return effectNames;
+}
+
 gd::ObjectMetadata& PlatformExtension::GetObjectMetadata(
     const gd::String& objectType) {
   if (objectsInfos.find(objectType) != objectsInfos.end())
@@ -225,6 +249,16 @@ gd::BehaviorMetadata& PlatformExtension::GetBehaviorMetadata(
   std::cout << "Warning: Behavior type \"" << behaviorType
             << "\" not found in an extension!" << std::endl;
   return badBehaviorMetadata;
+}
+
+gd::EffectMetadata& PlatformExtension::GetEffectMetadata(
+    const gd::String& effectName) {
+  if (effectsMetadata.find(effectName) != effectsMetadata.end())
+    return effectsMetadata.find(effectName)->second;
+
+  std::cout << "Warning: Effect with name \"" << effectName
+            << "\" not found in an extension!" << std::endl;
+  return badEffectMetadata;
 }
 
 std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
@@ -256,6 +290,10 @@ PlatformExtension::GetAllExpressions() {
 std::map<gd::String, gd::ExpressionMetadata>&
 PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
+}
+
+std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
+  return extensionDependenciesMetadata;
 }
 
 std::map<gd::String, gd::EventMetadata>& PlatformExtension::GetAllEvents() {
@@ -379,6 +417,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
       name == "BuiltinCommonConversions" ||
       name == "BuiltinStringInstructions" ||
       name == "BuiltinMathematicalTools" ||
+      name == "Effects" ||      // Well-known effects are not namespaced.
       name == "CommonDialogs")  // New name for BuiltinInterface
   {
     nameSpace = "";

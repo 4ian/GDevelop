@@ -60,11 +60,6 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
                                            const gd::String& expression,
                                            const gd::String& objectName = "");
 
-  static void UseOldExpressionParser(bool enable) {
-    useOldExpressionParser = enable;
-  };
-  static bool IsUsingOldExpressionParser() { return useOldExpressionParser; };
-
   const gd::String& GetOutput() { return output; };
 
  protected:
@@ -78,7 +73,8 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override;
   void OnVisitIdentifierNode(IdentifierNode& node) override;
-  void OnVisitFunctionNode(FunctionNode& node) override;
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override;
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override;
   void OnVisitEmptyNode(EmptyNode& node) override;
 
  private:
@@ -107,8 +103,6 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   gd::String output;
   EventsCodeGenerator& codeGenerator;
   EventsCodeGenerationContext& context;
-
-  static bool useOldExpressionParser;
 };
 
 }  // namespace gd

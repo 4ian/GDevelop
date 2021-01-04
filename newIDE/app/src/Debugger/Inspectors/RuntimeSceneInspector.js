@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
@@ -8,10 +9,11 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
-import { Line } from '../../UI/Grid';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import mapValues from 'lodash/mapValues';
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import Text from '../../UI/Text';
 
 type Props = {|
   runtimeScene: GameData,
@@ -22,13 +24,6 @@ type Props = {|
 type State = {|
   newObjectName: string,
 |};
-
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
 
 const transformLayer = layer => {
   if (!layer) return null;
@@ -111,10 +106,10 @@ export default class RuntimeSceneInspector extends React.Component<
     if (!runtimeScene) return null;
 
     return (
-      <div style={styles.container}>
-        <p>
+      <React.Fragment>
+        <Text>
           <Trans>Layers:</Trans>
-        </p>
+        </Text>
         <ReactJsonView
           collapsed={false}
           name={false}
@@ -126,39 +121,46 @@ export default class RuntimeSceneInspector extends React.Component<
           groupArraysAfterLength={50}
           theme="monokai"
         />
-        <p>
+        <Text>
           <Trans>
             Create a new instance on the scene (will be at position 0;0):
           </Trans>
-        </p>
+        </Text>
         {runtimeScene._objects && runtimeScene._objects.items && (
-          <Line noMargin alignItems="baseline">
-            <SemiControlledAutoComplete
-              hintText={<Trans>Enter the name of the object</Trans>}
-              value={this.state.newObjectName}
-              onChange={value => {
-                this.setState({
-                  newObjectName: value,
-                });
-              }}
-              dataSource={Object.keys(runtimeScene._objects.items).map(
-                objectName => ({
-                  text: objectName,
-                  value: objectName,
-                })
-              )}
-              openOnFocus
-            />
-            <RaisedButton
-              label={<Trans>Create</Trans>}
-              primary
-              onClick={() =>
-                onCall(['createObject'], [this.state.newObjectName])
-              }
-            />
-          </Line>
+          <TextFieldWithButtonLayout
+            noFloatingLabelText
+            renderTextField={() => (
+              <SemiControlledAutoComplete
+                hintText={t`Enter the name of the object`}
+                value={this.state.newObjectName}
+                onChange={value => {
+                  this.setState({
+                    newObjectName: value,
+                  });
+                }}
+                dataSource={Object.keys(runtimeScene._objects.items).map(
+                  objectName => ({
+                    text: objectName,
+                    value: objectName,
+                  })
+                )}
+                openOnFocus
+                fullWidth
+              />
+            )}
+            renderButton={style => (
+              <RaisedButton
+                style={style}
+                label={<Trans>Create</Trans>}
+                primary
+                onClick={() => {
+                  onCall(['createObject'], [this.state.newObjectName]);
+                }}
+              />
+            )}
+          />
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

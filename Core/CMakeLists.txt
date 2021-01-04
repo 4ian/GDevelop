@@ -51,7 +51,12 @@ file(GLOB_RECURSE formatted_source_files tests/* GDCore/Events/* GDCore/Extensio
 list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp")
 gd_add_clang_utils(GDCore "${formatted_source_files}")
 
-add_library(GDCore SHARED ${source_files})
+IF(EMSCRIPTEN)
+	# Emscripten treats all libraries as static libraries
+	add_library(GDCore STATIC ${source_files})
+ELSE()
+	add_library(GDCore SHARED ${source_files})
+ENDIF()
 add_dependencies(GDCore GDVersion)
 IF(EMSCRIPTEN)
 	set_target_properties(GDCore PROPERTIES SUFFIX ".bc")

@@ -1,15 +1,30 @@
 {
   "short_name": "GDevelop",
-  "name": "GDevelop game creator",
+  "name": "GDevelop",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-256.png",
       "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "128x128",
       "type": "image/png"
     }
   ],
   "start_url": "./index.html",
   "display": "standalone",
-  "theme_color": "#4ab0e4",
+  "theme_color": "#252525",
   "background_color": "#f0f0f0"
 }

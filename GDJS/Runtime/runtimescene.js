@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -5,7 +6,7 @@
  */
 
 /**
- * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
+ * A scene being played, containing instances of objects rendered on screen.
  *
  * @class RuntimeScene
  * @memberof gdjs
@@ -21,27 +22,37 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._layers = new Hashtable();
     this._initialBehaviorSharedData = new Hashtable();
     this._renderer = new gdjs.RuntimeSceneRenderer(this,
+        // @ts-ignore - allow no renderer for tests
         runtimeGame ? runtimeGame.getRenderer() : null);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
     this._name = "";
-    this._timeManager = new gdjs.TimeManager(Date.now());
+    this._timeManager = new gdjs.TimeManager();
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+    this._isJustResumed = false; // True in the first frame after resuming the paused scene
+    this._requestedChange = gdjs.RuntimeScene.CONTINUE; // What to do after the frame is rendered.
 
-    /** @type gdjs.RuntimeObject[] */
+    this._backgroundColor = 0; // Black background by default.
+
+    /** @type {gdjs.RuntimeObject[]} */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
 
-    /** @type gdjs.RuntimeObject[] */
+    this._onceTriggers = new gdjs.OnceTriggers();
+
+    /** @type {Object.<string, number[]>} */
+    this._layersCameraCoordinates = {};
+
+    /** @type {gdjs.RuntimeObject[]} */
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    /** @type gdjs.Profiler */
+    /** @type {?gdjs.Profiler} */
     this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
-    this.onCanvasResized();
+    this.onGameResolutionResized();
 };
 
 /**
@@ -49,17 +60,26 @@ gdjs.RuntimeScene = function(runtimeGame)
  * See gdjs.RuntimeGame.startGameLoop in particular.
  * @memberof gdjs.RuntimeScene
  */
-gdjs.RuntimeScene.prototype.onCanvasResized = function() {
-    this._renderer.onCanvasResized();
+gdjs.RuntimeScene.prototype.onGameResolutionResized = function() {
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            /** @type gdjs.Layer */
+            var theLayer = this._layers.items[name];
+
+            theLayer.onGameResolutionResized();
+        }
+    }
+
+    this._renderer.onGameResolutionResized();
 };
 
 /**
  * Load the runtime scene from the given scene.
- * @param {Object} sceneData An object containing the scene data.
+ * @param {?LayoutData} sceneData An object containing the scene data.
  * @see gdjs.RuntimeGame#getSceneData
  */
 gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
-    if ( sceneData === undefined ) {
+    if (!sceneData) {
         console.error("loadFromScene was called without a scene");
         return;
     }
@@ -69,16 +89,11 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     //Setup main properties
     if (this._runtimeGame) this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
     this._name = sceneData.name;
-    this.setBackgroundColor(parseInt(sceneData.r, 10),
-            parseInt(sceneData.v, 10),
-            parseInt(sceneData.b, 10));
+    this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
     //Load layers
     for(var i = 0, len = sceneData.layers.length;i<len;++i) {
-        var layerData = sceneData.layers[i];
-
-        this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
-        //console.log("Created layer : \""+name+"\".");
+        this.addLayer(sceneData.layers[i]);
     }
 
     //Load variables
@@ -86,50 +101,38 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
     //Cache the initial shared data of the behaviors
     for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
-        var data = sceneData.behaviorsSharedData[i];
+        var behaviorSharedData = sceneData.behaviorsSharedData[i];
 
-        //console.log("Initializing shared data for "+data.name);
-        this._initialBehaviorSharedData.put(data.name, data);
+        this.setInitialSharedDataForBehavior(behaviorSharedData.name, behaviorSharedData);
     }
 
-    var that = this;
-    function loadObject(objData) {
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-        //And cache the constructor for the performance sake:
-        that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-    }
-
-    //Load objects: Global objects first...
+    //Registering objects: Global objects first...
     var initialGlobalObjectsData = this.getGame().getInitialObjectsData();
     for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
-        loadObject(initialGlobalObjectsData[i]);
+        this.registerObject(initialGlobalObjectsData[i]);
     }
     //...then the scene objects
-    this._initialObjectsData = sceneData.objects;
-    for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
-        loadObject(this._initialObjectsData[i]);
+    for(var i = 0, len = sceneData.objects.length;i<len;++i) {
+        this.registerObject(sceneData.objects[i]);
     }
 
     //Create initial instances of objects
-    this.createObjectsFrom(sceneData.instances, 0, 0);
+    this.createObjectsFrom(sceneData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
+
+    // Set up the default z order (for objects created from events)
+    this._setLayerDefaultZOrders();
 
     //Set up the function to be executed at each tick
-    var module = gdjs[sceneData.mangledName+"Code"];
-    if ( module && module.func )
-        this._eventsFunction = module.func;
-    else {
-        console.log("Warning: no function found for running logic of scene " + this._name);
-        this._eventsFunction = (function() {});
-    }
+    this.setEventsGeneratedCodeFunction(sceneData);
 
     this._onceTriggers = new gdjs.OnceTriggers();
 
-    //Call global callback
+    // Notify the global callbacks
+    if (this._runtimeGame && !this._runtimeGame.wasFirstSceneLoaded()) {
+        for(var i = 0;i<gdjs.callbacksFirstRuntimeSceneLoaded.length;++i) {
+            gdjs.callbacksFirstRuntimeSceneLoaded[i](this);
+        }
+    }
     for(var i = 0;i<gdjs.callbacksRuntimeSceneLoaded.length;++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
     }
@@ -140,6 +143,70 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     this._isLoaded = true;
     this._timeManager.reset();
 };
+
+/**
+ * Check if an object is registered, meaning that instances of it can be created and lives in the scene.
+ * @see gdjs.RuntimeScene#registerObject
+ */
+gdjs.RuntimeScene.prototype.isObjectRegistered = function(objectName) {
+    return (
+        this._objects.containsKey(objectName) &&
+        this._instances.containsKey(objectName) &&
+        this._instancesCache.containsKey(objectName) &&
+        this._objectsCtor.containsKey(objectName)
+    );
+}
+
+/**
+ * Register a {@link gdjs.RuntimeObject} so that instances of it can be used in the scene.
+ * @param {ObjectData} objectData The data for the object to register.
+ */
+gdjs.RuntimeScene.prototype.registerObject = function(objectData) {
+    this._objects.put(objectData.name, objectData);
+    this._instances.put(objectData.name, []); //Also reserve an array for the instances
+    this._instancesCache.put(objectData.name, []); //and for cached instances
+    this._objectsCtor.put(objectData.name, gdjs.getObjectConstructor(objectData.type)); //And cache the constructor for the performance sake
+}
+
+/**
+ * Update the data of a {@link gdjs.RuntimeObject} so that instances use this when constructed.
+ * @param {ObjectData} objectData The data for the object to register.
+ */
+gdjs.RuntimeScene.prototype.updateObject = function(objectData) {
+    if (!this.isObjectRegistered(objectData.name)) {
+        console.warn(
+            "Tried to call updateObject for an object that was not registered (" +
+            objectData.name +
+            "). Call registerObject first."
+        );
+    }
+
+    this._objects.put(objectData.name, objectData);
+    // Don't erase instances, nor instances cache, or objectsCtor cache.
+}
+
+/**
+ * Unregister a {@link gdjs.RuntimeObject}. Instances will be destroyed.
+ * @param {string} objectName The name of the object to unregister.
+ */
+gdjs.RuntimeScene.prototype.unregisterObject = function(objectName) {
+    var instances = this._instances.get(objectName);
+    if (instances) {
+        // This is sub-optimal: markObjectForDeletion will search the instance to
+        // remove in instances, so cost is O(n^2), n being the number of instances.
+        // As we're unregistering an object which only happen during a hot-reloading,
+        // this is fine.
+        var instancesToRemove = instances.slice();
+        for(var i = 0;i<instancesToRemove.length;i++) {
+            this.markObjectForDeletion(instancesToRemove[i]);
+        }
+        this._cacheOrClearRemovedInstances();
+    }
+    this._objects.remove(objectName);
+    this._instances.remove(objectName);
+    this._instancesCache.remove(objectName);
+    this._objectsCtor.remove(objectName);
+}
 
 /**
  * Called when a scene is "paused", i.e it will be not be rendered again
@@ -156,6 +223,8 @@ gdjs.RuntimeScene.prototype.onPause = function() {
  * on screen after having being paused.
  */
 gdjs.RuntimeScene.prototype.onResume = function() {
+    this._isJustResumed = true;
+
     for(var i = 0;i < gdjs.callbacksRuntimeSceneResumed.length;++i) {
         gdjs.callbacksRuntimeSceneResumed[i](this);
     }
@@ -170,9 +239,25 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 
     if (this._profiler) this.stopProfiler();
 
-    if (this._renderer && this._renderer.onSceneUnloaded)
-        this._renderer.onSceneUnloaded();
+    // Notify the global callbacks (which should not release resources yet,
+    // as other callbacks might still refer to the objects/scene).
+    for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloading.length;++i) {
+        gdjs.callbacksRuntimeSceneUnloading[i](this);
+    }
 
+    // Notify the objects they are being destroyed
+    this._constructListOfAllInstances();
+    for(var i = 0, len = this._allInstancesList.length;i<len;++i) {
+        var object = this._allInstancesList[i];
+        object.onDestroyFromScene(this);
+    }
+
+    // Notify the renderer
+    if (this._renderer) this._renderer.onSceneUnloaded();
+
+    // Notify the global callbacks (after notifying objects and renderer, because
+    // callbacks from extensions might want to free resources - which can't be done
+    // safely before destroying objects and the renderer).
     for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
         gdjs.callbacksRuntimeSceneUnloaded[i](this);
     }
@@ -185,44 +270,101 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
     this._objects = new Hashtable();
     this._instances = new Hashtable();
     this._instancesCache = new Hashtable();
-    this._initialObjectsData = null;
     this._eventsFunction = null;
     this._objectsCtor = new Hashtable();
     this._allInstancesList = [];
     this._instancesRemoved = [];
 
     this._lastId = 0;
+
+    // @ts-ignore - set to null to force garbage collection.
     this._onceTriggers = null;
 
     this._isLoaded = false;
 
-    this.onCanvasResized();
+    this.onGameResolutionResized();
 };
 
 /**
- * Create objects from initial instances data ( for example, the initial instances
- * of the scene or from an external layout ).
+ * Create objects from initial instances data (for example, the initial instances
+ * of the scene or the instances of an external layout).
  *
- * @param {Object} data The instances data
+ * @param {InstanceData[]} data The instances data
  * @param {number} xPos The offset on X axis
  * @param {number} yPos The offset on Y axis
+ * @param {boolean} trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
+ * to the same as the associated instance. Useful for hot-reloading when instances are changed.
  */
-gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
+gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos, trackByPersistentUuid) {
     for(var i = 0, len = data.length;i<len;++i) {
         var instanceData = data[i];
         var objectName = instanceData.name;
         var newObject = this.createObject(objectName);
 
         if ( newObject !== null ) {
-            newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
-            newObject.setZOrder(parseFloat(instanceData.zOrder));
-            newObject.setAngle(parseFloat(instanceData.angle));
+            if (trackByPersistentUuid) {
+                // Give the object the same persistentUuid as the instance, so that
+                // it can be hot-reloaded.
+                newObject.persistentUuid = instanceData.persistentUuid || null;
+            }
+
+            newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
+            newObject.setZOrder(instanceData.zOrder);
+            newObject.setAngle(instanceData.angle);
             newObject.setLayer(instanceData.layer);
             newObject.getVariables().initFrom(instanceData.initialVariables, true);
             newObject.extraInitializationFromInitialInstance(instanceData);
         }
     }
 };
+
+/**
+ * Set the default Z order for each layer, which is the highest Z order found on each layer.
+ * Useful as it ensures that instances created from events are, by default, shown in front
+ * of other instances.
+ * @private
+ */
+gdjs.RuntimeScene.prototype._setLayerDefaultZOrders = function() {
+    if (this._runtimeGame.getGameData().properties.useDeprecatedZeroAsDefaultZOrder) {
+        // Deprecated option to still support games that were made considered 0 as the
+        // default Z order for all layers.
+        return;
+    }
+
+    /** @type {Object.<string, number>} */
+    var layerHighestZOrders = {};
+
+    var allInstances = this.getAdhocListOfAllInstances();
+    for(var i = 0, len = allInstances.length;i<len;++i) {
+        var object = allInstances[i];
+        var layerName = object.getLayer();
+        var zOrder = object.getZOrder();
+
+        if (layerHighestZOrders[layerName] === undefined || layerHighestZOrders[layerName] < zOrder)
+            layerHighestZOrders[layerName] = zOrder;
+    }
+
+    for(var layerName in layerHighestZOrders) {
+        this.getLayer(layerName).setDefaultZOrder(layerHighestZOrders[layerName] + 1);
+    }
+}
+
+/**
+ * Set the function called each time the scene is stepped to be the events generated code,
+ * which is by convention assumed to be a function in `gdjs` with a name based on the scene
+ * mangled name.
+ *
+ * @param {LayoutData} sceneData The scene data, used to find where the code was generated.
+ */
+gdjs.RuntimeScene.prototype.setEventsGeneratedCodeFunction = function(sceneData) {
+    var module = gdjs[sceneData.mangledName+"Code"];
+    if (module && module.func)
+        this._eventsFunction = module.func;
+    else {
+        console.log("Warning: no function found for running logic of scene " + this._name);
+        this._eventsFunction = (function() {});
+    }
+}
 
 /**
  * Set the function called each time the scene is stepped.
@@ -252,6 +394,12 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     this._updateObjectsPreEvents();
     if (this._profiler) this._profiler.end("objects (pre-events)");
 
+    if (this._profiler) this._profiler.begin("callbacks and extensions (pre-events)");
+    for(var i = 0;i < gdjs.callbacksRuntimeScenePreEvents.length;++i) {
+        gdjs.callbacksRuntimeScenePreEvents[i](this);
+    }
+    if (this._profiler) this._profiler.end("callbacks and extensions (pre-events)");
+
     if (this._profiler) this._profiler.begin("events");
     this._eventsFunction(this);
     if (this._profiler) this._profiler.end("events");
@@ -260,9 +408,19 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     this._updateObjectsPostEvents();
     if (this._profiler) this._profiler.end("objects (post-events)");
 
+    if (this._profiler) this._profiler.begin("callbacks and extensions (post-events)");
+    for(var i = 0;i < gdjs.callbacksRuntimeScenePostEvents.length;++i) {
+        gdjs.callbacksRuntimeScenePostEvents[i](this);
+    }
+    if (this._profiler) this._profiler.end("callbacks and extensions (post-events)");
+
     if (this._profiler) this._profiler.begin("objects (visibility)");
     this._updateObjectsVisibility();
     if (this._profiler) this._profiler.end("objects (visibility)");
+
+    if (this._profiler) this._profiler.begin("layers (effects update)");
+    this._updateLayers();
+    if (this._profiler) this._profiler.end("layers (effects update)");
 
     if (this._profiler) this._profiler.begin("render");
 
@@ -271,6 +429,8 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     // if (this._layersCameraCoordinates) {
     //  this.getRenderer().renderDebugDraw(this._allInstancesList, this._layersCameraCoordinates); //TODO
     // }
+
+    this._isJustResumed = false;
 
     this.render();
     if (this._profiler) this._profiler.end("render");
@@ -304,13 +464,23 @@ gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
     }
 }
 
+gdjs.RuntimeScene.prototype._updateLayers = function() {
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            /** @type gdjs.Layer */
+            var theLayer = this._layers.items[name];
+
+            theLayer.update(this);
+        }
+    }
+}
+
 /**
  * Called to update visibility of PIXI.DisplayObject of objects
  * rendered on the scene.
  *
  * Visibility is set to false if object is hidden, or if
  * object is too far from the camera of its layer ("culling").
- * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
     if (this._timeManager.isFirstFrame()) {
@@ -360,8 +530,6 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
  * and allows the removed objects to be cached (or destroyed if the cache is full).<br>
  * The removed objects could not be sent directly to the cache, as events may still be using them after
  * removing them from the scene for example.
- *
- * @private
  */
 gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
     for(var k =0, lenk=this._instancesRemoved.length;k<lenk;++k) {
@@ -374,8 +542,7 @@ gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
 };
 
 /**
- * Tool function filling _allObjectsList member with all the instances.
- * @private
+ * Tool function filling _allInstancesList member with all the living object instances.
  */
 gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
     var currentListSize = 0;
@@ -400,7 +567,6 @@ gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
 
 /**
  * Update the objects before launching the events.
- * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 
@@ -430,7 +596,6 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 
 /**
  * Update the objects (update positions, time management...)
- * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsPostEvents = function() {
     this._cacheOrClearRemovedInstances();
@@ -446,12 +611,22 @@ gdjs.RuntimeScene.prototype._updateObjectsPostEvents = function() {
 };
 
 /**
- * Change the background color
+ * Change the background color, by setting the RGB components.
+ * Internally, the color is stored as an hexadecimal number.
+ *
+ * @param {number} r The color red component (0-255).
+ * @param {number} g The color green component (0-255).
+ * @param {number} b The color blue component (0-255).
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
     this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
+
+/**
+ * Get the background color, as an hexadecimal number.
+ * @returns {number} The current background color.
+ */
 gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
     return this._backgroundColor;
 }
@@ -517,7 +692,7 @@ gdjs.RuntimeScene.prototype.getObjects = function(name){
  * Create a new object from its name. The object is also added to the instances
  * living on the scene ( No need to call RuntimeScene.addObject )
  * @param {string} objectName The name of the object to be created
- * @return {gdjs.RuntimeObject} The created object
+ * @return {?gdjs.RuntimeObject} The created object
  */
 gdjs.RuntimeScene.prototype.createObject = function(objectName){
 
@@ -545,7 +720,7 @@ gdjs.RuntimeScene.prototype.createObject = function(objectName){
 
 /**
  * Must be called whenever an object must be removed from the scene.
- * @param {gdjs.RuntimeObject} object The object to be removed.
+ * @param {gdjs.RuntimeObject} obj The object to be removed.
  */
 gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
     //Add to the objects removed list.
@@ -558,19 +733,16 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
         var allInstances = this._instances.get(obj.getName());
         for(var i = 0, len = allInstances.length;i<len;++i) {
             if (allInstances[i].id == objId) {
-                allInstances.remove(i);
+                allInstances.splice(i, 1);
                 break;
             }
         }
     }
 
     //Notify the object it was removed from the scene
-    obj.onDeletedFromScene(this);
-    for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
-        obj._behaviors[j].onOwnerRemovedFromScene();
-    }
+    obj.onDestroyFromScene(this);
 
-    //Call global callback
+    // Notify the global callbacks
     for(var j = 0;j<gdjs.callbacksObjectDeletedFromScene.length;++j) {
         gdjs.callbacksObjectDeletedFromScene[j](this, obj);
     }
@@ -611,10 +783,12 @@ gdjs.RuntimeScene.prototype.getVariables = function() {
 /**
  * Get the data representing the initial shared data of the scene for the specified behavior.
  * @param {string} name The name of the behavior
+ * @returns {?BehaviorSharedData} The shared data for the behavior, if any.
  */
 gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
-    if ( this._initialBehaviorSharedData.containsKey(name) ) {
-        return this._initialBehaviorSharedData.get(name);
+    const behaviorSharedData = this._initialBehaviorSharedData.get(name);
+    if (behaviorSharedData) {
+        return behaviorSharedData;
     }
 
     console.error("Can't find shared data for behavior with name:", name);
@@ -622,8 +796,18 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
 };
 
 /**
+ * Set the data representing the initial shared data of the scene for the specified behavior.
+ * @param {string} name The name of the behavior
+ * @param {?BehaviorSharedData} sharedData The shared data for the behavior, or null to remove it.
+ */
+gdjs.RuntimeScene.prototype.setInitialSharedDataForBehavior = function(name, sharedData) {
+    this._initialBehaviorSharedData.put(name, sharedData);
+};
+
+/**
  * Get the layer with the given name
- * @param {gdjs.Layer} name The name of the layer
+ * @param {string} name The name of the layer
+ * @returns {gdjs.Layer} The layer, or the base layer if not found
  */
 gdjs.RuntimeScene.prototype.getLayer = function(name) {
     if ( this._layers.containsKey(name) )
@@ -632,10 +816,57 @@ gdjs.RuntimeScene.prototype.getLayer = function(name) {
     return this._layers.get("");
 };
 
+/**
+ * Check if a layer exists
+ * @param {string} name The name of the layer
+ */
 gdjs.RuntimeScene.prototype.hasLayer = function(name) {
     return this._layers.containsKey(name);
 };
 
+/**
+ * Add a layer.
+ * @param {LayerData} layerData The data to construct the layer
+ */
+gdjs.RuntimeScene.prototype.addLayer = function(layerData) {
+    this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+};
+
+/**
+ * Remove a layer. All {@link gdjs.RuntimeObject} on this layer will
+ * be moved back to the base layer.
+ * @param {string} layerName The name of the layer to remove
+ */
+gdjs.RuntimeScene.prototype.removeLayer = function(layerName) {
+    var allInstances = this.getAdhocListOfAllInstances();
+    for(var i = 0;i < allInstances.length;++i) {
+        var runtimeObject = allInstances[i];
+        if (runtimeObject.getLayer() === layerName) {
+            runtimeObject.setLayer("");
+        }
+    }
+
+    this._layers.remove(layerName);
+}
+
+/**
+ * Change the position of a layer.
+ *
+ * @param {string} layerName The name of the layer to reorder
+ * @param {number} index The new position in the list of layers
+ */
+gdjs.RuntimeScene.prototype.setLayerIndex = function(layerName, index) {
+    /** @type {gdjs.Layer} */
+    var layer = this._layers.get(layerName);
+    if (!layer) return;
+
+    this._renderer.setLayerIndex(layer, index);
+};
+
+/**
+ * Fill the array passed as argument with the names of all layers
+ * @param {string[]} result The array where to put the layer names
+ */
 gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
     this._layers.keys(result);
 };
@@ -714,7 +945,7 @@ gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
  * Stop the profiler being run on the scene.
  */
 gdjs.RuntimeScene.prototype.stopProfiler = function() {
-    if (!this._profiler) return null;
+    if (!this._profiler) return;
 
     var oldProfiler = this._profiler;
     var onProfilerStopped = this._onProfilerStopped;
@@ -744,4 +975,14 @@ gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
 gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
     this._constructListOfAllInstances();
     return this._allInstancesList;
+}
+
+/**
+ * Check if the scene was just resumed.
+ * This is true during the first frame after the scene has been unpaused.
+ *
+ * @returns {boolean} true if the scene was just resumed
+ */
+gdjs.RuntimeScene.prototype.sceneJustResumed = function() {
+    return this._isJustResumed;
 }

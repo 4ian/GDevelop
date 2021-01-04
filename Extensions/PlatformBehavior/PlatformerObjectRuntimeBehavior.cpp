@@ -27,6 +27,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       roundCoordinates(true),
       gravity(1000),
       maxFallingSpeed(700),
+      ladderClimbingSpeed(150),
       acceleration(1500),
       deceleration(1500),
       maxSpeed(250),
@@ -64,6 +65,7 @@ PlatformerObjectRuntimeBehavior::PlatformerObjectRuntimeBehavior(
       behaviorContent.GetBoolAttribute("roundCoordinates", false);
   gravity = behaviorContent.GetDoubleAttribute("gravity");
   maxFallingSpeed = behaviorContent.GetDoubleAttribute("maxFallingSpeed");
+  ladderClimbingSpeed = behaviorContent.GetDoubleAttribute("ladderClimbingSpeed");
   acceleration = behaviorContent.GetDoubleAttribute("acceleration");
   deceleration = behaviorContent.GetDoubleAttribute("deceleration");
   maxSpeed = behaviorContent.GetDoubleAttribute("maxSpeed");
@@ -245,8 +247,8 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Up");
     downKey |=
         !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (upKey) requestedDeltaY -= 150 * timeDelta;
-    if (downKey) requestedDeltaY += 150 * timeDelta;
+    if (upKey) requestedDeltaY -= ladderClimbingSpeed * timeDelta;
+    if (downKey) requestedDeltaY += ladderClimbingSpeed * timeDelta;
 
     // Coming to an extremity of a ladder
     if (!IsOverlappingLadder(potentialObjects)) {
@@ -323,6 +325,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
   }
 
   if (jumping) {
+    // TODO: Port the jump sustain feature
     requestedDeltaY -= currentJumpSpeed * timeDelta;
     currentJumpSpeed -= gravity * timeDelta;
     if (currentJumpSpeed < 0) {
@@ -442,11 +445,16 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
       floorLastX = floorPlatform->GetObject()->GetX();
       floorLastY = floorPlatform->GetObject()->GetY();
     } else {
-      // Check if landing on a new floor: (Exclude already overlapped jump truh)
+      // Avoid landing on a platform if the object is not going down.
+      // (which could happen for a jumpthru, when the object jump and pass just
+      // at the top of a jumpthru, it could be considered as landing if not for
+      // this extra check).
+      bool canLand = requestedDeltaY >= 0;
+
+      // Check if landing on a new floor: (Exclude already overlapped jump thru)
       std::set<PlatformRuntimeBehavior*> collidingObjects =
           GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
-      if (!collidingObjects.empty())  // Just landed on floor
-      {
+      if (canLand && !collidingObjects.empty()) {  // Just landed on floor
         isOnFloor = true;
         canJump = true;
         jumping = false;
@@ -458,8 +466,7 @@ void PlatformerObjectRuntimeBehavior::DoStepPreEvents(RuntimeScene& scene) {
         floorLastY = floorPlatform->GetObject()->GetY();
 
         ReleaseGrabbedPlatform();  // Ensure nothing is grabbed.
-      } else                       // In the air
-      {
+      } else {                     // In the air
         canJump = false;
         isOnFloor = false;
         floorPlatform = NULL;
@@ -502,7 +509,8 @@ void PlatformerObjectRuntimeBehavior::ReleaseGrabbedPlatform() {
 }
 
 bool PlatformerObjectRuntimeBehavior::SeparateFromPlatforms(
-    const std::set<PlatformRuntimeBehavior*>& candidates, bool excludeJumpThrus) {
+    const std::set<PlatformRuntimeBehavior*>& candidates,
+    bool excludeJumpThrus) {
   std::vector<RuntimeObject*> objects;
   for (std::set<PlatformRuntimeBehavior*>::iterator it = candidates.begin();
        it != candidates.end();

@@ -1,10 +1,13 @@
 #include "ObjectJsImplementation.h"
-#include <GDCore/Project/PropertyDescriptor.h>
+
+#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/Project.h>
+#include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <emscripten.h>
+
 #include <map>
 
 using namespace gd;
@@ -32,7 +35,7 @@ std::unique_ptr<gd::Object> ObjectJsImplementation::Clone() const {
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-ObjectJsImplementation::GetProperties(gd::Project&) const {
+ObjectJsImplementation::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -42,7 +45,7 @@ ObjectJsImplementation::GetProperties(gd::Project&) const {
         if (!self.hasOwnProperty('getProperties'))
           throw 'getProperties is not defined on a ObjectJsImplementation.';
 
-        var objectContent = JSON.parse(Pointer_stringify($1));
+        var objectContent = JSON.parse(UTF8ToString($1));
         var newProperties = self['getProperties'](objectContent);
         if (!newProperties)
           throw 'getProperties returned nothing in a gd::ObjectJsImplementation.';
@@ -57,16 +60,15 @@ ObjectJsImplementation::GetProperties(gd::Project&) const {
   return copiedProperties;
 }
 bool ObjectJsImplementation::UpdateProperty(const gd::String& arg0,
-                                            const gd::String& arg1,
-                                            Project&) {
+                                            const gd::String& arg1) {
   jsonContent = (const char*)EM_ASM_INT(
       {
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateProperty'))
           throw 'updateProperty is not defined on a ObjectJsImplementation.';
-        var objectContent = JSON.parse(Pointer_stringify($1));
+        var objectContent = JSON.parse(UTF8ToString($1));
         self['updateProperty'](
-            objectContent, Pointer_stringify($2), Pointer_stringify($3));
+            objectContent, UTF8ToString($2), UTF8ToString($3));
         return ensureString(JSON.stringify(objectContent));
       },
       (int)this,
@@ -91,7 +93,7 @@ ObjectJsImplementation::GetInitialInstanceProperties(
         if (!self.hasOwnProperty('getInitialInstanceProperties'))
           throw 'getInitialInstanceProperties is not defined on a ObjectJsImplementation.';
 
-        var objectContent = JSON.parse(Pointer_stringify($1));
+        var objectContent = JSON.parse(UTF8ToString($1));
         var newProperties = self['getInitialInstanceProperties'](
             objectContent,
             wrapPointer($2, Module['InitialInstance']),
@@ -124,12 +126,12 @@ bool ObjectJsImplementation::UpdateInitialInstanceProperty(
         var self = Module['getCache'](Module['ObjectJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateInitialInstanceProperty'))
           throw 'updateInitialInstanceProperty is not defined on a ObjectJsImplementation.';
-        var objectContent = JSON.parse(Pointer_stringify($1));
+        var objectContent = JSON.parse(UTF8ToString($1));
         return self['updateInitialInstanceProperty'](
             objectContent,
             wrapPointer($2, Module['InitialInstance']),
-            Pointer_stringify($3),
-            Pointer_stringify($4),
+            UTF8ToString($3),
+            UTF8ToString($4),
             wrapPointer($5, Module['Project']),
             wrapPointer($6, Module['Layout']));
       },
@@ -159,4 +161,36 @@ void ObjectJsImplementation::__destroy__() {  // Useless?
         self['__destroy__']();
       },
       (int)this);
+}
+
+void ObjectJsImplementation::ExposeResources(
+    gd::ArbitraryResourceWorker& worker) {
+  std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
+
+  for (auto& property : properties) {
+    const String& propertyName = property.first;
+    const gd::PropertyDescriptor& propertyDescriptor = property.second;
+    if (propertyDescriptor.GetType() == "resource") {
+      auto& extraInfo = propertyDescriptor.GetExtraInfo();
+      const gd::String& resourceType = extraInfo.empty() ? "" : extraInfo[0];
+      const gd::String& oldPropertyValue = propertyDescriptor.GetValue();
+
+      gd::String newPropertyValue = oldPropertyValue;
+      if (resourceType == "image") {
+        worker.ExposeImage(newPropertyValue);
+      } else if (resourceType == "audio") {
+        worker.ExposeAudio(newPropertyValue);
+      } else if (resourceType == "font") {
+        worker.ExposeFont(newPropertyValue);
+      } else if (resourceType == "video") {
+        // Not supported in gd::ArbitraryResourceWorker
+      } else if (resourceType == "json") {
+        // Not supported in gd::ArbitraryResourceWorker
+      }
+
+      if (newPropertyValue != oldPropertyValue) {
+        UpdateProperty(propertyName, newPropertyValue);
+      }
+    }
+  }
 }

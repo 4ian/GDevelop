@@ -35,10 +35,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
@@ -93,10 +94,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
@@ -141,117 +143,97 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
                  _("Volume of the sound on a channel"),
                  _("This action modifies the volume of the sound on the "
                    "specified channel. The volume is between 0 and 100."),
-                 _("Do _PARAM2__PARAM3_ to the volume of the sound on channel "
-                   "_PARAM1_"),
+                 _("the volume of the sound on channel _PARAM1_"),
                  _("Audio/Sounds on channels"),
                  "res/actions/sonVolume24.png",
                  "res/actions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("ModVolumeMusicCanal",
                  _("Volume of the music on a channel"),
                  _("This action modifies the volume of the music on the "
                    "specified channel. The volume is between 0 and 100."),
-                 _("Do _PARAM2__PARAM3_ to the volume of the music on channel "
-                   "_PARAM1_"),
+                 _("the volume of the music on channel _PARAM1_"),
                  _("Audio/Music on channels"),
                  "res/actions/musicVolume24.png",
                  "res/actions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("ModGlobalVolume",
                  _("Game global volume"),
                  _("This action modifies the global volume of the game. The "
                    "volume is between 0 and 100."),
-                 _("Do _PARAM1__PARAM2_ to global sound level"),
+                 _("the global sound level"),
                  _("Audio"),
                  "res/actions/volume24.png",
                  "res/actions/volume.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   extension
       .AddAction("ModPitchSoundChannel",
                  _("Pitch of the sound of a channel"),
                  _("This action modifies the pitch (speed) of the sound on a "
                    "channel.\n1 is the default pitch."),
-                 _("Do _PARAM2__PARAM3_ to the pitch of the sound on channel "
-                   "_PARAM1_"),
+                 _("the pitch of the sound on channel _PARAM1_"),
                  _("Audio/Sounds on channels"),
                  "res/actions/son24.png",
                  "res/actions/son.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("ModPitchMusicChannel",
                  _("Pitch of the music on a channel"),
                  _("This action modifies the pitch of the music on the "
                    "specified channel. 1 is the default pitch"),
-                 _("Do _PARAM2__PARAM3_ to the pitch of the music on channel "
-                   "_PARAM1_"),
+                 _("the pitch of the music on channel _PARAM1_"),
                  _("Audio/Music on channels"),
                  "res/actions/music24.png",
                  "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("ModPlayingOffsetSoundChannel",
                  _("Playing offset of the sound on a channel"),
                  _("This action modifies the playing offset of the sound on a "
                    "channel"),
-                 _("Do _PARAM2__PARAM3_ to the playing offset of the sound on "
-                   "channel _PARAM1_"),
+                 _("the playing offset of the sound on channel _PARAM1_"),
                  _("Audio/Sounds on channels"),
                  "res/actions/son24.png",
                  "res/actions/son.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("ModPlayingOffsetMusicChannel",
                  _("Playing offset of the music on a channel"),
                  _("This action modifies the playing offset of the music on "
                    "the specified channel"),
-                 _("Do _PARAM2__PARAM3_ to the playing offset of the music on "
-                   "channel _PARAM1_"),
+                 _("the playing offset of the music on channel _PARAM1_"),
                  _("Audio/Music on channels"),
                  "res/actions/music24.png",
                  "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddAction("PlaySound",
@@ -265,10 +247,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("soundfile", _("Audio file (or audio resource name)"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsSimple();
 
@@ -284,10 +267,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("musicfile", _("Audio file (or audio resource name)"))
       .AddParameter("yesorno", _("Repeat the sound"), "", true)
       .SetDefaultValue("no")
-      .AddParameter(
-          "expression", _("Volume (from 0 to 100, 100 by default)"), "", true)
+      .AddParameter("expression", _("Volume"), "", true)
+      .SetParameterLongDescription(_("From 0 to 100, 100 by default."))
       .SetDefaultValue("100")
-      .AddParameter("expression", _("Pitch (speed) (1 by default)"), "", true)
+      .AddParameter("expression", _("Pitch (speed)"), "", true)
+      .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsSimple();
 
@@ -369,16 +353,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           _("Volume of the sound on a channel"),
           _("Test the volume of the sound on the specified channel. The volume "
             "is between 0 and 100."),
-          _("The volume of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
+          _("the volume of the sound on channel _PARAM1_"),
           _("Audio/Sounds on channels"),
           "res/conditions/sonVolume24.png",
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Volume to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
@@ -386,30 +368,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           _("Volume of the music on a channel"),
           _("Test the volume of the music on a specified channel. The volume "
             "is between 0 and 100."),
-          _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
+          _("the volume of the music on channel _PARAM1_"),
           _("Audio/Music on channels"),
           "res/conditions/musicVolume24.png",
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Volume to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
           "GlobalVolume",
           _("Global volume"),
           _("Test the global sound level. The volume is between 0 and 100."),
-          _("The global game volume is _PARAM1__PARAM2_"),
+          _("the global game volume"),
           _("Audio"),
           "res/conditions/volume24.png",
           "res/conditions/volume.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Volume to test"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   extension
       .AddCondition(
@@ -417,16 +395,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           _("Pitch of the sound of a channel"),
           _("Test the pitch of the sound on the specified channel. 1 is the "
             "default pitch."),
-          _("The pitch of the sound on channel _PARAM1_ is _PARAM2__PARAM3_"),
+          _("the pitch of the sound on channel _PARAM1_"),
           _("Audio/Sounds on channels"),
           "res/conditions/sonVolume24.png",
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Pitch to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
@@ -434,50 +410,42 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           _("Pitch of the music on a channel"),
           _("Test the pitch (speed) of the music on a specified channel. 1 is "
             "the default pitch."),
-          _("The pitch of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
+          _("the pitch of the music on channel _PARAM1_"),
           _("Audio/Music on channels"),
           "res/conditions/musicVolume24.png",
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Pitch to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
           "SoundChannelPlayingOffset",
           _("Playing offset of the sound on a channel"),
           _("Test the playing offset of the sound on the specified channel."),
-          _("The playing offset of the sound on channel _PARAM1_ is "
-            "_PARAM2__PARAM3_"),
+          _("the playing offset of the sound on channel _PARAM1_"),
           _("Audio/Sounds on channels"),
           "res/conditions/sonVolume24.png",
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Playing position (in seconds)"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition(
           "MusicChannelPlayingOffset",
           _("Playing offset of the music on a channel"),
           _("Test the playing offset of the music on the specified channel."),
-          _("The playing offset of the music on channel _PARAM1_ is "
-            "_PARAM2__PARAM3_"),
+          _("the playing offset of the music on channel _PARAM1_"),
           _("Audio/Music on channels"),
           "res/conditions/musicVolume24.png",
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Playing position (in seconds)"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
       .AddExpression("SoundChannelPlayingOffset",

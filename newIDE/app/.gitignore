@@ -1,4 +1,5 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# Generated files
+src/Version/VersionMetadata.js
 
 # dependencies
 node_modules
@@ -18,12 +19,18 @@ npm-debug.log
 
 # GD library
 public/libGD.js
+public/libGD.js.mem
+public/libGD.wasm
 
 # Third party editors
 public/external/piskel/piskel-editor
 public/external/piskel/piskel-editor.zip
-public/external/monaco-editor-min
-public/external/jfxr/jfxr-editor/
+public/external/monaco-editor-min/*
+public/external/jfxr/jfxr-editor/*
+public/external/yarn/yarn-editor/*
+public/external/zip.js/*
+public/external/zlib-asm/*
+public/external/__MACOSX/
 
 # Resources
 resources/GDJS

@@ -189,6 +189,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
   objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
+  objectExpressions["DistanceToPosition"].SetFunctionName("getDistanceToPosition");
+  objectExpressions["SqDistanceToPosition"].SetFunctionName("getSqDistanceToPosition");
+  objectExpressions["AngleToObject"].SetFunctionName("getAngleToObject");
+  objectExpressions["AngleToPosition"].SetFunctionName("getAngleToPosition");
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
@@ -214,6 +218,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(
       "gdjs.evtTools.object.turnedTowardTest");
+  GetAllConditions()["SourisSurObjet"].SetFunctionName(
+      "gdjs.evtTools.input.cursorOnObject");
 
   GetAllActions()["AjoutObjConcern"].SetFunctionName(
       "gdjs.evtTools.object.pickAllObjects");

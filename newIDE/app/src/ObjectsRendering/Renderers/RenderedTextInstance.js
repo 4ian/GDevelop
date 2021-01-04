@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js';
-const gd = global.gd;
+import * as PIXI from 'pixi.js-legacy';
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * Renderer for a Text object.
@@ -81,13 +81,16 @@ RenderedTextInstance.prototype.update = function() {
       })
       .catch(err => {
         // Ignore errors
-        console.warn('Unable to load font family', err);
+        console.warn(
+          'Unable to load font family for RenderedTextInstance',
+          err
+        );
       });
   }
 
   if (this._styleFontDirty) {
     this._pixiObject.style.fontFamily = this._fontFamily || 'Arial';
-    this._pixiObject.style.fontSize = this._characterSize + 'px';
+    this._pixiObject.style.fontSize = Math.max(1, this._characterSize) + 'px';
     this._pixiObject.style.fontStyle = this._isItalic ? 'italic' : 'normal';
     this._pixiObject.style.fontWeight = this._isBold ? 'bold' : 'normal';
     this._pixiObject.style.wordWrap = this._wrapping;

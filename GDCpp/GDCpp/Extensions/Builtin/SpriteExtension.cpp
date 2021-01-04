@@ -65,17 +65,16 @@ SpriteExtension::SpriteExtension() {
       .SetFunctionName("RotateTowardPosition")
       .SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
   objectActions["ChangeScale"]
-      .SetFunctionName("ChangeScale")
+      .SetFunctionName("SetScale")
+      .SetGetter("GetScale")
       .SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
   objectActions["ChangeScaleWidth"]
       .SetFunctionName("SetScaleX")
       .SetGetter("GetScaleX")
-      .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
   objectActions["ChangeScaleHeight"]
       .SetFunctionName("SetScaleY")
       .SetGetter("GetScaleY")
-      .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
 
   objectConditions["Animation"]

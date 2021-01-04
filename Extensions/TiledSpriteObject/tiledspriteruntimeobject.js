@@ -4,40 +4,70 @@
  */
 
 /**
+ * @typedef {Object} TiledSpriteObjectDataType Initial properties for a Tiled Sprite object
+ * @property {number} width The width of the object
+ * @property {number} height The height of the object
+ */
+
+/**
+ * @typedef {ObjectData & TiledSpriteObjectDataType} TiledSpriteObjectData
+ */
+
+/**
  * The TiledSpriteRuntimeObject displays a tiled texture.
  *
  * @class TiledSpriteRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {TiledSpriteObjectData} tiledSpriteObjectData The initial properties of the object
  */
-gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
+gdjs.TiledSpriteRuntimeObject = function(runtimeScene, tiledSpriteObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, tiledSpriteObjectData);
     this._xOffset = 0;
     this._yOffset = 0;
     this.opacity = 255;
 
     if (this._renderer)
-        gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, objectData.texture);
+        gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, tiledSpriteObjectData.texture);
     else
-        this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, objectData.texture);
+        /** @type {gdjs.TiledSpriteRuntimeObjectRenderer} */
+        this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(this, runtimeScene, tiledSpriteObjectData.texture);
 
-    this.setWidth(objectData.width);
-    this.setHeight(objectData.height);
+    this.setWidth(tiledSpriteObjectData.width);
+    this.setHeight(tiledSpriteObjectData.height);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.TiledSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "TiledSpriteObject::TiledSprite";
+gdjs.registerObject("TiledSpriteObject::TiledSprite", gdjs.TiledSpriteRuntimeObject);
+
+gdjs.TiledSpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.texture !== newObjectData.texture) {
+        this.setTexture(newObjectData.texture, this._runtimeScene);
+    }
+    if (oldObjectData.width !== newObjectData.width) {
+        this.setWidth(newObjectData.width);
+    }
+    if (oldObjectData.height !== newObjectData.height) {
+        this.setHeight(newObjectData.height);
+    }
+
+    return true;
+};
 
 gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
 };
 
-gdjs.TiledSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.TiledSpriteRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 
@@ -185,7 +215,7 @@ gdjs.TiledSpriteRuntimeObject.prototype.setColor = function(rgbColor) {
 /**
  * Get the tint of the tiled sprite object.
  *
- * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ * @returns {string} The color, in RGB format ("128;200;255").
  */
 gdjs.TiledSpriteRuntimeObject.prototype.getColor = function() {
     return this._renderer.getColor();

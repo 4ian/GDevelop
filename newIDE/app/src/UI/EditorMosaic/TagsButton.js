@@ -1,8 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import IconButton from 'material-ui/IconButton';
-import FilterList from 'material-ui/svg-icons/content/filter-list';
-import IconMenu from '../Menu/IconMenu';
+import { type I18n as I18nType } from '@lingui/core';
+import IconButton from '../IconButton';
+import FilterList from '@material-ui/icons/FilterList';
+import ElementWithMenu from '../Menu/ElementWithMenu';
+import { type MenuItemTemplate } from '../Menu/Menu.flow';
 
 const styles = {
   container: {
@@ -10,19 +12,23 @@ const styles = {
     width: 32,
     height: 32,
   },
+  icon: {
+    width: 16,
+    height: 16,
+  },
 };
 
-type Props = {
-  buildMenuTemplate: () => Array<any>,
-};
+type Props = {|
+  buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+|};
 
 export default class TagsButton extends Component<Props, {||}> {
   render() {
     return (
-      <IconMenu
-        iconButtonElement={
+      <ElementWithMenu
+        element={
           <IconButton style={styles.container}>
-            <FilterList color="white" />
+            <FilterList htmlColor="white" style={styles.icon} />
           </IconButton>
         }
         buildMenuTemplate={this.props.buildMenuTemplate}

@@ -1,14 +1,19 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import {
   type ParameterInlineRenderer,
   type ParameterInlineRendererProps,
 } from './ParameterFields/ParameterInlineRenderer.flow';
-import DefaultField from './ParameterFields/DefaultField';
+import DefaultField, {
+  renderInlineDefaultField,
+} from './ParameterFields/DefaultField';
 import RelationalOperatorField, {
   renderInlineRelationalOperator,
 } from './ParameterFields/RelationalOperatorField';
-import OperatorField from './ParameterFields/OperatorField';
+import OperatorField, {
+  renderInlineOperator,
+} from './ParameterFields/OperatorField';
 import MouseField, { renderInlineMouse } from './ParameterFields/MouseField';
 import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
 import ObjectField, {
@@ -40,7 +45,8 @@ import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
 import SceneNameField from './ParameterFields/SceneNameField';
-const gd = global.gd;
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+const gd: libGDevelop = global.gd;
 
 const components = {
   default: DefaultField,
@@ -71,6 +77,7 @@ const components = {
   sceneName: SceneNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
+  default: renderInlineDefaultField,
   forceMultiplier: renderInlineForceMultiplier,
   globalvar: renderInlineGlobalVariable,
   scenevar: renderInlineSceneVariable,
@@ -80,13 +87,40 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   object: renderInlineObjectWithThumbnail,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
+  operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
+};
+const userFriendlyTypeName: { [string]: MessageDescriptor } = {
+  mouse: t`Mouse button`,
+  object: t`Object`,
+  relationalOperator: t`Relational operator`,
+  operator: t`Operator`,
+  yesorno: t`Yes or No`,
+  trueorfalse: t`True or False`,
+  expression: t`Number`,
+  string: t`String`,
+  stringWithSelector: t`String`,
+  behavior: t`Behavior`,
+  scenevar: t`Scene variable`,
+  globalvar: t`Global variable`,
+  objectvar: t`Object variable`,
+  layer: t`Layer`,
+  key: t`Keyboard key`,
+  musicfile: t`Audio resource`,
+  soundfile: t`Audio resource`,
+  videoResource: t`Video resource`,
+  jsonResource: t`JSON resource`,
+  color: t`Color`,
+  forceMultiplier: t`Instant or permanent force`,
+  sceneName: t`Scene name`,
 };
 
 export default {
   components,
-  getParameterComponent: (type: string) => {
-    const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;
+  getParameterComponent: (rawType: string) => {
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
+      ? 'object'
+      : rawType;
 
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
@@ -97,8 +131,15 @@ export default {
       ? 'object'
       : rawType;
 
-    return inlineRenderers[fieldType]
-      ? inlineRenderers[fieldType](props)
-      : props.value;
+    const inlineRenderer =
+      inlineRenderers[fieldType] || inlineRenderers.default;
+    return inlineRenderer(props);
+  },
+  getUserFriendlyTypeName: (rawType: string): ?MessageDescriptor => {
+    const fieldType = gd.ParameterMetadata.isObject(rawType)
+      ? 'object'
+      : rawType;
+
+    return userFriendlyTypeName[fieldType] || null;
   },
 };

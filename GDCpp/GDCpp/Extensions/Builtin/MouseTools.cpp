@@ -1,7 +1,6 @@
 #include "GDCpp/Extensions/Builtin/MouseTools.h"
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Runtime/RuntimeLayer.h"
-#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 
 void GD_API CenterCursor(RuntimeScene &scene) {
@@ -82,15 +81,4 @@ bool GD_API IsMouseWheelScrollingUp(RuntimeScene &scene) {
 
 bool GD_API IsMouseWheelScrollingDown(RuntimeScene &scene) {
   return scene.GetInputManager().IsScrollingDown();
-}
-
-bool GD_API CursorOnObject(
-    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
-    RuntimeScene &scene,
-    bool precise,
-    bool conditionInverted) {
-  return PickObjectsIf(
-      objectsLists, conditionInverted, [&scene, precise](RuntimeObject *obj) {
-        return obj->CursorOnObject(scene, precise);
-      });
 }

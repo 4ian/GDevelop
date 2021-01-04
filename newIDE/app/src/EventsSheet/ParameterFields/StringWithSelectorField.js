@@ -35,13 +35,18 @@ export default class StringWithSelectorField extends Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
+        fullWidth
         value={value}
         onChange={onChange}
         dataSource={getChoices(parameterMetadata).map(choice => ({
-          text: choice,
+          text: '"' + choice + '"',
           value: '"' + choice + '"',
         }))}
         openOnFocus={!isInline}

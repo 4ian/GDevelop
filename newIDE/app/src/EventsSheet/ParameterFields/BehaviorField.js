@@ -1,11 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
-const gd = global.gd;
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
+const gd: libGDevelop = global.gd;
 
 type State = {|
   errorText: ?string,
@@ -17,9 +18,10 @@ export default class BehaviorField extends React.Component<
 > {
   state = { errorText: null };
   _description: ?string;
+  _longDescription: ?string;
   _behaviorTypeAllowed: ?string;
   _behaviorNames: Array<string> = [];
-  _field: ?AutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   constructor(props: ParameterFieldProps) {
     super(props);
@@ -27,6 +29,10 @@ export default class BehaviorField extends React.Component<
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
       ? parameterMetadata.getDescription()
+      : undefined;
+
+    this._longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
       : undefined;
 
     this._behaviorTypeAllowed = parameterMetadata
@@ -66,7 +72,8 @@ export default class BehaviorField extends React.Component<
           gd.getTypeOfBehavior(
             this.props.globalObjectsContainer,
             this.props.objectsContainer,
-            behaviorName
+            behaviorName,
+            false
           ) === this._behaviorTypeAllowed
         );
       });
@@ -128,7 +135,10 @@ export default class BehaviorField extends React.Component<
 
     return (
       <SemiControlledAutoComplete
+        margin={this.props.isInline ? 'none' : 'dense'}
         floatingLabelText={this._description}
+        helperMarkdownText={this._longDescription}
+        fullWidth
         errorText={
           !this._behaviorNames.length
             ? noBehaviorErrorText
@@ -136,6 +146,7 @@ export default class BehaviorField extends React.Component<
         }
         value={this.props.value}
         onChange={this.props.onChange}
+        onRequestClose={this.props.onRequestClose}
         onBlur={event => {
           this._doValidation(event.currentTarget.value);
         }}

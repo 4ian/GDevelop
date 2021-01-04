@@ -4,12 +4,8 @@
  */
 
 #include "JsCodeEvent.h"
-#include <fstream>
-#include <iostream>
+
 #include "GDCore/CommonTools.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Project/Layout.h"
@@ -23,17 +19,41 @@ using namespace std;
 
 namespace gdjs {
 
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+JsCodeEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&parameterObjects, metadata));
+
+  return allExpressionsWithMetadata;
+}
+
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+JsCodeEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("object");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&parameterObjects, metadata));
+
+  return allExpressionsWithMetadata;
+}
+
 void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
   element.AddChild("inlineCode").SetValue(inlineCode);
-  element.AddChild("parameterObjects").SetValue(parameterObjects);
+  element.AddChild("parameterObjects")
+      .SetValue(parameterObjects.GetPlainString());
   element.AddChild("useStrict").SetValue(useStrict);
+  element.AddChild("eventsSheetExpanded").SetValue(eventsSheetExpanded);
 }
 
 void JsCodeEvent::UnserializeFrom(gd::Project& project,
                                   const gd::SerializerElement& element) {
   inlineCode = element.GetChild("inlineCode").GetValue().GetString();
-  parameterObjects =
-      element.GetChild("parameterObjects").GetValue().GetString();
+  parameterObjects = gd::Expression(
+      element.GetChild("parameterObjects").GetValue().GetString());
 
   if (!element.HasChild("useStrict")) {
     // Compatibility with GD <= 5.0.0-beta68
@@ -42,11 +62,20 @@ void JsCodeEvent::UnserializeFrom(gd::Project& project,
   } else {
     useStrict = element.GetChild("useStrict").GetBoolValue();
   }
+
+  if (!element.HasChild("eventsSheetExpanded")) {
+    // Compatibility with GD <= 5.0.0-beta101
+    eventsSheetExpanded = false;
+    // end of compatibility code
+  } else {
+    eventsSheetExpanded = element.GetChild("eventsSheetExpanded").GetBoolValue();
+  }
 }
 
 JsCodeEvent::JsCodeEvent()
     : BaseEvent(),
       inlineCode("runtimeScene.setBackgroundColor(100,100,240);\n"),
-      useStrict(true) {}
+      useStrict(true),
+      eventsSheetExpanded(false) {}
 
 }  // namespace gdjs

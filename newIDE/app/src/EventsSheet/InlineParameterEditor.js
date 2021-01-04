@@ -7,8 +7,8 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from './EventsScope.flow';
-const gd = global.gd;
+import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -95,7 +95,10 @@ export default class InlineParameterEditor extends React.Component<
         instructionMetadata,
       },
       () => {
-        if (this._field && this._field.focus) this._field.focus();
+        // Give a bit of time for the popover to mount itself
+        setTimeout(() => {
+          if (this._field && this._field.focus) this._field.focus();
+        }, 10);
       }
     );
   }
@@ -120,6 +123,7 @@ export default class InlineParameterEditor extends React.Component<
           parameterIndex={this.props.parameterIndex}
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
+          onRequestClose={this.props.onRequestClose}
           project={this.props.project}
           scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}

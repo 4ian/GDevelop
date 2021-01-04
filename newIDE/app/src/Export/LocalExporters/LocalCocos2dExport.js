@@ -1,163 +1,160 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import Toggle from 'material-ui/Toggle';
-import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import HelpButton from '../../UI/HelpButton';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { findGDJS } from './LocalGDJSFinder';
+
+import React from 'react';
+import RaisedButton from '../../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
+import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
+import {
+  type ExportPipeline,
+  type ExportPipelineContext,
+} from '../ExportPipeline.flow';
+import Toggle from '../../UI/Toggle';
+import {
+  DoneFooter,
+  ExplanationHeader,
+} from '../GenericExporters/Cocos2dExport';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
-export default class LocalCocos2dExport extends Component {
-  state = {
-    exportFinishedDialogOpen: false,
-    outputDir: '',
+type ExportState = {
+  outputDir: string,
+  debugMode: boolean,
+};
+
+type PreparedExporter = {|
+  exporter: gdjsExporter,
+|};
+
+type ExportOutput = null;
+
+type ResourcesDownloadOutput = null;
+
+type CompressionOutput = null;
+
+export const localCocos2dExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  name: 'local-cocos2d',
+
+  getInitialExportState: (project: gdProject) => ({
+    outputDir: project.getLastCompilationDirectory(),
     debugMode: false,
-  };
+  }),
 
-  componentDidMount() {
-    const { project } = this.props;
-    this.setState({
-      outputDir: project ? project.getLastCompilationDirectory() : '',
+  canLaunchBuild: exportState => !!exportState.outputDir,
+
+  renderHeader: ({ project, exportState, updateExportState }) => (
+    <Column noMargin>
+      <Line>
+        <ExplanationHeader />
+      </Line>
+      <Line>
+        <LocalFolderPicker
+          type="export"
+          value={exportState.outputDir}
+          defaultPath={project.getLastCompilationDirectory()}
+          onChange={outputDir => {
+            updateExportState(prevState => ({ ...prevState, outputDir }));
+          }}
+          fullWidth
+        />
+      </Line>
+      <Line>
+        <Toggle
+          onToggle={(e, check) =>
+            updateExportState(prevState => ({
+              ...prevState,
+              debugMode: check,
+            }))
+          }
+          toggled={exportState.debugMode}
+          labelPosition="right"
+          label={
+            <Trans>
+              Debug mode (show FPS counter and stats in the bottom left)
+            </Trans>
+          }
+        />
+      </Line>
+    </Column>
+  ),
+
+  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+
+  prepareExporter: (
+    context: ExportPipelineContext<ExportState>
+  ): Promise<PreparedExporter> => {
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
+
+      // TODO: Memory leak? Check for other exporters too.
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+
+      return {
+        exporter,
+      };
     });
-  }
+  },
 
-  static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+  launchExport: (
+    context: ExportPipelineContext<ExportState>,
+    { exporter }: PreparedExporter
+  ): Promise<ExportOutput> => {
+    exporter.exportWholeCocos2dProject(
+      context.project,
+      context.exportState.debugMode,
+      context.exportState.outputDir
+    );
+    exporter.delete();
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+    return Promise.resolve(null);
+  },
 
-        resolve({
-          exporter,
-        });
-      });
-    });
-  };
+  launchResourcesDownload: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    return Promise.resolve(null);
+  },
 
-  launchExport = () => {
-    const { project } = this.props;
-    if (!project) return;
+  launchCompression: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ResourcesDownloadOutput
+  ): Promise<CompressionOutput> => {
+    return Promise.resolve(null);
+  },
 
-    sendExportLaunched('local-cocos2d');
-
-    const { outputDir, debugMode } = this.state;
-    project.setLastCompilationDirectory(outputDir);
-
-    LocalCocos2dExport.prepareExporter()
-      .then(({ exporter }) => {
-        exporter.exportWholeCocos2dProject(project, debugMode, outputDir);
-        exporter.delete();
-        this.setState({
-          exportFinishedDialogOpen: true,
-        });
-      })
-      .catch(err => {
-        showErrorBox('Unable to export the game with Cocos2d-JS', err);
-      });
-  };
-
-  openExportFolder = () => {
-    shell.openItem(this.state.outputDir);
-  };
-
-  render() {
-    const { project } = this.props;
-    if (!project) return null;
+  renderDoneFooter: ({ exportState, onClose }) => {
+    const openExportFolder = () => {
+      if (shell) shell.openItem(exportState.outputDir);
+    };
 
     return (
-      <Column noMargin>
-        <Line>
-          <Trans>
-            This will export your game using Cocos2d-JS game engine. The game
-            can be compiled for Android or iOS if you install Cocos2d-JS
-            developer tools.
-          </Trans>
-        </Line>
-        <Line>
-          <LocalFolderPicker
-            type="export"
-            value={this.state.outputDir}
-            defaultPath={project.getLastCompilationDirectory()}
-            onChange={value => this.setState({ outputDir: value })}
-            fullWidth
-          />
-        </Line>
-        <Line>
-          <Toggle
-            onToggle={(e, check) =>
-              this.setState({
-                debugMode: check,
-              })
-            }
-            toggled={this.state.debugMode}
-            labelPosition="right"
-            label={
-              <Trans>
-                Debug mode (show FPS counter and stats in the bottom left)
-              </Trans>
-            }
-          />
-        </Line>
-        <Line>
-          <Spacer expand />
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
-            label={<Trans>Export</Trans>}
+            key="open"
+            label={<Trans>Open folder</Trans>}
             primary={true}
-            onClick={this.launchExport}
-            disabled={!this.state.outputDir}
+            onClick={openExportFolder}
           />
-        </Line>
-        <Dialog
-          title={<Trans>Export finished</Trans>}
-          actions={[
-            <FlatButton
-              key="open"
-              label={<Trans>Open folder</Trans>}
-              primary={true}
-              onClick={this.openExportFolder}
-            />,
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary={false}
-              onClick={() =>
-                this.setState({
-                  exportFinishedDialogOpen: false,
-                })
-              }
-            />,
-          ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
-          modal
-          open={this.state.exportFinishedDialogOpen}
-        >
-          You can now upload the game to a web hosting or use Cocos2d-JS command
-          line tools to export it to other platforms like iOS (XCode is
-          required) or Android (Android SDK is required).
-        </Dialog>
-      </Column>
+        )}
+      />
     );
-  }
-}
+  },
+};

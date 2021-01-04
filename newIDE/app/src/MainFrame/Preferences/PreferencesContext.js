@@ -1,27 +1,185 @@
 // @flow
-import createReactContext, { type Context } from 'create-react-context';
+import { Trans } from '@lingui/macro';
+import * as React from 'react';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import { type EditorMosaicNode } from '../../UI/EditorMosaic';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
+  | 'default-additional-work'
+  | 'automatic-lighting-layer'
+  | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
   | 'minimum-fps-too-low'
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
-  | 'empty-events-based-behavior-explanation';
+  | 'empty-events-based-behavior-explanation'
+  | 'too-much-effects'
+  | 'effects-usage'
+  | 'lighting-layer-usage'
+  | 'resource-properties-panel-explanation'
+  | 'instance-drag-n-drop-explanation'
+  | 'objects-panel-explanation'
+  | 'instance-properties-panel-explanation'
+  | 'layers-panel-explanation'
+  | 'instances-panel-explanation'
+  | 'physics2-shape-collisions'
+  | 'edit-instruction-explanation'
+  | 'lifecycle-events-function-included-only-if-extension-used'
+  | 'p2p-broker-recommendation'
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation'
+  | 'extension-installed-explanation';
 
+export type EditorMosaicName =
+  | 'scene-editor'
+  | 'scene-editor-small'
+  | 'debugger'
+  | 'resources-editor'
+  | 'events-functions-extension-editor';
+
+export const allAlertMessages: Array<{
+  key: AlertMessageIdentifier,
+  label: React.Node,
+}> = [
+  {
+    key: 'use-non-smoothed-textures',
+    label: <Trans>Using non smoothed textures</Trans>,
+  },
+  {
+    key: 'use-nearest-scale-mode',
+    label: <Trans>Using Nearest Scale Mode</Trans>,
+  },
+  {
+    key: 'maximum-fps-too-low',
+    label: <Trans>Maximum Fps is too low</Trans>,
+  },
+  {
+    key: 'minimum-fps-too-low',
+    label: <Trans>Minimum Fps is too low</Trans>,
+  },
+  {
+    key: 'function-extractor-explanation',
+    label: <Trans>Using function extractor</Trans>,
+  },
+  {
+    key: 'events-based-behavior-explanation',
+    label: <Trans>Using events based behavior</Trans>,
+  },
+  {
+    key: 'empty-events-based-behavior-explanation',
+    label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'too-much-effects',
+    label: <Trans>Using too much effects</Trans>,
+  },
+  {
+    key: 'effects-usage',
+    label: <Trans>Using effects</Trans>,
+  },
+  {
+    key: 'lighting-layer-usage',
+    label: <Trans>Using lighting layer</Trans>,
+  },
+  {
+    key: 'automatic-lighting-layer',
+    label: <Trans>Automatic creation of lighting layer</Trans>,
+  },
+  {
+    key: 'object-moved-in-lighting-layer',
+    label: <Trans>Light object automatically put in lighting layer</Trans>,
+  },
+  {
+    key: 'resource-properties-panel-explanation',
+    label: <Trans>Using the resource properties panel</Trans>,
+  },
+  {
+    key: 'instance-drag-n-drop-explanation',
+    label: <Trans>Using instance drag'n'drop</Trans>,
+  },
+  {
+    key: 'objects-panel-explanation',
+    label: <Trans>Using the objects panel</Trans>,
+  },
+  {
+    key: 'instance-properties-panel-explanation',
+    label: <Trans>Using the instance properties panel</Trans>,
+  },
+  {
+    key: 'layers-panel-explanation',
+    label: <Trans>Using the layers panel</Trans>,
+  },
+  {
+    key: 'instances-panel-explanation',
+    label: <Trans>Using the instances panel</Trans>,
+  },
+  {
+    key: 'physics2-shape-collisions',
+    label: <Trans>Collisions handling with the Physics engine</Trans>,
+  },
+  {
+    key: 'edit-instruction-explanation',
+    label: <Trans>How to edit instructions</Trans>,
+  },
+  {
+    key: 'lifecycle-events-function-included-only-if-extension-used',
+    label: <Trans>Lifecycle functions only included when extension used</Trans>,
+  },
+  {
+    key: 'p2p-broker-recommendation',
+    label: <Trans>Peer to peer broker server recommendation</Trans>,
+  },
+  {
+    key: 'command-palette-shortcut',
+    label: <Trans>Command palette keyboard shortcut</Trans>,
+  },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
+];
+
+/**
+ * All the preferences of GDevelop. To add a new preference, add it into this
+ * type and add a setter into `Preferences` type. Then, update the
+ * preference dialog.
+ */
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
   themeName: string,
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
+  hiddenTutorialHints: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
+  useNewInstructionEditorDialog: boolean,
+  useGDJSDevelopmentWatcher: boolean,
+  eventsSheetUseAssignmentOperators: boolean,
+  showEffectParameterNames: boolean,
+  projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  autoOpenMostRecentProject: boolean,
+  hasProjectOpened: boolean,
+  userShortcutMap: ShortcutMap,
+  newObjectDialogDefaultTab: 'asset-store' | 'new-object',
 |};
 
+/**
+ * Type containing all the preferences of GDevelop and their setters.
+ */
 export type Preferences = {|
   values: PreferencesValues,
   setLanguage: (language: string) => void,
@@ -31,22 +189,69 @@ export type Preferences = {|
   checkUpdates: (forceDownload?: boolean) => void,
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
+  showTutorialHint: (identifier: string, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
+  setUseNewInstructionEditorDialog: (enabled: boolean) => void,
+  setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
+  setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
+  setShowEffectParameterNames: (enabled: boolean) => void,
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
+  setLastUsedPath: (
+    project: gdProject,
+    kind: ResourceKind,
+    path: string
+  ) => void,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => ?EditorMosaicNode,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => void,
+  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => void,
+  getAutoOpenMostRecentProject: () => boolean,
+  setAutoOpenMostRecentProject: (enabled: boolean) => void,
+  hadProjectOpenedDuringLastSession: () => boolean,
+  setHasProjectOpened: (enabled: boolean) => void,
+  resetShortcutsToDefault: () => void,
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
+  getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
+  setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
 |};
 
 export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName: electron
+      ? electron.remote.nativeTheme.shouldUseDarkColors
+        ? 'Nord'
+        : 'GDevelop default'
+      : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
+    hiddenTutorialHints: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
+    useNewInstructionEditorDialog: true,
+    useGDJSDevelopmentWatcher: true,
+    eventsSheetUseAssignmentOperators: false,
+    showEffectParameterNames: false,
+    projectLastUsedPaths: {},
+    defaultEditorMosaicNodes: {},
+    recentProjectFiles: [],
+    autoOpenMostRecentProject: true,
+    hasProjectOpened: false,
+    userShortcutMap: {},
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -55,13 +260,38 @@ export const initialPreferences = {
   checkUpdates: () => {},
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
+  showTutorialHint: (identifier: string, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
+  setUseNewInstructionEditorDialog: (enabled: boolean) => {},
+  setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
+  setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
+  setShowEffectParameterNames: (enabled: boolean) => {},
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  setDefaultEditorMosaicNode: (
+    name: EditorMosaicName,
+    node: ?EditorMosaicNode
+  ) => {},
+  getRecentProjectFiles: () => [],
+  insertRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  removeRecentProjectFile: (
+    fileMetadata: FileMetadataAndStorageProviderName
+  ) => {},
+  getAutoOpenMostRecentProject: () => true,
+  setAutoOpenMostRecentProject: () => {},
+  hadProjectOpenedDuringLastSession: () => false,
+  setHasProjectOpened: () => {},
+  resetShortcutsToDefault: () => {},
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
+  getNewObjectDialogDefaultTab: () => 'asset-store',
+  setNewObjectDialogDefaultTab: () => {},
 };
 
-const PreferencesContext: Context<Preferences> = createReactContext(
-  initialPreferences
-);
+const PreferencesContext = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

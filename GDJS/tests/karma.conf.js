@@ -32,9 +32,7 @@ module.exports = function(config) {
       '../Runtime/variable.js',
       '../Runtime/variablescontainer.js',
       '../Runtime/oncetriggers.js',
-      '../Runtime/runtimescene.js',
       '../Runtime/runtimebehavior.js',
-      '../Runtime/runtimeobject.js',
       '../Runtime/spriteruntimeobject.js',
       '../Runtime/events-tools/commontools.js',
       '../Runtime/events-tools/runtimescenetools.js',
@@ -46,6 +44,7 @@ module.exports = function(config) {
       '../Runtime/events-tools/storagetools.js',
       '../Runtime/events-tools/stringtools.js',
       '../Runtime/events-tools/windowtools.js',
+      '../Runtime/websocket-debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../Extensions/DraggableBehavior/draggableruntimebehavior.js',
@@ -54,15 +53,24 @@ module.exports = function(config) {
       '../../Extensions/LinkedObjects/linkedobjects.js',
       '../../Extensions/Inventory/inventory.js',
       '../../Extensions/Inventory/inventorytools.js',
+      '../../Extensions/Lighting/lightruntimeobject.js',
+      '../../Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
+      '../../Extensions/Lighting/lightobstacleruntimebehavior.js',
+
+      // Test extensions:
+      './tests/Extensions/**.js',
 
       //All tests files:
-      './tests/init.js',
+      './tests-utils/init.pixiruntimegamewithassets.js',
       '../../Extensions/**/tests/**.spec.js',
       './tests/**/*.js',
 
       //All benchmark files:
       './benchmarks/init.js',
-      './benchmarks/**/*.js'
+      './benchmarks/**/*.js',
+
+      // Assets
+      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false}
     ]
   });
 };

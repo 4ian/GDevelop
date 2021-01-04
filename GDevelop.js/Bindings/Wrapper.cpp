@@ -1,86 +1,88 @@
+#include <GDCore/Events/Builtin/CommentEvent.h>
+#include <GDCore/Events/Builtin/ForEachEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
+#include <GDCore/Events/Builtin/GroupEvent.h>
+#include <GDCore/Events/Builtin/LinkEvent.h>
+#include <GDCore/Events/Builtin/RepeatEvent.h>
+#include <GDCore/Events/Builtin/StandardEvent.h>
+#include <GDCore/Events/Builtin/WhileEvent.h>
+#include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
+#include <GDCore/Events/Parsers/ExpressionParser2.h>
+#include <GDCore/Events/Parsers/ExpressionParser2Node.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Animation.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Direction.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Sprite.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h>
+#include <GDCore/Extensions/Metadata/DependencyMetadata.h>
+#include <GDCore/Extensions/Metadata/EffectMetadata.h>
+#include <GDCore/Extensions/Metadata/MetadataProvider.h>
+#include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
+#include <GDCore/Extensions/Platform.h>
+#include <GDCore/IDE/AbstractFileSystem.h>
+#include <GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h>
+#include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
+#include <GDCore/IDE/Events/EventsContextAnalyzer.h>
+#include <GDCore/IDE/Events/EventsListUnfolder.h>
+#include <GDCore/IDE/Events/EventsParametersLister.h>
+#include <GDCore/IDE/Events/EventsRefactorer.h>
+#include <GDCore/IDE/Events/EventsRemover.h>
+#include <GDCore/IDE/Events/EventsTypesLister.h>
+#include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
+#include <GDCore/IDE/Events/ExpressionValidator.h>
+#include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
+#include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
+#include <GDCore/IDE/Events/TextFormatting.h>
+#include <GDCore/IDE/EventsFunctionTools.h>
+#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
+#include <GDCore/IDE/Project/ProjectResourcesAdder.h>
+#include <GDCore/IDE/Project/ProjectResourcesCopier.h>
+#include <GDCore/IDE/Project/ResourcesInUseHelper.h>
+#include <GDCore/IDE/Project/ResourcesMergingHelper.h>
+#include <GDCore/IDE/Project/ResourcesRenamer.h>
+#include <GDCore/IDE/WholeProjectRefactorer.h>
+#include <GDCore/Project/Behavior.h>
+#include <GDCore/Project/Effect.h>
+#include <GDCore/Project/EventsBasedBehavior.h>
+#include <GDCore/Project/EventsFunction.h>
+#include <GDCore/Project/EventsFunctionsExtension.h>
+#include <GDCore/Project/ExternalEvents.h>
+#include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/InitialInstance.h>
+#include <GDCore/Project/InitialInstancesContainer.h>
+#include <GDCore/Project/Layout.h>
+#include <GDCore/Project/NamedPropertyDescriptor.h>
+#include <GDCore/Project/Object.h>
+#include <GDCore/Project/Project.h>
+#include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/Variable.h>
+#include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Serialization/Serializer.h>
+#include <GDCore/Serialization/SerializerElement.h>
+#include <GDJS/Events/Builtin/JsCodeEvent.h>
+#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
+#include <GDJS/IDE/Exporter.h>
+#include <GDJS/IDE/ExporterHelper.h>
+#include <emscripten.h>
+
 #include <map>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <GDCore/Extensions/Platform.h>
-#include <GDCore/Project/Behavior.h>
-#include <GDCore/Project/ExternalEvents.h>
-#include <GDCore/Project/ExternalLayout.h>
-#include <GDCore/Project/InitialInstance.h>
-#include <GDCore/Project/InitialInstancesContainer.h>
-#include <GDCore/Project/Layout.h>
-#include <GDCore/Project/Object.h>
-#include <GDCore/Project/Project.h>
-#include <GDCore/Project/Variable.h>
-#include <GDCore/Project/EventsBasedBehavior.h>
-#include <GDCore/Project/VariablesContainer.h>
-#include <GDCore/Serialization/Serializer.h>
-#include <GDCore/Serialization/SerializerElement.h>
-
-#include <GDCore/Events/Parsers/ExpressionParser.h>
-#include <GDCore/Events/Parsers/ExpressionParser2.h>
-#include <GDCore/Events/Parsers/ExpressionParser2Node.h>
-#include <GDCore/IDE/Events/ExpressionValidator.h>
-#include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
-#include <GDCore/Extensions/Metadata/MetadataProvider.h>
-#include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
-#include <GDCore/Project/EventsFunction.h>
-#include <GDCore/Project/EventsFunctionsExtension.h>
-#include <GDCore/IDE/AbstractFileSystem.h>
-#include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h>
-#include <GDCore/Project/PropertyDescriptor.h>
-#include <GDCore/Project/NamedPropertyDescriptor.h>
-#include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
-#include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
-#include <GDCore/IDE/Events/EventsContextAnalyzer.h>
-#include <GDCore/IDE/Events/EventsParametersLister.h>
-#include <GDCore/IDE/Events/EventsTypesLister.h>
-#include <GDCore/IDE/Events/EventsRefactorer.h>
-#include <GDCore/IDE/Events/EventsRemover.h>
-#include <GDCore/IDE/Events/ExpressionsCorrectnessTesting.h>
-#include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
-#include <GDCore/IDE/Events/TextFormatting.h>
-#include <GDCore/IDE/Events/EventsListUnfolder.h>
-#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
-#include <GDCore/IDE/Project/ResourcesMergingHelper.h>
-#include <GDCore/IDE/Project/ResourcesInUseHelper.h>
-#include <GDCore/IDE/Project/ProjectResourcesAdder.h>
-#include <GDCore/IDE/WholeProjectRefactorer.h>
-
-#include <GDCore/Events/Builtin/CommentEvent.h>
-#include <GDCore/Events/Builtin/ForEachEvent.h>
-#include <GDCore/Events/Builtin/GroupEvent.h>
-#include <GDCore/Events/Builtin/LinkEvent.h>
-#include <GDCore/Events/Builtin/RepeatEvent.h>
-#include <GDCore/Events/Builtin/StandardEvent.h>
-#include <GDCore/Events/Builtin/WhileEvent.h>
-
-#include <GDCore/Extensions/Builtin/SpriteExtension/Animation.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/Direction.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/Sprite.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h>
-
 #include "../../Extensions/PanelSpriteObject/PanelSpriteObject.h"
 #include "../../Extensions/ParticleSystem/ParticleEmitterObject.h"
 #include "../../Extensions/PrimitiveDrawing/ShapePainterObject.h"
+#include "../../Extensions/SkeletonObject/SkeletonObject.h"
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
-
-#include <GDJS/Events/Builtin/JsCodeEvent.h>
-#include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
-#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
-#include <GDJS/IDE/Exporter.h>
-
-#include <emscripten.h>
-#include "ProjectHelper.h"
-
 #include "BehaviorJsImplementation.h"
 #include "BehaviorSharedDataJsImplementation.h"
 #include "ObjectJsImplementation.h"
+#include "ProjectHelper.h"
 
 /**
  * \brief Manual binding of gd::ArbitraryResourceWorker to allow overriding
@@ -95,7 +97,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeImage'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeImage.';
-          return ensureString(self.exposeImage(Pointer_stringify($1)));
+          return ensureString(self.exposeImage(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -107,7 +109,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeShader'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeShader.';
-          return ensureString(self.exposeShader(Pointer_stringify($1)));
+          return ensureString(self.exposeShader(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -119,7 +121,7 @@ class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
               Module['getCache'](Module['ArbitraryResourceWorkerJS'])[$0];
           if (!self.hasOwnProperty('exposeFile'))
             throw 'a JSImplementation must implement all functions, you forgot ArbitraryResourceWorkerJS::exposeFile.';
-          return ensureString(self.exposeFile(Pointer_stringify($1)));
+          return ensureString(self.exposeFile(UTF8ToString($1)));
         },
         (int)this,
         arg0.c_str());
@@ -138,7 +140,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('mkDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::mkDir.';
-          self.mkDir(Pointer_stringify($1));
+          self.mkDir(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -149,7 +151,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('dirExists'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::dirExists.';
-          return self.dirExists(Pointer_stringify($1));
+          return self.dirExists(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -161,7 +163,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('fileExists'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::fileExists.';
-          return self.fileExists(Pointer_stringify($1));
+          return self.fileExists(UTF8ToString($1));
         },
         (int)this,
         path.c_str());
@@ -173,7 +175,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('fileNameFrom'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::fileNameFrom.';
-          return ensureString(self.fileNameFrom(Pointer_stringify($1)));
+          return ensureString(self.fileNameFrom(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -185,7 +187,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('dirNameFrom'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::dirNameFrom.';
-          return ensureString(self.dirNameFrom(Pointer_stringify($1)));
+          return ensureString(self.dirNameFrom(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -199,7 +201,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           if (!self.hasOwnProperty('makeAbsolute'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::makeAbsolute.';
           return ensureString(
-              self.makeAbsolute(Pointer_stringify($1), Pointer_stringify($2)));
+              self.makeAbsolute(UTF8ToString($1), UTF8ToString($2)));
         },
         (int)this,
         filename.c_str(),
@@ -216,7 +218,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           if (!self.hasOwnProperty('makeRelative'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::makeRelative.';
           return ensureString(
-              self.makeRelative(Pointer_stringify($1), Pointer_stringify($2)));
+              self.makeRelative(UTF8ToString($1), UTF8ToString($2)));
         },
         (int)this,
         filename.c_str(),
@@ -231,7 +233,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('isAbsolute'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::isAbsolute.';
-          return self.isAbsolute(Pointer_stringify($1));
+          return self.isAbsolute(UTF8ToString($1));
         },
         (int)this,
         filename.c_str());
@@ -243,7 +245,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('copyFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::copyFile.';
-          return self.copyFile(Pointer_stringify($1), Pointer_stringify($2));
+          return self.copyFile(UTF8ToString($1), UTF8ToString($2));
         },
         (int)this,
         file.c_str(),
@@ -256,24 +258,10 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('clearDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::clearDir.';
-          return self.clearDir(Pointer_stringify($1));
+          return self.clearDir(UTF8ToString($1));
         },
         (int)this,
         directory.c_str());
-  }
-
-  virtual bool CopyDir(const gd::String &source,
-                       const gd::String &destination) {
-    return (bool)EM_ASM_INT(
-        {
-          var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
-          if (!self.hasOwnProperty('copyDir'))
-            throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::copyDir.';
-          return self.copyDir(Pointer_stringify($1), Pointer_stringify($2));
-        },
-        (int)this,
-        source.c_str(),
-        destination.c_str());
   }
 
   virtual bool WriteToFile(const gd::String &file, const gd::String &content) {
@@ -282,7 +270,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('writeToFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::writeToFile.';
-          return self.writeToFile(Pointer_stringify($1), Pointer_stringify($2));
+          return self.writeToFile(UTF8ToString($1), UTF8ToString($2));
         },
         (int)this,
         file.c_str(),
@@ -295,7 +283,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('readFile'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::readFile.';
-          return ensureString(self.readFile(Pointer_stringify($1)));
+          return ensureString(self.readFile(UTF8ToString($1)));
         },
         (int)this,
         file.c_str());
@@ -318,7 +306,7 @@ class AbstractFileSystemJS : public AbstractFileSystem {
           var self = Module['getCache'](Module['AbstractFileSystemJS'])[$0];
           if (!self.hasOwnProperty('readDir'))
             throw 'a JSImplementation must implement all functions, you forgot AbstractFileSystemJS::readDir.';
-          return self.readDir(Pointer_stringify($1), Pointer_stringify($2)).ptr;
+          return self.readDir(UTF8ToString($1), UTF8ToString($2)).ptr;
         },
         (int)this,
         path.c_str(),
@@ -350,7 +338,8 @@ void removeFromVectorVector2f(std::vector<sf::Vector2f> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
-void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec, size_t pos) {
+void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                       size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
@@ -378,6 +367,7 @@ typedef std::vector<std::pair<gd::String, TextFormatting>>
 typedef std::vector<gd::ObjectGroup> VectorObjectGroup;
 typedef std::map<gd::String, gd::String> MapStringString;
 typedef std::map<gd::String, bool> MapStringBoolean;
+typedef std::map<gd::String, double> MapStringDouble;
 typedef std::map<gd::String, gd::ExpressionMetadata>
     MapStringExpressionMetadata;
 typedef std::map<gd::String, gd::InstructionMetadata>
@@ -392,20 +382,33 @@ typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<sf::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
 typedef std::vector<gd::ParameterMetadata> VectorParameterMetadata;
+typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
-typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
-typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
-typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
+typedef std::vector<gd::ExpressionParserDiagnostic *>
+    VectorExpressionParserDiagnostic;
+typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
+    EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
+    NamedPropertyDescriptorsList;
+typedef ExpressionCompletionDescription::CompletionKind
+    ExpressionCompletionDescription_CompletionKind;
+typedef std::vector<gd::ExpressionCompletionDescription>
+    VectorExpressionCompletionDescription;
+typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
+    MapExtensionProperties;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
-typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
-typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
+typedef ExtensionAndMetadata<EffectMetadata> ExtensionAndEffectMetadata;
+typedef ExtensionAndMetadata<InstructionMetadata>
+    ExtensionAndInstructionMetadata;
+typedef ExtensionAndMetadata<InstructionMetadata>
+    ExtensionAndInstructionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
@@ -457,13 +460,14 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define WRAPPED_at(a) at(a).get()
 
-#define MAP_get(a) find(a)->second
+#define MAP_getOrCreate(key) operator[](key)
+#define MAP_get(key) find(key)->second
 #define MAP_set(key, value) [key] = value
 #define MAP_has(key) find(key) != self->end()
 
 #define STATIC_CreateNewGDJSProject CreateNewGDJSProject
 #define STATIC_InitializePlatforms InitializePlatforms
-#define STATIC_ValidateObjectName ValidateObjectName
+#define STATIC_ValidateName ValidateName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(gd::String(x))
 #define STATIC_IsObject IsObject
@@ -475,14 +479,21 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
+#define STATIC_GetExtensionAndEffectMetadata GetExtensionAndEffectMetadata
 #define STATIC_GetExtensionAndActionMetadata GetExtensionAndActionMetadata
 #define STATIC_GetExtensionAndConditionMetadata GetExtensionAndConditionMetadata
-#define STATIC_GetExtensionAndExpressionMetadata GetExtensionAndExpressionMetadata
-#define STATIC_GetExtensionAndObjectExpressionMetadata GetExtensionAndObjectExpressionMetadata
-#define STATIC_GetExtensionAndBehaviorExpressionMetadata GetExtensionAndBehaviorExpressionMetadata
-#define STATIC_GetExtensionAndStrExpressionMetadata GetExtensionAndStrExpressionMetadata
-#define STATIC_GetExtensionAndObjectStrExpressionMetadata GetExtensionAndObjectStrExpressionMetadata
-#define STATIC_GetExtensionAndBehaviorStrExpressionMetadata GetExtensionAndBehaviorStrExpressionMetadata
+#define STATIC_GetExtensionAndExpressionMetadata \
+  GetExtensionAndExpressionMetadata
+#define STATIC_GetExtensionAndObjectExpressionMetadata \
+  GetExtensionAndObjectExpressionMetadata
+#define STATIC_GetExtensionAndBehaviorExpressionMetadata \
+  GetExtensionAndBehaviorExpressionMetadata
+#define STATIC_GetExtensionAndStrExpressionMetadata \
+  GetExtensionAndStrExpressionMetadata
+#define STATIC_GetExtensionAndObjectStrExpressionMetadata \
+  GetExtensionAndObjectStrExpressionMetadata
+#define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
+  GetExtensionAndBehaviorStrExpressionMetadata
 #define STATIC_HasCondition HasCondition
 #define STATIC_HasAction HasAction
 #define STATIC_HasObjectAction HasObjectAction
@@ -503,6 +514,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata
+#define STATIC_GetEffectMetadata GetEffectMetadata
 #define STATIC_GetActionMetadata GetActionMetadata
 #define STATIC_GetConditionMetadata GetConditionMetadata
 #define STATIC_GetExpressionMetadata GetExpressionMetadata
@@ -512,8 +524,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
 
-#define STATIC_GenerateSceneEventsCompleteCode GenerateSceneEventsCompleteCode
-#define STATIC_GenerateEventsFunctionCode GenerateEventsFunctionCode
 #define STATIC_Major Major
 #define STATIC_Minor Minor
 #define STATIC_Build Build
@@ -523,12 +533,18 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Year Year
 #define STATIC_Month Month
 #define STATIC_Date Date
-#define STATIC_ObjectRenamedInLayout ObjectRenamedInLayout
-#define STATIC_ObjectRemovedInLayout ObjectRemovedInLayout
-#define STATIC_GlobalObjectRenamed GlobalObjectRenamed
-#define STATIC_GlobalObjectRemoved GlobalObjectRemoved
-#define STATIC_GetAllObjectTypesUsingEventsBasedBehavior GetAllObjectTypesUsingEventsBasedBehavior
-#define STATIC_EnsureBehaviorEventsFunctionsProperParameters EnsureBehaviorEventsFunctionsProperParameters
+#define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
+#define STATIC_ObjectOrGroupRemovedInLayout ObjectOrGroupRemovedInLayout
+#define STATIC_ObjectOrGroupRemovedInEventsFunction \
+  ObjectOrGroupRemovedInEventsFunction
+#define STATIC_ObjectOrGroupRenamedInEventsFunction \
+  ObjectOrGroupRenamedInEventsFunction
+#define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
+#define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
+#define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \
+  GetAllObjectTypesUsingEventsBasedBehavior
+#define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
+  EnsureBehaviorEventsFunctionsProperParameters
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty
@@ -547,17 +563,24 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
+#define STATIC_MoveEventsFunctionParameter MoveEventsFunctionParameter
+#define STATIC_MoveBehaviorEventsFunctionParameter \
+  MoveBehaviorEventsFunctionParameter
 #define STATIC_RenameBehaviorProperty RenameBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
-
-#define STATIC_UseOldExpressionParser UseOldExpressionParser
-#define STATIC_IsUsingOldExpressionParser IsUsingOldExpressionParser
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
 #define STATIC_GetPropertyActionName GetPropertyActionName
 #define STATIC_GetPropertyConditionName GetPropertyConditionName
 #define STATIC_GetPropertyExpressionName GetPropertyExpressionName
+
+#define STATIC_CopyAllResourcesTo CopyAllResourcesTo
+
+#define STATIC_IsExtensionLifecycleEventsFunction \
+  IsExtensionLifecycleEventsFunction
+
+#define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout
@@ -571,6 +594,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetEffectAt GetEffect
 
 // We don't use prefix in .idl file to workaround a webidl_binder.py bug
 // that can't find in its list of interfaces a class which has a prefix.

@@ -9,27 +9,42 @@
  * @class TextEntryRuntimeObject
  * @extends RuntimeObject
  * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ObjectData} textEntryObjectData The initial properties of the object
  */
-gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextEntryRuntimeObject = function(runtimeScene, textEntryObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, textEntryObjectData);
+
+    /** @type {string} */
     this._str = "";
+
+    /** @type {boolean} */
     this._activated = true;
 
     if (this._renderer)
         gdjs.TextEntryRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextEntryRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.TextEntryRuntimeObject.thisIsARuntimeObjectConstructor = "TextEntryObject::TextEntry";
+gdjs.registerObject("TextEntryObject::TextEntry", gdjs.TextEntryRuntimeObject);
 
-gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+gdjs.TextEntryRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    // Nothing to update.
+    return true;
+}
 
-    if (this._renderer.onOwnerRemovedFromScene) {
-        this._renderer.onOwnerRemovedFromScene();
+gdjs.TextEntryRuntimeObject.prototype.onDestroyFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
+
+    if (this._renderer.onDestroy) {
+        this._renderer.onDestroy();
     }
 };
 
@@ -55,12 +70,4 @@ gdjs.TextEntryRuntimeObject.prototype.isActivated = function() {
 gdjs.TextEntryRuntimeObject.prototype.activate = function(enable) {
     this._activated = enable;
     this._renderer.activate(this._activated);
-};
-
-gdjs.TextEntryRuntimeObject.prototype.setLayer = function(layer) {
-     // No renderable object
-};
-
-gdjs.TextEntryRuntimeObject.prototype.setZOrder = function(z) {
-     // No renderable object
 };

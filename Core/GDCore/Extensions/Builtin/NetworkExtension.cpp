@@ -26,29 +26,77 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "SendRequest",
           _("Send a request to a web page"),
           _("Send a request to the specified web page.\n\nPlease note that for "
-            "the web platform games, the game must be hosted on the same host "
+            "the web games, the game must be hosted on the same host "
             "as specified below, except if the server is configured to answer "
             "to all requests (cross-domain requests)."),
           _("Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"),
           _("Network"),
           "res/actions/net24.png",
           "res/actions/net.png")
-      .AddParameter("string", _("Host (example: http://www.some-server.org/)"))
-      .AddParameter("string", _("Path to page (Example: /page.php)"))
+      .AddParameter("string", _("Host, with protocol"))
+      .SetParameterLongDescription(_("Example: \"http://example.com/\"."))
+      .AddParameter("string", _("Path"))
+      .SetParameterLongDescription(
+          _("Example: \"/user/123\" or \"/some-page.php\"."))
       .AddParameter("string", _("Request body content"))
-      .AddParameter(
-          "string",
-          _("Method: \"POST\" or \"GET\" (if empty, GET will be used)"),
-          "",
-          true)
+      .AddParameter("string", _("Method: \"POST\" or \"GET\""), "", true)
+      .SetParameterLongDescription(_("If empty, \"GET\" will be used."))
       .SetDefaultValue("\"GET\"")
+      .AddParameter("string", _("Content type"), "", true)
+      .SetParameterLongDescription(
+          _("If empty, \"application/x-www-form-urlencoded\" will be used."))
+      .AddParameter("scenevar", _("Reponse scene variable"), "", true)
+      .SetParameterLongDescription(
+          _("The response of the server will be stored, as a string, in this "
+            "variable. If the server returns *JSON*, you may want to use the "
+            "action \"Convert JSON to a scene variable\" afterwards, to "
+            "explore the results with a *structure variable*."))
+      .MarkAsComplex()
+      .SetHidden();
+
+  extension
+      .AddAction(
+          "SendAsyncRequest",
+          _("Send a request to a web page"),
+          _("Send an asynchronous request to the specified web page.\n\nPlease "
+            "note that for "
+            "the web games, the game must be hosted on the same host "
+            "as specified below, except if the server is configured to answer "
+            "to all requests (cross-domain requests)."),
+          _("Send a _PARAM2_ request to _PARAM0_ with body: _PARAM1_, and "
+            "store the result in _PARAM4_ (or in _PARAM5_ in case of error)"),
+          _("Network"),
+          "res/actions/net24.png",
+          "res/actions/net.png")
+      .AddParameter("string", _("URL (API or web-page address)"))
+      .SetParameterLongDescription(
+          _("Example: \"https://example.com/user/123\". Using *https* is "
+            "highly recommended."))
+      .AddParameter("string", _("Request body content"))
+      .AddParameter("stringWithSelector",
+                    _("Resize mode"),
+                    "[\"GET\", \"POST\", \"PUT\", \"HEAD\", \"DELETE\", "
+                    "\"PATCH\", \"OPTIONS\"]",
+                    false)
+      .SetParameterLongDescription(_("If empty, \"GET\" will be used."))
+      .SetDefaultValue("\"GET\"")
+      .AddParameter("string", _("Content type"), "", true)
+      .SetParameterLongDescription(
+          _("If empty, \"application/x-www-form-urlencoded\" will be used."))
       .AddParameter(
-          "string",
-          _("Content type (application/x-www-form-urlencoded by default)"),
-          "",
-          true)
+          "scenevar", _("Variable where to store the response"), "", true)
+      .SetParameterLongDescription(
+          _("The response of the server will be stored, as a string, in this "
+            "variable. If the server returns *JSON*, you may want to use the "
+            "action \"Convert JSON to a scene variable\" afterwards, to "
+            "explore the results with a *structure variable*."))
       .AddParameter(
-          "scenevar", _("Store the response in this variable"), "", true)
+          "scenevar", _("Variable where to store the error message"), "", true)
+      .SetParameterLongDescription(
+          _("Optional, only used if an error occurs. This will contain the "
+            "error message (if request could not be sent) or the [\"status "
+            "code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes), "
+            "if the server returns a status >= 400."))
       .MarkAsComplex();
 
   extension
@@ -67,9 +115,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
 
   extension
       .AddAction(
+          "EnableMetrics",
+          _("Enable (or disable) metrics collection"),
+          _("Enable, or disable, the sending of anonymous data used to compute "
+            "the number of sessions and other metrics from your game "
+            "players.\nBe sure to only send metrics if in accordance with the "
+            "terms of service of your game and if they player gave their "
+            "consent, depending on how your game/company handles this."),
+          _("Enable analytics metrics: _PARAM1_"),
+          _("Network"),
+          "res/actions/net24.png",
+          "res/actions/net.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("yesorno", _("Enable the metrics?"));
+
+  extension
+      .AddAction(
           "JSONToVariableStructure",
-          _("Convert JSON to a variable"),
-          _("Parse a JSON object and store it into a variable"),
+          _("Convert JSON to a scene variable"),
+          _("Parse a JSON object and store it into a scene variable"),
           _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
           _("Network"),
           "res/actions/net24.png",
@@ -109,11 +173,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
 
   extension
       .AddStrExpression("ToJSON",
-                        _("Convert variable to JSON"),
-                        _("Convert a variable to JSON"),
+                        _("Convert scene variable to JSON"),
+                        _("Convert a scene variable to JSON"),
                         _("Conversion"),
                         "res/conditions/toujours24.png")
-      .AddParameter("scenevar", _("The variable to be stringified"));
+      .AddParameter("scenevar", _("Scene variable to be stringified"));
 
   extension
       .AddStrExpression("GlobalVarToJSON",

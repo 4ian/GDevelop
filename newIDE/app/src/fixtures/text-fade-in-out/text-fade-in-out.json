@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/text-fade-in-out/text-fade-in-out.json",
+    "projectUuid": "f2935d0a-bae7-4db7-9df3-50dcdf1a3246",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -145,6 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
+          "persistentUuid": "759ead9d-b04d-47d3-add0-531ad614a73f",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -272,6 +271,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -327,6 +331,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
+          "persistentUuid": "b1af45b3-fb1e-4bab-b2a7-946a47704daa",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -454,6 +459,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -509,6 +519,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
+          "persistentUuid": "1393df4d-64dd-4989-b106-1d5d11243771",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -636,6 +647,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

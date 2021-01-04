@@ -1,5 +1,11 @@
-// TODO: add flow
-import createReactContext, { type Context } from 'create-react-context';
+// @flow
+import * as React from 'react';
+import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import {
+  type Limits,
+  type Usages,
+  type Subscription,
+} from '../Utils/GDevelopServices/Usage';
 
 export type UserProfile = {|
   authenticated: boolean,
@@ -9,7 +15,9 @@ export type UserProfile = {|
   subscription: ?Subscription,
   onLogout: () => void,
   onLogin: () => void,
+  onCreateAccount: () => void,
   onRefreshUserProfile: () => void,
+  getAuthorizationHeader: () => Promise<string>,
 |};
 
 export const initialUserProfile = {
@@ -20,11 +28,11 @@ export const initialUserProfile = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onCreateAccount: () => {},
   onRefreshUserProfile: () => {},
+  getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 
-const UserProfileContext: Context<UserProfile> = createReactContext(
-  initialUserProfile
-);
+const UserProfileContext = React.createContext<UserProfile>(initialUserProfile);
 
 export default UserProfileContext;

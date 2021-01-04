@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
 import InstructionParametersEditor from './InstructionParametersEditor.js';
 import {
@@ -8,16 +8,12 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   container: {
     display: 'flex',
     flex: 1,
-  },
-  typeSelector: {
-    flex: 1,
-    overflowY: 'scroll',
   },
   parametersEditor: {
     flex: 2,
@@ -43,6 +39,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  anchorEl?: any, // Unused
 |};
 type State = {||};
 
@@ -72,14 +69,13 @@ export default class InstructionEditor extends React.Component<Props, State> {
     return (
       <div style={styles.container}>
         <InstructionSelector
-          style={styles.typeSelector}
           isCondition={isCondition}
           selectedType={instruction.getType()}
           onChoose={this.chooseType}
           focusOnMount={!instruction.getType()}
           scope={scope}
         />
-        <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
+        <Paper style={styles.parametersEditor} square elevation={2}>
           <InstructionParametersEditor
             project={project}
             scope={scope}
@@ -94,7 +90,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)
             }
-            focusOnMount={instruction.getType()}
+            focusOnMount={!!instruction.getType()}
           />
         </Paper>
       </div>

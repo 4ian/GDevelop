@@ -1,9 +1,14 @@
+// @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
-export default class RelationalOperatorField extends Component {
+export default class RelationalOperatorField extends Component<ParameterFieldProps> {
+  _field: ?SelectField;
   focus() {
     if (this._field && this._field.focus) this._field.focus();
   }
@@ -16,24 +21,23 @@ export default class RelationalOperatorField extends Component {
 
     return (
       <SelectField
+        margin={this.props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         value={this.props.value}
-        onChange={(e, i, value) => this.props.onChange(value)}
+        onChange={(e, i, value: string) => this.props.onChange(value)}
         ref={field => (this._field = field)}
+        hintText={t`Choose an operator`}
       >
-        <MenuItem value="=" primaryText={<Trans>= (equal to)</Trans>} />
-        <MenuItem value="<" primaryText={<Trans>&lt; (less than)</Trans>} />
-        <MenuItem value=">" primaryText={<Trans>&gt; (greater than)</Trans>} />
-        <MenuItem
-          value="<="
-          primaryText={<Trans>&le; (less or equal to)</Trans>}
-        />
-        <MenuItem
-          value=">="
-          primaryText={<Trans>&ge; (greater or equal to)</Trans>}
-        />
-        <MenuItem value="!=" primaryText={<Trans>&ne; (not equal to)</Trans>} />
+        <SelectOption value="=" primaryText={t`= (equal to)`} />
+        <SelectOption value="<" primaryText={t`< (less than)`} />
+        <SelectOption value=">" primaryText={t`> (greater than)`} />
+        <SelectOption value="<=" primaryText={t`≤ (less or equal to)`} />
+        <SelectOption value=">=" primaryText={t`≥ (greater or equal to)`} />
+        <SelectOption value="!=" primaryText={t`≠ (not equal to)`} />
       </SelectField>
     );
   }
@@ -41,7 +45,27 @@ export default class RelationalOperatorField extends Component {
 
 export const renderInlineRelationalOperator = ({
   value,
+  InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
+  if (!value) {
+    return (
+      <InvalidParameterValue isEmpty>
+        <Trans>Choose an operator</Trans>
+      </InvalidParameterValue>
+    );
+  }
+
+  if (
+    value !== '=' &&
+    value !== '<' &&
+    value !== '>' &&
+    value !== '<=' &&
+    value !== '>=' &&
+    value !== '!='
+  ) {
+    return <InvalidParameterValue>{value}</InvalidParameterValue>;
+  }
+
   if (value === '<=') return '\u2264';
   if (value === '>=') return '\u2265';
   else if (value === '!=') return '\u2260';

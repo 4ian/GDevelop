@@ -49,7 +49,7 @@ gdjs.LinksManager.prototype.removeAllLinksOf = function(obj) {
 		if ( this.links.hasOwnProperty(objLinkedObjects[i].id) ) {
 			var otherObjList = this.links[objLinkedObjects[i].id];
 			var index = otherObjList.indexOf(obj);
-			if ( index !== -1) otherObjList.remove(index);
+			if ( index !== -1) otherObjList.splice(index, 1);
 		}
 	}
 
@@ -63,13 +63,13 @@ gdjs.LinksManager.prototype.removeLinkBetween = function(objA, objB) {
 	if ( this.links.hasOwnProperty(objA.id) ) {
 		list = this.links[objA.id];
 		index = list.indexOf(objB);
-		if ( index !== -1) list.remove(index);
+		if ( index !== -1) list.splice(index, 1);
 	}
 
 	if ( this.links.hasOwnProperty(objB.id) ) {
 		list = this.links[objB.id];
 		index = list.indexOf(objA);
-		if ( index !== -1) list.remove(index);
+		if ( index !== -1) list.splice(index, 1);
 	}
 };
 
@@ -81,14 +81,9 @@ gdjs.LinksManager.prototype.removeLinkBetween = function(objA, objB) {
  */
 gdjs.evtTools.linkedObjects = {};
 
-gdjs.evtTools.linkedObjects.gdjsCallbackRuntimeSceneLoaded = function(runtimeScene) {
-	//Manager is created on demand, no need to instanciate it now.
-	//gdjs.LinksManager.getManager(runtimeScene);
-};
-
-gdjs.evtTools.linkedObjects.gdjsCallbackObjectDeletedFromScene = function(runtimeScene, obj) {
+gdjs.registerObjectDeletedFromSceneCallback(function(runtimeScene, obj) {
 	gdjs.LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
-};
+});
 
 gdjs.evtTools.linkedObjects.linkObjects = function(runtimeScene, objA, objB) {
 	if (objA === null || objB === null) return;

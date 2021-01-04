@@ -5,18 +5,106 @@
  */
 #ifndef EXPORTER_HELPER_H
 #define EXPORTER_HELPER_H
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "GDCore/String.h"
 namespace gd {
 class Project;
 class Layout;
 class ExternalLayout;
+class SerializerElement;
 class AbstractFileSystem;
+class ResourcesManager;
 }  // namespace gd
 class wxProgressDialog;
 
 namespace gdjs {
+
+/**
+ * \brief The options used to export a project for a preview.
+ */
+struct PreviewExportOptions {
+  /**
+   * \param project_ The project to export
+   * \param exportPath_ The path in the filesystem where to export the files
+   */
+  PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
+      : project(project_),
+        exportPath(exportPath_),
+        projectDataOnlyExport(false),
+        nonRuntimeScriptsCacheBurst(0) {};
+
+  /**
+   * \brief Set the address of the debugger server that the game should reach
+   * out to, using WebSockets.
+   */
+  PreviewExportOptions &SetDebuggerServerAddress(const gd::String &address,
+                                                 const gd::String &port) {
+    debuggerServerAddress = address;
+    debuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set the layout to be run first in the previewed game
+   */
+  PreviewExportOptions &SetLayoutName(const gd::String &layoutName_) {
+    layoutName = layoutName_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) external layout to be instanciated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetExternalLayoutName(
+      const gd::String &externalLayoutName_) {
+    externalLayoutName = externalLayoutName_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the hash associated to an include file. Useful for the preview
+   * hot-reload, to know if a file changed.
+   */
+  PreviewExportOptions &SetIncludeFileHash(const gd::String &includeFile,
+                                           int hash) {
+    includeFileHashes[includeFile] = hash;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the export should only export the project data, not
+   * exporting events code.
+   */
+  PreviewExportOptions &SetProjectDataOnlyExport(bool enable) {
+    projectDataOnlyExport = enable;
+    return *this;
+  }
+
+  /**
+   * \brief If set to a non zero value, the exported script URLs will have an
+   * extra search parameter added (with the given value) to ensure browser cache
+   * is bypassed when they are loaded.
+   */
+  PreviewExportOptions &SetNonRuntimeScriptsCacheBurst(unsigned int value) {
+    nonRuntimeScriptsCacheBurst = value;
+    return *this;
+  }
+
+  gd::Project &project;
+  gd::String exportPath;
+  gd::String debuggerServerAddress;
+  gd::String debuggerServerPort;
+  gd::String layoutName;
+  gd::String externalLayoutName;
+  std::map<gd::String, int> includeFileHashes;
+  bool projectDataOnlyExport;
+  unsigned int nonRuntimeScriptsCacheBurst;
+};
 
 /**
  * \brief Export a project or a layout to a playable HTML5/Javascript based
@@ -40,15 +128,15 @@ class ExporterHelper {
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
    * \param filename The filename where export the project
-   * \param wrapIntoVariable If not empty, the resulting json will be wrapped in
-   * this javascript variable allowing to use it as a classical javascript
-   * object. \return Empty string if everthing is ok, description of the error
-   * otherwise.
+   * \param runtimeGameOptions The content of the extra configuration to store
+   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * description of the error otherwise.
    */
-  static gd::String ExportToJSON(gd::AbstractFileSystem &fs,
-                                 const gd::Project &project,
-                                 gd::String filename,
-                                 gd::String wrapIntoVariable);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs,
+      const gd::Project &project,
+      gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -62,8 +150,7 @@ class ExporterHelper {
    */
   static void ExportResources(gd::AbstractFileSystem &fs,
                               gd::Project &project,
-                              gd::String exportDir,
-                              wxProgressDialog *progressDlg = NULL);
+                              gd::String exportDir);
 
   /**
    * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.
@@ -81,22 +168,15 @@ class ExporterHelper {
                       std::vector<gd::String> &includesFiles);
 
   /**
-   * \brief Copy all the includes files and the standard libraries files to the
-   * export directory.
-   *
-   * The includes files are also modified so as to be relative to the export
-   * directory ( Files with absolute filenames are copied into the export
-   * directory and their path are stripped ).
+   * \brief Copy all the specified files to the
+   * export directory. Relative files are copied from "<GDJS root>/Runtime"
+   * directory.
    *
    * \param includesFiles A vector with filenames to be copied.
-   * \param exportDir The directory where the preview must be created.
-   * \param minify If true, the includes files must be merged into one file
-   * using Google Closure Compiler. ( includesFiles parameter will be updated
-   * with the new filename )
+   * \param exportDir The directory where the files mus tbe copied.
    */
-  bool ExportIncludesAndLibs(std::vector<gd::String> &includesFiles,
-                             gd::String exportDir,
-                             bool minify);
+  bool ExportIncludesAndLibs(const std::vector<gd::String> &includesFiles,
+                             gd::String exportDir);
 
   /**
    * \brief Generate the events JS code, and save them to the export directory.
@@ -111,6 +191,19 @@ class ExporterHelper {
                         gd::String outputDir,
                         std::vector<gd::String> &includesFiles,
                         bool exportForPreview);
+
+  /**
+   * \brief Add the project effects include files.
+   */
+  bool ExportEffectIncludes(gd::Project &project,
+                            std::vector<gd::String> &includesFiles);
+
+  /**
+   * \brief Add the include files for all the objects of the project
+   * and their behaviors.
+   */
+  void ExportObjectAndBehaviorsIncludes(gd::Project &project,
+                                        std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export
@@ -137,13 +230,18 @@ class ExporterHelper {
    * \param source The file to be used as a template for the final file.
    * \param exportDir The directory where the preview must be created.
    * \param includesFiles The JS files to be included in the HTML file. Order is
-   * important. \param additionalSpec JSON string that will be passed to the
+   * important.
+   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
+   * bursting parameter to scripts, that are not part of the runtime/extensions,
+   * to force the browser to reload them.
+   * \param additionalSpec JSON string that will be passed to the
    * gdjs.RuntimeGame object.
    */
   bool ExportPixiIndexFile(const gd::Project &project,
                            gd::String source,
                            gd::String exportDir,
                            const std::vector<gd::String> &includesFiles,
+                           unsigned int nonRuntimeScriptsCacheBurst,
                            gd::String additionalSpec = "");
 
   /**
@@ -151,20 +249,21 @@ class ExporterHelper {
    * content.
    *
    * \param indexFileContent The source of the index.html file.
-   * \param customCss "<!-- GDJS_CUSTOM_STYLE -->" will be replaced by the
-   * content of the string. \param customHtml "<!-- GDJS_CUSTOM_HTML -->" will
-   * be replaced by the content of the string. \param exportDir The directory
-   * where the project must be generated. \param codeFilesIncludes "<!--
-   * GDJS_CODE_FILES -->" will be replaced by HTML tags to include the filenames
-   * contained inside the vector. \param additionalSpec The string
-   * "GDJS_ADDITIONAL_SPEC" surrounded by comments marks will be replaced by the
-   * content of the string.
+   * \param exportDir The directory where the project must be generated.
+   * \param includesFiles "<!--GDJS_CODE_FILES -->" will be
+   * replaced by HTML tags to include the filenames
+   * contained inside the vector.
+   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
+   * bursting parameter to scripts, that are not part of the runtime/extensions,
+   * to force the browser to reload them.
+   * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC"
+   * surrounded by comments marks will be replaced by the
+   * content of this string.
    */
   bool CompleteIndexFile(gd::String &indexFileContent,
-                         gd::String customCss,
-                         gd::String customHtml,
                          gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
+                         unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
 
   /**
@@ -174,8 +273,7 @@ class ExporterHelper {
    * \param project The project to be used to generate the configuration file.
    * \param exportDir The directory where the config.xml must be created.
    */
-  bool ExportCordovaConfigFile(const gd::Project &project,
-                               gd::String exportDir);
+  bool ExportCordovaFiles(const gd::Project &project, gd::String exportDir);
 
   /**
    * \brief Generate the base Cocos2d files.
@@ -205,18 +303,20 @@ class ExporterHelper {
                                        gd::String exportDir);
 
   /**
-   * \brief Launch all export methods to generate a complete, stand-alone game
-   * for previewing.
+   * \brief Create a preview for the specified options.
+   * \note The preview is not launched, it is the caller responsibility to open
+   * a browser pointing to the preview.
    *
-   * \param layout The layout to be previewed.
-   * \param exportDir The directory where the preview must be created.
-   * \param additionalSpec Any additional parameters to be passed to the
-   * gdjs.RuntimeGame. \return true if export was successful.
+   * \param options The options to generate the preview.
    */
-  bool ExportLayoutForPixiPreview(gd::Project &project,
-                                  gd::Layout &layout,
-                                  gd::String exportDir,
-                                  gd::String additionalSpec);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
+
+  /**
+   * \brief Given an include file, returns the name of the file to reference
+   * in the exported game.
+   */
+  gd::String GetExportedIncludeFilename(
+      const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**
    * \brief Change the directory where code files are generated.
@@ -226,6 +326,12 @@ class ExporterHelper {
   void SetCodeOutputDirectory(gd::String codeOutputDir_) {
     codeOutputDir = codeOutputDir_;
   }
+
+  static void AddDeprecatedFontFilesToFontResources(
+      gd::AbstractFileSystem &fs,
+      gd::ResourcesManager &resourcesManager,
+      const gd::String &exportDir,
+      gd::String urlPrefix = "");
 
   gd::AbstractFileSystem
       &fs;  ///< The abstract file system to be used for exportation.

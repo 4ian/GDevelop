@@ -14,13 +14,6 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
-
 const transformVariable = variable => {
   if (!variable) return null;
 
@@ -66,19 +59,15 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
 };
 
 export default (props: Props) => (
-  <div style={styles.container}>
-    <ReactJsonView
-      collapsed={false}
-      name={false}
-      src={
-        props.variablesContainer ? transform(props.variablesContainer) : null
-      }
-      enableClipboard={false}
-      displayDataTypes={false}
-      displayObjectSize={false}
-      onEdit={edit => handleEdit(edit, props)}
-      groupArraysAfterLength={50}
-      theme="monokai"
-    />
-  </div>
+  <ReactJsonView
+    collapsed={false}
+    name={false}
+    src={props.variablesContainer ? transform(props.variablesContainer) : null}
+    enableClipboard={false}
+    displayDataTypes={false}
+    displayObjectSize={false}
+    onEdit={edit => handleEdit(edit, props)}
+    groupArraysAfterLength={50}
+    theme="monokai"
+  />
 );

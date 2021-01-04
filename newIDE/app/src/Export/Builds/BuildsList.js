@@ -2,18 +2,24 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
-import { type Build } from '../../Utils/GDevelopServices/Build';
+import Paper from '@material-ui/core/Paper';
+import {
+  type Build,
+  type BuildArtifactKeyName,
+} from '../../Utils/GDevelopServices/Build';
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import BuildProgress from './BuildProgress';
+import { type UserProfile } from '../../Profile/UserProfileContext';
 import format from 'date-fns/format';
-import difference_in_calendar_days from 'date-fns/difference_in_calendar_days';
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
+import Text from '../../UI/Text';
 
 type Props = {|
   builds: ?Array<Build>,
-  onDownload: (build: Build, key: string) => void,
+  userProfile: UserProfile,
+  onDownload: (build: Build, key: BuildArtifactKeyName) => void,
 |};
 
 const styles = {
@@ -22,7 +28,22 @@ const styles = {
   },
 };
 
-export default ({ builds, onDownload }: Props) => {
+const formatBuildText = (
+  buildType: 'cordova-build' | 'electron-build' | 'web-build'
+) => {
+  switch (buildType) {
+    case 'cordova-build':
+      return <Trans>Android Build</Trans>;
+    case 'electron-build':
+      return <Trans>Windows/macOS/Linux Build</Trans>;
+    case 'web-build':
+      return <Trans>Web (upload online) Build</Trans>;
+    default:
+      return buildType;
+  }
+};
+
+export default ({ builds, userProfile, onDownload }: Props) => {
   return (
     <Column noMargin expand>
       <Line>
@@ -30,19 +51,23 @@ export default ({ builds, onDownload }: Props) => {
           <EmptyMessage>
             <Trans>
               This is the list of builds that you've done. Note that you can
-              download games generated during to 7 days, after which they are
-              removed.
+              download games generated during the last 7 days, after which they
+              are removed.
             </Trans>
           </EmptyMessage>
         </Column>
       </Line>
       <Line>
-        {!builds ? (
+        {!userProfile.authenticated ? (
+          <EmptyMessage>
+            <Trans>You need to login first to see your builds.</Trans>
+          </EmptyMessage>
+        ) : !builds ? (
           <PlaceholderLoader />
         ) : builds.length === 0 ? (
           <EmptyMessage>
             <Trans>
-              You don't have any builds on the online services for now
+              You don't have any builds on the online services for now.
             </Trans>
           </EmptyMessage>
         ) : (
@@ -50,14 +75,15 @@ export default ({ builds, onDownload }: Props) => {
             {builds.map((build: Build) => {
               const isOld =
                 build &&
-                difference_in_calendar_days(Date.now(), build.updatedAt) > 6;
+                differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
 
               return (
                 <Paper style={styles.buildContainer} key={build.id}>
-                  <p>
-                    {build.type} - Last updated on{' '}
-                    {format(build.updatedAt, 'YYYY-MM-DD HH:mm:ss')}
-                  </p>
+                  <Text>
+                    {formatBuildText(build.type)} -{' '}
+                    <Trans>Last updated on</Trans>{' '}
+                    {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
+                  </Text>
                   {!isOld && (
                     <BuildProgress
                       build={build}

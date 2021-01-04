@@ -1,3 +1,4 @@
+// @ts-check
 
 /**
  * Hold the stack of scenes (gdjs.RuntimeScene) being played.
@@ -13,13 +14,21 @@ gdjs.SceneStack = function(runtimeGame) {
 
     this._runtimeGame = runtimeGame;
 
-    /** @type gdjs.RuntimeScene[] */
-	this._stack = [];
+    /** @type {gdjs.RuntimeScene[]} */
+    this._stack = [];
+
+    /** @type {boolean} */
+    this._wasFirstSceneLoaded = false;
 };
 
-gdjs.SceneStack.prototype.onRendererResized = function() {
+/**
+ * Called by the RuntimeGame when the game resolution is changed.
+ * Useful to notify scene and layers that resolution is changed, as they
+ * might be caching it.
+ */
+gdjs.SceneStack.prototype.onGameResolutionResized = function() {
 	for(var i = 0;i < this._stack.length; ++i) {
-		this._stack[i].onCanvasResized();
+		this._stack[i].onGameResolutionResized();
 	}
 };
 
@@ -50,11 +59,11 @@ gdjs.SceneStack.prototype.step = function(elapsedTime) {
     return true;
 };
 
-gdjs.SceneStack.prototype.renderWithoutStep = function(elapsedTime) {
+gdjs.SceneStack.prototype.renderWithoutStep = function() {
 	if (this._stack.length === 0) return false;
 
 	var currentScene = this._stack[this._stack.length - 1];
-    currentScene.render(elapsedTime);
+    currentScene.render();
 
     return true;
 };
@@ -64,6 +73,8 @@ gdjs.SceneStack.prototype.pop = function() {
 
     // Unload the current scene
     var scene = this._stack.pop();
+    if (!scene) return null;
+
     scene.unloadScene();
 
     // Tell the new current scene it's being resumed
@@ -75,6 +86,12 @@ gdjs.SceneStack.prototype.pop = function() {
 	return scene;
 };
 
+/**
+ * Pause the scene currently being played and start the new scene that is specified.
+ * If `externalLayoutName` is set, also instantiate the objects from this external layout.
+ * @param {string} newSceneName
+ * @param {string=} externalLayoutName
+ */
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     // Tell the scene it's being paused
     var currentScene = this._stack[this._stack.length - 1];
@@ -85,30 +102,37 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     // Load the new one
     var newScene = new gdjs.RuntimeScene(this._runtimeGame);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
+    this._wasFirstSceneLoaded = true;
 
-    //Optionally create the objects from an external layout.
+    // Optionally create the objects from an external layout.
     if (externalLayoutName) {
         var externalLayoutData = this._runtimeGame.getExternalLayoutData(externalLayoutName);
         if (externalLayoutData)
-            newScene.createObjectsFrom(externalLayoutData.instances, 0, 0);
+            newScene.createObjectsFrom(externalLayoutData.instances, 0, 0, /*trackByPersistentUuid=*/ true);
     }
 
     this._stack.push(newScene);
     return newScene;
 };
 
+/**
+ * Start the specified scene, replacing the one currently being played.
+ * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+ * @param {string} newSceneName
+ * @param {boolean=} clear
+ */
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
             var scene = this._stack.pop();
-            scene.unloadScene();
+            if (scene) scene.unloadScene();
         }
     } else {
         // Unload the current scene
         if (this._stack.length !== 0) {
             var scene = this._stack.pop();
-            scene.unloadScene();
+            if (scene) scene.unloadScene();
         }
     }
 
@@ -123,3 +147,10 @@ gdjs.SceneStack.prototype.getCurrentScene = function() {
 
 	return this._stack[this._stack.length - 1];
 };
+
+/**
+ * Return true if a scene was loaded, false otherwise (i.e: game not yet started).
+ */
+gdjs.SceneStack.prototype.wasFirstSceneLoaded = function() {
+    return this._wasFirstSceneLoaded;
+}

@@ -1,59 +1,174 @@
 /**
-
-GDevelop - Particle System Extension
-Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
-This project is released under the MIT License.
+ * GDevelop - Particle System Extension
+ * Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
+ * This project is released under the MIT License.
 */
 
+/**
+ * @typedef {Object} ParticleEmitterObjectDataType
+ * @property {boolean} emissionEditionSimpleMode
+ * @property {number} emitterAngleA
+ * @property {number} emitterAngleB
+ * @property {number} emitterForceMin
+ * @property {number} emitterForceMax
+ * @property {number} zoneRadius
+ * @property {number} particleLifeTimeMin
+ * @property {number} particleLifeTimeMax
+ * @property {number} particleGravityX
+ * @property {number} particleGravityY
+ * @property {number} particleRed1
+ * @property {number} particleRed2
+ * @property {number} particleGreen1
+ * @property {number} particleGreen2
+ * @property {number} particleBlue1
+ * @property {number} particleBlue2
+ * @property {number} particleSize1
+ * @property {number} particleSize2
+ * @property {number} particleAngle1
+ * @property {number} particleAngle2
+ * @property {string} sizeParam
+ * @property {number} particleAlpha1
+ * @property {number} particleAlpha2
+ * @property {string} rendererType
+ * @property {number} rendererParam1
+ * @property {number} rendererParam2
+ * @property {string} textureParticleName Resource name for image in particle
+ * @property {number} flow
+ * @property {number} tank
+ * @property {boolean} destroyWhenNoParticles Destroy the object when there is no particles?
+ */
 
-gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+/**
+ * @typedef {ObjectData & ParticleEmitterObjectDataType} ParticleEmitterObjectData
+ */
 
-    this._renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, objectData);
+/**
+ * Displays particles.
+ *
+ * @memberof gdjs
+ * @class ParticleEmitterObject
+ * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene  The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {ParticleEmitterObjectData} particleObjectData The initial properties of the object
+ */
+gdjs.ParticleEmitterObject = function(runtimeScene, particleObjectData){
+    gdjs.RuntimeObject.call(this, runtimeScene, particleObjectData);
 
-    this.singleAngle = objectData.emissionEditionSimpleMode;
-    this.angleA = objectData.emitterAngleA;
-    this.angleB = objectData.emitterAngleB;
-    this.forceMin = objectData.emitterForceMin;
-    this.forceMax = objectData.emitterForceMax;
-    this.zoneRadius = objectData.zoneRadius;
-    this.lifeTimeMin = objectData.particleLifeTimeMin;
-    this.lifeTimeMax = objectData.particleLifeTimeMax;
-    this.gravityX = objectData.particleGravityX;
-    this.gravityY = objectData.particleGravityY;
-    this.colorR1 = objectData.particleRed1;
-    this.colorR2 = objectData.particleRed2;
-    this.colorG1 = objectData.particleGreen1;
-    this.colorG2 = objectData.particleGreen2;
-    this.colorB1 = objectData.particleBlue1;
-    this.colorB2 = objectData.particleBlue2;
-    this.size1 = objectData.particleSize1;
-    this.size2 = objectData.particleSize2;
-    this.sizeParam = objectData.sizeParam;
-    this.alpha1 = objectData.particleAlpha1;
-    this.alpha2 = objectData.particleAlpha2;
-    this.rendererType = objectData.rendererType;
-    this.rendererParam1 = objectData.rendererParam1;
-    this.rendererParam2 = objectData.rendererParam2;
-    this.texture = objectData.textureParticleName;
-    this.flow = objectData.flow;
-    this.tank = objectData.tank;
-    this.destroyWhenNoParticles = objectData.destroyWhenNoParticles;
+    /** @type {gdjs.ParticleEmitterObjectRenderer} */
+    this._renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, particleObjectData);
 
+    /** @type {boolean} */
+    this.singleAngle = particleObjectData.emissionEditionSimpleMode;
+
+    /** @type {number} */
+    this.angleA = particleObjectData.emitterAngleA;
+
+    /** @type {number} */
+    this.angleB = particleObjectData.emitterAngleB;
+
+    /** @type {number} */
+    this.forceMin = particleObjectData.emitterForceMin;
+
+    /** @type {number} */
+    this.forceMax = particleObjectData.emitterForceMax;
+
+    /** @type {number} */
+    this.zoneRadius = particleObjectData.zoneRadius;
+
+    /** @type {number} */
+    this.lifeTimeMin = particleObjectData.particleLifeTimeMin;
+
+    /** @type {number} */
+    this.lifeTimeMax = particleObjectData.particleLifeTimeMax;
+
+    /** @type {number} */
+    this.gravityX = particleObjectData.particleGravityX;
+
+    /** @type {number} */
+    this.gravityY = particleObjectData.particleGravityY;
+
+    /** @type {number} */
+    this.colorR1 = particleObjectData.particleRed1;
+
+    /** @type {number} */
+    this.colorR2 = particleObjectData.particleRed2;
+
+    /** @type {number} */
+    this.colorG1 = particleObjectData.particleGreen1;
+
+    /** @type {number} */
+    this.colorG2 = particleObjectData.particleGreen2;
+
+    /** @type {number} */
+    this.colorB1 = particleObjectData.particleBlue1;
+
+    /** @type {number} */
+    this.colorB2 = particleObjectData.particleBlue2;
+
+    /** @type {number} */
+    this.size1 = particleObjectData.particleSize1;
+
+    /** @type {number} */
+    this.size2 = particleObjectData.particleSize2;
+
+    /** @type {string} */
+    this.sizeParam = particleObjectData.sizeParam;
+
+    /** @type {number} */
+    this.alpha1 = particleObjectData.particleAlpha1;
+
+    /** @type {number} */
+    this.alpha2 = particleObjectData.particleAlpha2;
+
+    /** @type {string} */
+    this.rendererType = particleObjectData.rendererType;
+
+    /** @type {number} */
+    this.rendererParam1 = particleObjectData.rendererParam1;
+
+    /** @type {number} */
+    this.rendererParam2 = particleObjectData.rendererParam2;
+
+    /** @type {string} */
+    this.texture = particleObjectData.textureParticleName;
+
+    /** @type {number} */
+    this.flow = particleObjectData.flow;
+
+    /** @type {number} */
+    this.tank = particleObjectData.tank;
+
+    /** @type {boolean} */
+    this.destroyWhenNoParticles = particleObjectData.destroyWhenNoParticles;
+
+    /** @type {boolean} */
     this._posDirty = true;
+    /** @type {boolean} */
     this._angleDirty = true;
+    /** @type {boolean} */
     this._forceDirty = true;
+    /** @type {boolean} */
     this._zoneRadiusDirty = true;
+    /** @type {boolean} */
     this._lifeTimeDirty = true;
+    /** @type {boolean} */
     this._gravityDirty = true;
+    /** @type {boolean} */
     this._colorDirty = true;
+    /** @type {boolean} */
     this._sizeDirty = true;
+    /** @type {boolean} */
     this._alphaDirty = true;
-    this._textureDirty = true;
+    /** @type {boolean} */
+    this._textureDirty = this.texture !== ''; // Don't mark texture as dirty if not using one.
+    /** @type {boolean} */
     this._flowDirty = true;
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 gdjs.ParticleEmitterObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.ParticleEmitterObject.thisIsARuntimeObjectConstructor = "ParticleSystem::ParticleEmitter";
+gdjs.registerObject("ParticleSystem::ParticleEmitter", gdjs.ParticleEmitterObject);
 
 gdjs.ParticleEmitterObject.prototype.setX = function(x){
     if(this.x !== x) this._posDirty = true;
@@ -72,6 +187,116 @@ gdjs.ParticleEmitterObject.prototype.setAngle = function(angle){
 
 gdjs.ParticleEmitterObject.prototype.getRendererObject = function(){
     return this._renderer.getRendererObject();
+};
+
+/**
+ * @param {ParticleEmitterObjectData} oldObjectData
+ * @param {ParticleEmitterObjectData} newObjectData
+ */
+gdjs.ParticleEmitterObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.emissionEditionSimpleMode !== newObjectData.emissionEditionSimpleMode) {
+        this.singleAngle = newObjectData.emissionEditionSimpleMode;
+        this._angleDirty = true;
+    }
+    if (oldObjectData.emitterAngleA !== newObjectData.emitterAngleA) {
+        this.setEmitterAngleA(newObjectData.emitterAngleA);
+    }
+    if (oldObjectData.emitterAngleB !== newObjectData.emitterAngleB) {
+        this.setEmitterAngleB(newObjectData.emitterAngleB);
+    }
+    if (oldObjectData.emitterForceMin !== newObjectData.emitterForceMin) {
+        this.setEmitterForceMin(newObjectData.emitterForceMin);
+    }
+    if (oldObjectData.emitterForceMax !== newObjectData.emitterForceMax) {
+        this.setEmitterForceMax(newObjectData.emitterForceMax);
+    }
+    if (oldObjectData.zoneRadius !== newObjectData.zoneRadius) {
+        this.setZoneRadius(newObjectData.zoneRadius);
+    }
+    if (oldObjectData.particleLifeTimeMin !== newObjectData.particleLifeTimeMin) {
+        this.setParticleLifeTimeMin(newObjectData.particleLifeTimeMin);
+    }
+    if (oldObjectData.particleLifeTimeMax !== newObjectData.particleLifeTimeMax) {
+        this.setParticleLifeTimeMax(newObjectData.particleLifeTimeMax);
+    }
+    if (oldObjectData.particleGravityX !== newObjectData.particleGravityX) {
+        this.setParticleGravityX(newObjectData.particleGravityX);
+    }
+    if (oldObjectData.particleGravityY !== newObjectData.particleGravityY) {
+        this.setParticleGravityY(newObjectData.particleGravityY);
+    }
+    if (oldObjectData.particleRed1 !== newObjectData.particleRed1) {
+        this.setParticleRed1(newObjectData.particleRed1);
+    }
+    if (oldObjectData.particleRed2 !== newObjectData.particleRed2) {
+        this.setParticleRed2(newObjectData.particleRed2);
+    }
+    if (oldObjectData.particleGreen1 !== newObjectData.particleGreen1) {
+        this.setParticleGreen1(newObjectData.particleGreen1);
+    }
+    if (oldObjectData.particleGreen2 !== newObjectData.particleGreen2) {
+        this.setParticleGreen2(newObjectData.particleGreen2);
+    }
+    if (oldObjectData.particleBlue1 !== newObjectData.particleBlue1) {
+        this.setParticleBlue1(newObjectData.particleBlue1);
+    }
+    if (oldObjectData.particleBlue2 !== newObjectData.particleBlue2) {
+        this.setParticleBlue2(newObjectData.particleBlue2);
+    }
+    if (oldObjectData.particleSize1 !== newObjectData.particleSize1) {
+        this.setParticleSize1(newObjectData.particleSize1);
+    }
+    if (oldObjectData.particleSize2 !== newObjectData.particleSize2) {
+        this.setParticleSize2(newObjectData.particleSize2);
+    }
+    if (oldObjectData.sizeParam !== newObjectData.sizeParam) {
+        this.sizeParam = newObjectData.sizeParam;
+        this._sizeDirty = true;
+    }
+    if (oldObjectData.particleAlpha1 !== newObjectData.particleAlpha1) {
+        this.setParticleAlpha1(newObjectData.particleAlpha1);
+    }
+    if (oldObjectData.particleAlpha2 !== newObjectData.particleAlpha2) {
+        this.setParticleAlpha2(newObjectData.particleAlpha2);
+    }
+    if (oldObjectData.textureParticleName !== newObjectData.textureParticleName) {
+        this.setTexture(newObjectData.textureParticleName, this._runtimeScene);
+    }
+    if (oldObjectData.flow !== newObjectData.flow) {
+        this.setFlow(newObjectData.flow);
+    }
+    if (oldObjectData.tank !== newObjectData.tank) {
+        this.setTank(newObjectData.tank);
+    }
+    if (oldObjectData.destroyWhenNoParticles !== newObjectData.destroyWhenNoParticles) {
+        this.destroyWhenNoParticles = newObjectData.destroyWhenNoParticles;
+    }
+
+    if (oldObjectData.particleSizeRandomness1 !== newObjectData.particleSizeRandomness1 ||
+        oldObjectData.particleSizeRandomness2 !== newObjectData.particleSizeRandomness2 ||
+        oldObjectData.particleAngle1 !== newObjectData.particleAngle1 ||
+        oldObjectData.particleAngle2 !== newObjectData.particleAngle2 ||
+        oldObjectData.maxParticleNb !== newObjectData.maxParticleNb ||
+        oldObjectData.additive !== newObjectData.additive ||
+        oldObjectData.rendererType !== newObjectData.rendererType ||
+        oldObjectData.rendererParam1 !== newObjectData.rendererParam1 ||
+        oldObjectData.rendererParam2 !== newObjectData.rendererParam2) {
+        // Destroy the renderer, ensure it's removed from the layer.
+        var layer = this._runtimeScene.getLayer(this.layer);
+        layer.getRenderer().removeRendererObject(this._renderer.getRendererObject());
+        this._renderer.destroy();
+
+        // and recreate the renderer, which will add itself to the layer.
+        this._renderer = new gdjs.ParticleEmitterObjectRenderer(this._runtimeScene, this, newObjectData);
+
+        // Consider every state dirty as the renderer was just re-created, so it needs
+        // to be repositioned, angle updated, etc...
+        this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
+        this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
+        this._alphaDirty = this._flowDirty = this._textureDirty = true;
+    }
+
+    return true;
 };
 
 gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
@@ -109,7 +334,7 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
         this._renderer.setFlow(this.flow, this.tank);
     }
     if(this._textureDirty){
-        this._renderer.setTexture(this.texture, runtimeScene);
+        this._renderer.setTextureName(this.texture, runtimeScene);
     }
 
     this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
@@ -127,9 +352,9 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
     }
 };
 
-gdjs.ParticleEmitterObject.prototype.onDeletedFromScene = function(runtimeScene){
+gdjs.ParticleEmitterObject.prototype.onDestroyFromScene = function(runtimeScene){
     this._renderer.destroy();
-    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+    gdjs.RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);
 };
 
 gdjs.ParticleEmitterObject.prototype.getEmitterForceMin = function(){
@@ -478,7 +703,7 @@ gdjs.ParticleEmitterObject.prototype.getTexture = function(){
 
 gdjs.ParticleEmitterObject.prototype.setTexture = function(texture, runtimeScene){
     if(this.texture !== texture){
-        if(this._renderer.isTextureValid(texture, runtimeScene)){
+        if(this._renderer.isTextureNameValid(texture, runtimeScene)){
             this.texture = texture;
             this._textureDirty = true;
         }

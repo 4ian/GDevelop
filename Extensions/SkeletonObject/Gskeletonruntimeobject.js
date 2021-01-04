@@ -28,9 +28,12 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
 
     this.manager = gdjs.SkeletonObjectsManager.getManager(runtimeScene);
     this.getSkeletonData(runtimeScene, objectData);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.SkeletonRuntimeObject.thisIsARuntimeObjectConstructor = "SkeletonObject::Skeleton";
+gdjs.registerObject("SkeletonObject::Skeleton", gdjs.SkeletonRuntimeObject);
 
 gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     if(initialInstanceData.customSize){
@@ -330,7 +333,7 @@ gdjs.SkeletonRuntimeObject.prototype.setSlotZOrder = function(slotPath, z){
 gdjs.SkeletonRuntimeObject.prototype.isPointInsideSlot = function(slotPath, x, y){
     var hitBoxes = this.getPolygons(slotPath);
     if(!hitBoxes) return false;
-    
+
     for(var i = 0; i < this.hitBoxes.length; ++i) {
        if ( gdjs.Polygon.isPointInside(hitBoxes[i], x, y) )
             return true;
@@ -343,7 +346,7 @@ gdjs.SkeletonRuntimeObject.prototype.isPointInsideSlot = function(slotPath, x, y
 gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angle, dist, closest){
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
-    
+
     var endX = x + dist*Math.cos(angle*Math.PI/180.0);
     var endY = y + dist*Math.sin(angle*Math.PI/180.0);
     var testSqDist = closest ? dist*dist : 0;
@@ -364,7 +367,7 @@ gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angl
             }
         }
     }
-    
+
     return result;
 };
 
@@ -433,7 +436,7 @@ gdjs.SkeletonRuntimeObject.prototype.getBone = function(bonePath){
     if(slot && slot.type === gdjs.sk.SLOT_ARMATURE && boneName in slot.childArmature.bonesMap){
         return slot.childArmature.bonesMap[boneName];
     }
-    
+
     return null;
 };
 

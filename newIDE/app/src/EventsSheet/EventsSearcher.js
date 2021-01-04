@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type SelectionState } from './SelectionHandler';
 import { mapFor } from '../Utils/MapFor';
 import uniqBy from 'lodash/uniqBy';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export type SearchInEventsInputs = {|
   searchInSelection: boolean,
@@ -11,6 +11,7 @@ export type SearchInEventsInputs = {|
   matchCase: boolean,
   searchInConditions: boolean,
   searchInActions: boolean,
+  searchInEventStrings: boolean,
 |};
 
 export type ReplaceInEventsInputs = {|
@@ -20,6 +21,7 @@ export type ReplaceInEventsInputs = {|
   matchCase: boolean,
   searchInConditions: boolean,
   searchInActions: boolean,
+  searchInEventStrings: boolean,
 |};
 
 type State = {|
@@ -28,8 +30,8 @@ type State = {|
 |};
 
 type Props = {|
-  globalObjectsContainer: gdProject,
-  objectsContainer: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   selection: SelectionState,
   children: (props: {|
@@ -77,6 +79,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     matchCase,
     searchInConditions,
     searchInActions,
+    searchInEventStrings,
   }: ReplaceInEventsInputs) => {
     const { globalObjectsContainer, objectsContainer, events } = this.props;
 
@@ -86,6 +89,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       // function to be done in C++.
       console.error('Replace in selection is not implemented yet');
     }
+    if (!replaceText) return;
 
     gd.EventsRefactorer.replaceStringInEvents(
       globalObjectsContainer,
@@ -96,6 +100,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       matchCase,
       searchInConditions,
       searchInActions
+      // TODO: add capability to replace in event strings
+      // searchInEventStrings
     );
   };
 
@@ -106,6 +112,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       matchCase,
       searchInConditions,
       searchInActions,
+      searchInEventStrings,
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
@@ -125,7 +132,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchText,
       matchCase,
       searchInConditions,
-      searchInActions
+      searchInActions,
+      searchInEventStrings
     );
 
     if (this.state.eventsSearchResults) {

@@ -1,0 +1,81 @@
+[
+	{
+		"title": "Numeric",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = -123.4>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},{
+		"title": "NumericExpression",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = (1 + 2) * -3 + 4.3>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "String",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = \"Variable String\">>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "StringExpression",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = \"Variable String\" + \" Appended\">>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Boolean",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = true>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "BooleanExpression",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $testvar = (true || false) && (false || !false)>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Variable",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $firstvar = \"First variable string\">><<set $secondvar = $firstvar>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	},
+	{
+		"title": "VariableExpression",
+		"tags": "Tag",
+		"body": "Test Line\n<<set $firstvar = 100>><<set $secondvar = -4.3 + $firstvar>>\nTest Line After",
+		"position": {
+			"x": 449,
+			"y": 252
+		},
+		"colorID": 0
+	}
+]

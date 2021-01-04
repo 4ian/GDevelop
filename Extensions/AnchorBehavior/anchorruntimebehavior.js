@@ -24,7 +24,7 @@ gdjs.AnchorRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.AnchorRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.AnchorRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "AnchorBehavior::AnchorBehavior";
+gdjs.registerBehavior("AnchorBehavior::AnchorBehavior", gdjs.AnchorRuntimeBehavior);
 
 gdjs.AnchorRuntimeBehavior.HorizontalAnchor = {
    NONE: 0,
@@ -40,14 +40,34 @@ gdjs.AnchorRuntimeBehavior.VerticalAnchor = {
    PROPORTIONAL: 3
 };
 
+gdjs.AnchorRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.leftEdgeAnchor !== newBehaviorData.leftEdgeAnchor) {
+        this._leftEdgeAnchor = newBehaviorData.leftEdgeAnchor;
+    }
+    if (oldBehaviorData.rightEdgeAnchor !== newBehaviorData.rightEdgeAnchor) {
+        this._rightEdgeAnchor = newBehaviorData.rightEdgeAnchor;
+    }
+    if (oldBehaviorData.topEdgeAnchor !== newBehaviorData.topEdgeAnchor) {
+        this._topEdgeAnchor = newBehaviorData.topEdgeAnchor;
+    }
+    if (oldBehaviorData.bottomEdgeAnchor !== newBehaviorData.bottomEdgeAnchor) {
+        this._bottomEdgeAnchor = newBehaviorData.bottomEdgeAnchor;
+    }
+    if (oldBehaviorData.relativeToOriginalWindowSize !== newBehaviorData.relativeToOriginalWindowSize) {
+        return false;
+    }
+
+    return true;
+}
+
 gdjs.AnchorRuntimeBehavior.prototype.onActivate = function() {
     this._invalidDistances = true;
 };
 
 gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
     var game = runtimeScene.getGame();
-    var rendererWidth = game.getRenderer().getCurrentWidth();
-    var rendererHeight = game.getRenderer().getCurrentHeight();
+    var rendererWidth = game.getGameResolutionWidth();
+    var rendererHeight = game.getGameResolutionHeight();
     var layer = runtimeScene.getLayer(this.owner.getLayer());
 
     if(this._invalidDistances)
@@ -147,13 +167,13 @@ gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
         var bottomRightCoord = layer.convertInverseCoords(rightPixel, bottomPixel);
 
         //Move and resize the object according to the anchors
-        if(this._rightEdgeAnchor != gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
+        if(this._rightEdgeAnchor !== gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
             this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
-        if(this._bottomEdgeAnchor != gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
+        if(this._bottomEdgeAnchor !== gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
             this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
-        if(this._leftEdgeAnchor != gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
+        if(this._leftEdgeAnchor !== gdjs.AnchorRuntimeBehavior.HorizontalAnchor.NONE)
             this.owner.setX(topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX());
-        if(this._topEdgeAnchor != gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
+        if(this._topEdgeAnchor !== gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
             this.owner.setY(topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY());
     }
 };

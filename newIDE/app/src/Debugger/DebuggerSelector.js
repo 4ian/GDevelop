@@ -1,9 +1,9 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import { Column } from '../UI/Grid';
-import { type DebuggerId } from '.';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import { type DebuggerId } from '../Export/PreviewLauncher.flow';
 
 type Props = {|
   selectedId: DebuggerId,
@@ -15,26 +15,28 @@ export default class DebuggerSelector extends React.Component<Props, void> {
   render() {
     const hasDebuggers = !!this.props.debuggerIds.length;
     return (
-      <Column>
-        <SelectField
-          fullWidth
-          value={hasDebuggers ? this.props.selectedId : 0}
-          onChange={(e, i, value) => this.props.onChooseDebugger(value)}
-          disabled={!hasDebuggers}
-        >
-          {this.props.debuggerIds.map(id => (
-            <MenuItem value={id} key={id} primaryText={'Game preview #' + id} />
-          ))}
-          {!hasDebuggers && (
-            <MenuItem
-              value={0}
-              primaryText={
-                'No preview running. Run a preview and you will be able to inspect it with the debugger'
-              }
-            />
-          )}
-        </SelectField>
-      </Column>
+      <SelectField
+        fullWidth
+        value={hasDebuggers ? this.props.selectedId : 0}
+        onChange={(e, i, value) =>
+          this.props.onChooseDebugger(parseInt(value, 10) || 0)
+        }
+        disabled={!hasDebuggers}
+      >
+        {this.props.debuggerIds.map(id => (
+          <SelectOption
+            value={id}
+            key={id}
+            primaryText={t`Game preview #${id}`}
+          />
+        ))}
+        {!hasDebuggers && (
+          <SelectOption
+            value={0}
+            primaryText={t`No preview running. Run a preview and you will be able to inspect it with the debugger`}
+          />
+        )}
+      </SelectField>
     );
   }
 }

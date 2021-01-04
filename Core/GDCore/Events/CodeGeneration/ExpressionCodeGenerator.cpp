@@ -24,16 +24,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 
-// Compatibility with old ExpressionParser
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/CodeGeneration/VariableParserCallbacks.h"
-#include "GDCore/Events/Parsers/ExpressionParser.h"
-#include "GDCore/Events/Parsers/VariableParser.h"
-// end of compatibility code
-
 namespace gd {
-
-bool ExpressionCodeGenerator::useOldExpressionParser = false;
 
 gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerator& codeGenerator,
@@ -41,100 +32,6 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     const gd::String& type,
     const gd::String& expression,
     const gd::String& objectName) {
-  // Compatibility with old ExpressionParser
-  if (useOldExpressionParser) {
-    if (type == "number") {
-      gd::String code = "";
-      gd::CallbacksForGeneratingExpressionCode callbacks(
-          code, codeGenerator, context);
-      gd::ExpressionParser parser(expression);
-      if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                      codeGenerator.GetGlobalObjectsAndGroups(),
-                                      codeGenerator.GetObjectsAndGroups(),
-                                      callbacks) ||
-          code.empty()) {
-        std::cout << "Error (old ExpressionParser): \""
-                  << parser.GetFirstError() << "\" in: \"" << expression
-                  << "\" (number)" << std::endl;
-        code = "0";
-      }
-
-      return code;
-    } else if (type == "string") {
-      gd::String code = "";
-      gd::CallbacksForGeneratingExpressionCode callbacks(
-          code, codeGenerator, context);
-      gd::ExpressionParser parser(expression);
-      if (!parser.ParseStringExpression(
-              codeGenerator.GetPlatform(),
-              codeGenerator.GetGlobalObjectsAndGroups(),
-              codeGenerator.GetObjectsAndGroups(),
-              callbacks) ||
-          code.empty()) {
-        std::cout << "Error (old ExpressionParser): \""
-                  << parser.GetFirstError() << "\" in: \"" << expression
-                  << "\" (string)" << std::endl;
-        code = "\"\"";
-      }
-
-      return code;
-    } else if (type == "scenevar") {
-      gd::String code = "";
-      gd::VariableCodeGenerationCallbacks callbacks(
-          code,
-          codeGenerator,
-          context,
-          gd::EventsCodeGenerator::LAYOUT_VARIABLE);
-
-      gd::VariableParser parser(expression);
-      if (!parser.Parse(callbacks)) {
-        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
-                  << " in: " << expression << std::endl;
-        code = codeGenerator.GenerateBadVariable();
-      }
-      return code;
-    } else if (type == "globalvar") {
-      gd::String code = "";
-      gd::VariableCodeGenerationCallbacks callbacks(
-          code,
-          codeGenerator,
-          context,
-          gd::EventsCodeGenerator::PROJECT_VARIABLE);
-
-      gd::VariableParser parser(expression);
-      if (!parser.Parse(callbacks)) {
-        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
-                  << " in: " << expression << std::endl;
-        code = codeGenerator.GenerateBadVariable();
-      }
-      return code;
-    } else if (type == "objectvar") {
-      gd::String code = "";
-
-      // Object is either the object of the previous parameter or, if it is
-      // empty, the object being picked by the instruction.
-      gd::String object =
-          objectName.empty() ? context.GetCurrentObject() : objectName;
-
-      gd::VariableCodeGenerationCallbacks callbacks(
-          code, codeGenerator, context, object);
-
-      gd::VariableParser parser(expression);
-      if (!parser.Parse(callbacks)) {
-        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
-                  << " in: " << expression << std::endl;
-        code = codeGenerator.GenerateBadVariable();
-      }
-      return code;
-    }
-
-    std::cout << "Type error (old ExpressionParser): type \"" << type
-              << "\" is not supported" << std::endl;
-    return "/* Error during code generation: type " + type +
-           " is not supported for old ExpressionParser. */ 0";
-  }
-  // end of compatibility code
-
   gd::ExpressionParser2 parser(codeGenerator.GetPlatform(),
                                codeGenerator.GetGlobalObjectsAndGroups(),
                                codeGenerator.GetObjectsAndGroups());
@@ -230,7 +127,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   }
 }
 
-void ExpressionCodeGenerator::OnVisitFunctionNode(FunctionNode& node) {
+void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(node.expressionMetadata)) {
     output += "/* Error during generation, function not found: " +
               codeGenerator.ConvertToString(node.functionName) + " for type " +
@@ -459,6 +356,10 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
+  output += GenerateDefaultValue(node.type);
+}
+
+void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) {
   output += GenerateDefaultValue(node.type);
 }
 

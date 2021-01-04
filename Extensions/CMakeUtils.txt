@@ -50,13 +50,18 @@ function(gd_add_extension_target target_name source_files)
 	IF(target_name STREQUAL "")
 		MESSAGE(ERROR "You called gd_add_extension_target without specifying a target name")
 	ENDIF()
-	
+
 	SET(platform_directory ${ARGV2})
 	IF(NOT platform_directory)
 		SET(platform_directory "CppPlatform")
 	ENDIF()
 
-	add_library(${target_name} SHARED ${source_files})
+	IF(EMSCRIPTEN)
+		# Emscripten treats all libraries as static libraries
+		add_library(${target_name} STATIC ${source_files})
+	ELSE()
+		add_library(${target_name} SHARED ${source_files})
+	ENDIF()
 	set_target_properties(${target_name} PROPERTIES PREFIX "")
 	set_target_properties(${target_name} PROPERTIES COMPILE_DEFINITIONS "${${target_name}_extra_definitions}")
 	set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/${platform_directory}/Extensions")

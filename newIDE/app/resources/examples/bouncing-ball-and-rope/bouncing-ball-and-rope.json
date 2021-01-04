@@ -1,19 +1,20 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
     "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.dom.tom",
-    "projectFile": "G:\\Games\\Rope Example\\game.json",
+    "projectFile": "G:\\onedrive\\Documents\\GDevelop projects\\Bouncing ball and rope\\bouncing-ball-and-rope.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -175,7 +176,7 @@
         "kind": "image",
         "metadata": "",
         "name": "Ball.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": false
       },
       {
@@ -193,7 +194,7 @@
         "kind": "image",
         "metadata": "",
         "name": "BoundsLine.png",
-        "smoothed": false,
+        "smoothed": true,
         "userAdded": true
       }
     ],
@@ -240,7 +241,7 @@
           "locked": false,
           "name": "Instructions",
           "width": 562,
-          "x": 164,
+          "x": 139,
           "y": 187,
           "zOrder": 1,
           "numberProperties": [],
@@ -255,7 +256,7 @@
           "locked": false,
           "name": "Logo",
           "width": 355,
-          "x": 486,
+          "x": 427,
           "y": 446,
           "zOrder": 2,
           "numberProperties": [],
@@ -270,7 +271,7 @@
           "locked": false,
           "name": "Title",
           "width": 0,
-          "x": 76,
+          "x": 51,
           "y": 33,
           "zOrder": 3,
           "numberProperties": [],
@@ -299,6 +300,7 @@
           "italic": false,
           "name": "Instructions",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -314,6 +316,7 @@
         },
         {
           "name": "Logo",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -355,6 +358,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -371,6 +375,7 @@
         {
           "height": 64,
           "name": "Back",
+          "tags": "",
           "texture": "Back.jpg",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -523,7 +528,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.496
       },
       "objectsGroups": [
         {
@@ -1061,6 +1066,7 @@
       "objects": [
         {
           "name": "SwingBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1068,59 +1074,57 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": true,
-                "canSleep": true,
-                "shape": "Polygon",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1,
-                "vertices": [
-                  {
-                    "x": -19,
-                    "y": 25
-                  },
-                  {
-                    "x": 13,
-                    "y": 22
-                  },
-                  {
-                    "x": 28,
-                    "y": 0
-                  },
-                  {
-                    "x": 28,
-                    "y": -60
-                  },
-                  {
-                    "x": 8,
-                    "y": -87
-                  },
-                  {
-                    "x": -27,
-                    "y": -88
-                  },
-                  {
-                    "x": -47,
-                    "y": -61
-                  },
-                  {
-                    "x": -36,
-                    "y": 7
-                  }
-                ]
-              }
+              "bullet": false,
+              "fixedRotation": true,
+              "canSleep": true,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "vertices": [
+                {
+                  "x": -19,
+                  "y": 25
+                },
+                {
+                  "x": 13,
+                  "y": 22
+                },
+                {
+                  "x": 28,
+                  "y": 0
+                },
+                {
+                  "x": 28,
+                  "y": -60
+                },
+                {
+                  "x": 8,
+                  "y": -87
+                },
+                {
+                  "x": -27,
+                  "y": -88
+                },
+                {
+                  "x": -47,
+                  "y": -61
+                },
+                {
+                  "x": -36,
+                  "y": 7
+                }
+              ],
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -1163,6 +1167,7 @@
         },
         {
           "name": "MainChar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1170,25 +1175,23 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": true,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.1,
-                "restitution": 1,
-                "linearDamping": 0,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": true,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.1,
+              "restitution": 1,
+              "linearDamping": 0,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1225,6 +1228,7 @@
         },
         {
           "name": "Rope",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1245,6 +1249,7 @@
         },
         {
           "name": "Follow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1257,6 +1262,7 @@
           "leftMargin": 10,
           "name": "Platform",
           "rightMargin": 10,
+          "tags": "",
           "texture": "Shelf.png",
           "tiled": false,
           "topMargin": 10,
@@ -1267,31 +1273,30 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": true,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": true,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ]
         },
         {
           "height": 32,
           "name": "Finish",
+          "tags": "",
           "texture": "Finish.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -1301,6 +1306,7 @@
         {
           "height": 32,
           "name": "Background",
+          "tags": "",
           "texture": "Back.jpg",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -1309,6 +1315,7 @@
         },
         {
           "name": "MainShaow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1347,6 +1354,7 @@
         },
         {
           "name": "BoundsLine",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1362,7 +1370,7 @@
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "NewObject-1.png",
+                      "image": "BoundsLine.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -1472,18 +1480,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Toujours"
-                  },
-                  "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -1657,8 +1654,8 @@
                       "parameters": [
                         "Group",
                         "Physics2Behavior",
-                        "Group.PointX(Swing)",
-                        "Group.PointY(Swing)",
+                        "Group.PointX(\"Swing\")",
+                        "Group.PointY(\"Swing\")",
                         "MainChar",
                         "MainChar.X()",
                         "MainChar.Y()",
@@ -1714,8 +1711,8 @@
                     "Rope",
                     "MainChar.X()",
                     "MainChar.Y()",
-                    "Group.PointX(Swing)",
-                    "Group.PointY(Swing)",
+                    "Group.PointX(\"Swing\")",
+                    "Group.PointY(\"Swing\")",
                     "3"
                   ],
                   "subInstructions": []
@@ -2108,12 +2105,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }

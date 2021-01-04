@@ -7,11 +7,9 @@ import {
   redo,
 } from './History';
 import { makeTestProject } from '../fixtures/TestProject';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 describe('History', () => {
-  const { project, testLayout } = makeTestProject(gd);
-
   it('can save changes for a simple serializable object from libGD.js', () => {
     const gdVariable = new gd.Variable();
 
@@ -53,6 +51,8 @@ describe('History', () => {
   });
 
   it('can save changes for a serializable object from libGD.js', () => {
+    const { project, testLayout } = makeTestProject(gd);
+
     testLayout.setWindowDefaultTitle('Original name');
     let history = getHistoryInitialState(testLayout, { historyMaxSize: 50 });
     expect(canUndo(history)).toBe(false);

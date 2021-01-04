@@ -5,9 +5,6 @@
  */
 
 #include "GDCpp/Extensions/Builtin/VariablesExtension.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Layout.h"

@@ -1,6 +1,6 @@
 // Note: this file does not use export/imports nor Flow to allow its usage from Node.js
 
-const { findGDJS } = require('../Export/LocalExporters/LocalGDJSFinder');
+const { findGDJS } = require('../GameEngineFinder/LocalGDJSFinder');
 const optionalRequire = require('../Utils/OptionalRequire');
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
@@ -22,16 +22,12 @@ const checkIfPathHasJsExtensionModule = extensionFolderPath => {
 };
 
 const findJsExtensionModules = ({ filterExamples }) => {
-  return new Promise((resolve, reject) => {
-    findGDJS(gdjsRoot => {
-      if (!gdjsRoot) {
-        return reject();
-      }
-
-      const extensionsRoot = path.join(gdjsRoot, 'Runtime', 'Extensions');
-      console.info(
-        `Searching for JS extensions (file called JsExtension.js) in ${extensionsRoot}...`
-      );
+  return findGDJS().then(({ gdjsRoot }) => {
+    const extensionsRoot = path.join(gdjsRoot, 'Runtime', 'Extensions');
+    console.info(
+      `Searching for JS extensions (file called JsExtension.js) in ${extensionsRoot}...`
+    );
+    return new Promise((resolve, reject) => {
       fs.readdir(extensionsRoot, (error, extensionFolders) => {
         if (error) {
           return reject(error);

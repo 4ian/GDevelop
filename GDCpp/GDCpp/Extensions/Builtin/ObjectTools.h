@@ -57,4 +57,13 @@ MovesToward(std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
             float tolerance,
             bool conditionInverted);
 
+/**
+ * Only used internally by GD events generated code.
+ */
+bool GD_API CursorOnObject(
+    std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists,
+    RuntimeScene &scene,
+    bool precise,
+    bool conditionInverted);
+
 #endif  // OBJECTTOOLS_H

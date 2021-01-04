@@ -1,0 +1,61 @@
+version: 1.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+image: Visual Studio 2019
+clone_depth: 5
+init:
+- ps: ''
+install:
+- ps: Install-Product node 10
+build_script:
+- cmd: >-
+    cd GDevelop.js
+
+    git clone https://github.com/juj/emsdk.git
+
+    cd emsdk
+
+    emsdk install 1.39.6
+
+    emsdk activate 1.39.6
+
+    emsdk_env.bat
+
+    cd ..
+
+    npm install
+
+    npm run build
+
+    cd ..
+
+    cd newIDE\app
+
+    npm install
+
+    cd ..\..
+
+    cd GDJS
+
+    npm install
+
+    cd tests
+
+    npm install
+
+    cd ..\..
+test_script:
+- cmd: >-
+    cd GDevelop.js
+
+    npm test
+
+    cd ..
+
+    cd newIDE\app
+
+    npm test
+
+    cd ..\..
+on_finish:
+- ps: ''

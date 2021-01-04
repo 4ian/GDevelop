@@ -1,12 +1,14 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import SemiControlledAutoComplete, {
   type DataSource,
+  type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   project: ?gdProject,
@@ -17,13 +19,16 @@ type Props = {|
 
   onChoose?: string => void,
   onChange: string => void,
+  onRequestClose?: () => void,
   value: string,
   errorTextIfInvalid?: React.Node,
 
   fullWidth?: boolean,
-  floatingLabelText?: ?string,
+  floatingLabelText?: React.Node,
+  helperMarkdownText?: ?string,
+  hintText?: MessageDescriptor | string,
   openOnFocus?: boolean,
-  hintText?: ?React.Node,
+  margin?: 'none' | 'dense',
 |};
 
 const iconSize = 24;
@@ -50,8 +55,9 @@ const getObjectsAndGroupsDataSource = ({
     return {
       text: object.getName(),
       value: object.getName(),
-      renderLeftIcon: project
+      renderIcon: project
         ? () => (
+            // TODO: This is broken since the changes to ListIcon
             <ListIcon
               iconSize={iconSize}
               src={ObjectsRenderingService.getThumbnail(project, object)}
@@ -73,7 +79,7 @@ const getObjectsAndGroupsDataSource = ({
 };
 
 export default class ObjectSelector extends React.Component<Props, {||}> {
-  _field: ?SemiControlledAutoComplete;
+  _field: ?SemiControlledAutoCompleteInterface;
 
   // Don't add a componentWillUnmount that would call onChange. This can lead to
   // calling callbacks that would then update a deleted instruction parameters.
@@ -93,6 +99,8 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       allowedObjectType,
       noGroups,
       errorTextIfInvalid,
+      margin,
+      onRequestClose,
       ...rest
     } = this.props;
 
@@ -110,10 +118,12 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
 
     return (
       <SemiControlledAutoComplete
-        hintText={<Trans>Choose an object</Trans>}
+        margin={margin}
+        hintText={t`Choose an object`}
         value={value}
         onChange={onChange}
         onChoose={onChoose}
+        onRequestClose={onRequestClose}
         dataSource={objectAndGroups}
         errorText={hasValidChoice ? undefined : errorTextIfInvalid}
         ref={field => (this._field = field)}

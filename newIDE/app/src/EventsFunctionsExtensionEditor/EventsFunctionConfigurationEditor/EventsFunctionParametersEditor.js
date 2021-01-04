@@ -5,24 +5,32 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { mapVector } from '../../Utils/MapFor';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
+import RaisedButton from '../../UI/RaisedButton';
+import IconButton from '../../UI/IconButton';
 import EmptyMessage from '../../UI/EmptyMessage';
-import IconMenu from '../../UI/Menu/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import MoreVert from '@material-ui/icons/MoreVert';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
-import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import {
+  isBehaviorLifecycleEventsFunction,
+  isExtensionLifecycleEventsFunction,
+} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -33,6 +41,10 @@ type Props = {|
   freezeParameters?: boolean,
 |};
 
+type State = {|
+  longDescriptionShownIndexes: { [number]: boolean },
+|};
+
 const styles = {
   parametersContainer: {
     flex: 1,
@@ -40,11 +52,22 @@ const styles = {
 };
 
 const validateParameterName = (i18n: I18nType, newName: string) => {
-  if (!gd.Project.validateObjectName(newName)) {
+  if (!newName) {
     showWarningBox(
       i18n._(
-        t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your parameter name.`
-      )
+        t`The name of a parameter can not be empty. Enter a name for the parameter or you won't be able to use it.`
+      ),
+      { delayToNextTick: true }
+    );
+    return false;
+  }
+
+  if (!gd.Project.validateName(newName)) {
+    showWarningBox(
+      i18n._(
+        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -52,10 +75,75 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
   return true;
 };
 
+type StringSelectorEditorProps = {|
+  extraInfo: string,
+  setExtraInfo: string => void,
+|};
+
+const StringSelectorEditor = ({
+  extraInfo,
+  setExtraInfo,
+}: StringSelectorEditorProps) => {
+  let array = [];
+  try {
+    if (extraInfo !== '') array = JSON.parse(extraInfo);
+    if (!Array.isArray(array)) array = [];
+  } catch (e) {
+    console.error('Cannot parse parameter extraInfo: ', e);
+  }
+
+  const updateExtraInfo = () => setExtraInfo(JSON.stringify(array));
+
+  return (
+    <ResponsiveLineStackLayout>
+      <Column justifyContent="flex-end" expand>
+        {array.map((item, index) => (
+          <Line key={index} justifyContent="flex-end" expand marginSize="5px">
+            <SemiControlledTextField
+              commitOnBlur
+              value={item}
+              onChange={text => {
+                array[index] = text;
+                updateExtraInfo();
+              }}
+              fullWidth
+            />
+            <IconButton
+              tooltip={t`Delete option`}
+              onClick={() => {
+                array.splice(index, 1);
+                updateExtraInfo();
+              }}
+            >
+              <Delete />
+            </IconButton>
+          </Line>
+        ))}
+
+        <Line justifyContent="flex-end" expand>
+          <RaisedButton
+            primary
+            onClick={() => {
+              array.push('New Option');
+              updateExtraInfo();
+            }}
+            label={<Trans>Add a new option</Trans>}
+            icon={<Add />}
+          />
+        </Line>
+      </Column>
+    </ResponsiveLineStackLayout>
+  );
+};
+
 export default class EventsFunctionParametersEditor extends React.Component<
   Props,
-  {||}
+  State
 > {
+  state = {
+    longDescriptionShownIndexes: {},
+  };
+
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
@@ -77,6 +165,31 @@ export default class EventsFunctionParametersEditor extends React.Component<
     this.props.onParametersUpdated();
   };
 
+  _addLongDescription = (index: number) => {
+    // Show the long description field
+    this.setState(state => ({
+      longDescriptionShownIndexes: {
+        ...state.longDescriptionShownIndexes,
+        [index]: true,
+      },
+    }));
+  };
+
+  _removeLongDescription = (index: number) => {
+    const { eventsFunction } = this.props;
+    const parameters = eventsFunction.getParameters();
+    const parameter = parameters.at(index);
+
+    // Reset the long description and hide the field
+    parameter.setLongDescription('');
+    this.setState(state => ({
+      longDescriptionShownIndexes: {
+        ...state.longDescriptionShownIndexes,
+        [index]: false,
+      },
+    }));
+  };
+
   _moveParameters = (oldIndex: number, newIndex: number) => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
@@ -96,16 +209,46 @@ export default class EventsFunctionParametersEditor extends React.Component<
     } = this.props;
 
     const parameters = eventsFunction.getParameters();
-    const isABehaviorLifecycleFunction =
+    const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleFunction(eventsFunction.getName());
-    if (isABehaviorLifecycleFunction) {
+      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine and has two parameters: "Object" (the object the behavior
-          is acting on) and "Behavior" (the behavior itself).
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine and has two parameters: "Object" (the object the
+            behavior is acting on) and "Behavior" (the behavior itself).
+          </Trans>
         </EmptyMessage>
+      );
+    }
+    const isAnExtensionLifecycleEventsFunction =
+      !eventsBasedBehavior &&
+      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnExtensionLifecycleEventsFunction) {
+      return (
+        <Column>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters. Only global objects can be
+              used as the events will be run for all scenes in your game.
+            </Trans>
+          </EmptyMessage>
+        </Column>
       );
     }
 
@@ -117,6 +260,14 @@ export default class EventsFunctionParametersEditor extends React.Component<
       // so we even hide their description and type to avoid cluttering the interface.
       return !eventsBasedBehavior || index >= 2;
     };
+    const isParameterLongDescriptionShown = (parameter, index): boolean => {
+      if (!isParameterDescriptionAndTypeShown(index)) return false;
+
+      return (
+        !!parameter.getLongDescription() ||
+        !!this.state.longDescriptionShownIndexes[index]
+      );
+    };
     const parametersIndexOffset = getParametersIndexOffset(
       !!eventsBasedBehavior
     );
@@ -124,7 +275,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
+          <Column noMargin expand>
             <Line noMargin>
               <div style={styles.parametersContainer}>
                 {mapVector(
@@ -138,7 +289,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         <Column expand noMargin>
                           <SemiControlledTextField
                             commitOnBlur
-                            hintText={<Trans>Enter the parameter name</Trans>}
+                            margin="none"
+                            hintText={t`Enter the parameter name (mandatory)`}
                             value={parameter.getName()}
                             onChange={text => {
                               if (!validateParameterName(i18n, text)) return;
@@ -148,27 +300,39 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               this.props.onParametersUpdated();
                             }}
                             disabled={isParameterDisabled(i)}
-                            errorText={
-                              parameter.getName() ? null : (
-                                <Trans>
-                                  Name of the parameter is mandatory.
-                                </Trans>
-                              )
-                            }
                             fullWidth
                           />
                         </Column>
-                        <IconMenu
-                          iconButtonElement={
+                        <ElementWithMenu
+                          element={
                             <IconButton>
-                              <MoreVertIcon />
+                              <MoreVert />
                             </IconButton>
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
+                            },
+                            { type: 'separator' },
+                            {
+                              label: i18n._(t`Add a Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: !isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => this._addLongDescription(i),
+                            },
+                            {
+                              label: i18n._(t`Remove the Long Description`),
+                              enabled: !isParameterDisabled(i),
+                              visible: isParameterLongDescriptionShown(
+                                parameter,
+                                i
+                              ),
+                              click: () => this._removeLongDescription(i),
                             },
                             {
                               label: i18n._(t`Move up`),
@@ -183,98 +347,115 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           ]}
                         />
                       </MiniToolbar>
-                      <Line expand noMargin>
-                        {isParameterDescriptionAndTypeShown(i) && (
-                          <Column expand>
-                            <SelectField
-                              floatingLabelText={<Trans>Type</Trans>}
-                              value={parameter.getType()}
-                              onChange={(e, i, value) => {
-                                parameter.setType(value);
+                      <Line>
+                        <ColumnStackLayout expand>
+                          <ResponsiveLineStackLayout noMargin>
+                            {isParameterDescriptionAndTypeShown(i) && (
+                              <SelectField
+                                floatingLabelText={<Trans>Type</Trans>}
+                                value={parameter.getType()}
+                                onChange={(e, i, value: string) => {
+                                  parameter.setType(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                disabled={isParameterDisabled(i)}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="objectList"
+                                  primaryText={t`Objects`}
+                                />
+                                <SelectOption
+                                  value="behavior"
+                                  primaryText={t`Behavior (for the previous object)`}
+                                />
+                                <SelectOption
+                                  value="expression"
+                                  primaryText={t`Number`}
+                                />
+                                <SelectOption
+                                  value="string"
+                                  primaryText={t`String (text)`}
+                                />
+                                <SelectOption
+                                  value="stringWithSelector"
+                                  primaryText={t`String from a list of options (text)`}
+                                />
+                                <SelectOption
+                                  value="key"
+                                  primaryText={t`Keyboard Key (text)`}
+                                />
+                                <SelectOption
+                                  value="mouse"
+                                  primaryText={t`Mouse button (text)`}
+                                />
+                                <SelectOption
+                                  value="color"
+                                  primaryText={t`Color (text)`}
+                                />
+                                <SelectOption
+                                  value="layer"
+                                  primaryText={t`Layer (text)`}
+                                />
+                                <SelectOption
+                                  value="sceneName"
+                                  primaryText={t`Scene name (text)`}
+                                />
+                                <SelectOption
+                                  value="yesorno"
+                                  primaryText={t`Yes or no (boolean)`}
+                                />
+                                <SelectOption
+                                  value="trueorfalse"
+                                  primaryText={t`True or false (boolean)`}
+                                />
+                              </SelectField>
+                            )}
+                            {gd.ParameterMetadata.isObject(
+                              parameter.getType()
+                            ) && (
+                              <ObjectTypeSelector
+                                project={project}
+                                value={parameter.getExtraInfo()}
+                                onChange={(value: string) => {
+                                  parameter.setExtraInfo(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                disabled={isParameterDisabled(i)}
+                              />
+                            )}
+                            {parameter.getType() === 'behavior' && (
+                              <BehaviorTypeSelector
+                                project={project}
+                                objectType={getLastObjectParameterObjectType(
+                                  parameters,
+                                  i
+                                )}
+                                value={parameter.getExtraInfo()}
+                                onChange={(value: string) => {
+                                  parameter.setExtraInfo(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                disabled={isParameterDisabled(i)}
+                              />
+                            )}
+                          </ResponsiveLineStackLayout>
+                          {parameter.getType() === 'stringWithSelector' && (
+                            <StringSelectorEditor
+                              extraInfo={parameter.getExtraInfo()}
+                              setExtraInfo={newExtraInfo => {
+                                parameter.setExtraInfo(newExtraInfo);
                                 this.forceUpdate();
-                                this.props.onParametersUpdated();
                               }}
-                              disabled={isParameterDisabled(i)}
-                              fullWidth
-                            >
-                              <MenuItem
-                                value="objectList"
-                                primaryText={<Trans>Objects</Trans>}
-                              />
-                              <MenuItem
-                                value="behavior"
-                                primaryText={
-                                  <Trans>
-                                    Behavior (for the previous object)
-                                  </Trans>
-                                }
-                              />
-                              <MenuItem
-                                value="expression"
-                                primaryText={<Trans>Number</Trans>}
-                              />
-                              <MenuItem
-                                value="string"
-                                primaryText={<Trans>String (text)</Trans>}
-                              />
-                              <MenuItem
-                                value="key"
-                                primaryText={<Trans>Keyboard Key (text)</Trans>}
-                              />
-                              <MenuItem
-                                value="mouse"
-                                primaryText={<Trans>Mouse button (text)</Trans>}
-                              />
-                              <MenuItem
-                                value="color"
-                                primaryText={<Trans>Color (text)</Trans>}
-                              />
-                              <MenuItem
-                                value="layer"
-                                primaryText={<Trans>Layer (text)</Trans>}
-                              />
-                              <MenuItem
-                                value="sceneName"
-                                primaryText={<Trans>Scene name (text)</Trans>}
-                              />
-                            </SelectField>
-                          </Column>
-                        )}
-                        {gd.ParameterMetadata.isObject(parameter.getType()) && (
-                          <Column expand>
-                            <ObjectTypeSelector
-                              project={project}
-                              value={parameter.getExtraInfo()}
-                              onChange={(value: string) => {
-                                parameter.setExtraInfo(value);
-                                this.forceUpdate();
-                                this.props.onParametersUpdated();
-                              }}
-                              disabled={isParameterDisabled(i)}
                             />
-                          </Column>
-                        )}
-                        {parameter.getType() === 'behavior' && (
-                          <Column expand>
-                            <BehaviorTypeSelector
-                              project={project}
-                              value={parameter.getExtraInfo()}
-                              onChange={(value: string) => {
-                                parameter.setExtraInfo(value);
-                                this.forceUpdate();
-                                this.props.onParametersUpdated();
-                              }}
-                              disabled={isParameterDisabled(i)}
-                            />
-                          </Column>
-                        )}
-                      </Line>
-                      {isParameterDescriptionAndTypeShown(i) && (
-                        <Line expand noMargin>
-                          <Column expand>
+                          )}
+                          {isParameterDescriptionAndTypeShown(i) && (
                             <SemiControlledTextField
                               commitOnBlur
-                              floatingLabelText={<Trans>Description</Trans>}
+                              floatingLabelText={<Trans>Label</Trans>}
                               floatingLabelFixed
                               value={parameter.getDescription()}
                               onChange={text => {
@@ -283,12 +464,31 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               }}
                               fullWidth
                               disabled={
-                                false /* Description, if shown, can always be changed */
+                                false /* Label, if shown, can always be changed */
                               }
                             />
-                          </Column>
-                        </Line>
-                      )}
+                          )}
+                          {isParameterLongDescriptionShown(parameter, i) && (
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={
+                                <Trans>Long description</Trans>
+                              }
+                              floatingLabelFixed
+                              value={parameter.getLongDescription()}
+                              onChange={text => {
+                                parameter.setLongDescription(text);
+                                this.forceUpdate();
+                              }}
+                              multiline
+                              fullWidth
+                              disabled={
+                                false /* Long description, if shown, can always be changed */
+                              }
+                            />
+                          )}
+                        </ColumnStackLayout>
+                      </Line>
                     </React.Fragment>
                   )
                 )}
@@ -297,15 +497,18 @@ export default class EventsFunctionParametersEditor extends React.Component<
                     <Trans>No parameters for this function.</Trans>
                   </EmptyMessage>
                 ) : null}
-                <Line justifyContent="center">
-                  {!freezeParameters && (
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add a parameter</Trans>}
-                      onClick={this._addParameter}
-                    />
-                  )}
-                </Line>
+                <Column>
+                  <Line justifyContent="flex-end" expand>
+                    {!freezeParameters && (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={this._addParameter}
+                        icon={<Add />}
+                      />
+                    )}
+                  </Line>
+                </Column>
               </div>
             </Line>
             {helpPagePath ? (

@@ -16,7 +16,8 @@ doxygen > ..\..\scripts\logs\GDCppDoxygenLog.txt 2> ..\..\scripts\logs\GDCppDoxy
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..\..
 cd GDJS
-jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+npm install
+npm run generate-doc
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..
 cd scripts

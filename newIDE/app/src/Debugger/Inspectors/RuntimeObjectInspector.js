@@ -9,19 +9,13 @@ import {
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
 import VariablesContainerInspector from './VariablesContainerInspector';
+import Text from '../../UI/Text';
 
 type Props = {|
   runtimeObject: GameData,
   onCall: CallFunction,
   onEdit: EditFunction,
 |};
-
-const styles = {
-  container: {
-    flex: 1,
-    overflowY: 'scroll',
-  },
-};
 
 const transform = runtimeObject => {
   if (!runtimeObject) return null;
@@ -54,10 +48,10 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
 };
 
 export default (props: Props) => (
-  <div style={styles.container}>
-    <p>
+  <React.Fragment>
+    <Text>
       <Trans>General:</Trans>
-    </p>
+    </Text>
     <ReactJsonView
       collapsed={false}
       name={false}
@@ -69,9 +63,9 @@ export default (props: Props) => (
       groupArraysAfterLength={50}
       theme="monokai"
     />
-    <p>
+    <Text>
       <Trans>Instance variables:</Trans>
-    </p>
+    </Text>
     <VariablesContainerInspector
       variablesContainer={
         props.runtimeObject ? props.runtimeObject._variables : null
@@ -83,5 +77,5 @@ export default (props: Props) => (
       }
       onCall={(path, args) => props.onCall(['_variables'].concat(path), args)}
     />
-  </div>
+  </React.Fragment>
 );

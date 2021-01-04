@@ -1,179 +1,145 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { findGDJS } from './LocalGDJSFinder';
+import React from 'react';
+import RaisedButton from '../../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
+import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
-import HelpButton from '../../UI/HelpButton';
-import {
-  displayProjectErrorsBox,
-  getErrors,
-} from '../../ProjectManager/ProjectErrorsChecker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
+import {
+  type ExportPipeline,
+  type ExportPipelineContext,
+} from '../ExportPipeline.flow';
+import {
+  ExplanationHeader,
+  DoneFooter,
+} from '../GenericExporters/ElectronExport';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
-type Props = {|
-  project: gdProject,
-|};
-
-type State = {|
+type ExportState = {
   outputDir: string,
-  exportFinishedDialogOpen: boolean,
+};
+
+type PreparedExporter = {|
+  exporter: gdjsExporter,
 |};
 
-class LocalElectronExport extends Component<Props, State> {
-  state = {
-    exportFinishedDialogOpen: false,
-    outputDir: '',
-  };
+type ExportOutput = null;
 
-  componentDidMount() {
-    const { project } = this.props;
-    this.setState({
-      outputDir: project ? project.getLastCompilationDirectory() : '',
+type ResourcesDownloadOutput = null;
+
+type CompressionOutput = null;
+
+export const localElectronExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  name: 'local-electron',
+
+  getInitialExportState: (project: gdProject) => ({
+    outputDir: project.getLastCompilationDirectory(),
+  }),
+
+  canLaunchBuild: exportState => !!exportState.outputDir,
+
+  renderHeader: ({ project, exportState, updateExportState }) => (
+    <Column noMargin>
+      <Line>
+        <Column noMargin>
+          <ExplanationHeader />
+        </Column>
+      </Line>
+      <Line>
+        <LocalFolderPicker
+          type="export"
+          value={exportState.outputDir}
+          defaultPath={project.getLastCompilationDirectory()}
+          onChange={outputDir => {
+            updateExportState(() => ({ outputDir }));
+          }}
+          fullWidth
+        />
+      </Line>
+    </Column>
+  ),
+
+  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+
+  prepareExporter: (
+    context: ExportPipelineContext<ExportState>
+  ): Promise<PreparedExporter> => {
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
+
+      // TODO: Memory leak? Check for other exporters too.
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+
+      return {
+        exporter,
+      };
     });
-  }
+  },
 
-  static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+  launchExport: (
+    context: ExportPipelineContext<ExportState>,
+    { exporter }: PreparedExporter
+  ): Promise<ExportOutput> => {
+    const exportOptions = new gd.MapStringBoolean();
+    exportOptions.set('exportForElectron', true);
+    exporter.exportWholePixiProject(
+      context.project,
+      context.exportState.outputDir,
+      exportOptions
+    );
+    exportOptions.delete();
+    exporter.delete();
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+    return Promise.resolve(null);
+  },
 
-        resolve({
-          exporter,
-        });
-      });
-    });
-  };
+  launchResourcesDownload: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    return Promise.resolve(null);
+  },
 
-  launchExport = () => {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return;
+  launchCompression: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ResourcesDownloadOutput
+  ): Promise<CompressionOutput> => {
+    return Promise.resolve(null);
+  },
 
-    sendExportLaunched('local-electron');
-
-    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
-
-    const outputDir = this.state.outputDir;
-    project.setLastCompilationDirectory(outputDir);
-
-    LocalElectronExport.prepareExporter()
-      .then(({ exporter }) => {
-        const exportOptions = new gd.MapStringBoolean();
-        exportOptions.set('exportForElectron', true);
-        exporter.exportWholePixiProject(project, outputDir, exportOptions);
-        exportOptions.delete();
-        exporter.delete();
-
-        this.setState({
-          exportFinishedDialogOpen: true,
-        });
-      })
-      .catch(err => {
-        showErrorBox('Unable to export the game', err);
-      });
-  };
-
-  openExportFolder = () => {
-    if (shell) shell.openItem(this.state.outputDir);
-  };
-
-  render() {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return null;
+  renderDoneFooter: ({ exportState, onClose }) => {
+    const openExportFolder = () => {
+      if (shell) shell.openItem(exportState.outputDir);
+    };
 
     return (
-      <Column noMargin>
-        <Line>
-          <Column noMargin>
-            <p>
-              <Trans>
-                This will export your game so that you can package it for
-                Windows, macOS or Linux. You will need to install third-party
-                tools (Node.js, Electron Builder) to package your game by
-                yourself.
-              </Trans>
-            </p>
-          </Column>
-        </Line>
-        <Line>
-          <LocalFolderPicker
-            type="export"
-            value={this.state.outputDir}
-            defaultPath={project.getLastCompilationDirectory()}
-            onChange={value => this.setState({ outputDir: value })}
-            fullWidth
-          />
-        </Line>
-        <Line>
-          <Spacer expand />
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
-            label={<Trans>Export</Trans>}
+            key="open"
+            label={<Trans>Open folder</Trans>}
             primary={true}
-            onClick={this.launchExport}
-            disabled={!this.state.outputDir}
+            onClick={openExportFolder}
           />
-        </Line>
-        <Dialog
-          title={t('Export finished')}
-          actions={[
-            <FlatButton
-              key="open"
-              label={<Trans>Open folder</Trans>}
-              primary={true}
-              onClick={this.openExportFolder}
-            />,
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary={false}
-              onClick={() =>
-                this.setState({
-                  exportFinishedDialogOpen: false,
-                })
-              }
-            />,
-          ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
-          modal
-          open={this.state.exportFinishedDialogOpen}
-        >
-          <p>
-            <Trans>
-              The game was properly exported. You can now use Electron Builder
-              (you need Node.js installed and to use the command-line to run it)
-              to create an executable.
-            </Trans>
-          </p>
-        </Dialog>
-      </Column>
+        )}
+      />
     );
-  }
-}
-
-export default LocalElectronExport;
+  },
+};

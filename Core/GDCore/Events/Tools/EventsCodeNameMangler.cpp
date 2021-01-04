@@ -8,10 +8,15 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/String.h"
 
-EventsCodeNameMangler *EventsCodeNameMangler::_singleton = NULL;
+EventsCodeNameMangler *EventsCodeNameMangler::_singleton = nullptr;
 
-gd::String EventsCodeNameMangler::GetMangledObjectsListName(
+const gd::String& EventsCodeNameMangler::GetMangledObjectsListName(
     const gd::String &originalObjectName) {
+  auto it = mangledObjectNames.find(originalObjectName);
+  if (it != mangledObjectNames.end()) {
+    return it->second;
+  }
+
   gd::String partiallyMangledName = originalObjectName;
   static const gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -27,11 +32,17 @@ gd::String EventsCodeNameMangler::GetMangledObjectsListName(
     }
   }
 
-  return "GD" + partiallyMangledName + "Objects";
+  mangledObjectNames[originalObjectName] = "GD" + partiallyMangledName + "Objects";
+  return mangledObjectNames[originalObjectName];
 }
 
-gd::String EventsCodeNameMangler::GetExternalEventsFunctionMangledName(
+const gd::String& EventsCodeNameMangler::GetExternalEventsFunctionMangledName(
     const gd::String &externalEventsName) {
+  auto it = mangledExternalEventsNames.find(externalEventsName);
+  if (it != mangledExternalEventsNames.end()) {
+    return it->second;
+  }
+
   gd::String partiallyMangledName = externalEventsName;
   static const gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -47,23 +58,24 @@ gd::String EventsCodeNameMangler::GetExternalEventsFunctionMangledName(
     }
   }
 
-  return "GDExternalEvents" + partiallyMangledName;
+  mangledExternalEventsNames[externalEventsName] = "GDExternalEvents" + partiallyMangledName;
+  return mangledExternalEventsNames[externalEventsName];
 }
 
-gd::String ManObjListName(const gd::String &objectName) {
+const gd::String& ManObjListName(const gd::String &objectName) {
   return EventsCodeNameMangler::Get()->GetMangledObjectsListName(objectName);
 }
 
 EventsCodeNameMangler *EventsCodeNameMangler::Get() {
-  if (NULL == _singleton) _singleton = new EventsCodeNameMangler;
+  if (nullptr == _singleton) _singleton = new EventsCodeNameMangler;
 
   return (static_cast<EventsCodeNameMangler *>(_singleton));
 }
 
 void EventsCodeNameMangler::DestroySingleton() {
-  if (NULL != _singleton) {
+  if (nullptr != _singleton) {
     delete _singleton;
-    _singleton = NULL;
+    _singleton = nullptr;
   }
 }
 

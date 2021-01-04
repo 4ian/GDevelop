@@ -8,13 +8,10 @@ import Authentification from './Utils/GDevelopServices/Authentification';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 
 // Import for Electron powered IDE.
-import ExternalEditor from './ExternalEditor';
 import LocalExamples from './ProjectCreation/LocalExamples';
 import LocalStarters from './ProjectCreation/LocalStarters';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
-import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
-import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
@@ -25,88 +22,75 @@ import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService'
 import Providers from './MainFrame/Providers';
 import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
 import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
-const gd = global.gd;
+import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
+import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
+import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
+import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+
+const gd: libGDevelop = global.gd;
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
 
-  let app = null;
   const appArguments = Window.getArguments();
+  const isDev = Window.isDev();
 
-  if (appArguments['server-port']) {
-    app = (
-      <Providers
-        authentification={authentification}
-        disableCheckForUpdates={!!appArguments['disable-update-check']}
-        eventsFunctionCodeWriter={null}
-        eventsFunctionsExtensionWriter={null}
-        eventsFunctionsExtensionOpener={null}
-      >
-        {({ i18n, eventsFunctionsExtensionsState }) => (
-          <ExternalEditor
-            serverPort={appArguments['server-port']}
-            isIntegrated={appArguments['mode'] === 'integrated'}
-            editor={appArguments['editor']}
-            editedElementName={appArguments['edited-element-name']}
-          >
+  return (
+    <Providers
+      authentification={authentification}
+      disableCheckForUpdates={!!appArguments['disable-update-check']}
+      makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
+      eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
+      eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
+      resourceFetcher={LocalResourceFetcher}
+    >
+      {({ i18n }) => (
+        <ProjectStorageProviders
+          appArguments={appArguments}
+          storageProviders={[LocalFileStorageProvider]}
+          defaultStorageProvider={LocalFileStorageProvider}
+        >
+          {({
+            getStorageProviderOperations,
+            storageProviders,
+            initialFileMetadataToOpen,
+            getStorageProvider,
+          }) => (
             <MainFrame
               i18n={i18n}
-              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-              resourceSources={localResourceSources}
-              authentification={authentification}
-              onReadFromPathOrURL={() =>
-                Promise.reject('Should never be called')
-              }
-              resourceExternalEditors={localResourceExternalEditors}
-              initialPathsOrURLsToOpen={[]}
-            />
-          </ExternalEditor>
-        )}
-      </Providers>
-    );
-  } else {
-    app = (
-      <Providers
-        authentification={authentification}
-        disableCheckForUpdates={!!appArguments['disable-update-check']}
-        eventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter()}
-        eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
-        eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
-      >
-        {({ i18n, eventsFunctionsExtensionsState }) => (
-          <ElectronMainMenu i18n={i18n}>
-            <MainFrame
-              i18n={i18n}
-              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
-              previewLauncher={<LocalPreviewLauncher />}
-              exportDialog={<ExportDialog exporters={getLocalExporters()} />}
-              createDialog={
+              renderMainMenu={props => <ElectronMainMenu {...props} />}
+              renderPreviewLauncher={(props, ref) => (
+                <LocalPreviewLauncher {...props} ref={ref} />
+              )}
+              renderExportDialog={props => (
+                <ExportDialog {...props} exporters={getLocalExporters()} />
+              )}
+              renderCreateDialog={props => (
                 <CreateProjectDialog
+                  {...props}
                   examplesComponent={LocalExamples}
                   startersComponent={LocalStarters}
                 />
+              )}
+              renderGDJSDevelopmentWatcher={
+                isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
-              onSaveProject={LocalProjectWriter.saveProject}
-              onAutoSaveProject={LocalProjectWriter.autoSaveProject}
-              onChooseProject={LocalProjectOpener.chooseProjectFile}
-              onReadFromPathOrURL={LocalProjectOpener.readProjectFile}
-              shouldOpenAutosave={LocalProjectOpener.shouldOpenAutosave}
+              storageProviders={storageProviders}
+              getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}
               resourceExternalEditors={localResourceExternalEditors}
-              authentification={authentification}
               extensionsLoader={makeExtensionsLoader({
                 gd,
                 objectsEditorService: ObjectsEditorService,
                 objectsRenderingService: ObjectsRenderingService,
-                filterExamples: !Window.isDev(),
+                filterExamples: !isDev,
               })}
-              initialPathsOrURLsToOpen={appArguments['_']}
+              initialFileMetadataToOpen={initialFileMetadataToOpen}
             />
-          </ElectronMainMenu>
-        )}
-      </Providers>
-    );
-  }
-
-  return app;
+          )}
+        </ProjectStorageProviders>
+      )}
+    </Providers>
+  );
 };

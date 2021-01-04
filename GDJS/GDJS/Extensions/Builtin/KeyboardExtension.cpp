@@ -4,11 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "KeyboardExtension.h"
-#include "GDCore/CommonTools.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
 

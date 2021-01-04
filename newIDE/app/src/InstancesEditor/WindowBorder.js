@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
@@ -13,8 +13,8 @@ export default class WindowBorder {
     this.windowRectangle = {
       x: 0,
       y: 0,
-      width: this.project.getMainWindowDefaultWidth(),
-      height: this.project.getMainWindowDefaultHeight(),
+      width: this.project.getGameResolutionWidth(),
+      height: this.project.getGameResolutionHeight(),
     };
   }
 
@@ -23,6 +23,9 @@ export default class WindowBorder {
   }
 
   render() {
+    this.windowRectangle.width = this.project.getGameResolutionWidth();
+    this.windowRectangle.height = this.project.getGameResolutionHeight();
+
     const displayedRectangle = transformRect(
       this.toCanvasCoordinates,
       this.windowRectangle
@@ -40,7 +43,7 @@ export default class WindowBorder {
       1
     );
     this.pixiRectangle.alpha = 1;
-    this.pixiRectangle.fillAlpha = 0;
+    this.pixiRectangle.fill.alpha = 0;
     this.pixiRectangle.drawRect(
       displayedRectangle.x,
       displayedRectangle.y,

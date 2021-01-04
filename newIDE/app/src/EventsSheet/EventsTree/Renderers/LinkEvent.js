@@ -5,8 +5,8 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
-import IconButton from 'material-ui/IconButton';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import IconButton from '../../../UI/IconButton';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -18,8 +18,9 @@ import {
 import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
-import { type EventRendererProps } from './EventRenderer.flow';
-const gd = global.gd;
+import { type EventRendererProps } from './EventRenderer';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
@@ -29,12 +30,15 @@ const styles = {
     padding: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
 
 export default class LinkEvent extends React.Component<EventRendererProps, *> {
-  _externalEventsField = null;
+  _externalEventsField: ?ExternalEventsField = null;
 
   state = {
     editing: false,
@@ -42,14 +46,26 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
   };
 
   edit = (domEvent: any) => {
-    this.setState(
-      {
-        editing: true,
-        anchorEl: domEvent.currentTarget,
-      },
-      () => {
-        if (this._externalEventsField) this._externalEventsField.focus();
-      }
+    // We should not need to use a timeout, but
+    // if we don't do this, the InlinePopover's clickaway listener
+    // is immediately picking up the event and closing.
+    // Search the rest of the codebase for inlinepopover-event-hack
+    const anchorEl = domEvent.currentTarget;
+    setTimeout(
+      () =>
+        this.setState(
+          {
+            editing: true,
+            anchorEl,
+          },
+          () => {
+            // Give a bit of time for the popover to mount itself
+            setTimeout(() => {
+              if (this._externalEventsField) this._externalEventsField.focus();
+            }, 10);
+          }
+        ),
+      10
     );
   };
 
@@ -72,6 +88,12 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
   };
 
   endEditing = () => {
+    const { anchorEl } = this.state;
+
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editing: false,
       anchorEl: null,
@@ -105,9 +127,15 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                   [selectableArea]: true,
                 })}
                 onClick={this.edit}
+                onKeyPress={event => {
+                  if (shouldActivate(event)) {
+                    this.edit(event);
+                  }
+                }}
+                tabIndex={0}
               >
                 {target || (
-                  <Trans>&lt; Enter the name of external events &gt;</Trans>
+                  <Trans>{`<Enter the name of external events>`}</Trans>
                 )}
               </i>
             </span>
@@ -133,6 +161,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                   this.props.onUpdate();
                 }}
                 isInline
+                onRequestClose={this.endEditing}
                 ref={externalEventsField =>
                   (this._externalEventsField = externalEventsField)
                 }

@@ -6,7 +6,7 @@ import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
-const gd = global.gd;
+const gd /* TODO: add flow in this file */ = global.gd;
 
 /**
  * A service returning editor components for each object type.
@@ -53,7 +53,7 @@ export default {
     );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
-  getDefaultObjectJsImplementationPropertiesEditor() {
+  getDefaultObjectJsImplementationPropertiesEditor(options) {
     return {
       component: ObjectPropertiesEditor,
       createNewObject: object =>
@@ -62,6 +62,7 @@ export default {
           .clone()
           .release(),
       castToObjectType: object => gd.asObjectJsImplementation(object),
+      helpPagePath: options.helpPagePath,
     };
   },
   editorConfigurations: {
@@ -106,6 +107,12 @@ export default {
       createNewObject: () => new gd.ParticleEmitterObject(''),
       castToObjectType: object => gd.asParticleEmitterObject(object),
       helpPagePath: '/objects/particles_emitter',
+    },
+    'SkeletonObject::Skeleton': {
+      component: ObjectPropertiesEditor,
+      createNewObject: () => new gd.SkeletonObject(''),
+      castToObjectType: object => gd.castObject(object, gd.SkeletonObject),
+      helpPagePath: '/objects/skeleton',
     },
   },
 };

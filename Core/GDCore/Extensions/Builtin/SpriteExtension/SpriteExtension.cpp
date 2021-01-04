@@ -31,35 +31,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
-                _("Change Sprite opacity"),
+                _("Change sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
                   "is opaque (default)."),
-                _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+                _("the opacity"),
                 _("Visibility"),
                 "res/actions/opacity24.png",
                 "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value (between 0 and 255)"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction("ChangeAnimation",
                 _("Change the animation"),
                 _("Change the animation of the object, using the animation "
                   "number in the animations list."),
-                _("Do _PARAM1__PARAM2_ to the number of current animation of "
-                  "_PARAM0_"),
+                _("the number of the animation"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction("SetAnimationName",
                 _("Change the animation (by name)"),
@@ -80,35 +75,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Change the direction of the object.\nIf the object is set to "
            "automatically rotate, the direction is its angle.\nIf the object "
            "is in 8 directions mode, the valid directions are 0..7"),
-         _("Do _PARAM1__PARAM2_ to the direction of _PARAM0_"),
+         _("the direction"),
          _("Direction"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("ChangeSprite",
                 _("Current frame"),
                 _("Modify the current frame of the object"),
-                _("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
+                _("the animation frame"),
                 _("Animations and images"),
                 "res/actions/sprite24.png",
                 "res/actions/sprite.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("PauseAnimation",
                 _("Pause the animation"),
-                _("Pause the current animation of the object"),
-                _("Pause the current animation of _PARAM0_"),
+                _("Pause the animation of the object"),
+                _("Pause the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
@@ -118,8 +109,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction("PlayAnimation",
                 _("Play the animation"),
-                _("Play the current animation of the object"),
-                _("Play the current animation of _PARAM0_"),
+                _("Play the animation of the object"),
+                _("Play the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
@@ -132,16 +123,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Animation speed scale"),
          _("Modify the animation speed scale (1 = the default speed, >1 = "
            "faster and <1 = slower)."),
-         _("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
+         _("the animation speed scale"),
          _("Animations and images"),
          "res/actions/animation24.png",
          "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddAction("TourneVersPos",
                 _("Rotate an object toward a position"),
@@ -162,91 +151,79 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("ChangeScale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
-                _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
+                _("the scale"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeScaleWidth",
                 _("Scale on X axis"),
                 _("Modify the scale of the width of an object."),
-                _("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
+                _("the width's scale"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("ChangeScaleHeight",
                 _("Scale on Y axis"),
                 _("Modify the scale of the height of an object."),
-                _("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
+                _("the height's scale"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("ChangeWidth",
                 _("Width"),
                 _("Change the width of a Sprite object."),
-                _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                _("the width"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("ChangeHeight",
                 _("Height"),
                 _("Change the height of a Sprite object."),
-                _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                _("the height"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition(
          "Animation",
          _("Current animation"),
-         _("Compare the number of the current animation of the object."),
-         _("The number of the current animation of _PARAM0_ is "
-           "_PARAM1__PARAM2_"),
+         _("Compare the number of the animation played by the object."),
+         _("the number of the animation"),
          _("Animations and images"),
          "res/conditions/animation24.png",
          "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Number to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("AnimationName",
                    _("Current animation name"),
-                   _("Check the current animation of the object."),
+                   _("Check the animation by played by the object."),
                    _("The animation of _PARAM0_ is _PARAM1_"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
@@ -262,33 +239,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Compare the direction of the object. If 8 direction mode is "
            "activated for the sprite, the value taken for direction will be "
            "from 0 to 7. Otherwise, the direction is in degrees."),
-         _("Direction of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the direction"),
          _("Direction"),
          "res/conditions/direction24.png",
          "res/conditions/direction.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Direction to test"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddCondition("Sprite",
                    _("Current frame"),
-                   _("Test the number of the current animation frame."),
-                   _("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Compare the index of the current frame in the animation displayed by the specified object. The first frame in an animation starts at index 0."),
+                   _("the animation frame"),
                    _("Animations and images"),
                    "res/conditions/sprite24.png",
                    "res/conditions/sprite.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Animation frame to test"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("AnimStopped",
                    _("Animation paused"),
-                   _("Test if the animation of an object is paused"),
+                   _("Check if the animation of an object is paused."),
                    _("The animation of _PARAM0_ is paused"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
@@ -312,62 +285,52 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddCondition("ScaleWidth",
                    _("Scale on X axis"),
                    _("Compare the scale of the width of an object."),
-                   _("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the width's scale"),
                    _("Size"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("ScaleHeight",
                    _("Scale on Y axis"),
                    _("Compare the scale of the height of an object."),
-                   _("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the height's scale"),
                    _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Sprite, between 0 (fully "
                      "transparent) to 255 (opaque)."),
-                   _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the opacity"),
                    _("Visibility"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .MarkAsSimple()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsSimple();
 
   obj.AddCondition(
          "BlendMode",
          _("Blend mode"),
          _("Compare the number of the blend mode currently used by an object"),
-         _("The number of the current blend mode of _PARAM0_ is "
-           "_PARAM1__PARAM2_"),
+         _("the number of the current blend mode"),
          _("Effects"),
          "res/conditions/opacity24.png",
          "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression",
-                    _("Value to compare (0: Alpha, 1: Add, 2: Multiply, 3: None)"))
-      .MarkAsAdvanced()
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   obj.AddAction("CopyImageOnImageOfSprite",
                 _("Copy an image on the current one of an object"),
@@ -404,20 +367,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction(
          "ChangeColor",
-         _("Global color"),
-         _("Change the global color of an object. The default color is white."),
-         _("Change color of _PARAM0_ to _PARAM1_"),
+         _("Tint color"),
+         _("Change the tint of an object. The default color is white."),
+         _("Change tint of _PARAM0_ to _PARAM1_"),
          _("Effects"),
          "res/actions/color24.png",
          "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("color", _("Color"));
+      .AddParameter("color", _("Tint"));
 
   obj.AddAction("ChangeBlendMode",
                 _("Blend mode"),
                 _("Change the number of the blend mode of an object.\nThe "
-                  "default blend mode is 0 (Alpha)."),
+                  "default blend mode is 0 (Normal)."),
                 _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                 _("Effects"),
                 "res/actions/color24.png",
@@ -425,7 +388,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("expression",
-                    _("Mode (0 : Alpha, 1 : Add, 2 : Multiply, 3 : None)"))
+                    _("Mode (0: Normal, 1: Add, 2: Multiply, 3: Screen)"))
       .MarkAsSimple();
 
   obj.AddAction("FlipX",
@@ -454,7 +417,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedX",
                    _("Horizontally flipped"),
-                   _("Return true if the object is horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
                    _("_PARAM0_ is horizontally flipped"),
                    _("Effects"),
                    "res/actions/flipX24.png",
@@ -464,7 +427,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
-                   _("Return true if the object is vertically flipped"),
+                   _("Check if the object is vertically flipped"),
                    _("_PARAM0_ is vertically flipped"),
                    _("Effects"),
                    "res/actions/flipY24.png",

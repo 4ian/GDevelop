@@ -12,6 +12,15 @@ using namespace std;
 
 namespace gd {
 
+vector<gd::String> CommentEvent::GetAllSearchableStrings() const {
+  vector<gd::String> allSearchableStrings;
+
+  allSearchableStrings.push_back(com1);
+  allSearchableStrings.push_back(com2);  ///< Com2 is deprecated
+
+  return allSearchableStrings;
+}
+
 void CommentEvent::SerializeTo(SerializerElement &element) const {
   element.AddChild("color")
       .SetAttribute("r", r)

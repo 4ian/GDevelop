@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\load-image-from-url\\game.json",
+    "projectUuid": "4c00f198-c8c3-4524-b480-ec27b616c56a",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/load-image-from-url/Credits.png",
+        "file": "https://resources.gdevelop-app.com/examples/load-image-from-url/Credits.png",
         "kind": "image",
         "metadata": "",
         "name": "Credits.png",
@@ -152,6 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_1",
+          "persistentUuid": "b7647706-b4de-421e-b7c9-d1370d9a63d1",
           "width": 0,
           "x": 164,
           "y": 10,
@@ -167,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "My_picture",
+          "persistentUuid": "91c3a6d6-2460-4d8e-95ce-56ddf681a178",
           "width": 0,
           "x": 136,
           "y": 192,
@@ -182,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_2",
+          "persistentUuid": "53562295-b7e3-4e59-99b3-6fb54f60aabe",
           "width": 0,
           "x": 147,
           "y": 74,
@@ -197,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "bybouhandlizard",
+          "persistentUuid": "a10b3294-1b7f-4451-ba3e-28b9a3de5183",
           "width": 0,
           "x": 208,
           "y": 441,
@@ -212,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
+          "persistentUuid": "f8a045a8-d346-40d5-b02b-0e362fa7f0d2",
           "width": 0,
           "x": 981,
           "y": 44,
@@ -227,6 +230,7 @@
           "layer": "",
           "locked": false,
           "name": "CopyOfNewObject",
+          "persistentUuid": "5c03ace1-c052-4b4c-886a-faa28e82cbbb",
           "width": 0,
           "x": 459,
           "y": 156,
@@ -435,7 +439,7 @@
               "parameters": [
                 "url",
                 "=",
-                "\"http://4ian.github.io/GD-Documentation/GDCore%20Documentation/gdlogo.png\""
+                "\"https://docs.gdevelop-app.com/GDCore%20Documentation/gdlogo.png\""
               ],
               "subInstructions": []
             },
@@ -532,15 +536,21 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.loader\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.loader.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.loader.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.loader.load(runtimeScene.myCallback); // Use callback for load the new image",
+              "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.Loader.shared\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.Loader.shared.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.Loader.shared.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.Loader.shared.load(runtimeScene.myCallback); // Use callback for load the new image",
               "parameterObjects": "",
-              "useStrict": false
+              "useStrict": false,
+              "eventsSheetExpanded": false
             }
           ]
         }
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

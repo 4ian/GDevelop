@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../../../../UI/FlatButton';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
@@ -13,8 +13,9 @@ import {
   copyAnimationsSpriteCollisionMasks,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
+import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export default class CollisionMasksEditor extends Component {
   state = {
@@ -129,8 +130,7 @@ export default class CollisionMasksEditor extends Component {
 
   _setSameCollisionMasksForAllAnimations = enable => {
     if (enable) {
-      // eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?"
       );
       if (!answer) return;
@@ -151,8 +151,7 @@ export default class CollisionMasksEditor extends Component {
 
   _setSameCollisionMasksForAllSprites = enable => {
     if (enable) {
-      // eslint-disable-next-line
-      const answer = confirm(
+      const answer = Window.showConfirmDialog(
         "Having the same collision masks for all frames will erase and reset all the other frames collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the frames of the animation?"
       );
       if (!answer) return;

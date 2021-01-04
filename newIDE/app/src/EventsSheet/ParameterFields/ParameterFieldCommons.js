@@ -4,7 +4,14 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type EventsScope } from '../EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+
+export type ParameterRenderingServiceType = {
+  components: any,
+  getParameterComponent: (type: string) => any,
+  getUserFriendlyTypeName: (rawType: string) => ?MessageDescriptor,
+};
 
 type CommonProps = {|
   // The parameter
@@ -18,15 +25,13 @@ type CommonProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   isInline?: boolean,
+  onRequestClose?: () => void,
   resourceSources?: Array<ResourceSource>,
   onChooseResource?: ChooseResourceFunction,
   resourceExternalEditors?: Array<ResourceExternalEditor>,
 
   // Pass the ParameterRenderingService to allow to render nested parameters
-  parameterRenderingService?: {
-    components: any,
-    getParameterComponent: (type: string) => any,
-  },
+  parameterRenderingService?: ParameterRenderingServiceType,
 |};
 
 export type ExpressionParameters = {|
@@ -54,9 +59,11 @@ export const getParameterValueOrDefault = (
   value: string,
   parameterMetadata: ?gdParameterMetadata
 ) => {
+  if (value) return value;
+
   const defaultValue =
     parameterMetadata && parameterMetadata.isOptional()
       ? parameterMetadata.getDefaultValue()
       : '';
-  return value ? value : defaultValue;
+  return defaultValue;
 };

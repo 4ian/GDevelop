@@ -2,26 +2,27 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import TextField from '../UI/TextField';
+import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '../UI/Checkbox';
 import { isNullPtr } from '../Utils/IsNullPtr';
-const gd = global.gd;
+import { ColumnStackLayout } from '../UI/Layout';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
   layout: gdLayout,
   project: gdProject,
-  onApply?: () => void,
+  onApply: () => void,
   onClose: () => void,
-  onOpenMoreSettings: () => void,
+  onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
 |};
 
@@ -74,11 +75,11 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       this.state.backgroundColor.g,
       this.state.backgroundColor.b
     );
-    if (this.props.onApply) this.props.onApply();
+    this.props.onApply();
   };
 
   render() {
-    const { layout, project } = this.props;
+    const { layout } = this.props;
     const actions = [
       // TODO: Add support for cancelling modifications made to BehaviorSharedData
       // (either by enhancing a function like propertiesMapToSchema or using copies)
@@ -112,23 +113,19 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         if (isNullPtr(gd, behaviorSharedData)) return null;
 
         const properties = behaviorSharedData.getProperties(
-          sharedDataContent.getContent(),
-          project
+          sharedDataContent.getContent()
         );
         const propertiesSchema = propertiesMapToSchema(
           properties,
           sharedDataContent =>
-            behaviorSharedData.getProperties(
-              sharedDataContent.getContent(),
-              project
-            ),
-          (sharedDataContent, name, value) =>
+            behaviorSharedData.getProperties(sharedDataContent.getContent()),
+          (sharedDataContent, name, value) => {
             behaviorSharedData.updateProperty(
               sharedDataContent.getContent(),
               name,
-              value,
-              project
-            )
+              value
+            );
+          }
         );
 
         return (
@@ -145,64 +142,70 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
 
     return (
       <Dialog
+        title={<Trans>Scene properties</Trans>}
         actions={actions}
-        open={this.props.open}
-        onRequestClose={this.props.onClose}
-        autoScrollBodyContent={true}
-        contentStyle={{ width: '350px' }}
-      >
-        <TextField
-          floatingLabelText={<Trans>Window title</Trans>}
-          fullWidth
-          type="text"
-          value={this.state.windowTitle}
-          onChange={(e, value) => this.setState({ windowTitle: value })}
-        />
-        <Checkbox
-          checked={this.state.shouldStopSoundsOnStartup}
-          label={<Trans>Stop musics and sounds on startup</Trans>}
-          onCheck={(e, check) =>
-            this.setState({
-              shouldStopSoundsOnStartup: check,
-            })
-          }
-        />
-        <ColorField
-          floatingLabelText={<Trans>Scene background color</Trans>}
-          fullWidth
-          disableAlpha
-          color={this.state.backgroundColor}
-          onChangeComplete={color =>
-            this.setState({ backgroundColor: color.rgb })
-          }
-        />
-        <RaisedButton
-          label={<Trans>Edit scene variables</Trans>}
-          fullWidth
-          onClick={() => {
-            this.props.onEditVariables();
-            this.props.onClose();
-          }}
-        />
-        {!some(propertiesEditors) && (
-          <EmptyMessage>
-            <Trans>
-              Any additional properties will appear here if you add behaviors to
-              objects, like Physics behavior.
-            </Trans>
-          </EmptyMessage>
-        )}
-        {propertiesEditors}
-        {this.props.onOpenMoreSettings && (
+        secondaryActions={
           <RaisedButton
-            label={<Trans>Open advanced settings</Trans>}
+            label={<Trans>Edit scene variables</Trans>}
             fullWidth
             onClick={() => {
-              this.props.onOpenMoreSettings();
+              this.props.onEditVariables();
               this.props.onClose();
             }}
           />
-        )}
+        }
+        open={this.props.open}
+        cannotBeDismissed={true}
+        onRequestClose={this.props.onClose}
+        maxWidth="sm"
+      >
+        <ColumnStackLayout expand noMargin>
+          <TextField
+            floatingLabelText={<Trans>Window title</Trans>}
+            fullWidth
+            type="text"
+            value={this.state.windowTitle}
+            onChange={(e, value) => this.setState({ windowTitle: value })}
+          />
+          <Checkbox
+            checked={this.state.shouldStopSoundsOnStartup}
+            label={<Trans>Stop music and sounds on startup</Trans>}
+            onCheck={(e, check) =>
+              this.setState({
+                shouldStopSoundsOnStartup: check,
+              })
+            }
+          />
+          <ColorField
+            floatingLabelText={<Trans>Scene background color</Trans>}
+            fullWidth
+            disableAlpha
+            color={this.state.backgroundColor}
+            onChangeComplete={color =>
+              this.setState({ backgroundColor: color.rgb })
+            }
+          />
+          {!some(propertiesEditors) && (
+            <EmptyMessage>
+              <Trans>
+                Any additional properties will appear here if you add behaviors
+                to objects, like Physics behavior.
+              </Trans>
+            </EmptyMessage>
+          )}
+          {propertiesEditors}
+          {this.props.onOpenMoreSettings && (
+            <RaisedButton
+              label={<Trans>Open advanced settings</Trans>}
+              fullWidth
+              onClick={() => {
+                if (this.props.onOpenMoreSettings)
+                  this.props.onOpenMoreSettings();
+                this.props.onClose();
+              }}
+            />
+          )}
+        </ColumnStackLayout>
       </Dialog>
     );
   }

@@ -22,15 +22,6 @@ using namespace std;
 
 namespace gd {
 
-gd::String ExpressionParser2::NUMBER_FIRST_CHAR = ".0123456789";
-gd::String ExpressionParser2::DOT = ".";
-gd::String ExpressionParser2::PARAMETERS_SEPARATOR = ",";
-gd::String ExpressionParser2::QUOTE = "\"";
-gd::String ExpressionParser2::BRACKETS = "()[]{}";
-gd::String ExpressionParser2::EXPRESSION_OPERATORS = "+-<>?^=\\:!";
-gd::String ExpressionParser2::TERM_OPERATORS = "/*";
-gd::String ExpressionParser2::UNARY_OPERATORS = "+-";
-gd::String ExpressionParser2::WHITESPACES = " \n\r";
 gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
 ExpressionParser2::ExpressionParser2(
@@ -76,7 +67,7 @@ size_t GetMaximumParametersNumber(
 }  // namespace
 
 std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
-    const gd::FunctionNode& function, size_t functionStartPosition) {
+    const gd::FunctionCallNode& function, size_t functionStartPosition) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(
           function.expressionMetadata)) {
     return gd::make_unique<ExpressionParserError>(
@@ -118,11 +109,13 @@ std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
 }
 
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
-  SkipWhitespace();
-  if (!IsAnyChar("\"")) {
+  size_t textStartPosition = GetCurrentPosition();
+  SkipAllWhitespaces();
+  if (!CheckIfChar(IsQuote)) {
     auto text = gd::make_unique<TextNode>("");
     text->diagnostic =
         RaiseSyntaxError(_("A text must start with a double quote (\")."));
+    text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
     return text;
   }
   SkipChar();
@@ -157,6 +150,7 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   }
 
   auto text = gd::make_unique<TextNode>(parsedText);
+  text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
   if (!textParsingHasEnded) {
     text->diagnostic =
         RaiseSyntaxError(_("A text must end with a double quote (\"). Add a "
@@ -167,24 +161,25 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
 }
 
 std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
-  SkipWhitespace();
+  size_t numberStartPosition = GetCurrentPosition();
+  SkipAllWhitespaces();
   gd::String parsedNumber;
 
   bool numberHasStarted = false;
   bool digitFound = false;
   bool dotFound = false;
   while (!IsEndReached()) {
-    if (IsAnyChar("0")) {
+    if (CheckIfChar(IsZeroDigit)) {
       numberHasStarted = true;
       digitFound = true;
       if (!parsedNumber.empty()) { // Ignore leading 0s.
         parsedNumber += GetCurrentChar();
       }
-    } else if (IsAnyChar("123456789")) {
+    } else if (CheckIfChar(IsNonZeroDigit)) {
       numberHasStarted = true;
       digitFound = true;
       parsedNumber += GetCurrentChar();
-    } else if (IsAnyChar(".") && !dotFound) {
+    } else if (CheckIfChar(IsDot) && !dotFound) {
       numberHasStarted = true;
       dotFound = true;
       if (parsedNumber == "") {
@@ -209,6 +204,7 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   // valid in most languages so we allow this.
 
   auto number = gd::make_unique<NumberNode>(parsedNumber);
+  number->location = ExpressionParserLocation(numberStartPosition, GetCurrentPosition());
   if (!numberHasStarted || !digitFound) {
     number->diagnostic = RaiseSyntaxError(
         _("A number was expected. You must enter a number here."));

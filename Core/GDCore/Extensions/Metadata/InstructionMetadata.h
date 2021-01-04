@@ -140,6 +140,19 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * \brief Get the user friendly, long description for the parameter.
+   */
+  const gd::String &GetLongDescription() const { return longDescription; }
+
+  /**
+   * \brief Set the user friendly, long description for the parameter.
+   */
+  ParameterMetadata &SetLongDescription(const gd::String &longDescription_) {
+    longDescription = longDescription_;
+    return *this;
+  }
+
+  /**
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
    * "objectList".
    *
@@ -207,11 +220,12 @@ class GD_CORE_API ParameterMetadata {
   gd::String description;  ///< Description shown in editor
   bool codeOnly;  ///< True if parameter is relative to code generation only,
                   ///< i.e. must not be shown in editor
-  gd::String defaultValue;  ///< Used as a default value in editor or if an
-                            ///< optional parameter is empty.
  private:
-  gd::String name;  ///< The name of the parameter to be used in code
-                    ///< generation. Optional.
+  gd::String longDescription;  ///< Long description shown in the editor.
+  gd::String defaultValue;     ///< Used as a default value in editor or if an
+                               ///< optional parameter is empty.
+  gd::String name;             ///< The name of the parameter to be used in code
+                               ///< generation. Optional.
 };
 
 /**
@@ -260,12 +274,12 @@ class GD_CORE_API InstructionMetadata {
   bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
   /**
-   * Get the help path of the instruction, relative to the documentation root.
+   * Get the help path of the instruction, relative to the GDevelop documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the instruction, relative to the documentation root.
+   * Set the help path of the instruction, relative to the GDevelop documentation root.
    */
   InstructionMetadata &SetHelpPath(const gd::String &path) {
     helpPath = path;
@@ -319,43 +333,92 @@ class GD_CORE_API InstructionMetadata {
   bool IsHidden() const { return hidden; }
 
   /**
-   * \brief Add a parameter to the instruction ( condition or action )
-   * information class. \param type One of the type handled by GDevelop. This
+   * \brief Add a parameter to the instruction metadata.
+   *
+   * \param type One of the type handled by GDevelop. This
    * will also determine the type of the argument used when calling the function
-   * in the generated code. \see EventsCodeGenerator::GenerateParametersCodes
+   * in the generated code.
    * \param description Description for parameter
    * \param optionalObjectType If type is "object", this parameter will describe
-   * which objects are allowed. If it is empty, all objects are allowed. \param
-   * parameterIsOptional true if the parameter must be optional, false
+   * which objects are allowed. If it is empty, all objects are allowed.
+   * \param parameterIsOptional true if the parameter must be optional, false
    * otherwise.
+   *
+   * \see EventsCodeGenerator::GenerateParametersCodes
    */
   InstructionMetadata &AddParameter(const gd::String &type,
-                                    const gd::String &description,
+                                    const gd::String &label,
                                     const gd::String &optionalObjectType = "",
                                     bool parameterIsOptional = false);
 
   /**
    * \brief Add a parameter not displayed in editor.
+   *
    * \param type One of the type handled by GDevelop. This will also determine
-   * the type of the argument used when calling the function in C++ code. \see
-   * EventsCodeGenerator::GenerateParametersCodes \param
-   * supplementaryInformation Can be used if needed. For example, when type ==
-   * "inlineCode", the content of supplementaryInformation is inserted in the
-   * generated C++ code.
+   * the type of the argument used when calling the function in the generated
+   * code. \param supplementaryInformation Depends on `type`. For example, when
+   * `type == "inlineCode"`, the content of supplementaryInformation is inserted
+   * in the generated code.
+   *
+   * \see EventsCodeGenerator::GenerateParametersCodes
    */
   InstructionMetadata &AddCodeOnlyParameter(
       const gd::String &type, const gd::String &supplementaryInformation);
 
   /**
    * \brief Set the default value used in editor (or if an optional parameter is
-   * empty during code generation) for the latest added parameter.
+   * empty during code generation) for the last added parameter.
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetDefaultValue(gd::String defaultValue_) {
-    if (!parameters.empty()) parameters.back().defaultValue = defaultValue_;
+  InstructionMetadata &SetDefaultValue(const gd::String &defaultValue_) {
+    if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
     return *this;
   };
+
+  /**
+   * \brief Set the long description shown in the editor for the last added
+   * parameter.
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &SetParameterLongDescription(
+      const gd::String &longDescription) {
+    if (!parameters.empty())
+      parameters.back().SetLongDescription(longDescription);
+    return *this;
+  };
+
+  /**
+   * \brief Add the default parameters for an instruction manipulating the
+   * specified type ("string", "number") with the default operators.
+   */
+  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
+
+  /**
+   * \brief Add the default parameters for an instruction comparing the
+   * specified type ("string", "number") with the default relational operators.
+   */
+  InstructionMetadata &UseStandardRelationalOperatorParameters(
+      const gd::String &type);
+
+  /**
+   * \brief Mark the instruction as an object instruction. Automatically called
+   * when using `AddAction`/`AddCondition` on an `ObjectMetadata`.
+   */
+  InstructionMetadata &SetIsObjectInstruction() {
+    isObjectInstruction = true;
+    return *this;
+  }
+
+  /**
+   * \brief Mark the instruction as a behavior instruction. Automatically called
+   * when using `AddAction`/`AddCondition` on a `BehaviorMetadata`.
+   */
+  InstructionMetadata &SetIsBehaviorInstruction() {
+    isBehaviorInstruction = true;
+    return *this;
+  }
 
   /**
    * \brief Consider that the instruction is easy for an user to understand.
@@ -425,7 +488,7 @@ class GD_CORE_API InstructionMetadata {
      *  obj.AddAction("String",
      *                 _("Change the string"),
      *                 _("Change the string of a text"),
-     *                 _("Do _PARAM1__PARAM2_ to the string of _PARAM0_"),
+     *                 _("the string"),
      *                 _("Text"),
      *                 "CppPlatform/Extensions/text24.png",
      *                 "CppPlatform/Extensions/text.png");
@@ -558,6 +621,8 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
+  bool isObjectInstruction;
+  bool isBehaviorInstruction;
 };
 
 }  // namespace gd

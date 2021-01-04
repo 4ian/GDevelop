@@ -50,6 +50,8 @@ gdjs.PlatformObjectsManager.prototype.removePlatform = function(platformBehavior
  * @return An array with all platforms near the object.
  */
 gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, maxMovementLength, result) {
+    // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
+    // is not necessarily in the middle of the object (for sprites for example).
     var ow = object.getWidth();
     var oh = object.getHeight();
     var x = object.getDrawableX()+object.getCenterX();
@@ -98,13 +100,27 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.PlatformRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.PlatformRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "PlatformBehavior::PlatformBehavior";
+gdjs.registerBehavior("PlatformBehavior::PlatformBehavior", gdjs.PlatformRuntimeBehavior);
 
 gdjs.PlatformRuntimeBehavior.LADDER = 2;
 gdjs.PlatformRuntimeBehavior.JUMPTHRU = 1;
 gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM = 0;
 
-gdjs.PlatformRuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
+gdjs.PlatformRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    if (oldBehaviorData.platformType !== newBehaviorData.platformType) {
+        this.changePlatformType(newBehaviorData.platformType);
+    }
+    if (oldBehaviorData.canBeGrabbed !== newBehaviorData.canBeGrabbed) {
+        this._canBeGrabbed = newBehaviorData.canBeGrabbed;
+    }
+    if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
+        this._yGrabOffset = newBehaviorData.yGrabOffset;
+    }
+
+    return true;
+};
+
+gdjs.PlatformRuntimeBehavior.prototype.onDestroy = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removePlatform(this);
 };
 

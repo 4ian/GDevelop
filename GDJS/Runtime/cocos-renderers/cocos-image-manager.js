@@ -9,7 +9,7 @@
  *
  * @class CocosImageManager
  * @memberof gdjs
- * @param {Object} resources The resources data of the game.
+ * @param {ResourceData[]} resources The resources data of the game.
  */
 gdjs.CocosImageManager = function(resources)
 {
@@ -25,6 +25,15 @@ gdjs.CocosImageManager = function(resources)
 };
 
 gdjs.ImageManager = gdjs.CocosImageManager; //Register the class to let the engine use it.
+
+/**
+ * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+ *
+ * @param {ResourceData[]} resources The resources data of the game.
+ */
+gdjs.CocosImageManager.prototype.setResources = function(resources) {
+    this._resources = resources;
+};
 
 /**
  * Return the texture associated to the specified name.
@@ -52,7 +61,9 @@ gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
  * especially when compiled to a native game on iOS/Android/macOS.
  */
 gdjs.CocosImageManager.prototype.getInvalidTexture = function() {
-    return "res/HelloWorld.png"; //TODO
+    // TODO: use a valid texture from memory and ensure that each usage of _textureLoaded
+    // is updated to compare the texture with invalid texture.
+    return "res/HelloWorld.png";
 };
 
 gdjs.CocosImageManager.prototype.isPowerOf2 = function(texture) {

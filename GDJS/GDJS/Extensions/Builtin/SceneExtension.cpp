@@ -28,6 +28,8 @@ SceneExtension::SceneExtension() {
 
   GetAllConditions()["DepartScene"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.sceneJustBegins");
+  GetAllConditions()["SceneJustResumed"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.sceneJustResumed");
   GetAllActions()["SceneBackground"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.setBackgroundColor");
   GetAllActions()["Scene"].SetFunctionName(

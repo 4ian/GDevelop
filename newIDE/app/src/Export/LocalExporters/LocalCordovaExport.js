@@ -1,195 +1,145 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
-import Dialog from '../../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { findGDJS } from './LocalGDJSFinder';
+import React from 'react';
+import RaisedButton from '../../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
+import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
-import HelpButton from '../../UI/HelpButton';
-import {
-  displayProjectErrorsBox,
-  getErrors,
-} from '../../ProjectManager/ProjectErrorsChecker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Window from '../../Utils/Window';
+import {
+  type ExportPipeline,
+  type ExportPipelineContext,
+} from '../ExportPipeline.flow';
+import {
+  ExplanationHeader,
+  DoneFooter,
+} from '../GenericExporters/CordovaExport';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
-type Props = {|
-  project: gdProject,
-|};
-
-type State = {|
+type ExportState = {
   outputDir: string,
-  exportFinishedDialogOpen: boolean,
+};
+
+type PreparedExporter = {|
+  exporter: gdjsExporter,
 |};
 
-class LocalCordovaExport extends Component<Props, State> {
-  state = {
-    exportFinishedDialogOpen: false,
-    outputDir: '',
-  };
+type ExportOutput = null;
 
-  componentDidMount() {
-    const { project } = this.props;
-    this.setState({
-      outputDir: project ? project.getLastCompilationDirectory() : '',
+type ResourcesDownloadOutput = null;
+
+type CompressionOutput = null;
+
+export const localCordovaExportPipeline: ExportPipeline<
+  ExportState,
+  PreparedExporter,
+  ExportOutput,
+  ResourcesDownloadOutput,
+  CompressionOutput
+> = {
+  name: 'local-cordova',
+
+  getInitialExportState: (project: gdProject) => ({
+    outputDir: project.getLastCompilationDirectory(),
+  }),
+
+  canLaunchBuild: exportState => !!exportState.outputDir,
+
+  renderHeader: ({ project, exportState, updateExportState }) => (
+    <Column noMargin>
+      <Line>
+        <Column noMargin>
+          <ExplanationHeader />
+        </Column>
+      </Line>
+      <Line>
+        <LocalFolderPicker
+          type="export"
+          value={exportState.outputDir}
+          defaultPath={project.getLastCompilationDirectory()}
+          onChange={outputDir => {
+            updateExportState(() => ({ outputDir }));
+          }}
+          fullWidth
+        />
+      </Line>
+    </Column>
+  ),
+
+  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+
+  prepareExporter: (
+    context: ExportPipelineContext<ExportState>
+  ): Promise<PreparedExporter> => {
+    return findGDJS().then(({ gdjsRoot }) => {
+      console.info('GDJS found in ', gdjsRoot);
+
+      // TODO: Memory leak? Check for other exporters too.
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        localFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+
+      return {
+        exporter,
+      };
     });
-  }
+  },
 
-  static prepareExporter = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      findGDJS(gdjsRoot => {
-        if (!gdjsRoot) {
-          showErrorBox('Could not find GDJS');
-          return reject();
-        }
-        console.info('GDJS found in ', gdjsRoot);
+  launchExport: (
+    context: ExportPipelineContext<ExportState>,
+    { exporter }: PreparedExporter
+  ): Promise<ExportOutput> => {
+    const exportOptions = new gd.MapStringBoolean();
+    exportOptions.set('exportForCordova', true);
+    exporter.exportWholePixiProject(
+      context.project,
+      context.exportState.outputDir,
+      exportOptions
+    );
+    exportOptions.delete();
+    exporter.delete();
 
-        const fileSystem = assignIn(
-          new gd.AbstractFileSystemJS(),
-          localFileSystem
-        );
-        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+    return Promise.resolve(null);
+  },
 
-        resolve({
-          exporter,
-        });
-      });
-    });
-  };
+  launchResourcesDownload: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ExportOutput
+  ): Promise<ResourcesDownloadOutput> => {
+    return Promise.resolve(null);
+  },
 
-  launchExport = () => {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return;
+  launchCompression: (
+    context: ExportPipelineContext<ExportState>,
+    exportOutput: ResourcesDownloadOutput
+  ): Promise<CompressionOutput> => {
+    return Promise.resolve(null);
+  },
 
-    sendExportLaunched('local-cordova');
-
-    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
-
-    const outputDir = this.state.outputDir;
-    project.setLastCompilationDirectory(outputDir);
-
-    LocalCordovaExport.prepareExporter()
-      .then(({ exporter }) => {
-        const exportOptions = new gd.MapStringBoolean();
-        exportOptions.set('exportForCordova', true);
-        exporter.exportWholePixiProject(project, outputDir, exportOptions);
-        exportOptions.delete();
-        exporter.delete();
-
-        this.setState({
-          exportFinishedDialogOpen: true,
-        });
-      })
-      .catch(err => {
-        showErrorBox('Unable to export the game', err);
-      });
-  };
-
-  openExportFolder = () => {
-    if (shell) shell.openItem(this.state.outputDir);
-  };
-
-  openPhoneGapBuild = () => {
-    Window.openExternalURL('https://build.phonegap.com');
-  };
-
-  render() {
-    const t = str => str; //TODO;
-    const { project } = this.props;
-    if (!project) return null;
+  renderDoneFooter: ({ exportState, onClose }) => {
+    const openExportFolder = () => {
+      if (shell) shell.openItem(exportState.outputDir);
+    };
 
     return (
-      <Column noMargin>
-        <Line>
-          <Column noMargin>
-            <p>
-              This will export your game as a Cordova project. Cordova is a
-              technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
-              <b>Android</b> and more.
-            </p>
-            <p>
-              Third-party tools like <b>Adobe PhoneGap Build</b> allow game
-              developers to bundle their games using Cordova.
-            </p>
-          </Column>
-        </Line>
-        <Line>
-          <LocalFolderPicker
-            type="export"
-            value={this.state.outputDir}
-            defaultPath={project.getLastCompilationDirectory()}
-            onChange={value => this.setState({ outputDir: value })}
-            fullWidth
-          />
-        </Line>
-        <Line>
-          <Spacer expand />
+      <DoneFooter
+        renderGameButton={() => (
           <RaisedButton
-            label={<Trans>Export</Trans>}
+            key="open"
+            label={<Trans>Open folder</Trans>}
             primary={true}
-            onClick={this.launchExport}
-            disabled={!this.state.outputDir}
+            onClick={openExportFolder}
           />
-        </Line>
-        <Dialog
-          title={t('Export finished')}
-          actions={[
-            <FlatButton
-              key="open"
-              label={<Trans>Open folder</Trans>}
-              primary={true}
-              onClick={this.openExportFolder}
-            />,
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary={false}
-              onClick={() =>
-                this.setState({
-                  exportFinishedDialogOpen: false,
-                })
-              }
-            />,
-          ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
-          modal
-          open={this.state.exportFinishedDialogOpen}
-        >
-          <p>
-            You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
-            which will compile it for you to an iOS and Android app.
-          </p>
-          <p>
-            <Trans>
-              You can also compile the game by yourself using Cordova
-              command-line tool to iOS (XCode is required) or Android (Android
-              SDK is required).
-            </Trans>
-          </p>
-          <RaisedButton
-            fullWidth
-            primary
-            onClick={() => this.openPhoneGapBuild()}
-            label={t('Open PhoneGap Build')}
-          />
-        </Dialog>
-      </Column>
+        )}
+      />
     );
-  }
-}
-
-export default LocalCordovaExport;
+  },
+};

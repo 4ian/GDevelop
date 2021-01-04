@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/sprite-fade-in-out/sprite-fade-in-out.json",
+    "projectUuid": "6a905bab-a7dd-4eb5-8c64-9ded8ce1b41a",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/sprite-fade-in-out/p1_front.png",
+        "file": "https://resources.gdevelop-app.com/examples/sprite-fade-in-out/p1_front.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_front.png",
@@ -155,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "36011ef0-b578-4b6e-88c4-cc3706e1c28a",
           "width": 0,
           "x": 155,
           "y": 63,
@@ -170,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "d8eacf3a-f79b-46dd-967f-0dbc5ea99c71",
           "width": 0,
           "x": 364,
           "y": 247,
@@ -336,6 +336,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -391,6 +396,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "e10fb8be-fbc5-4e59-992e-f8b89cc4cc47",
           "width": 0,
           "x": 93,
           "y": 58,
@@ -406,6 +412,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "a77f1d24-dbe8-435d-b9a8-4693772ec337",
           "width": 0,
           "x": 356,
           "y": 275,
@@ -606,6 +613,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -661,6 +673,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "52bf71c4-e478-43ee-a766-f2e9d8f66d03",
           "width": 0,
           "x": 193,
           "y": 68,
@@ -676,6 +689,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "d8fd78c3-0244-49fb-a24b-8383d69317cc",
           "width": 0,
           "x": 361,
           "y": 298,
@@ -842,6 +856,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

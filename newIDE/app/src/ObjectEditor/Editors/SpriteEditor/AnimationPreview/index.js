@@ -2,14 +2,15 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import { Line } from '../../../../UI/Grid';
+import { Line, Spacer } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
-import Replay from 'material-ui/svg-icons/av/replay';
-import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
-import Pause from 'material-ui/svg-icons/av/pause';
-import Timer from 'material-ui/svg-icons/image/timer';
-import TextField from 'material-ui/TextField';
-import { FlatButton } from 'material-ui';
+import Replay from '@material-ui/icons/Replay';
+import PlayArrow from '@material-ui/icons/PlayArrow';
+import Pause from '@material-ui/icons/Pause';
+import Timer from '@material-ui/icons/Timer';
+import TextField from '../../../../UI/TextField';
+import FlatButton from '../../../../UI/FlatButton';
+import Text from '../../../../UI/Text';
 
 type Props = {|
   spritesContainer: Object,
@@ -127,8 +128,12 @@ export default class AnimationPreview extends Component<Props, State> {
           project={project}
         />
         <Line noMargin alignItems="center">
-          <span style={styles.timeIcon}>FPS:</span>
+          <Text>
+            <Trans>FPS:</Trans>
+          </Text>
+          <Spacer />
           <TextField
+            margin="none"
             value={fps}
             onChange={(e, text) => {
               const fps = parseFloat(text);
@@ -148,6 +153,7 @@ export default class AnimationPreview extends Component<Props, State> {
           />
           <Timer style={styles.timeIcon} />
           <TextField
+            margin="none"
             value={timeBetweenFrames}
             onChange={(e, text) => {
               const time = parseFloat(text);

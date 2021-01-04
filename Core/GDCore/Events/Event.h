@@ -12,6 +12,7 @@
 #include <vector>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -90,8 +91,8 @@ class GD_CORE_API BaseEvent {
   bool HasSubEvents() const;
 
   /**
-   * Event must be able to return all conditions std::vector they have.
-   * Used to preprocess the conditions.
+   * \brief Return a list of all conditions of the event.
+   * \note Used to preprocess or search in the conditions.
    */
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors() {
     std::vector<gd::InstructionsList*> noConditions;
@@ -104,8 +105,8 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
-   * Event must be able to return all actions std::vector they have.
-   * Used to preprocess the actions.
+   * \brief Return a list of all actions of the event.
+   * \note Used to preprocess or search in the actions.
    */
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors() {
     std::vector<gd::InstructionsList*> noActions;
@@ -118,15 +119,26 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
-   * Event must be able to return all expressions they have.
-   * Used to preprocess the expressions.
+   * \brief Return a list of all strings of the event.
+   * \note Used to preprocess or search in the event strings.
    */
-  virtual std::vector<gd::Expression*> GetAllExpressions() {
-    std::vector<gd::Expression*> noExpr;
+  virtual std::vector<gd::String> GetAllSearchableStrings() const {
+    std::vector<gd::String> noSearchableStrings;
+    return noSearchableStrings;
+  };
+
+  /**
+   * \brief Return a list of all expressions of the event, each with their associated metadata.
+   * \note Used to preprocess or search in the expressions of the event.
+   */
+  virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() {
+    std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> > noExpr;
     return noExpr;
   };
-  virtual std::vector<const gd::Expression*> GetAllExpressions() const {
-    std::vector<const gd::Expression*> noExpr;
+  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+      GetAllExpressionsWithMetadata() const {
+    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> > noExpr;
     return noExpr;
   };
 

@@ -1,40 +1,50 @@
 // @flow
+import { t } from '@lingui/macro';
+
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { type EventRendererProps } from './EventRenderer.flow';
+import TextField from '../../../UI/TextField';
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
+  disabledText,
 } from '../ClassNames';
-const gd = global.gd;
+import { type EventRendererProps } from './EventRenderer';
+import {
+  shouldActivate,
+  shouldCloseOrCancel,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
+const gd: libGDevelop = global.gd;
+
+const commentTextStyle = {
+  width: '100%',
+  fontSize: 14,
+};
 
 const styles = {
   container: {
-    minHeight: 30,
     display: 'flex',
-    backgroundColor: '#fbf3d9',
-  },
-  text: {
-    flex: 1,
-    whiteSpace: 'pre-line',
-    margin: 0,
+    flexWrap: 'wrap',
     padding: 5,
+    overflow: 'hidden',
+    minHeight: 35,
   },
-  textArea: {
-    padding: 5,
-    flex: 1,
+  commentTextField: commentTextStyle,
+  commentSpan: {
+    ...commentTextStyle,
     boxSizing: 'border-box',
-    width: '100%',
-    fontSize: 14,
+    alignItems: 'center',
+    height: '100%',
+    whiteSpace: 'pre-wrap',
+    lineHeight: 1.5,
+    border: 1,
   },
 };
 
 type State = {|
   editing: boolean,
-  height: number,
 |};
 
 export default class CommentEvent extends React.Component<
@@ -43,37 +53,32 @@ export default class CommentEvent extends React.Component<
 > {
   state = {
     editing: false,
-    height: 0,
   };
 
-  _container: ?any;
-  _input: ?any;
+  _selectable: ?HTMLSpanElement;
+  _textField: ?TextField;
 
   edit = () => {
-    if (!this._container) return;
-
     this.setState(
       {
         editing: true,
-        height: this._container.offsetHeight,
       },
       () => {
-        // $FlowFixMe
-        const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
-        if (input) {
-          input.focus();
-          input.value = gd.asCommentEvent(this.props.event).getComment();
-        }
+        if (this._textField) this._textField.focus();
       }
     );
   };
 
-  endEditing = () => {
+  onEvent = (e: any, text: string) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
+    commentEvent.setComment(text);
 
-    // $FlowFixMe
-    const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
-    if (input) commentEvent.setComment(input.value);
+    this.props.onUpdate();
+    this.forceUpdate();
+  };
+
+  endEditing = () => {
+    if (!this._textField) return;
 
     this.setState(
       {
@@ -95,11 +100,13 @@ export default class CommentEvent extends React.Component<
 
   render() {
     const commentEvent = gd.asCommentEvent(this.props.event);
-    const color = rgbToHex(
+
+    const backgroundColor = rgbToHex(
       commentEvent.getBackgroundColorRed(),
       commentEvent.getBackgroundColorGreen(),
       commentEvent.getBackgroundColorBlue()
     );
+
     const textColor = rgbToHex(
       commentEvent.getTextColorRed(),
       commentEvent.getTextColorGreen(),
@@ -108,32 +115,62 @@ export default class CommentEvent extends React.Component<
 
     return (
       <div
-        style={{ ...styles.container, backgroundColor: `#${color}` }}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
-        ref={container => (this._container = container)}
+        style={{
+          ...styles.container,
+          backgroundColor: `#${backgroundColor}`,
+        }}
+        onClick={this.edit}
+        onKeyPress={event => {
+          if (shouldActivate(event)) {
+            this.edit();
+          }
+        }}
+        tabIndex={0}
       >
-        {!this.state.editing ? (
-          <p
-            className={classNames({
-              [selectableArea]: true,
-            })}
-            onClick={this.edit}
-            key="p"
-            style={{ ...styles.text, color: `#${textColor}` }}
-            dangerouslySetInnerHTML={{
-              __html: this._getCommentHTML(),
+        {this.state.editing ? (
+          <TextField
+            multiline
+            margin="none"
+            ref={textField => (this._textField = textField)}
+            value={commentEvent.getComment()}
+            hintText={t`<Enter comment>`}
+            onBlur={this.endEditing}
+            onChange={this.onEvent}
+            style={styles.commentTextField}
+            inputStyle={{
+              color: `#${textColor}`,
+              padding: 0,
+              lineHeight: 1.5,
+            }}
+            underlineFocusStyle={{
+              borderColor: `#${textColor}`,
+            }}
+            fullWidth
+            id="comment-title"
+            onKeyUp={event => {
+              if (shouldCloseOrCancel(event)) {
+                this.endEditing();
+              }
             }}
           />
         ) : (
-          <textarea
-            key="textarea"
-            type="text"
-            style={{ ...styles.textArea, height: this.state.height }}
-            onBlur={this.endEditing}
-            ref={input => (this._input = input)}
+          <span
+            ref={selectable => (this._selectable = selectable)}
+            className={classNames({
+              [selectableArea]: true,
+              [disabledText]: this.props.disabled,
+            })}
+            style={{
+              ...styles.commentSpan,
+              color: `#${textColor}`,
+            }}
+            dangerouslySetInnerHTML={{
+              __html: this._getCommentHTML(),
+            }}
           />
         )}
       </div>

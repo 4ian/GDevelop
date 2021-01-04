@@ -1,25 +1,21 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.mindaworld",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/isometric-game/isometric-game.json",
+    "projectUuid": "cb709419-e4da-470b-87e9-ea00c4b844af",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Minda_Isometric_World",
     "author": "Mickael HOARAU",
     "windowWidth": 1280,
@@ -56,6 +52,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -126,7 +123,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/Full/fond-iso_map_2.jpg",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/Full/fond-iso_map_2.jpg",
         "kind": "image",
         "metadata": "",
         "name": "fond-iso_map_2.jpg",
@@ -135,7 +132,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/UI/avat-fullpng.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/UI/avat-fullpng.png",
         "kind": "image",
         "metadata": "",
         "name": "avat-fullpng.png",
@@ -144,7 +141,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/desktop-icon-512.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/desktop-icon-512.png",
         "kind": "image",
         "metadata": "",
         "name": "desktop-icon-512.png",
@@ -153,7 +150,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-192.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-192.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-192.png",
@@ -162,7 +159,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-144.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-144.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-144.png",
@@ -171,7 +168,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-96.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-96.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-96.png",
@@ -180,7 +177,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-72.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-72.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-72.png",
@@ -189,7 +186,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-48.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-48.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-48.png",
@@ -198,7 +195,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/android-icon-36.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/android-icon-36.png",
         "kind": "image",
         "metadata": "",
         "name": "android-icon-36.png",
@@ -207,7 +204,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-180.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-180.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-180.png",
@@ -216,7 +213,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-167.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-167.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-167.png",
@@ -225,7 +222,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-152.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-152.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-152.png",
@@ -234,7 +231,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-144.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-144.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-144.png",
@@ -243,7 +240,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-120.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-120.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-120.png",
@@ -252,7 +249,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-114.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-114.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-114.png",
@@ -261,7 +258,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-100.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-100.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-100.png",
@@ -270,7 +267,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-80.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-80.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-80.png",
@@ -279,7 +276,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-76.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-76.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-76.png",
@@ -288,7 +285,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-72.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-72.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-72.png",
@@ -297,7 +294,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-60.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-60.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-60.png",
@@ -306,7 +303,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-58.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-58.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-58.png",
@@ -315,7 +312,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-57.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-57.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-57.png",
@@ -324,7 +321,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-50.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-50.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-50.png",
@@ -333,7 +330,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-40.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-40.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-40.png",
@@ -342,7 +339,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/ios-icon-29.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/ios-icon-29.png",
         "kind": "image",
         "metadata": "",
         "name": "ios-icon-29.png",
@@ -351,7 +348,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/test_shadow.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/test_shadow.png",
         "kind": "image",
         "metadata": "",
         "name": "test_shadow.png",
@@ -360,7 +357,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0001.png",
         "kind": "image",
         "metadata": "",
         "name": "left0001.png",
@@ -369,7 +366,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0002.png",
         "kind": "image",
         "metadata": "",
         "name": "left0002.png",
@@ -378,7 +375,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0003.png",
         "kind": "image",
         "metadata": "",
         "name": "left0003.png",
@@ -387,7 +384,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0004.png",
         "kind": "image",
         "metadata": "",
         "name": "left0004.png",
@@ -396,7 +393,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0005.png",
         "kind": "image",
         "metadata": "",
         "name": "left0005.png",
@@ -405,7 +402,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0006.png",
         "kind": "image",
         "metadata": "",
         "name": "left0006.png",
@@ -414,7 +411,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0007.png",
         "kind": "image",
         "metadata": "",
         "name": "left0007.png",
@@ -423,7 +420,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0008.png",
         "kind": "image",
         "metadata": "",
         "name": "left0008.png",
@@ -432,7 +429,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0009.png",
         "kind": "image",
         "metadata": "",
         "name": "left0009.png",
@@ -441,7 +438,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0010.png",
         "kind": "image",
         "metadata": "",
         "name": "left0010.png",
@@ -450,7 +447,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0011.png",
         "kind": "image",
         "metadata": "",
         "name": "left0011.png",
@@ -459,7 +456,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0012.png",
         "kind": "image",
         "metadata": "",
         "name": "left0012.png",
@@ -468,7 +465,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0013.png",
         "kind": "image",
         "metadata": "",
         "name": "left0013.png",
@@ -477,7 +474,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0014.png",
         "kind": "image",
         "metadata": "",
         "name": "left0014.png",
@@ -486,7 +483,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0015.png",
         "kind": "image",
         "metadata": "",
         "name": "left0015.png",
@@ -495,7 +492,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0016.png",
         "kind": "image",
         "metadata": "",
         "name": "left0016.png",
@@ -504,7 +501,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0017.png",
         "kind": "image",
         "metadata": "",
         "name": "left0017.png",
@@ -513,7 +510,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0018.png",
         "kind": "image",
         "metadata": "",
         "name": "left0018.png",
@@ -522,7 +519,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0019.png",
         "kind": "image",
         "metadata": "",
         "name": "left0019.png",
@@ -531,7 +528,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0020.png",
         "kind": "image",
         "metadata": "",
         "name": "left0020.png",
@@ -540,7 +537,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0021.png",
         "kind": "image",
         "metadata": "",
         "name": "left0021.png",
@@ -549,7 +546,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0022.png",
         "kind": "image",
         "metadata": "",
         "name": "left0022.png",
@@ -558,7 +555,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0023.png",
         "kind": "image",
         "metadata": "",
         "name": "left0023.png",
@@ -567,7 +564,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0024.png",
         "kind": "image",
         "metadata": "",
         "name": "left0024.png",
@@ -576,7 +573,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0025.png",
         "kind": "image",
         "metadata": "",
         "name": "left0025.png",
@@ -585,7 +582,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0026.png",
         "kind": "image",
         "metadata": "",
         "name": "left0026.png",
@@ -594,7 +591,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0027.png",
         "kind": "image",
         "metadata": "",
         "name": "left0027.png",
@@ -603,7 +600,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0028.png",
         "kind": "image",
         "metadata": "",
         "name": "left0028.png",
@@ -612,7 +609,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0029.png",
         "kind": "image",
         "metadata": "",
         "name": "left0029.png",
@@ -621,7 +618,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Left/left0030.png",
         "kind": "image",
         "metadata": "",
         "name": "left0030.png",
@@ -630,7 +627,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0001.png",
         "kind": "image",
         "metadata": "",
         "name": "right0001.png",
@@ -639,7 +636,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0002.png",
         "kind": "image",
         "metadata": "",
         "name": "right0002.png",
@@ -648,7 +645,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0003.png",
         "kind": "image",
         "metadata": "",
         "name": "right0003.png",
@@ -657,7 +654,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0004.png",
         "kind": "image",
         "metadata": "",
         "name": "right0004.png",
@@ -666,7 +663,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0005.png",
         "kind": "image",
         "metadata": "",
         "name": "right0005.png",
@@ -675,7 +672,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0006.png",
         "kind": "image",
         "metadata": "",
         "name": "right0006.png",
@@ -684,7 +681,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0007.png",
         "kind": "image",
         "metadata": "",
         "name": "right0007.png",
@@ -693,7 +690,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0008.png",
         "kind": "image",
         "metadata": "",
         "name": "right0008.png",
@@ -702,7 +699,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0009.png",
         "kind": "image",
         "metadata": "",
         "name": "right0009.png",
@@ -711,7 +708,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0010.png",
         "kind": "image",
         "metadata": "",
         "name": "right0010.png",
@@ -720,7 +717,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0011.png",
         "kind": "image",
         "metadata": "",
         "name": "right0011.png",
@@ -729,7 +726,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0012.png",
         "kind": "image",
         "metadata": "",
         "name": "right0012.png",
@@ -738,7 +735,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0013.png",
         "kind": "image",
         "metadata": "",
         "name": "right0013.png",
@@ -747,7 +744,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0014.png",
         "kind": "image",
         "metadata": "",
         "name": "right0014.png",
@@ -756,7 +753,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0015.png",
         "kind": "image",
         "metadata": "",
         "name": "right0015.png",
@@ -765,7 +762,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0016.png",
         "kind": "image",
         "metadata": "",
         "name": "right0016.png",
@@ -774,7 +771,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0017.png",
         "kind": "image",
         "metadata": "",
         "name": "right0017.png",
@@ -783,7 +780,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0018.png",
         "kind": "image",
         "metadata": "",
         "name": "right0018.png",
@@ -792,7 +789,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0019.png",
         "kind": "image",
         "metadata": "",
         "name": "right0019.png",
@@ -801,7 +798,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0020.png",
         "kind": "image",
         "metadata": "",
         "name": "right0020.png",
@@ -810,7 +807,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0021.png",
         "kind": "image",
         "metadata": "",
         "name": "right0021.png",
@@ -819,7 +816,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0022.png",
         "kind": "image",
         "metadata": "",
         "name": "right0022.png",
@@ -828,7 +825,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0023.png",
         "kind": "image",
         "metadata": "",
         "name": "right0023.png",
@@ -837,7 +834,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0024.png",
         "kind": "image",
         "metadata": "",
         "name": "right0024.png",
@@ -846,7 +843,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0025.png",
         "kind": "image",
         "metadata": "",
         "name": "right0025.png",
@@ -855,7 +852,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0026.png",
         "kind": "image",
         "metadata": "",
         "name": "right0026.png",
@@ -864,7 +861,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0027.png",
         "kind": "image",
         "metadata": "",
         "name": "right0027.png",
@@ -873,7 +870,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0028.png",
         "kind": "image",
         "metadata": "",
         "name": "right0028.png",
@@ -882,7 +879,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0029.png",
         "kind": "image",
         "metadata": "",
         "name": "right0029.png",
@@ -891,7 +888,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Right/right0030.png",
         "kind": "image",
         "metadata": "",
         "name": "right0030.png",
@@ -900,7 +897,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0001.png",
         "kind": "image",
         "metadata": "",
         "name": "up0001.png",
@@ -909,7 +906,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0002.png",
         "kind": "image",
         "metadata": "",
         "name": "up0002.png",
@@ -918,7 +915,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0003.png",
         "kind": "image",
         "metadata": "",
         "name": "up0003.png",
@@ -927,7 +924,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0004.png",
         "kind": "image",
         "metadata": "",
         "name": "up0004.png",
@@ -936,7 +933,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0005.png",
         "kind": "image",
         "metadata": "",
         "name": "up0005.png",
@@ -945,7 +942,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0006.png",
         "kind": "image",
         "metadata": "",
         "name": "up0006.png",
@@ -954,7 +951,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0007.png",
         "kind": "image",
         "metadata": "",
         "name": "up0007.png",
@@ -963,7 +960,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0008.png",
         "kind": "image",
         "metadata": "",
         "name": "up0008.png",
@@ -972,7 +969,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0009.png",
         "kind": "image",
         "metadata": "",
         "name": "up0009.png",
@@ -981,7 +978,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0010.png",
         "kind": "image",
         "metadata": "",
         "name": "up0010.png",
@@ -990,7 +987,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0011.png",
         "kind": "image",
         "metadata": "",
         "name": "up0011.png",
@@ -999,7 +996,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0012.png",
         "kind": "image",
         "metadata": "",
         "name": "up0012.png",
@@ -1008,7 +1005,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0013.png",
         "kind": "image",
         "metadata": "",
         "name": "up0013.png",
@@ -1017,7 +1014,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0014.png",
         "kind": "image",
         "metadata": "",
         "name": "up0014.png",
@@ -1026,7 +1023,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0015.png",
         "kind": "image",
         "metadata": "",
         "name": "up0015.png",
@@ -1035,7 +1032,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0016.png",
         "kind": "image",
         "metadata": "",
         "name": "up0016.png",
@@ -1044,7 +1041,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0017.png",
         "kind": "image",
         "metadata": "",
         "name": "up0017.png",
@@ -1053,7 +1050,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0018.png",
         "kind": "image",
         "metadata": "",
         "name": "up0018.png",
@@ -1062,7 +1059,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0019.png",
         "kind": "image",
         "metadata": "",
         "name": "up0019.png",
@@ -1071,7 +1068,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0020.png",
         "kind": "image",
         "metadata": "",
         "name": "up0020.png",
@@ -1080,7 +1077,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0021.png",
         "kind": "image",
         "metadata": "",
         "name": "up0021.png",
@@ -1089,7 +1086,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0022.png",
         "kind": "image",
         "metadata": "",
         "name": "up0022.png",
@@ -1098,7 +1095,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0023.png",
         "kind": "image",
         "metadata": "",
         "name": "up0023.png",
@@ -1107,7 +1104,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0024.png",
         "kind": "image",
         "metadata": "",
         "name": "up0024.png",
@@ -1116,7 +1113,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0025.png",
         "kind": "image",
         "metadata": "",
         "name": "up0025.png",
@@ -1125,7 +1122,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0026.png",
         "kind": "image",
         "metadata": "",
         "name": "up0026.png",
@@ -1134,7 +1131,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0027.png",
         "kind": "image",
         "metadata": "",
         "name": "up0027.png",
@@ -1143,7 +1140,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0028.png",
         "kind": "image",
         "metadata": "",
         "name": "up0028.png",
@@ -1152,7 +1149,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0029.png",
         "kind": "image",
         "metadata": "",
         "name": "up0029.png",
@@ -1161,7 +1158,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Up/up0030.png",
         "kind": "image",
         "metadata": "",
         "name": "up0030.png",
@@ -1170,7 +1167,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0001.png",
         "kind": "image",
         "metadata": "",
         "name": "down0001.png",
@@ -1179,7 +1176,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0002.png",
         "kind": "image",
         "metadata": "",
         "name": "down0002.png",
@@ -1188,7 +1185,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0003.png",
         "kind": "image",
         "metadata": "",
         "name": "down0003.png",
@@ -1197,7 +1194,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0004.png",
         "kind": "image",
         "metadata": "",
         "name": "down0004.png",
@@ -1206,7 +1203,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0005.png",
         "kind": "image",
         "metadata": "",
         "name": "down0005.png",
@@ -1215,7 +1212,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0006.png",
         "kind": "image",
         "metadata": "",
         "name": "down0006.png",
@@ -1224,7 +1221,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0007.png",
         "kind": "image",
         "metadata": "",
         "name": "down0007.png",
@@ -1233,7 +1230,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0008.png",
         "kind": "image",
         "metadata": "",
         "name": "down0008.png",
@@ -1242,7 +1239,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0009.png",
         "kind": "image",
         "metadata": "",
         "name": "down0009.png",
@@ -1251,7 +1248,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0010.png",
         "kind": "image",
         "metadata": "",
         "name": "down0010.png",
@@ -1260,7 +1257,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0011.png",
         "kind": "image",
         "metadata": "",
         "name": "down0011.png",
@@ -1269,7 +1266,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0012.png",
         "kind": "image",
         "metadata": "",
         "name": "down0012.png",
@@ -1278,7 +1275,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0013.png",
         "kind": "image",
         "metadata": "",
         "name": "down0013.png",
@@ -1287,7 +1284,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0014.png",
         "kind": "image",
         "metadata": "",
         "name": "down0014.png",
@@ -1296,7 +1293,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0015.png",
         "kind": "image",
         "metadata": "",
         "name": "down0015.png",
@@ -1305,7 +1302,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0016.png",
         "kind": "image",
         "metadata": "",
         "name": "down0016.png",
@@ -1314,7 +1311,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0017.png",
         "kind": "image",
         "metadata": "",
         "name": "down0017.png",
@@ -1323,7 +1320,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0018.png",
         "kind": "image",
         "metadata": "",
         "name": "down0018.png",
@@ -1332,7 +1329,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0019.png",
         "kind": "image",
         "metadata": "",
         "name": "down0019.png",
@@ -1341,7 +1338,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0020.png",
         "kind": "image",
         "metadata": "",
         "name": "down0020.png",
@@ -1350,7 +1347,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0021.png",
         "kind": "image",
         "metadata": "",
         "name": "down0021.png",
@@ -1359,7 +1356,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0022.png",
         "kind": "image",
         "metadata": "",
         "name": "down0022.png",
@@ -1368,7 +1365,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0023.png",
         "kind": "image",
         "metadata": "",
         "name": "down0023.png",
@@ -1377,7 +1374,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0024.png",
         "kind": "image",
         "metadata": "",
         "name": "down0024.png",
@@ -1386,7 +1383,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0025.png",
         "kind": "image",
         "metadata": "",
         "name": "down0025.png",
@@ -1395,7 +1392,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0026.png",
         "kind": "image",
         "metadata": "",
         "name": "down0026.png",
@@ -1404,7 +1401,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0027.png",
         "kind": "image",
         "metadata": "",
         "name": "down0027.png",
@@ -1413,7 +1410,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0028.png",
         "kind": "image",
         "metadata": "",
         "name": "down0028.png",
@@ -1422,7 +1419,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0029.png",
         "kind": "image",
         "metadata": "",
         "name": "down0029.png",
@@ -1431,7 +1428,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Down/down0030.png",
         "kind": "image",
         "metadata": "",
         "name": "down0030.png",
@@ -1440,7 +1437,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0001.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0001.png",
@@ -1449,7 +1446,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0002.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0002.png",
@@ -1458,7 +1455,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0003.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0003.png",
@@ -1467,7 +1464,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0004.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0004.png",
@@ -1476,7 +1473,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0005.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0005.png",
@@ -1485,7 +1482,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0006.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0006.png",
@@ -1494,7 +1491,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0007.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0007.png",
@@ -1503,7 +1500,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0008.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0008.png",
@@ -1512,7 +1509,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0009.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0009.png",
@@ -1521,7 +1518,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0010.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0010.png",
@@ -1530,7 +1527,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0011.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0011.png",
@@ -1539,7 +1536,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0012.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0012.png",
@@ -1548,7 +1545,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0013.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0013.png",
@@ -1557,7 +1554,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0014.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0014.png",
@@ -1566,7 +1563,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0015.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0015.png",
@@ -1575,7 +1572,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0016.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0016.png",
@@ -1584,7 +1581,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0017.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0017.png",
@@ -1593,7 +1590,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0018.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0018.png",
@@ -1602,7 +1599,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0019.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0019.png",
@@ -1611,7 +1608,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0020.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0020.png",
@@ -1620,7 +1617,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0021.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0021.png",
@@ -1629,7 +1626,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0022.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0022.png",
@@ -1638,7 +1635,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0023.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0023.png",
@@ -1647,7 +1644,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0024.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0024.png",
@@ -1656,7 +1653,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0025.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0025.png",
@@ -1665,7 +1662,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0026.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0026.png",
@@ -1674,7 +1671,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0027.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0027.png",
@@ -1683,7 +1680,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0028.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0028.png",
@@ -1692,7 +1689,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0029.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0029.png",
@@ -1701,7 +1698,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-X/-X0030.png",
         "kind": "image",
         "metadata": "",
         "name": "-X0030.png",
@@ -1710,7 +1707,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0001.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0001.png",
@@ -1719,7 +1716,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0002.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0002.png",
@@ -1728,7 +1725,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0003.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0003.png",
@@ -1737,7 +1734,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0004.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0004.png",
@@ -1746,7 +1743,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0005.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0005.png",
@@ -1755,7 +1752,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0006.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0006.png",
@@ -1764,7 +1761,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0007.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0007.png",
@@ -1773,7 +1770,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0008.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0008.png",
@@ -1782,7 +1779,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0009.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0009.png",
@@ -1791,7 +1788,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0010.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0010.png",
@@ -1800,7 +1797,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0011.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0011.png",
@@ -1809,7 +1806,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0012.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0012.png",
@@ -1818,7 +1815,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0013.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0013.png",
@@ -1827,7 +1824,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0014.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0014.png",
@@ -1836,7 +1833,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0015.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0015.png",
@@ -1845,7 +1842,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0016.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0016.png",
@@ -1854,7 +1851,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0017.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0017.png",
@@ -1863,7 +1860,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0018.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0018.png",
@@ -1872,7 +1869,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0019.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0019.png",
@@ -1881,7 +1878,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0020.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0020.png",
@@ -1890,7 +1887,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0021.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0021.png",
@@ -1899,7 +1896,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0022.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0022.png",
@@ -1908,7 +1905,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0023.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0023.png",
@@ -1917,7 +1914,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0024.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0024.png",
@@ -1926,7 +1923,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0025.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0025.png",
@@ -1935,7 +1932,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0026.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0026.png",
@@ -1944,7 +1941,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0027.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0027.png",
@@ -1953,7 +1950,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0028.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0028.png",
@@ -1962,7 +1959,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0029.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0029.png",
@@ -1971,7 +1968,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/-Y/-Y0030.png",
         "kind": "image",
         "metadata": "",
         "name": "-Y0030.png",
@@ -1980,7 +1977,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0001.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0001.png",
@@ -1989,7 +1986,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0002.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0002.png",
@@ -1998,7 +1995,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0003.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0003.png",
@@ -2007,7 +2004,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0004.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0004.png",
@@ -2016,7 +2013,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0005.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0005.png",
@@ -2025,7 +2022,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0006.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0006.png",
@@ -2034,7 +2031,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0007.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0007.png",
@@ -2043,7 +2040,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0008.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0008.png",
@@ -2052,7 +2049,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0009.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0009.png",
@@ -2061,7 +2058,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0010.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0010.png",
@@ -2070,7 +2067,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0011.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0011.png",
@@ -2079,7 +2076,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0012.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0012.png",
@@ -2088,7 +2085,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0013.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0013.png",
@@ -2097,7 +2094,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0014.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0014.png",
@@ -2106,7 +2103,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0015.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0015.png",
@@ -2115,7 +2112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0016.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0016.png",
@@ -2124,7 +2121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0017.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0017.png",
@@ -2133,7 +2130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0018.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0018.png",
@@ -2142,7 +2139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0019.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0019.png",
@@ -2151,7 +2148,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0020.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0020.png",
@@ -2160,7 +2157,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0021.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0021.png",
@@ -2169,7 +2166,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0022.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0022.png",
@@ -2178,7 +2175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0023.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0023.png",
@@ -2187,7 +2184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0024.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0024.png",
@@ -2196,7 +2193,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0025.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0025.png",
@@ -2205,7 +2202,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0026.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0026.png",
@@ -2214,7 +2211,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0027.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0027.png",
@@ -2223,7 +2220,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0028.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0028.png",
@@ -2232,7 +2229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0029.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0029.png",
@@ -2241,7 +2238,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/Y/Y0030.png",
         "kind": "image",
         "metadata": "",
         "name": "Y0030.png",
@@ -2250,7 +2247,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0001.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0001.png",
         "kind": "image",
         "metadata": "",
         "name": "X0001.png",
@@ -2259,7 +2256,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0002.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0002.png",
         "kind": "image",
         "metadata": "",
         "name": "X0002.png",
@@ -2268,7 +2265,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0003.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0003.png",
         "kind": "image",
         "metadata": "",
         "name": "X0003.png",
@@ -2277,7 +2274,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0004.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0004.png",
         "kind": "image",
         "metadata": "",
         "name": "X0004.png",
@@ -2286,7 +2283,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0005.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0005.png",
         "kind": "image",
         "metadata": "",
         "name": "X0005.png",
@@ -2295,7 +2292,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0006.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0006.png",
         "kind": "image",
         "metadata": "",
         "name": "X0006.png",
@@ -2304,7 +2301,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0007.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0007.png",
         "kind": "image",
         "metadata": "",
         "name": "X0007.png",
@@ -2313,7 +2310,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0008.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0008.png",
         "kind": "image",
         "metadata": "",
         "name": "X0008.png",
@@ -2322,7 +2319,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0009.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0009.png",
         "kind": "image",
         "metadata": "",
         "name": "X0009.png",
@@ -2331,7 +2328,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0010.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0010.png",
         "kind": "image",
         "metadata": "",
         "name": "X0010.png",
@@ -2340,7 +2337,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0011.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0011.png",
         "kind": "image",
         "metadata": "",
         "name": "X0011.png",
@@ -2349,7 +2346,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0012.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0012.png",
         "kind": "image",
         "metadata": "",
         "name": "X0012.png",
@@ -2358,7 +2355,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0013.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0013.png",
         "kind": "image",
         "metadata": "",
         "name": "X0013.png",
@@ -2367,7 +2364,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0014.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0014.png",
         "kind": "image",
         "metadata": "",
         "name": "X0014.png",
@@ -2376,7 +2373,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0015.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0015.png",
         "kind": "image",
         "metadata": "",
         "name": "X0015.png",
@@ -2385,7 +2382,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0016.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0016.png",
         "kind": "image",
         "metadata": "",
         "name": "X0016.png",
@@ -2394,7 +2391,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0017.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0017.png",
         "kind": "image",
         "metadata": "",
         "name": "X0017.png",
@@ -2403,7 +2400,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0018.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0018.png",
         "kind": "image",
         "metadata": "",
         "name": "X0018.png",
@@ -2412,7 +2409,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0019.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0019.png",
         "kind": "image",
         "metadata": "",
         "name": "X0019.png",
@@ -2421,7 +2418,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0020.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0020.png",
         "kind": "image",
         "metadata": "",
         "name": "X0020.png",
@@ -2430,7 +2427,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0021.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0021.png",
         "kind": "image",
         "metadata": "",
         "name": "X0021.png",
@@ -2439,7 +2436,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0022.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0022.png",
         "kind": "image",
         "metadata": "",
         "name": "X0022.png",
@@ -2448,7 +2445,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0023.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0023.png",
         "kind": "image",
         "metadata": "",
         "name": "X0023.png",
@@ -2457,7 +2454,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0024.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0024.png",
         "kind": "image",
         "metadata": "",
         "name": "X0024.png",
@@ -2466,7 +2463,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0025.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0025.png",
         "kind": "image",
         "metadata": "",
         "name": "X0025.png",
@@ -2475,7 +2472,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0026.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0026.png",
         "kind": "image",
         "metadata": "",
         "name": "X0026.png",
@@ -2484,7 +2481,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0027.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0027.png",
         "kind": "image",
         "metadata": "",
         "name": "X0027.png",
@@ -2493,7 +2490,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0028.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0028.png",
         "kind": "image",
         "metadata": "",
         "name": "X0028.png",
@@ -2502,7 +2499,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0029.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0029.png",
         "kind": "image",
         "metadata": "",
         "name": "X0029.png",
@@ -2511,7 +2508,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0030.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Perso_GD/with_shadow/X/X0030.png",
         "kind": "image",
         "metadata": "",
         "name": "X0030.png",
@@ -2520,7 +2517,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (1).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (1).png",
@@ -2529,7 +2526,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (2).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (2).png",
@@ -2538,7 +2535,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (3).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (3).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (3).png",
@@ -2547,7 +2544,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (4).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (4).png",
@@ -2556,7 +2553,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (5).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (5).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (5).png",
@@ -2565,7 +2562,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (6).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (6).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (6).png",
@@ -2574,7 +2571,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (7).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (7).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (7).png",
@@ -2583,7 +2580,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (8).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (8).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (8).png",
@@ -2592,7 +2589,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (9).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (9).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (9).png",
@@ -2601,7 +2598,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (10).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (10).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (10).png",
@@ -2610,7 +2607,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (11).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (11).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (11).png",
@@ -2619,7 +2616,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (12).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (12).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (12).png",
@@ -2628,7 +2625,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (13).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (13).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (13).png",
@@ -2637,7 +2634,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (14).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (14).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (14).png",
@@ -2646,7 +2643,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (15).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (15).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (15).png",
@@ -2655,7 +2652,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (16).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (16).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (16).png",
@@ -2664,7 +2661,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (17).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (17).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (17).png",
@@ -2673,7 +2670,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (18).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (18).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (18).png",
@@ -2682,7 +2679,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (19).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (19).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (19).png",
@@ -2691,7 +2688,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (20).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (20).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (20).png",
@@ -2700,7 +2697,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (21).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (21).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (21).png",
@@ -2709,7 +2706,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (22).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (22).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (22).png",
@@ -2718,7 +2715,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (23).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (23).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (23).png",
@@ -2727,7 +2724,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/Assets/Map/tilebg/tile_bg (24).png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/Assets/Map/tilebg/tile_bg (24).png",
         "kind": "image",
         "metadata": "",
         "name": "tile_bg (24).png",
@@ -2736,7 +2733,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/isometric-game/NewFile-1.png",
+        "file": "https://resources.gdevelop-app.com/examples/isometric-game/NewFile-1.png",
         "kind": "image",
         "metadata": "",
         "name": "NewFile-1.png",
@@ -2795,6 +2792,7 @@
           "layer": "",
           "locked": false,
           "name": "Minda",
+          "persistentUuid": "0b80be58-1a38-42d0-9f92-c4627973fb6c",
           "width": 100,
           "x": 543,
           "y": 595,
@@ -2815,6 +2813,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "9ededc4b-4a34-4ed5-9310-a55bcbbe746d",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -2830,6 +2829,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7200aa67-f040-47ed-80de-ae7d6cf294e6",
           "width": 0,
           "x": 320,
           "y": 0,
@@ -2850,6 +2850,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "c0694d5b-e9c5-47b2-b605-0c3dbccb3e9f",
           "width": 0,
           "x": 640,
           "y": 0,
@@ -2870,6 +2871,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7c5afb89-cc98-4a40-b520-e9101d43e506",
           "width": 0,
           "x": 960,
           "y": 0,
@@ -2890,6 +2892,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7fab4e1f-2237-4254-a63a-6476b2d7dec7",
           "width": 0,
           "x": 1280,
           "y": 0,
@@ -2910,6 +2913,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "3cede878-bd2a-40f5-9335-e6f369eabb93",
           "width": 0,
           "x": 1600,
           "y": 0,
@@ -2930,6 +2934,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "21d83ffb-8bfc-4017-9a93-a9251a4076c5",
           "width": 0,
           "x": 0,
           "y": 270,
@@ -2950,6 +2955,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "079f4f01-4524-423b-8ca2-44de3097c154",
           "width": 0,
           "x": 320,
           "y": 270,
@@ -2970,6 +2976,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "1786cbde-06f9-432f-b7d1-ba1e7f687f7c",
           "width": 0,
           "x": 640,
           "y": 270,
@@ -2990,6 +2997,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "fa24fc09-e52e-46f2-b1a5-d74e36b99a28",
           "width": 0,
           "x": 960,
           "y": 270,
@@ -3010,6 +3018,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "e4b6941e-be6f-48b9-83d4-d3b8fee75fef",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3030,6 +3039,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "508a6243-6072-4fa7-988e-9448a22ba542",
           "width": 0,
           "x": 1600,
           "y": 270,
@@ -3050,6 +3060,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "ca968faf-addb-41d4-b414-abaf7c47a43b",
           "width": 0,
           "x": 0,
           "y": 540,
@@ -3070,6 +3081,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "6dd672c6-cca9-4b26-97d7-8d71f1e884ae",
           "width": 0,
           "x": 320,
           "y": 540,
@@ -3090,6 +3102,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "853114f4-d108-4b11-8f6d-8da000d44e8b",
           "width": 0,
           "x": 1280,
           "y": 540,
@@ -3110,6 +3123,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "3dd4274b-ed09-438e-8960-d7d8a6b97b29",
           "width": 0,
           "x": 1600,
           "y": 540,
@@ -3130,6 +3144,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "55631156-879c-4577-9d1d-f4b979062452",
           "width": 0,
           "x": 960,
           "y": 540,
@@ -3150,6 +3165,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "395ade6c-17c5-46cb-80f4-dc772087a790",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -3170,6 +3186,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "8880d9c1-d158-457f-83f5-01eef91b7bd9",
           "width": 0,
           "x": 0,
           "y": 810,
@@ -3190,6 +3207,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "2d6d9522-8293-4880-9dc6-d200c54ecec9",
           "width": 0,
           "x": 320,
           "y": 810,
@@ -3210,6 +3228,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "5f8af143-e95f-44a0-a052-e356bdfa9c9e",
           "width": 0,
           "x": 640,
           "y": 810,
@@ -3230,6 +3249,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "ce91e054-b46c-480e-9276-b9ef0a1fb8bd",
           "width": 0,
           "x": 960,
           "y": 810,
@@ -3250,6 +3270,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "6c4c1c4c-de8a-43c4-9040-3d247d379474",
           "width": 0,
           "x": 1280,
           "y": 810,
@@ -3270,6 +3291,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "bb3f1aad-a51c-4411-a2d0-d076d4cf574a",
           "width": 0,
           "x": 1600,
           "y": 810,
@@ -3290,6 +3312,7 @@
           "layer": "UI",
           "locked": false,
           "name": "Avatar",
+          "persistentUuid": "342e0509-0396-473d-8dd0-8593b0d267a2",
           "width": 97,
           "x": 13,
           "y": 14,
@@ -3305,6 +3328,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7aefbcef-92a4-4944-b82c-a5d6be836d58",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3325,6 +3349,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "3e3c5554-8c05-4703-9445-c512f514b256",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3345,6 +3370,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "282320b2-3468-411a-a4a8-8633347f3a15",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3365,6 +3391,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "830a478a-7593-45d7-974d-de938d739dee",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3385,6 +3412,7 @@
           "layer": "",
           "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "68c8aa7d-7941-4498-9830-8c36c2975164",
           "width": 0,
           "x": 1280,
           "y": 270,
@@ -3405,6 +3433,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "cb5827f4-b541-4d59-996d-0e887485338a",
           "width": 314,
           "x": -16,
           "y": 305,
@@ -3420,6 +3449,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "01f11999-548d-454d-8115-ac6c5b799071",
           "width": 139,
           "x": 1083,
           "y": 298,
@@ -3435,6 +3465,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "e8fbfe61-c66b-4ee2-9e5b-0e2635988b5d",
           "width": 586,
           "x": 1264,
           "y": 266,
@@ -3450,6 +3481,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "e87da9d8-17f4-4123-ae6e-ef29f81428b3",
           "width": 586,
           "x": 572,
           "y": 114,
@@ -3465,6 +3497,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "b50aa8ae-b53e-45a5-9856-20a1b27c3705",
           "width": 315,
           "x": 671,
           "y": 268,
@@ -3480,6 +3513,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "3774546b-d492-4db5-b11b-b4c9c3d7dca5",
           "width": 315,
           "x": 514,
           "y": 854,
@@ -3495,6 +3529,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "2a7d67f9-0c56-436b-a43b-f7beaae5cc19",
           "width": 150,
           "x": 1351,
           "y": 486,
@@ -3510,6 +3545,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "10a5377e-54fb-435a-87ea-042917fe8b9a",
           "width": 353,
           "x": 1110,
           "y": 226,
@@ -3525,6 +3561,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "5f78defe-3c57-4ae9-88a9-862bab6be616",
           "width": 150,
           "x": 1221,
           "y": 486,
@@ -3540,6 +3577,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "3c587212-40f5-4eea-acef-9f82f880c5e5",
           "width": 314,
           "x": 90,
           "y": 650,
@@ -3555,6 +3593,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "e99e432e-4915-488f-ab30-d7c613abbcb5",
           "width": 179,
           "x": 1240,
           "y": 554,
@@ -3570,6 +3609,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "ef221e4d-a97e-4867-b0ff-516917891b40",
           "width": 227,
           "x": 273,
           "y": 200,
@@ -3585,6 +3625,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "5d58820c-a812-413d-bcdf-ecb45edd34ab",
           "width": 586,
           "x": 1440,
           "y": 414,
@@ -3600,6 +3641,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "6f16e931-2696-437b-99b5-7d55215be229",
           "width": 227,
           "x": 9,
           "y": 943,
@@ -3615,6 +3657,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "85761669-699a-4470-8d7a-680c5100050e",
           "width": 139,
           "x": 260,
           "y": 414,
@@ -3630,6 +3673,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "f8f214e8-a649-41d7-ab30-500c69ebfe57",
           "width": 139,
           "x": 397,
           "y": 350,
@@ -3645,6 +3689,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "20839a64-6e79-4b94-a56e-eadfd347f899",
           "width": 586,
           "x": -34,
           "y": 908,
@@ -3660,6 +3705,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "d63b77f9-1859-49d3-acb2-5c7e1a39542b",
           "width": 315,
           "x": 929,
           "y": 450,
@@ -3675,6 +3721,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "6d2db198-3386-45de-beea-eab64265eec3",
           "width": 155,
           "x": -28,
           "y": 924,
@@ -3690,6 +3737,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "69a9f255-9d76-4cd4-8fd9-7ccdc2ac01f2",
           "width": 301,
           "x": 411,
           "y": 255,
@@ -3705,6 +3753,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "f44e826e-6377-49fa-91d5-0a4371a8cfee",
           "width": 179,
           "x": 668,
           "y": 454,
@@ -3720,6 +3769,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "18ed45ae-05e6-4c2b-8a84-fd693dc34f86",
           "width": 165,
           "x": 1344,
           "y": 576,
@@ -3735,6 +3785,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "e0d8bbe1-ff16-4541-9037-d1861442bb92",
           "width": 179,
           "x": 523,
           "y": 382,
@@ -3750,6 +3801,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "dd4bd290-f606-4b1f-9f50-69f200229285",
           "width": 68,
           "x": 1352,
           "y": 232,
@@ -3765,6 +3817,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "366fae7b-8568-4304-a462-d689d67a1170",
           "width": 179,
           "x": 1339,
           "y": 668,
@@ -3780,6 +3833,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "2ecc33a1-4416-46be-bf92-da61591b0d0e",
           "width": 315,
           "x": 780,
           "y": 604,
@@ -3795,6 +3849,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "522c6104-364f-48b7-b31b-e34e987b3cae",
           "width": 179,
           "x": 1090,
           "y": 638,
@@ -3810,6 +3865,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "d94df0c6-fc41-4f8a-863e-30da66559294",
           "width": 139,
           "x": 939,
           "y": 356,
@@ -3825,6 +3881,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "493ad72f-b15b-4463-aed8-af75f86f73c9",
           "width": 155,
           "x": 678,
           "y": 385,
@@ -3840,6 +3897,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "a6be8df9-c3cf-4702-ae41-70c178f0c40c",
           "width": 586,
           "x": -159,
           "y": 592,
@@ -3855,6 +3913,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "729acece-cea9-4433-b825-0ca8f21ae06b",
           "width": 143,
           "x": 221,
           "y": 611,
@@ -3870,6 +3929,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "326a0c1b-828b-4fb5-a405-db92972b6697",
           "width": 586,
           "x": -162,
           "y": 833,
@@ -3885,6 +3945,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "924925e2-c967-4c4a-9b96-c3e77ecb40d7",
           "width": 227,
           "x": -62,
           "y": 881,
@@ -3900,6 +3961,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "39e6bcbf-ba60-4a76-b129-e859e547cb1d",
           "width": 132,
           "x": 242,
           "y": 568,
@@ -3915,6 +3977,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "d079ee9c-5ddc-47ec-9466-4dbf7e32380c",
           "width": 227,
           "x": 358,
           "y": 242,
@@ -3930,6 +3993,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "682a493f-de51-4f70-9051-0090881216d1",
           "width": 315,
           "x": 665,
           "y": 545,
@@ -3945,6 +4009,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "536f2fc4-3bcc-4448-8d14-50cf89e7f12c",
           "width": 586,
           "x": 114,
           "y": 165,
@@ -3960,6 +4025,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "bfe9ef93-64d6-4cd0-aab6-5264f2763f2b",
           "width": 586,
           "x": 647,
           "y": 855,
@@ -3975,6 +4041,7 @@
           "layer": "",
           "locked": false,
           "name": "Obstacle",
+          "persistentUuid": "a1dbd2fa-aee6-42ac-80f3-ede0feba94b8",
           "width": 206,
           "x": 1150,
           "y": 680,
@@ -14480,6 +14547,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -14497,6 +14569,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UI",
           "visibility": true,
           "cameras": [],

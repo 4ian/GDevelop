@@ -1,64 +1,61 @@
+// @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
-import Add from 'material-ui/svg-icons/content/add';
-import Delete from 'material-ui/svg-icons/action/delete';
-import IconButton from 'material-ui/IconButton';
+import TextField from '../UI/TextField';
+import Add from '@material-ui/icons/Add';
+import Delete from '@material-ui/icons/Delete';
+import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import MiniToolbar from '../UI/MiniToolbar';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import { isNullPtr } from '../Utils/IsNullPtr';
-const gd = global.gd;
+import Window from '../Utils/Window';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { getBehaviorTutorialHints } from '../Hints';
+import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
+import { ColumnStackLayout } from '../UI/Layout';
+const gd: libGDevelop = global.gd;
 
-const styles = {
-  addBehaviorLine: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  addBehaviorText: {
-    justifyContent: 'flex-end',
-  },
-  behaviorTitle: {
-    flex: 1,
-  },
-  behaviorTools: {
-    flexShrink: 0,
-  },
-};
 const AddBehaviorLine = ({ onAdd }) => (
-  <div style={styles.addBehaviorLine}>
-    <EmptyMessage style={styles.addBehaviorText}>
-      Click to add a behavior to the object:
-    </EmptyMessage>
-    <IconButton onClick={onAdd}>
-      <Add />
-    </IconButton>
-  </div>
+  <Column>
+    <Line justifyContent="flex-end" expand>
+      <RaisedButton
+        label={<Trans>Add a behavior to the object</Trans>}
+        primary
+        onClick={onAdd}
+        icon={<Add />}
+      />
+    </Line>
+  </Column>
 );
 
-export default class BehaviorsEditor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { newBehaviorDialogOpen: false };
-  }
+type Props = {|
+  project: gdProject,
+  object: gdObject,
+  onUpdateBehaviorsSharedData: () => void,
+  onSizeUpdated?: ?() => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+|};
 
-  componentWillMount() {
-    this._loadFrom(this.props.object);
-  }
+type State = {|
+  newBehaviorDialogOpen: boolean,
+|};
 
-  componentWillReceiveProps(newProps) {
-    if (this.props.object !== newProps.object) {
-      this._loadFrom(newProps.object);
-    }
-  }
-
-  _loadFrom(object) {
-    if (!object) return;
-  }
+export default class BehaviorsEditor extends Component<Props, State> {
+  state = { newBehaviorDialogOpen: false };
 
   chooseNewBehavior = () => {
     this.setState({
@@ -66,7 +63,7 @@ export default class BehaviorsEditor extends Component {
     });
   };
 
-  _hasBehaviorWithType = type => {
+  _hasBehaviorWithType = (type: string) => {
     const { object } = this.props;
     const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
 
@@ -76,7 +73,7 @@ export default class BehaviorsEditor extends Component {
       .filter(behaviorType => behaviorType === type).length;
   };
 
-  addBehavior = (type, defaultName) => {
+  addBehavior = (type: string, defaultName: string) => {
     const { object, project } = this.props;
 
     this.setState(
@@ -85,8 +82,7 @@ export default class BehaviorsEditor extends Component {
       },
       () => {
         if (this._hasBehaviorWithType(type)) {
-          //eslint-disable-next-line
-          const answer = confirm(
+          const answer = Window.showConfirmDialog(
             "There is already a behavior of this type attached to the object. It's possible to add again this behavior but it's unusual and may not be always supported properly. Are you sure you want to add again this behavior?"
           );
 
@@ -100,11 +96,15 @@ export default class BehaviorsEditor extends Component {
 
         this.forceUpdate();
         if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        this.props.onUpdateBehaviorsSharedData();
       }
     );
   };
 
-  _onChangeBehaviorName = (behaviorContent, newName) => {
+  _onChangeBehaviorName = (
+    behaviorContent: gdBehaviorContent,
+    newName: string
+  ) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -118,10 +118,9 @@ export default class BehaviorsEditor extends Component {
     this.forceUpdate();
   };
 
-  _onRemoveBehavior = behaviorName => {
+  _onRemoveBehavior = (behaviorName: string) => {
     const { object } = this.props;
-    //eslint-disable-next-line
-    const answer = confirm(
+    const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this behavior? This can't be undone."
     );
 
@@ -141,71 +140,87 @@ export default class BehaviorsEditor extends Component {
         {allBehaviorNames
           .map((behaviorName, index) => {
             const behaviorContent = object.getBehavior(behaviorName);
-            const behavior = gd.JsPlatform.get().getBehavior(
-              behaviorContent.getTypeName()
-            );
+            const behaviorTypeName = behaviorContent.getTypeName();
+            const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
             if (isNullPtr(gd, behavior)) {
               return (
                 <div key={index}>
                   <MiniToolbar>
-                    <span style={styles.behaviorTitle}>
+                    <MiniToolbarText>
                       <Trans>Unknown behavior</Trans>{' '}
-                      <TextField value={behaviorName} disabled />
-                    </span>
-                    <span style={styles.behaviorTools}>
-                      <IconButton
-                        onClick={() => this._onRemoveBehavior(behaviorName)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </span>
+                    </MiniToolbarText>
+                    <Column noMargin expand>
+                      <TextField margin="none" value={behaviorName} disabled />
+                    </Column>
+                    <IconButton
+                      onClick={() => this._onRemoveBehavior(behaviorName)}
+                    >
+                      <Delete />
+                    </IconButton>
                   </MiniToolbar>
                   <EmptyMessage>
-                    This behavior is unknown. It might be a behavior that was
-                    defined in an extension and that was later removed. You
-                    should delete it.
+                    <Trans>
+                      This behavior is unknown. It might be a behavior that was
+                      defined in an extension and that was later removed. You
+                      should delete it.
+                    </Trans>
                   </EmptyMessage>
                 </div>
               );
             }
 
             const BehaviorComponent = BehaviorsEditorService.getEditor(
-              behaviorContent.getTypeName()
+              behaviorTypeName
             );
+            const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
 
             return (
               <div key={index}>
                 <MiniToolbar>
-                  <span style={styles.behaviorTitle}>
+                  <MiniToolbarText>
                     <Trans>Behavior</Trans>{' '}
+                  </MiniToolbarText>
+                  <Column noMargin expand>
                     <TextField
                       value={behaviorName}
-                      hintText={<Trans>Behavior name</Trans>}
+                      hintText={t`Behavior name`}
+                      margin="none"
+                      fullWidth
                       disabled
                       onChange={(e, text) =>
                         this._onChangeBehaviorName(behaviorContent, text)
                       }
                     />
-                  </span>
-                  <span style={styles.behaviorTools}>
-                    <IconButton
-                      onClick={() => this._onRemoveBehavior(behaviorName)}
-                    >
-                      <Delete />
-                    </IconButton>
-                    <HelpIcon
-                      helpPagePath={getBehaviorHelpPagePath(behavior)}
-                    />
-                  </span>
+                  </Column>
+                  <IconButton
+                    onClick={() => this._onRemoveBehavior(behaviorName)}
+                  >
+                    <Delete />
+                  </IconButton>
+                  <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
                 </MiniToolbar>
-                <BehaviorComponent
-                  behavior={behavior}
-                  behaviorContent={behaviorContent}
-                  project={project}
-                  resourceSources={this.props.resourceSources}
-                  onChooseResource={this.props.onChooseResource}
-                  resourceExternalEditors={this.props.resourceExternalEditors}
-                />
+                {tutorialHints.length ? (
+                  <Line>
+                    <ColumnStackLayout expand>
+                      {tutorialHints.map(tutorialHint => (
+                        <DismissableTutorialMessage
+                          key={tutorialHint.identifier}
+                          tutorialHint={tutorialHint}
+                        />
+                      ))}
+                    </ColumnStackLayout>
+                  </Line>
+                ) : null}
+                <Line>
+                  <BehaviorComponent
+                    behavior={behavior}
+                    behaviorContent={behaviorContent}
+                    project={project}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
+                  />
+                </Line>
               </div>
             );
           })

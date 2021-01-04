@@ -1,61 +1,71 @@
-module.exports = function(grunt) {
-  var emscriptenPath = process.env.EMSCRIPTEN;
-  var emscriptenMemoryProfiler = emscriptenPath + '/src/memoryprofiler.js';
-  var cmakeToolchainpath =
-    emscriptenPath + '/cmake/Modules/Platform/Emscripten.cmake';
-  var buildOutputPath = '../Binaries/Output/libGD.js/Release/';
-  var buildPath = '../Binaries/embuild';
+// TODO: This could be rewritten as one (or more) pure Node.js script(s)
+// without Grunt, and called from package.json.
+module.exports = function (grunt) {
+  const fs = require('fs');
+  const path = require('path');
+  const isWin = /^win/.test(process.platform);
+  const isDev = grunt.option('dev') || false;
+  const useMinGW = grunt.option('use-MinGW') || false;
 
-  var isWin = /^win/.test(process.platform);
-  var cmakeBinary = isWin
-    ? '"C:\\Program Files (x86)\\CMake\\bin\\cmake"'
-    : 'emconfigure cmake';
-  var cmakeArgs = isWin ? '-G "MinGW Makefiles"' : '';
+  const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
+  const buildPath = '../Binaries/embuild';
 
-  var makeBinary = isWin ? 'mingw32-make' : 'emmake make';
+  let cmakeBinary = 'emconfigure cmake';
+  let cmakeGeneratorArgs = [];
+  let makeBinary = 'emmake make';
+  let makeArgs = ['-j 4'];
 
-  //Sanity checks
-  var fs = require('fs');
-  if (!process.env.EMSCRIPTEN) {
-    console.error('🔴 EMSCRIPTEN env. variable is not set');
-    console.log(
-      '⚠️ Please set Emscripten environment by launching `emsdk_env` script'
-    );
+  // Use more specific paths on Windows
+  if (isWin) {
+    let makeProgram = '';
+    if (useMinGW) {
+      // Use make from MinGW
+      if (!fs.existsSync('C:\\MinGW\\bin\\mingw32-make.exe')) {
+        console.error(
+          "🔴 Can't find mingw32-make in C:\\MinGW. Make sure MinGW is installed."
+        );
+        return;
+      }
+      const mingwBinary = 'C:\\MinGW\\bin\\mingw32-make';
+      cmakeGeneratorArgs = ['-G "MinGW Makefiles"'];
+      makeProgram = mingwBinary;
+    } else {
+      // Use Ninja (by default)
+      const ninjaBinary = path.join(__dirname, 'ninja', 'ninja.exe');
+      cmakeGeneratorArgs = [
+        '-G "Ninja"',
+        `-DCMAKE_MAKE_PROGRAM="${ninjaBinary}"`,
+      ];
+      makeProgram = ninjaBinary;
+    }
+
+    makeBinary = `emmake "${makeProgram}"`;
+    makeArgs = [];
+
+    // Find CMake in usual folders or fallback to PATH.
+    if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
+      cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
+    } else if (
+      fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake.exe')
+    ) {
+      cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
+    } else {
+      console.log(
+        "⚠️ Can't find CMake in its usual Program Files folder. Make sure you have cmake in your PATH instead."
+      );
+    }
   }
-  if (!fs.existsSync(emscriptenMemoryProfiler)) {
-    console.error(
-      '🔴 Unable to find memoryprofiler.js inside Emscripten sources'
-    );
-    console.log(
-      "⚠️ Building with profiler (build:with-profiler task) won't work"
-    );
+
+  // Clean alternative artifacts
+  if (isDev) {
+    if (fs.existsSync(path.join(buildOutputPath, 'libGD.js.mem')))
+      fs.unlinkSync(path.join(buildOutputPath, 'libGD.js.mem'));
+  } else {
+    if (fs.existsSync(path.join(buildOutputPath, 'libGD.wasm')))
+      fs.unlinkSync(path.join(buildOutputPath, 'libGD.wasm'));
   }
 
   grunt.initConfig({
-    concat: {
-      options: {
-        separator: ';',
-      },
-      'without-profiler': {
-        src: [
-          'Bindings/prejs.js',
-          buildOutputPath + 'libGD.raw.js',
-          'Bindings/glue.js',
-          'Bindings/postjs.js',
-        ],
-        dest: buildOutputPath + 'libGD.js',
-      },
-      'with-profiler': {
-        src: [
-          'Bindings/prejs.js',
-          buildOutputPath + 'libGD.raw.js',
-          'Bindings/glue.js',
-          emscriptenMemoryProfiler,
-          'Bindings/postjs.js',
-        ],
-        dest: buildOutputPath + 'libGD.js',
-      },
-    },
     mkdir: {
       embuild: {
         options: {
@@ -64,14 +74,23 @@ module.exports = function(grunt) {
       },
     },
     shell: {
-      //Launch CMake if needed
+      // Launch CMake if needed
       cmake: {
         src: [buildPath + '/CMakeCache.txt', 'CMakeLists.txt'],
         command:
           cmakeBinary +
           ' ' +
-          cmakeArgs +
-          ' ../.. -DFULL_VERSION_NUMBER=FALSE',
+          [
+            ...cmakeGeneratorArgs,
+            '../..',
+            '-DFULL_VERSION_NUMBER=FALSE',
+            // Use wasm for faster builds in development.
+            isDev ? '-DUSE_WASM=TRUE' : '-DUSE_WASM=FALSE',
+            // Disable link time optimizations for slightly faster build time.
+            isDev
+              ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'
+              : '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=FALSE',
+          ].join(' '),
         options: {
           execOptions: {
             cwd: buildPath,
@@ -80,14 +99,14 @@ module.exports = function(grunt) {
           },
         },
       },
-      //Generate glue.cpp and glue.js file using Bindings.idl, and patch them
+      // Generate glue.cpp and glue.js file using Bindings.idl, and patch them
       updateGDBindings: {
         src: 'Bindings/Bindings.idl',
         command: 'node update-bindings.js',
       },
-      //Compile GDevelop with emscripten
+      // Compile GDevelop with emscripten
       make: {
-        command: makeBinary + ' -j 4',
+        command: makeBinary + ' ' + makeArgs.join(' '),
         options: {
           execOptions: {
             cwd: buildPath,
@@ -95,47 +114,33 @@ module.exports = function(grunt) {
           },
         },
       },
-    },
-    uglify: {
-      build: {
-        files: [
-          {
-            src: [buildOutputPath + 'libGD.js'],
-            dest: buildOutputPath + 'libGD.min.js',
+      // Copy the library to newIDE
+      copyToNewIDE: {
+        command: 'node scripts/copy-to-newIDE.js',
+        options: {
+          execOptions: {
+            cwd: __dirname,
           },
-        ],
+        },
+      },
+      // Copy the library to newIDE
+      generateTypes: {
+        command: 'node scripts/generate-types.js',
+        options: {
+          execOptions: {
+            cwd: __dirname,
+          },
+        },
       },
     },
     clean: {
       options: { force: true },
       build: {
-        src: [buildOutputPath + 'libGD.js', buildOutputPath + 'libGD.min.js'],
-      },
-    },
-    compress: {
-      main: {
-        options: {
-          mode: 'gzip',
-        },
-        files: [
-          {
-            expand: true,
-            src: [buildOutputPath + '/libGD.js'],
-            dest: '.',
-            ext: '.js.gz',
-          },
-        ],
-      },
-    },
-    copy: {
-      newIDE: {
-        files: [
-          {
-            expand: true,
-            src: [buildOutputPath + '/libGD.js'],
-            dest: '../newIDE/app/public',
-            flatten: true,
-          },
+        src: [
+          buildPath,
+          buildOutputPath + 'libGD.js',
+          buildOutputPath + 'libGD.js.mem',
+          buildOutputPath + 'libGD.wasm',
         ],
       },
     },
@@ -143,30 +148,19 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-string-replace');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-mkdir');
   grunt.registerTask('build:raw', [
-    'clean',
     'mkdir:embuild',
-    'newer:shell:cmake',
+    'shell:cmake',
     'newer:shell:updateGDBindings',
     'shell:make',
   ]);
   grunt.registerTask('build', [
     'build:raw',
-    'concat:without-profiler',
-    'compress',
-    'copy:newIDE',
-  ]);
-  grunt.registerTask('build:with-profiler', [
-    'build:raw',
-    'concat:with-profiler',
-    'compress',
-    'copy:newIDE',
+    'shell:copyToNewIDE',
+    'shell:generateTypes',
   ]);
 };

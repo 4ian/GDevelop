@@ -63,7 +63,7 @@ Layout::Layout()
 
 void Layout::SetName(const gd::String& name_) {
   name = name_;
-  mangledName = gd::SceneNameMangler::GetMangledSceneName(name);
+  mangledName = gd::SceneNameMangler::Get()->GetMangledSceneName(name);
 };
 
 bool Layout::HasBehaviorSharedData(const gd::String& behaviorName) {

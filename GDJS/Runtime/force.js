@@ -120,6 +120,7 @@ gdjs.Force.prototype.getLength = function() {
 
 /**
  * Return 1 (true) if the force is permanent, 0 (false) if it is instant.
+ * @returns {number}
  */
 gdjs.Force.prototype.getMultiplier = function() {
 	return this._multiplier;

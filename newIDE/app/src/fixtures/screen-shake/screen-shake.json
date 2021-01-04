@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.screenshake",
-    "projectFile": "G:\\Games\\Screen Shake\\ScreenShake.json",
+    "projectUuid": "1b6a2366-de2b-4f73-aaf2-85dd542ef8cb",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Screen Shake Example",
     "author": "Zat",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -111,7 +109,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_stand.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_stand.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_stand.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_jump.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_jump.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_jump.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_walk03.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_walk03.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk03.png",
@@ -138,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_walk04.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_walk04.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk04.png",
@@ -147,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_walk05.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_walk05.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk05.png",
@@ -156,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_walk06.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_walk06.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk06.png",
@@ -165,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/p1_walk07.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/p1_walk07.png",
         "kind": "image",
         "metadata": "",
         "name": "p1_walk07.png",
@@ -174,7 +172,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/grassHalfMid.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/grassHalfMid.png",
         "kind": "image",
         "metadata": "",
         "name": "grassHalfMid.png",
@@ -183,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/bridgeLogs.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/bridgeLogs.png",
         "kind": "image",
         "metadata": "",
         "name": "bridgeLogs.png",
@@ -192,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/PlayerArea.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/PlayerArea.png",
         "kind": "image",
         "metadata": "",
         "name": "PlayerArea.png",
@@ -201,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/bush.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/bush.png",
         "kind": "image",
         "metadata": "",
         "name": "bush.png",
@@ -210,7 +208,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/cactus.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/cactus.png",
         "kind": "image",
         "metadata": "",
         "name": "cactus.png",
@@ -219,7 +217,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/plant.png",
+        "file": "https://resources.gdevelop-app.com/examples/screen-shake/plant.png",
         "kind": "image",
         "metadata": "",
         "name": "plant.png",
@@ -287,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "b17a8412-e0d5-4656-9470-e6481161c7b4",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -302,6 +301,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "a8c85be6-072e-4f24-9914-0d237b042833",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -317,6 +317,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0ec3567c-a8fc-4296-a263-c89c77960676",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -332,6 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "bbf234d0-5a9c-46ab-b501-1785e8727a91",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -347,6 +349,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "b194775a-12c0-425b-aadb-b761117d738d",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -362,6 +365,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "0e7023c6-fc85-4af3-96e5-d25790773583",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -377,6 +381,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "b4511c64-5888-45ff-bc99-46ec972b8255",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -397,6 +402,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "387e2967-344a-4b1c-bec9-186921887eb6",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -412,6 +418,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "101f8fef-505d-462f-872b-a009d116efa4",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -432,6 +439,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "3aa1b25f-1006-4388-9c98-f9110ebedb3b",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1637,6 +1645,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1654,6 +1667,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [
@@ -1690,7 +1708,7 @@
   "externalEvents": [
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383154438,
+      "lastChangeTimeStamp": 1383154432,
       "name": "EnemiesManagement",
       "events": [
         {
@@ -2000,7 +2018,7 @@
                       },
                       "parameters": [
                         "",
-                        "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/jump.wav",
+                        "https://resources.gdevelop-app.com/examples/screen-shake/jump.wav",
                         "",
                         "",
                         ""
@@ -2179,7 +2197,7 @@
     },
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383151997,
+      "lastChangeTimeStamp": 1383152000,
       "name": "ObjectsManagement",
       "events": [
         {
@@ -2195,7 +2213,7 @@
               },
               "parameters": [
                 "",
-                "https://df5lqcdudryde.cloudfront.net/examples/screen-shake/coin.wav",
+                "https://resources.gdevelop-app.com/examples/screen-shake/coin.wav",
                 "",
                 "",
                 ""
@@ -2237,7 +2255,7 @@
     },
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383151997,
+      "lastChangeTimeStamp": 1383152000,
       "name": "GUIManagement",
       "events": [
         {

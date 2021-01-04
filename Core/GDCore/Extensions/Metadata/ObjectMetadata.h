@@ -108,13 +108,13 @@ class GD_CORE_API ObjectMetadata {
   ObjectMetadata& SetDescription(const gd::String& description_);
 
   /**
-   * Get the help path of the object, relative to the documentation root.
+   * Get the help path of the object, relative to the GDevelop documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the object, relative to the documentation root.
-   * 
+   * Set the help path of the object, relative to the GDevelop documentation root.
+   *
    * The object instructions will have this help path set by
    * default, unless you call SetHelpPath on them.
    */

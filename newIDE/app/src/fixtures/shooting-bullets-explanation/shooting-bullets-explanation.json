@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shooting-bullets-explanation\\shooting-bullets-explanation.json",
+    "projectUuid": "5935ef21-e6be-42f4-8aab-724d02048d9e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Basic explanation about shooting bullets",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -108,7 +106,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/Bullet.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/Bullet.png",
         "kind": "image",
         "metadata": "",
         "name": "Tir.png",
@@ -117,7 +115,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/tank1fr1.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/tank1fr1.png",
         "kind": "image",
         "metadata": "",
         "name": "tank1fr1.png",
@@ -126,7 +124,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/shooting-bullets-explanation/Pointer-Standard.png",
+        "file": "https://resources.gdevelop-app.com/examples/shooting-bullets-explanation/Pointer-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pointer-Standard.png",
@@ -176,6 +174,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "3458a491-0172-46e4-8ff4-f59843814e31",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -196,6 +195,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "4d8e19ba-2e10-4baf-9f3c-0f8d6d861496",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -519,6 +519,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -574,6 +579,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "b720cae1-c5c3-4ea1-9195-96396d94868f",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -594,6 +600,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "ebd6f39b-6581-4fb4-8ab8-2465f62f5518",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -614,6 +621,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "45be8aed-2d4a-4a27-b07f-ba4efdc4d49a",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -634,6 +642,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "6299af59-ccf9-4b32-a893-dc5cbe563481",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -983,6 +992,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

@@ -6,6 +6,7 @@
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
 #include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -16,12 +17,15 @@ namespace gd {
 /**
  * \brief Used to describe a property shown in a property grid.
  * \see gd::Object
+ * \see gd::EffectMetadata
  */
 class GD_CORE_API PropertyDescriptor {
  public:
   /**
    * \brief Create a property being a simple gd::String with the specified
-   * value. \param propertyValue The value of the property.
+   * value.
+   *
+   * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
       : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
@@ -65,6 +69,14 @@ class GD_CORE_API PropertyDescriptor {
   }
 
   /**
+   * \brief Change the description displayed to the user, if any.
+   */
+  PropertyDescriptor& SetDescription(gd::String description_) {
+    description = description_;
+    return *this;
+  }
+
+  /**
    * \brief Add an information about the property.
    * \note The information are arbitrary and are interpreted by the class
    * updating the property grid: Refer to it or to the documentation of the
@@ -79,6 +91,7 @@ class GD_CORE_API PropertyDescriptor {
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
+  const gd::String& GetDescription() const { return description; }
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
   }
@@ -108,6 +121,16 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Unserialize the PropertyDescriptor.
    */
   virtual void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Serialize only the value and extra informations.
+   */
+  virtual void SerializeValuesTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize only the value and extra informations.
+   */
+  virtual void UnserializeValuesFrom(const SerializerElement& element);
   ///@}
 
  private:
@@ -115,7 +138,8 @@ class GD_CORE_API PropertyDescriptor {
   gd::String
       type;  ///< The type of the property. This is arbitrary and interpreted by
              ///< the class responsible for updating the property grid.
-  gd::String label;  //< The user-friendly property name
+  gd::String label;        //< The user-friendly property name
+  gd::String description;  //< The user-friendly property description
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available
                          ///< choices, if a property is a displayed as a combo

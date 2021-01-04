@@ -31,6 +31,7 @@ export default class JsonResourceField extends Component<
 
     return (
       <ResourceSelector
+        margin={this.props.isInline ? 'none' : 'dense'}
         project={this.props.project}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
@@ -41,6 +42,7 @@ export default class JsonResourceField extends Component<
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
         floatingLabelText={<Trans>Choose the json file to use</Trans>}
+        onRequestClose={this.props.onRequestClose}
         ref={field => (this._field = field)}
       />
     );

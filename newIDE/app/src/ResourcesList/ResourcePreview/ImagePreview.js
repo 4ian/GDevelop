@@ -1,14 +1,18 @@
 // @flow
+import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import { Column } from '../../UI/Grid';
 import MiniToolbar from '../../UI/MiniToolbar';
-import ZoomIn from 'material-ui/svg-icons/action/zoom-in';
-import ZoomOut from 'material-ui/svg-icons/action/zoom-out';
-import ZoomOutMap from 'material-ui/svg-icons/maps/zoom-out-map';
+import ZoomIn from '@material-ui/icons/ZoomIn';
+import ZoomOut from '@material-ui/icons/ZoomOut';
+import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
+import Text from '../../UI/Text';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -23,6 +27,12 @@ const styles = {
     overflow: 'scroll',
     height: 200,
     background: 'url("res/transparentback.png") repeat',
+
+    // The container contains the image and the "overlay" that can display
+    // points or polygons that can be drag'n'dropped. `touch-action` must
+    // be set to `none`, otherwise the (mobile) browser will claim the
+    // `pointermove` event for "native" behavior like panning the page.
+    touchAction: 'none',
   },
   spriteThumbnailImage: {
     position: 'relative',
@@ -44,7 +54,6 @@ type Props = {|
     imageHeight: number,
     imageZoomFactor: number,
   |}) => React.Node,
-  style?: Object,
   onSize?: (number, number) => void,
 |};
 
@@ -60,8 +69,6 @@ type State = {|
  * Display the preview for a resource of a project with kind "image".
  */
 export default class ImagePreview extends React.Component<Props, State> {
-  _container: ?HTMLDivElement = null;
-
   state = {
     errored: false,
     imageWidth: null,
@@ -85,7 +92,11 @@ export default class ImagePreview extends React.Component<Props, State> {
     const { project, resourceName, resourcesLoader } = props;
     return {
       errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
+      imageSource: resourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        {}
+      ),
     };
   }
 
@@ -126,10 +137,10 @@ export default class ImagePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <Measure>
-        {dimensions => {
-          const containerWidth = dimensions.width;
-          const { resourceName, style, renderOverlay } = this.props;
+      <Measure bounds>
+        {({ contentRect, measureRef }) => {
+          const containerWidth = contentRect.bounds.width;
+          const { resourceName, renderOverlay } = this.props;
           const {
             imageHeight,
             imageWidth,
@@ -137,7 +148,8 @@ export default class ImagePreview extends React.Component<Props, State> {
             imageZoomFactor,
           } = this.state;
 
-          const imageLoaded = !!imageWidth && !!imageHeight;
+          const imageLoaded =
+            !!imageWidth && !!imageHeight && !this.state.errored;
 
           const imagePositionTop = 0;
           const imagePositionLeft = Math.max(
@@ -170,40 +182,34 @@ export default class ImagePreview extends React.Component<Props, State> {
               <MiniToolbar>
                 <IconButton
                   onClick={() => this._zoomBy(+0.2)}
-                  tooltip={
-                    <Trans>Zoom in (you can also use Ctrl + Mouse wheel)</Trans>
-                  }
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
                 </IconButton>
                 <IconButton
                   onClick={() => this._zoomBy(-0.2)}
-                  tooltip={
-                    <Trans>
-                      Zoom out (you can also use Ctrl + Mouse wheel)
-                    </Trans>
-                  }
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
                 </IconButton>
                 <IconButton
                   onClick={() => this._zoomTo(1)}
-                  tooltip={<Trans>Restore original size</Trans>}
-                  tooltipPosition="bottom-right"
+                  tooltip={t`Restore original size`}
                 >
                   <ZoomOutMap />
                 </IconButton>
               </MiniToolbar>
               <div
-                style={{ ...styles.imagePreviewContainer, ...style }}
-                ref={container => (this._container = container)}
+                dir={
+                  'ltr' /* Force LTR layout to avoid issues with image positioning */
+                }
+                style={styles.imagePreviewContainer}
+                ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts
                   if (event.metaKey || event.ctrlKey) {
-                    this._zoomBy(deltaY / 500);
+                    this._zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();
                   } else {
@@ -212,18 +218,19 @@ export default class ImagePreview extends React.Component<Props, State> {
                 }}
               >
                 {!!this.state.errored && (
-                  <p>
-                    <Trans>Unable to load the image</Trans>
-                  </p>
+                  <PlaceholderMessage>
+                    <Text>
+                      <Trans>Unable to load the image</Trans>
+                    </Text>
+                  </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
-                  <img
+                  <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
                     src={imageSource}
                     onError={this._handleImageError}
                     onLoad={this._handleImageLoaded}
-                    crossOrigin="anonymous"
                   />
                 )}
                 {imageLoaded && renderOverlay && (

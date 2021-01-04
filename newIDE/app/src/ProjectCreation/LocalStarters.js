@@ -3,49 +3,47 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
-import Divider from 'material-ui/Divider';
-import RaisedButton from 'material-ui/RaisedButton';
+import Divider from '@material-ui/core/Divider';
+import RaisedButton from '../UI/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
+import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem } from '../UI/List';
+import Subheader from '../UI/Subheader';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { findEmptyPath } from './LocalPathFinder';
 import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import { findEmptyPath } from './LocalPathFinder';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 type Props = {|
-  onOpen: string => void,
-  onCreate: gdProject => void,
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
+  onCreate: (
+    gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void,
+  onChangeOutputPath: (outputPath: string) => void,
   onShowExamples: () => void,
-|};
-
-type State = {|
   outputPath: string,
 |};
 
+type State = {||};
+
 export default class LocalStarters extends Component<Props, State> {
-  state = {
-    outputPath: findEmptyPath(
-      path && app
-        ? path.join(app.getPath('documents'), 'GDevelop projects')
-        : ''
-    ),
-  };
-
-  _handleChangePath = (outputPath: string) =>
-    this.setState({
-      outputPath,
-    });
-
   createFromExample(i18n: I18nType, exampleName: string) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     findExamples(examplesPath => {
@@ -57,13 +55,15 @@ export default class LocalStarters extends Component<Props, State> {
         return;
       }
 
-      this.props.onOpen(path.join(outputPath, exampleName + '.json'));
+      this.props.onOpen(LocalFileStorageProvider, {
+        fileIdentifier: path.join(outputPath, exampleName + '.json'),
+      });
       sendNewGameCreated(exampleName);
     });
   }
 
   createEmptyGame(i18n: I18nType) {
-    const { outputPath } = this.state;
+    const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
     try {
@@ -73,10 +73,23 @@ export default class LocalStarters extends Component<Props, State> {
       return;
     }
 
-    const project = gd.ProjectHelper.createNewGDJSProject();
-    project.setProjectFile(path.join(outputPath, 'game.json'));
-    this.props.onCreate(project);
+    const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
+    const filePath = path.join(outputPath, 'game.json');
+    project.setProjectFile(filePath);
+    this.props.onCreate(project, LocalFileStorageProvider, {
+      fileIdentifier: filePath,
+    });
     sendNewGameCreated('');
+  }
+
+  componentDidMount() {
+    if (this.props.outputPath === '')
+      if (path && app)
+        this.props.onChangeOutputPath(
+          findEmptyPath(
+            path.join(app.getPath('documents'), 'GDevelop projects')
+          )
+        );
   }
 
   render() {
@@ -84,51 +97,58 @@ export default class LocalStarters extends Component<Props, State> {
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
+            <Line expand>
+              <Column expand>
+                <LocalFolderPicker
+                  fullWidth
+                  value={this.props.outputPath}
+                  onChange={this.props.onChangeOutputPath}
+                  type="create-game"
+                />
+              </Column>
+            </Line>
+            <Divider />
             <Line>
               <Column>
-                <p>
+                <Text>
                   <Trans>Choose a game to use as a starter:</Trans>
-                </p>
+                </Text>
               </Column>
             </Line>
             <Line>
               <Column expand noMargin>
                 <List>
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/platformer.png"
                       />
                     }
                     primaryText={<Trans>Platformer</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          A simple platform game, with coins to collect, moving
-                          platforms and enemies.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        A simple platform game, with coins to collect, moving
+                        platforms and enemies.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createFromExample(i18n, 'platformer')}
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/space-shooter.png"
                       />
                     }
                     primaryText={<Trans>8-bit Space Shooter</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          A beautiful, retro side-scrolling shooter where you
-                          must defeat incoming enemies with your mecha
-                          transforming spaceship. Huge boss included!
-                        </Trans>
-                      </p>
+                      <Trans>
+                        A beautiful, retro side-scrolling shooter where you must
+                        defeat incoming enemies with your mecha transforming
+                        spaceship. Huge boss included!
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -136,20 +156,38 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
+                        src="res/starters_icons/geometry-monster.png"
+                      />
+                    }
+                    primaryText={<Trans>Geometry Monster</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A hyper casual endless game where you have to collect
+                        shapes and avoid bombs, with a progressively increasing
+                        difficulty.
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'geometry-monster')
+                    }
+                  />
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
                         src="res/starters_icons/isometric-game.png"
                       />
                     }
                     primaryText={<Trans>Isometric game</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>
-                          An example of an isometric game where you can explore
-                          a map with your character.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        An example of an isometric game where you can explore a
+                        map with your character.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -157,20 +195,18 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/downhill-bike-physics-demo.png"
                       />
                     }
                     primaryText="Downhill Bike Racing"
                     secondaryText={
-                      <p>
-                        <Trans>
-                          An example of a 2D physics based driving game, where
-                          player have to reach the end as fast as possible.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        An example of a 2D physics based game, where players
+                        have to reach the end as fast as possible.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() =>
@@ -178,34 +214,79 @@ export default class LocalStarters extends Component<Props, State> {
                     }
                   />
                   <ListItem
-                    leftAvatar={
+                    leftIcon={
                       <ListIcon
-                        iconSize={32}
+                        iconSize={40}
                         src="res/starters_icons/pairs.png"
                       />
                     }
                     primaryText="Pairs"
                     secondaryText={
-                      <p>
-                        <Trans>
-                          Find all matching pairs of cards in this relaxing
-                          game. Use tweens to create smooth, natural animations
-                          with a few events.
-                        </Trans>
-                      </p>
+                      <Trans>
+                        Find all matching pairs of cards in this relaxing game.
+                        Use tweens to create smooth, natural animations with a
+                        few events.
+                      </Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createFromExample(i18n, 'pairs')}
                   />
                   <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/new.png"
+                      />
+                    }
                     primaryText={<Trans>Empty game</Trans>}
                     secondaryText={
-                      <p>
-                        <Trans>Start a new game from scratch.</Trans>
-                      </p>
+                      <Trans>Start a new game from scratch.</Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createEmptyGame(i18n)}
+                  />
+                  <Subheader>
+                    <Trans>Advanced</Trans>
+                  </Subheader>
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/particle-effects-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Particle Effects Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo of various high quality particle effects (fire,
+                        magic, snow, rune spell...) that you can try and use in
+                        your game.
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'particle-effects-demo')
+                    }
+                  />
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/game-feel-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Game Feel Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo showing how to enhance the "game feel" of your
+                        project: VFX, shot trail, ambient sounds and SFX,
+                        screenshake, wobble...
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'game-feel-demo')
+                    }
                   />
                 </List>
                 <Line alignItems="center" justifyContent="center">
@@ -214,17 +295,6 @@ export default class LocalStarters extends Component<Props, State> {
                     onClick={() => this.props.onShowExamples()}
                   />
                 </Line>
-              </Column>
-            </Line>
-            <Divider />
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.state.outputPath}
-                  onChange={this._handleChangePath}
-                  type="create-game"
-                />
               </Column>
             </Line>
           </Column>

@@ -1,6 +1,6 @@
 // @flow
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Tool function to save a serializable object to a JS object.
@@ -20,6 +20,26 @@ export function serializeToJSObject(
   serializedElement.delete();
 
   return object;
+}
+
+/**
+ * Tool function to save a serializable object to a JSON.
+ * Most gd.* objects are "serializable", meaning they have a serializeTo
+ * and unserializeFrom method.
+ *
+ * @param {*} serializable
+ * @param {*} methodName The name of the serialization method. "unserializeFrom" by default
+ */
+export function serializeToJSON(
+  serializable: gdSerializable,
+  methodName: string = 'serializeTo'
+): string {
+  const serializedElement = new gd.SerializerElement();
+  serializable[methodName](serializedElement);
+  const json = gd.Serializer.toJSON(serializedElement);
+  serializedElement.delete();
+
+  return json;
 }
 
 /**

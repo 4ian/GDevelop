@@ -1,148 +1,236 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
-import { List, ListItem } from 'material-ui/List';
-import RaisedButton from 'material-ui/RaisedButton';
+import { List, ListItem } from '../UI/List';
+import Subheader from '../UI/Subheader';
+import RaisedButton from '../UI/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
-const gd = global.gd;
+import Text from '../UI/Text';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
+const gd: libGDevelop = global.gd;
 
-export default class BrowserStarters extends Component {
+type Props = {|
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void,
+  onCreate: (
+    gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void,
+  onShowExamples: () => void,
+|};
+
+export default class BrowserStarters extends Component<Props> {
   render() {
     return (
       <Column noMargin>
         <Line>
           <Column>
-            <p>
+            <Text>
               <Trans>Choose a game to use as a starter:</Trans>
-            </p>
+            </Text>
           </Column>
         </Line>
         <Line>
           <Column expand noMargin>
             <List>
               <ListItem
-                leftAvatar={
+                leftIcon={
                   <ListIcon
-                    iconSize={32}
+                    iconSize={40}
                     src="res/starters_icons/platformer.png"
                   />
                 }
                 primaryText={<Trans>Platformer</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      A simple platform game, with coins to collect, moving
-                      platforms and enemies.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    A simple platform game, with coins to collect, moving
+                    platforms and enemies.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('platformer');
-                  this.props.onOpen('example://platformer');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://platformer',
+                  });
                 }}
               />
               <ListItem
-                leftAvatar={
+                leftIcon={
                   <ListIcon
-                    iconSize={32}
+                    iconSize={40}
                     src="res/starters_icons/space-shooter.png"
                   />
                 }
                 primaryText={<Trans>8-bit Space Shooter</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      A beautiful, retro side-scrolling shooter where you must
-                      defeat incoming enemies with your mecha transforming
-                      spaceship. Huge boss included!
-                    </Trans>
-                  </p>
+                  <Trans>
+                    A beautiful, retro side-scrolling shooter where you must
+                    defeat incoming enemies with your mecha transforming
+                    spaceship. Huge boss included!
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('space-shooter');
-                  this.props.onOpen('example://space-shooter');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://space-shooter',
+                  });
                 }}
               />
               <ListItem
-                leftAvatar={
+                leftIcon={
                   <ListIcon
-                    iconSize={32}
+                    iconSize={40}
+                    src="res/starters_icons/geometry-monster.png"
+                  />
+                }
+                primaryText={<Trans>Geometry Monster</Trans>}
+                secondaryText={
+                  <Trans>
+                    A hyper casual endless game where you have to collect shapes
+                    and avoid bombs, with a progressively increasing difficulty.
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('geometry-monster');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://geometry-monster',
+                  });
+                }}
+              />
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
                     src="res/starters_icons/isometric-game.png"
                   />
                 }
                 primaryText={<Trans>Isometric game</Trans>}
                 secondaryText={
-                  <p>
-                    <Trans>
-                      An example of an isometric game where you can explore a
-                      map with your character.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    An example of an isometric game where you can explore a map
+                    with your character.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('isometric-game');
-                  this.props.onOpen('example://isometric-game');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://isometric-game',
+                  });
                 }}
               />
               <ListItem
-                leftAvatar={
+                leftIcon={
                   <ListIcon
-                    iconSize={32}
+                    iconSize={40}
                     src="res/starters_icons/downhill-bike-physics-demo.png"
                   />
                 }
                 primaryText="Downhill Bike Racing"
                 secondaryText={
-                  <p>
-                    <Trans>
-                      An example of a 2D physics based driving game, where
-                      player have to reach the end as fast as possible.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    An example of a 2D physics based game, where players have to
+                    reach the end as fast as possible.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('downhill-bike-physics-demo');
-                  this.props.onOpen('example://downhill-bike-physics-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://downhill-bike-physics-demo',
+                  });
                 }}
               />
               <ListItem
-                leftAvatar={
-                  <ListIcon iconSize={32} src="res/starters_icons/pairs.png" />
+                leftIcon={
+                  <ListIcon iconSize={40} src="res/starters_icons/pairs.png" />
                 }
                 primaryText="Pairs"
                 secondaryText={
-                  <p>
-                    <Trans>
-                      Find all matching pairs of cards in this relaxing game.
-                      Use tweens to create smooth, natural animations with a few
-                      events.
-                    </Trans>
-                  </p>
+                  <Trans>
+                    Find all matching pairs of cards in this relaxing game. Use
+                    tweens to create smooth, natural animations with a few
+                    events.
+                  </Trans>
                 }
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('pairs');
-                  this.props.onOpen('example://pairs');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://pairs',
+                  });
                 }}
               />
               <ListItem
-                primaryText={<Trans>Empty game</Trans>}
-                secondaryText={
-                  <p>
-                    <Trans>Start a new game from scratch.</Trans>
-                  </p>
+                leftIcon={
+                  <ListIcon iconSize={40} src="res/starters_icons/new.png" />
                 }
+                primaryText={<Trans>Empty game</Trans>}
+                secondaryText={<Trans>Start a new game from scratch.</Trans>}
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('');
 
                   const project = gd.ProjectHelper.createNewGDJSProject();
-                  this.props.onCreate(project);
+                  this.props.onCreate(project, null, null);
+                }}
+              />
+              <Subheader>
+                <Trans>Advanced</Trans>
+              </Subheader>
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
+                    src="res/starters_icons/particle-effects-demo.png"
+                  />
+                }
+                primaryText={<Trans>Particle Effects Demo</Trans>}
+                secondaryText={
+                  <Trans>
+                    A demo of various high quality particle effects (fire,
+                    magic, snow, rune spell...) that you can try and use in your
+                    game.
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('particle-effects-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://particle-effects-demo',
+                  });
+                }}
+              />
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
+                    src="res/starters_icons/game-feel-demo.png"
+                  />
+                }
+                primaryText={<Trans>Game Feel Demo</Trans>}
+                secondaryText={
+                  <Trans>
+                    A demo showing how to enhance the "game feel" of your
+                    project: VFX, shot trail, ambient sounds and SFX,
+                    screenshake, wobble...
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('game-feel-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://game-feel-demo',
+                  });
                 }}
               />
             </List>

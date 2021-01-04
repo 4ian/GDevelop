@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PlaneAndClouds\\game.json",
+    "projectUuid": "c025eff8-ddca-40d9-a070-469499a36aaf",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/Plane.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/Plane.png",
         "kind": "image",
         "metadata": "",
         "name": "Plane.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudA.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudA.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudA.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudB.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudB.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudB.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/CloudC.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/CloudC.png",
         "kind": "image",
         "metadata": "",
         "name": "CloudC.png",
@@ -138,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/plane-and-clouds/Smoke.png",
+        "file": "https://resources.gdevelop-app.com/examples/plane-and-clouds/Smoke.png",
         "kind": "image",
         "metadata": "",
         "name": "Smoke.png",
@@ -188,6 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
+          "persistentUuid": "2f2681fb-f98d-4ace-ace7-ca785f16cb6e",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -203,6 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "09941112-c413-4a82-b2a2-88f1fd4ce62f",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -223,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "54c6ea7a-ce2d-41b8-b1ae-053414da8407",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -243,6 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "7be2a22e-a9b1-4c9d-b740-1d0aa5d1f16a",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -258,6 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "f59fc332-8d66-490e-8379-3541602b9d0f",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -1555,6 +1558,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1572,6 +1580,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

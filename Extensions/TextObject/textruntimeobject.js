@@ -4,50 +4,155 @@
  */
 
 /**
- * Displays a text on the screen.
+ * @typedef {Object} TextObjectDataType Base parameters for gdjs.TextRuntimeObject
+ * @property {number} characterSize The size of the characters
+ * @property {string} font The font name
+ * @property {boolean} bold Is Bold?
+ * @property {boolean} italic Is Italic?
+ * @property {boolean} underlined Is Underlined?
+ * @property {Object} color The text color in an RGB representation
+ * @property {number} color.r The Red level from 0 to 255
+ * @property {number} color.g The Green level from 0 to 255
+ * @property {number} color.b The Blue level from 0 to 255
+ * @property {string} string The text of the object
+ */
+
+/**
+ * @typedef {ObjectData & TextObjectDataType} TextObjectData
+ */
+
+/**
+ * Displays a text.
  *
  * @memberof gdjs
  * @class TextRuntimeObject
  * @extends RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The {@link gdjs.RuntimeScene} the object belongs to
+ * @param {TextObjectData} textObjectData The initial properties of the object
  */
-gdjs.TextRuntimeObject = function(runtimeScene, objectData)
+gdjs.TextRuntimeObject = function(runtimeScene, textObjectData)
 {
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    gdjs.RuntimeObject.call(this, runtimeScene, textObjectData);
 
-    this._characterSize = objectData.characterSize;
-    this._fontName = objectData.font;
-    this._bold = objectData.bold;
-    this._italic = objectData.italic;
-    this._underlined = objectData.underlined;
-    this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    /** @type {number} */
+    this._characterSize = Math.max(1, textObjectData.characterSize);
+
+    /** @type {string} */
+    this._fontName = textObjectData.font;
+
+    /** @type {boolean} */
+    this._bold = textObjectData.bold;
+
+    /** @type {boolean} */
+    this._italic = textObjectData.italic;
+
+    /** @type {boolean} */
+    this._underlined = textObjectData.underlined;
+
+    /** @type {Array<number>} */
+    this._color = [textObjectData.color.r, textObjectData.color.g, textObjectData.color.b];
+
+    /** @type {boolean} */
     this._useGradient = false;
+
+    /** @type {Array} */
     this._gradient = [];
+
+    /** @type {string} */
     this._gradientType = '';
+
+    /** @type {number} */
     this.opacity = 255;
+
+    /** @type {string} */
     this._textAlign = 'left';
+
+    /** @type {boolean} */
     this._wrapping = false;
+
+    /** @type {number} */
     this._wrappingWidth = 1;
+
+    /** @type {number} */
     this._outlineThickness = 0;
+
+    /** @type {Array<number>} */
     this._outlineColor = [255,255,255];
+
+    /** @type {boolean} */
     this._shadow = false;
+
+    /** @type {Array<number>} */
     this._shadowColor = [0,0,0];
+
+    /** @type {number} */
     this._shadowDistance = 1;
+
+    /** @type {number} */
     this._shadowBlur = 1;
+
+    /** @type {number} */
     this._shadowAngle = 0;
+
+    /** @type {number} */
     this._padding = 5;
+
+    /** @type {number} */
     this._scaleX = 1;
+
+    /** @type {number} */
     this._scaleY = 1;
 
-    this._str = objectData.string;
+    /** @type {string} */
+    this._str = textObjectData.string;
 
     if (this._renderer)
         gdjs.TextRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
+        /** @type {gdjs.TextRuntimeObjectRenderer} */
         this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
+
+    // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+    this.onCreated();
 };
 
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
-gdjs.TextRuntimeObject.thisIsARuntimeObjectConstructor = "TextObject::Text";
+gdjs.registerObject("TextObject::Text", gdjs.TextRuntimeObject);
+
+/**
+ * @param {TextObjectData} oldObjectData
+ * @param {TextObjectData} newObjectData
+ */
+gdjs.TextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
+    if (oldObjectData.characterSize !== newObjectData.characterSize) {
+        this.setCharacterSize(newObjectData.characterSize);
+    }
+    if (oldObjectData.font !== newObjectData.font) {
+        this.setFontName(newObjectData.font);
+    }
+    if (oldObjectData.bold !== newObjectData.bold) {
+        this.setBold(newObjectData.bold);
+    }
+    if (oldObjectData.italic !== newObjectData.italic) {
+        this.setItalic(newObjectData.italic);
+    }
+    if (oldObjectData.color.r !== newObjectData.color.r ||
+        oldObjectData.color.g !== newObjectData.color.g ||
+        oldObjectData.color.b !== newObjectData.color.b) {
+        this.setColor('' + newObjectData.color.r + ';' + newObjectData.color.g +
+            ';' + newObjectData.color.b);
+    }
+    if (oldObjectData.string !== newObjectData.string) {
+        this.setString(newObjectData.string);
+    }
+
+    if (oldObjectData.underlined !== newObjectData.underlined) {
+        return false;
+    }
+
+    return true;
+};
+
 
 gdjs.TextRuntimeObject.prototype.getRendererObject = function() {
     return this._renderer.getRendererObject();
@@ -65,6 +170,8 @@ gdjs.TextRuntimeObject.prototype.extraInitializationFromInitialInstance = functi
     if ( initialInstanceData.customSize ) {
         this.setWrapping(true);
         this.setWrappingWidth(initialInstanceData.width);
+    } else {
+        this.setWrapping(false);
     }
 };
 
@@ -129,7 +236,7 @@ gdjs.TextRuntimeObject.prototype.getString = function() {
 
 /**
  * Set the string displayed by the object.
- * @param {String} str The new text
+ * @param {string} str The new text
  */
 gdjs.TextRuntimeObject.prototype.setString = function(str) {
     if ( str === this._str ) return;
@@ -157,6 +264,15 @@ gdjs.TextRuntimeObject.prototype.setCharacterSize = function(newSize) {
 };
 
 /**
+ * Set the name of the resource to use for the font.
+ * @param {string} fontResourceName The name of the font resource.
+ */
+gdjs.TextRuntimeObject.prototype.setFontName = function(fontResourceName) {
+    this._fontName = fontResourceName;
+    this._renderer.updateStyle();
+};
+
+/**
  * Return true if the text is bold.
  */
 gdjs.TextRuntimeObject.prototype.isBold = function() {
@@ -165,7 +281,7 @@ gdjs.TextRuntimeObject.prototype.isBold = function() {
 
 /**
  * Set bold for the object text.
- * @param enable {Boolean} true to have a bold text, false otherwise.
+ * @param enable {boolean} true to have a bold text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setBold = function(enable) {
     this._bold = enable;
@@ -181,7 +297,7 @@ gdjs.TextRuntimeObject.prototype.isItalic = function() {
 
 /**
  * Set italic for the object text.
- * @param enable {Boolean} true to have an italic text, false otherwise.
+ * @param enable {boolean} true to have an italic text, false otherwise.
  */
 gdjs.TextRuntimeObject.prototype.setItalic = function(enable) {
     this._italic = enable;
@@ -206,7 +322,7 @@ gdjs.TextRuntimeObject.prototype.getHeight = function() {
  * Get scale of the text.
  */
 gdjs.TextRuntimeObject.prototype.getScale = function() {
-    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0; 
+    return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
 };
 
 /**
@@ -270,7 +386,7 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
 
 /**
  * Get the text color.
- * @return {String} The color as a "R;G;B" string, for example: "255;0;0"
+ * @return {string} The color as a "R;G;B" string, for example: "255;0;0"
  */
 gdjs.TextRuntimeObject.prototype.getColor = function(str) {
     return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
@@ -302,7 +418,7 @@ gdjs.TextRuntimeObject.prototype.isWrapping = function() {
 
 /**
  * Set word wrapping for the object text.
- * @param {Boolean} enable true to enable word wrapping, false to disable it.
+ * @param {boolean} enable true to enable word wrapping, false to disable it.
  */
 gdjs.TextRuntimeObject.prototype.setWrapping = function(enable) {
     this._wrapping = enable;
@@ -413,7 +529,7 @@ gdjs.TextRuntimeObject.prototype.setGradient = function(strGradientType, strFirs
 
     this._gradientType = strGradientType;
 
-    this._useGradient = (this._gradient.length > 1) ? true : false; 
+    this._useGradient = (this._gradient.length > 1) ? true : false;
 
     this._renderer.updateStyle();
 };

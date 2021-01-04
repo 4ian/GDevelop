@@ -1,17 +1,26 @@
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
- * 
- * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
- * to this extension file or to any other *.js file that you reference inside.
- * 
- * The file must be named "JsExtension.js", otherwise GDevelop won't load it. 
+ *
+ * ℹ️ Changes in this file are watched and automatically imported if the editor
+ * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).
+ *
+ * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
  * and search for any errors.
- * 
+ *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "DeviceSensors",
@@ -48,7 +57,7 @@ module.exports = {
         _(
           "Compare the value of orientation alpha. (Range: 0 to 360°)"
         ),
-        _("Orientation alpha is _PARAM0__PARAM1_"),
+        _("the orientation alpha"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_alpha24.png",
         "JsPlatform/Extensions/orientation_alpha32.png"
@@ -68,7 +77,7 @@ module.exports = {
         _(
           "Compare the value of orientation beta. (Range: -180 to 180°)"
         ),
-        _("Orientation beta is _PARAM0__PARAM1_"),
+        _("the orientation beta"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_beta24.png",
         "JsPlatform/Extensions/orientation_beta32.png"
@@ -88,7 +97,7 @@ module.exports = {
         _(
           "Compare the value of orientation gamma. (Range: -90 to 90°)"
         ),
-        _("Orientation gamma is _PARAM0__PARAM1_"),
+        _("the orientation gamma"),
         _("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_gamma24.png",
         "JsPlatform/Extensions/orientation_gamma32.png"
@@ -214,7 +223,7 @@ module.exports = {
         _(
           "Compare the value of rotation alpha. (Note: few devices support this sensor)"
         ),
-        _("Rotation alpha is _PARAM0__PARAM1_"),
+        _("the rotation alpha"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_alpha24.png",
         "JsPlatform/Extensions/motion_rotation_alpha32.png"
@@ -234,7 +243,7 @@ module.exports = {
         _(
           "Compare the value of rotation beta. (Note: few devices support this sensor)"
         ),
-        _("Rotation beta is _PARAM0__PARAM1_"),
+        _("the rotation beta"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_beta24.png",
         "JsPlatform/Extensions/motion_rotation_beta32.png"
@@ -254,7 +263,7 @@ module.exports = {
         _(
           "Compare the value of rotation gamma. (Note: few devices support this sensor)"
         ),
-        _("Rotation gamma is _PARAM0__PARAM1_"),
+        _("the rotation gamma"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_rotation_gamma24.png",
         "JsPlatform/Extensions/motion_rotation_gamma32.png"
@@ -274,7 +283,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the X-axis (m/s²)."
         ),
-        _("Acceleration X is _PARAM0__PARAM1_"),
+        _("the acceleration X"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_x24.png",
         "JsPlatform/Extensions/motion_acceleration_x32.png"
@@ -294,7 +303,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the Y-axis (m/s²)."
         ),
-        _("Acceleration Y is _PARAM0__PARAM1_"),
+        _("the acceleration Y"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_y24.png",
         "JsPlatform/Extensions/motion_acceleration_y32.png"
@@ -314,7 +323,7 @@ module.exports = {
         _(
           "Compare the value of acceleration on the Z-axis (m/s²)."
         ),
-        _("Acceleration Z is _PARAM0__PARAM1_"),
+        _("the acceleration Z"),
         _("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_z24.png",
         "JsPlatform/Extensions/motion_acceleration_z32.png"
@@ -445,5 +454,5 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd, extension) { return []; },
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) { return []; },
 };

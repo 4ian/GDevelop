@@ -1,7 +1,7 @@
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
-import AddCircle from 'material-ui/svg-icons/content/add-circle';
-import IconButton from 'material-ui/IconButton';
+import { TableRow, TableRowColumn } from '../../../../UI/Table';
+import AddCircle from '@material-ui/icons/AddCircle';
+import IconButton from '../../../../UI/IconButton';
 import styles from './styles';
 
 const AddVerticeRow = ({ onAdd }) => (
@@ -11,7 +11,7 @@ const AddVerticeRow = ({ onAdd }) => (
     <TableRowColumn style={styles.coordinateColumn} />
     <TableRowColumn style={styles.coordinateColumn} />
     <TableRowColumn style={styles.toolColumn}>
-      <IconButton onClick={onAdd}>
+      <IconButton size="small" onClick={onAdd}>
         <AddCircle />
       </IconButton>
     </TableRowColumn>

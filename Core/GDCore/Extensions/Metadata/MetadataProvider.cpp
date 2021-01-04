@@ -8,6 +8,7 @@
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/String.h"
@@ -18,6 +19,7 @@ namespace gd {
 
 gd::BehaviorMetadata MetadataProvider::badBehaviorInfo;
 gd::ObjectMetadata MetadataProvider::badObjectInfo;
+gd::EffectMetadata MetadataProvider::badEffectMetadata;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
 gd::ExpressionMetadata MetadataProvider::badStrExpressionMetadata;
@@ -61,6 +63,26 @@ MetadataProvider::GetExtensionAndObjectMetadata(const gd::Platform& platform,
 const ObjectMetadata& MetadataProvider::GetObjectMetadata(
     const gd::Platform& platform, gd::String objectType) {
   return GetExtensionAndObjectMetadata(platform, objectType).GetMetadata();
+}
+
+ExtensionAndMetadata<EffectMetadata>
+MetadataProvider::GetExtensionAndEffectMetadata(const gd::Platform& platform,
+                                                gd::String type) {
+  for (auto& extension : platform.GetAllPlatformExtensions()) {
+    auto objectsTypes = extension->GetExtensionEffectTypes();
+    for (std::size_t j = 0; j < objectsTypes.size(); ++j) {
+      if (objectsTypes[j] == type)
+        return ExtensionAndMetadata<EffectMetadata>(
+            *extension, extension->GetEffectMetadata(type));
+    }
+  }
+
+  return ExtensionAndMetadata<EffectMetadata>(badExtension, badEffectMetadata);
+}
+
+const EffectMetadata& MetadataProvider::GetEffectMetadata(
+    const gd::Platform& platform, gd::String objectType) {
+  return GetExtensionAndEffectMetadata(platform, objectType).GetMetadata();
 }
 
 ExtensionAndMetadata<InstructionMetadata>

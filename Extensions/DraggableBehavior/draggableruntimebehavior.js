@@ -23,13 +23,18 @@ gdjs.DraggableRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 
 gdjs.DraggableRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.DraggableRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "DraggableBehavior::Draggable";
+gdjs.registerBehavior("DraggableBehavior::Draggable", gdjs.DraggableRuntimeBehavior);
+
+gdjs.DraggableRuntimeBehavior.prototype.updateFromBehaviorData = function(oldBehaviorData, newBehaviorData) {
+    // Nothing to update.
+    return true;
+}
 
 gdjs.DraggableRuntimeBehavior.prototype.onDeActivate = function() {
     this._endDrag();
 };
 
-gdjs.DraggableRuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
+gdjs.DraggableRuntimeBehavior.prototype.onDestroy = function() {
     this.onDeActivate();
 };
 

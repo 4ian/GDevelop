@@ -2,7 +2,11 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { mapVector } from '../Utils/MapFor';
-const gd = global.gd;
+import {
+  enumerateNamedPropertyDescriptorsList,
+  toGdPropertyDescriptor,
+} from './EnumerateProperties';
+const gd: libGDevelop = global.gd;
 
 // This file contains the logic to declare extension metadata from
 // events functions or events based behaviors.
@@ -16,14 +20,21 @@ export const declareExtension = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  extension.setExtensionInformation(
-    eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getFullName() ||
+  extension
+    .setExtensionInformation(
       eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getDescription(),
-    '',
-    ''
-  );
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      eventsFunctionsExtension.getDescription(),
+      eventsFunctionsExtension.getAuthor(),
+      ''
+    )
+    .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
+    .setIconUrl(eventsFunctionsExtension.getIconUrl());
+};
+
+const getExtensionIconUrl = (extension: gdPlatformExtension) => {
+  return extension.getIconUrl() || 'res/function24.png';
 };
 
 /**
@@ -36,80 +47,99 @@ export const declareBehaviorMetadata = (
 ): gdBehaviorMetadata => {
   const generatedBehavior = new gd.BehaviorJsImplementation();
 
-  // The functions below are keeping a reference to eventsBasedBehavior.
+  // We enumerate the properties of the behavior from a list of gdNamedPropertyDescriptor
+  // to an array of JavaScript objects. This is important to ensure that the functions
+  // below are not keeping any reference to eventsBasedBehavior.
+  //
+  // We could in theory keep a reference to eventsBasedBehavior, and avoid using
+  // `enumerateNamedPropertyDescriptorsList` and `toGdPropertyDescriptor`.
   // This should be safe as if eventsBasedBehavior is deleted (i.e: the behavior
-  // is removed from its extension), then extension will be re-generated.
+  // is removed from its extension), then the extension will be re-generated.
+  //
+  // In practice, we don't want to risk keeping this references, because if at some point
+  // we delete the eventsBasedBehavior and forget to remove the extension, then the
+  // extension will use a deleted object and crash the app. Instead, we convert the
+  // properties to an array of JavaScript objects, so that we're guaranteed that the
+  // lifetime of these properties is the same as the lifetime of these functions (i.e:
+  // we use the JS garbage collector).
+  const enumeratedProperties = enumerateNamedPropertyDescriptorsList(
+    eventsBasedBehavior.getPropertyDescriptors()
+  );
 
-  // Declare the properties of the behavior
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.updateProperty = function(
-    behaviorContent: gdBehaviorContent,
+    behaviorContent: gdSerializerElement,
     propertyName: string,
     newValue: string
   ) {
-    let propertyFound = false;
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      if (property.getName() === propertyName) {
-        propertyFound = true;
-        const element = behaviorContent.addChild(propertyName);
-        const propertyType: string = property.getType();
+    const enumeratedProperty = enumeratedProperties.find(
+      enumeratedProperty => enumeratedProperty.name === propertyName
+    );
+    if (!enumeratedProperty) return false;
 
-        if (propertyType === 'String' || propertyType === 'Choice') {
-          element.setStringValue(newValue);
-        } else if (propertyType === 'Number') {
-          element.setDoubleValue(parseFloat(newValue));
-        } else if (propertyType === 'Boolean') {
-          element.setBoolValue(newValue === '1');
-        }
-      }
-    });
+    const element = behaviorContent.addChild(propertyName);
+    const propertyType: string = enumeratedProperty.type;
 
-    return propertyFound;
+    if (propertyType === 'String' || propertyType === 'Choice') {
+      element.setStringValue(newValue);
+    } else if (propertyType === 'Number') {
+      element.setDoubleValue(parseFloat(newValue));
+    } else if (propertyType === 'Boolean') {
+      element.setBoolValue(newValue === '1');
+    }
+
+    return true;
   };
 
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.getProperties = function(behaviorContent) {
     var behaviorProperties = new gd.MapStringPropertyDescriptor();
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      const newProperty = property.toPropertyDescriptor();
-      const propertyType: string = newProperty.getType();
 
-      if (behaviorContent.hasChild(property.getName())) {
+    enumeratedProperties.forEach(enumeratedProperty => {
+      const propertyName = enumeratedProperty.name;
+      const propertyType = enumeratedProperty.type;
+      const newProperty = toGdPropertyDescriptor(
+        enumeratedProperty,
+        behaviorProperties.getOrCreate(propertyName)
+      );
+
+      if (behaviorContent.hasChild(propertyName)) {
         if (propertyType === 'String' || propertyType === 'Choice') {
           newProperty.setValue(
-            behaviorContent.getChild(property.getName()).getStringValue()
+            behaviorContent.getChild(propertyName).getStringValue()
           );
         } else if (propertyType === 'Number') {
           newProperty.setValue(
-            '' + behaviorContent.getChild(property.getName()).getDoubleValue()
+            '' + behaviorContent.getChild(propertyName).getDoubleValue()
           );
         } else if (propertyType === 'Boolean') {
           newProperty.setValue(
-            behaviorContent.getChild(property.getName()).getBoolValue()
+            behaviorContent.getChild(propertyName).getBoolValue()
               ? 'true'
               : 'false'
           );
         }
       } else {
         // No value was serialized for this property. `newProperty`
-        // will have the default value coming from `property`.
+        // will have the default value coming from `enumeratedProperty`.
       }
-
-      behaviorProperties.set(property.getName(), newProperty);
     });
 
     return behaviorProperties;
   };
 
+  // $FlowExpectedError - we're creating a behavior
   generatedBehavior.initializeContent = function(behaviorContent) {
-    mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
-      const element = behaviorContent.addChild(property.getName());
-      const propertyType: string = property.getType();
+    enumeratedProperties.forEach(enumeratedProperty => {
+      const element = behaviorContent.addChild(enumeratedProperty.name);
+      const propertyType: string = enumeratedProperty.type;
 
       if (propertyType === 'String' || propertyType === 'Choice') {
-        element.setStringValue(property.getValue());
+        element.setStringValue(enumeratedProperty.value);
       } else if (propertyType === 'Number') {
-        element.setDoubleValue(parseFloat(property.getValue()) || 0);
+        element.setDoubleValue(parseFloat(enumeratedProperty.value) || 0);
       } else if (propertyType === 'Boolean') {
-        element.setBoolValue(property.getValue() === 'true');
+        element.setBoolValue(enumeratedProperty.value === 'true');
       }
     });
   };
@@ -121,7 +151,7 @@ export const declareBehaviorMetadata = (
       eventsBasedBehavior.getName(), // Default name is the name
       eventsBasedBehavior.getDescription(),
       '',
-      'res/function24.png',
+      getExtensionIconUrl(extension),
       eventsBasedBehavior.getName(), // Class name is the name, actually unused
       generatedBehavior,
       new gd.BehaviorsSharedData()
@@ -130,10 +160,10 @@ export const declareBehaviorMetadata = (
 };
 
 /**
- * Check if the name of the function is the name of a lifecycle function,
+ * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
-export const isBehaviorLifecycleFunction = (functionName: string) => {
+export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
   return (
     [
       'onCreated',
@@ -141,8 +171,21 @@ export const isBehaviorLifecycleFunction = (functionName: string) => {
       'onDeActivate',
       'doStepPreEvents',
       'doStepPostEvents',
+      'onDestroy',
+      // Compatibility with GD <= 5.0 beta 75
       'onOwnerRemovedFromScene',
+      // end of compatibility code
     ].indexOf(functionName) !== -1
+  );
+};
+
+/**
+ * Check if the name of the function is the name of a lifecycle function (for events-based extensions),
+ * that will be called automatically by the game engine.
+ */
+export const isExtensionLifecycleEventsFunction = (functionName: string) => {
+  return gd.EventsFunctionsExtension.isExtensionLifecycleEventsFunction(
+    functionName
   );
 };
 
@@ -163,7 +206,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
     return extension.addStrExpression(
@@ -172,7 +215,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
     return extension.addCondition(
@@ -182,8 +225,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getSentence(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   } else {
     return extension.addAction(
@@ -193,8 +236,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getSentence(),
       eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   }
 };
@@ -204,6 +247,7 @@ export const declareInstructionOrExpressionMetadata = (
  * behavior events function.
  */
 export const declareBehaviorInstructionOrExpressionMetadata = (
+  extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
@@ -215,7 +259,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
     return behaviorMetadata.addStrExpression(
@@ -223,7 +267,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png'
+      getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
@@ -235,8 +279,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   } else {
     // Use the new "scoped" way to declare an instruction, because
@@ -248,11 +292,15 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      'res/function.png',
-      'res/function24.png'
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
     );
   }
 };
+
+type gdInstructionOrExpressionMetadata =
+  | gdInstructionMetadata
+  | gdExpressionMetadata;
 
 /**
  * Declare the instructions (actions/conditions) and expressions for the
@@ -262,12 +310,13 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
  */
 export const declareBehaviorPropertiesInstructionAndExpressions = (
   i18n: I18nType,
+  extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): void => {
-  const addObjectAndBehaviorParameters = (
-    instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
-  ) => {
+  const addObjectAndBehaviorParameters = <T: gdInstructionOrExpressionMetadata>(
+    instructionOrExpression: T
+  ): T => {
     // By convention, first parameter is always the object:
     instructionOrExpression.addParameter(
       'object',
@@ -317,7 +366,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -328,36 +377,28 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the content of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
-        .addParameter(
-          'relationalOperator',
-          i18n._(t`Sign of the test`),
-          '',
-          false
-        )
-        .addParameter('string', i18n._(t`String to compare against`), '', false)
+        .useStandardRelationalOperatorParameters('string')
         .getCodeExtraInformation()
-        .setFunctionName(getterName)
-        .setManipulatedType('string');
+        .setFunctionName(getterName);
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
-          i18n._(t`Update the content of ${propertyLabel}`),
-          i18n._(
-            t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
-          ),
+          i18n._(t`Change the content of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
-        .addParameter('operator', i18n._(t`Modification's sign`), '', false)
-        .addParameter('string', i18n._(t`New value`), '', false)
+        .useStandardOperatorParameters('string')
         .getCodeExtraInformation()
         .setFunctionName(setterName)
         .setManipulatedType('string')
@@ -369,7 +410,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -380,44 +421,30 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
           i18n._(t`Compare the value of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is _PARAM2__PARAM3_`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
-        .addParameter(
-          'relationalOperator',
-          i18n._(t`Sign of the test`),
-          '',
-          false
-        )
-        .addParameter(
-          'expression',
-          i18n._(t`Value to compare against`),
-          '',
-          false
-        )
+        .useStandardRelationalOperatorParameters('number')
         .getCodeExtraInformation()
-        .setFunctionName(getterName)
-        .setManipulatedType('number');
+        .setFunctionName(getterName);
 
       addObjectAndBehaviorParameters(
         behaviorMetadata.addScopedAction(
           gd.EventsBasedBehavior.getPropertyActionName(propertyName),
           propertyLabel,
-          i18n._(t`Update the value of ${propertyLabel}`),
-          i18n._(
-            t`Do _PARAM2__PARAM3_ to property ${propertyName} of _PARAM0_`
-          ),
+          i18n._(t`Change the value of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
-        .addParameter('operator', i18n._(t`Modification's sign`), '', false)
-        .addParameter('expression', i18n._(t`New value`), '', false)
+        .useStandardOperatorParameters('number')
         .getCodeExtraInformation()
         .setFunctionName(setterName)
-        .setManipulatedType('number')
         .setGetter(getterName);
     } else if (propertyType === 'Boolean') {
       addObjectAndBehaviorParameters(
@@ -427,8 +454,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Check the value of ${propertyLabel}`),
           i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png',
-          'res/function24.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .getCodeExtraInformation()
@@ -441,7 +468,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           i18n._(t`Update the value of ${propertyLabel}`),
           i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          'res/function.png'
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
         )
       )
         .addParameter('yesorno', i18n._(t`New value to set`), '', false)
@@ -468,6 +496,9 @@ export const declareEventsFunctionParameters = (
           parameter.getDescription(),
           '', // See below for adding the extra information
           parameter.isOptional()
+        );
+        instructionOrExpression.setParameterLongDescription(
+          parameter.getLongDescription()
         );
       } else {
         instructionOrExpression.addCodeOnlyParameter(

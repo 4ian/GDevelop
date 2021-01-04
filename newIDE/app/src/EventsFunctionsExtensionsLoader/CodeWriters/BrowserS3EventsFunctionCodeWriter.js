@@ -1,5 +1,8 @@
 // @flow
-import { type EventsFunctionCodeWriter } from '..';
+import {
+  type EventsFunctionCodeWriter,
+  type EventsFunctionCodeWriterCallbacks,
+} from '..';
 import { uploadObject, getBaseUrl } from '../../Utils/GDevelopServices/Preview';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import slugs from 'slugs';
@@ -8,7 +11,9 @@ import slugs from 'slugs';
  * Create the EventsFunctionCodeWriter that writes generated code for events functions
  * to temporary S3 files.
  */
-export const makeBrowserS3EventsFunctionCodeWriter = (): EventsFunctionCodeWriter => {
+export const makeBrowserS3EventsFunctionCodeWriter = ({
+  onWriteFile,
+}: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   const prefix = makeTimestampedId();
   const getPathFor = (codeNamespace: string) => {
     return `${prefix}/${slugs(codeNamespace)}.js`;
@@ -22,6 +27,7 @@ export const makeBrowserS3EventsFunctionCodeWriter = (): EventsFunctionCodeWrite
       code: string
     ): Promise<void> => {
       const key = getPathFor(functionCodeNamespace);
+      onWriteFile({ includeFile: key, content: code });
       console.log(`Uploading function generated code to ${key}...`);
       return uploadObject({
         Key: getPathFor(functionCodeNamespace),
@@ -34,6 +40,7 @@ export const makeBrowserS3EventsFunctionCodeWriter = (): EventsFunctionCodeWrite
       code: string
     ): Promise<void> => {
       const key = getPathFor(behaviorCodeNamespace);
+      onWriteFile({ includeFile: key, content: code });
       console.log(`Uploading behavior generated code to ${key}...`);
       return uploadObject({
         Key: getPathFor(behaviorCodeNamespace),

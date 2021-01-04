@@ -19,8 +19,14 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     );
     this._pixiObject._texture.baseTexture.autoPlay = false;
   } else {
-    this._pixiObject._texture.baseTexture.source.currentTime = 0;
+    this._pixiObject._texture.baseTexture.resource.source.currentTime = 0;
   }
+  
+  // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
+  // See https://github.com/pixijs/pixi.js/issues/5996
+  this._pixiObject._texture.baseTexture.resource.source.preload = "auto";
+  this._pixiObject._texture.baseTexture.resource.source.autoload = true;
+  
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   runtimeScene
@@ -49,7 +55,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 /**
  * To be called when the object is removed from the scene: will pause the video.
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.onOwnerRemovedFromScene = function() {
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.onDestroy = function() {
   this.pause();
 };
 
@@ -72,11 +78,11 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateLoop = function() {
-  this._pixiObject._texture.baseTexture.source.loop = this._object._loop;
+  this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateVolume = function() {
-  this._pixiObject._texture.baseTexture.source.volume =
+  this._pixiObject._texture.baseTexture.resource.source.volume =
     this._object._volume / 100;
 };
 
@@ -121,18 +127,17 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setHeight = function(height) {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype._getHTMLVideoElementSource = function() {
   if (
     !this._pixiObject.texture ||
-    !this._pixiObject.texture.baseTexture.source
+    !this._pixiObject.texture.baseTexture.resource.source
   ) {
     return null;
   }
 
-  var source = this._pixiObject.texture.baseTexture.source;
+  var source = this._pixiObject.texture.baseTexture.resource.source;
   if (!source instanceof HTMLVideoElement) {
     return null;
   }
-
   return source;
-}
+};
 
 /**
  * Start the video
@@ -194,7 +199,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setMute = function(enable) {
   var source = this._getHTMLVideoElementSource();
   if (!source) return;
 
-  this._pixiObject._texture.baseTexture.source.muted = enable;
+  this._pixiObject._texture.baseTexture.resource.source.muted = enable;
 };
 
 /**
@@ -247,10 +252,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
   var source = this._getHTMLVideoElementSource();
   if (!source) return false;
 
-  return (
-    !source.paused &&
-    !source.ended
-  );
+  return !source.paused && !source.ended;
 };
 
 /**

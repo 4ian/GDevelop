@@ -11,32 +11,32 @@ This project is released under the MIT License.
 #include "SkeletonObject.h"
 
 void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "SkeletonObject",
-      _("Skeleton"),
-      _("Enables the use of animated skeleton objects.\nCurrently supported "
-        "formats:\n    *DragonBones"),
-      "Franco Maciel",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("SkeletonObject",
+                               _("Skeleton"),
+                               _("Enables the use of animated skeleton objects "
+                                 "made with DragonBones."),
+                               "Franco Maciel",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/skeleton");
 
   gd::ObjectMetadata& obj = extension.AddObject<SkeletonObject>(
       "Skeleton",
       _("Skeleton"),
-      _("Object animated through bones"),
+      _("Object displayed using skeletal animation, powered by DragonBones. "
+        "This object is experimental and searching for a maintainer."),
       "JsPlatform/Extensions/skeletonicon.png");
 
   // Object instructions
   obj.AddCondition("ScaleX",
                    _("Scale X"),
                    _("Check the object scale X."),
-                   _("Current scale X of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current scale X"),
                    _("Size"),
                    "JsPlatform/Extensions/skeletonicon24.png",
                    "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetScaleX",
                 _("Scale X"),
@@ -46,9 +46,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonicon24.png",
                 "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("ScaleX",
                     _("Scale X"),
@@ -60,14 +58,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("ScaleY",
                    _("Scale Y"),
                    _("Check the object scale Y."),
-                   _("Current scale Y of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current scale Y"),
                    _("Size"),
                    "JsPlatform/Extensions/skeletonicon24.png",
                    "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetScaleY",
                 _("Scale Y"),
@@ -77,9 +73,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonicon24.png",
                 "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("ScaleY",
                     _("Scale Y"),
@@ -91,14 +85,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("Width",
                    _("Width"),
                    _("Check the object width."),
-                   _("Current width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current width"),
                    _("Size"),
                    "JsPlatform/Extensions/skeletonicon24.png",
                    "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetWidth",
                 _("Width"),
@@ -108,9 +100,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonicon24.png",
                 "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("Width",
                     _("Width"),
@@ -122,14 +112,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("Height",
                    _("Height"),
                    _("Check the object height."),
-                   _("Current height of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current height"),
                    _("Size"),
                    "JsPlatform/Extensions/skeletonicon24.png",
                    "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetHeight",
                 _("Height"),
@@ -139,9 +127,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonicon24.png",
                 "JsPlatform/Extensions/skeletonicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("Height",
                     _("Height"),
@@ -206,14 +192,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("AnimationTime",
                    _("Current time"),
                    _("Check the current animation elapsed time."),
-                   _("Current animation time of _PARAM0_ is _PARAM1_ _PARAM2_"),
+                   _("the current animation time"),
                    _("Animation"),
                    "JsPlatform/Extensions/skeletonanimationicon24.png",
                    "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetAnimationTime",
                 _("Current time"),
@@ -223,9 +207,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonanimationicon24.png",
                 "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("AnimationTime",
                     _("Current time"),
@@ -246,14 +228,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          _("Current frame"),
          _("Check the current animation frame.\nIf the animation is set as "
            "smooth, a float can be (and probably will be) returned."),
-         _("Current animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the current animation frame"),
          _("Animation"),
          "JsPlatform/Extensions/skeletonanimationicon24.png",
          "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetAnimationFrame",
                 _("Current frame"),
@@ -263,9 +243,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonanimationicon24.png",
                 "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddExpression("AnimationFrame",
                     _("Current frame"),
@@ -285,14 +263,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                    _("Animation index"),
                    _("Check the current animation index.\nIf not sure about "
                      "the index, you can use the \"by name\" action"),
-                   _("Current animation of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current animation"),
                    _("Animation"),
                    "JsPlatform/Extensions/skeletonanimationicon24.png",
                    "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction(
          "SetAnimationIndex",
@@ -304,14 +280,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          "JsPlatform/Extensions/skeletonanimationicon24.png",
          "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .UseStandardOperatorParameters("number")
       .AddParameter(
           "expression", _("Blend time (0 for automatic blending)"), "", true)
       .SetDefaultValue("0")
       .AddParameter("expression", _("Loops (0 for infinite loops)"), "", true)
-      .SetDefaultValue("-1")
-      .SetManipulatedType("number");
+      .SetDefaultValue("-1");
 
   obj.AddExpression("AnimationIndex",
                     _("Animation index"),
@@ -323,14 +297,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("AnimationName",
                    _("Animation name"),
                    _("Check the current animation name."),
-                   _("Current animation of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the current animation"),
                    _("Animation"),
                    "JsPlatform/Extensions/skeletonanimationicon24.png",
                    "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text"))
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string");
 
   obj.AddAction("SetAnimationName",
                 _("Animation name"),
@@ -376,14 +348,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("AnimationTimeScale",
                    _("Time scale"),
                    _("Check the animation time scale."),
-                   _("Animation time scale of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the animation time scale"),
                    _("Animation"),
                    "JsPlatform/Extensions/skeletonanimationicon24.png",
                    "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetAnimationTimeScale",
                 _("Time scale"),
@@ -393,9 +363,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
                 "JsPlatform/Extensions/skeletonanimationicon24.png",
                 "JsPlatform/Extensions/skeletonanimationicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("AnimationTimeScale",
                     _("Time scale"),
@@ -418,16 +386,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          "BonePositionX",
          _("Position X"),
          _("Check the bone position X."),
-         _("Current position X of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+         _("the current position X :_PARAM1_"),
          _("Bone"),
          "JsPlatform/Extensions/skeletonboneicon24.png",
          "JsPlatform/Extensions/skeletonboneicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetBonePositionX",
                 _("Position X"),
@@ -439,9 +405,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("BonePositionX",
                     _("Position X"),
@@ -456,16 +420,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          "BonePositionY",
          _("Position Y"),
          _("Check the bone position Y."),
-         _("Current position Y of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+         _("the current position Y :_PARAM1_"),
          _("Bone"),
          "JsPlatform/Extensions/skeletonboneicon24.png",
          "JsPlatform/Extensions/skeletonboneicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetBonePositionY",
                 _("Position Y"),
@@ -477,9 +439,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("BonePositionY",
                     _("Position Y"),
@@ -503,13 +463,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .SetDefaultValue("\"\"")
       .AddParameter("operator", _("Modification's sign"))
       .AddParameter("expression", _("Position X"))
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Position Y"));
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition("BoneAngle",
                    _("Angle"),
                    _("Check the bone angle (in degrees)."),
-                   _("Current angle of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+                   _("the current angle :_PARAM1_"),
                    _("Bone"),
                    "JsPlatform/Extensions/skeletonboneicon24.png",
                    "JsPlatform/Extensions/skeletonboneicon16.png")
@@ -517,8 +476,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .AddParameter("expression", _("Value"));
 
   obj.AddAction("SetBoneAngle",
                 _("Angle"),
@@ -530,9 +488,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("BoneAngle",
                     _("Angle"),
@@ -547,16 +503,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          "BoneScaleX",
          _("Scale X"),
          _("Check the bone scale X."),
-         _("Current scale X of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+         _("the current scale X :_PARAM1_"),
          _("Bone"),
          "JsPlatform/Extensions/skeletonboneicon24.png",
          "JsPlatform/Extensions/skeletonboneicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetBoneScaleX",
                 _("Scale X"),
@@ -568,9 +522,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("BoneScaleX",
                     _("Scale X"),
@@ -585,16 +537,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
          "BoneScaleY",
          _("Scale Y"),
          _("Check the bone scale Y."),
-         _("Current scale Y of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+         _("the current scale Y :_PARAM1_"),
          _("Bone"),
          "JsPlatform/Extensions/skeletonboneicon24.png",
          "JsPlatform/Extensions/skeletonboneicon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetBoneScaleY",
                 _("Scale Y"),
@@ -606,9 +556,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Bone path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("BoneScaleY",
                     _("Scale Y"),
@@ -699,16 +647,14 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
   obj.AddCondition("SlotZOrder",
                    _("Z-order"),
                    _("Check the slot Z-order."),
-                   _("Z-order of _PARAM0_:_PARAM1_ is _PARAM2__PARAM3_"),
+                   _("the z-order :_PARAM1_"),
                    _("Slot"),
                    "JsPlatform/Extensions/skeletonsloticon24.png",
                    "JsPlatform/Extensions/skeletonsloticon16.png")
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Slot path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("SetSlotZOrder",
                 _("Z-order"),
@@ -720,9 +666,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Skeleton")
       .AddParameter("string", _("Slot path"))
       .SetDefaultValue("\"\"")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddExpression("SlotZOrder",
                     _("Z-order"),
@@ -796,10 +740,10 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Ray maximum distance (in pixels)"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the X position of the intersection"))
+          _("Scene variable where to store the X position of the intersection"))
       .AddParameter(
           "scenevar",
-          _("Variable where to store the Y position of the intersection"))
+          _("Scene variable where to store the Y position of the intersection"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 }

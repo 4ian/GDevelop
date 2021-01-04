@@ -31,7 +31,7 @@ BehaviorJsImplementation* BehaviorJsImplementation::Clone() const {
   return clone;
 }
 std::map<gd::String, gd::PropertyDescriptor>
-BehaviorJsImplementation::GetProperties(const gd::SerializerElement& behaviorContent, gd::Project&) const {
+BehaviorJsImplementation::GetProperties(const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -56,8 +56,7 @@ BehaviorJsImplementation::GetProperties(const gd::SerializerElement& behaviorCon
 }
 bool BehaviorJsImplementation::UpdateProperty(gd::SerializerElement& behaviorContent,
                                               const gd::String& name,
-                                              const gd::String& value,
-                                              Project&) {
+                                              const gd::String& value) {
   EM_ASM_INT(
       {
         var self = Module['getCache'](Module['BehaviorJsImplementation'])[$0];
@@ -65,7 +64,7 @@ bool BehaviorJsImplementation::UpdateProperty(gd::SerializerElement& behaviorCon
           throw 'updateProperty is not defined on a BehaviorJsImplementation.';
 
         self['updateProperty'](
-            wrapPointer($1, Module['SerializerElement']), Pointer_stringify($2), Pointer_stringify($3));
+            wrapPointer($1, Module['SerializerElement']), UTF8ToString($2), UTF8ToString($3));
       },
       (int)this,
       (int)&behaviorContent,

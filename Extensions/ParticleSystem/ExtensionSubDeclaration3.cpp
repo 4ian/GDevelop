@@ -30,103 +30,87 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
          _("Rendering first parameter"),
          _("Modify first parameter of rendering ( Size/Length ).\nParticles "
            "have to be recreated in order to take changes in account."),
-         _("Do _PARAM1__PARAM2_ to rendering 1st parameter of _PARAM0_"),
+         _("the rendering 1st parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition(
          "RendererParam1",
          _("Rendering first parameter"),
          _("Test the first parameter of rendering ( Size/Length )."),
-         _("The 1nd rendering parameter of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the 1st rendering parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
 
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("RendererParam2",
                 _("Rendering second parameter"),
                 _("Modify the second parameter of rendering ( Size/Length "
                   ").\nParticles have to be recreated in order to take changes "
                   "in account."),
-                _("Do _PARAM1__PARAM2_ to rendering 2nd parameter of _PARAM0_"),
+                _("the rendering 2nd parameter"),
                 _("Setup"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition(
          "RendererParam2",
          _("Rendering second parameter"),
          _("Test the second parameter of rendering ( Size/Length )."),
-         _("The 2nd rendering parameter of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the 2nd rendering parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Tank",
                 _("Capacity"),
                 _("Change the capacity of the emitter."),
-                _("Do _PARAM1__PARAM2_ to the capacity of _PARAM0_"),
+                _("the capacity"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition("Tank",
                    _("Capacity"),
                    _("Test the capacity of the emitter."),
-                   _("The capacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("the capacity"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Flow",
                 _("Flow"),
                 _("Change the flow of the emitter."),
-                _("Do _PARAM1__PARAM2_ to flow of _PARAM0_"),
+                _("the flow"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
-      .SetManipulatedType("number");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition("Flow",
                    _("Flow"),
                    _("Test the flow of the emitter."),
-                   _("The flow of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                   _("the flow"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("Value to compare"))
-      .SetManipulatedType("number");
+      .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Texture",
                 _("Image"),
@@ -142,14 +126,12 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
          "Texture",
          _("Image"),
          _("Test the name of the image displayed by particles."),
-         _("Image displayed by particles of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("the image displayed by particles"),
          _("Common"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("string", _("Text to test"))
-      .SetManipulatedType("string");
+      .UseStandardRelationalOperatorParameters("string");
 
   obj.AddStrExpression("Texture",
                        _("Particles image"),

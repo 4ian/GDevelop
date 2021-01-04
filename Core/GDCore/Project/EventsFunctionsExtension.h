@@ -8,8 +8,9 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
-#include "GDCore/Project/EventsFunctionsContainer.h"
+
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
@@ -59,7 +60,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   const gd::String& GetShortDescription() const { return shortDescription; };
-  EventsFunctionsExtension& SetShortDescription(const gd::String& shortDescription_) {
+  EventsFunctionsExtension& SetShortDescription(
+      const gd::String& shortDescription_) {
     shortDescription = shortDescription_;
     return *this;
   }
@@ -82,11 +84,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
-  const gd::String& GetTags() const { return tags; };
-  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
-    tags = tags_;
-    return *this;
-  }
+  const std::vector<gd::String>& GetTags() const { return tags; };
+  std::vector<gd::String>& GetTags() { return tags; };
 
   const gd::String& GetAuthor() const { return author; };
   EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
@@ -94,18 +93,46 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetPreviewIconUrl() const { return previewIconUrl; };
+  EventsFunctionsExtension& SetPreviewIconUrl(
+      const gd::String& previewIconUrl_) {
+    previewIconUrl = previewIconUrl_;
+    return *this;
+  }
+
+  const gd::String& GetIconUrl() const { return iconUrl; };
+  EventsFunctionsExtension& SetIconUrl(const gd::String& iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  const gd::String& GetHelpPath() const { return helpPath; };
+
+  /**
+   * \brief Set the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  EventsFunctionsExtension& SetHelpPath(const gd::String& helpPath_) {
+    helpPath = helpPath_;
+    return *this;
+  }
+
   /**
    * \brief Return a reference to the list of the events based behaviors.
    */
-  SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
+  gd::SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
     return eventsBasedBehaviors;
   }
 
   /**
    * \brief Return a const reference to the list of the events based behaviors.
    */
-  const SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors()
-      const {
+  const gd::SerializableWithNameList<EventsBasedBehavior>&
+  GetEventsBasedBehaviors() const {
     return eventsBasedBehaviors;
   }
 
@@ -124,6 +151,13 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
                        const gd::SerializerElement& element);
   ///@}
 
+  /** \name Lifecycle event functions
+   */
+  ///@{
+  static bool IsExtensionLifecycleEventsFunction(
+      const gd::String& eventsFunctionName);
+  ///@}
+
  private:
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
@@ -137,9 +171,13 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
-  gd::String tags;
+  std::vector<gd::String> tags;
   gd::String author;
-  SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  gd::String previewIconUrl;
+  gd::String iconUrl;
+  gd::String helpPath;  ///< The relative path to the help for this extension in
+                        ///< the documentation (or an absolute URL).
+  gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 
 }  // namespace gd

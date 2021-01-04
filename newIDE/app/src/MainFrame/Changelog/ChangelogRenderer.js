@@ -8,13 +8,13 @@ import {
 } from '../../Utils/GDevelopServices/Release';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownText } from '../../UI/MarkdownText';
 import { Column, Line } from '../../UI/Grid';
-import { FlatButton, RaisedButton } from 'material-ui';
 import Window from '../../Utils/Window';
 import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
 import AlertMessage from '../../UI/AlertMessage';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 
 type Props = {|
   releases: ?Array<Release>,
@@ -34,9 +34,11 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
       <Column>
         <Line>
           <AlertMessage kind="warning">
-            Please double check online the changes to make sure that you are
-            aware of anything new in this version that would require you to
-            adapt your project.
+            <Trans>
+              Please double check online the changes to make sure that you are
+              aware of anything new in this version that would require you to
+              adapt your project.
+            </Trans>
           </AlertMessage>
         </Line>
         <Line>
@@ -66,41 +68,36 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
     !!currentRelease && hasBreakingChange(currentRelease);
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <Column>
-          {currentVersionHasBreakingChange && (
-            <AlertMessage kind="warning">
-              This version of GDevelop has a breaking change. Please make sure
-              to read the changes below to understand if any change or
-              adaptation must be made to your project.
-            </AlertMessage>
-          )}
-          {releases.map(release =>
-            release.name ? (
-              <ReactMarkdown
-                key={release.name}
-                escapeHtml
-                source={
-                  '# Version ' +
-                  release.name +
-                  '\n---\n' +
-                  (release.description ||
-                    'Changes and new features description will be available soon.')
-                }
-                className={muiTheme.markdownRootClassName}
-              />
-            ) : null
-          )}
-          <Line justifyContent="center">
-            <FlatButton
-              label={<Trans>See all the releases notes</Trans>}
-              onClick={openReleaseNote}
-            />
-          </Line>
-        </Column>
+    <Column>
+      {currentVersionHasBreakingChange && (
+        <AlertMessage kind="warning">
+          This version of GDevelop has a breaking change. Please make sure to
+          read the changes below to understand if any change or adaptation must
+          be made to your project.
+        </AlertMessage>
       )}
-    </ThemeConsumer>
+      {releases.map(release =>
+        release.name ? (
+          <MarkdownText
+            key={release.name}
+            source={
+              '# Version ' +
+              release.name +
+              '\n---\n' +
+              (release.description ||
+                'Changes and new features description will be available soon.')
+            }
+            isStandaloneText
+          />
+        ) : null
+      )}
+      <Line justifyContent="center">
+        <FlatButton
+          label={<Trans>See all the releases notes</Trans>}
+          onClick={openReleaseNote}
+        />
+      </Line>
+    </Column>
   );
 };
 

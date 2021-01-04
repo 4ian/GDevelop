@@ -44,10 +44,6 @@ class MockFileSystem : public gd::AbstractFileSystem {
   virtual bool CopyFile(const gd::String& file, const gd::String& destination) {
     return true;
   }
-  virtual bool CopyDir(const gd::String& source,
-                       const gd::String& destination) {
-    return true;
-  }
   virtual bool ClearDir(const gd::String& directory) { return true; }
   virtual bool WriteToFile(const gd::String& file, const gd::String& content) {
     return true;
@@ -110,7 +106,7 @@ TEST_CASE("ResourcesMergingHelper", "[common]") {
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();
     REQUIRE(resourcesFilenames["MakeAbsolute(/image1.png)"] ==
-            "MakeRelative(MakeAbsolute(/image1.png))");
+            "FileNameFrom(MakeAbsolute(/image1.png))");
     REQUIRE(resourcesFilenames["MakeAbsolute(image2.png)"] ==
             "MakeRelative(MakeAbsolute(image2.png))");
     REQUIRE(resourcesFilenames["MakeAbsolute(audio1.png)"] ==

@@ -13,7 +13,7 @@ namespace gd {
 Camera Layer::badCamera;
 Effect Layer::badEffect;
 
-Layer::Layer() : isVisible(true) {}
+Layer::Layer() : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -29,6 +29,11 @@ void Layer::SetCameraCount(std::size_t n) {
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("visibility", GetVisibility());
+  element.SetAttribute("isLightingLayer", IsLightingLayer());
+  element.SetAttribute("followBaseLayerCamera", IsFollowingBaseLayerCamera());
+  element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
+  element.SetAttribute("ambientLightColorG", (int)GetAmbientLightColorGreen());
+  element.SetAttribute("ambientLightColorB", (int)GetAmbientLightColorBlue());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -61,6 +66,11 @@ void Layer::SerializeTo(SerializerElement& element) const {
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
+  SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
+  SetFollowBaseLayerCamera(element.GetBoolAttribute("followBaseLayerCamera", false));
+  SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200), 
+                       element.GetIntAttribute("ambientLightColorG", 200),
+                       element.GetIntAttribute("ambientLightColorB", 200));
 
   // Compatibility with GD <= 3.3
   if (element.HasChild("Camera")) {
@@ -170,7 +180,7 @@ gd::Effect& Layer::InsertNewEffect(const gd::String& name,
                                    std::size_t position) {
   auto newEffect = std::make_shared<Effect>();
   newEffect->SetName(name);
-  newEffect->SetEffectName(name);
+
   if (position < effects.size())
     effects.insert(effects.begin() + position, newEffect);
   else

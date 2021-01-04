@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import FlatButton from '../UI/FlatButton';
 import Window from '../Utils/Window';
 import DocSearchArea from './DocSearchArea';
 import debounce from 'lodash/debounce';
@@ -78,6 +78,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             label={<Trans>Wiki</Trans>}
           />,
         ]}
+        cannotBeDismissed={false}
         open={open}
       >
         <DocSearchArea

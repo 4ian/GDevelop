@@ -15,6 +15,29 @@ const isWin = /^win/.test(process.platform);
 
 const newIdeAppPath = path.join(__dirname, '..');
 
+const readUtf8File = path =>
+  new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', function(err, content) {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(content);
+    });
+  });
+
+const writeUtf8File = (path, content) =>
+  new Promise((resolve, reject) => {
+    fs.writeFile(path, content, 'utf8', function(err) {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve();
+    });
+  });
+
 // Identify where msgcat is on the system
 let msgcat = '';
 if (isWin) {
@@ -23,9 +46,8 @@ if (isWin) {
     `ℹ️ Pull Requests are welcome to add support for "msgcat" on Windows!`
   );
   shell.exit(0);
-  return;
 } else {
-  msgcat = shell.exec('type msgcat 2>/dev/null', { silent: true }).stdout;
+  msgcat = shell.exec('which msgcat 2>/dev/null', { silent: true }).stdout;
   if (!msgcat) {
     msgcat = shell.exec('find /usr -name "msgcat" -print -quit 2>/dev/null', {
       silent: true,
@@ -42,7 +64,6 @@ if (!msgcat) {
     `ℹ️ Install "gettext" with "brew install gettext" (macOS) or your Linux package manager.`
   );
   shell.exit(0);
-  return;
 }
 
 const computeTranslationRatio = compiledCatalog => {
@@ -71,55 +92,90 @@ const writeLocaleMetadata = object => {
 };
 
 const sanitizeMessagePo = path => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', function(err, content) {
-      if (err) {
-        return reject(err);
+  return readUtf8File(path).then(content => {
+    let forbiddenStringsFound = [];
+    let forbiddenStrings = [
+      {
+        str: 'n\\\\',
+        regex: /n\\\\/g,
+      },
+      {
+        str: '\\\\',
+        regex: /\\\\/g,
+      },
+      {
+        str: '\\ n',
+        regex: /\\ n/g,
+      },
+      {
+        str: '\\ t',
+        regex: /\\ t/g,
+      },
+      {
+        str: '\\ ',
+        regex: /\\ /g,
+      },
+    ];
+    let sanitizedContent = content;
+    forbiddenStrings.forEach(forbiddenString => {
+      if (sanitizedContent.search(forbiddenString.regex) !== -1) {
+        forbiddenStringsFound.push(forbiddenString);
+        sanitizedContent = sanitizedContent.replace(forbiddenString.regex, ' ');
       }
-      let forbiddenStringsFound = [];
-      let forbiddenStrings = [
-        {
-          str: 'n\\\\',
-          regex: /n\\\\/g,
-        },
-        {
-          str: '\\\\',
-          regex: /\\\\/g,
-        },
-        {
-          str: '\\ n',
-          regex: /\\ n/g,
-        },
-        {
-          str: '\\ t',
-          regex: /\\ t/g,
-        },
-        {
-          str: '\\ ',
-          regex: /\\ /g,
-        },
-      ];
-      let sanitizedContent = content;
-      forbiddenStrings.forEach(forbiddenString => {
-        if (sanitizedContent.search(forbiddenString.regex) !== -1) {
-          forbiddenStringsFound.push(forbiddenString);
-          sanitizedContent = sanitizedContent.replace(
-            forbiddenString.regex,
-            ' '
-          );
-        }
-      });
-
-      fs.writeFile(path, sanitizedContent, 'utf8', function(err) {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve({
-          forbiddenStringsFound,
-        });
-      });
     });
+
+    return writeUtf8File(path, sanitizedContent).then(() => {
+      return {
+        forbiddenStringsFound,
+      };
+    });
+  });
+};
+
+const lintMessagePo = (locale, path) => {
+  return readUtf8File(path).then(content => {
+    const errors = [];
+    if (locale === 'pseudo_LOCALE' || locale === 'en') {
+      return { errors };
+    }
+
+    const operatorWithBracketsCount = (content.match(/<operator>/g) || [])
+      .length;
+    const valueWithBracketsCount = (content.match(/<value>/g) || []).length;
+    const subjectWithBracketsCount = (content.match(/<subject>/g) || []).length;
+
+    if (operatorWithBracketsCount !== 4 && operatorWithBracketsCount !== 8) {
+      errors.push({
+        str:
+          'Unexpected number of <operator>: verify the <operator> translations',
+      });
+    }
+    if (valueWithBracketsCount !== 4 && valueWithBracketsCount !== 8) {
+      errors.push({
+        str: 'Unexpected number of <value>: verify the <value> translations',
+      });
+    }
+    if (subjectWithBracketsCount !== 4 && subjectWithBracketsCount !== 8) {
+      errors.push({
+        str:
+          'Unexpected number of <subject>: verify the <subject> translations',
+      });
+    }
+    if (
+      content.indexOf(`msgid "<subject> <operator> <value>"
+msgstr "<subject> <operator> <value>"`) === -1 &&
+      content.indexOf(`msgid "<subject> <operator> <value>"
+msgstr ""`) === -1
+    ) {
+      errors.push({
+        str:
+          "Can't find an untranslated <subject> <operator> <value>: Double check these translations, they are surely wrongly done!",
+      });
+    }
+
+    return {
+      errors,
+    };
   });
 };
 
@@ -155,7 +211,8 @@ getLocales()
             // Use --use-first to avoid merging multiple translations for the same
             // string.
             shell.exec(
-              msgcat + ` --no-wrap --use-first ${files.join(' ')} -o messages.po`,
+              msgcat +
+                ` --no-wrap --use-first ${files.join(' ')} -o messages.po`,
               {
                 cwd: getLocalePath(locale),
                 silent: true,
@@ -217,6 +274,21 @@ getLocales()
             );
             results.forbiddenStringsFound.forEach(({ str }) => {
               shell.echo(`  * Found ${str}`);
+            });
+          }
+        })
+      )
+    ).then(() => locales);
+  })
+  .then(locales => {
+    // "Lint" all catalogs to find common errors.
+    return Promise.all(
+      locales.map(locale =>
+        lintMessagePo(locale, getLocaleCatalogPath(locale)).then(results => {
+          if (results.errors.length) {
+            shell.echo(`🚩 Found errors for locale ${locale}:`);
+            results.errors.forEach(({ str }) => {
+              shell.echo(`  * ${str}`);
             });
           }
         })

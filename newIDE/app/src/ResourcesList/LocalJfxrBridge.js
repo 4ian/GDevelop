@@ -9,7 +9,7 @@ import {
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Open JFXR to create wav resources.
@@ -19,7 +19,6 @@ export const openJfxr = ({
   resourcesLoader,
   resourceNames,
   onChangesSaved,
-  resourcePath,
   extraOptions,
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
@@ -31,8 +30,7 @@ export const openJfxr = ({
 
   const externalEditorData = {
     resourcePath: initialResourcePath,
-    // $FlowFixMe - TODO: There is an error here to be solved.
-    externalEditorData: extraOptions.initialResourceMetadata,
+    externalEditorData: extraOptions.externalEditorData,
     projectPath,
   };
 
@@ -40,18 +38,17 @@ export const openJfxr = ({
   ipcRenderer.on(
     'jfxr-changes-saved',
     (event, newFilePath, externalEditorData) => {
-      const resourceName = path.relative(projectPath, newFilePath);
-      createOrUpdateResource(project, new gd.AudioResource(), resourceName);
+      const name = path.relative(projectPath, newFilePath);
+      createOrUpdateResource(project, new gd.AudioResource(), name);
 
       const metadata = {
         jfxr: externalEditorData,
       };
       project
         .getResourcesManager()
-        .getResource(resourceName)
+        .getResource(name)
         .setMetadata(JSON.stringify(metadata));
-      // $FlowFixMe - TODO: There is an error here to be solved.
-      onChangesSaved([{ metadata }], resourceName);
+      onChangesSaved([{ metadata, name }]);
     }
   );
 

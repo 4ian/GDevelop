@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/device_orientation_ballgame/game.json",
+    "projectUuid": "625af9dc-3658-44c3-901f-e25fafffc851",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bois.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Bois.png",
         "kind": "image",
         "metadata": "",
         "name": "Bois.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Noir.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Noir.png",
         "kind": "image",
         "metadata": "",
         "name": "Noir.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bille.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Bille.png",
         "kind": "image",
         "metadata": "",
         "name": "Bille.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Trou.png",
+        "file": "https://resources.gdevelop-app.com/examples/device-orientation-ballgame/img/Trou.png",
         "kind": "image",
         "metadata": "",
         "name": "Trou.png",
@@ -179,6 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "board",
+          "persistentUuid": "cfdb469d-f1a4-4863-8323-1120600e1e94",
           "width": 640,
           "x": 0,
           "y": 16,
@@ -194,6 +193,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "81c862d1-e642-42c9-8ec6-55e50462ecdc",
           "width": 32,
           "x": -16,
           "y": -16,
@@ -209,6 +209,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "1a4c4f0a-bfdf-4e56-be93-2e51bcc160c6",
           "width": 592,
           "x": 16,
           "y": -16,
@@ -224,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "ball",
+          "persistentUuid": "740280be-0b21-4350-910e-812d0f1a3ac9",
           "width": 0,
           "x": 512,
           "y": 480,
@@ -239,6 +241,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "67325b4f-6e70-44b5-826f-e0a782e868c9",
           "width": 32,
           "x": 608,
           "y": -16,
@@ -254,6 +257,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "e6873bdf-52e6-4d0d-a9f5-331c188a1f5e",
           "width": 592,
           "x": 16,
           "y": 584,
@@ -269,6 +273,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "9e5653f1-0ac4-4ea7-9c50-eb16cfc0d79a",
           "width": 32,
           "x": 416,
           "y": 128,
@@ -284,6 +289,7 @@
           "layer": "",
           "locked": false,
           "name": "boundary",
+          "persistentUuid": "31fb7822-9fd9-4b76-aafc-81de05c2479f",
           "width": 32,
           "x": 192,
           "y": 0,
@@ -299,6 +305,7 @@
           "layer": "",
           "locked": false,
           "name": "pit",
+          "persistentUuid": "ca948654-1491-47f9-873c-2cef7f603bb8",
           "width": 0,
           "x": 32,
           "y": 32,
@@ -314,6 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "you_win",
+          "persistentUuid": "2250d74f-3f45-4bb2-97bc-def6099b3439",
           "width": 0,
           "x": 192,
           "y": 256,
@@ -732,6 +740,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

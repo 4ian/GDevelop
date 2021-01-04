@@ -1,0 +1,22 @@
+{
+    "name": "GDJS_GAME_MANGLED_NAME",
+    "displayName": "GDJS_GAME_NAME",
+    "version": "GDJS_GAME_VERSION",
+    "description": "GDJS_GAME_NAME",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "ecosystem:cordova"
+    ],
+    "author": "GDJS_GAME_AUTHOR",
+    "devDependencies": {
+        "cordova-plugin-ionic-webview": "5.0.0"
+    },
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-ionic-webview": {}
+        }
+    }
+}

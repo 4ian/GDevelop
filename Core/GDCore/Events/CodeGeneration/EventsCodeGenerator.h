@@ -9,6 +9,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
@@ -35,10 +36,6 @@ namespace gd {
  * \brief Internal class used to generate code from events
  */
 class GD_CORE_API EventsCodeGenerator {
-  // Compatiblity with old ExpressionParser
-  friend class CallbacksForGeneratingExpressionCode;
-  friend class VariableCodeGenerationCallbacks;
-  // end of compatibility code
   friend class ExpressionCodeGenerator;
 
  public:
@@ -127,7 +124,7 @@ class GD_CORE_API EventsCodeGenerator {
    *
    */
   std::vector<gd::String> GenerateParametersCodes(
-      const std::vector<gd::Expression> & parameters,
+      const std::vector<gd::Expression>& parameters,
       const std::vector<gd::ParameterMetadata>& parametersInfo,
       EventsCodeGenerationContext& context,
       std::vector<std::pair<gd::String, gd::String> >*
@@ -325,7 +322,7 @@ class GD_CORE_API EventsCodeGenerator {
    * group.
    *
    * Get a list containing the "real" objects name when the events refers to \a
-   * objectName :<br> If \a objectName if really an object, the list will only
+   * objectName :<br> If \a objectName is really an object, the list will only
    * contains \a objectName unchanged.<br> If \a objectName is a group, the list
    * will contains all the objects of the group.<br> If \a objectName is the
    * "current" object in the context ( i.e: The object being used for launching
@@ -414,6 +411,29 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GetCodeNamespace() { return ""; };
 
   enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
+
+  /**
+   * Generate a single unique number for the specified instruction.
+   *
+   * This is useful for instructions that need to identify themselves in the
+   * generated code like the "Trigger Once" conditions. The id is stable across
+   * code generations if the instructions are the same objects in memory.
+   *
+   * Note that if this function is called multiple times with the same
+   * instruction, the unique number returned will be *different*. This is
+   * because a single instruction might appear at multiple places in events due
+   * to the usage of links.
+   */
+  size_t GenerateSingleUsageUniqueIdFor(const gd::Instruction* instruction);
+
+  /**
+   * Generate a single unique number for an events list.
+   *
+   * This is useful to create unique function names for events list, that are
+   * stable across code generation given the exact same list of events. They are
+   * *not* stable if events are moved/reorganized.
+   */
+  size_t GenerateSingleUsageUniqueIdForEventsList();
 
  protected:
   /**
@@ -708,7 +728,8 @@ class GD_CORE_API EventsCodeGenerator {
   /**
    * Generate the getter to get the name of the specified behavior.
    */
-  virtual gd::String GenerateGetBehaviorNameCode(const gd::String& behaviorName);
+  virtual gd::String GenerateGetBehaviorNameCode(
+      const gd::String& behaviorName);
 
   const gd::Platform& platform;  ///< The platform being used.
 
@@ -736,6 +757,11 @@ class GD_CORE_API EventsCodeGenerator {
   size_t maxCustomConditionsDepth;  ///< The maximum depth value for all the
                                     ///< custom conditions created.
   size_t maxConditionsListsSize;  ///< The maximum size of a list of conditions.
+
+  std::set<size_t>
+      instructionUniqueIds;  ///< The unique ids generated for instructions.
+  size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
+                                  ///< list function name.
 };
 
 }  // namespace gd

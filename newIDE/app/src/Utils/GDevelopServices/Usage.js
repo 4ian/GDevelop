@@ -1,6 +1,8 @@
 // @flow
+import { t } from '@lingui/macro';
 import axios from 'axios';
 import { GDevelopUsageApi } from './ApiConfigs';
+import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 
 export type Usage = {
   id: string,
@@ -33,9 +35,12 @@ export type PlanDetails = {
   planId: string | null,
   name: string,
   monthlyPriceInEuros: number,
-  smallDescription: string,
-  descriptionBullets: Array<string>,
-  extraDescription?: string,
+  smallDescription?: MessageDescriptor,
+  descriptionBullets: Array<{|
+    isLocalAppOnly?: boolean,
+    message: MessageDescriptor,
+  |}>,
+  extraDescription?: MessageDescriptor,
 };
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
@@ -43,39 +48,62 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     planId: 'gdevelop_pro',
     name: 'GDevelop Pro',
     monthlyPriceInEuros: 7,
-    smallDescription: 'Ideal for advanced game makers',
+    smallDescription: t`Ideal for advanced game makers`,
     descriptionBullets: [
-      'Package your game for Android up to 70 times a day.',
-      'One-click packaging for Windows, macOS and Linux up to 70 times a day.',
-      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets.',
-      'Use the Debugger to find and solve issues in your games.',
-      'Immerse your players by removing GDevelop logo when the game loads.',
+      {
+        message: t`Package your game for Android up to 70 times a day (every 24 hours).`,
+      },
+      {
+        message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day (every 24 hours).`,
+      },
+      {
+        message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
+        isLocalAppOnly: true,
+      },
+      {
+        message: t`Use the Debugger to find and solve issues in your games.`,
+        isLocalAppOnly: true,
+      },
+      {
+        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
+      },
     ],
-    extraDescription:
-      "You'll also have access to online packaging for iOS or other services when they are released.",
+    extraDescription: t`You'll also have access to online packaging for iOS or other services when they are released.`,
   },
   {
     planId: 'gdevelop_indie',
     name: 'GDevelop Indie',
     monthlyPriceInEuros: 2,
-    smallDescription: 'Ideal for beginners',
+    smallDescription: t`Ideal for beginners`,
     descriptionBullets: [
-      'Package your game for Android up to 10 times a day.',
-      'One-click packaging for Windows, macOS and Linux up to 10 times a day.',
-      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
-      'Use the Debugger to find and solve issues in your games.',
-      'Immerse your players by removing GDevelop logo when the game loads',
+      {
+        message: t`Package your game for Android up to 10 times a day (every 24 hours).`,
+      },
+      {
+        message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day (every 24 hours).`,
+      },
+      {
+        message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
+        isLocalAppOnly: true,
+      },
+      {
+        message: t`Use the Debugger to find and solve issues in your games.`,
+        isLocalAppOnly: true,
+      },
+      {
+        message: t`Immerse your players by removing GDevelop logo when the game loads`,
+      },
     ],
-    extraDescription:
-      "You'll also have access to online packaging for iOS or other services when they are released.",
+    extraDescription: t`You'll also have access to online packaging for iOS or other services when they are released.`,
   },
   {
     planId: null,
     name: 'No subscription',
     monthlyPriceInEuros: 0,
-    smallDescription: '',
     descriptionBullets: [
-      'You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day to avoid overloading the services.',
+      {
+        message: t`You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day (every 24 hours) to avoid overloading the services.`,
+      },
     ],
   },
 ];
@@ -122,7 +150,7 @@ export const getUserSubscription = (
 ): Promise<Subscription> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/subscription`, {
+      axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
         params: {
           userId,
         },
@@ -142,7 +170,7 @@ export const changeUserSubscription = (
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription`,
+        `${GDevelopUsageApi.baseUrl}/subscription-v2`,
         newSubscriptionDetails,
         {
           params: {
@@ -155,4 +183,32 @@ export const changeUserSubscription = (
       )
     )
     .then(response => response.data);
+};
+
+type UploadType = 'build' | 'preview';
+
+export const getSignedUrl = (params: {|
+  uploadType: UploadType,
+  key: string,
+  contentType: string,
+|}): Promise<{
+  signedUrl: string,
+}> => {
+  return axios
+    .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
+    .then(response => response.data);
+};
+
+export const getRedirectToCheckoutUrl = (
+  planId: string,
+  uid: string,
+  email: string
+): string => {
+  return `${
+    GDevelopUsageApi.baseUrl
+  }/subscription-v2/redirect-to-checkout?planId=${encodeURIComponent(
+    planId
+  )}&clientReferenceId=${encodeURIComponent(
+    uid
+  )}&customerEmail=${encodeURIComponent(email)}`;
 };

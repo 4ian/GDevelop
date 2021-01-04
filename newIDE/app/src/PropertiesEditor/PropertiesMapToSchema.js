@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
+import { type ResourceKind } from '../ResourcesList/ResourceSource.flow';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -22,6 +23,7 @@ export default (
   const propertyFields = mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
+    const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
     const getLabel = (instance: Instance) => {
       const propertyName = getProperties(instance)
@@ -36,6 +38,7 @@ export default (
           .join(' ')
       );
     };
+    const getDescription = () => propertyDescription;
 
     if (property.isHidden()) return null;
 
@@ -44,16 +47,19 @@ export default (
         name,
         valueType,
         getValue: (instance: Instance): number => {
-          return parseFloat(
-            getProperties(instance)
-              .get(name)
-              .getValue()
-          );
+          return (
+            parseFloat(
+              getProperties(instance)
+                .get(name)
+                .getValue()
+            ) || 0
+          ); // Consider a missing value as 0 to avoid propagating NaN.
         },
         setValue: (instance: Instance, newValue: number) => {
           onUpdateProperty(instance, name, '' + newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'string' || valueType === '') {
       return {
@@ -68,6 +74,7 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'boolean') {
       return {
@@ -84,6 +91,7 @@ export default (
           onUpdateProperty(instance, name, newValue ? '1' : '0');
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'choice') {
       // Choice is a "string" (with a selector for the user in the UI)
@@ -104,10 +112,12 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
       };
     } else if (valueType === 'resource') {
       // Resource is a "string" (with a selector in the UI)
-      const kind = property.getExtraInfo().toJSArray()[0] || '';
+      // $FlowFixMe - assume the passed resource kind is always valid.
+      const kind: ResourceKind = property.getExtraInfo().toJSArray()[0] || '';
       return {
         name,
         valueType: 'resource',
@@ -121,6 +131,37 @@ export default (
           onUpdateProperty(instance, name, newValue);
         },
         getLabel,
+        getDescription,
+      };
+    } else if (valueType === 'color') {
+      return {
+        name,
+        valueType: 'color',
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+        getDescription,
+      };
+    } else if (valueType === 'textarea') {
+      return {
+        name,
+        valueType: 'textarea',
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+        getDescription,
       };
     } else {
       console.error(

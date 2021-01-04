@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/video-player/video-player.json",
+    "projectUuid": "19145c8a-0fb6-4486-90a1-74ae482fe303",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Example video",
     "author": "Bouh",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,7 +100,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Play.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Play.png",
         "kind": "image",
         "metadata": "",
         "name": "Play.png",
@@ -111,7 +109,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Pause.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Pause.png",
         "kind": "image",
         "metadata": "",
         "name": "Pause.png",
@@ -120,7 +118,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Background-gradient.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Background-gradient.png",
         "kind": "image",
         "metadata": "",
         "name": "Background-gradient.png",
@@ -129,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Hand-cursor.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Hand-cursor.png",
         "kind": "image",
         "metadata": "",
         "name": "Hand-cursor.png",
@@ -138,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Fullscreen.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Fullscreen.png",
         "kind": "image",
         "metadata": "",
         "name": "Fullscreen.png",
@@ -147,7 +145,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_high.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_high.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_high.png",
@@ -156,7 +154,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_low.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_low.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_low.png",
@@ -165,7 +163,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Sound_muted.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Sound_muted.png",
         "kind": "image",
         "metadata": "",
         "name": "Sound_muted.png",
@@ -174,7 +172,7 @@
       },
       {
         "alwaysLoaded": true,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Volume_Background_ProgressBar.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Volume_Background_ProgressBar.png",
         "kind": "image",
         "metadata": "",
         "name": "Volume_Background_ProgressBar.png",
@@ -183,7 +181,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Circle.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Circle.png",
         "kind": "image",
         "metadata": "",
         "name": "Circle.png",
@@ -192,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/Placeholder_ProgressBar.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/Placeholder_ProgressBar.png",
         "kind": "image",
         "metadata": "",
         "name": "Placeholder_ProgressBar.png",
@@ -201,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/transparent.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/transparent.png",
         "kind": "image",
         "metadata": "",
         "name": "Transparent.png",
@@ -210,7 +208,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/loop.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/loop.png",
         "kind": "image",
         "metadata": "",
         "name": "Loop.png",
@@ -219,7 +217,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/notlooped.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/notlooped.png",
         "kind": "image",
         "metadata": "",
         "name": "NotLooped.png",
@@ -227,7 +225,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
         "kind": "video",
         "metadata": "",
         "name": "The-Daily-Dweebs-By-Blender-Foundation-1000kbps.mp4",
@@ -235,7 +233,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/notlooped.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/notlooped.png",
         "kind": "image",
         "metadata": "",
         "name": "notlooped.png",
@@ -244,7 +242,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/loop.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/loop.png",
         "kind": "image",
         "metadata": "",
         "name": "loop.png",
@@ -253,7 +251,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/transparent.png",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/transparent.png",
         "kind": "image",
         "metadata": "",
         "name": "transparent.png",
@@ -261,7 +259,7 @@
         "userAdded": true
       },
       {
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",
+        "file": "https://resources.gdevelop-app.com/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",
         "kind": "video",
         "metadata": "",
         "name": "The-Daily-Dweebs-By-Blender-Foundation-Short.mp4",
@@ -319,6 +317,7 @@
           "layer": "",
           "locked": false,
           "name": "Video",
+          "persistentUuid": "38ddc3b6-4163-4443-9512-b6aed7d98b11",
           "width": 625,
           "x": 89,
           "y": 98,
@@ -343,6 +342,7 @@
           "layer": "",
           "locked": false,
           "name": "DEBUG_VIDEO",
+          "persistentUuid": "245e016b-a829-40d6-b00b-f11fda663128",
           "width": 0,
           "x": 325,
           "y": 648,
@@ -358,6 +358,7 @@
           "layer": "",
           "locked": false,
           "name": "Explain",
+          "persistentUuid": "74060008-1840-40ae-abec-7373eefb8cf7",
           "width": 0,
           "x": 83,
           "y": 467,
@@ -373,6 +374,7 @@
           "layer": "",
           "locked": false,
           "name": "Credit",
+          "persistentUuid": "97a2f4c3-25ad-431a-a161-9a15d838d635",
           "width": 0,
           "x": 306,
           "y": 570,
@@ -388,6 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "b9818239-12b0-47b1-93ee-b8ec7878356d",
           "width": 344,
           "x": 260,
           "y": 32,
@@ -5327,7 +5330,8 @@
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": "window.scene = runtimeScene;\nvariables = scene.getVariables();\n\n//currenttime of video object, for more see DEBUG group\ncurrentTime = Math.round(variables.get(\"exp_currentTime\").getAsNumber());\ncurrentTime_formated = variables.get(\"currentTime_formated\");\n\n//duration of video object, for more see debug group\nduration = Math.round(variables.get(\"exp_duration\").getAsNumber());\nduration_formated = variables.get(\"duration_formated\"); //this init the variable\n\n\n\nfunction format_time(time_second) {\n    if (Number.isInteger(time_second)) {\n        date = new Date(null);\n        date.setSeconds(time_second);\n        if (time_second >= 3600) {\n            return date.toISOString().substr(11, 8); // MM:SS\n        } else {\n            return date.toISOString().substr(14, 5); // HH:MM:SS\n        }\n\n\n    }\n}\n\n//update the new variables with time formated, ready to use in this group Time display\nduration_formated.setString(format_time(duration));\ncurrentTime_formated.setString(format_time(currentTime));\n\n",
                   "parameterObjects": "",
-                  "useStrict": false
+                  "useStrict": false,
+                  "eventsSheetExpanded": false
                 },
                 {
                   "disabled": false,
@@ -6043,6 +6047,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -6060,12 +6069,22 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Progressbar",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UI",
           "visibility": true,
           "cameras": [],
@@ -6087,10 +6106,13 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Utils",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [],
       "eventsFunctions": [
         {
           "description": "Set the position of a object in %, position is from the objet parent.",
@@ -6207,6 +6229,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Object to place",
+              "longDescription": "",
               "name": "OBJECT",
               "optional": false,
               "supplementaryInformation": "",
@@ -6216,6 +6239,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Parent object",
+              "longDescription": "",
               "name": "PARENT_OBJECT",
               "optional": false,
               "supplementaryInformation": "",
@@ -6225,6 +6249,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "X %(Number)",
+              "longDescription": "",
               "name": "POS_X",
               "optional": false,
               "supplementaryInformation": "",
@@ -6234,6 +6259,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Y %(Number)",
+              "longDescription": "",
               "name": "POS_Y",
               "optional": false,
               "supplementaryInformation": "",
@@ -6243,6 +6269,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Include or not the dimension of the object ? (0 = no ,1 = yes)",
+              "longDescription": "",
               "name": "INCLUDE",
               "optional": false,
               "supplementaryInformation": "",
@@ -6252,6 +6279,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Offset X px of the object",
+              "longDescription": "",
               "name": "OFFSET_X",
               "optional": false,
               "supplementaryInformation": "",
@@ -6261,6 +6289,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Offset Y px of the object",
+              "longDescription": "",
               "name": "OFFSET_Y",
               "optional": false,
               "supplementaryInformation": "",

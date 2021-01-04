@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/GDevelop projects/My project1338/object-gravity.json",
+    "projectUuid": "3e5b2747-854a-4250-b671-b6f186278b6a",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/Planeta.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/Planeta.png",
         "kind": "image",
         "metadata": "",
         "name": "Planeta.png",
@@ -114,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/SpaceGuy.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/SpaceGuy.png",
         "kind": "image",
         "metadata": "",
         "name": "SpaceGuy.png",
@@ -123,7 +121,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight22.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight22.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight22.png",
@@ -132,7 +130,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight23.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight23.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight23.png",
@@ -141,7 +139,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight34.png",
+        "file": "https://resources.gdevelop-app.com/examples/object-gravity/flatLight34.png",
         "kind": "image",
         "metadata": "",
         "name": "flatLight34.png",
@@ -208,6 +206,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
+          "persistentUuid": "c1c7aca8-7a71-4bf3-9f1f-1502543fa320",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -223,6 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
+          "persistentUuid": "bb7ba60f-d3c1-41ec-814e-d536d435a837",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -238,6 +238,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "4866bcc2-9319-460c-9a22-8b8bc14747e3",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -253,6 +254,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
+          "persistentUuid": "9784bcd6-3c49-41c8-af1b-1c523eeee3ba",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -268,6 +270,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
+          "persistentUuid": "246b0ca5-dfe1-41f0-8bbd-2fb49d1c24f9",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -283,6 +286,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
+          "persistentUuid": "f70b894a-b766-4119-be5f-bdf32259702f",
           "width": 0,
           "x": 620,
           "y": 427,
@@ -956,6 +960,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -973,6 +982,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Touch",
           "visibility": true,
           "cameras": [],

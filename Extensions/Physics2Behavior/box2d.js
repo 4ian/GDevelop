@@ -1,3 +1,5 @@
+window.Box2D = (function() {
+
 function c(a){throw a;}var d=void 0,aa=!0,ba=null,ca=!1,e;e||(e=eval("(function() { try { return Module || {} } catch(e) { return {} } })()"));var da={},ea;for(ea in e)e.hasOwnProperty(ea)&&(da[ea]=e[ea]);var fa="object"===typeof process&&"function"===typeof require,ga="object"===typeof window,ia="function"===typeof importScripts,ja=!ga&&!fa&&!ia;
 if(fa){e.print||(e.print=function(a){process.stdout.write(a+"\n")});e.printErr||(e.printErr=function(a){process.stderr.write(a+"\n")});var ka=require("fs"),la=require("path");e.read=function(a,b){var a=la.normalize(a),f=ka.readFileSync(a);!f&&a!=la.resolve(a)&&(a=path.join(__dirname,"..","src",a),f=ka.readFileSync(a));f&&!b&&(f=f.toString());return f};e.readBinary=function(a){return e.read(a,aa)};e.load=function(a){ma(read(a))};e.thisProgram=1<process.argv.length?process.argv[1].replace(/\\/g,"/"):
 "unknown-program";e.arguments=process.argv.slice(2);"undefined"!==typeof module&&(module.exports=e);process.on("uncaughtException",function(a){a instanceof na||c(a)})}else ja?(e.print||(e.print=print),"undefined"!=typeof printErr&&(e.printErr=printErr),e.read="undefined"!=typeof read?read:function(){c("no read() available (jsc?)")},e.readBinary=function(a){if("function"===typeof readbuffer)return new Uint8Array(readbuffer(a));a=read(a,"binary");oa("object"===typeof a);return a},"undefined"!=typeof scriptArgs?
@@ -802,3 +804,5 @@ $.prototype.set_bodyB=function(a){var b=this.e,a=a&&"object"===typeof a?a.e:r(a)
 e.e_distanceJoint=Fo();e.e_pulleyJoint=Yf();e.e_mouseJoint=ae();e.e_gearJoint=Gt();e.e_wheelJoint=Zr();e.e_weldJoint=$m();e.e_frictionJoint=xe();e.e_ropeJoint=rs();e.e_motorJoint=Po();e.e_inactiveLimit=dv();e.e_atLowerLimit=On();e.e_atUpperLimit=Xw();e.e_equalLimits=Ci();e.b2Manifold.e_circles=co();e.b2Manifold.e_faceA=ok();e.b2Manifold.e_faceB=pk();e.b2_staticBody=Km();e.b2_kinematicBody=Yq();e.b2_dynamicBody=Sq();e.b2Draw.e_shapeBit=Gi();e.b2Draw.e_jointBit=qg();e.b2Draw.e_aabbBit=Pu();
 e.b2Draw.e_pairBit=jp();e.b2Draw.e_centerOfMassBit=iw();e.b2ContactFeature.e_vertex=Ih();e.b2ContactFeature.e_face=tm();this.Box2D=e;
 
+    return this.Box2D;
+})();

@@ -1,15 +1,18 @@
 // @flow
 import * as React from 'react';
+import classNames from 'classnames';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
+import { nameAndIconContainer } from '../EventsTree/ClassNames';
 
 export default class ObjectField extends React.Component<
   ParameterFieldProps,
   {||}
 > {
   _description: ?string;
+  _longDescription: ?string;
   _allowedObjectType: ?string;
   _field: ?ObjectSelector;
 
@@ -20,6 +23,10 @@ export default class ObjectField extends React.Component<
 
     this._description = parameterMetadata
       ? parameterMetadata.getDescription()
+      : undefined;
+
+    this._longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
       : undefined;
 
     this._allowedObjectType = parameterMetadata
@@ -34,13 +41,16 @@ export default class ObjectField extends React.Component<
   render() {
     return (
       <ObjectSelector
+        margin={this.props.isInline ? 'none' : 'dense'}
         project={this.props.project}
         value={this.props.value}
         onChange={this.props.onChange}
+        onRequestClose={this.props.onRequestClose}
         allowedObjectType={this._allowedObjectType}
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
+        helperMarkdownText={this._longDescription}
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (
@@ -61,10 +71,21 @@ export default class ObjectField extends React.Component<
 
 export const renderInlineObjectWithThumbnail = ({
   value,
+  parameterMetadata,
   renderObjectThumbnail,
+  MissingParameterValue,
 }: ParameterInlineRendererProps) => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+
   return (
-    <span title={value}>
+    <span
+      title={value}
+      className={classNames({
+        [nameAndIconContainer]: true,
+      })}
+    >
       {renderObjectThumbnail(value)}
       {value}
     </span>

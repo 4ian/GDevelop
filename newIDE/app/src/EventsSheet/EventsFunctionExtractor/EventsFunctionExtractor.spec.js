@@ -1,7 +1,7 @@
 // @flow
 import { setupFunctionFromEvents } from '.';
 import { makeTestProject } from '../../fixtures/TestProject';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 const serializedEvents = [
   {
@@ -39,9 +39,8 @@ const serializedEvents = [
 ];
 
 describe('EventsFunctionExtractor', () => {
-  const { project, testLayout } = makeTestProject(gd);
-
   it('configures the events function with the proper parameters', () => {
+    const { project, testLayout } = makeTestProject(gd);
     const eventsFunction = new gd.EventsFunction();
 
     setupFunctionFromEvents({

@@ -1,12 +1,10 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
+import Paper from '@material-ui/core/Paper';
 
 const styles = {
   container: {
-    flex: 1,
     display: 'flex',
-    height: '100%',
     flexDirection: 'column',
   },
   maxWidth: {
@@ -17,19 +15,24 @@ const styles = {
 type Props = {|
   children: ?React.Node,
   maxWidth?: boolean,
+  width?: number | string,
+  /** Sometimes required on Safari */
+  noFullHeight?: boolean,
+  noExpand?: boolean,
 |};
 
 /**
  * This is the component to be used to display the standard
  * background of editor/windows/dialogs.
- *
- * TODO: All usage of material-ui Paper in other components should be
- * removed in favor of using this component.
  */
 const Background = (props: Props) => (
   <Paper
+    square
     style={{
       ...styles.container,
+      height: props.noFullHeight ? undefined : '100%',
+      width: props.width ? props.width : undefined,
+      flex: props.noExpand ? undefined : 1,
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
   >

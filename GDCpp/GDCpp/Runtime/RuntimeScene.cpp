@@ -438,8 +438,8 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances(
   layers.clear();
   sf::View defaultView(sf::FloatRect(0.0f,
                                      0.0f,
-                                     game->GetMainWindowDefaultWidth(),
-                                     game->GetMainWindowDefaultHeight()));
+                                     game->GetGameResolutionWidth(),
+                                     game->GetGameResolutionHeight()));
   for (std::size_t i = 0; i < GetLayersCount(); ++i) {
     layers.push_back(RuntimeLayer(GetLayer(i), defaultView));
   }

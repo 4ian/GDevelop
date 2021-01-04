@@ -1,18 +1,26 @@
-#Script launching the generation of the documentations of all modules
-#Install globally doxgen and jsdoc before starting it.
+# Script launching the generation of the documentations of all modules
+# Install globally doxgen before starting it.
+set -e
+
 echo Generating all docs...
+mkdir -p ../docs
 mkdir -p logs
 cd ..
 cd Core/docs
-doxygen > ../../scripts/logs/CoreDoxygenLog.txt 2> ../../scripts/logs/CoreDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated Core docs
 cd ../..
 cd GDJS/docs
-doxygen > ../../scripts/logs/GDJSDoxygenLog.txt  2> ../../scripts/logs/GDJSDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated GDJS docs
 cd ../..
 cd GDCpp/docs
-doxygen > ../../scripts/logs/GDCppDoxygenLog.txt 2> ../../scripts/logs/GDCppDoxygenWarningLog.txt
+doxygen
+echo ℹ️ Generated GDCpp docs
 cd ../..
 cd GDJS
-jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+npm install
+npm run generate-doc
+echo ℹ️ Generated GDJS Runtime docs
 cd ..
 cd scripts

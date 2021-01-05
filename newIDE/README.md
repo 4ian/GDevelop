@@ -33,9 +33,8 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 
 You can run the standalone app with Electron. **Make sure that you've launched `npm start` (or `yarn start`) in `app` folder before** (see above) and **keep it running** (in development, the app is served from a local server, even for the standalone app).
 
-> Note For Windows: With **Node.js 14 or older**, there is an error related to `git-sh-setup` when running npm install. </br>
-> To solve this problem - add [this folder to your path environment variable](https://stackoverflow.com/questions/49256190/how-to-fix-git-sh-setup-file-not-found-in-windows) </br> **OR** </br>
-> run `npm install` in newIDE/electron-app/app **before** npm install in newIDE/electron-app.
+> Note for Windows: With **Node.js 14 or older**, there is an error related to `git-sh-setup` when running npm install.  
+> To solve this problem: add [this folder to your path environment variable](https://stackoverflow.com/questions/49256190/how-to-fix-git-sh-setup-file-not-found-in-windows) **OR** run `npm install` in newIDE/electron-app/app **before** npm install in newIDE/electron-app.
 
 ```bash
 cd newIDE/app && npm start # Be sure to have this running in another terminal, before the rest!
@@ -56,9 +55,9 @@ npm run electron-linux
 
 ### Quick Install and Run
 
-There is a script file that automates cloning this repository, building the newIde and running it
+There is a script file that automates cloning this repository, building the IDE and running it:
 
--   For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GD to be cloned to, then simply run it.
+-   For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned to, then simply run it.
 
 ### Development of UI components
 

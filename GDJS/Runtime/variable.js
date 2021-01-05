@@ -35,7 +35,7 @@ gdjs.Variable = function (varData) {
   this._str = '0';
   /** @type {boolean} */
   this._bool = false;
-  /** @type {Object.<string, gdjs.Variable>} */
+  /** @type {Object<string | number, gdjs.Variable>} */
   this._children = {};
   /** @type {gdjs.Variable[]} */
   this._childrenList = [];
@@ -94,21 +94,50 @@ gdjs.Variable.prototype.isUndefinedInContainer = function () {
 };
 
 /**
+ * Converts the variable into another type.
+ * @param {VariableType} newType
+ */
+gdjs.Variable.prototype.castTo = function (newType) {
+  if (newType === 'string') this.setString(this.getAsString());
+  else if (newType === 'number') this.setNumber(this.getAsNumber());
+  else if (newType === 'boolean') this.setBoolean(this.getAsBoolean());
+  else if (newType === 'structure') {
+    if (this._type === 'structure') return;
+    this._children = this.getAllChildren();
+    this._type = 'structure';
+  } else if (newType === 'array') {
+    if (this._type === 'array') return;
+    this._childrenList = this.getAllChildrenList();
+    this._type = 'array';
+  }
+};
+
+/**
  * Get the child with the specified name.
  *
  * If the variable has not the specified child, an empty variable with the specified name
  * is added as child.
+ * @param {string | number} childName
  * @returns {gdjs.Variable} The child variable
  */
 gdjs.Variable.prototype.getChild = function (childName) {
-  if (
-    this._children.hasOwnProperty(childName) &&
-    this._children[childName] !== undefined
-  )
-    return this._children[childName];
+  // Make sure the variable is a collection
+  if (this.isPrimitive()) this.castTo('structure');
 
-  this._type = 'structure';
-  this._children[childName] = new gdjs.Variable();
+  if (this._type === 'array') {
+    // Make sure the key is an integer for arrays
+    //@ts-ignore parseInt does accept numbers.
+    childName = parseInt(childName, 10);
+    // Prevent NaN to be used as key
+    if (childName !== childName) childName = 0;
+
+    if (this._childrenList[childName] === undefined)
+      this._childrenList[childName] = new gdjs.Variable();
+    return this._childrenList[childName];
+  }
+
+  if (this._children[childName] === undefined)
+    this._children[childName] = new gdjs.Variable();
   return this._children[childName];
 };
 
@@ -121,7 +150,8 @@ gdjs.Variable.prototype.getChild = function (childName) {
  * @returns {gdjs.Variable} The variable (for chaining calls)
  */
 gdjs.Variable.prototype.addChild = function (childName, childVariable) {
-  this._type = 'structure';
+  // Make sure this is a structure
+  this.castTo('structure');
   this._children[childName] = childVariable;
   return this;
 };
@@ -154,12 +184,7 @@ gdjs.Variable.prototype.removeChild = function (childName) {
  */
 gdjs.Variable.prototype.clearChildren = function () {
   if (this._type !== 'structure') return;
-
-  for (var child in this._children) {
-    if (this._children.hasOwnProperty(child)) {
-      delete this._children[child];
-    }
-  }
+  this._children = {};
 };
 
 /**
@@ -177,11 +202,10 @@ gdjs.Variable.prototype.replaceChildren = function (newChildren) {
  */
 gdjs.Variable.prototype.getAsNumber = function () {
   if (this._type !== 'number') {
-    let number;
+    let number = 0;
     if (this._type === 'string') number = parseFloat(this._str);
     else if (this._type === 'boolean') number = this._bool ? 1 : 0;
 
-    if (typeof number === 'undefined') return 0;
     return number === number ? number : 0; //Ensure NaN is not returned as a value.
   }
 
@@ -194,7 +218,9 @@ gdjs.Variable.prototype.getAsNumber = function () {
  */
 gdjs.Variable.prototype.setNumber = function (newValue) {
   this._type = 'number';
-  this._value = newValue;
+  //@ts-ignore parseFloat does accept numbers.
+  newValue = parseFloat(newValue);
+  this._value = newValue === newValue ? newValue : 0; // Prevent NaN
 };
 
 /**
@@ -205,6 +231,9 @@ gdjs.Variable.prototype.getAsString = function () {
   if (this._type !== 'string') {
     if (this._type === 'number') return this._value.toString();
     else if (this._type === 'boolean') return this._bool ? 'true' : 'false';
+    else if (this._type === 'structure') return '[Structure]';
+    else if (this._type === 'array') return '[Array]';
+    else return '';
   }
 
   return this._str;
@@ -216,7 +245,7 @@ gdjs.Variable.prototype.getAsString = function () {
  */
 gdjs.Variable.prototype.setString = function (newValue) {
   this._type = 'string';
-  this._str = newValue;
+  this._str = newValue.toString();
 };
 
 /**
@@ -228,6 +257,7 @@ gdjs.Variable.prototype.getAsBoolean = function () {
     if (this._type === 'number') return this._value !== 0;
     else if (this._type === 'string')
       return this._str !== '0' && this._str !== '' && this._str !== 'false';
+    else return this.getChildrenCount() !== 0;
   }
 
   return this._bool;
@@ -239,7 +269,7 @@ gdjs.Variable.prototype.getAsBoolean = function () {
  */
 gdjs.Variable.prototype.setBoolean = function (newValue) {
   this._type = 'boolean';
-  this._bool = newValue;
+  this._bool = !!newValue;
 };
 
 /**
@@ -281,7 +311,11 @@ gdjs.Variable.prototype.getType = function () {
  * @return {Object.<string, gdjs.Variable>} All the children of the variable
  */
 gdjs.Variable.prototype.getAllChildren = function () {
-  return this._children;
+  return this._type === 'structure'
+    ? this._children
+    : this._type === 'array'
+    ? Object.assign({}, this._childrenList)
+    : {};
 };
 
 /**
@@ -302,7 +336,6 @@ gdjs.Variable.prototype.getAllChildrenList = function () {
  */
 gdjs.Variable.prototype.getChildrenCount = function () {
   if (this.isPrimitive()) return 0;
-  //@ts-ignore This cannot return null as type isn't a primitive.
   return this.getAllChildrenList().length;
 };
 
@@ -353,25 +386,12 @@ gdjs.Variable.prototype.concatenateString = function (str) {
 gdjs.Variable.prototype.concatenate = gdjs.Variable.prototype.concatenateString;
 
 /**
- * Returns the variable at a specific index in the array.
- * If it doesn't yet exists, create it.
- * @param {number} index
- * @returns {gdjs.Variable}
- */
-gdjs.Variable.prototype.getAtIndex = function (index) {
-  if (this._childrenList[index] === undefined) {
-    this._type = 'array';
-    this._childrenList[index] = new gdjs.Variable();
-  }
-  return this._childrenList[index];
-};
-
-/**
  * Removes a variable at a given index of the variable.
  * @param {number} index
  */
 gdjs.Variable.prototype.removeAtIndex = function (index) {
-  if (this._type === 'array') this._childrenList.splice(index, 1);
+  this.castTo('array');
+  this._childrenList.splice(index, 1);
 };
 
 /**
@@ -379,6 +399,8 @@ gdjs.Variable.prototype.removeAtIndex = function (index) {
  * @param {gdjs.Variable} variable
  */
 gdjs.Variable.prototype.push = function (variable) {
-  if (this._type === 'array' && variable instanceof gdjs.Variable)
+  if (variable instanceof gdjs.Variable) {
+    this.castTo('array');
     this._childrenList.push(variable);
+  }
 };

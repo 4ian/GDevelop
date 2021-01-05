@@ -27,6 +27,7 @@ import { create } from 'jss';
 import rtl from 'jss-rtl';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import {
   type ResourceFetcher,
   ResourceFetcherContext,
@@ -99,11 +100,13 @@ export default class Providers extends React.Component<Props, {||}> {
                                   <CommandsContextProvider>
                                     <AssetStoreStateProvider>
                                       <ResourceStoreStateProvider>
-                                        <ResourceFetcherContext.Provider
-                                          value={resourceFetcher}
-                                        >
-                                          {children({ i18n })}
-                                        </ResourceFetcherContext.Provider>
+                                        <ExtensionStoreStateProvider>
+                                          <ResourceFetcherContext.Provider
+                                            value={resourceFetcher}
+                                          >
+                                            {children({ i18n })}
+                                          </ResourceFetcherContext.Provider>
+                                        </ExtensionStoreStateProvider>
                                       </ResourceStoreStateProvider>
                                     </AssetStoreStateProvider>
                                   </CommandsContextProvider>

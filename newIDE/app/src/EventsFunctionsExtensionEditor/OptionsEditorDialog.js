@@ -134,7 +134,7 @@ const HelpPathTextField = ({
             t`This is a relative path that will open in the GDevelop wiki.`
           )
         : i18n._(t`This is link to a webpage.`)) +
-      ` [${i18n._(`Click here to test the link.`)}](${getHelpLink(helpPath)})`
+      ` [${i18n._(t`Click here to test the link.`)}](${getHelpLink(helpPath)})`
     : i18n._(
         t`This can either be a URL to a web page, or a path starting with a slash that will be opened in the GDevelop wiki. Leave empty if there is no help page, although it's recommended you eventually write one if you distribute the extension.`
       );
@@ -283,11 +283,22 @@ export default function OptionsEditorDialog({
               }}
               fullWidth
             />
-            <TextField
+            <SemiControlledTextField
               floatingLabelText={<Trans>Tags (comma separated)</Trans>}
-              value={eventsFunctionsExtension.getTags()}
-              onChange={(e, text) => {
-                eventsFunctionsExtension.setTags(text);
+              value={eventsFunctionsExtension
+                .getTags()
+                .toJSArray()
+                .join(', ')}
+              onChange={text => {
+                const tags = eventsFunctionsExtension.getTags();
+                tags.clear();
+                text
+                  .split(',')
+                  .map(tag => tag.trim())
+                  .filter(Boolean)
+                  .forEach(tag => {
+                    tags.push_back(tag);
+                  });
                 forceUpdate();
               }}
               fullWidth

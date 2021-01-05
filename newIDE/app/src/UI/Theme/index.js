@@ -2,29 +2,26 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import { isLtr } from '../../Utils/i18n/RtlLanguages';
 import memoize from '../../Utils/Memoize';
-import DefaultTheme, {
-  themeName as defaultThemeName,
-  type Theme,
-} from './DefaultTheme';
-import DarkTheme from './DarkTheme';
-import NordTheme from './NordTheme';
-import SolarizedDarkTheme from './SolarizedDarkTheme';
-import './Global.css';
 
-// To add a new theme:
-// * copy the folder of an existing one (DarkTheme for example),
-// * import it at the top of the file
-// * add it below:
-export const themes = {
-  [defaultThemeName]: DefaultTheme,
-  Dark: DarkTheme,
-  Nord: NordTheme,
-  'Solarized Dark': SolarizedDarkTheme,
-};
+import DefaultTheme from './DefaultTheme';
+import { themes as themeList } from './ThemeRegistry';
+
+import 'react-virtualized/styles.css';
+// Styles
+import './Global/Animation.css';
+import './Global/EventsSheet.css';
+import './Global/Markdown.css';
+import './Global/Scrollbar.css';
+import './Global/Mosaic.css';
+import './Global/Table.css';
+
+export type Theme = $Exact<typeof DefaultTheme>;
+export const themes = themeList;
 
 export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
 type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
 type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
+const defaultThemeName = 'GDevelop default';
 
 export function getTheme({
   themeName,
@@ -91,6 +88,6 @@ const rtlOverrides = {
 };
 
 export const defaultTheme: ActualTheme = {
-  gdevelopTheme: DefaultTheme.gdevelopTheme,
-  muiTheme: createLtrTheme(DefaultTheme.muiThemeOptions),
+  ...DefaultTheme,
+  muiThemeOptions: createLtrTheme(DefaultTheme.muiThemeOptions),
 };

@@ -84,11 +84,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
-  const gd::String& GetTags() const { return tags; };
-  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
-    tags = tags_;
-    return *this;
-  }
+  const std::vector<gd::String>& GetTags() const { return tags; };
+  std::vector<gd::String>& GetTags() { return tags; };
 
   const gd::String& GetAuthor() const { return author; };
   EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
@@ -174,7 +171,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
-  gd::String tags;
+  std::vector<gd::String> tags;
   gd::String author;
   gd::String previewIconUrl;
   gd::String iconUrl;

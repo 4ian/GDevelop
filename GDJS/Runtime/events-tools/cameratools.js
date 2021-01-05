@@ -174,6 +174,20 @@ gdjs.evtTools.camera.getCameraRotation = function (
 
 /**
  * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {string} layer
+ * @param {number} cameraId
+ * @returns {number}
+ */
+gdjs.evtTools.camera.getCameraZoom = function (runtimeScene, layer, cameraId) {
+  if (!runtimeScene.hasLayer(layer)) {
+    return 0;
+  }
+
+  return runtimeScene.getLayer(layer).getCameraZoom(cameraId);
+};
+
+/**
+ * @param {gdjs.RuntimeScene} runtimeScene
  * @param {number} newZoom
  * @param {string} layer
  * @param {number} cameraId
@@ -442,4 +456,34 @@ gdjs.evtTools.camera.getLayerDefaultZOrder = function (runtimeScene, layer) {
     return 0;
   }
   return runtimeScene.getLayer(layer).getDefaultZOrder();
+};
+
+/**
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {string} layerName The lighting layer with the ambient color.
+ * @param {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.evtTools.camera.setLayerAmbientLightColor = function (
+  runtimeScene,
+  layerName,
+  rgbColor
+) {
+  if (!runtimeScene.hasLayer(layerName)) {
+    return;
+  }
+  if (!runtimeScene
+    .getLayer(layerName).isLightingLayer()) {
+    return;
+  }
+
+  var colors = rgbColor.split(';');
+  if (colors.length < 3) return;
+
+  return runtimeScene
+    .getLayer(layerName)
+    .setClearColor(
+      parseInt(colors[0]),
+      parseInt(colors[1]),
+      parseInt(colors[2])
+    );
 };

@@ -11,6 +11,7 @@ import {
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -47,7 +48,7 @@ export default class ForEachEvent extends React.Component<
             [disabledText]: this.props.disabled,
           })}
         >
-          While these conditions are true:
+          <Trans>While these conditions are true:</Trans>
         </div>
         <InstructionsList
           instrsList={whileEvent.getWhileConditions()}
@@ -76,7 +77,7 @@ export default class ForEachEvent extends React.Component<
             [disabledText]: this.props.disabled,
           })}
         >
-          Repeat these:
+          <Trans>Repeat these:</Trans>
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}

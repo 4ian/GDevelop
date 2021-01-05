@@ -3355,6 +3355,44 @@ describe('libGD.js', function () {
           .getName()
       ).toBe('MyBehavior1');
     });
+    it('can be unserialized, with tags as a (deprecated) string', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+
+      // Check that we can unserialize tags from the old format, where they were
+      // written as a string.
+      const element = gd.Serializer.fromJSObject({
+        version: '1.0.0',
+        extensionNamespace: '',
+        shortDescription: '',
+        description: '',
+        name: 'ExtensionName',
+        fullName: '',
+        tags: ' 12,34, 56  , 789',
+        author: '',
+        previewIconUrl: '',
+        iconUrl: '',
+        helpPath: '',
+        eventsFunctions: [],
+        eventsBasedBehaviors: [],
+      });
+
+      eventsFunctionsExtension.unserializeFrom(project, element);
+      element.delete();
+
+      expect(eventsFunctionsExtension.getVersion()).toBe('1.0.0');
+      expect(eventsFunctionsExtension.getName()).toBe('ExtensionName');
+
+      // Verify that tags were properly converted to an array
+      expect(eventsFunctionsExtension.getTags().toJSArray()).toEqual([
+        '12',
+        '34',
+        '56',
+        '789',
+      ]);
+
+      project.delete();
+    });
   });
   describe('gd.EventsBasedBehavior', () => {
     it('can have a name, fullname, description', function () {

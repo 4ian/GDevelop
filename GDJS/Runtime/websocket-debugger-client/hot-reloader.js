@@ -7,6 +7,10 @@
  */
 
 /**
+ * @typedef {{oldBehaviorConstructor: Function, newBehaviorConstructor: Function, behaviorTypeName: string }} ChangedRuntimeBehavior
+ */
+
+/**
  * Reload scripts/data of an exported game and applies the changes
  * to the running runtime game.
  *
@@ -67,6 +71,8 @@ gdjs.HotReloader.prototype._canReloadScriptFile = function (srcFilename) {
       endsWith(srcFilename, 'shopify-buy.umd.polyfilled.min.js') ||
       // Don't reload pixi-multistyle-text library.
       endsWith(srcFilename, 'pixi-multistyle-text.umd.js') ||
+      // Don't reload pixi-tilemap library.
+      endsWith(srcFilename, 'pixi-tilemap.umd.js') ||
       // Don't reload bondage.js library.
       endsWith(srcFilename, 'bondage.min.js') ||
       // Don't reload pixi-particles library.
@@ -226,10 +232,6 @@ gdjs.HotReloader.prototype.hotReload = function () {
       });
   });
 };
-
-/**
- * @typedef {{oldBehaviorConstructor: Function, newBehaviorConstructor: Function, behaviorTypeName: string }} ChangedRuntimeBehavior
- */
 
 /**
  * @param {Object.<string, Function>} oldBehaviorConstructors

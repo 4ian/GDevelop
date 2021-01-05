@@ -13,7 +13,9 @@
  * @property {number} width The object width
  * @property {number} height The object height
  * @property {string} texture The name of the resource containing the texture to use
- *
+ */
+
+/**
  * @typedef {ObjectData & PanelSpriteObjectDataType} PanelSpriteObjectData
  */
 

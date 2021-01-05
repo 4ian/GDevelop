@@ -19,6 +19,6 @@
     "git-rev": "^0.2.1",
     "is-git-clean": "^1.1.0",
     "minimist": "^1.2.3",
-    "shelljs": "^0.7.7"
+    "shelljs": "0.8.4"
   }
 }

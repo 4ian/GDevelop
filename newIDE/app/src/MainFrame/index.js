@@ -1640,6 +1640,11 @@ const MainFrame = (props: Props) => {
                 _showSnackMessage(i18n._(t`Project properly saved`));
 
                 if (fileMetadata) {
+                  preferences.insertRecentProjectFile({
+                    fileMetadata,
+                    storageProviderName: getStorageProvider().internalName,
+                  });
+
                   setState(state => ({
                     ...state,
                     currentFileMetadata: fileMetadata,
@@ -1671,6 +1676,8 @@ const MainFrame = (props: Props) => {
       setState,
       state.editorTabs,
       _showSnackMessage,
+      getStorageProvider,
+      preferences,
     ]
   );
 

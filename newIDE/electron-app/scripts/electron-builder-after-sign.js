@@ -30,6 +30,7 @@ exports.default = async function notarizing(context) {
   }
 
   // Launch notarization
+  const startTime = Date.now();
   console.info(
     `Notarizing ${appBundleId} found at ${appPath} for Apple ID=${appleId}...`
   );
@@ -42,7 +43,8 @@ exports.default = async function notarizing(context) {
       appleIdPassword,
     });
 
-    console.info(`Done notarizing ${appBundleId}.`);
+    const duration = (Date.now() - startTime) / 1000;
+    console.info(`Done notarizing ${appBundleId} in ${duration} seconds.`);
   } catch (error) {
     console.error(`Error during notarization: `, error);
     throw new Error(`Error during notarization: ${error}`);

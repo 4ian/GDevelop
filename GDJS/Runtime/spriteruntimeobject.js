@@ -53,7 +53,9 @@
  * @typedef {Object} SpriteObjectDataType Represents the data of a {@link gdjs.SpriteRuntimeObject}.
  * @property {boolean} updateIfNotVisible Update the object even if he is not visible?.
  * @property {Array<SpriteAnimationData>} animations The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances.
- *
+ */
+
+/**
  * @typedef {ObjectData & SpriteObjectDataType} SpriteObjectData
  */
 
@@ -122,14 +124,16 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
     //Load the custom collision mask, if any:
     if ( frameData.hasCustomCollisionMask ) {
         this.hasCustomHitBoxes = true;
-    	for(var i = 0, len = frameData.customCollisionMask.length;i<len;++i) {
+        var i = 0;
+    	for(var len = frameData.customCollisionMask.length;i<len;++i) {
             /** @type {Array<SpritePoint>} */
     		var polygonData = frameData.customCollisionMask[i];
 
             //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
             if ( i >= this.customHitBoxes.length ) this.customHitBoxes.push(new gdjs.Polygon());
 
-        	for(var j = 0, len2 = polygonData.length;j<len2;++j) {
+            var j = 0;
+        	for(var len2 = polygonData.length;j<len2;++j) {
                 /** @type {SpritePoint} */
         		var pointData = polygonData[j];
 
@@ -184,7 +188,8 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
         /** @type {Array<SpriteAnimationFrame>} */
         this.frames = [];
     }
-    for(var i = 0, len = directionData.sprites.length;i<len;++i) {
+    var i = 0;
+    for(var len = directionData.sprites.length;i<len;++i) {
         /** @type {SpriteFrameData} */
         var frameData = directionData.sprites[i];
 
@@ -213,7 +218,8 @@ gdjs.SpriteAnimation = function(imageManager, animData)
 
     /** @type {Array<gdjs.SpriteAnimationDirection>} */
     if ( this.directions === undefined ) this.directions = [];
-    for(var i = 0, len = animData.directions.length;i<len;++i) {
+    var i = 0;
+    for(var len = animData.directions.length;i<len;++i) {
         /** @type {SpriteDirectionData} */
         var directionData = animData.directions[i];
 
@@ -287,7 +293,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, spriteObjectData) {
      * call `this._updateAnimationFrame()`.
      * Can be null, so ensure that this case is handled properly.
      *
-     * @type {gdjs.SpriteAnimationFrame}
+     * @type {?gdjs.SpriteAnimationFrame}
      */
     this._animationFrame = null;
 
@@ -311,10 +317,12 @@ gdjs.registerObject("Sprite", gdjs.SpriteRuntimeObject); //Notify gdjs of the ob
 /**
  * @param {SpriteObjectData} oldObjectData
  * @param {SpriteObjectData} newObjectData
+ * @returns {boolean}
  */
 gdjs.SpriteRuntimeObject.prototype.updateFromObjectData = function(oldObjectData, newObjectData) {
     var runtimeScene = this._runtimeScene;
-    for(var i = 0, len = newObjectData.animations.length;i<len;++i) {
+    var i = 0;
+    for(var len = newObjectData.animations.length;i<len;++i) {
         var animData = newObjectData.animations[i];
 
         if ( i < this._animations.length )
@@ -526,7 +534,7 @@ gdjs.SpriteRuntimeObject.prototype.isCurrentAnimationName = function(name) {
 
 /**
  * Change the angle (or direction index) of the object
- * @return {number} The new angle (or direction index) to be applied
+ * @param {number} The new angle (or direction index) to be applied
  */
 gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
     if ( this._currentAnimation >= this._animations.length ) {
@@ -675,10 +683,10 @@ gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
  *
  * All transformations (flipping, scale, rotation) are supported.
  *
- * @param {number} pointX The X position of the point, in object coordinates.
- * @param {number} pointY The Y position of the point, in object coordinates.
- * @param {Array} result Array that will be updated with the result (x and y position of the point
- * in global coordinates)
+ * @param {number} x The X position of the point, in object coordinates.
+ * @param {number} y The Y position of the point, in object coordinates.
+ * @param {Array<number>} result Array that will be updated with the result
+ * (x and y position of the point in global coordinates).
  * @private
  */
 gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
@@ -836,7 +844,7 @@ gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
  * Get the angle of the object.
  * @return {number} The angle, in degrees.
  */
-gdjs.SpriteRuntimeObject.prototype.getAngle = function(angle) {
+gdjs.SpriteRuntimeObject.prototype.getAngle = function() {
     if ( this._currentAnimation >= this._animations.length ) {
         return 0;
     }

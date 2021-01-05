@@ -53,6 +53,18 @@ export default class Tutorials extends PureComponent {
                 }}
               />
               <ListItem
+                primaryText={<Trans>Space Shooter Tutorial</Trans>}
+                secondaryText={
+                  <Trans>Make a space shooter game from scratch.</Trans>
+                }
+                onClick={() => {
+                  sendTutorialOpened('Space Shooter');
+                  Window.openExternalURL(
+                    getHelpLink('/tutorials/space-shooter/start')
+                  );
+                }}
+              />
+              <ListItem
                 primaryText={<Trans>Tank Shooter Tutorial</Trans>}
                 secondaryText={
                   <Trans>Make a simple tank shooter game from scratch.</Trans>

@@ -74,6 +74,13 @@ const jsExtensions = [
     },
   },
   {
+    name: 'TileMap',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/JsExtension.js'),
+    objectsRenderingServiceModules: {
+      'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
+    },
+  },
+  {
     name: 'Effects',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
     objectsRenderingServiceModules: {},

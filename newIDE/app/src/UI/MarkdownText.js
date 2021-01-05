@@ -49,6 +49,7 @@ export const MarkdownText = (props: Props) => {
       escapeHtml
       source={props.source}
       className={classNames({
+        'gd-markdown': true,
         [gdevelopTheme.markdownRootClassName]: true,
         'standalone-text-container': props.isStandaloneText,
       })}

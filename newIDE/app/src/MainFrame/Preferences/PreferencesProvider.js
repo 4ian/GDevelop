@@ -28,6 +28,7 @@ type Props = {|
 type State = Preferences;
 
 const LocalStorageItem = 'gd-preferences';
+const MAX_RECENT_FILES_COUNT = 20;
 
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
@@ -398,7 +399,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }
@@ -409,7 +410,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }

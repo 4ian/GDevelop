@@ -23,7 +23,8 @@
     "react-scripts": "3.4.0",
     "recursive-copy": "^2.0.10",
     "recursive-readdir": "^2.2.2",
-    "shelljs": "^0.7.7",
+    "shelljs": "0.8.4",
+    "style-dictionary": "^2.10.2",
     "unzipper": "^0.9.11",
     "webpack": "4.41.5",
     "workbox-build": "^4.3.1"
@@ -43,7 +44,7 @@
     "date-fns": "2.16.1",
     "downshift": "^3.2.12",
     "element-closest": "2.0.2",
-    "firebase": "^6.1.0",
+    "firebase": "8.0.2",
     "fontfaceobserver": "2.0.13",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
@@ -81,7 +82,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources && npm run make-version-metadata",
-    "import-resources": "npm run import-zipped-external-editors && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js --clean && node import-monaco-editor.js && node import-zipped-external-libs.js",
+    "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js --clean && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
     "start": "npm run import-resources && npm run make-version-metadata && react-scripts start",
@@ -100,6 +101,8 @@
     "extract-all-translations": "node scripts/extract-all-translations.js",
     "compile-translations": "node scripts/compile-translations.js",
     "reload-extensions": "node scripts/import-GDJS-Runtime.js",
+    "build-theme-resources": "node scripts/build-theme-resources.js",
+    "create-new-theme": "node scripts/create-new-theme.js",
     "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta80 5930c686ccf2b6fd3433b1c9539483473a6aedb8b6a73dd13c07030c95efecb9"
   },
   "eslintConfig": {

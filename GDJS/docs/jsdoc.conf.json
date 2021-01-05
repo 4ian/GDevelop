@@ -6,6 +6,8 @@
     "include": ["./Runtime/"],
     "exclude": [
       "./Runtime/Cocos2d/",
+      "./Runtime/cocos-renderers/",
+      "./Runtime/cocos-sound-manager/",
       "./Runtime/Cordova/",
       "./Runtime/Electron/",
       "./Runtime/FacebookInstantGames/"

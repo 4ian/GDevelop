@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -5,250 +6,289 @@
  */
 
 /**
- * Tools related to storage, for events generated code.
+ * Functions to store and load basic values (strings or numbers), organized
+ * into objects:
+ * * Each object has a name
+ * * Each value can be accessed using a path-like string
+ *   (for example: `Root/Some folder/MyValueName`), where each segment is
+ *   separated by a slash.
+ *
+ * These objects are persisted into the environment `localStorage` - which
+ * might not always be available (if not, objects won't be persisted).
  *
  * @memberof gdjs.evtTools
  * @namespace storage
  * @private
  */
-gdjs.evtTools.storage = gdjs.evtTools.storage || {
-	loadedFiles: new Hashtable(),
-	localStorage: typeof cc !== 'undefined' ? cc.sys.localStorage : localStorage,
-	fileUtils: null //Disabled for now
-};
-
-/**
- * Load into memory a JSON object stored in the local storage object
- * provided by the browser.
- * The JSON object is named GDJS_filename in the localStorage object.
- *
- * @param filename {String} The name of the JSON object
- */
-gdjs.evtTools.storage.loadJSONFileFromStorage = function(filename) {
-	if ( gdjs.evtTools.storage.loadedFiles.containsKey(filename) )
-		return; //Already loaded.
-
-    var rawStr = null;
-    if (gdjs.evtTools.storage.fileUtils) {
-        var fileUtils = gdjs.evtTools.storage.fileUtils;
-
-        var fullPath = jsb.fileUtils.getWritablePath() + filename;
-        if (jsb.fileUtils.isFileExist(fullPath)) {
-            rawStr = jsb.fileUtils.getStringFromFile(fullPath);
-        } else {
-            console.log('File "' + filename + '" does not exist.');
-        }
-    } else {
-    	var localStorage = gdjs.evtTools.storage.localStorage;
-    	rawStr = localStorage.getItem("GDJS_"+filename);
+gdjs.evtTools.storage = (function () {
+  /** @type {?Storage} */
+  let localStorage = null;
+  try {
+    // @ts-ignore
+    if (typeof cc !== 'undefined') {
+      // @ts-ignore
+      localStorage = cc.sys.localStorage;
+    } else if (typeof window !== 'undefined') {
+      localStorage = window.localStorage;
     }
+  } catch (error) {
+    console.warn('Unable to get access to the localStorage: ', error);
+  }
+  if (!localStorage) {
+    console.warn("Storage actions won't work as no localStorage was found.");
+  }
+
+  /** The stored objects that are loaded in memory */
+  const loadedObjects = new Hashtable();
+
+  /**
+   * Load into memory a JSON serialized object, from the local storage
+   * provided by the browser/environment.
+   *
+   * The object name is prefixed with `GDJS_` in `localStorage`.
+   *
+   * @param {string} name The name of the object to load
+   */
+  const loadJSONFileFromStorage = (name) => {
+    if (loadedObjects.containsKey(name)) return; // Already loaded.
+
+    let serializedString = null;
+    try {
+      if (localStorage) {
+        serializedString = localStorage.getItem('GDJS_' + name);
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to load data from localStorage for "' + name + '":',
+        error
+      );
+    }
+
+    let jsObject = {};
+    try {
+      if (serializedString) jsObject = JSON.parse(serializedString);
+    } catch (error) {
+      console.warn(
+        'Unable to load data from "' + name + '" - data is not valid JSON:',
+        error
+      );
+    }
+
+    loadedObjects.put(name, jsObject);
+  };
+
+  /**
+   * Unload from memory an object, which is then serialized as JSON and
+   * stored in the local storage provided by the browser/environment.
+   *
+   * The object name is prefixed with `GDJS_` in `localStorage`.
+   *
+   * @param {string} name The name of the object to load
+   */
+  const unloadJSONFile = (name) => {
+    if (!loadedObjects.containsKey(name)) return; // Not loaded.
+
+    const jsObject = loadedObjects.get(name);
+    const serializedString = JSON.stringify(jsObject);
 
     try {
-        if ( rawStr !== null )
-            gdjs.evtTools.storage.loadedFiles.put(filename, JSON.parse(rawStr));
-        else
-            gdjs.evtTools.storage.loadedFiles.put(filename, {});
+      if (localStorage) localStorage.setItem('GDJS_' + name, serializedString);
+    } catch (error) {
+      console.warn(
+        'Unable to save data to localStorage for "' + name + '":',
+        error
+      );
     }
-    catch(e) {
-        console.log('Unable to load data from "' + filename + '"!');
-        gdjs.evtTools.storage.loadedFiles.put(filename, {});
-	}
-};
 
-/**
- * Unload from memory a JSON object, which is then stored in the local storage
- * object provided by the browser.
- * The JSON object is named GDJS_filename in the localStorage object.
- *
- * @param filename {String} The name of the JSON object
- */
-gdjs.evtTools.storage.unloadJSONFile = function(filename) {
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) )
-		return; //Not loaded.
+    loadedObjects.remove(name);
+  };
 
-    var jsonObject = gdjs.evtTools.storage.loadedFiles.get(filename);
-    var rawStr = JSON.stringify(jsonObject);
-    if (gdjs.evtTools.storage.fileUtils) {
-        var fileUtils = gdjs.evtTools.storage.fileUtils;
+  /**
+   * @param {*} name
+   * @param {Function} cb
+   */
+  const loadObject = (name, cb) => {
+    let notPermanentlyLoaded = false;
+    if (!loadedObjects.containsKey(name)) {
+      notPermanentlyLoaded = true;
+      loadJSONFileFromStorage(name);
+    }
 
-        var fullPath = jsb.fileUtils.getWritablePath() + filename;
-        if (!jsb.fileUtils.writeToFile(rawStr, fullPath)) {
-            console.log('Unable to save data to file "' + filename + '"!');
+    const returnValue = cb(loadedObjects.get(name));
+    if (notPermanentlyLoaded) unloadJSONFile(name);
+    return returnValue;
+  };
+
+  /**
+   * @param {string} name
+   */
+  const clearJSONFile = (name) => {
+    return loadObject(name, (jsObject) => {
+      for (var p in jsObject) {
+        if (jsObject.hasOwnProperty(p)) delete jsObject[p];
+      }
+      return true;
+    });
+  };
+
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   */
+  const elementExistsInJSONFile = (name, elementPath) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) {
+          return false;
         }
 
-    } else {
-    	var localStorage = gdjs.evtTools.storage.localStorage;
-    	try {
-    		localStorage.setItem("GDJS_"+filename, rawStr);
-    	} catch(e) {
-    		//TODO: Handle storage error.
-            console.log('Unable to save data to localStorage for "' + filename + '"!');
-    	}
-    }
+        currentElem = currentElem[pathSegments[i]];
+      }
 
-	 gdjs.evtTools.storage.loadedFiles.remove(filename);
-};
+      return true;
+    });
+  };
 
-gdjs.evtTools.storage.clearJSONFile = function(filename) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   */
+  const deleteElementFromJSONFile = (name, elementPath) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) {
+          return false;
+        }
 
-    var JSONobject = gdjs.evtTools.storage.loadedFiles.get(filename);
-    for ( var p in JSONobject ) {
-        if ( JSONobject.hasOwnProperty(p) )
-            delete JSONobject[p];
-    }
+        if (i === pathSegments.length - 1) delete currentElem[pathSegments[i]];
+        else currentElem = currentElem[pathSegments[i]];
+      }
 
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
+      return true;
+    });
+  };
 
-gdjs.evtTools.storage.elementExistsInJSONFile = function(filename, element) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   * @param {any} val
+   */
+  const writeNumberInJSONFile = (name, elementPath, val) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) currentElem[pathSegments[i]] = {};
 
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
+        if (i === pathSegments.length - 1)
+          currentElem[pathSegments[i]].value = val;
+        else currentElem = currentElem[pathSegments[i]];
+      }
 
-		if ( !currentElem[elemArray[i]] ) {
-			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-			return false;
-		}
+      return true;
+    });
+  };
 
-		currentElem = currentElem[elemArray[i]];
-	}
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   * @param {any} str
+   */
+  const writeStringInJSONFile = (name, elementPath, str) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) currentElem[pathSegments[i]] = {};
 
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
+        if (i === pathSegments.length - 1)
+          currentElem[pathSegments[i]].str = str;
+        else currentElem = currentElem[pathSegments[i]];
+      }
 
-gdjs.evtTools.storage.deleteElementFromJSONFile = function(filename, element) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
+      return true;
+    });
+  };
 
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   * @param {?gdjs.RuntimeScene} runtimeScene
+   * @param {gdjs.Variable} variable
+   */
+  const readNumberFromJSONFile = (
+    name,
+    elementPath,
+    runtimeScene,
+    variable
+  ) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) {
+          return false;
+        }
 
-		if ( !currentElem[elemArray[i]] ) {
-			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-			return false;
-		}
+        if (
+          i === pathSegments.length - 1 &&
+          typeof currentElem[pathSegments[i]].value !== 'undefined'
+        )
+          variable.setNumber(currentElem[pathSegments[i]].value);
+        else currentElem = currentElem[pathSegments[i]];
+      }
 
-		if ( i == elemArray.length-1)
-			delete currentElem[elemArray[i]];
-		else
-			currentElem = currentElem[elemArray[i]];
-	}
+      return true;
+    });
+  };
 
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
+  /**
+   * @param {string} name
+   * @param {string} elementPath
+   * @param {?gdjs.RuntimeScene} runtimeScene
+   * @param {gdjs.Variable} variable
+   */
+  const readStringFromJSONFile = (
+    name,
+    elementPath,
+    runtimeScene,
+    variable
+  ) => {
+    return loadObject(name, (jsObject) => {
+      const pathSegments = elementPath.split('/');
+      let currentElem = jsObject;
+      for (var i = 0; i < pathSegments.length; ++i) {
+        if (!currentElem[pathSegments[i]]) {
+          return false;
+        }
 
-gdjs.evtTools.storage.writeNumberInJSONFile = function(filename, element, val) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
+        if (
+          i === pathSegments.length - 1 &&
+          typeof currentElem[pathSegments[i]].str !== 'undefined'
+        )
+          variable.setString(currentElem[pathSegments[i]].str);
+        else currentElem = currentElem[pathSegments[i]];
+      }
 
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
+      return true;
+    });
+  };
 
-		if ( !currentElem[elemArray[i]] ) currentElem[elemArray[i]] = {};
-
-		if ( i == elemArray.length-1)
-			currentElem[elemArray[i]].value = val;
-		else
-			currentElem = currentElem[elemArray[i]];
-	}
-
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
-
-gdjs.evtTools.storage.writeStringInJSONFile = function(filename, element, str) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
-
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
-
-		if ( !currentElem[elemArray[i]] ) currentElem[elemArray[i]] = {};
-
-		if ( i == elemArray.length-1)
-			currentElem[elemArray[i]].str = str;
-		else
-			currentElem = currentElem[elemArray[i]];
-	}
-
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
-
-gdjs.evtTools.storage.readNumberFromJSONFile = function(filename, element, runtimeScene, variable) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
-
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
-
-		if ( !currentElem[elemArray[i]] ) {
-			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-			return false;
-		}
-
-		if ( i == elemArray.length-1 && typeof currentElem[elemArray[i]].value !== "undefined")
-			variable.setNumber(currentElem[elemArray[i]].value);
-		else
-			currentElem = currentElem[elemArray[i]];
-	}
-
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
-
-gdjs.evtTools.storage.readStringFromJSONFile = function(filename, element, runtimeScene, variable) {
-	var notPermanentlyLoaded = false;
-	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) ) {
-		notPermanentlyLoaded = true;
-		gdjs.evtTools.storage.loadJSONFileFromStorage(filename);
-	}
-
-	var elemArray = element.split("/");
-	var currentElem = gdjs.evtTools.storage.loadedFiles.get(filename);
-	for (var i =0;i<elemArray.length;++i) {
-
-		if ( !currentElem[elemArray[i]] ) {
-			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-			return false;
-		}
-
-		if ( i == elemArray.length-1 && typeof currentElem[elemArray[i]].str !== "undefined")
-			variable.setString(currentElem[elemArray[i]].str);
-		else
-			currentElem = currentElem[elemArray[i]];
-	}
-
-	if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
-	return true;
-};
+  return {
+    // TODO: All methods are using "JSONFile" in their name, but this could be replaced
+    // by "data" or "object".
+    loadJSONFileFromStorage: loadJSONFileFromStorage,
+    unloadJSONFile: unloadJSONFile,
+    clearJSONFile: clearJSONFile,
+    elementExistsInJSONFile: elementExistsInJSONFile,
+    deleteElementFromJSONFile: deleteElementFromJSONFile,
+    writeNumberInJSONFile: writeNumberInJSONFile,
+    writeStringInJSONFile: writeStringInJSONFile,
+    readNumberFromJSONFile: readNumberFromJSONFile,
+    readStringFromJSONFile: readStringFromJSONFile,
+  };
+})();

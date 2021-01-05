@@ -5,7 +5,9 @@
  * @property {string} content.color A string representing color in hexadecimal format.
  * @property {string} content.texture A string representing the name of texture used for light object.
  * @property {boolean} content.debugMode true if the light objects shows debug graphics, false otherwise.
- *
+ */
+
+/**
  * @typedef {ObjectData & LightObjectDataType} LightObjectData
  */
 

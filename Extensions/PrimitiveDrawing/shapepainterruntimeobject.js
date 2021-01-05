@@ -19,7 +19,9 @@
  * @property {number} outlineSize The size of the outline of the painted shape, in pixels.
  * @property {boolean} absoluteCoordinates Use absolute coordinates?
  * @property {boolean} clearBetweenFrames Clear the previous render before the next draw?
- *
+ */
+
+/**
  * @typedef {ObjectData & ShapePainterObjectDataType} ShapePainterObjectData
  */
 

@@ -1,0 +1,43 @@
+{ "compressionlevel":-1,
+ "height":30,
+ "infinite":false,
+ "layers":[
+        {
+         "compression":"zlib",
+         "data":"eJzNlk8LgjAUwKcYWB0sCcI8RP9OUV0KwVt47Rj2\/b9JCyY8lr639Tbt8EPn5n6899xcIIQIemAj2Sp2zLnOP753NBhz8RA75k0UBbiHfUvtmet4C0ZcJwtvra655s0JB6zHXnIALAjvWDIhSDvyDfNyldwAVLxzIqaXo3pg3lASSUaGc3G8mWSF4MvL4Z+99UDePuKF673WnnO9Juu9C46XWu++0L1lyxhqf+V64fxY\/jOP9ZwiecDqex+onpWlt62uOqGl9\/OPm6krtX+bkBp6u4iRdnMfWdbKldf2G6m0\/PbpxWJNxPcZM0b6XOaZip8bL3VWbvpMz9KY96G118hYrA\/zPgfiDQjlIOU=",
+         "encoding":"base64",
+         "height":30,
+         "id":1,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":30,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":2,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.4.3",
+ "tileheight":8,
+ "tilesets":[
+        {
+         "columns":8,
+         "firstgid":1,
+         "image":"cavesofgallet_tiles.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"Platformer tileset",
+         "spacing":0,
+         "tilecount":96,
+         "tileheight":8,
+         "tilewidth":8
+        }],
+ "tilewidth":8,
+ "type":"map",
+ "version":1.4,
+ "width":30
+}

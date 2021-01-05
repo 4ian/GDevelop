@@ -147,7 +147,7 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
-import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -213,11 +213,14 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { AssetStore } from '../AssetStore';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import ScrollView from '../UI/ScrollView';
-import '../UI/Theme/Global.css';
+import '../UI/Theme/Global/Scrollbar.css';
+import '../UI/Theme/Global/Animation.css';
 import { AssetCard } from '../AssetStore/AssetCard';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
@@ -4317,33 +4320,15 @@ storiesOf('ObjectTypeSelector', module)
 storiesOf('NewBehaviorDialog', module)
   .addDecorator(muiDecorator)
   .add('default, for a Sprite object', () => (
-    <NewBehaviorDialog
-      open
-      project={testProject.project}
-      objectType={'Sprite'}
-      onClose={action('on close')}
-      onChoose={action('on choose')}
-    />
-  ));
-
-storiesOf('ExtensionsSearchDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <I18n>
-      {({ i18n }) => (
-        <EventsFunctionsExtensionsProvider
-          i18n={i18n}
-          makeEventsFunctionCodeWriter={() => null}
-          eventsFunctionsExtensionWriter={null}
-          eventsFunctionsExtensionOpener={null}
-        >
-          <ExtensionsSearchDialog
-            project={testProject.project}
-            onClose={action('on close')}
-          />
-        </EventsFunctionsExtensionsProvider>
-      )}
-    </I18n>
+    <ExtensionStoreStateProvider>
+      <NewBehaviorDialog
+        open
+        project={testProject.project}
+        objectType={'Sprite'}
+        onClose={action('on close')}
+        onChoose={action('on choose')}
+      />
+    </ExtensionStoreStateProvider>
   ));
 
 storiesOf('LayersList', module)
@@ -4889,3 +4874,64 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       </UserProfileContext.Provider>
     );
   });
+
+storiesOf('AssetStore/ExtensionStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={false}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={false}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('is installing', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={true}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={false}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('showOnlyWithBehaviors', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={false}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={true}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ExtensionsSearchDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          makeEventsFunctionCodeWriter={() => null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionStoreStateProvider>
+            <ExtensionsSearchDialog
+              project={testProject.project}
+              onClose={action('on close')}
+            />
+          </ExtensionStoreStateProvider>
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
+  ));

@@ -132,9 +132,7 @@ gdjs.PixiFiltersTools.rgbOrHexToHexNumber = function (value) {
  */
 
 /**
- * A wrapper allowing to create a PIXI filter and update it using a common interface
- * @typedef gdjsPixiFiltersToolsFilterCreator
- * @type {Object}
+ * @typedef {Object} gdjsPixiFiltersToolsFilterCreator A wrapper allowing to create a PIXI filter and update it using a common interface
  * @property {gdjsPixiFiltersToolsFilterCreatorMakePIXIFilter} makePIXIFilter Function to call to create the filter
  * @property {gdjsPixiFiltersToolsUpdate} update The function to be called to update the filter at every frame
  * @property {gdjsPixiFiltersToolsUpdateDoubleParameter} updateDoubleParameter The function to be called to update a parameter (with a number)
@@ -143,9 +141,7 @@ gdjs.PixiFiltersTools.rgbOrHexToHexNumber = function (value) {
  */
 
 /**
- * The type of a filter used to manipulate a Pixi filter.
- * @typedef gdjsPixiFiltersToolsFilter
- * @type {Object}
+ * @typedef {Object} gdjsPixiFiltersToolsFilter The type of a filter used to manipulate a Pixi filter.
  * @property {any} pixiFilter The PIXI filter
  * @property {gdjsPixiFiltersToolsUpdate} update The function to be called to update the filter at every frame
  * @property {gdjsPixiFiltersToolsUpdateDoubleParameter} updateDoubleParameter The function to be called to update a parameter (with a number)

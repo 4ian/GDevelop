@@ -373,12 +373,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             {
                               label: i18n._(t`Move up`),
                               click: () => this._moveParameters(i, i - 1),
-                              enabled: i - 1 >= 0,
+                              enabled: !isParameterDisabled(i) && i - 1 >= 0 && !isParameterDisabled(i - 1),
                             },
                             {
                               label: i18n._(t`Move down`),
                               click: () => this._moveParameters(i, i + 1),
-                              enabled: i + 1 < parameters.size(),
+                              enabled: !isParameterDisabled(i) && i + 1 < parameters.size() && !isParameterDisabled(i + 1),
                             },
                           ]}
                         />

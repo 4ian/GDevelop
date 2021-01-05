@@ -40,6 +40,7 @@ import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import {getParametersIndexOffset} from '../EventsFunctionsExtensionsLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -307,15 +308,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newIndex: number,
     done: boolean => void
   ) => {
-    //TODO add verifications and warning box
+    // Don't ask for user confirmation as this change is easy to revert.
 
     const { project, eventsFunctionsExtension } = this.props;
     gd.WholeProjectRefactorer.moveEventsFunctionParameter(
       project,
       eventsFunctionsExtension,
       eventsFunction.getName(),
-      oldIndex,
-      newIndex
+      oldIndex + getParametersIndexOffset(false),
+      newIndex + getParametersIndexOffset(false),
     );
 
     done(true);
@@ -328,7 +329,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newIndex: number,
     done: boolean => void
   ) => {
-    //TODO add verifications and warning box
+    // Don't ask for user confirmation as this change is easy to revert.
 
     const { project, eventsFunctionsExtension } = this.props;
     gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(

@@ -69,7 +69,6 @@ export default class ForceMultiplierField extends Component<
                 conditions that are only true once, or with a "Trigger Once"
                 condition.
               </Trans>
-              <Trans>The force</Trans>
             </Text>
           </Column>
         </Line>

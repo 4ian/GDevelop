@@ -33,13 +33,12 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 
 You can run the standalone app with Electron. **Make sure that you've launched `npm start` (or `yarn start`) in `app` folder before** (see above) and **keep it running** (in development, the app is served from a local server, even for the standalone app).
 
+> Note For Windows: With **Node.js 14 or older**, there is an error related to `git-sh-setup` when running npm install. </br>
+> To solve this problem - add [this folder to your path environment variable](https://stackoverflow.com/questions/49256190/how-to-fix-git-sh-setup-file-not-found-in-windows) </br> **OR** </br>
+> run `npm install` in newIDE/electron-app/app **before** npm install in newIDE/electron-app.
+
 ```bash
 cd newIDE/app && npm start # Be sure to have this running in another terminal, before the rest!
-
-# In a new terminal:
-cd newIDE/electron-app/app
-npm install # or yarn
-# After successful installation close this terminal
 
 # In a new terminal:
 cd newIDE/electron-app

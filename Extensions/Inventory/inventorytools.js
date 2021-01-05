@@ -66,8 +66,8 @@ gdjs.evtTools.inventory.serializeToVariable = function(runtimeScene, inventoryNa
 		var serializedItem = variable.getChild(name);
 		serializedItem.getChild("count").setNumber(item.count);
 		serializedItem.getChild("maxCount").setNumber(item.maxCount);
-		serializedItem.getChild("unlimited").setNumber(item.unlimited ? "true" : "false");
-		serializedItem.getChild("equipped").setNumber(item.equipped ? "true" : "false");
+		serializedItem.getChild("unlimited").setBoolean(item.unlimited);
+		serializedItem.getChild("equipped").setBoolean(item.equipped);
 	}
 };
 
@@ -78,9 +78,10 @@ gdjs.evtTools.inventory.unserializeFromVariable = function(runtimeScene, invento
 	var children = variable.getAllChildren();
 	for(var name in children) {
 		var serializedItem = children[name];
-		inventory.setMaximum(name, serializedItem.getChild('maxCount').getAsNumber());
-		inventory.setUnlimited(name, serializedItem.getChild('unlimited').getAsString() == "true");
+		debugger;
 		inventory.setCount(name, serializedItem.getChild('count').getAsNumber());
-		inventory.equip(name, serializedItem.getChild('equipped').getAsString() == "true");
+		inventory.setMaximum(name, serializedItem.getChild('maxCount').getAsNumber());
+		inventory.setUnlimited(name, serializedItem.getChild('unlimited').getAsBoolean());
+		inventory.equip(name, serializedItem.getChild('equipped').getAsBoolean());
 	}
 };

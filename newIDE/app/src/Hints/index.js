@@ -30,6 +30,7 @@ export const getExperimentalObjects = (): {
 } => ({
   'Video::VideoObject': true,
   'SkeletonObject::Skeleton': true,
+  'TileMap::TileMap': true,
 });
 
 export const getExtraObjectsInformation = (): {
@@ -57,6 +58,12 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
+    },
+  ],
+  'TileMap::TileMap': [
+    {
+      kind: 'info',
+      message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
     },
   ],
 });

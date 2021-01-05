@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectUuid": "9db0a521-6759-47dc-aa07-6f4124a8bbc1",
+    "projectUuid": "c82d449a-9975-4c9d-a003-8683951a8a09",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -5577,8 +5577,11 @@
       "name": "Parallax",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/image-move.svg",
       "shortDescription": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
-      "tags": "parallax, tiled",
-      "version": "1.0.0",
+      "version": "1.0.1",
+      "tags": [
+        "parallax",
+        "tiled"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -5632,7 +5635,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "CameraWidth(Object.Behavior::PropertyFollowedLayer(), 0)"
+                        "CameraWidth(Object.Layer(), 0)"
                       ],
                       "subInstructions": []
                     }
@@ -5737,7 +5740,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "CameraHeight(Object.Behavior::PropertyFollowedLayer(), 0)"
+                        "CameraHeight(Object.Layer(), 0)"
                       ],
                       "subInstructions": []
                     }

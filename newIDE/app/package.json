@@ -38,7 +38,7 @@
     "@material-ui/lab": "4.0.0-alpha.56",
     "@supercharge/promise-pool": "^1.6.0",
     "algoliasearch": "3.33.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "blueimp-md5": "^2.10.0",
     "classnames": "2.2.5",
     "date-fns": "2.16.1",

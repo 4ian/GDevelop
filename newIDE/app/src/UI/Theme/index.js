@@ -2,6 +2,15 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import { isLtr } from '../../Utils/i18n/RtlLanguages';
 import memoize from '../../Utils/Memoize';
+import DefaultTheme, {
+  themeName as defaultThemeName,
+  type Theme,
+} from './DefaultTheme';
+import DarkTheme from './DarkTheme';
+import NordTheme from './NordTheme';
+import SolarizedDarkTheme from './SolarizedDarkTheme';
+import { type Theme } from './DefaultTheme';
+import './Global.css';
 
 import DefaultTheme from './DefaultTheme';
 import { themes as themeList } from './ThemeRegistry';

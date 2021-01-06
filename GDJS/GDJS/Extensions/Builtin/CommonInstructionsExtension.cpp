@@ -487,13 +487,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "      : $ITERABLE_REFERENCE.getType() === \"array\"\n"
             "        ? $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY)\n"
             "        : gdjs.VariablesContainer.badVariable;\n";
+
         if(valueIteratorExists) outputCode += 
-            "    const $STRUCTURE_CHILD_VARIABLE = \n"
-            "      $ITERABLE_REFERENCE.getType() === \"structure\"\n"
-            "        ? $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
-            "        : $ITERABLE_REFERENCE.getType() === \"array\"\n"
-            "          ? $ITERABLE_REFERENCE.getAtIndex($ITERATOR_KEY)\n"
-            "          : gdjs.VariablesContainer.badVariable;\n"
+            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
             "    const type = $STRUCTURE_CHILD_VARIABLE.getType();\n"
             "    if(type === \"number\") {\n"
             "        $VALUE_ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber());\n"
@@ -505,8 +501,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        // Structures are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
             "    } else if (type === \"array\") {\n"
-            "        // Structures are passed by reference like JS objects\n"
-            "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
+            "        // Arrays are passed by reference like JS objects\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenList($STRUCTURE_CHILD_VARIABLE.getAllChildrenList());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n"
             "    delete type;\n";
         

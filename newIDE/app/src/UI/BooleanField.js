@@ -10,11 +10,11 @@ const buttonStyle = {
 
 type Props = {|
   value: boolean,
-  onToggle: (newValue: boolean) => void,
+  onChange: (newValue: boolean) => void,
   disabled: boolean,
 |};
 
-const BooleanEditor = ({ value, onToggle, disabled }: Props) => {
+const BooleanEditor = ({ value, onChange, disabled }: Props) => {
   return (
     <Line>
       <Column noMargin>
@@ -23,7 +23,7 @@ const BooleanEditor = ({ value, onToggle, disabled }: Props) => {
           label={<Trans>True</Trans>}
           primary={value && !disabled}
           onClick={() => {
-            if (!value && !disabled) onToggle(true);
+            if (!value && !disabled) onChange(true);
           }}
         />
       </Column>
@@ -33,7 +33,7 @@ const BooleanEditor = ({ value, onToggle, disabled }: Props) => {
           label={<Trans>False</Trans>}
           primary={!value && !disabled}
           onClick={() => {
-            if (value && !disabled) onToggle(false);
+            if (value && !disabled) onChange(false);
           }}
         />
       </Column>

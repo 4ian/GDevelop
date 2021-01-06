@@ -197,6 +197,15 @@ gdjs.Variable.prototype.replaceChildren = function (newChildren) {
 };
 
 /**
+ * Replaces all the children with a new array of children.
+ * @param {gdjs.Variable[]} newChildren The array of new children.
+ */
+gdjs.Variable.prototype.replaceChildrenList = function (newChildren) {
+  this._type = 'array';
+  this._childrenList = newChildren;
+};
+
+/**
  * Get the value of the variable, considered as a number
  * @return {number} The number stored in the variable
  */

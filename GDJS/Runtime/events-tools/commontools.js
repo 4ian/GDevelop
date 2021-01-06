@@ -34,7 +34,7 @@ gdjs.evtTools.common.getVariableString = function (variable) {
 
 /**
  * Compares the boolean value of a variable. Equivalent to `variable.getAsBoolean()`.
- * This shorcut function is needed for events code generation.
+ * This shortcut function is needed for events code generation.
  *
  * @param {gdjs.Variable} variable
  * @param {boolean} compareWith
@@ -47,14 +47,14 @@ gdjs.evtTools.common.getVariableBoolean = function (variable, compareWith) {
 
 /**
  * Set the boolean value of a variable. Equivalent to `variable.setBoolean()`.
- * This shorcut function is needed for events code generation.
+ * This shortcut function is needed for events code generation.
  *
  * @param {gdjs.Variable} variable
  * @param {boolean} bool The new boolean value of the variable.
  * @private
  */
-gdjs.evtTools.common.setVariableBoolean = function (variable, bool) {
-  variable.setBoolean(bool);
+gdjs.evtTools.common.setVariableBoolean = function (variable, newValue) {
+  variable.setBoolean(newValue);
 };
 
 /**

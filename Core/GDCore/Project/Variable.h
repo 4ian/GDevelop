@@ -33,20 +33,10 @@ class GD_CORE_API Variable {
     Number,
     Boolean,
 
-    // Structural types
+    // Collection types
     Structure,
     Array
   };
-
-  /**
-   * \brief Converts a Type to a string.
-   */
-  static gd::String TypeAsString(Type t);
-
-  /**
-   * \brief Converts a string to a Type.
-   */
-  static Type StringAsType(const gd::String& str);
 
   /**
    * \brief Returns true if the passed type is primitive
@@ -75,7 +65,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Converts the variable to a new type.
    */
-  void CastTo(const gd::String& type) {return CastTo(StringAsType(type));};
+  void CastTo(const gd::String& type) { return CastTo(StringAsType(type)); };
 
   /** \name Primitives
    * Methods and operators used when the variable is considered as a primitive.
@@ -167,8 +157,8 @@ class GD_CORE_API Variable {
 
   ///@}
 
-  /** \name Structural types
-   * Methods used for structural types
+  /** \name Collection types
+   * Methods used for collection types
    */
   ///@{
 
@@ -314,6 +304,16 @@ class GD_CORE_API Variable {
   ///@}
 
  private:
+  /**
+   * \brief Converts a Type to a string.
+   */
+  static gd::String TypeAsString(Type t);
+
+  /**
+   * \brief Converts a string to a Type.
+   */
+  static Type StringAsType(const gd::String& str);
+
   mutable Type type;
   mutable gd::String str;
   mutable double value;

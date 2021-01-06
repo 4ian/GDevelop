@@ -464,14 +464,12 @@ gdjs.HotReloader.prototype._hotReloadVariablesContainer = function (
           variable
         );
       else {
-        /**
-         * Arrays cannot be hot reloaded.
-         * As indices can change at runtime, and in the IDE, they can be desychronized.
-         * It will in that case mess up the whole array,
-         * and there is no way to know if that was the case.
-         *
-         * We therefore just replace the old array with the new one.
-         */
+        // Arrays cannot be hot reloaded.
+        // As indices can change at runtime, and in the IDE, they can be desychronized.
+        // It will in that case mess up the whole array,
+        // and there is no way to know if that was the case.
+        //
+        // We therefore just replace the old array with the new one.
         variablesContainer.remove(variableName);
         variablesContainer.add(
           variableName,
@@ -533,15 +531,16 @@ gdjs.HotReloader.prototype._hotReloadStructureVariable = function (
             variable.getChild(newChildVariableData.name)
           );
         else {
-          /**
-           * Arrays cannot be hot reloaded.
-           * As indices can change at runtime, and in the IDE, they can be desychronized.
-           * It will in that case mess up the whole array,
-           * and there is no way to know if that was the case.
-           *
-           * We therefore just replace the old array with the new one.
-           */
-          variable.addChild(newChildVariableData.name, new gdjs.Variable(newChildVariableData));
+          // Arrays cannot be hot reloaded.
+          // As indices can change at runtime, and in the IDE, they can be desychronized.
+          // It will in that case mess up the whole array,
+          // and there is no way to know if that was the case.
+          //
+          // We therefore just replace the old array with the new one.
+          variable.addChild(
+            newChildVariableData.name,
+            new gdjs.Variable(newChildVariableData)
+          );
         }
       }
     });

@@ -150,7 +150,7 @@ const VariableRow = ({
         <TreeTableCell key="value" expand>
           <BooleanEditor
             value={variable.getBool()}
-            onToggle={onChangeValue}
+            onChange={onChangeValue}
             disabled={origin === 'parent' && depth !== 0}
           />
         </TreeTableCell>

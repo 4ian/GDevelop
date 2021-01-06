@@ -69,8 +69,6 @@ void Variable::CastTo(const Type newType) {
             std::make_pair(gd::String::From(i - childrenList.begin()), (*i)));
 
     type = Type::Structure;
-    // A valid structure has at least 1 child
-    if (children.empty()) GetChild("ChildVariable");
   } else if (newType == Type::Array) {
     childrenList.clear();
 
@@ -80,8 +78,6 @@ void Variable::CastTo(const Type newType) {
         childrenList.push_back((*i).second);
 
     type = Type::Array;
-    // A valid array has at least 1 element
-    if (childrenList.empty()) GetAtIndex(0);
   }
 }
 
@@ -164,12 +160,6 @@ const Variable& Variable::GetChild(const gd::String& name) const {
 void Variable::RemoveChild(const gd::String& name) {
   if (type != Type::Structure) return;
   children.erase(name);
-
-  // If the structure is empty, make it a default empty variable again.
-  if (children.empty()) {
-    type = Type::Number;
-    value = 0;
-  }
 }
 
 bool Variable::RenameChild(const gd::String& oldName,
@@ -200,12 +190,6 @@ Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenList.size()) return;
   childrenList.erase(childrenList.begin() + index);
-
-  // If the array is now empty, demote back to a primitive.
-  if (childrenList.empty()) {
-    type = Type::Number;
-    value = 0.0;
-  }
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
@@ -299,26 +283,20 @@ bool Variable::Contains(const gd::Variable& variableToSearch,
 
 void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
   for (auto it = children.begin(); it != children.end();) {
-    if (it->second.get() == &variableToRemove) {
+    if (it->second.get() == &variableToRemove)
       it = children.erase(it);
-    } else {
+    else {
       it->second->RemoveRecursively(variableToRemove);
       it++;
     }
   }
-  for (auto it = childrenList.begin(); it != childrenList.end();) {
-    if (it->get() == &variableToRemove) {
+  for (auto it = childrenList.begin(); it != childrenList.end();)
+    if (it->get() == &variableToRemove)
       childrenList.erase(it);
-    } else {
+    else {
       (*it)->RemoveRecursively(variableToRemove);
       it++;
-    }
-    if ((type == Type::Structure && children.empty()) ||
-        (type == Type::Array && childrenList.empty())) {
-      type = Type::Number;
-      value = 0.0;
-    }
-  }
+    };
 }
 
 Variable::Variable(const Variable& other)

@@ -4,7 +4,6 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
-import { makeNonBreakable } from '../../Utils/StringHelpers';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import BackgroundText from '../../UI/BackgroundText';
@@ -38,7 +37,7 @@ export default class ForceMultiplierField extends Component<
         <Line expand alignItems="center">
           <Column>
             <RaisedButton
-              label={makeNonBreakable('Instant')}
+              label={<Trans>Instant</Trans>}
               primary={this.props.value === '' || this.props.value === '0'}
               onClick={() => this.props.onChange('0')}
               ref={this._instantButton}
@@ -102,8 +101,8 @@ export default class ForceMultiplierField extends Component<
 export const renderInlineForceMultiplier = ({
   value,
 }: ParameterInlineRendererProps) => {
-  if (value === '1') return 'a permanent';
-  else if (value === '0' || value === '') return 'an instant';
+  if (value === '1') return <Trans>{`a permanent`}</Trans>;
+  else if (value === '0' || value === '') return <Trans>{`an instant`}</Trans>;
 
   return 'a (multiplier: ' + value + ')';
 };

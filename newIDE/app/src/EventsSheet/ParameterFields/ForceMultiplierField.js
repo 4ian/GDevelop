@@ -104,5 +104,5 @@ export const renderInlineForceMultiplier = ({
   if (value === '1') return <Trans>{`a permanent`}</Trans>;
   else if (value === '0' || value === '') return <Trans>{`an instant`}</Trans>;
 
-  return `a (multiplier: ' + ${value} + ')`;
+  return 'a (multiplier: ' + value + ')';
 };

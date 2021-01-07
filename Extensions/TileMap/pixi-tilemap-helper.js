@@ -50,7 +50,7 @@
     tileWidth: number,
     tileHeight: number,
     atlasTexture: PIXI.BaseTexture,
-    textureCache: Array<PIXI.Texture>,
+    textureCache: Array<PIXI.Texture | null>,
     layers: Array<TiledDataLayer>,
     tiles: Array<TiledDataTile>,
    }} GenericPixiTileMapData
@@ -69,9 +69,9 @@
    * into a generic tile map data (`GenericPixiTileMapData`).
    *
    * @param {Object} tiledData A JS object representing a map exported from Tiled.
-   * @param {PIXI.BaseTexture} atlasTexture
+   * @param {?PIXI.BaseTexture} atlasTexture
    * @param {(textureName: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
-   * @returns {GenericPixiTileMapData}
+   * @returns {?GenericPixiTileMapData}
    */
   const parseTiledData = (tiledData, atlasTexture, getTexture) => {
     if (!tiledData.tiledversion) {
@@ -132,6 +132,7 @@
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
+        // @ts-ignore - atlasTexture is never null here.
         const texture = new PIXI.Texture(atlasTexture, rect);
         texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
@@ -256,6 +257,7 @@
         let layerData = layer.data;
 
         if (layer.encoding === 'base64') {
+          // @ts-ignore
           layerData = decodeBase64LayerData(layer, pako);
           if (!layerData) {
             console.warn('Failed to uncompress layer.data');
@@ -318,7 +320,7 @@
    * @param {string} atlasImageResourceName The name of the resource to pass to `getTexture` to load the atlas.
    * @param {string} tilemapResourceName The name of the tilemap resource - used to index internally the loaded tilemap data.
    * @param {string} tilesetResourceName The name of the tileset resource - used to index internally the loaded tilemap data.
-   * @returns {GenericPixiTileMapData}
+   * @returns {?GenericPixiTileMapData}
    */
   exports.loadPixiTileMapData = (
     getTexture,

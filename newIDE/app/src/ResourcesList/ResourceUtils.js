@@ -80,27 +80,24 @@ export const copyAllToProjectFolder = (
         return resourcePath;
       }
 
-      let resourceBasename = path.basename(resourcePath),
+      const resourceBasename = path.basename(resourcePath),
         splitAt = resourceBasename.lastIndexOf('.'),
-        fileName = resourceBasename.substring(0, splitAt),
+        originalFileName = resourceBasename.substring(0, splitAt),
         fileExtension = resourceBasename.substring(splitAt),
+        allResourcesNames = project.getResourcesManager().getAllResourceNames();
+
+      let fileName = originalFileName,
         fileNumber = 1;
 
-      const AllResourcesNames = project
-        .getResourcesManager()
-        .getAllResourceNames();
-
-      for (let itr = 0; itr < AllResourcesNames.size(); itr++) {
-        if (fileName + fileExtension === AllResourcesNames.at(itr)) {
-          fileName = resourceBasename.substring(0, splitAt) + fileNumber;
+      for (let itr = 0; itr < allResourcesNames.size(); itr++) {
+        if (fileName + fileExtension === allResourcesNames.at(itr)) {
+          fileName = originalFileName + fileNumber;
           fileNumber++;
           itr = 0;
         }
       }
 
-      resourceBasename = fileName + fileExtension;
-
-      const resourceNewPath = path.join(projectPath, resourceBasename);
+      const resourceNewPath = path.join(projectPath, fileName + fileExtension);
 
       return new Promise(resolve => {
         fs.copyFile(resourcePath, resourceNewPath, err => {

@@ -479,7 +479,45 @@ gdjs.RuntimeGamePixiRenderer.prototype.openURL = function (url) {
     Cocoon.App.openURL(url);
   } else if (typeof window !== 'undefined') {
     var target = window.cordova ? '_system' : '_blank';
-    window.open(url, target);
+
+    //To detect if the application is running in electron or other browser window
+    function isElectron() {
+      // Renderer process
+      if (
+        typeof window !== 'undefined' &&
+        typeof window.process === 'object' &&
+        window.process.type === 'renderer'
+      ) {
+        return true;
+      }
+
+      // Main process
+      if (
+        typeof process !== 'undefined' &&
+        typeof process.versions === 'object' &&
+        !!process.versions.electron
+      ) {
+        return true;
+      }
+
+      // Detect the user agent when the `nodeIntegration` option is set to true
+      if (
+        typeof navigator === 'object' &&
+        typeof navigator.userAgent === 'string' &&
+        navigator.userAgent.indexOf('Electron') >= 0
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+
+    if (isElectron()) {
+      const electron = this.getElectron();
+      electron.shell.openExternal(url);
+    } else {
+      window.open(url, target);
+    }
   }
 };
 

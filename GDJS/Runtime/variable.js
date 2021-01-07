@@ -282,6 +282,16 @@ gdjs.Variable.prototype.setBoolean = function (newValue) {
 };
 
 /**
+ * Sets the primitive value using the setter of the current type.
+ * @param {any} newValue
+ */
+gdjs.Variable.prototype.setValue = function (newValue) {
+  if (this._type === 'string') this.setString(newValue);
+  else if (this._type === 'number') this.setNumber(newValue);
+  else if (this._type === 'boolean') this.setBoolean(newValue);
+};
+
+/**
  * Return true if the variable is a structure.
  * @return {boolean} true if the variable is a structure.
  * @deprecated Use {@link gdjs.Variable.getType} instead.

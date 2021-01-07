@@ -186,7 +186,17 @@ gdjs.WebsocketDebuggerClient.prototype.call = function (path, args) {
   var object = this._runtimegame;
   var currentIndex = 0;
   while (currentIndex < path.length - 1) {
-    var key = path[currentIndex];
+    const key = path[currentIndex];
+    console.log(key)
+    const parsedKey = key.toString().match(/(.*)\((.*)\)/);
+    if (parsedKey !== null) {
+      // The current key is a method, call it
+      object = object[parsedKey[1]].apply(object, parsedKey[2].split(','));
+      currentIndex++;
+      continue;
+    }
+
+    // The current key is a property, get it.
     if (!object || !object[key]) {
       console.error('Incorrect path specified. No ' + key + ' in ', object);
       return false;

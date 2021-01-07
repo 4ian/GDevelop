@@ -17,13 +17,20 @@ type Props = {|
 const transformVariable = variable => {
   if (!variable) return null;
 
-  if (!variable._isStructure) {
-    return variable._stringDirty ? variable._value : variable._str;
-  } else {
-    if (!variable._children) return null;
+  const adaptedVariable = {
+    type: variable._type,
+    value: null,
+  };
 
-    return mapValues(variable._children, transformVariable);
-  }
+  if (variable._type === 'string') adaptedVariable.value = variable._str;
+  else if (variable._type === 'number') adaptedVariable.value = variable._value;
+  else if (variable._type === 'boolean') adaptedVariable.value = variable._bool;
+  else if (variable._type === 'structure')
+    adaptedVariable.value = mapValues(variable._children, transformVariable);
+  else if (variable._type === 'array')
+    adaptedVariable.value = variable._childrenList.map(transformVariable);
+
+  return adaptedVariable;
 };
 
 const transform = variablesContainer => {
@@ -37,22 +44,33 @@ const transform = variablesContainer => {
   return mapValues(variablesContainer._variables.items, transformVariable);
 };
 
-const handleEdit = (edit, { onCall, onEdit }: Props) => {
-  // Reconstruct the path to the variable to edit
-  const path = ['_variables', 'items'];
-  edit.namespace.forEach(variableName => {
-    path.push(variableName);
-    path.push('_children');
-  });
-  path.push(edit.name);
+const constructPath = (editPath: string[]) => {
+  const path = [`get(${editPath.shift()})`];
 
-  // Guess the type of the new value (number or string)
-  if (parseFloat(edit.new_value).toString() === edit.new_value) {
-    path.push('setNumber');
-    onCall(path, [parseFloat(edit.new_value)]);
-  } else {
-    path.push('setString');
-    onCall(path, ['' + edit.new_value]);
+  let skip = false;
+  for (const variableName of editPath) {
+    // Skip every second key as it is the "value"
+    // key which is displayed only for better user
+    // experience but doesn't really exists
+    skip = !skip;
+    if (skip) continue;
+
+    path.push(`getChild(${variableName})`);
+  }
+
+  return path;
+}
+
+const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
+  // Reconstruct the path to the variable to edit
+  const path = constructPath(edit.namespace);
+
+  if (edit.name === 'type') {
+    path.push('castTo');
+    onCall(path, [edit.new_value]);
+  } else if (edit.name === 'value') {
+    path.push('setValue');
+    onCall(path, [edit.new_value]);
   }
 
   return true;

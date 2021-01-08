@@ -235,7 +235,7 @@ namespace gdjs {
           theObject.HSHG.grid.allCells[theObjectHashInItsGrid];
 
         // default broad test to internal aabb overlap test
-        broadOverlapTest = testAABBOverlap;
+        const broadOverlapTest = testAABBOverlap;
 
         // for all grids ordered by cell size ASC
         for (i = 0; i < this._grids.length; i++) {

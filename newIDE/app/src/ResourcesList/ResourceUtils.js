@@ -1,6 +1,7 @@
 // @flow
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import newNameGenerator from '../Utils/NewNameGenerator';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
@@ -80,8 +81,26 @@ export const copyAllToProjectFolder = (
         return resourcePath;
       }
 
-      const resourceBasename = path.basename(resourcePath);
-      const resourceNewPath = path.join(projectPath, resourceBasename);
+      const resourceBasename = path.basename(resourcePath),
+        fileExtension = path.extname(resourceBasename),
+        fileNameWithoutExtension = path.basename(
+          resourceBasename,
+          fileExtension
+        );
+
+      const newFileNameWithoutExtension = newNameGenerator(
+        fileNameWithoutExtension,
+        tentativeFileName => {
+          const tentativePath =
+            path.join(projectPath, tentativeFileName) + fileExtension;
+          return fs.existsSync(tentativePath);
+        }
+      );
+
+      const resourceNewPath = path.join(
+        projectPath,
+        newFileNameWithoutExtension + fileExtension
+      );
 
       return new Promise(resolve => {
         fs.copyFile(resourcePath, resourceNewPath, err => {

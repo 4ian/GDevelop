@@ -40,7 +40,7 @@ import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import {getParametersIndexOffset} from '../EventsFunctionsExtensionsLoader';
+import { getParametersIndexOffset } from '../EventsFunctionsExtensionsLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -316,7 +316,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunctionsExtension,
       eventsFunction.getName(),
       oldIndex + getParametersIndexOffset(false),
-      newIndex + getParametersIndexOffset(false),
+      newIndex + getParametersIndexOffset(false)
     );
 
     done(true);

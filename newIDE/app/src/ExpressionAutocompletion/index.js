@@ -379,9 +379,10 @@ export const insertAutocompletionInExpression = (
   // (to avoid repeating an existing character).
   const maybeNextCharacter: ?string = expression[wordEndPosition + 1];
 
-  const newExpressionStart = expression.substring(0, wordStartPosition);
+  let newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
   const newExpressionEnd = expression.substring(wordEndPosition + 1);
+  if (insertedWord.includes(newExpressionStart)) newExpressionStart = '';
 
   return {
     caretLocation: newExpressionStart.length + insertedWord.length,

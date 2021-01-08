@@ -69,7 +69,12 @@ namespace gdjs {
           // Don't reload bondage.js library.
           endsWith(srcFilename, 'bondage.min.js') ||
           // Don't reload pixi-particles library.
-          endsWith(srcFilename, 'pixi-particles-pixi-renderer.min.js')
+          endsWith(srcFilename, 'pixi-particles-pixi-renderer.min.js') ||
+          // Don't reload pixi-tilemap amd pixi-tilemap-helper libraries.
+          endsWith(srcFilename, 'pixi-tilemap.umd.js') ||
+          endsWith(srcFilename, 'pixi-tilemap-helper.js') ||
+          // Don't reload pako library (used in pixi-tilemap)
+          endsWith(srcFilename, 'pako/dist/pako.min')
         ) {
           return false;
         }

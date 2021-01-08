@@ -69,7 +69,7 @@ module.exports = {
       );
       objectProperties.set(
         'tilesetJsonFile',
-        new gd.PropertyDescriptor(objectContent.tilesetJsonFile)
+        new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
           .setType('resource')
           .addExtraInfo('json')
           .setLabel(_('Tileset JSON file (optional)'))

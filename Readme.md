@@ -1,6 +1,6 @@
 ![GDevelop logo](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png "GDevelop logo")
 
-GDevelop is a full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
+GDevelop is a full-featured, open-source game development software, allowing to create desktop and mobile games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
 
 ![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
@@ -23,14 +23,14 @@ Overview of the architecture
 | --- | --- |
 | `Core` | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games. |
 | `GDCpp` | The C++ game engine, used to build native games (*not used in GDevelop 5*). |
-| `GDJS` | The JavaScript game engine, using Pixi.js (WebGL), powering all GDevelop games. |
+| `GDJS` | The game engine, written in TypeScript, using PixiJS (WebGL), powering all GDevelop games. |
 | `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
-| `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |
-| `Extensions` | Extensions for the C++ or JavaScript game engines, providing objects, behaviors, events and new features. |
+| `newIDE` | The game editor, written in JavaScript with React, Electron and PixiJS. |
+| `Extensions` | Extensions for the game engine, providing objects, behaviors, events and new features. |
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
-A pre-generated documentation of the Core library, C++ and JS game engines is [available here](https://docs.gdevelop-app.com).
+A pre-generated documentation of the Core library, C++ and TypeScript game engines is [available here](https://docs.gdevelop-app.com).
 
 Status of the tests and builds: [![Build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Quick tests status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/shields_badge.svg)](https://semaphoreci.com/4ian/gd) [![All tests Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
@@ -51,7 +51,7 @@ Links
 
 ### Games made with GDevelop
 
-* See the [Showcase of games](https://gdevelop-app.com/games-showcase) created with GDevelop. 
+* See the [Showcase of games](https://gdevelop-app.com/games-showcase) created with GDevelop.
 * Suggest your game to be [added to the showcase here](https://github.com/GDevelopApp/GDevelop-website-showcase/issues/new/choose).
 
 ![Lil Bub](http://compilgames.net/assets/bub/screenshots-background.jpg "GDevelop logo")

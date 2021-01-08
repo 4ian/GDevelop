@@ -46,7 +46,6 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
   this._debugLight = null;
   /** @type {?PIXI.Graphics} */
   this._debugGraphics = null;
-  this.updateDebugMode();
 
   /** @type {gdjs.Polygon} */
   this._lightBoundingPoly = new gdjs.Polygon();
@@ -55,6 +54,8 @@ gdjs.LightRuntimeObjectPixiRenderer = function (runtimeObject, runtimeScene) {
       runtimeObject.getHitBoxes()[0].vertices[i]
     );
   }
+
+  this.updateDebugMode();
 
   // Objects will be added in lighting layer, this is just to maintain consistency.
   if (this._light)

@@ -479,7 +479,13 @@ gdjs.RuntimeGamePixiRenderer.prototype.openURL = function (url) {
     Cocoon.App.openURL(url);
   } else if (typeof window !== 'undefined') {
     var target = window.cordova ? '_system' : '_blank';
-    window.open(url, target);
+
+    const electron = this.getElectron();
+    if (electron) {
+      electron.shell.openExternal(url);
+    } else {
+      window.open(url, target);
+    }
   }
 };
 

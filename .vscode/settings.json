@@ -100,7 +100,6 @@
         "GDJS/docs": true,
         "GDCpp/docs": true,
         "Core/docs": true,
-        "Extensions/CommonDialogs/dlib-18.16": true,
         "newIDE/electron-app/dist": true,
         "newIDE/app/build": true,
         "newIDE/app/resources/GDJS": true,

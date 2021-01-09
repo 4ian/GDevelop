@@ -13,10 +13,10 @@ describe('gdjs.Polygon', function() {
     });
     benchmarkSuite
       .add('collisionTest between two overlapping rectangles', i => {
-        gdjs.Polygon.collisionTest(rect1, rect2);
+        gdjs.Polygon.collisionTest(rect1, rect2, false);
       })
       .add('collisionTest between two non overlapping rectangles', i => {
-        gdjs.Polygon.collisionTest(rect1, rect3);
+        gdjs.Polygon.collisionTest(rect1, rect3, false);
       });
 
     console.log(benchmarkSuite.run());

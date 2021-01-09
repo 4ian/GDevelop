@@ -68,7 +68,6 @@ class BehaviorCodeGenerator {
       std::function<gd::String()> generateUpdateFromBehaviorDataCode);
   gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
-      const gd::String& codeNamespace,
       const gd::NamedPropertyDescriptor& property);
   gd::String GenerateInitializePropertyFromDataCode(
       const gd::NamedPropertyDescriptor& property);
@@ -77,7 +76,6 @@ class BehaviorCodeGenerator {
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
   gd::String GenerateUpdatePropertyFromBehaviorDataCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
-      const gd::String& codeNamespace,
       const gd::NamedPropertyDescriptor& property);
   gd::String GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
       const gd::EventsBasedBehavior& eventsBasedBehavior,

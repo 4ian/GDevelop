@@ -4,7 +4,7 @@ GDevelop editor and games engines are designed so that all objects, behaviors, e
 are provided by _extensions_. These extensions are composed of two parts:
 
 - the _declaration_ of the extension, traditionally done in a file called `JsExtension.js`.
-- the _implementation_ of the extension for the game engine (also called the "Runtime"), containing the functions corresponding to the actions/conditions/expressions and the classes used for the objects or behaviors. The implementation is traditionally in files called `extensionnametools.js`, `objectnameruntimeobject.js` or `objectnameruntimebehavior.js`.
+- the _implementation_ of the extension for the game engine (also called the "Runtime"), written in [TypeScript](typescriptlang.org), containing the functions corresponding to the actions/conditions/expressions and the classes used for the objects or behaviors. The implementation is traditionally in files called `extensionnametools.ts`, `objectnameruntimeobject.ts` or `objectnameruntimebehavior.ts`.
 
 > Note that some GDevelop extensions are declared in C++, in files called `JsExtension.cpp`. If you want to edit them,
 > refer to the paragraph about them at the end.
@@ -48,32 +48,32 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
 ### 2.1) Implement your feature for the game engine 👾
 
-> ℹ️ Implement your extension in file called `extensionnametools.js` (for general functions), `objectnameruntimeobject.js` (for objects) or `behaviornameruntimebehavior.js` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
+> ℹ️ Implement your extension in file called `extensionnametools.ts` (for general functions), `objectnameruntimeobject.ts` (for objects) or `behaviornameruntimebehavior.ts` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
-Check the [GDJS game engine documentation here](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [mostly be written in JavaScript "ES5 flavor" (i.e: usual, classic good old JavaScript) (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
+Check the [GDJS game engine documentation here](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [almost all be written in TypeScript, with a few precautions to ensure good performance (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 #### How to create functions to be called by events
 
-See examples in [examplejsextensiontools.js](../Extensions/ExampleJsExtension/examplejsextensiontools.js).
+See examples in [examplejsextensiontools.ts](../Extensions/ExampleJsExtension/examplejsextensiontools.ts).
 
-Read about [`gdjs.RuntimeScene`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
+Read about [`gdjs.RuntimeScene`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation//RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
 
 #### How to create a behavior by extending `gdjs.RuntimeBehavior`
 
-See examples in [dummyruntimebehavior.js](../Extensions/ExampleJsExtension/dummyruntimebehavior.js) (or [dummywithshareddataruntimebehavior.js](../Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js) for an example with shared data between behaviors).
+See examples in [dummyruntimebehavior.ts](../Extensions/ExampleJsExtension/dummyruntimebehavior.ts) (or [dummywithshareddataruntimebehavior.ts](../Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.ts) for an example with shared data between behaviors).
 
 You'll be interested in the constructor (to initialize things), `onDeActivate` (called when behavior is deactivated), `doStepPreEvents`
 and `doStepPostEvents` (to run logic before/after the events at each frame).
 
-Read about [`gdjs.RuntimeBehavior`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeBehavior.html), the base class inherited by all behaviors, to see everything that is available.
+Read about [`gdjs.RuntimeBehavior`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/RuntimeBehavior.html), the base class inherited by all behaviors, to see everything that is available.
 
 #### How to create an object by extending `gdjs.RuntimeObject`
 
-See example in [dummyruntimeobject.js](../Extensions/ExampleJsExtension/dummyruntimeobject.js) (the object itself) and [dummyruntimeobject-pixi-renderer.js](../Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js) (the renderer, using PIXI.js).
+See example in [dummyruntimeobject.js](../Extensions/ExampleJsExtension/dummyruntimeobject.js) (the object itself) and [dummyruntimeobject-pixi-renderer.js](../Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js) (the renderer, using PixiJS).
 
-You'll be interested in the constructor (to initialize things), `update` (called every frame) and the other methods. In the PIXI renderer, check the constructor (where PIXI objects are created). Other methods depend on the renderer.
+You'll be interested in the constructor (to initialize things), `update` (called every frame) and the other methods. In the PIXI renderer, check the constructor (where PixiJS objects are created). Other methods depend on the renderer.
 
-Read about [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
+Read about [`gdjs.RuntimeObject`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/RuntimeObject.html), the base class inherited by all objects.
 
 #### How to create an effect ("shader", PixiJS "filter")
 
@@ -212,9 +212,9 @@ registerEditorConfigurations: function(objectsEditorService /*: ObjectsEditorSer
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
-#### Declare the Pixi.js renderer for the instance of your object in the scene editor
+#### Declare the PixiJS renderer for the instance of your object in the scene editor
 
-Finally, to have the instances of your object displayed properly on the scene editor, implement the function `registerInstanceRenderers` in your extension module. The function is passed an object called `objectsRenderingService`, containing [RenderedInstance](./app/src/ObjectsRendering/Renderers/RenderedInstance.js), the "base class" for instance renderers, and PIXI, which give you access to [Pixi.js rendering engine](https://github.com/pixijs/pixi.js), used in the editor to render the scene.
+Finally, to have the instances of your object displayed properly on the scene editor, implement the function `registerInstanceRenderers` in your extension module. The function is passed an object called `objectsRenderingService`, containing [RenderedInstance](./app/src/ObjectsRendering/Renderers/RenderedInstance.js), the "base class" for instance renderers, and PixiJS, which give you access to [PixiJS rendering engine](https://github.com/pixijs/pixi.js), used in the editor to render the scene.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
@@ -239,7 +239,7 @@ If you want to start a new extension:
 - Change the extension information (`extension.setExtensionInformation`). The first argument is the extension internal name and should be the same name as your folder for consistency.
 - Remove all the actions/conditions/expressions declarations and tests, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
 - Create a file called for example _yourextensionnametools.js_ in the same directory.
-- Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the js file that you've created, prefixed by the path from the root folder. For example:
+- Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the ts file that you've created **but with a js extension**, prefixed by the path from the root folder. For example:
   ```js
   .setIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.js")
   ```

@@ -5,11 +5,11 @@ GDevelop is architectured around a `Core` library, platforms (`GDJS`, `GDCpp`) a
 | Directory | ℹ️ Description |
 | --- | --- |
 | `Core` | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games. |
-| `GDCpp` | GDevelop C++ game engine, used to **build native games**. |
-| `GDJS` | GDevelop JS game engine, used to build **HTML5 games**. |
-| `GDevelop.js` | Bindings of Core/GDCpp/GDJS and Extensions to JavaScript (used by the IDE). |
-| `newIDE` | The game editor, written in JavaScript with React, Electron and Pixi.js. |
-| `Extensions` | Extensions for C++ or JS game engines, providing objects, events and new features. |
+| `GDCpp` | The C++ game engine, used to build native games (*not used in GDevelop 5*). |
+| `GDJS` | The game engine, written in TypeScript, using PixiJS (WebGL), powering all GDevelop games. |
+| `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
+| `newIDE` | The game editor, written in JavaScript with React, Electron and PixiJS. |
+| `Extensions` | Extensions for the game engine, providing objects, behaviors, events and new features. |
 
 The rest of this page is an introduction to the main concepts of GDevelop architecture.
 
@@ -26,16 +26,16 @@ The rest of this page is an introduction to the main concepts of GDevelop archit
 Extensions do have the same distinction between the "**IDE**" part and the "**Runtime**" part. For example, most extensions have:
 
 * A file called [`JsExtension.js`(https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/JsExtension.js)], which contains the *declaration* of the extension for the **IDE**
-* One or more files implementing the feature for the game, in other words for **Runtime**. This can be a [Runtime Object](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimeobject.js) or a [Runtime Behavior](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimebehavior.js), [functions called by actions or conditions](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/examplejsextensiontools.js) or by the game engine.
+* One or more files implementing the feature for the game, in other words for **Runtime**. This can be a [Runtime Object](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimeobject.ts) or a [Runtime Behavior](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimebehavior.ts), [functions called by actions or conditions](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/examplejsextensiontools.ts) or by the game engine.
 
 ### "Runtime" and "IDE" difference using an example: the `gd::Variable` class
 
 In GDevelop, developers can associate and manipulate variables in their games. To represent them, we have two things:
 
 * The **editor** `gd::Variable` that is part of the structure of the game, so living in [GDCore in Variable.h](https://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_variable.html). This is what is shown in the editor, saved on disk in the project file.
-* The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/gdjs.Variable.html). This JavaScript class is what is used during a game.
+* The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/Variable.html). This JavaScript class is what is used during a game.
 
-The editor `gd::Variable` **know nothing** about the game engine class `gdjs.Variable`. And the `gdjs.Variable` class in the game engine know almost nothing from `gd::Variable` (apart from how it's written in JSON, to be able to load a game default variables).
+The editor `gd::Variable` **knows nothing** about the game engine class `gdjs.Variable`. And the `gdjs.Variable` class in the game engine knows almost nothing from `gd::Variable` (apart from how it's written in JSON, to be able to load a game default variables).
 
 > Note that the name `gdjs.Variable` is maybe a *bad decision*: it should have been called a `gdjs.RuntimeVariable`, like `gdjs.RuntimeObject` and like most other classes of the game engine.
 
@@ -53,7 +53,7 @@ While `GDJS/Runtime` folder is the game engine that is executed inside a game, `
 * What are [the default extensions](https://github.com/4ian/GDevelop/tree/master/GDJS/GDJS/Extensions/Builtin),
 * How do you [generate JS code from events](https://github.com/4ian/GDevelop/tree/master/GDJS/GDJS/Events/CodeGeneration),
 
-The game engine is in GDJS/Runtime and is all JavaScript.
+The game engine is in GDJS/Runtime and is all written in TypeScript.
 
 ## What about events?
 
@@ -68,7 +68,7 @@ A `gd::Instruction` is "just" a type (the name of the action or condition), and 
 
 They do not exist anymore! ✨
 
-Events are translated (we also say "transpiled" or "generated") into "real" code in a programming language. This process is called "Code Generation", and is [done here for the JavaScript game engine](https://github.com/4ian/GDevelop/tree/master/GDJS/GDJS/Events/CodeGeneration).
+Events are translated (we also say "transpiled" or "generated") into "real" code in a programming language. This process is called "Code Generation", and is [done here for the TypeScript game engine](https://github.com/4ian/GDevelop/tree/master/GDJS/GDJS/Events/CodeGeneration).
 
 ### Can I extract Events classes and code generator to make a development environment based on GDevelop events?
 
@@ -79,7 +79,7 @@ You're welcome to do so! Please get in touch :)
 The idea of GDevelop editor and game engine is to have a lean game engine, supporting almost nothing. Then, one can add "mods", "plugins", "modules" for GDevelop. We chose to call them "**Extensions**" in GDevelop.
 
 * `GDevelop/Core/GDCore/Extensions` is the **declaration** of default (we say "builtin") extensions, that are available for any game and are "mandatory". They are called Extensions but they could be named "Extensions that will always be in your game". In programming languages, this is called a "[Standard Library](https://en.wikipedia.org/wiki/Standard_library)" (but don't get too distracted by this naming).
-* `GDevelop/GDJS/GDJS/Extensions/` and `GDevelop/GDCpp/GDCpp/Extensions/` are reusing these **declarations** and **adding** their own declarations. Mainly, they are setting the name of the functions to be called (either in JS or in C++) for each action, condition or expression.
+* `GDevelop/GDJS/GDJS/Extensions/` and `GDevelop/GDCpp/GDCpp/Extensions/` are reusing these **declarations** and **adding** their own declarations. Mainly, they are setting the name of the functions to be called (either in TypeScript or in C++) for each action, condition or expression.
 * `GDevelop/Extensions/` is the folder for the "mods"/"plugins" for GDevelop - the one that are not mandatory. They are not part of GDCore - they work on their own.
 
 > In theory, all extensions could be moved to `GDevelop/Extensions/`. In practice, it's more pragmatic to have a set of "builtin" extensions with basic features.
@@ -111,7 +111,7 @@ All the required C++ files are imported into this huge list: https://github.com/
 
 GDevelop was originally written in C++. It's a scary language at first but is portable across almost any existing machine in this universe, can be pretty good, safe and readable with the latest C++ features.
 
-### What's the deal with JavaScript? Why so much of it?
+### What's the deal with JavaScript/TypeScript? Why so much of it?
 
 JavaScript, with the latest language proposals, is actually a very capable language, fast to write and safe with typing:
 

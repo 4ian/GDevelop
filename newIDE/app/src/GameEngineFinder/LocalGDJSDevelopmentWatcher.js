@@ -124,6 +124,7 @@ const importGDJSRuntime = (): Promise<void> => {
   if (!child_process || !path) return Promise.reject(new Error('Unsupported'));
 
   return new Promise((resolve, reject) => {
+    const startTime = performance.now();
     child_process.exec(
       `node "${path.join(
         findDevelopmentNewIdeAppPath(),
@@ -131,15 +132,16 @@ const importGDJSRuntime = (): Promise<void> => {
       )}"`,
       (error, stdout, stderr) => {
         if (error) {
-          console.error(`GDJS Runtime update error: ${error}`);
+          console.error(`GDJS Runtime update error:\n${error}`);
           reject(error);
           return;
         }
 
-        console.info(`GDJS Runtime update: ${stdout}`);
+        const duration = (performance.now() - startTime).toFixed(0);
+        console.info(`GDJS Runtime updated in ${duration}ms:\n${stdout}`);
 
         if (stderr) {
-          console.error(`GDJS Runtime update error: ${stderr}`);
+          console.error(`GDJS Runtime update error:\n${stderr}`);
           reject(new Error('Error while updating GDJS Runtime'));
           return;
         }

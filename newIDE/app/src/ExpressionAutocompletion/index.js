@@ -382,7 +382,7 @@ export const insertAutocompletionInExpression = (
   let newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
   const newExpressionEnd = expression.substring(wordEndPosition + 1);
-  if (insertedWord.includes(newExpressionStart)) newExpressionStart = '';
+  if (insertedWord.indexOf(newExpressionStart) === 0) newExpressionStart = '';
 
   return {
     caretLocation: newExpressionStart.length + insertedWord.length,

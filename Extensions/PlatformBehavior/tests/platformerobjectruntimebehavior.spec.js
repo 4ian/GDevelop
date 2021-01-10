@@ -80,7 +80,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 
   it('can fall when in the air', function() {
     for (var i = 0; i < 30; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
       if (i < 10) expect(object.getBehavior('auto1').isFalling()).to.be(true);
     }
 
@@ -92,7 +92,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
     for (var i = 0; i < 35; ++i) {
       //Check that the platformer object can fall.
       object.getBehavior('auto1').simulateRightKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getX()).to.be.within(87.5, 87.51);
     expect(object.getY()).to.be(-24.75);
@@ -100,7 +100,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 
     for (var i = 0; i < 100; ++i) {
       //Let the speed on X axis go back to 0.
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
   });
 
@@ -113,7 +113,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 
     for (var i = 0; i < 35; ++i) {
       object.getBehavior('auto1').simulateLeftKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     //Check that the object grabbed the platform
@@ -125,7 +125,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 
     object.getBehavior('auto1').simulateReleaseKey();
     for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     //Check that the object is falling
@@ -140,7 +140,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
     );
 
     for (var i = 0; i < 15; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     expect(object.getBehavior('auto1').isFalling()).to.be(false);
@@ -150,13 +150,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
     object.getHeight = function() {
       return 9;
     };
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getBehavior('auto1').isFalling()).to.be(false);
     expect(object.getY()).to.be(-19); // -19 = -10 (platform y) + -9 (object height)
 
     for (var i = 0; i < 10; ++i) {
       object.getBehavior('auto1').simulateRightKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
     }
     expect(object.getY()).to.be(-19);
@@ -165,7 +165,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
     object.getHeight = function() {
       return 20;
     };
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
   });
 });
@@ -211,7 +211,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jump and jump sustain (round coo
   it('can jump', function() {
     // Ensure the object falls on the platform
     for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     //Check the object is on the platform
@@ -222,19 +222,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jump and jump sustain (round coo
     // Jump without sustaining
     object.getBehavior('auto1').simulateJumpKey();
     for (var i = 0; i < 18; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
 	}
 
     // Check that we reached the maximum height
     expect(object.getY()).to.be.within(-180, -179);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-180);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-180, -179);
 
     // Then let the object fall
     for (var i = 0; i < 60; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
   });
@@ -249,29 +249,29 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jump and jump sustain (round coo
 	// even more (18 frames at 60fps is greater than 0.2s)
     for (var i = 0; i < 18; ++i) {
       object.getBehavior('auto1').simulateJumpKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     // Check the height reached
     expect(object.getY()).to.be(-230);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-235);
     for (var i = 0; i < 5; ++i) {
       // Verify that pressing the jump key does not change anything
       object.getBehavior('auto1').simulateJumpKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     // Check that we reached the maximum height
     expect(object.getY()).to.be(-247.5);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-247.5);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-247, -246);
 
     // Then let the object fall
     for (var i = 0; i < 60; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
   });
@@ -285,34 +285,34 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jump and jump sustain (round coo
 	// Jump with sustaining a bit (5 frames at 60fps = 0.08s), then stop
     for (var i = 0; i < 5; ++i) {
       object.getBehavior('auto1').simulateJumpKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 	expect(object.getY()).to.be.within(-101, -100);
 
 	// Stop holding the jump key
-	runtimeScene.renderAndStep();
+	runtimeScene.renderAndStep(1000 / 60);
 
     for (var i = 0; i < 13; ++i) {
 	  // then hold it again (but it's too late, jump sustain is gone for this jump)
       object.getBehavior('auto1').simulateJumpKey();
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     // Check that we reached the maximum height
     expect(object.getY()).to.be.within(-206, -205);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-208, -207);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-208, -207);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-208, -207);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-206, -205);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
 
     // Then let the object fall
     for (var i = 0; i < 60; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
   });
@@ -380,7 +380,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jumpthru', function() {
   it('can jump through the jumpthru', function() {
     //Check the platform stopped the platformer object.
     for (var i = 0; i < 5; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
     expect(object.getBehavior('auto1').isFalling()).to.be(false);
@@ -388,29 +388,29 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, jumpthru', function() {
 
     // Check that the jump starts properly, and is not stopped on the jumpthru
     object.getBehavior('auto1').simulateJumpKey();
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-39, -38);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-47, -46);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     // At this step, the object is almost on the jumpthru (-53 + 20 (object height) = -33 (jump thru Y position)),
     // but the object should not stop.
     expect(object.getY()).to.be.within(-54, -53);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-61, -60);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be.within(-67, -66);
     expect(object.getBehavior('auto1').isJumping()).to.be(true);
 
     // Continue the simulation and check that position is correct in the middle of the jump
     for (var i = 0; i < 20; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be.within(-89, -88);
 
     // Continue simulation and check that we arrive on the jumpthru
     for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be.within(
       jumpthru.getY() - object.getHeight(),
@@ -459,7 +459,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, rounded coordinates (moving plat
 
   it('follows the platform', function() {
     for (var i = 0; i < 30; ++i) {
-      runtimeScene.renderAndStep();
+      runtimeScene.renderAndStep(1000 / 60);
     }
 
     // Check the object has not moved.
@@ -472,11 +472,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior, rounded coordinates (moving plat
     // Check that the object follow the platform, even if the
     // movement is less than one pixel.
     platform.setX(platform.getX() + 0.12);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     platform.setX(platform.getX() + 0.12);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     platform.setX(platform.getX() + 0.12);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
 
     expect(object.getX()).to.be(0.36);
   });

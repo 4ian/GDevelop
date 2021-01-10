@@ -50,7 +50,7 @@
     tileWidth: number,
     tileHeight: number,
     atlasTexture: PIXI.BaseTexture,
-    textureCache: Array<PIXI.Texture>,
+    textureCache: Object<number, PIXI.Texture | null>,
     layers: Array<TiledDataLayer>,
     tiles: Array<TiledDataTile>,
    }} GenericPixiTileMapData
@@ -69,9 +69,9 @@
    * into a generic tile map data (`GenericPixiTileMapData`).
    *
    * @param {Object} tiledData A JS object representing a map exported from Tiled.
-   * @param {PIXI.BaseTexture} atlasTexture
+   * @param {?PIXI.BaseTexture} atlasTexture
    * @param {(textureName: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
-   * @returns {GenericPixiTileMapData}
+   * @returns {?GenericPixiTileMapData}
    */
   const parseTiledData = (tiledData, atlasTexture, getTexture) => {
     if (!tiledData.tiledversion) {
@@ -124,7 +124,12 @@
       return null;
     }
 
-    const textureCache = new Array(tilecount + 1).fill(0).map((_, frame) => {
+    // Prepare the textures pointing to the base "Atlas" Texture for each tile.
+    // Note that this cache can be augmented later with rotated/flipped
+    // versions of the tile textures.
+    /** @type {Object<number, PIXI.Texture | null>} */
+    const textureCache = {};
+    for (let frame = 0; frame <= tilecount; frame++) {
       const columnMultiplier = Math.floor((frame - 1) % columns);
       const rowMultiplier = Math.floor((frame - 1) / columns);
       const x = margin + columnMultiplier * (tilewidth + spacing);
@@ -132,18 +137,19 @@
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
+        // @ts-ignore - atlasTexture is never null here.
         const texture = new PIXI.Texture(atlasTexture, rect);
         texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
-        return texture;
+        textureCache[frame] = texture;
       } catch (error) {
         console.error(
-          'An error occurred while creating a PIXI.Texture to be used in a TileSet:',
+          'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
           error
         );
-        return null;
+        textureCache[frame] = null;
       }
-    });
+    }
 
     /** @type {GenericPixiTileMapData} */
     const tileMapData = {
@@ -216,6 +222,102 @@
   };
 
   /**
+   * Extract information about the rotation of a tile from the tile id.
+   * @param {number} globalTileUid
+   * @returns {[number, boolean, boolean, boolean]}
+   */
+  const extractTileUidFlippedStates = (globalTileUid) => {
+    const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+    const FLIPPED_VERTICALLY_FLAG = 0x40000000;
+    const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+
+    const flippedHorizontally = globalTileUid & FLIPPED_HORIZONTALLY_FLAG;
+    const flippedVertically = globalTileUid & FLIPPED_VERTICALLY_FLAG;
+    const flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
+    const tileUid =
+      globalTileUid &
+      ~(
+        FLIPPED_HORIZONTALLY_FLAG |
+        FLIPPED_VERTICALLY_FLAG |
+        FLIPPED_DIAGONALLY_FLAG
+      );
+
+    return [tileUid, !!flippedHorizontally, !!flippedVertically, !!flippedDiagonally];
+  };
+
+  /**
+   * Return the texture to use for the tile with the specified uid, which can contains
+   * information about rotation in bits 32, 31 and 30
+   * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
+   *
+   * @param {Object<number, PIXI.Texture | null>} textureCache
+   * @param {number} globalTileUid
+   * @returns {?PIXI.Texture}
+   */
+  const findTileTextureInCache = (textureCache, globalTileUid) => {
+    if (globalTileUid === 0) return null;
+
+    if (textureCache[globalTileUid]) {
+      return textureCache[globalTileUid];
+    }
+
+    // If the texture is not in the cache, it's potentially because its ID
+    // is a flipped/rotated version of another ID.
+    const flippedStates = extractTileUidFlippedStates(globalTileUid);
+    const tileUid = flippedStates[0];
+    const flippedHorizontally = flippedStates[1];
+    const flippedVertically = flippedStates[2];
+    const flippedDiagonally = flippedStates[3];
+
+    if (tileUid === 0) return null;
+
+    // If the tile still can't be found in the cache, it means the ID we got
+    // is invalid.
+    const unflippedTexture = textureCache[tileUid];
+    if (!unflippedTexture) return null;
+
+    // Clone the unflipped texture and save it in the cache
+    const frame = unflippedTexture.frame.clone();
+    const orig = unflippedTexture.orig.clone();
+    if (flippedDiagonally) {
+      const width = orig.width;
+      orig.width = orig.height;
+      orig.height = width;
+    }
+    const trim = orig.clone();
+
+    let rotate = 0;
+    if (flippedDiagonally) {
+      rotate = 6;
+      if (!flippedHorizontally && flippedVertically) {
+        rotate = 14;
+      } else if (flippedHorizontally && !flippedVertically) {
+        rotate = 10;
+      } else if (flippedHorizontally && flippedVertically) {
+        rotate = 2;
+      }
+    } else {
+      rotate = 0;
+      if (!flippedHorizontally && flippedVertically) {
+        rotate = 8;
+      } else if (flippedHorizontally && !flippedVertically) {
+        rotate = 12;
+      } else if (flippedHorizontally && flippedVertically) {
+        rotate = 4;
+      }
+    }
+
+    const flippedTexture = new PIXI.Texture(
+      unflippedTexture.baseTexture,
+      frame,
+      orig,
+      trim,
+      rotate
+    );
+    return (textureCache[globalTileUid] = flippedTexture);
+  };
+
+  /**
    * Re-renders the tilemap whenever its rendering settings have been changed
    *
    * @param {any} pixiTileMap
@@ -238,7 +340,6 @@
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
-      // TODO: add support for filtering a specific tiled object group by its name.
       if (layer.type === 'objectgroup') {
         layer.objects.forEach(function (object) {
           const { gid, x, y, visible } = object;
@@ -256,12 +357,14 @@
         let layerData = layer.data;
 
         if (layer.encoding === 'base64') {
+          // @ts-ignore
           layerData = decodeBase64LayerData(layer, pako);
           if (!layerData) {
             console.warn('Failed to uncompress layer.data');
             return;
           }
         }
+
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
             const xPos = genericTileMapData.tileWidth * j;
@@ -269,36 +372,34 @@
 
             /** @type {number} */
             // @ts-ignore
-            const tileUid = layerData[tileSlotIndex];
+            const globalTileUid = layerData[tileSlotIndex];
 
-            if (tileUid !== 0 && genericTileMapData.textureCache[tileUid]) {
+            const tileTexture = findTileTextureInCache(
+              genericTileMapData.textureCache,
+              globalTileUid
+            );
+            if (tileTexture) {
               const tileData =
                 genericTileMapData.tiles &&
                 genericTileMapData.tiles.find(function (tile) {
-                  return tile.id === tileUid - 1;
+                  return tile.id === globalTileUid - 1;
                 });
+
+              const pixiTilemapFrame = pixiTileMap.addFrame(
+                tileTexture,
+                xPos,
+                yPos
+              );
 
               // Animated tiles have a limitation with only being able to use frames arranged one to each other on the image resource
               if (tileData && tileData.animation) {
-                pixiTileMap
-                  .addFrame(
-                    genericTileMapData.textureCache[tileUid],
-                    xPos,
-                    yPos
-                  )
-                  .tileAnimX(
-                    genericTileMapData.tileWidth,
-                    tileData.animation.length
-                  );
-              } else {
-                // Non animated props dont require tileAnimX or Y
-                pixiTileMap.addFrame(
-                  genericTileMapData.textureCache[tileUid],
-                  xPos,
-                  yPos
+                pixiTilemapFrame.tileAnimX(
+                  genericTileMapData.tileWidth,
+                  tileData.animation.length
                 );
               }
             }
+
             tileSlotIndex += 1;
           }
         }
@@ -318,7 +419,7 @@
    * @param {string} atlasImageResourceName The name of the resource to pass to `getTexture` to load the atlas.
    * @param {string} tilemapResourceName The name of the tilemap resource - used to index internally the loaded tilemap data.
    * @param {string} tilesetResourceName The name of the tileset resource - used to index internally the loaded tilemap data.
-   * @returns {GenericPixiTileMapData}
+   * @returns {?GenericPixiTileMapData}
    */
   exports.loadPixiTileMapData = (
     getTexture,

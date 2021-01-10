@@ -6,7 +6,9 @@
   "private": true,
   "scripts": {
     "test": "karma start --browsers ChromeHeadless --single-run",
-    "test:firefox": "karma start --browsers Firefox --single-run"
+    "test:watch": "karma start --browsers ChromeHeadless",
+    "test:firefox": "karma start --browsers Firefox --single-run",
+    "test:firefox:watch": "karma start --browsers Firefox"
   },
   "keywords": [
     "HTML5",

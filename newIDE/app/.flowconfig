@@ -11,7 +11,7 @@
 # Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
 # as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
 # game engine and extensions are annotated with TypeScript annotations, not Flow.
-<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Extensions
+<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only
 
 [include]
 # Type check the declarations of the JavaScript extensions (i.e: JsExtension.js files) with Flow

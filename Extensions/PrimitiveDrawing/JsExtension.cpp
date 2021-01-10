@@ -139,6 +139,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("getOutlineOpacity");
 
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineOpacity"]
+        .SetFunctionName("getOutlineOpacity");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

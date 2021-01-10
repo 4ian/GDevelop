@@ -477,6 +477,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetOutlineOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "OutlineOpacity",
+        _("Get current opacity of the outline"),
+        _("Return the opacity of the outline (a number from 0 to 1, 1 being fully opaque)."),
+        "",
+        "res/conditions/opacity.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineOpacity")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      
 #endif
 }
 

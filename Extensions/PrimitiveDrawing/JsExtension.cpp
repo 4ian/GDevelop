@@ -124,6 +124,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"]
         .SetFunctionName("getOutlineSize");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineSize"]
+        .SetFunctionName("getOutlineSize");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"]
         .SetFunctionName("setFillOpacity")

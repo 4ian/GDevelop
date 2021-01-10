@@ -419,6 +419,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetOutlineSize")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "OutlineSize",
+        _("Get current outline size"),
+        _("Return the outline size in pixels."),
+        "",
+        "res/conditions/outlineSize.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineSize")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction(
          "FillOpacity",
          _("Fill opacity"),

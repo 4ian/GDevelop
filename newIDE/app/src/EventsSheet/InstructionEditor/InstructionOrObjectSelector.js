@@ -11,6 +11,7 @@ import {
   findInTree,
 } from '../../InstructionOrExpression/CreateTree';
 import {
+  enumerateAllInstructions,
   enumerateFreeInstructions,
   filterInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
@@ -85,15 +86,22 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
 
-  instructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
+  // Free instructions, to be displayed in a tab next to the objects.
+  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
   );
-  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.instructionsInfo
+  freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
+    this.freeInstructionsInfo
   );
   initialInstructionTypePath = findInTree(
-    this.instructionsInfoTree,
+    this.freeInstructionsInfoTree,
     this.props.chosenInstructionType
+  );
+
+  // All the instructions, to be used when searching, so that the search is done
+  // across all the instructions (including object and behaviors instructions).
+  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateAllInstructions(
+    this.props.isCondition
   );
 
   componentDidMount() {
@@ -168,11 +176,12 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const displayedObjectGroupsList = selectedObjectTags.length
       ? []
       : filterGroupsList(allGroupsList, searchText);
+    const isSearching = !!searchText;
     const displayedInstructionsList = filterInstructionsList(
-      this.instructionsInfo,
+      // When searching, search among all the instructions
+      isSearching ? this.allInstructionsInfo : this.freeInstructionsInfo,
       { searchText }
     );
-    const isSearching = !!searchText;
     const hasResults =
       !isSearching ||
       !!displayedObjectsList.length ||
@@ -265,49 +274,53 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   )}
                   {hasResults && (
                     <List>
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectsList.map(objectWithContext =>
-                          renderObjectListItem({
-                            project: project,
-                            objectWithContext: objectWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(
-                                objectWithContext.object.getName()
-                              ),
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                          })
-                        )}
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectGroupsList.length > 0 && (
-                          <Subheader>
-                            <Trans>Object groups</Trans>
-                          </Subheader>
-                        )}
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectGroupsList.map(groupWithContext =>
-                          renderGroupObjectsListItem({
-                            groupWithContext: groupWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(groupWithContext.group.getName()),
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                          })
-                        )}
+                      {(isSearching || currentTab === 'objects') && (
+                        <React.Fragment>
+                          {displayedObjectsList.map(objectWithContext =>
+                            renderObjectListItem({
+                              project: project,
+                              objectWithContext: objectWithContext,
+                              iconSize: iconSize,
+                              onClick: () =>
+                                onChooseObject(
+                                  objectWithContext.object.getName()
+                                ),
+                              selectedValue: chosenObjectName
+                                ? getObjectOrObjectGroupListItemValue(
+                                    chosenObjectName
+                                  )
+                                : undefined,
+                            })
+                          )}
+
+                          {displayedObjectGroupsList.length > 0 && (
+                            <Subheader>
+                              <Trans>Object groups</Trans>
+                            </Subheader>
+                          )}
+                          {displayedObjectGroupsList.map(groupWithContext =>
+                            renderGroupObjectsListItem({
+                              groupWithContext: groupWithContext,
+                              iconSize: iconSize,
+                              onClick: () =>
+                                onChooseObject(
+                                  groupWithContext.group.getName()
+                                ),
+                              selectedValue: chosenObjectName
+                                ? getObjectOrObjectGroupListItemValue(
+                                    chosenObjectName
+                                  )
+                                : undefined,
+                            })
+                          )}
+                        </React.Fragment>
+                      )}
                       {isSearching && displayedInstructionsList.length > 0 && (
                         <Subheader>
                           {isCondition ? (
-                            <Trans>Non-objects and other conditions</Trans>
+                            <Trans>Conditions</Trans>
                           ) : (
-                            <Trans>Non-objects and other actions</Trans>
+                            <Trans>Actions</Trans>
                           )}
                         </Subheader>
                       )}
@@ -331,7 +344,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       {!isSearching &&
                         currentTab === 'free-instructions' &&
                         renderInstructionOrExpressionTree({
-                          instructionTreeNode: this.instructionsInfoTree,
+                          instructionTreeNode: this.freeInstructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,
                           selectedValue: chosenInstructionType

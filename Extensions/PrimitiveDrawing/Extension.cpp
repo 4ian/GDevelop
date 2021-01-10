@@ -448,6 +448,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetFillOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "FillOpacity",
+        _("Get current opacity of filling"),
+        _("Return the opacity of filling (a number from 0 to 1, 1 being fully opaque)."),
+        "",
+        "res/conditions/opacity.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillOpacity")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction(
          "OutlineOpacity",
          _("Outline opacity"),

@@ -131,6 +131,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"]
         .SetFunctionName("getFillOpacity");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillOpacity"]
+        .SetFunctionName("getFillOpacity");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("setOutlineOpacity")
@@ -138,7 +140,6 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("getOutlineOpacity");
-
     GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineOpacity"]
         .SetFunctionName("getOutlineOpacity");
 

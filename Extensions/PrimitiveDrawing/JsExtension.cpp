@@ -111,6 +111,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
         .SetFunctionName("isClearedBetweenFrames");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["IsClearBetweenFrames"]
+        .SetFunctionName("isClearedBetweenFrames");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");

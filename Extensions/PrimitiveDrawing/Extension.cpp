@@ -366,6 +366,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("IsClearedBetweenFrames")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "IsClearBetweenFrames",
+        _("Is clear between frames"),
+        _("Return the outline size in pixels."), //todo
+        "",
+        "res/conditions/outlineSize.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("IsClearedBetweenFrames")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction("FillColor",
                 _("Fill color"),
                 _("Change the color used when filling"),

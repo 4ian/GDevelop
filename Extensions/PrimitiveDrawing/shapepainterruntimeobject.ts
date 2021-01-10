@@ -274,6 +274,22 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
+    setCoordinatesAbsolute(value): void {
+      this._absoluteCoordinates = value;
+    }
+
+    setCoordinatesRelative(value): void {
+      this._absoluteCoordinates = !value;
+    }
+
+    areCoordinatesAbsolute(): boolean {
+      return this._absoluteCoordinates;
+    }
+
+    areCoordinatesRelative(): boolean {
+      return !this._absoluteCoordinates;
+    }
+
     setFillColor(rgbColor): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {

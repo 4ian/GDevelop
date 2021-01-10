@@ -105,6 +105,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ArcTo"]
         .SetFunctionName("drawArcTo");*/
+        
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
         .SetFunctionName("setClearBetweenFrames");
@@ -113,12 +114,15 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("isClearedBetweenFrames");
     GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["IsClearBetweenFrames"]
         .SetFunctionName("isClearedBetweenFrames");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"]
         .SetFunctionName("setOutlineColor");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"]
         .SetFunctionName("setOutlineSize")
@@ -128,6 +132,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getOutlineSize");
     GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineSize"]
         .SetFunctionName("getOutlineSize");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"]
         .SetFunctionName("setFillOpacity")
@@ -137,6 +142,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getFillOpacity");
     GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillOpacity"]
         .SetFunctionName("getFillOpacity");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("setOutlineOpacity")
@@ -146,6 +152,26 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getOutlineOpacity");
     GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineOpacity"]
         .SetFunctionName("getOutlineOpacity");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CoordinatesAbsolute"]
+        .SetFunctionName("setCoordinatesAbsolute")
+        .SetGetter("areCoordinatesAbsolute");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::AreCoordinatesAbsolute"]
+        .SetFunctionName("areCoordinatesAbsolute");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["AreCoordinatesAbsolute"]
+        .SetFunctionName("areCoordinatesAbsolute");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CoordinatesRelative"]
+        .SetFunctionName("setCoordinatesRelative")
+        .SetGetter("areCoordinatesRelative");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::AreCoordinatesRelative"]
+        .SetFunctionName("areCoordinatesRelative");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["AreCoordinatesRelative"]
+        .SetFunctionName("areCoordinatesRelative");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

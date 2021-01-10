@@ -382,7 +382,15 @@ export const insertAutocompletionInExpression = (
   let newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
   const newExpressionEnd = expression.substring(wordEndPosition + 1);
-  if (insertedWord.indexOf(newExpressionStart) === 0) newExpressionStart = '';
+
+  //Code to merge common part between end of newExpressionStart and start of insertWord
+  for (let index = 0; index < newExpressionStart.length; index++) {
+    let subStr = newExpressionStart.substring(index);
+    if (insertedWord.indexOf(subStr) === 0) {
+      newExpressionStart = newExpressionStart.substring(0, index);
+      break;
+    }
+  }
 
   return {
     caretLocation: newExpressionStart.length + insertedWord.length,

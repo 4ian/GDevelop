@@ -6,7 +6,6 @@ import ContextMenu from './ContextMenu';
 import { type MenuItemTemplate } from './Menu.flow';
 
 type Props = {|
-  shouldOpen?: (SyntheticEvent<HTMLButtonElement>) => boolean,
   element: React$Element<any>,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
@@ -23,10 +22,9 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenu;
   _wrappedElement: ?any;
 
-  open = (e: SyntheticEvent<HTMLButtonElement>) => {
+  open = () => {
     const { _contextMenu } = this;
-    if (!_contextMenu || (this.props.shouldOpen && !this.props.shouldOpen(e)))
-      return;
+    if (!_contextMenu) return;
 
     const node = ReactDOM.findDOMNode(this._wrappedElement);
     if (node instanceof HTMLElement) {

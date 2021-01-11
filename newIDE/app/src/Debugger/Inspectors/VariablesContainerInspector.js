@@ -59,7 +59,7 @@ const constructPath = (editPath: string[]) => {
   }
 
   return path;
-}
+};
 
 const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
   // Reconstruct the path to the variable to edit

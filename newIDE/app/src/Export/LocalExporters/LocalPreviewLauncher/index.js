@@ -38,7 +38,7 @@ type State = {|
     title: string,
     backgroundColor: string,
   },
-  hideMenubar: boolean,
+  hideMenuBar: boolean,
 |};
 
 export default class LocalPreviewLauncher extends React.Component<
@@ -57,6 +57,7 @@ export default class LocalPreviewLauncher extends React.Component<
     devToolsOpen: false,
     previewBrowserWindowConfig: null,
     hotReloadsCount: 0,
+    hideMenuBar: true,
   };
   _networkPreviewSubscriptionChecker: ?SubscriptionChecker = null;
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
@@ -70,8 +71,8 @@ export default class LocalPreviewLauncher extends React.Component<
       return;
 
     const win = new BrowserWindow(this.state.previewBrowserWindowConfig);
-    win.setMenuBarVisibility(this.state.hideMenubar);
     win.loadURL(`file://${this.state.previewGamePath}/index.html`);
+    win.setMenuBarVisibility(this.state.hideMenuBar);
     win.webContents.on('devtools-opened', () => {
       this.setState({ devToolsOpen: true });
     });
@@ -99,7 +100,7 @@ export default class LocalPreviewLauncher extends React.Component<
           },
         },
         previewGamePath: gamePath,
-        hideMenubar: !options.getIsMenubarHiddenInPreview(),
+        hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
       },
       () => {
         if (!options.networkPreview) {

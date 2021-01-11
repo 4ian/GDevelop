@@ -45,7 +45,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoOpenMostRecentProject,
     resetShortcutsToDefault,
     setShortcutForCommand,
-    setIsMenubarHiddenInPreview,
+    setIsMenuBarHiddenInPreview,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -249,10 +249,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </Line>
           <Line>
             <Toggle
-              onToggle={(e, check) => setIsMenubarHiddenInPreview(check)}
-              toggled={values.isMenubarHiddenInPreview}
+              onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
+              toggled={values.isMenuBarHiddenInPreview}
               labelPosition="right"
-              label={<Trans>Hide menubar in preview window</Trans>}
+              label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
           </Line>
           {Window.isDev() && (

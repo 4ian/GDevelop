@@ -1184,8 +1184,8 @@ const MainFrame = (props: Props) => {
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
-            getIsMenubarHiddenInPreview:
-              preferences.getIsMenubarHiddenInPreview,
+            getIsMenuBarHiddenInPreview:
+              preferences.getIsMenuBarHiddenInPreview,
           })
         )
         .catch(error => {
@@ -1204,7 +1204,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       previewState,
       state.editorTabs,
-      preferences.getIsMenubarHiddenInPreview,
+      preferences.getIsMenuBarHiddenInPreview,
     ]
   );
 

@@ -268,26 +268,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsIos = [&getIconFilename]() {
-    std::vector<gd::String> sizes = {"180",
-                                     "60",
-                                     "120",
-                                     "76",
-                                     "152",
-                                     "40",
-                                     "80",
-                                     "57",
-                                     "114",
-                                     "72",
-                                     "144",
-                                     "167",
-                                     "29",
-                                     "58",
-                                     "87",
-                                     "50",
-                                     "20",
-                                     "100",
-                                     "167",
-                                     "1024"};
+    std::vector<gd::String> sizes = {
+        "180", "60",  "120", "76", "152", "40", "80", "57",  "114", "72",
+        "144", "167", "29",  "58", "87",  "50", "20", "100", "167", "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -640,6 +623,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "spriteruntimeobject.js");
 
   // Common includes for events only.
+  InsertUnique(includesFiles, "events-tools/variabletools.js");
   InsertUnique(includesFiles, "events-tools/commontools.js");
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
@@ -840,6 +824,12 @@ bool ExporterHelper::ExportIncludesAndLibs(
         if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
+
+        gd::String sourceMap = source + ".map";
+        // Copy source map if present
+        if (fs.FileExists(sourceMap)) {
+          fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
+        }
       } else {
         std::cout << "Could not find GDJS include file " << include
                   << std::endl;

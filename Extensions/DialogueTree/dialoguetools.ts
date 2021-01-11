@@ -785,7 +785,7 @@ namespace gdjs {
       variables: gdjs.dialogueTree.runner.variables.data,
       visited: gdjs.dialogueTree.runner.visited,
     };
-    gdjs.evtTools.network._objectToVariable(dialogueState, outputVariable);
+    gdjs.evtTools.variable.objectToVariable(dialogueState, outputVariable);
   };
 
   /**
@@ -796,7 +796,7 @@ namespace gdjs {
    */
   gdjs.dialogueTree.loadState = function (inputVariable: gdjs.Variable) {
     const loadedState = JSON.parse(
-      gdjs.evtTools.network.variableStructureToJSON(inputVariable)
+      gdjs.evtTools.variable.variableStructureToJSON(inputVariable)
     );
     if (!loadedState) {
       console.error('Load state variable is empty:', inputVariable);

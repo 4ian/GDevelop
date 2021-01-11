@@ -590,7 +590,7 @@ namespace gdjs {
       variable: gdjs.Variable,
       compareWith: boolean
     ): boolean {
-      return gdjs.evtTools.common.getVariableBoolean(variable, compareWith);
+      return gdjs.evtTools.variable.getVariableBoolean(variable, compareWith);
     };
 
     /**
@@ -599,10 +599,10 @@ namespace gdjs {
      *
      * @private
      * @param {gdjs.Variable} variable
-     * @see {gdjs.evtTools.common.toggleVariableBoolean}
+     * @see {gdjs.evtTools.variable.toggleVariableBoolean}
      */
     static toggleVariableBoolean = function (variable: gdjs.Variable) {
-      gdjs.evtTools.common.toggleVariableBoolean(variable);
+      gdjs.evtTools.variable.toggleVariableBoolean(variable);
     };
 
     /**

@@ -103,6 +103,7 @@ namespace gdjs {
           responseVar.setString(xhr.responseText);
         } catch (e) {}
       };
+      
       export const enableMetrics = function (
         runtimeScene: gdjs.RuntimeScene,
         enable: boolean
@@ -111,128 +112,35 @@ namespace gdjs {
       };
 
       /**
-       * Convert a variable to JSON.
-       * @param variable The variable to convert to JSON
-       * @returns The JSON string representing the variable
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.variableStructureToJSON
        */
-      export const variableStructureToJSON = function (
-        variable: gdjs.Variable
-      ): string {
-        // TODO: Move this function to gdjs.Variable
-        if (!variable.isStructure()) {
-          if (variable.isNumber()) {
-            return JSON.stringify(variable.getAsNumber());
-          } else {
-            return JSON.stringify(variable.getAsString());
-          }
-        }
-        let str = '{';
-        let firstChild = true;
-        const children = variable.getAllChildren();
-        for (const p in children) {
-          if (children.hasOwnProperty(p)) {
-            if (!firstChild) {
-              str += ',';
-            }
-            str +=
-              JSON.stringify(p) +
-              ': ' +
-              gdjs.evtTools.network.variableStructureToJSON(children[p]);
-            firstChild = false;
-          }
-        }
-        str += '}';
-        return str;
-      };
-      export const objectVariableStructureToJSON = function (object, variable) {
-        return gdjs.evtTools.network.variableStructureToJSON(variable);
-      };
-      export const _objectToVariable = function (obj, variable) {
-        if (obj === null) {
-          variable.setString('null');
-        } else if (
-          (typeof obj === 'number' || typeof obj === 'string') &&
-          // @ts-ignore
-          !isNaN(obj)
-        ) {
-          variable.setNumber(obj);
-        } else if (typeof obj === 'string' || obj instanceof String) {
-          variable.setString(obj);
-        } else if (typeof obj === 'undefined') {
-          // Do not modify the variable, as there is no value to set it to.
-        } else if (typeof obj === 'boolean') {
-          // Convert boolean to string.
-          variable.setString('' + obj);
-        } else if (Array.isArray(obj)) {
-          for (var i = 0; i < obj.length; ++i) {
-            gdjs.evtTools.network._objectToVariable(
-              obj[i],
-              variable.getChild(i.toString())
-            );
-          }
-        } else if (typeof obj === 'object') {
-          for (var p in obj) {
-            if (obj.hasOwnProperty(p)) {
-              gdjs.evtTools.network._objectToVariable(
-                obj[p],
-                variable.getChild(p)
-              );
-            }
-          }
-        } else if (typeof obj === 'symbol') {
-          variable.setString(obj.toString());
-        } else if (typeof obj === 'number' && isNaN(obj)) {
-          console.warn('Variables cannot be set to NaN, setting it to 0.');
-          variable.setNumber(0);
-        } else if (typeof obj === 'bigint') {
-          if (obj > Number.MAX_SAFE_INTEGER)
-            console.warn(
-              'Integers bigger than ' +
-                Number.MAX_SAFE_INTEGER +
-                " aren't supported by variables, it will be reduced to that size."
-            );
-          // @ts-ignore
-          variable.setNumber(parseInt(obj, 10));
-        } else if (typeof obj === 'function') {
-          console.error(
-            'Error: Impossible to set variable value to a function.'
-          );
-        } else {
-          console.error('Cannot identify type of object:', obj);
-        }
-      };
-
+      export const variableStructureToJSON = gdjs.evtTools.variable.variableStructureToJSON
       /**
-       * Parse the given JSON and fill the content of the variable with it.
-       *
-       * @param jsonStr The JSON string
-       * @param variable The variable where to put the parsed JSON
-       * @returns true if JSON was properly parsed
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.objectVariableStructureToJSON
        */
-      export const jsonToVariableStructure = function (
-        jsonStr: string,
-        variable: gdjs.Variable
-      ): boolean {
-        // TODO: Move this function to gdjs.Variable
-        if (jsonStr.length === 0) {
-          return false;
-        }
-        try {
-          const obj = JSON.parse(jsonStr);
-          gdjs.evtTools.network._objectToVariable(obj, variable);
-          return true;
-        } catch (e) {
-          // Do nothing if JSON was not properly parsed.
-          return false;
-        }
-      };
-      export const jsonToObjectVariableStructure = function (
-        jsonStr,
-        object,
-        variable
-      ) {
-        gdjs.evtTools.network.jsonToVariableStructure(jsonStr, variable);
-      };
+      export const objectVariableStructureToJSON = gdjs.evtTools.variable.objectVariableStructureToJSON;
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.objectToVariable
+       */
+      export const _objectToVariable = gdjs.evtTools.variable.objectToVariable;
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.jsonToVariableStructure
+       */
+      export const jsonToVariableStructure = gdjs.evtTools.variable.jsonToVariableStructure;
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.jsonToObjectVariableStructure
+       */
+      export const jsonToObjectVariableStructure = gdjs.evtTools.variable.jsonToObjectVariableStructure;
     }
   }
 }

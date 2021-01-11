@@ -7,164 +7,6 @@ namespace gdjs {
   export namespace evtTools {
     export namespace common {
       /**
-       * Get the value of a variable. Equivalent to `variable.getAsNumber()`.
-       * @param variable Variable.
-       * @returns The content of the variable, as a number.
-       */
-      export const getVariableNumber = function (
-        variable: gdjs.Variable
-      ): number {
-        return variable.getAsNumber();
-      };
-
-      /**
-       * Get the string of a variable. Equivalent to `variable.getAsString()`.
-       * @param variable Variable.
-       * @returns The content of the variable, as a string.
-       */
-      export const getVariableString = function (
-        variable: gdjs.Variable
-      ): string {
-        return variable.getAsString();
-      };
-
-      /**
-       * Compares the boolean value of a variable. 
-       * Equivalent to `variable.getAsBoolean() === boolean`.
-       * This shortcut function is needed for events code generation.
-       *
-       * @param {gdjs.Variable} variable
-       * @param {boolean} compareWith
-       * @returns {boolean}
-       * @private
-       */
-      export const getVariableBoolean = function (
-        variable: gdjs.Variable,
-        compareWith: boolean
-      ): boolean {
-        return variable.getAsBoolean() === compareWith;
-      };
-
-      /**
-       * Set the boolean value of a variable. Equivalent to `variable.setBoolean()`.
-       * This shortcut function is needed for events code generation.
-       *
-       * @param {gdjs.Variable} variable
-       * @param {boolean} bool The new boolean value of the variable.
-       * @private
-       */
-      export const setVariableBoolean = function (variable: gdjs.Variable, newValue: boolean) {
-        variable.setBoolean(newValue);
-      };
-
-      /**
-       * Toggles the boolean value of a variable.
-       * @param {gdjs.Variable} variable Variable.
-       * @private
-       */
-      export const toggleVariableBoolean = function (variable: gdjs.Variable) {
-        variable.setBoolean(!variable.getAsBoolean());
-      };
-
-      /**
-       * Check if a scene variable exists.
-       * @param runtimeScene The scene.
-       * @param variableName Name of the scene variable.
-       * @returns true if the scene variable exits, false otherwise.
-       */
-      export const sceneVariableExists = function (
-        runtimeScene: gdjs.RuntimeScene,
-        variableName: string
-      ): boolean {
-        return runtimeScene.getVariables().has(variableName);
-      };
-
-      /**
-       * Check if a global variable exists.
-       * @param runtimeScene The scene.
-       * @param variableName Name of the global variable.
-       * @returns true if the global variable exits, false otherwise.
-       */
-      export const globalVariableExists = function (
-        runtimeScene: gdjs.RuntimeScene,
-        variableName: string
-      ): boolean {
-        return runtimeScene.getGame().getVariables().has(variableName);
-      };
-
-      /**
-       * Check if a child exists in a variable.
-       * @param variable Variable.
-       * @param childName Name of the child.
-       * @returns true if child exist in the variable, false otherwise.
-       */
-      export const variableChildExists = function (
-        variable: gdjs.Variable,
-        childName: string
-      ): boolean {
-        return variable.hasChild(childName);
-      };
-
-      /**
-       * Remove the child with the given name in a variable.
-       * @param variable Variable.
-       * @param childName Name of the child.
-       * @returns The new variable, with the child removed.
-       */
-      export const variableRemoveChild = function (
-        variable: gdjs.Variable,
-        childName: string
-      ): void {
-        variable.removeChild(childName);
-      };
-
-      /**
-       * Clear the children in a variable.
-       * @param variable Variable.
-       */
-      export const variableClearChildren = function (variable: gdjs.Variable) {
-        variable.clearChildren();
-      };
-
-      /**
-       * Pushes a variable onto an array.
-       * @param {gdjs.Variable} array
-       * @param {gdjs.Variable} variable
-       * @private
-       */
-      export const variablePush = function (
-        array: gdjs.Variable,
-        variable: gdjs.Variable
-      ) {
-        array.push(variable);
-      };
-
-      /**
-       * Removes an index from an array.
-       *
-       * @param {gdjs.Variable} array
-       * @param {number} index
-       * @private
-       */
-      export const variableRemoveAt = function (
-        array: gdjs.Variable,
-        index: number
-      ) {
-        array.removeAtIndex(index);
-      };
-
-      /**
-       * Get the number of children in a variable.
-       * @param variable Variable.
-       * @returns The number of children in the variable.
-       */
-      export const getVariableChildCount = function (
-        variable: gdjs.Variable
-      ): number {
-        return variable.getChildrenCount();
-      };
-
-      /**
        * Convert a string to a number.
        * @param str String to convert.
        * @returns The parsed number, or NaN if invalid.
@@ -427,6 +269,63 @@ namespace gdjs {
       export const trunc = function (x: float): number {
         return x | 0;
       };
+
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.getVariableNumber
+       */
+      export const getVariableNumber = gdjs.evtTools.variable.getVariableNumber;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.getVariableString
+       */
+      export const getVariableString = gdjs.evtTools.variable.getVariableString;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.sceneVariableExists
+       */
+      export const sceneVariableExists = gdjs.evtTools.variable.sceneVariableExists;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.globalVariableExists
+       */
+      export const globalVariableExists = gdjs.evtTools.variable.globalVariableExists;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.variableChildExists
+       */
+      export const variableChildExists = gdjs.evtTools.variable.variableChildExists;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.variableRemoveChild
+       */
+      export const variableRemoveChild = gdjs.evtTools.variable.variableRemoveChild;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.variableClearChildren
+       */
+      export const variableClearChildren = gdjs.evtTools.variable.variableClearChildren;
+
+      /**
+       * @private
+       * @deprecated
+       * @alias gdjs.evtTools.variable.getVariableChildCount
+       */
+      export const getVariableChildCount = gdjs.evtTools.variable.getVariableChildCount;
     }
   }
 }

@@ -26,7 +26,7 @@ namespace gdjs {
     firebase
       .database()
       .ref(path)
-      .set(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
+      .set(JSON.parse(gdjs.evtTools.variable.variableStructureToJSON(variable)))
       .then(function () {
         if (typeof callbackStateVariable !== 'undefined') {
           callbackStateVariable.setString('ok');
@@ -86,7 +86,7 @@ namespace gdjs {
       .database()
       .ref(path)
       .update(
-        JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable))
+        JSON.parse(gdjs.evtTools.variable.variableStructureToJSON(variable))
       )
       .then(function () {
         if (typeof callbackStateVariable !== 'undefined') {
@@ -205,7 +205,7 @@ namespace gdjs {
           callbackStateVariable.setString('ok');
         }
         if (typeof callbackValueVariable !== 'undefined') {
-          gdjs.evtTools.network._objectToVariable(
+          gdjs.evtTools.variable.objectToVariable(
             snapshot.val(),
             callbackValueVariable
           );
@@ -240,7 +240,7 @@ namespace gdjs {
           callbackStateVariable.setString('ok');
         }
         if (typeof callbackValueVariable !== 'undefined') {
-          gdjs.evtTools.network._objectToVariable(
+          gdjs.evtTools.variable.objectToVariable(
             snapshot.val()[field],
             callbackValueVariable
           );

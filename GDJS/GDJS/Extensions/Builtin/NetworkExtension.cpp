@@ -22,18 +22,18 @@ NetworkExtension::NetworkExtension() {
   GetAllActions()["EnableMetrics"].SetFunctionName(
       "gdjs.evtTools.network.enableMetrics");
   GetAllActions()["JSONToVariableStructure"].SetFunctionName(
-      "gdjs.evtTools.network.jsonToVariableStructure");
+      "gdjs.evtTools.variable.jsonToVariableStructure");
   GetAllActions()["JSONToGlobalVariableStructure"].SetFunctionName(
-      "gdjs.evtTools.network.jsonToVariableStructure");
+      "gdjs.evtTools.variable.jsonToVariableStructure");
   GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName(
-      "gdjs.evtTools.network.jsonToObjectVariableStructure");
+      "gdjs.evtTools.variable.jsonToObjectVariableStructure");
 
   GetAllStrExpressions()["ToJSON"].SetFunctionName(
-      "gdjs.evtTools.network.variableStructureToJSON");
+      "gdjs.evtTools.variable.variableStructureToJSON");
   GetAllStrExpressions()["GlobalVarToJSON"].SetFunctionName(
-      "gdjs.evtTools.network.variableStructureToJSON");
+      "gdjs.evtTools.variable.variableStructureToJSON");
   GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName(
-      "gdjs.evtTools.network.objectVariableStructureToJSON");
+      "gdjs.evtTools.variable.objectVariableStructureToJSON");
 
   StripUnimplementedInstructionsAndExpressions();
 }

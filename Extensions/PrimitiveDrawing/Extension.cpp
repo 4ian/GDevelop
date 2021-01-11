@@ -381,7 +381,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetFillColorR",
-        _("Get red filling colors"),
+        _("Filling color red component"),
         _("Current value for red filling colors."),
         "",
         "res/actions/color.png")
@@ -391,7 +391,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetFillColorG",
-        _("Get green filling colors"),
+        _("Filling color green component"),
         _("Current value for green filling colors."),
         "",
         "res/actions/color.png")
@@ -401,7 +401,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetFillColorB",
-        _("Get blue filling colors"),
+        _("Filling color blue component"),
         _("Current value for blue filling colors."),
         "",
         "res/actions/color.png")
@@ -425,7 +425,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetOutlineColorR",
-        _("Get red outline colors"),
+        _("Outline color red component"),
         _("Current value for red outline colors."),
         "",
         "res/actions/color.png")
@@ -435,7 +435,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetOutlineColorG",
-        _("Get green outline colors"),
+        _("Outline color green component"),
         _("Current value for green outline colors."),
         "",
         "res/actions/color.png")
@@ -445,7 +445,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "GetOutlineColorB",
-        _("Get blue outline colors"),
+        _("Outline color blue component"),
         _("Current value for blue outline colors."),
         "",
         "res/actions/color.png")

@@ -297,6 +297,42 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddAction("SceneVariablePushString",
+                 _("Push a string on a scene array"),
+                 _("Appends a string at the end of a scene array variable."),
+                 _("Append string _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"))
+      .AddParameter("string", _("String to push"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("SceneVariablePushNumber",
+                 _("Push a number on a scene array"),
+                 _("Appends a number at the end of a scene array variable."),
+                 _("Append number _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"))
+      .AddParameter("expression", _("Number to push"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("SceneVariablePushBool",
+                 _("Push a boolean on a scene array"),
+                 _("Appends a boolean at the end of a scene array variable."),
+                 _("Append boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"))
+      .AddParameter("trueorfalse", _("Boolean to push"))
+      .MarkAsAdvanced();
+
+  extension
       .AddAction(
           "SceneVariableRemoveAt",
           _("Remove index of scene array"),
@@ -332,6 +368,42 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("expression", _("Index to remove"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("GlobalVariablePushString",
+                 _("Push a string on a global array"),
+                 _("Appends a string at the end of a global array variable."),
+                 _("Append string _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Global variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"))
+      .AddParameter("string", _("String to push"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("GlobalVariablePushNumber",
+                 _("Push a number on a global array"),
+                 _("Appends a number at the end of a global array variable."),
+                 _("Append number _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Global variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"))
+      .AddParameter("expression", _("Number to push"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("GlobalVariablePushBool",
+                 _("Push a boolean on a global array"),
+                 _("Appends a boolean at the end of a global array variable."),
+                 _("Append boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Variables/Global variables/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"))
+      .AddParameter("trueorfalse", _("Boolean to push"))
       .MarkAsAdvanced();
 
   extension

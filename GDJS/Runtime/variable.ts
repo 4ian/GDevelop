@@ -73,11 +73,46 @@ namespace gdjs {
     }
 
     /**
+     * Deeply copies a variable into another.
+     * @param source The source variable.
+     * @param target The target variable.
+     * @param merge Should the target be merged with the source, or be an exact copy?
+     * @returns The target variable.
+     */
+    static copy(
+      source: gdjs.Variable,
+      target: gdjs.Variable,
+      merge?: boolean
+    ): gdjs.Variable {
+      if (!merge) target.clearChildren();
+      target.castTo(source.getType());
+      if (source.isPrimitive()) {
+        target.setValue(source.getValue());
+      } else if (source.getType() === 'structure') {
+        const children = source.getAllChildren();
+        for (const p in source.getAllChildren()) {
+          if (children.hasOwnProperty(p))
+            target.addChild(p, children[p].clone());
+        }
+      } else if (source.getType() === 'array') {
+        for (const p of source.getAllChildrenList()) target.pushVariable(p);
+      }
+      return target;
+    }
+
+    /**
      * Return true if the type of the variable is a primitive type.
      * @return {boolean}
      */
     isPrimitive() {
       return gdjs.Variable.isPrimitive(this._type);
+    }
+
+    /**
+     * Returns a deep copy of this variable.
+     */
+    clone(): gdjs.Variable {
+      return gdjs.Variable.copy(this, new gdjs.Variable());
     }
 
     /**
@@ -123,22 +158,17 @@ namespace gdjs {
      * is added as child.
      * @returns The child variable
      */
-    getChild(childName: string | integer): gdjs.Variable {
+    getChild(childName: string): gdjs.Variable {
       // Make sure the variable is a collection
       if (this.isPrimitive()) this.castTo('structure');
 
-      if (this._type === 'array') {
-        // Make sure the key is an integer for arrays
-        childName = parseInt(childName as string, 10);
-        // Prevent NaN to be used as key
-        if (childName !== childName) childName = 0;
+      if (this._type === 'array')
+        return this.getChildAt(parseInt(childName, 10) || 0);
 
-        if (this._childrenList[childName] === undefined)
-          this._childrenList[childName] = new gdjs.Variable();
-        return this._childrenList[childName];
-      }
-
-      if (this._children[childName] === undefined)
+      if (
+        this._children[childName] === undefined ||
+        this._children[childName] === null
+      )
         this._children[childName] = new gdjs.Variable();
       return this._children[childName];
     }
@@ -183,12 +213,10 @@ namespace gdjs {
 
     /**
      * Remove all the children.
-     *
-     * If the variable is not a structure, nothing is done.
      */
     clearChildren() {
-      if (this._type !== 'structure') return;
       this._children = {};
+      this._childrenList = [];
     }
 
     /**
@@ -414,21 +442,48 @@ namespace gdjs {
     concatenate = gdjs.Variable.prototype.concatenateString;
 
     /**
-     * Removes a variable at a given index of the variable.
+     * Get a variable at a given index of the array.
      * @param {number} index
      */
-    removeAtIndex(index: integer) {
+    getChildAt(index: integer) {
       this.castTo('array');
-      this._childrenList.splice(index, 1);
+      if (
+        this._childrenList[index] === undefined ||
+        this._childrenList[index] === null
+      )
+        this._childrenList[index] = new gdjs.Variable();
+      return this._childrenList[index];
     }
 
     /**
-     * Pushes a variable onto the array.
+     * Removes a variable at a given index of the array.
+     * @param {number} index
+     */
+    removeAtIndex(index: integer) {
+      if (this._type === 'array') this._childrenList.splice(index, 1);
+    }
+
+    /**
+     * Pushes a copy of a variable onto the array.
      * @param {gdjs.Variable} variable
      */
-    push(variable: gdjs.Variable) {
+    pushVariable(variable: gdjs.Variable) {
       this.castTo('array');
-      this._childrenList.push(variable);
+      this._childrenList.push(variable.clone());
+    }
+
+    /**
+     * Pushes a value onto the array.
+     * @param
+     */
+    pushValue(value: string | float | boolean) {
+      this.castTo('array');
+      this._childrenList.push(
+        new gdjs.Variable({
+          type: typeof value as 'string' | 'number' | 'boolean',
+          value,
+        })
+      );
     }
   }
 }

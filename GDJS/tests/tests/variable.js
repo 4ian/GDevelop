@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * Common tests for gdjs game engine.
  * See README.md for more information.
@@ -67,18 +68,31 @@ describe('gdjs.Variable', function () {
     expect(a.getAsString()).to.be('3Apples');
   });
 
-  it('should clear a structure', function () {
-    const structure = new gdjs.Variable({ value: '0' });
+  it('should clear a collection', function () {
+    const structure = new gdjs.Variable();
     structure.getChild('a').setNumber(5);
     structure.getChild('b').getChild('alpha').setString('Apples');
+
+    const array = new gdjs.Variable();
+    array.getChildAt(1).setNumber(5);
+    array.getChildAt(0).getChild('alpha').setString('Apples');
 
     expect(structure.hasChild('a')).to.be(true);
     expect(structure.hasChild('b')).to.be(true);
     expect(structure.getChild('b').hasChild('alpha')).to.be(true);
 
+    expect(array.getChildrenCount()).to.be(2);
+    expect(array.getChildAt(0).hasChild('alpha')).to.be(true);
+    expect(array.getChildAt(0).getChild('alpha').getValue()).to.be('Apples');
+
     structure.clearChildren();
+    array.clearChildren();
+
     expect(structure.hasChild('a')).to.be(false);
     expect(structure.hasChild('b')).to.be(false);
+
+    expect(array.getChildrenCount()).to.be(0);
+    expect(array.getChildAt(0).getChild('alpha').getAsString()).to.be('0');
   });
 
   it('should parse collections', function () {
@@ -104,7 +118,8 @@ describe('gdjs.Variable', function () {
     expect(structure.getAllChildren().bar.getAsString()).to.be('World');
     expect(array.getAllChildren()[0].getAsString()).to.be('Hello');
 
-    expect(array.getChild(0).getAsString()).to.be('Hello');
+    expect(array.getChild('0').getAsString()).to.be('Hello');
+    expect(array.getChildAt(0).getAsString()).to.be('Hello');
     expect(array.getAllChildrenList()[1].getAsString()).to.be('World');
     expect(structure.getAllChildrenList()[0].getAsString()).to.be('Hello');
   });
@@ -122,8 +137,8 @@ describe('gdjs.Variable', function () {
       );
     const array = structure.getChild('c');
     array.castTo('array');
-    array.push(new gdjs.Variable({ type: 'number', value: 49 }));
-    array.push(structure.getChild('b'));
+    array.pushValue(49);
+    array.pushVariable(structure.getChild('b'));
 
     const b =
       '{"alpha": "Apples","beta": true,"Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';
@@ -160,13 +175,13 @@ describe('gdjs.Variable', function () {
       'String with quotes "", and a backslash \\ and new line \\n \\n\\r and brackets {[{}]}!'
     );
     expect(structure.getChild('c').getType()).to.be('array');
-    expect(structure.getChild('c').getChild(0).getType()).to.be('number');
-    expect(structure.getChild('c').getChild(0).getAsNumber()).to.be(49);
-    expect(structure.getChild('c').getChild(1).getType()).to.be('structure');
+    expect(structure.getChild('c').getChild('0').getType()).to.be('number');
+    expect(structure.getChild('c').getChild('0').getAsNumber()).to.be(49);
+    expect(structure.getChild('c').getChild('1').getType()).to.be('structure');
     expect(
       structure
         .getChild('c')
-        .getChild(1)
+        .getChild('1')
         .getChild('Child with quotes "" and a backlash \\')
         .getAsString()
     ).to.be(

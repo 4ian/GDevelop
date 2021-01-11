@@ -29,7 +29,7 @@ namespace gdjs {
       };
 
       /**
-       * Compares the boolean value of a variable. 
+       * Compares the boolean value of a variable.
        * Equivalent to `variable.getAsBoolean() === boolean`.
        * This shortcut function is needed for events code generation.
        *
@@ -53,7 +53,10 @@ namespace gdjs {
        * @param {boolean} bool The new boolean value of the variable.
        * @private
        */
-      export const setVariableBoolean = function (variable: gdjs.Variable, newValue: boolean) {
+      export const setVariableBoolean = function (
+        variable: gdjs.Variable,
+        newValue: boolean
+      ) {
         variable.setBoolean(newValue);
       };
 
@@ -136,7 +139,20 @@ namespace gdjs {
         array: gdjs.Variable,
         variable: gdjs.Variable
       ) {
-        array.push(variable);
+        array.pushVariable(variable);
+      };
+
+      /**
+       * Pushes a value onto an array.
+       * @param {gdjs.Variable} array
+       * @param {string | float | boolean} value
+       * @private
+       */
+      export const valuePush = function (
+        array: gdjs.Variable,
+        value: string | float | boolean
+      ) {
+        array.pushValue(value);
       };
 
       /**

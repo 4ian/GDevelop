@@ -676,7 +676,18 @@ namespace gdjs {
       array: gdjs.Variable,
       variable: gdjs.Variable
     ) {
-      array.push(variable);
+      array.pushVariable(variable);
+    };
+
+    /**
+     * This shorcut function is needed for events code generation.
+     * @private
+     */
+    static valuePush = function (
+      array: gdjs.Variable,
+      value: string | float | boolean
+    ) {
+      array.pushValue(value);
     };
 
     /**
@@ -1821,6 +1832,7 @@ namespace gdjs {
     variableRemoveChild = RuntimeObject.variableRemoveChild;
     variableClearChildren = RuntimeObject.variableClearChildren;
     variablePush = RuntimeObject.variablePush;
+    valuePush = RuntimeObject.valuePush;
     variableRemoveAt = RuntimeObject.variableRemoveAt;
 
     /**

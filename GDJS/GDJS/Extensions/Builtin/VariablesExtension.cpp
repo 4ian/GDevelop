@@ -76,10 +76,22 @@ VariablesExtension::VariablesExtension() {
 
   GetAllActions()["SceneVariablePush"].SetFunctionName(
       "gdjs.evtTools.common.variablePush");
+  GetAllActions()["SceneVariablePushString"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["SceneVariablePushNumber"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["SceneVariablePushBool"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
   GetAllActions()["SceneVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.common.variableRemoveAt");
   GetAllActions()["GlobalVariablePush"].SetFunctionName(
       "gdjs.evtTools.common.variablePush");
+  GetAllActions()["GlobalVariablePushString"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["GlobalVariablePushNumber"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["GlobalVariablePushBool"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
   GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.common.variableRemoveAt");
 

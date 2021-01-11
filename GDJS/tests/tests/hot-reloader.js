@@ -462,11 +462,11 @@ describe('gdjs.HotReloader.deepEqual', () => {
     expect(variablesContainer.get('MyVariable').getType()).to.be('array');
     expect(variablesContainer.get('MyVariable').getChildrenCount()).to.be(2);
     const array = variablesContainer.get('MyVariable');
-    expect(array.getChild(0).getType()).to.be('structure');
-    expect(array.getChild(0).getChild('MyGrandChild2').getAsString()).to.be(
+    expect(array.getChild('0').getType()).to.be('structure');
+    expect(array.getChild('0').getChild('MyGrandChild2').getAsString()).to.be(
       'Hello World 3'
     );
-    expect(array.getChild(1).getType()).to.be('string');
-    expect(array.getChild(1).getAsString()).to.be('Hello World 2');
+    expect(array.getChild('1').getType()).to.be('string');
+    expect(array.getChild('1').getAsString()).to.be('Hello World 2');
   });
 });

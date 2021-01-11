@@ -549,6 +549,42 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("scenevar", _("Variable to push"))
       .MarkAsAdvanced();
 
+  obj.AddAction("ObjectVariablePushString",
+                _("Push a string on an object array"),
+                _("Appends a string at the end of an object array variable."),
+                _("Append string _PARAM1_ to array variable _PARAM0_"),
+                _("Variables/Arrays"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("string", _("String to push"))
+      .MarkAsAdvanced();
+
+  obj.AddAction("ObjectVariablePushNumber",
+                _("Push a number on an object array"),
+                _("Appends a number at the end of an object array variable."),
+                _("Append number _PARAM1_ to array variable _PARAM0_"),
+                _("Variables/Arrays"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("expression", _("Number to push"))
+      .MarkAsAdvanced();
+
+  obj.AddAction("ObjectVariablePushBool",
+                _("Push a boolean on an object array"),
+                _("Appends a boolean at the end of an object array variable."),
+                _("Append boolean _PARAM1_ to array variable _PARAM0_"),
+                _("Variables/Arrays"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("trueorfalse", _("Boolean to push"))
+      .MarkAsAdvanced();
+
   obj.AddAction(
          "ObjectVariableRemoveAt",
          _("Remove index of object array"),

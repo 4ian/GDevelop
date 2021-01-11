@@ -268,6 +268,15 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["ObjectVariablePush"]
       .SetFunctionName("variablePush")
       .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushString"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushNumber"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushBool"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["ObjectVariableRemoveAt"]
       .SetFunctionName("variableRemoveAt")
       .SetIncludeFile("runtimeobject.js");

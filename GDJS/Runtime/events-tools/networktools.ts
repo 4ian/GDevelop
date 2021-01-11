@@ -119,64 +119,78 @@ namespace gdjs {
         variable: gdjs.Variable
       ): string {
         // TODO: Move this function to gdjs.Variable
-        if (!variable.isStructure()) {
-          if (variable.isNumber()) {
-            return JSON.stringify(variable.getAsNumber());
-          } else {
-            return JSON.stringify(variable.getAsString());
-          }
-        }
-        let str = '{';
-        let firstChild = true;
-        const children = variable.getAllChildren();
-        for (const p in children) {
-          if (children.hasOwnProperty(p)) {
-            if (!firstChild) {
-              str += ',';
+        if (variable.isPrimitive()) {
+          return JSON.stringify(variable.getValue());
+        } else if (variable.getType() === 'array') {
+          let str = '[';
+          let firstChild = true;
+          const children = variable.getAllChildren();
+          for (const p in children) {
+            if (children.hasOwnProperty(p)) {
+              if (!firstChild) {
+                str += ',';
+              }
+              str += variableStructureToJSON(children[p]);
+              firstChild = false;
             }
-            str +=
-              JSON.stringify(p) +
-              ': ' +
-              gdjs.evtTools.network.variableStructureToJSON(children[p]);
-            firstChild = false;
           }
+          str += ']';
+          return str;
+        } else if (variable.getType() === 'structure') {
+          let str = '{';
+          let firstChild = true;
+          const children = variable.getAllChildren();
+          for (const p in children) {
+            if (children.hasOwnProperty(p)) {
+              if (!firstChild) {
+                str += ',';
+              }
+              str +=
+                JSON.stringify(p) + ': ' + variableStructureToJSON(children[p]);
+              firstChild = false;
+            }
+          }
+          str += '}';
+          return str;
         }
-        str += '}';
-        return str;
+
+        console.error('JSON conversion error: Variable type not recognized');
+        return '';
       };
+
       export const objectVariableStructureToJSON = function (object, variable) {
         return gdjs.evtTools.network.variableStructureToJSON(variable);
       };
-      export const _objectToVariable = function (obj, variable) {
+
+      export const _objectToVariable = function (
+        obj: any,
+        variable: gdjs.Variable
+      ) {
         if (obj === null) {
           variable.setString('null');
         } else if (
           (typeof obj === 'number' || typeof obj === 'string') &&
-          // @ts-ignore
-          !isNaN(obj)
+          !isNaN(obj as number)
         ) {
-          variable.setNumber(obj);
-        } else if (typeof obj === 'string' || obj instanceof String) {
+          variable.setNumber(obj as number);
+        } else if (typeof obj === 'string') {
           variable.setString(obj);
         } else if (typeof obj === 'undefined') {
           // Do not modify the variable, as there is no value to set it to.
         } else if (typeof obj === 'boolean') {
-          // Convert boolean to string.
-          variable.setString('' + obj);
+          variable.setBoolean(obj);
         } else if (Array.isArray(obj)) {
-          for (var i = 0; i < obj.length; ++i) {
-            gdjs.evtTools.network._objectToVariable(
-              obj[i],
-              variable.getChild(i.toString())
-            );
+          variable.castTo('array');
+          variable.clearChildren();
+          for (const i in obj) {
+            _objectToVariable(obj[i], variable.getChild(i));
           }
         } else if (typeof obj === 'object') {
+          variable.castTo('structure');
+          variable.clearChildren();
           for (var p in obj) {
             if (obj.hasOwnProperty(p)) {
-              gdjs.evtTools.network._objectToVariable(
-                obj[p],
-                variable.getChild(p)
-              );
+              _objectToVariable(obj[p], variable.getChild(p));
             }
           }
         } else if (typeof obj === 'symbol') {

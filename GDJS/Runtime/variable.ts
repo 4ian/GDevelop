@@ -40,7 +40,7 @@ namespace gdjs {
       if (varData !== undefined) {
         this._type = varData.type || 'number';
         if (this._type === 'number') {
-          this._value = parseFloat(varData.value as string || '0');
+          this._value = parseFloat((varData.value as string) || '0');
           if (this._value !== this._value) this._value = 0;
         } else if (this._type === 'string') {
           this._str = '' + varData.value || '0';
@@ -296,6 +296,18 @@ namespace gdjs {
     }
 
     /**
+     * Gets the primitive value using the getter of the current type.
+     * @param {any} newValue
+     */
+    getValue(): string | float | boolean {
+      return this._type === 'number'
+        ? this.getAsNumber()
+        : this._type === 'boolean'
+        ? this.getAsBoolean()
+        : this.getAsString();
+    }
+
+    /**
      * Return true if the variable is a structure.
      * @return true if the variable is a structure.
      * @deprecated Use {@link gdjs.Variable.getType} instead.
@@ -415,8 +427,8 @@ namespace gdjs {
      * @param {gdjs.Variable} variable
      */
     push(variable: gdjs.Variable) {
-        this.castTo('array');
-        this._childrenList.push(variable);
+      this.castTo('array');
+      this._childrenList.push(variable);
     }
   }
 }

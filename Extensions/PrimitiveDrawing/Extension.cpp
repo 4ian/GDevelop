@@ -366,16 +366,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("IsClearedBetweenFrames")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddExpression(
-        "IsClearBetweenFrames",
-        _("Is clear between frames"),
-        _("Return true if the object is clear between two frames."),
-        "",
-        "res/conditions/outlineSize.png")
-      .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("IsClearedBetweenFrames")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
   obj.AddAction("FillColor",
                 _("Fill color"),
                 _("Change the color used when filling"),
@@ -431,8 +421,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "OutlineSize",
-        _("Get current outline size"),
-        _("Return the outline size in pixels."),
+        _("Outline size"),
+        _("Check the outline size in pixels."),
         "",
         "res/conditions/outlineSize.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -470,8 +460,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "FillOpacity",
-        _("Get current opacity of filling"),
-        _("Return the opacity of filling (a number from 0 to 1, 1 being fully opaque)."),
+        _("Filling opacity"),
+        _("Check if the opacity of filling (a number from 0 to 1, 1 being fully opaque)."),
         "",
         "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -509,17 +499,17 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddExpression(
         "OutlineOpacity",
-        _("Get current opacity of the outline"),
-        _("Return the opacity of the outline (a number from 0 to 1, 1 being fully opaque)."),
+        _("Outline opacity"),
+        _("Check if the opacity of the outline (a number from 0 to 1, 1 being fully opaque)."),
         "",
         "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("GetOutlineOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("CoordinatesAbsolute",
-                _("Coordinates Absolute"),
-                _("Change the coordinate type the shape painter object to absolute."),
+  obj.AddAction("UseAbsoluteCoordinates",
+                _("Use absolute coordinates"),
+                _("Set the coordinates of the Shape Painter to be absolute"),
                 _("Change the coordinate for _PARAM0_ to absolute"),
                 _("Setup"),
                 "res/actions/position24.png",
@@ -528,28 +518,17 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetCoordinatesAbsolute")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("CoordinatesRelative",
-                  _("Coordinates Relative"),
-                  _("Change the coordinate type the shape painter object to relative."),
+  obj.AddAction("UseCoordinatesRelative",
+                  _("Use coordinates Relative"),
+                  _("Set the coordinates of the Shape Painter to be relative"),
                   _("Change the coordinate for _PARAM0_ to relative"),
                   _("Setup"),
                   "res/actions/position24.png",
                   "res/actions/position.png")
         .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("yesorno", _("Use coordinates Relative?"), "", false)
+        .SetDefaultValue("true")
         .SetFunctionName("SetCoordinatesRelative")
-        .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
-    obj.AddCondition(
-          "AreCoordinatesAbsolute",
-          _("Coordinates absolute"),
-          _("Check if the coordinates of the shape painter is absolute."),
-          _("_PARAM0_ use the coordinates absolute"),
-          _("Setup"),
-              "res/conditions/position24.png",
-              "res/conditions/position.png")
-
-        .AddParameter("object", _("Shape Painter object"), "Drawer")
-        .SetFunctionName("AreCoordinatesAbsolute")
         .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
     obj.AddCondition(
@@ -561,26 +540,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
               "res/conditions/position24.png",
               "res/conditions/position.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer")
-        .SetFunctionName("AreCoordinatesRelative")
-        .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
-    obj.AddExpression(
-          "AreCoordinatesAbsolute",
-          _("Coordinates absolute"),
-          _("Return if the coordinates of the shape painter is absolute."),
-          "",
-          "res/conditions/position.png")
-        .AddParameter("object", _("Shape Painter object"), "Drawer")
-        .SetFunctionName("AreCoordinatesAbsolute")
-        .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
-    obj.AddExpression(
-          "AreCoordinatesRelative",
-          _("Coordinates relative"),
-          _("Return if the coordinates of the shape painter is relative."),
-          "",
-          "res/conditions/position.png")
         .AddParameter("object", _("Shape Painter object"), "Drawer")
         .SetFunctionName("AreCoordinatesRelative")
         .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");

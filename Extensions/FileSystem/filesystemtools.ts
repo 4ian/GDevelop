@@ -274,12 +274,13 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
+      const network = gdjs.evtTools.network;
       let result = 'error';
-      if (fileSystem) {
+      if (fileSystem && network) {
         try {
           fileSystem.writeFileSync(
             savePath,
-            gdjs.evtTools.variable.variableStructureToJSON(variable),
+            network.variableStructureToJSON(variable),
             'utf8'
           );
           result = 'ok';
@@ -305,10 +306,11 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      if (fileSystem) {
+      const network = gdjs.evtTools.network;
+      if (fileSystem && network) {
         fileSystem.writeFile(
           savePath,
-          gdjs.evtTools.variable.variableStructureToJSON(variable),
+          network.variableStructureToJSON(variable),
           'utf8',
           (err) => {
             resultVar.setString('ok');
@@ -366,12 +368,13 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
+      const network = gdjs.evtTools.network;
       let result = 'error';
-      if (fileSystem) {
+      if (fileSystem && network) {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            gdjs.evtTools.variable.jsonToVariableStructure(data, variable);
+            network.jsonToVariableStructure(data, variable);
             result = 'ok';
           }
         } catch (err) {
@@ -398,10 +401,11 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      if (fileSystem) {
+      const network = gdjs.evtTools.network;
+      if (fileSystem && network) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            gdjs.evtTools.variable.jsonToVariableStructure(data, variable);
+            network.jsonToVariableStructure(data, variable);
             resultVar.setString('ok');
           }
           if (err) {

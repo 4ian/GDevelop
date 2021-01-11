@@ -55,7 +55,7 @@ namespace gdjs {
       firebase.storage.TaskEvent.STATE_CHANGED,
       (uploadProgress) => {
         if (typeof callbackProgressVariable !== 'undefined') {
-          gdjs.evtTools.variable.objectToVariable(
+          gdjs.evtTools.network._objectToVariable(
             uploadProgress,
             callbackProgressVariable,
             // Remove circular reference.

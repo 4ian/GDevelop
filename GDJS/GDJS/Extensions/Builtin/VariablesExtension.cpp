@@ -23,65 +23,65 @@ VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
   GetAllConditions()["VarScene"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableNumber");
+      "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarSceneTxt"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableString");
+      "gdjs.evtTools.common.getVariableString");
   GetAllConditions()["SceneVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableBoolean");
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllConditions()["VarGlobal"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableNumber");
+      "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarGlobalTxt"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableString");
+      "gdjs.evtTools.common.getVariableString");
   GetAllConditions()["GlobalVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableBoolean");
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllExpressions()["Variable"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableNumber");
+      "gdjs.evtTools.common.getVariableNumber");
   GetAllStrExpressions()["VariableString"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableString");
+      "gdjs.evtTools.common.getVariableString");
   GetAllExpressions()["VariableChildCount"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableChildCount");
+      "gdjs.evtTools.common.getVariableChildCount");
   GetAllExpressions()["GlobalVariableChildCount"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableChildCount");
+      "gdjs.evtTools.common.getVariableChildCount");
   GetAllExpressions()["GlobalVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableNumber");
+      "gdjs.evtTools.common.getVariableNumber");
   GetAllStrExpressions()["GlobalVariableString"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableString");
+      "gdjs.evtTools.common.getVariableString");
 
   GetAllConditions()["VarSceneDef"].SetFunctionName(
-      "gdjs.evtTools.variable.sceneVariableExists");
+      "gdjs.evtTools.common.sceneVariableExists");
   GetAllConditions()["VarGlobalDef"].SetFunctionName(
-      "gdjs.evtTools.variable.globalVariableExists");
+      "gdjs.evtTools.common.globalVariableExists");
 
   GetAllActions()["SetSceneVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.setVariableBoolean");
+      "gdjs.evtTools.common.setVariableBoolean");
   GetAllActions()["SetGlobalVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.setVariableBoolean");
+      "gdjs.evtTools.common.setVariableBoolean");
   GetAllActions()["ToggleSceneVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.toggleVariableBoolean");
+      "gdjs.evtTools.common.toggleVariableBoolean");
   GetAllActions()["ToggleGlobalVariableAsBoolean"].SetFunctionName(
-      "gdjs.evtTools.variable.toggleVariableBoolean");
+      "gdjs.evtTools.common.toggleVariableBoolean");
 
   GetAllConditions()["VariableChildExists"].SetFunctionName(
-      "gdjs.evtTools.variable.variableChildExists");
+      "gdjs.evtTools.common.variableChildExists");
   GetAllConditions()["GlobalVariableChildExists"].SetFunctionName(
-      "gdjs.evtTools.variable.variableChildExists");
+      "gdjs.evtTools.common.variableChildExists");
   GetAllActions()["VariableRemoveChild"].SetFunctionName(
-      "gdjs.evtTools.variable.variableRemoveChild");
+      "gdjs.evtTools.common.variableRemoveChild");
   GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName(
-      "gdjs.evtTools.variable.variableRemoveChild");
+      "gdjs.evtTools.common.variableRemoveChild");
   GetAllActions()["VariableClearChildren"].SetFunctionName(
-      "gdjs.evtTools.variable.variableClearChildren");
+      "gdjs.evtTools.common.variableClearChildren");
   GetAllActions()["GlobalVariableClearChildren"].SetFunctionName(
-      "gdjs.evtTools.variable.variableClearChildren");
+      "gdjs.evtTools.common.variableClearChildren");
 
   GetAllActions()["SceneVariablePush"].SetFunctionName(
-      "gdjs.evtTools.variable.variablePush");
+      "gdjs.evtTools.common.variablePush");
   GetAllActions()["SceneVariableRemoveAt"].SetFunctionName(
-      "gdjs.evtTools.variable.variableRemoveAt");
+      "gdjs.evtTools.common.variableRemoveAt");
   GetAllActions()["GlobalVariablePush"].SetFunctionName(
-      "gdjs.evtTools.variable.variablePush");
+      "gdjs.evtTools.common.variablePush");
   GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
-      "gdjs.evtTools.variable.variableRemoveAt");
+      "gdjs.evtTools.common.variableRemoveAt");
 
   GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,

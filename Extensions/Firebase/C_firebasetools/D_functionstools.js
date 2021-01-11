@@ -36,7 +36,7 @@ gdjs.evtTools.firebase.functions = {
       .then((response) => response.data)
       .then((data) => {
         if (callbackValueVariable)
-          gdjs.evtTools.variable.objectToVariable(data, callbackValueVariable);
+          gdjs.evtTools.network._objectToVariable(data, callbackValueVariable);
         if (typeof callbackStateVariable !== 'undefined')
           callbackStateVariable.setString('ok');
       })

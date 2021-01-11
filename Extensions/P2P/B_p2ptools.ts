@@ -236,7 +236,7 @@ namespace gdjs {
     gdjs.evtTools.p2p.sendDataTo(
       id,
       eventName,
-      gdjs.evtTools.variable.variableStructureToJSON(variable)
+      gdjs.evtTools.network.variableStructureToJSON(variable)
     );
   };
 
@@ -251,7 +251,7 @@ namespace gdjs {
   ) {
     gdjs.evtTools.p2p.sendDataToAll(
       eventName,
-      gdjs.evtTools.variable.variableStructureToJSON(variable)
+      gdjs.evtTools.network.variableStructureToJSON(variable)
     );
   };
 
@@ -279,7 +279,7 @@ namespace gdjs {
     eventName: string,
     variable: gdjs.Variable
   ) {
-    gdjs.evtTools.variable.jsonToVariableStructure(
+    gdjs.evtTools.network.jsonToVariableStructure(
       gdjs.evtTools.p2p.getEventData(eventName),
       variable
     );

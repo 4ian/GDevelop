@@ -34,7 +34,6 @@ module.exports = function(config) {
       '../Runtime-bundled/oncetriggers.js',
       '../Runtime-bundled/runtimebehavior.js',
       '../Runtime-bundled/spriteruntimeobject.js',
-      '../Runtime-bundled/events-tools/variabletools.js',
       '../Runtime-bundled/events-tools/commontools.js',
       '../Runtime-bundled/events-tools/runtimescenetools.js',
       '../Runtime-bundled/events-tools/inputtools.js',

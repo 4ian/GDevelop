@@ -29,7 +29,7 @@ namespace gdjs {
     variable: gdjs.Variable
   ) {
     firebase.remoteConfig().defaultConfig = JSON.parse(
-      gdjs.evtTools.variable.variableStructureToJSON(variable)
+      gdjs.evtTools.network.variableStructureToJSON(variable)
     );
   };
   gdjs.evtTools.firebase.onAppCreated.push(function () {

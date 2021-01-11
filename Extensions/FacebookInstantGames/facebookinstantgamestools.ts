@@ -43,7 +43,7 @@ namespace gdjs {
         FBInstant.player
           .getDataAsync([key])
           .then(function (data) {
-            gdjs.evtTools.variable.jsonToVariableStructure(
+            gdjs.evtTools.network.jsonToVariableStructure(
               data[key],
               successVariable
             );
@@ -64,7 +64,7 @@ namespace gdjs {
         errorVariable.setString('');
         successVariable.setString('');
         const data = {};
-        data[key] = gdjs.evtTools.variable.variableStructureToJSON(variable);
+        data[key] = gdjs.evtTools.network.variableStructureToJSON(variable);
         FBInstant.player
           .setDataAsync(data)
           .then(function () {
@@ -86,7 +86,7 @@ namespace gdjs {
         }
         errorVariable.setString('');
         successVariable.setString('');
-        const data = gdjs.evtTools.variable.variableStructureToJSON(
+        const data = gdjs.evtTools.network.variableStructureToJSON(
           extraDataVariable
         );
         FBInstant.getLeaderboardAsync(leaderboardName)
@@ -123,7 +123,7 @@ namespace gdjs {
             scoreVariable.setNumber(
               entry.getScore() === null ? -1 : entry.getScore()
             );
-            gdjs.evtTools.variable.jsonToVariableStructure(
+            gdjs.evtTools.network.jsonToVariableStructure(
               entry.getExtraData(),
               extraDataVariable
             );

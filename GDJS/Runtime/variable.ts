@@ -40,7 +40,7 @@ namespace gdjs {
       if (varData !== undefined) {
         this._type = varData.type || 'number';
         if (this._type === 'number') {
-          this._value = parseFloat((varData.value as string) || '0');
+          this._value = parseFloat(varData.value as string || '0');
           if (this._value !== this._value) this._value = 0;
         } else if (this._type === 'string') {
           this._str = '' + varData.value || '0';
@@ -62,149 +62,6 @@ namespace gdjs {
     }
 
     /**
-     * An internal JS object to variable function.
-     * This is necessary for code generation.
-     * @private
-     */
-    static _objectToVariable(obj: any, variable: gdjs.Variable) {
-      if (obj === null) {
-        variable.setString('null');
-      } else if (
-        (typeof obj === 'number' || typeof obj === 'string') &&
-        !isNaN(obj as number)
-      ) {
-        variable.setNumber(obj as number);
-      } else if (typeof obj === 'string') {
-        variable.setString(obj);
-      } else if (typeof obj === 'undefined') {
-        // Do not modify the variable, as there is no value to set it to.
-      } else if (typeof obj === 'boolean') {
-        variable.setBoolean(obj);
-      } else if (Array.isArray(obj)) {
-        variable.castTo('array');
-        variable.clearChildren();
-        for (const i in obj) {
-          gdjs.Variable._objectToVariable(obj[i], variable.getChild(i));
-        }
-      } else if (typeof obj === 'object') {
-        variable.castTo('structure');
-        variable.clearChildren();
-        for (var p in obj) {
-          if (obj.hasOwnProperty(p)) {
-            gdjs.Variable._objectToVariable(
-              obj[p],
-              variable.getChild(p)
-            );
-          }
-        }
-      } else if (typeof obj === 'symbol') {
-        variable.setString(obj.toString());
-      } else if (typeof obj === 'number' && isNaN(obj)) {
-        console.warn('Variables cannot be set to NaN, setting it to 0.');
-        variable.setNumber(0);
-      } else if (typeof obj === 'bigint') {
-        if (obj > Number.MAX_SAFE_INTEGER)
-          console.warn(
-            'Integers bigger than ' +
-              Number.MAX_SAFE_INTEGER +
-              " aren't supported by variables, it will be reduced to that size."
-          );
-        // @ts-ignore
-        variable.setNumber(parseInt(obj, 10));
-      } else if (typeof obj === 'function') {
-        console.error('Error: Impossible to set variable value to a function.');
-      } else {
-        console.error('Cannot identify type of object:', obj);
-      }
-      return variable;
-    }
-
-    /**
-     * An internal JSON to variable function.
-     * This is necessary for code generation.
-     * @private
-     */
-    static _jsonToVariable(
-      jsonStr: string,
-      variable: gdjs.Variable
-    ): gdjs.Variable {
-      try {
-        const obj = JSON.parse(jsonStr);
-        return gdjs.Variable._objectToVariable(obj, variable);
-      } catch (e) {
-        // Return error message if JSON was not properly parsed.
-        return gdjs.Variable._objectToVariable(
-          'JSON parsing error:' + e,
-          variable
-        );
-      }
-    }
-
-    /**
-     * Creates a GDevelop variable from a JavaScript variable.
-     * @param {any} obj
-     * @return {gdjs.Variable}
-     */
-    static fromObject(obj: any): gdjs.Variable {
-      return gdjs.Variable._objectToVariable(obj, new gdjs.Variable());
-    }
-
-    /**
-     * Creates a GDevelop variable from a JSON string.
-     * @param {string} jsonStr 
-     */
-    static fromJSON(jsonStr: string): gdjs.Variable {
-      return gdjs.Variable._jsonToVariable(jsonStr, new gdjs.Variable())
-    }
-
-    /**
-     * Convert a variable to JSON.
-     * @param variable The variable to convert to JSON
-     * @returns The JSON string representing the variable
-     */
-    static toJSON(variable: gdjs.Variable): string {
-      if (variable.isPrimitive()) {
-        return JSON.stringify(variable.getValue());
-      } else if (variable.getType() === 'array') {
-        let str = '[';
-        let firstChild = true;
-        const children = variable.getAllChildren();
-        for (const p in children) {
-          if (children.hasOwnProperty(p)) {
-            if (!firstChild) {
-              str += ',';
-            }
-            str += children[p].toJSON();
-            firstChild = false;
-          }
-        }
-        str += ']';
-        return str;
-      } else if (variable.getType() === 'structure') {
-        let str = '{';
-        let firstChild = true;
-        const children = variable.getAllChildren();
-        for (const p in children) {
-          if (children.hasOwnProperty(p)) {
-            if (!firstChild) {
-              str += ',';
-            }
-            str +=
-              JSON.stringify(p) +
-              ': ' +
-              children[p].toJSON();
-            firstChild = false;
-          }
-        }
-        str += '}';
-        return str;
-      }
-
-      console.error('JSON conversion error: Variable type not recognized');
-      return '';
-    }
-
-    /**
      * Return true if the variable type is a primitive type.
      * @param {VariableType} type
      * @return {boolean}
@@ -213,14 +70,6 @@ namespace gdjs {
       type: VariableType
     ): type is 'string' | 'number' | 'boolean' {
       return type === 'string' || type === 'number' || type === 'boolean';
-    }
-
-    /**
-     * Convert this variable to JSON.
-     * @returns The JSON string representing the variable
-     */
-    toJSON(): string {
-      return gdjs.Variable.toJSON(this);
     }
 
     /**
@@ -334,9 +183,11 @@ namespace gdjs {
 
     /**
      * Remove all the children.
+     *
+     * If the variable is not a structure, nothing is done.
      */
     clearChildren() {
-      this._childrenList = [];
+      if (this._type !== 'structure') return;
       this._children = {};
     }
 
@@ -432,18 +283,6 @@ namespace gdjs {
     setBoolean(newValue: boolean) {
       this._type = 'boolean';
       this._bool = !!newValue;
-    }
-
-    /**
-     * Gets the primitive value using the getter of the current type.
-     * @param {any} newValue
-     */
-    getValue(): string | float | boolean {
-      return this._type === 'number'
-        ? this.getAsNumber()
-        : this._type === 'boolean'
-        ? this.getAsBoolean()
-        : this.getAsString();
     }
 
     /**
@@ -576,8 +415,8 @@ namespace gdjs {
      * @param {gdjs.Variable} variable
      */
     push(variable: gdjs.Variable) {
-      this.castTo('array');
-      this._childrenList.push(variable);
+        this.castTo('array');
+        this._childrenList.push(variable);
     }
   }
 }

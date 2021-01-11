@@ -29,7 +29,7 @@ namespace gdjs {
       .firestore()
       .collection(collectionName)
       .doc(variableName)
-      .set(JSON.parse(gdjs.evtTools.variable.variableStructureToJSON(variable)))
+      .set(JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable)))
       .then(function () {
         if (typeof callbackStateVariable !== 'undefined') {
           callbackStateVariable.setString('ok');
@@ -97,7 +97,7 @@ namespace gdjs {
       .collection(collectionName)
       .doc(variableName)
       .update(
-        JSON.parse(gdjs.evtTools.variable.variableStructureToJSON(variable))
+        JSON.parse(gdjs.evtTools.network.variableStructureToJSON(variable))
       )
       .then(function () {
         if (typeof callbackStateVariable !== 'undefined') {
@@ -228,7 +228,7 @@ namespace gdjs {
           callbackStateVariable.setString('ok');
         }
         if (callbackValueVariable) {
-          gdjs.evtTools.variable.objectToVariable(
+          gdjs.evtTools.network._objectToVariable(
             doc.data(),
             callbackValueVariable
           );
@@ -266,7 +266,7 @@ namespace gdjs {
           callbackStateVariable.setString('ok');
         }
         if (callbackValueVariable) {
-          gdjs.evtTools.variable.objectToVariable(
+          gdjs.evtTools.network._objectToVariable(
             doc.get(field),
             callbackValueVariable
           );
@@ -369,7 +369,7 @@ namespace gdjs {
           callbackStateVariable.setString(snapshot.empty ? 'empty' : 'ok');
         }
         if (callbackValueVariable) {
-          gdjs.evtTools.variable.objectToVariable(
+          gdjs.evtTools.network._objectToVariable(
             snapshot.docs.map((doc) => doc.id),
             callbackValueVariable
           );

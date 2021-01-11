@@ -297,6 +297,16 @@ namespace gdjs {
       );
     }
 
+    getFillColorR(): void {
+      return gdjs.hexNumberToRGB(this._fillColor).r;
+    }
+    getFillColorG(): void {
+      return gdjs.hexNumberToRGB(this._fillColor).g;
+    }
+    getFillColorB(): void {
+      return gdjs.hexNumberToRGB(this._fillColor).b;
+    }
+
     setOutlineColor(rgbColor): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
@@ -311,6 +321,16 @@ namespace gdjs {
         16
       );
       this._renderer.updateOutline();
+    }
+
+    getOutlineColorR(): void {
+      return gdjs.hexNumberToRGB(this._outlineColor).r;
+    }
+    getOutlineColorG(): void {
+      return gdjs.hexNumberToRGB(this._outlineColor).g;
+    }
+    getOutlineColorB(): void {
+      return gdjs.hexNumberToRGB(this._outlineColor).b;
     }
 
     setOutlineSize(size): void {

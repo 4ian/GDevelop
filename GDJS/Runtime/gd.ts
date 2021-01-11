@@ -69,6 +69,19 @@ namespace gdjs {
   };
 
   /**
+   * Convert a hex color value to an rgb object.
+   * @param hex Hex color
+   */
+  export const hexNumberToRGB = (hexNumber: number) => {
+    return {
+      r: (hexNumber >> 16) & 0xff,
+      g: (hexNumber >> 8) & 0xff,
+      b: hexNumber & 0xff,
+      a: 255,
+    };
+  };
+
+  /**
    * Get a random integer between 0 and max.
    * @param max The maximum value (inclusive).
    */

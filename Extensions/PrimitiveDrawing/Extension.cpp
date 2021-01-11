@@ -379,6 +379,37 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetFillColor")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "GetFillColorR",
+        _("Get red filling colors"),
+        _("Current value for red filling colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorR")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "GetFillColorG",
+        _("Get green filling colors"),
+        _("Current value for green filling colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorG")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "GetFillColorB",
+        _("Get blue filling colors"),
+        _("Current value for blue filling colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorB")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+
   obj.AddAction("OutlineColor",
                 _("Outline color"),
                 _("Modify the color of the outline of future drawings."),
@@ -390,6 +421,36 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("color", _("Color"))
       .SetFunctionName("SetOutlineColor")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "GetOutlineColorR",
+        _("Get red outline colors"),
+        _("Current value for red outline colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorR")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "GetOutlineColorG",
+        _("Get green outline colors"),
+        _("Current value for green outline colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorG")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "GetOutlineColorB",
+        _("Get blue outline colors"),
+        _("Current value for blue outline colors."),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorB")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("OutlineSize",

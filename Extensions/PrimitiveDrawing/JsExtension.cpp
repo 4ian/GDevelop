@@ -115,10 +115,22 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorR"]
+        .SetFunctionName("getFillColorR");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorG"]
+        .SetFunctionName("getFillColorG");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorB"]
+        .SetFunctionName("getFillColorB");
 
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"]
         .SetFunctionName("setOutlineColor");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorR"]
+        .SetFunctionName("getOutlineColorR");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorG"]
+        .SetFunctionName("getOutlineColorG");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorB"]
+        .SetFunctionName("getOutlineColorB");
 
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"]

@@ -490,21 +490,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         if(valueIteratorExists) outputCode += 
             "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
-            "    const type = $STRUCTURE_CHILD_VARIABLE.getType();\n"
-            "    if(type === \"number\") {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber());\n"
-            "    } else if(type === \"string\") {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setString($STRUCTURE_CHILD_VARIABLE.getAsString());\n"
-            "    } else if(type === \"boolean\") {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setBoolean($STRUCTURE_CHILD_VARIABLE.getAsBoolean());\n"
-            "    } else if (type === \"structure\") {\n"
+            "    $VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE.getType())\n"
+            "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
+            "        $VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE.getValue());\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"structure\") {\n"
             "        // Structures are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
-            "    } else if (type === \"array\") {\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"array\") {\n"
             "        // Arrays are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildrenList($STRUCTURE_CHILD_VARIABLE.getAllChildrenList());\n"
-            "    } else console.warn(\"Cannot identify type: \", type);\n"
-            "    delete type;\n";
+            "    } else console.warn(\"Cannot identify type: \", type);\n";
         
         // Now do the rest of standard event generation
         outputCode += objectDeclaration;

@@ -321,7 +321,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("trueorfalse", _("New Value:"));
 
   obj.AddAction("ToggleObjectVariableAsBoolean",
-                _("Toggles the boolean value of a variable of an object"),
+                _("Toggle the boolean value of a variable of an object"),
                 _("Toggles the boolean value of a variable of an object.\n"
                   "If it was true, it will become false, and if it was false "
                   "it will become true."),
@@ -338,7 +338,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Child existence"),
                    _("Check if the specified child of the variable exists."),
                    _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
-                   _("Variables/Structures"),
+                   _("Variables/Collections/Structures"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
       .AddParameter("object", _("Object"))
@@ -350,7 +350,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Remove a child"),
                 _("Remove a child from a variable of an object."),
                 _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Structure"),
+                _("Variables/Collections/Structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -362,7 +362,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Clear variable"),
                 _("Remove all the children from the object variable."),
                 _("Clear children from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Structure"),
+                _("Variables/Collections"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -541,7 +541,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Appends a variable at the end of a object array variable."),
                 _("Append variable _PARAM2_ to array variable _PARAM1_ of "
                   "object _PARAM0_"),
-                _("Variables/Arrays"),
+                _("Variables/Collections/Arrays"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -553,7 +553,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Push a string on an object array"),
                 _("Appends a string at the end of an object array variable."),
                 _("Append string _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Arrays"),
+                _("Variables/Collections/Arrays"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -565,7 +565,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Push a number on an object array"),
                 _("Appends a number at the end of an object array variable."),
                 _("Append number _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Arrays"),
+                _("Variables/Collections/Arrays"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -577,7 +577,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Push a boolean on an object array"),
                 _("Appends a boolean at the end of an object array variable."),
                 _("Append boolean _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Arrays"),
+                _("Variables/Collections/Arrays"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -591,7 +591,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Removes a variable at an index of an object array variable."),
          _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
            "object _PARAM0_"),
-         _("Variables/Arrays"),
+         _("Variables/Collections/Arrays"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))

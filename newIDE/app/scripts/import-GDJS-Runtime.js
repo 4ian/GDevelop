@@ -5,14 +5,8 @@ const args = require('minimist')(process.argv.slice(2));
 
 const gdevelopRootPath = path.join(__dirname, '..', '..', '..');
 const destinationPaths = [
-  path.join(__dirname, '..', 'resources', 'GDJS', 'Runtime'),
-  path.join(
-    __dirname,
-    '..',
-    'node_modules',
-    'GDJS-for-web-app-only',
-    'Runtime'
-  ),
+  path.join(__dirname, '..', 'resources', 'GDJS'),
+  path.join(__dirname, '..', 'node_modules', 'GDJS-for-web-app-only'),
 ];
 
 // Build GDJS
@@ -32,7 +26,7 @@ const copyOptions = {
 };
 
 shell.echo(
-  `ℹ️ Copying GDJS and extensions runtime files (*.js) to ${destinationPaths.join(
+  `ℹ️ Copying GDJS and extensions runtime built files and sources to ${destinationPaths.join(
     ', '
   )}...`
 );
@@ -44,13 +38,30 @@ destinationPaths.forEach(destinationPath => {
   shell.mkdir('-p', destinationPath);
 
   const startTime = Date.now();
-  return copy(
-    path.join(gdevelopRootPath, 'GDJS', 'Runtime-bundled'),
-    destinationPath,
-    copyOptions
-  )
-    .then(function(results) {
-      const totalFilesCount = results.length;
+  // TODO: Investigate the use of a smart & faster sync
+  // that only copy files with changed content.
+  return Promise.all([
+    // Copy the built files
+    copy(
+      path.join(gdevelopRootPath, 'GDJS', 'Runtime-bundled'),
+      path.join(destinationPath, 'Runtime'),
+      copyOptions
+    ),
+    // Copy the GDJS runtime and extension sources (useful for autocompletions
+    // in the IDE).
+    copy(
+      path.join(gdevelopRootPath, 'GDJS', 'Runtime'),
+      path.join(destinationPath, 'Runtime-sources'),
+      copyOptions
+    ),
+    copy(
+      path.join(gdevelopRootPath, 'Extensions'),
+      path.join(destinationPath, 'Runtime-sources', 'Extensions'),
+      { ...copyOptions, filter: ['**/*.js', '**/*.ts'] }
+    ),
+  ])
+    .then(function([bundledResults, unbundledResults, unbundledExtensionsResults]) {
+      const totalFilesCount = bundledResults.length + unbundledResults.length + unbundledExtensionsResults.length;
       const duration = Date.now() - startTime;
       console.info(
         `✅ Runtime files copy done (${totalFilesCount} file(s) copied in ${duration}ms).`

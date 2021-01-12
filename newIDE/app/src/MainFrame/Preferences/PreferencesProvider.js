@@ -71,6 +71,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
+    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
   };
 
   componentDidMount() {
@@ -482,6 +484,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, newObjectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getIsMenuBarHiddenInPreview() {
+    return this.state.values.isMenuBarHiddenInPreview;
+  }
+
+  _setIsMenuBarHiddenInPreview(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isMenuBarHiddenInPreview: enabled,
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

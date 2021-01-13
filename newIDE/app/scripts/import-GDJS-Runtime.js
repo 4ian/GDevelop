@@ -43,7 +43,7 @@ destinationPaths.forEach(destinationPath => {
   return Promise.all([
     // Copy the built files
     copy(
-      path.join(gdevelopRootPath, 'GDJS', 'Runtime-bundled'),
+      path.join(gdevelopRootPath, 'GDJS', 'Runtime-dist'),
       path.join(destinationPath, 'Runtime'),
       copyOptions
     ),

@@ -27,7 +27,10 @@ export const setupAutocompletions = (monaco: any) => {
               return;
             }
 
-            monaco.languages.typescript.javascriptDefaults.addExtraLib(content, fullPath);
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+              content,
+              fullPath
+            );
           });
         }
       });

@@ -97,7 +97,7 @@ export default function NewInstructionEditorMenu({
     chosenObjectInstructionsInfoTree,
   } = newInstructionEditorState;
   const {
-    chooseFreeInstruction,
+    chooseInstruction,
     chooseObject,
     chooseObjectInstruction,
   } = newInstructionEditorSetters;
@@ -149,7 +149,7 @@ export default function NewInstructionEditorMenu({
       isCondition={isCondition}
       chosenInstructionType={!chosenObjectName ? instructionType : undefined}
       onChooseInstruction={(instructionType: string) => {
-        const { instruction, chosenObjectName } = chooseFreeInstruction(
+        const { instruction, chosenObjectName } = chooseInstruction(
           instructionType
         );
         submitInstruction({ instruction, chosenObjectName });

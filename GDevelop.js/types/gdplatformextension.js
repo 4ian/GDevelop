@@ -23,6 +23,10 @@ declare class gdPlatformExtension {
   getIconUrl(): string;
   isBuiltin(): boolean;
   getNameSpace(): string;
+  addDuplicatedAction(newActionName: string, copiedActionName: string): gdInstructionMetadata;
+  addDuplicatedCondition(newConditionName: string, copiedConditionName: string): gdInstructionMetadata;
+  addDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): gdExpressionMetadata;
+  addDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): gdExpressionMetadata;
   getExtensionObjectsTypes(): gdVectorString;
   getBehaviorsTypes(): gdVectorString;
   getExtensionEffectTypes(): gdVectorString;

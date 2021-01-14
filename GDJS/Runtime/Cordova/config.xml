@@ -20,8 +20,13 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
 
+        <preference name="SwiftVersion" value="5.3" />
+
         <!-- GDJS_ICONS_IOS -->
     </platform>
+
+    <preference name="AndroidXEnabled" value="true" />
+
     <preference name="BackgroundColor" value="0xff000000"/>
 
     <!-- Android Fullscreen -->

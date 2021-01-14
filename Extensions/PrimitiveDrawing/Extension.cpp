@@ -380,9 +380,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetFillColorR",
-        _("Filling color red component"),
-        _("Current value for red filling colors."),
+        "FillColorRed",
+        _("Filing color red component"),
+        _("Filing color red component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -390,9 +390,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetFillColorG",
-        _("Filling color green component"),
-        _("Current value for green filling colors."),
+        "FillColorGreen",
+        _("Filing color green component"),
+        _("Filing color green component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -400,9 +400,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetFillColorB",
-        _("Filling color blue component"),
-        _("Current value for blue filling colors."),
+        "FillColorBlue",
+        _("Filing color blue component"),
+        _("Filing color blue component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -424,9 +424,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetOutlineColorR",
+        "OutlineColorRed",
         _("Outline color red component"),
-        _("Current value for red outline colors."),
+        _("Outline color red component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -434,9 +434,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetOutlineColorG",
+        "OutlineColorGreen",
         _("Outline color green component"),
-        _("Current value for green outline colors."),
+        _("Outline color green component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -444,9 +444,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddExpression(
-        "GetOutlineColorB",
+        "OutlineColorBlue",
         _("Outline color blue component"),
-        _("Current value for blue outline colors."),
+        _("Outline color blue component"),
         "",
         "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -483,7 +483,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddExpression(
         "OutlineSize",
         _("Outline size"),
-        _("Check the outline size in pixels."),
+        _("Outline size"),
         "",
         "res/conditions/outlineSize.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -522,7 +522,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddExpression(
         "FillOpacity",
         _("Filling opacity"),
-        _("Check if the opacity of filling (a number from 0 to 1, 1 being fully opaque)."),
+        _("Filling opacity"),
         "",
         "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
@@ -561,42 +561,31 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddExpression(
         "OutlineOpacity",
         _("Outline opacity"),
-        _("Check if the opacity of the outline (a number from 0 to 1, 1 being fully opaque)."),
+        _("Outline opacity"),
         "",
         "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("GetOutlineOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddAction("UseAbsoluteCoordinates",
-                _("Use absolute coordinates"),
-                _("Set the coordinates of the Shape Painter to be absolute"),
-                _("Change the coordinate for _PARAM0_ to absolute"),
-                _("Setup"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
-      .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("SetCoordinatesAbsolute")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
-  obj.AddAction("UseCoordinatesRelative",
-                  _("Use coordinates Relative"),
-                  _("Set the coordinates of the Shape Painter to be relative"),
-                  _("Change the coordinate for _PARAM0_ to relative"),
+  obj.AddAction("UseRelativeCoordinates",
+                  _("Use relative coordinates"),
+                  _("Set if the object should use relative coordinates (by default) or not. It's recommended to use relative coordinates."),
+                  _("Use relative coordinates for _PARAM0_: _PARAM1_"),
                   _("Setup"),
                   "res/actions/position24.png",
                   "res/actions/position.png")
         .AddParameter("object", _("Shape Painter object"), "Drawer")
-        .AddParameter("yesorno", _("Use coordinates Relative?"), "", false)
+        .AddParameter("yesorno", _("Use relative coordinates?"), "", false)
         .SetDefaultValue("true")
-        .SetFunctionName("SetCoordinatesRelative")
+        .SetFunctionName("setCoordinatesRelative")
         .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
     obj.AddCondition(
           "AreCoordinatesRelative",
-          _("Coordinates relative"),
+          _("Relative coordinates"),
           _("Check if the coordinates of the shape painter is relative."),
-          _("_PARAM0_ use the coordinates relative"),
+          _("_PARAM0_ is using relative coordinates"),
           _("Setup"),
               "res/conditions/position24.png",
               "res/conditions/position.png")

@@ -115,21 +115,21 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorR"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorRed"]
         .SetFunctionName("getFillColorR");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorG"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorGreen"]
         .SetFunctionName("getFillColorG");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetFillColorB"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorBlue"]
         .SetFunctionName("getFillColorB");
 
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"]
         .SetFunctionName("setOutlineColor");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorR"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorRed"]
         .SetFunctionName("getOutlineColorR");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorG"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorGreen"]
         .SetFunctionName("getOutlineColorG");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["GetOutlineColorB"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorBlue"]
         .SetFunctionName("getOutlineColorB");
 
     GetAllActionsForObject(
@@ -163,9 +163,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getOutlineOpacity");
 
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CoordinatesRelative"]
-        .SetFunctionName("setCoordinatesRelative")
-        .SetGetter("areCoordinatesRelative");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::UseRelativeCoordinates"]
+        .SetFunctionName("setCoordinatesRelative");
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::AreCoordinatesRelative"]
         .SetFunctionName("areCoordinatesRelative");

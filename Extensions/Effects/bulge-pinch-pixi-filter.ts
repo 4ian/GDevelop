@@ -14,7 +14,11 @@ namespace gdjs {
       } else if (parameterName === 'radius') {
         bulgePinchFilter.radius = value;
       } else if (parameterName === 'strength') {
-        bulgePinchFilter.strength = gdjs.PixiFiltersTools.clampValue(value, -1, 1);
+        bulgePinchFilter.strength = gdjs.PixiFiltersTools.clampValue(
+          value,
+          -1,
+          1
+        );
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

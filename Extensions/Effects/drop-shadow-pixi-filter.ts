@@ -22,7 +22,9 @@ namespace gdjs {
     updateStringParameter: function (filter, parameterName, value) {
       const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
       if (parameterName === 'color') {
-        dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          value
+        );
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {

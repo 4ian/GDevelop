@@ -7,9 +7,13 @@ namespace gdjs {
     update: function (filter, layer) {
       const radialBlurFilter = filter as PIXI.filters.RadialBlurFilter;
       // @ts-ignore - extra properties are stored on the filter.
-      radialBlurFilter.center[0] = Math.round(radialBlurFilter._centerX * layer.getWidth());
+      radialBlurFilter.center[0] = Math.round(
+        radialBlurFilter._centerX * layer.getWidth()
+      );
       // @ts-ignore - extra properties are stored on the filter.
-      radialBlurFilter.center[1] = Math.round(radialBlurFilter._centerY * layer.getHeight());
+      radialBlurFilter.center[1] = Math.round(
+        radialBlurFilter._centerY * layer.getHeight()
+      );
     },
     updateDoubleParameter: function (filter, parameterName, value) {
       const radialBlurFilter = filter as PIXI.filters.RadialBlurFilter;
@@ -18,7 +22,11 @@ namespace gdjs {
       } else if (parameterName === 'angle') {
         radialBlurFilter.angle = value;
       } else if (parameterName === 'kernelSize') {
-        radialBlurFilter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(value, 3, 25);
+        radialBlurFilter.kernelSize = gdjs.PixiFiltersTools.clampKernelSize(
+          value,
+          3,
+          25
+        );
       } else if (parameterName === 'centerX') {
         // @ts-ignore - extra properties are stored on the filter.
         radialBlurFilter._centerX = value;

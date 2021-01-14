@@ -1,6 +1,5 @@
 // @ts-nocheck - TODO: convert this file to use TypeScript namespaces
 namespace gdjs {
-
   /**
    * Firebase Cloud Firestore Event Tools.
    * @namespace

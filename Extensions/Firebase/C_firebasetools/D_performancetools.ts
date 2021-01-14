@@ -1,6 +1,5 @@
 // @ts-nocheck - TODO: convert this file to use TypeScript namespaces
 namespace gdjs {
-
   /**
    * Firebase Performance Event Tools.
    * @namespace

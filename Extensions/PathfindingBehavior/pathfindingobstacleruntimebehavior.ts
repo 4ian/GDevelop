@@ -1,4 +1,4 @@
-/**
+/*
 GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -68,6 +68,7 @@ namespace gdjs {
   export namespace PathfindingObstaclesManager {
     /**
      * Tool class which represents a simple point with a radius and a getAABB method.
+     * @ignore
      */
     export class Vertex {
       x: float;

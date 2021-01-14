@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * A dummy object doing showing a text on screen.
+   * @ignore
    */
   export class DummyRuntimeObject extends gdjs.RuntimeObject {
     // Load any required data from the object properties.

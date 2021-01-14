@@ -1,10 +1,6 @@
 // @ts-nocheck - TODO: convert this file to use TypeScript namespaces
 namespace gdjs {
-  /**
-   * Firebase Tools Collection
-   * @fileoverview
-   * @author arthuro555
-   */
+
 
   /**
    * Remote Config Tools

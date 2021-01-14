@@ -1,9 +1,10 @@
-namespace gdjs {
-  /**
+
+  /*
 GDevelop - Skeleton Object Extension
 Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
+namespace gdjs {
 
   gdjs.sk.SharedSlot = function () {
     // Transform

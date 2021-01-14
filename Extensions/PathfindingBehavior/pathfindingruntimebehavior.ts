@@ -1,4 +1,4 @@
-/**
+/*
 GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -461,6 +461,7 @@ namespace gdjs {
     /**
      * Internal tool class containing the structures used by A* and members functions related
      * to them.
+     * @ignore
      */
     export class SearchContext {
       _obstacles: any = null;

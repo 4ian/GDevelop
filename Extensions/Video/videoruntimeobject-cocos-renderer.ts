@@ -3,6 +3,7 @@ namespace gdjs {
    * The Cocos2D-JS renderer for the VideoRuntimeObject.
    *
    * The implementation is empty as the object is not supported in Cocos2D-JS for now.
+   * @ignore
    */
   export class VideoRuntimeObjectCocosRenderer {
     getRendererObject() {}

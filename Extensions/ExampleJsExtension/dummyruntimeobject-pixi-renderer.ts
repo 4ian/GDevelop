@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * The PIXI.js renderer for the DummyRuntimeObject.
+   * @ignore
    */
   export class DummyRuntimeObjectPixiRenderer {
     _object: gdjs.DummyRuntimeObject;

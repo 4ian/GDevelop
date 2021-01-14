@@ -1,4 +1,4 @@
-/**
+/*
  * GDevelop - SystemInfo Extension
  * Copyright (c) 2016-present Florian Rival (Florian.Rival@gmail.com)
  */

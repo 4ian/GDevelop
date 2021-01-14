@@ -1,9 +1,8 @@
-namespace gdjs {
-  /**
+/*
 GDevelop - Platform Behavior Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
-
+namespace gdjs {
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.

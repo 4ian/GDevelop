@@ -10,9 +10,9 @@ import ToolbarCommands from './ToolbarCommands';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 
 type Props = {|
-  openObjectsList: () => void,
-  openObjectGroupsList: () => void,
-  openProperties: () => void,
+  toggleObjectsList: () => void,
+  toggleObjectGroupsList: () => void,
+  toggleProperties: () => void,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -38,9 +38,9 @@ export class Toolbar extends PureComponent<Props> {
     return (
       <>
         <ToolbarCommands
-          openObjectsList={this.props.openObjectsList}
-          openObjectGroupsList={this.props.openObjectGroupsList}
-          openPropertiesPanel={this.props.openProperties}
+          toggleObjectsList={this.props.toggleObjectsList}
+          toggleObjectGroupsList={this.props.toggleObjectGroupsList}
+          togglePropertiesPanel={this.props.toggleProperties}
           toggleInstancesList={this.props.toggleInstancesList}
           toggleLayersList={this.props.toggleLayersList}
           undo={this.props.undo}
@@ -57,29 +57,34 @@ export class Toolbar extends PureComponent<Props> {
         />
         <ToolbarGroup lastChild>
           <ToolbarIcon
-            onClick={this.props.openObjectsList}
+            onClick={this.props.toggleObjectsList}
             src="res/ribbon_default/objects64.png"
             tooltip={t`Open the objects editor`}
+            showComponent={this.props.showObjectsListInfoBar}
           />
           <ToolbarIcon
-            onClick={this.props.openObjectGroupsList}
+            onClick={this.props.toggleObjectGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
             tooltip={t`Open the objects groups editor`}
+            showComponent={this.props.showObjectGroupsListInfoBar}
           />
           <ToolbarIcon
-            onClick={this.props.openProperties}
+            onClick={this.props.toggleProperties}
             src="res/ribbon_default/editprop32.png"
             tooltip={t`Open the properties panel`}
+            showComponent={this.props.showPropertiesInfoBar}
           />
           <ToolbarIcon
             onClick={this.props.toggleInstancesList}
             src="res/ribbon_default/ObjectsPositionsList32.png"
             tooltip={t`Open the list of instances`}
+            showComponent={this.props.showInstancesInfoBar}
           />
           <ToolbarIcon
             onClick={this.props.toggleLayersList}
             src="res/ribbon_default/layers32.png"
             tooltip={t`Open the layers editor`}
+            showComponent={this.props.showLayersInfoBar}
           />
           <ToolbarSeparator />
           <ToolbarIcon

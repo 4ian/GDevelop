@@ -5,6 +5,7 @@ import {
   MosaicWindow as RMMosaicWindow,
   MosaicWithoutDragDropContext,
   getLeaves,
+  MosaicContext,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
@@ -169,7 +170,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
   ) => {
     const { editors, limitToOneSecondaryEditor } = this.props;
 
-    const editor = this.props.editors[editorName];
+    const editor = editors[editorName];
     if (!editor) return false;
 
     const openedEditorNames = getLeaves(this.state.mosaicNode);
@@ -240,23 +241,33 @@ export default class EditorMosaic extends React.Component<Props, State> {
                 return null;
               }
 
-              if (editor.noTitleBar) {
-                return editor.renderEditor();
-              }
+              if (!editor.showComponent) {
+                return (
+                  <MosaicContext.Consumer>
+                    {({ mosaicActions }) => {
+                      mosaicActions.remove(path);
+                    }}
+                  </MosaicContext.Consumer>
+                );
+              } else {
+                if (editor.noTitleBar) {
+                  return editor.renderEditor();
+                }
 
-              return (
-                <I18n>
-                  {({ i18n }) => (
-                    <MosaicWindow
-                      path={path}
-                      title={i18n._(editor.title)}
-                      toolbarControls={editor.toolbarControls}
-                    >
-                      {editor.renderEditor()}
-                    </MosaicWindow>
-                  )}
-                </I18n>
-              );
+                return (
+                  <I18n>
+                    {({ i18n }) => (
+                      <MosaicWindow
+                        path={path}
+                        title={i18n._(editor.title)}
+                        toolbarControls={editor.toolbarControls}
+                      >
+                        {editor.renderEditor()}
+                      </MosaicWindow>
+                    )}
+                  </I18n>
+                );
+              }
             }}
             value={this.state.mosaicNode}
             onChange={this._onChange}

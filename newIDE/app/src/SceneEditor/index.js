@@ -142,6 +142,7 @@ type State = {|
   history: HistoryState,
 
   showObjectsListInfoBar: boolean,
+  showObjectGroupsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
   showPropertiesInfoBar: boolean,
   showLayersInfoBar: boolean,
@@ -193,9 +194,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         historyMaxSize: 50,
       }),
 
-      showObjectsListInfoBar: false,
+      showObjectsListInfoBar: true,
+      showObjectGroupsListInfoBar: false,
       layoutVariablesDialogOpen: false,
-      showPropertiesInfoBar: false,
+      showPropertiesInfoBar: true,
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
 
@@ -224,9 +226,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         instancesSelection={this.instancesSelection}
-        openObjectsList={this.openObjectsList}
-        openObjectGroupsList={this.openObjectGroupsList}
-        openProperties={this.openProperties}
+        toggleObjectsList={this.toggleObjectsList}
+        toggleObjectGroupsList={this.toggleObjectGroupsList}
+        toggleProperties={this.toggleProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
         toggleLayersList={this.toggleLayersList}
@@ -244,6 +246,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         zoomIn={this.zoomIn}
         zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
+        showObjectsListInfoBar={this.state.showObjectsListInfoBar}
+        showObjectGroupsListInfoBar={this.state.showObjectGroupsListInfoBar}
+        showPropertiesInfoBar={this.state.showPropertiesInfoBar}
+        showLayersInfoBar={this.state.showLayersInfoBar}
+        showInstancesInfoBar={this.state.showInstancesInfoBar}
       />
     );
   }
@@ -261,45 +268,49 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  openObjectsList = () => {
+  toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')) {
-      this.setState({
-        showObjectsListInfoBar: true,
-      });
-    }
+    if (!this.state.showObjectsListInfoBar)
+      this.editorMosaic.openEditor('objects-list', 'end', 75, 'column');
+    this.setState({
+      showObjectsListInfoBar: !this.state.showObjectsListInfoBar,
+    });
   };
 
-  openProperties = () => {
+  toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column')) {
-      this.setState({
-        showPropertiesInfoBar: true,
-      });
-    }
+    if (!this.state.showPropertiesInfoBar)
+      this.editorMosaic.openEditor('properties', 'start', 25, 'column');
+    this.setState({
+      showPropertiesInfoBar: !this.state.showPropertiesInfoBar,
+    });
   };
 
-  openObjectGroupsList = () => {
+  toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
+    if (!this.state.showObjectGroupsListInfoBar)
+      this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
+    this.setState({
+      showObjectGroupsListInfoBar: !this.state.showObjectGroupsListInfoBar,
+    });
   };
 
   toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('instances-list', 'end', 75, 'row')) {
-      this.setState({
-        showInstancesInfoBar: true,
-      });
-    }
+    if (!this.state.showInstancesInfoBar)
+      this.editorMosaic.openEditor('instances-list', 'end', 75, 'row');
+    this.setState({
+      showInstancesInfoBar: !this.state.showInstancesInfoBar,
+    });
   };
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('layers-list', 'end', 75, 'row')) {
-      this.setState({
-        showLayersInfoBar: true,
-      });
-    }
+    if (!this.state.showLayersInfoBar)
+      this.editorMosaic.openEditor('layers-list', 'end', 75, 'row');
+    this.setState({
+      showLayersInfoBar: !this.state.showLayersInfoBar,
+    });
   };
 
   toggleWindowMask = () => {
@@ -952,6 +963,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       properties: {
         type: 'secondary',
         title: t`Properties`,
+        showComponent: this.state.showPropertiesInfoBar,
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
@@ -975,6 +987,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'layers-list': {
         type: 'secondary',
         title: t`Layers`,
+        showComponent: this.state.showLayersInfoBar,
         renderEditor: () => (
           <LayersList
             project={project}
@@ -995,6 +1008,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-list': {
         type: 'secondary',
         title: t`Instances list`,
+        showComponent: this.state.showInstancesInfoBar,
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}
@@ -1006,6 +1020,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-editor': {
         type: 'primary',
         noTitleBar: true,
+        showComponent: true,
         renderEditor: () => (
           <FullSizeInstancesEditorWithScrollbars
             project={project}
@@ -1052,6 +1067,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           </I18n>,
           <CloseButton key="close" />,
         ],
+        showComponent: this.state.showObjectsListInfoBar,
         renderEditor: () => (
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
@@ -1088,6 +1104,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': {
         type: 'secondary',
         title: t`Object Groups`,
+        showComponent: this.state.showObjectGroupsListInfoBar,
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}

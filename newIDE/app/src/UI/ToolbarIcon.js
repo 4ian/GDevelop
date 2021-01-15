@@ -24,7 +24,23 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
     disabled,
     onClick,
     onContextMenu,
+    showComponent,
   } = props;
+
+  let buttonStyle = {};
+  if (showComponent !== undefined) {
+    buttonStyle = showComponent
+      ? {
+          border: '5px solid #80BE1F',
+          backgroundColor: '#80BE1F',
+          marginRight: '5px',
+        }
+      : {
+          border: '5px solid #FF3232',
+          backgroundColor: '#FF3232',
+          marginRight: '5px',
+        };
+  }
 
   return (
     <ThemeConsumer>
@@ -37,6 +53,7 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
           tooltip={tooltip}
           acceleratorString={acceleratorString}
           ref={ref}
+          style={buttonStyle}
         >
           <img
             alt={tooltip}

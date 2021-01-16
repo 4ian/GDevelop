@@ -174,8 +174,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-  // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath);
+  // Copy all the dependencies and their source maps
+  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -811,7 +811,9 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    const std::vector<gd::String> &includesFiles, gd::String exportDir) {
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
+    bool exportSourceMaps) {
   for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
       // By convention, an include file that is relative is relative to
@@ -826,7 +828,7 @@ bool ExporterHelper::ExportIncludesAndLibs(
 
         gd::String sourceMap = source + ".map";
         // Copy source map if present
-        if (fs.FileExists(sourceMap)) {
+        if (exportSourceMaps && fs.FileExists(sourceMap)) {
           fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
         }
       } else {

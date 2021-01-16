@@ -194,10 +194,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         historyMaxSize: 50,
       }),
 
-      showObjectsListInfoBar: true,
+      showObjectsListInfoBar: false,
       showObjectGroupsListInfoBar: false,
       layoutVariablesDialogOpen: false,
-      showPropertiesInfoBar: true,
+      showPropertiesInfoBar: false,
       showLayersInfoBar: false,
       showInstancesInfoBar: false,
 
@@ -210,6 +210,64 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       selectedObjectTags: [],
     };
+  }
+
+  componentWillMount() {
+    //Get the window width
+    const windowWidth =
+      window.innerWidth < 750 || window.innerHeight < 350
+        ? 'small'
+        : window.innerWidth < 1150
+        ? 'medium'
+        : 'large';
+
+    //Get initial editor nodes based on window width and scene editor
+    const initialNodes =
+      windowWidth === 'small'
+        ? this.context.getDefaultEditorMosaicNode('scene-editor-small') ||
+          initialMosaicEditorNodesSmallWindow
+        : this.context.getDefaultEditorMosaicNode('scene-editor') ||
+          initialMosaicEditorNodes;
+
+    //converting the nodes of tree in array
+    let namesOfInitialNodes = [];
+    const getNodes = node => {
+      if (typeof node === 'string') {
+        namesOfInitialNodes.push(node);
+        return;
+      }
+
+      getNodes(node.first);
+      getNodes(node.second);
+    };
+
+    getNodes(initialNodes);
+    //creating the initial state from nodes in array
+    let finalState = {};
+    namesOfInitialNodes.forEach(editorName => {
+      switch (editorName) {
+        case 'objects-list':
+          finalState = { ...finalState, showObjectsListInfoBar: true };
+          break;
+        case 'properties':
+          finalState = { ...finalState, showPropertiesInfoBar: true };
+          break;
+        case 'object-groups-list':
+          finalState = { ...finalState, showObjectGroupsListInfoBar: true };
+          break;
+        case 'instances-list':
+          finalState = { ...finalState, showInstancesInfoBar: true };
+          break;
+        case 'layers-list':
+          finalState = { ...finalState, showLayersInfoBar: true };
+          break;
+        default:
+          break;
+      }
+    });
+
+    //setting the initial state
+    this.setState(finalState);
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -270,8 +328,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.state.showObjectsListInfoBar)
-      this.editorMosaic.openEditor('objects-list', 'end', 75, 'column');
+    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column'))
+      this.setState({ showObjectsListInfoBar: false });
     this.setState({
       showObjectsListInfoBar: !this.state.showObjectsListInfoBar,
     });
@@ -279,8 +337,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.state.showPropertiesInfoBar)
-      this.editorMosaic.openEditor('properties', 'start', 25, 'column');
+    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column'))
+      this.setState({ showPropertiesInfoBar: false });
     this.setState({
       showPropertiesInfoBar: !this.state.showPropertiesInfoBar,
     });
@@ -288,8 +346,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.state.showObjectGroupsListInfoBar)
-      this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
+    if (
+      !this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column')
+    )
+      this.setState({ showObjectGroupsListInfoBar: false });
     this.setState({
       showObjectGroupsListInfoBar: !this.state.showObjectGroupsListInfoBar,
     });
@@ -297,8 +357,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    if (!this.state.showInstancesInfoBar)
-      this.editorMosaic.openEditor('instances-list', 'end', 75, 'row');
+    if (!this.editorMosaic.openEditor('instances-list', 'end', 75, 'row'))
+      this.setState({ showInstancesInfoBar: false });
     this.setState({
       showInstancesInfoBar: !this.state.showInstancesInfoBar,
     });
@@ -306,8 +366,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (!this.state.showLayersInfoBar)
-      this.editorMosaic.openEditor('layers-list', 'end', 75, 'row');
+    if (!this.editorMosaic.openEditor('layers-list', 'end', 75, 'row'))
+      this.setState({ showLayersInfoBar: false });
     this.setState({
       showLayersInfoBar: !this.state.showLayersInfoBar,
     });
@@ -964,6 +1024,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Properties`,
         showComponent: this.state.showPropertiesInfoBar,
+        toolbarControls: [
+          <CloseButton
+            key="close"
+            closeActions={() => {
+              this.setState({ showPropertiesInfoBar: false });
+            }}
+          />,
+        ],
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
@@ -988,6 +1056,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Layers`,
         showComponent: this.state.showLayersInfoBar,
+        toolbarControls: [
+          <CloseButton
+            key="close"
+            closeActions={() => {
+              this.setState({ showLayersInfoBar: false });
+            }}
+          />,
+        ],
         renderEditor: () => (
           <LayersList
             project={project}
@@ -1009,6 +1085,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Instances list`,
         showComponent: this.state.showInstancesInfoBar,
+        toolbarControls: [
+          <CloseButton
+            key="close"
+            closeActions={() => {
+              this.setState({ showInstancesInfoBar: false });
+            }}
+          />,
+        ],
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}
@@ -1065,7 +1149,12 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
             )}
           </I18n>,
-          <CloseButton key="close" />,
+          <CloseButton
+            key="close"
+            closeActions={() => {
+              this.setState({ showObjectsListInfoBar: false });
+            }}
+          />,
         ],
         showComponent: this.state.showObjectsListInfoBar,
         renderEditor: () => (
@@ -1105,6 +1194,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Object Groups`,
         showComponent: this.state.showObjectGroupsListInfoBar,
+        toolbarControls: [
+          <CloseButton
+            key="close"
+            closeActions={() => {
+              this.setState({ showObjectGroupsListInfoBar: false });
+            }}
+          />,
+        ],
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}
@@ -1467,3 +1564,5 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   }
 }
+
+SceneEditor.contextType = PreferencesContext;

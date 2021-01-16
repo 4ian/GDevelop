@@ -24,6 +24,7 @@ export default class CloseButton extends Component {
             {({ mosaicWindowActions }) => (
               <IconButton
                 onClick={() => {
+                  if (this.props.closeActions) this.props.closeActions();
                   mosaicActions.remove(mosaicWindowActions.getPath());
                 }}
                 style={styles.container}

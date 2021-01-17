@@ -6,12 +6,12 @@ namespace gdjs {
     },
     update: function (filter, layer) {
       const radialBlurFilter = filter as PIXI.filters.RadialBlurFilter;
-      // @ts-ignore - extra properties are stored on the filter.
       radialBlurFilter.center[0] = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
         radialBlurFilter._centerX * layer.getWidth()
       );
-      // @ts-ignore - extra properties are stored on the filter.
       radialBlurFilter.center[1] = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
         radialBlurFilter._centerY * layer.getHeight()
       );
     },

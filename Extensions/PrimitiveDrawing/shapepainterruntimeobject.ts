@@ -297,13 +297,13 @@ namespace gdjs {
       );
     }
 
-    getFillColorR(): void {
+    getFillColorR(): integer {
       return gdjs.hexNumberToRGB(this._fillColor).r;
     }
-    getFillColorG(): void {
+    getFillColorG(): integer {
       return gdjs.hexNumberToRGB(this._fillColor).g;
     }
-    getFillColorB(): void {
+    getFillColorB(): integer {
       return gdjs.hexNumberToRGB(this._fillColor).b;
     }
 
@@ -323,13 +323,13 @@ namespace gdjs {
       this._renderer.updateOutline();
     }
 
-    getOutlineColorR(): void {
+    getOutlineColorR(): integer {
       return gdjs.hexNumberToRGB(this._outlineColor).r;
     }
-    getOutlineColorG(): void {
+    getOutlineColorG(): integer {
       return gdjs.hexNumberToRGB(this._outlineColor).g;
     }
-    getOutlineColorB(): void {
+    getOutlineColorB(): integer {
       return gdjs.hexNumberToRGB(this._outlineColor).b;
     }
 

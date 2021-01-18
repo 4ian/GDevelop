@@ -9,6 +9,7 @@ declare class libGDevelop {
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
+  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;

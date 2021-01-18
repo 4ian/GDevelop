@@ -208,30 +208,32 @@ export default class EventsFunctionParametersEditor extends React.Component<
     const parameters = eventsFunction.getParameters();
 
     if (eventsBasedBehavior) {
-      this.props.onMoveBehaviorEventsParameter(
-        eventsBasedBehavior,
-        eventsFunction,
-        oldIndex,
-        newIndex,
-        isDone => {
-          if (!isDone) return;
-          gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
-          this.forceUpdate();
-          this.props.onParametersUpdated();
-        }
-      );
+      if (this.props.onMoveBehaviorEventsParameter)
+        this.props.onMoveBehaviorEventsParameter(
+          eventsBasedBehavior,
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
     } else {
-      this.props.onMoveFreeEventsParameter(
-        eventsFunction,
-        oldIndex,
-        newIndex,
-        isDone => {
-          if (!isDone) return;
-          gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
-          this.forceUpdate();
-          this.props.onParametersUpdated();
-        }
-      );
+      if (this.props.onMoveFreeEventsParameter)
+        this.props.onMoveFreeEventsParameter(
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
     }
   };
 

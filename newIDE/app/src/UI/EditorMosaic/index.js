@@ -241,7 +241,10 @@ export default class EditorMosaic extends React.Component<Props, State> {
                 return null;
               }
 
-              if (!editor.showComponent) {
+              if (
+                typeof editor.showComponent === 'boolean' &&
+                !editor.showComponent
+              ) {
                 return (
                   <MosaicContext.Consumer>
                     {({ mosaicActions }) => {

@@ -48,17 +48,20 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
-    _potentialCollidingObjects: any;
-    _overlappedJumpThru: any;
+
+    /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
+    _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
+
+    /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
+    _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
+
     _oldHeight: float = 0;
 
-    //owner.getHeight(); //Be careful, object might not be initialized.
     _hasReallyMoved: boolean = false;
     _manager: any;
     _grabbedPlatformLastX: any;
     _grabbedPlatformLastY: any;
 
-    //Still on the same floor
     _floorLastX: any;
     _floorLastY: any;
     _releaseKey: any;
@@ -80,12 +83,9 @@ namespace gdjs {
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
-      this._potentialCollidingObjects = this._potentialCollidingObjects || [];
+      this._potentialCollidingObjects = [];
 
-      //Platforms near the object, updated with _updatePotentialCollidingObjects.
-      this._potentialCollidingObjects.length = 0;
-      this._overlappedJumpThru = this._overlappedJumpThru || [];
-      this._overlappedJumpThru.length = 0;
+      this._overlappedJumpThru = [];
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
       this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
@@ -391,7 +391,9 @@ namespace gdjs {
         if (tryGrabbingPlatform) {
           let oldY = object.getY();
           object.setY(
+            // @ts-ignore - collidingPlatform is guaranteed to be not null.
             collidingPlatform.owner.getY() +
+              // @ts-ignore - collidingPlatform is guaranteed to be not null.
               collidingPlatform.getYGrabOffset() -
               this._yGrabOffset
           );
@@ -618,6 +620,7 @@ namespace gdjs {
             this._ignoreTouchingEdges
           )
         ) {
+          //Still on the same floor
           this._floorLastX = this._floorPlatform.owner.getX();
           this._floorLastY = this._floorPlatform.owner.getY();
 
@@ -827,10 +830,11 @@ namespace gdjs {
           return platform;
         }
       }
+
+      //Nothing is being colliding with the behavior object.
       return null;
     }
 
-    //Nothing is being colliding with the behavior object.
     /**
      * Update _overlappedJumpThru member, so that it contains all the jumpthru platforms colliding with
      * the behavior owner object.
@@ -897,6 +901,17 @@ namespace gdjs {
         maxMovementLength,
         this._potentialCollidingObjects
       );
+
+      // Filter the potential colliding platforms to ensure that the object owning the behavior
+      // is not considered as colliding with itself, in the case that it also has the
+      // platform behavior.
+      for(let i = 0;i<this._potentialCollidingObjects.length;) {
+        if (this._potentialCollidingObjects[i].owner === this.owner) {
+          this._potentialCollidingObjects.splice(i, 1);
+        } else {
+          i++;
+        }
+      }
     }
 
     //This is the naive implementation when the platforms manager is simply containing a list

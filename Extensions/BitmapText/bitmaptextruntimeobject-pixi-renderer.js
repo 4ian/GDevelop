@@ -1,62 +1,4 @@
 /**
- * @constructor
- * @memberof gdjs
- * @class BitmapFontManager
- */
-gdjs.BitmapFontManager = {
-  _fontUsed: {},
-  _fontTobeUnloaded: [],
-};
-
-/**
- * When an object use an bitmapFont register the slug of the font and how many objects use it.
- * @param {string} name Slug of the bitmapFont
- */
-gdjs.BitmapFontManager.setFontUsed = function (name) {
-  gdjs.BitmapFontManager._fontUsed[name] = gdjs.BitmapFontManager._fontUsed[name] || { objectsUsingTheFont: 0 };
-  gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont++;
-
-  const fontCachePosition = gdjs.BitmapFontManager._fontTobeUnloaded.indexOf(name);
-  if (fontCachePosition !== -1) {
-    // The font is in the cache of unloaded font, because it was previously used and then marked as not used anymore.
-    // Remove it from the cache to avoid the font getting unloaded.
-    gdjs.BitmapFontManager._fontTobeUnloaded.splice(fontCachePosition, 1);
-  }
-};
-
-/**
- * When an bitmapText object is removed, decrease the count of objects related to the font in the manager.
- * When a font is not unused anymore, it goes in a temporary cache. The cache holds up to 10 fonts.
- * If the cache reaches its maximum capacity, the oldest font is unloaded from memory.
- * @param {string} name Slug of the bitmapFont
- */
-gdjs.BitmapFontManager.removeFontUsed = function (name) {
-  if (!gdjs.BitmapFontManager._fontUsed[name]) {
-    // We tried to remove font that was never marked as used.
-    console.error('BitmapFont with name ' + name + ' was tried to be removed but was never marked as used.');
-    return;
-  }
-
-  gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont--;
-
-  if (gdjs.BitmapFontManager._fontUsed[name].objectsUsingTheFont <= 0) {
-    delete gdjs.BitmapFontManager._fontUsed[name];
-
-    // Add the font name at the last position of the cache.
-    if (!gdjs.BitmapFontManager._fontTobeUnloaded.includes(name))
-      gdjs.BitmapFontManager._fontTobeUnloaded.push(name);
-
-    if (gdjs.BitmapFontManager._fontTobeUnloaded.length > 10) {
-      // Remove the first font (i.e: the oldest one)
-      const oldestUnloadedFont = gdjs.BitmapFontManager._fontTobeUnloaded.shift();
-      PIXI.BitmapFont.uninstall(oldestUnloadedFont);
-      console.log('Uninstall bitmapFont: ' + oldestUnloadedFont);
-    }
-
-  }
-};
-
-/**
  * The PIXI.js renderer for the Bitmap Text runtime object.
  *
  * @class BitmapTextRuntimeObjectPixiRenderer
@@ -72,23 +14,58 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
 
   // Set up the object to track the font we're using.
   this._bitmapFontStyle = new PIXI.TextStyle();
-  this._bitmapFontStyle.fontFamily = runtimeScene
-    .getGame()
-    .getFontManager()
-    .getFontFamily(runtimeObject._bitmapFontResourceName);
+  this._bitmapFontStyle.fontFamily = 'Arial';
   this._bitmapFontStyle.fontSize = runtimeObject._fontSize;
-  this._bitmapFontStyle.specialChars = runtimeObject._specialChars;
+  this._bitmapFontStyle.align = runtimeObject._align;
+  this._bitmapFontStyle.wordWrap = runtimeObject._wordWrap;
   this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
     runtimeObject._fontColor[0],
     runtimeObject._fontColor[1],
     runtimeObject._fontColor[2]
   );
 
+  const defaultSlugFontName =
+    this._bitmapFontStyle.fontFamily +
+    '-' +
+    this._bitmapFontStyle.fontSize +
+    '-' +
+    this._bitmapFontStyle.fill +
+    '-bitmapFont';
+  this._bitmapFontStyle.fontName = defaultSlugFontName;
+
   // Load (or reset) the text
   if (this._pixiObject === undefined) {
-    this._pixiObject = new PIXI.BitmapText('BitmapText object', {
-      fontName: this._ensureFontAvailableAndGetFontName(),
+    //Generate default bitmap font
+    PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
+      chars: [
+        [' ', '~'], // All the printable ASCII characters
+      ],
     });
+
+    this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
+      fontName: defaultSlugFontName,
+    });
+
+    let bitmapFontResourceName = runtimeObject._bitmapFontFile;
+    let bitmapTextureResourceName = runtimeObject._bitmapTextureFile;
+
+    let texture = runtimeScene
+      .getGame()
+      .getImageManager()
+      .getPIXITexture(bitmapTextureResourceName);
+
+    // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
+    runtimeScene
+      .getGame()
+      .getBitmapFontManager()
+      .loadBitmapFont(bitmapFontResourceName, texture)
+      .then((fontName) => {
+        this._pixiObject.fontName = fontName;
+        this.updatePosition();
+      })
+      .catch((error) => {
+        console.error('Error while loading a bitmapFont resource:', error);
+      });
   } else {
     this.updateFont();
     this.updateFontSize();
@@ -132,18 +109,15 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
     this._bitmapFontStyle.fontSize +
     '-' +
     this._bitmapFontStyle.fill +
-    '-' +
-    this._bitmapFontStyle.specialChars +
     '-bitmapFont';
 
   // Load the font if it's not available yet.
   if (!PIXI.BitmapFont.available[slugFontName]) {
     console.info('Generating font "' + slugFontName + '" for BitmapText.');
     PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-        chars: [
-          [' ', '~'], // All the printable ASCII characters
-          this._bitmapFontStyle.specialChars
-        ],
+      chars: [
+        [' ', '~'], // All the printable ASCII characters
+      ],
     });
   }
 
@@ -160,26 +134,29 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFon
   return slugFontName;
 };
 
-gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateColor = function () {
-  this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
-    this._object._fontColor[0],
-    this._object._fontColor[1],
-    this._object._fontColor[2]
-  );
-  this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
-    this._pixiObject.fontName
-  );
-};
-
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
-  this._bitmapFontStyle.specialChars = this._object._specialChars;
-  this._bitmapFontStyle.fontFamily = this._object._runtimeScene
+  let bitmapFontResourceName = this._object._bitmapFontFile;
+  let bitmapTextureResourceName = this._object._bitmapTextureFile;
+
+  // Get the texture used in the bitmap font
+  let texture = this._object._runtimeScene
     .getGame()
-    .getFontManager()
-    .getFontFamily(this._object._bitmapFontResourceName);
-  this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
-    this._pixiObject.fontName
-  );
+    .getImageManager()
+    .getPIXITexture(bitmapTextureResourceName);
+
+  // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
+  this._object._runtimeScene
+    .getGame()
+    .getBitmapFontManager()
+    .loadBitmapFont(bitmapFontResourceName, texture)
+    .then((fontName) => {
+      this._pixiObject.fontName = fontName;
+    })
+    .catch((error) => {
+      console.error('Error while loading a bitmapFont resource:', error);
+    });
+
+  this.updatePosition();
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function () {
@@ -206,6 +183,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTextContent = function 
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function () {
   this._pixiObject.align = this._object._align;
+  this.updatePosition();
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updatePosition = function () {

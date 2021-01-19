@@ -52,7 +52,7 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v0.3.3",
-    "pixi.js-legacy": "5.3.3",
+    "pixi.js-legacy": "5.3.7",
     "prop-types": "^15.5.10",
     "randomcolor": "^0.5.3",
     "raven-js": "^3.19.1",

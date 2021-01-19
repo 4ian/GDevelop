@@ -623,6 +623,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
+  InsertUnique(includesFiles, "bitmapfontmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");

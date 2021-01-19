@@ -4,6 +4,7 @@ declare class gdResourcesInUseHelper extends gdArbitraryResourceWorker {
   getAllImages(): gdSetString;
   getAllAudios(): gdSetString;
   getAllFonts(): gdSetString;
+  getAllBitmapFonts(): gdSetString;
   getAll(resourceType: string): gdSetString;
   delete(): void;
   ptr: number;

@@ -114,7 +114,8 @@ module.exports = {
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text: 'This is a text displayed with a Bitmap Text object.',
+        text:
+          'This text use the default bitmap font,\nadd your files in the object properties.',
         opacity: 255,
         fontSize: 20,
         fontColor: '#000000',
@@ -349,7 +350,7 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('font', _('Font resource'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setBitmapFontResourceName');
+      .setFunctionName('setFont');
 
     object
       .addAction(
@@ -474,35 +475,46 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      // Set up and load a default font. It will then be replaced by another
-      // font (see `update` method) so we go ahead with some defaults:
-      this._bitmapFontStyle = new PIXI.TextStyle();
+      text: 'This text use the default bitmap font,\nadd your files in the object properties.',
+        // Set up a and generate a default bitmap font
+        // It will then be replaced with the bitmap font setup by the user (see `update` method)
+
+        // Define same as  bitmapTextObject.setRawJSONContent() on top of this file
+        (this._bitmapFontStyle = new PIXI.TextStyle());
       this._bitmapFontStyle.fontFamily = 'Arial';
-      this._bitmapFontStyle.fontName = '';
       this._bitmapFontStyle.fontSize = 20;
-      this._bitmapFontStyle.wordWrap = false;
-      this._bitmapFontStyle.fill = '#ffffff';
+      this._bitmapFontStyle.align = 'left';
+      this._bitmapFontStyle.wordWrap = true;
+      this._bitmapFontStyle.fill = '#000000';
+
+      const defaultSlugFontName =
+        this._bitmapFontStyle.fontFamily +
+        '-' +
+        this._bitmapFontStyle.fontSize +
+        '-' +
+        this._bitmapFontStyle.fill +
+        '-bitmapFont';
+      this._bitmapFontStyle.fontName = defaultSlugFontName;
+
+      //Generate default bitmap font
+      PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
+        chars: [
+          [' ', '~'], // All the printable ASCII characters
+        ],
+      });
+
+      this._defaultFont = true;
 
       // We'll track changes of the font to trigger the loading of the new font.
       this._currentBitmapFontFile = '';
       this._currentBitmapTextureFile = '';
 
-     // this._pixiObject = new PIXI.BitmapText('',this._bitmapFontStyle);
-
-      this._ensureFontAvailableAndGetFontName().then(
-        (fontName) => {
-          this._bitmapFontStyle.fontName = fontName;
-        },
-        (error) => {
-          console.warn(
-            'There was an issue loading the bitmap font for a BitmapText object, instead a bitmap font was generated with Arial font.' + error
-          );
+      this._pixiObject = new PIXI.BitmapText(
+        'Text placeholder, default Arial font used',
+        {
+          fontName: this._bitmapFontStyle.fontName,
         }
       );
-
-      this._pixiObject = new PIXI.BitmapText('BitmapText initialization...', {
-        fontName: this._bitmapFontStyle.fontName,
-      });
 
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
@@ -567,19 +579,12 @@ module.exports = {
           const bitmapFont = PIXI.BitmapFont.install(fontData, texture);
           return bitmapFont.font;
         } catch (err) {
-          console.error('Unable to load a bitmap font data: ', err);
-          console.info(
-            'Generating font "' + slugFontName + '" for BitmapText.'
-          );
-
-          PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-            chars: [
-              [' ', '~'], // All the printable ASCII characters
-            ],
-          });
-
-          return slugFontName;
+          console.error('Unable to load the bitmap font: ', error);
         }
+      } else {
+        console.error(
+          'The bitmap font: ' + slugFontName + ', has already been generated.'
+        );
       }
 
       // TODO: find a way to unload the BitmapFont that are not used anymore, otherwise
@@ -587,9 +592,7 @@ module.exports = {
       // plays with the color/size.
     };
 
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
+    // This is called to update the PIXI object on the scene editor
     RenderedBitmapTextInstance.prototype.update = function () {
       const properties = this._associatedObject.getProperties();
 
@@ -598,49 +601,54 @@ module.exports = {
       const rawText = properties.get('text').getValue();
       this._pixiObject.text = rawText;
 
+      if (this._defaultFont) {
+        this._pixiObject.text =
+          'This text use the default bitmap font,\nadd your files in the object properties.';
+      }
+
       const opacity = properties.get('opacity').getValue();
       this._pixiObject.alpha = opacity / 255;
 
       const align = properties.get('align').getValue();
       this._pixiObject.align = align;
 
-      // The next properties implies that a new font texture will be generated
-      // when they change.
       const fontColor = properties.get('fontColor').getValue();
       this._bitmapFontStyle.fill = fontColor;
 
       const fontSize = Number(properties.get('fontSize').getValue()) || 1;
       this._bitmapFontStyle.fontSize = fontSize;
-      this._pixiObject.fontSize = fontSize; // We also need to update the BitmapText fontSize
+      this._pixiObject.fontSize = fontSize;
 
       // Track the changes in font to load the new requested font.
       const bitmapFontFile = properties.get('bitmapFontFile').getValue();
-      if (this._currentBitmapFontFile !== bitmapFontFile) {
+      const bitmapTextureFile = properties.get('bitmapTextureFile').getValue();
+
+      if (
+        this._currentBitmapFontFile !== bitmapFontFile ||
+        this._currentBitmapTextureFile !== bitmapTextureFile
+      ) {
         this._currentBitmapFontFile = bitmapFontFile;
+        this._currentBitmapTextureFile = bitmapTextureFile;
+
+        this._texture = this._pixiResourcesLoader.getPIXITexture(
+          this._project,
+          bitmapTextureFile
+        );
 
         this._pixiResourcesLoader
           .getResourceBitmapFont(this._project, bitmapFontFile)
-          .then((fontFamily) => {
-            // Once the font is loaded, we can use the given fontFamily.
-            this._bitmapFontStyle.fontFamily = fontFamily;
+          .then((fontData) => {
+            const bitmapFont = PIXI.BitmapFont.install(fontData, this._texture);
 
-            // Next update will pick up the fontFamily change and update the text.
+            //this._bitmapFontStyle.font = bitmapFont.font;
+            this._pixiObject.fontName = bitmapFont.font;
+            this._pixiObject.dirty = true;
+            this._defaultFont = false;
           })
           .catch((err) => {
-            // Ignore errors
-            console.warn(
-              'Unable to load font family for RenderedBitmapTextInstance',
-              err
-            );
+            console.warn('Unable to load font data', err);
+            this._defaultFont = true;
           });
-      }
-
-
-      const bitmapTextureResourceName = properties.get('bitmapTextureFile').getValue();
-      const texture = this._pixiResourcesLoader.getPIXITexture(this._project, bitmapTextureResourceName);
-
-      if (this._currentBitmapTexture !== texture) {
-        this._currentBitmapTexture = texture;
       }
 
       // Set up the wrapping width if enabled.
@@ -652,19 +660,6 @@ module.exports = {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
-
-      // Assign the font name (that will change if fontFamily, fontSize or color were
-      // changed).
-      this._ensureFontAvailableAndGetFontName().then(
-        (fontName) => {
-          this._pixiObject.fontName = fontName;
-        },
-        () => {
-          console.warn(
-            'There was an issue loading the bitmap font for a BitmapText object, instead a bitmap font was generated with Arial font.'
-          );
-        }
-      );
 
       // Note: use `textWidth` as `width` seems unreliable.
       this._pixiObject.position.x =

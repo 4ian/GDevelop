@@ -241,9 +241,12 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-
     if (!fullUrl) {
-      return Promise.resolve('Arial');
+      return Promise.reject(
+        new Error(
+          `The resource called ${resourceName} was no found.`
+        )
+      );
     }
 
     return axios.get(fullUrl).then(response => response.data);

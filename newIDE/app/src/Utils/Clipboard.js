@@ -27,7 +27,8 @@ export class SafeExtractor {
     anything: any,
     propertyName: string
   ): number | null {
-    if (typeof anything !== 'object') return null;
+    const object = this.extractObject(anything);
+    if (!object) return null;
 
     const property = anything[propertyName];
 
@@ -40,7 +41,8 @@ export class SafeExtractor {
     anything: any,
     propertyName: string
   ): string | null {
-    if (typeof anything !== 'object') return null;
+    const object = this.extractObject(anything);
+    if (!object) return null;
 
     const property = anything[propertyName];
 
@@ -53,28 +55,46 @@ export class SafeExtractor {
     anything: any,
     propertyName: string
   ): Object | null {
-    if (typeof anything !== 'object') return null;
+    const object = this.extractObject(anything);
+    if (!object) return null;
 
     const property = anything[propertyName];
 
-    if (typeof property !== 'object' || Array.isArray(property)) return null;
-
-    return property;
+    return this.extractObject(property);
   }
 
   static extractArrayProperty(
     anything: any,
     propertyName: string
   ): Array<any> | null {
-    if (typeof anything !== 'object') return null;
+    const object = this.extractObject(anything);
+    if (!object) return null;
 
     const property = anything[propertyName];
 
     return this.extractArray(property);
   }
 
+  static extractObject(anything: any): Object | null {
+    if (
+      anything === null ||
+      anything === undefined ||
+      typeof anything !== 'object' ||
+      Array.isArray(anything)
+    )
+      return null;
+
+    return anything;
+  }
+
   static extractArray(anything: any): Array<any> | null {
-    if (typeof anything !== 'object' || !Array.isArray(anything)) return null;
+    if (
+      anything === null ||
+      anything === undefined ||
+      typeof anything !== 'object' ||
+      !Array.isArray(anything)
+    )
+      return null;
 
     return anything;
   }

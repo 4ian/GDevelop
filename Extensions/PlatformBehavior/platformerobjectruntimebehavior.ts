@@ -905,7 +905,7 @@ namespace gdjs {
       // Filter the potential colliding platforms to ensure that the object owning the behavior
       // is not considered as colliding with itself, in the case that it also has the
       // platform behavior.
-      for(let i = 0;i<this._potentialCollidingObjects.length;) {
+      for (let i = 0; i < this._potentialCollidingObjects.length; ) {
         if (this._potentialCollidingObjects[i].owner === this.owner) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {

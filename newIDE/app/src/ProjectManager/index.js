@@ -1196,6 +1196,9 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ExtensionsSearchDialog
             project={project}
             onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
+            onCloseEventsFunctionsExtensionTab={
+              this.props.onCloseEventsFunctionsExtensionTab
+            }
           />
         )}
       </div>

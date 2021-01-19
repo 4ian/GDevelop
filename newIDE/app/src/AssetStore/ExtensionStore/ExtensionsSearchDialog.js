@@ -19,7 +19,11 @@ type Props = {|
 /**
  * Allows to browse and install events based extensions.
  */
-export default function ExtensionsSearchDialog({ project, onClose }: Props) {
+export default function ExtensionsSearchDialog({
+  project,
+  onClose,
+  onCloseEventsFunctionsExtensionTab,
+}: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -88,6 +92,9 @@ export default function ExtensionsSearchDialog({ project, onClose }: Props) {
             }}
             project={project}
             showOnlyWithBehaviors={false}
+            onCloseEventsFunctionsExtensionTab={
+              onCloseEventsFunctionsExtensionTab
+            }
           />
           <InfoBar
             identifier="extension-installed-explanation"

@@ -811,6 +811,18 @@ const MainFrame = (props: Props) => {
     _onProjectItemModified();
   };
 
+  const closeEventsFunctionsExtensionTab = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension
+  ) => {
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsFunctionsExtensionTabs(
+        state.editorTabs,
+        eventsFunctionsExtension
+      ),
+    }));
+  };
+
   const deleteLayout = (layout: gdLayout) => {
     const { i18n } = props;
     if (!state.currentProject) return;
@@ -1973,6 +1985,9 @@ const MainFrame = (props: Props) => {
             onAddExternalLayout={addExternalLayout}
             onAddEventsFunctionsExtension={addEventsFunctionsExtension}
             onAddExternalEvents={addExternalEvents}
+            onCloseEventsFunctionsExtensionTab={
+              closeEventsFunctionsExtensionTab
+            }
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
             onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

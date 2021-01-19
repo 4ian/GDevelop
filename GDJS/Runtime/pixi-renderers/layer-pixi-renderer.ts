@@ -9,10 +9,12 @@ namespace gdjs {
    */
   export class LayerPixiRenderer {
     _pixiContainer: any;
+    _normalMapsContainer: PIXI.Container;
 
     _filters: { [key: string]: gdjs.PixiFiltersTools.Filter } = {};
     _layer: any;
     _renderTexture: PIXI.RenderTexture | null = null;
+    _normalsRenderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: any;
     _pixiRenderer: PIXI.Renderer;
@@ -32,6 +34,8 @@ namespace gdjs {
       runtimeSceneRenderer: gdjs.RuntimeScenePixiRenderer
     ) {
       this._pixiContainer = new PIXI.Container();
+      this._normalMapsContainer = new PIXI.Container();
+      this._normalMapsContainer.renderable = false;
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeSceneRenderer;
       this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
@@ -46,6 +50,10 @@ namespace gdjs {
 
     getRendererObject() {
       return this._pixiContainer;
+    }
+
+    getNormalsRendererObject() {
+      return this._normalMapsContainer;
     }
 
     getLightingSprite() {
@@ -143,24 +151,33 @@ namespace gdjs {
     }
 
     /**
-     * Add a child to the pixi container associated to the layer.
+     * Add a child to the pixi container associated to the layer in a container.
      * All objects which are on this layer must be children of this container.
      *
+     * @param container The pixi container
      * @param child The child (PIXI object) to be added.
      * @param zOrder The z order of the associated object.
      */
-    addRendererObject(child, zOrder) {
+    private _addRendererObject(container, child, zOrder) {
       child.zOrder = zOrder;
 
       //Extend the pixi object with a z order.
-      for (let i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
-        if (this._pixiContainer.children[i].zOrder >= zOrder) {
+      for (let i = 0, len = container.children.length; i < len; ++i) {
+        if (container.children[i].zOrder >= zOrder) {
           //TODO : Dichotomic search
-          this._pixiContainer.addChildAt(child, i);
+          container.addChildAt(child, i);
           return;
         }
       }
-      this._pixiContainer.addChild(child);
+      container.addChild(child);
+    }
+
+    addRendererObject(child, zOrder) {
+      this._addRendererObject(this._pixiContainer, child, zOrder);
+    }
+
+    addNormalMapRendererObject(child, zOrder) {
+      this._addRendererObject(this._normalMapsContainer, child, zOrder);
     }
 
     /**
@@ -182,6 +199,16 @@ namespace gdjs {
      */
     removeRendererObject(child) {
       this._pixiContainer.removeChild(child);
+    }
+
+    /**
+     * Remove a child from the internal pixi container of normal maps.
+     * Should be called when an object is deleted or removed from the layer.
+     *
+     * @param child The child (PIXI object) to be removed.
+     */
+    removeNormalRendererObject(child) {
+      this._normalMapsContainer.removeChild(child);
     }
 
     /**
@@ -282,7 +309,7 @@ namespace gdjs {
      * Updates the render texture, if it exists.
      * Also, render texture is cleared with a specified clear color.
      */
-    _updateRenderTexture() {
+    private _updateRenderTexture() {
       if (
         !this._pixiRenderer ||
         this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL

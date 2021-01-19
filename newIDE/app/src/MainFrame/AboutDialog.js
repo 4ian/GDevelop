@@ -91,6 +91,11 @@ const contributors = [
     description: 'Contributions to GDevelop and Moderation on the Forum',
     link: 'https://forum.gdevelop-app.com/u/arthuro555/summary',
   },
+  {
+    name: 'The Gem Dev',
+    description: 'Contributions to GDevelop and tutorials on Youtube',
+    link: 'https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q',
+  },
 
   // Community members:
   {

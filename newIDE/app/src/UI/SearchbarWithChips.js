@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import Chip from '@material-ui/core/Chip';
 import { Column, Line } from '../UI/Grid';
 import randomColor from 'randomcolor';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 
 type Props = {|
   value: string,
@@ -36,7 +36,8 @@ export default class SearchbarWithChips extends Component<Props> {
   _searchBar: ?SearchBar;
 
   componentDidMount() {
-    if (this._searchBar) this._searchBar.focus();
+    if (useShouldAutofocusSearchbar() && this._searchBar)
+      this._searchBar.focus();
   }
 
   render() {

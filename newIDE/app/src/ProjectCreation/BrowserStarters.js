@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { List, ListItem } from '../UI/List';
+import Subheader from '../UI/Subheader';
 import RaisedButton from '../UI/RaisedButton';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -109,29 +110,6 @@ export default class BrowserStarters extends Component<Props> {
                 leftIcon={
                   <ListIcon
                     iconSize={40}
-                    src="res/starters_icons/particle-effects-demo.png"
-                  />
-                }
-                primaryText={<Trans>Particle Effects Demo</Trans>}
-                secondaryText={
-                  <Trans>
-                    A demo of various high quality particle effects (fire,
-                    magic, snow, rune spell...) that you can try and use in your
-                    game.
-                  </Trans>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('particle-effects-demo');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://particle-effects-demo',
-                  });
-                }}
-              />
-              <ListItem
-                leftIcon={
-                  <ListIcon
-                    iconSize={40}
                     src="res/starters_icons/isometric-game.png"
                   />
                 }
@@ -193,6 +171,9 @@ export default class BrowserStarters extends Component<Props> {
                 }}
               />
               <ListItem
+                leftIcon={
+                  <ListIcon iconSize={40} src="res/starters_icons/new.png" />
+                }
                 primaryText={<Trans>Empty game</Trans>}
                 secondaryText={<Trans>Start a new game from scratch.</Trans>}
                 secondaryTextLines={2}
@@ -201,6 +182,55 @@ export default class BrowserStarters extends Component<Props> {
 
                   const project = gd.ProjectHelper.createNewGDJSProject();
                   this.props.onCreate(project, null, null);
+                }}
+              />
+              <Subheader>
+                <Trans>Advanced</Trans>
+              </Subheader>
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
+                    src="res/starters_icons/particle-effects-demo.png"
+                  />
+                }
+                primaryText={<Trans>Particle Effects Demo</Trans>}
+                secondaryText={
+                  <Trans>
+                    A demo of various high quality particle effects (fire,
+                    magic, snow, rune spell...) that you can try and use in your
+                    game.
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('particle-effects-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://particle-effects-demo',
+                  });
+                }}
+              />
+              <ListItem
+                leftIcon={
+                  <ListIcon
+                    iconSize={40}
+                    src="res/starters_icons/game-feel-demo.png"
+                  />
+                }
+                primaryText={<Trans>Game Feel Demo</Trans>}
+                secondaryText={
+                  <Trans>
+                    A demo showing how to enhance the "game feel" of your
+                    project: VFX, shot trail, ambient sounds and SFX,
+                    screenshake, wobble...
+                  </Trans>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('game-feel-demo');
+                  this.props.onOpen(InternalFileStorageProvider, {
+                    fileIdentifier: 'example://game-feel-demo',
+                  });
                 }}
               />
             </List>

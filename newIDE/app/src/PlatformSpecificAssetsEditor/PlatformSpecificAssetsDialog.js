@@ -40,6 +40,7 @@ type State = {|
 const desktopSizes = [512];
 const androidSizes = [192, 144, 96, 72, 48, 36];
 const iosSizes = [
+  1024,
   180,
   167,
   152,
@@ -47,6 +48,7 @@ const iosSizes = [
   120,
   114,
   100,
+  87,
   80,
   76,
   72,
@@ -56,6 +58,7 @@ const iosSizes = [
   50,
   40,
   29,
+  20,
 ];
 
 export default class PlatformSpecificAssetsDialog extends React.Component<
@@ -142,7 +145,12 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         ),
       ]).then(results => {
         if (results.indexOf(false) !== -1) {
-          showErrorBox('Some icons could not be generated!');
+          showErrorBox({
+            message: 'Some icons could not be generated!',
+            rawError: undefined,
+            errorId: 'icon-generation-error',
+            doNotReport: true,
+          });
           return;
         }
 

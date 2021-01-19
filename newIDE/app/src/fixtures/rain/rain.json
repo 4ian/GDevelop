@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\rain\\game.json",
+    "projectUuid": "12957a31-b672-43be-addc-069a6ec11153",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "inRain",
     "author": "CROSS",
     "windowWidth": 1024,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -201,7 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_1",
-          "persistentUuid": "6858c352-be24-4b44-82ae-edbb39f33c04",
+          "persistentUuid": "069fe5e9-a185-4d65-9e8c-377a44d25035",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -222,7 +219,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_2",
-          "persistentUuid": "29fa6281-9969-47fa-9a4e-e0ffcdbd12d5",
+          "persistentUuid": "0a791976-40db-498f-ae9d-d4912002722f",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -243,7 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "nuages_3",
-          "persistentUuid": "c5dedca6-c5d1-4895-9d37-9e0cee0068ad",
+          "persistentUuid": "e68da987-2c0f-4d04-819c-2f4d0db9e900",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -264,7 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "logo_inrain",
-          "persistentUuid": "c8a173ce-f8da-4531-9e9f-5f25027b9b34",
+          "persistentUuid": "16f98d7f-a61e-426a-beaf-38a75756696e",
           "width": 0,
           "x": 906,
           "y": 666,
@@ -840,6 +837,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

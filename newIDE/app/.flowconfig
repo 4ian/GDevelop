@@ -2,14 +2,17 @@
 <PROJECT_ROOT>/resources/.*
 <PROJECT_ROOT>/node_modules/protobufjs/src/bower.json
 <PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Cocos2d/project.json
+<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime-sources/.*
 
 [declarations]
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
+# JSS triggers a Flow error
+<PROJECT_ROOT>/node_modules/jss/src/index.js
 # Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
 # as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
 # game engine and extensions are annotated with TypeScript annotations, not Flow.
-<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Extensions
+<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only
 
 [include]
 # Type check the declarations of the JavaScript extensions (i.e: JsExtension.js files) with Flow
@@ -23,3 +26,5 @@
 module.ignore_non_literal_requires=true
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
+# For node_modules/jss/src/Jss.js:
+suppress_comment=\\(.\\|\n\\)*\\$FlowIgnore

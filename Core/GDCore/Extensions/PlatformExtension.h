@@ -10,11 +10,14 @@
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
-#include "GDCore/Extensions/Metadata/EffectMetadata.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
 
@@ -25,6 +28,7 @@ class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
 class EffectMetadata;
+class DependencyMetadata;
 class BaseEvent;
 class EventMetadata;
 class EventCodeGenerator;
@@ -88,7 +92,15 @@ class GD_CORE_API PlatformExtension {
                                              const gd::String& license_);
 
   /**
-   * \brief Set the path to the help, relative to the wiki/documentation root.
+   * \brief Set the URL of the extension icon.
+   */
+  PlatformExtension& SetIconUrl(const gd::String& iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the path to the help, relative to the GDevelop documentation root.
    * For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
    *
@@ -147,6 +159,8 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& description_,
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
+
+  gd::DependencyMetadata& AddDependency();
 
   /**
    * \brief Declare a new object as being part of the extension.
@@ -225,6 +239,15 @@ class GD_CORE_API PlatformExtension {
                               const gd::String& smallicon_,
                               std::shared_ptr<gd::BaseEvent> instance);
 
+#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Adds a property to the extension.
+   */
+  gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
+    return extensionPropertiesMetadata[name];
+  };
+#endif
+
   /**
    * \brief Return the name extension user friendly name.
    */
@@ -252,9 +275,15 @@ class GD_CORE_API PlatformExtension {
 
   /**
    * \brief Return the help path of extension, relative to the
-   * wiki/documentation root.
+   * GDevelop documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
+
+  /**
+   * \brief Return the URL to the icon to be displayed for this
+   * extension.
+   */
+  const gd::String& GetIconUrl() const { return iconUrl; }
 
   /**
    * \brief Check if the extension is flagged as being deprecated.
@@ -366,6 +395,12 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions();
 
   /**
+   * \brief Return a reference to a vector containing the metadata of all the
+   * dependencies of the extension.
+   */
+  std::vector<gd::DependencyMetadata>& GetAllDependencies();
+
+  /**
    * \brief Return a reference to a map containing the names of the actions,
    * related to the object type, and the metadata associated with.
    */
@@ -437,6 +472,13 @@ class GD_CORE_API PlatformExtension {
    * generator.
    */
   void StripUnimplementedInstructionsAndExpressions();
+
+  /**
+   * \brief Get all the properties of the extension
+   */
+  std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
+    return extensionPropertiesMetadata;
+  }
 #endif
 
   /**
@@ -463,14 +505,15 @@ class GD_CORE_API PlatformExtension {
       nameSpace;  ///< Automatically set from the name of the extension, and
                   ///< added to every
                   ///< actions/conditions/expressions/objects/behavior/event.
-  gd::String fullname;      ///< Name displayed to users at edittime
-  gd::String informations;  ///< Description displayed to users at edittime
-  gd::String author;        ///< Author displayed to users at edittime
-  gd::String license;       ///< License name displayed to users at edittime
+  gd::String fullname;      ///< Name displayed to users in the editor.
+  gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String author;        ///< Author displayed to users in the editor.
+  gd::String license;       ///< License name displayed to users in the editor.
   bool deprecated;  ///< true if the extension is deprecated and shouldn't be
                     ///< shown in IDE.
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
+  gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;
@@ -480,7 +523,9 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
+  std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
 #endif
 
   ObjectMetadata badObjectMetadata;

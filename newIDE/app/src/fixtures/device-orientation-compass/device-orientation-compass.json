@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/GD/newIDE/app/resources/examples/device-orientation-compass/device-orientation-compass.json",
+    "projectUuid": "f15ba2cc-a78b-4c40-99f1-0c4ae6f4e7a1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -162,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "compass",
-          "persistentUuid": "d4c2072a-a764-441e-8236-ec852f435364",
+          "persistentUuid": "32aa2304-9e98-4f34-99d8-ec93dea69378",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -178,7 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "needle",
-          "persistentUuid": "f40fa3b3-545b-404e-9df5-453a5d71f9e2",
+          "persistentUuid": "4d3da07a-16bc-4644-80ed-4924ad45a5d0",
           "width": 0,
           "x": 16,
           "y": 0,
@@ -336,6 +333,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

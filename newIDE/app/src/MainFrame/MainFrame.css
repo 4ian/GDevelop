@@ -1,9 +1,12 @@
 html {
   /* Disable browser zooming/auto panning */
   touch-action: none;
-  
+
   /* Prevent larger texts in landscape mode on Safari iOS */
   -webkit-text-size-adjust: 100%;
+
+  /* Prevent callout when long pressing images by default on Safari iOS */
+  -webkit-touch-callout: none;
 }
 
 #root {
@@ -19,8 +22,30 @@ html {
   flex-direction: column;
   max-width: 100%;
 
+  /* Support portrait and landscape right only */
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+
   /* Smoother startup */
   animation: fadein 0.5s;
+}
+
+/* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */
+.safe-area-aware-container {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Add top margin to fit on screen, useful for drawers on non square screens ("notch"). */
+.safe-area-aware-top-margin {
+  margin-top: env(safe-area-inset-top);
+}
+
+/* Add left padding to fit on screen, useful for drawers on non square screens ("notch"). */
+.safe-area-aware-left-container {
+  padding-left: env(safe-area-inset-left);
 }
 
 @keyframes fadein {

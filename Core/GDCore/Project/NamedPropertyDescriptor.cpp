@@ -23,4 +23,14 @@ void NamedPropertyDescriptor::UnserializeFrom(
   name = element.GetChild("name").GetStringValue();
 }
 
+void NamedPropertyDescriptor::SerializeValuesTo(SerializerElement& element) const {
+  PropertyDescriptor::SerializeValuesTo(element);
+  element.AddChild("name").SetStringValue(name);
+}
+
+void NamedPropertyDescriptor::UnserializeValuesFrom(const SerializerElement& element) {
+  PropertyDescriptor::UnserializeValuesFrom(element);
+  name = element.GetChild("name").GetStringValue();
+}
+
 }  // namespace gd

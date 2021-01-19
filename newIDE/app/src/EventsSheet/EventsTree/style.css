@@ -16,6 +16,16 @@
     border-radius: 0;
 }
 
+@media only screen and (max-width: 750px) {
+    /**
+     * Slightly reduce the size of the handle on small screens
+     * and phones (where drag'n'drop is not supported anyway).
+     */
+    .gd-events-sheet .rst__moveHandle {
+        width: 4px;
+    }
+}
+
 .gd-events-sheet .events-tree {
     height: 100%;
 }
@@ -154,8 +164,12 @@
 }
 
 /**
- * Container having an icon next to the associated name
+ * Container having an icon next to the associated name.
+ * No rules to be set, we used to have a nowrap but it creates issues
+ * with overflowing long object/variable names (that can contain expressions).
  */
+/*
 .gd-events-sheet .name-and-icon-container {
     white-space: nowrap;
 }
+*/

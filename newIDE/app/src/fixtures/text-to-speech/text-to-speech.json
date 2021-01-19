@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\text-to-speech\\text-to-speech.json",
+    "projectUuid": "6174379f-e73b-433d-877c-1a65c359b7e0",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,7 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
-          "persistentUuid": "b3e1671d-78f9-47ce-a99a-3bff3c9026fc",
+          "persistentUuid": "f3e1c653-2755-4eae-bf43-151004474f6b",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -159,7 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
-          "persistentUuid": "dc6af947-f5f5-4027-9cce-f20a1074384e",
+          "persistentUuid": "ccd28d07-b383-49fa-a5b2-d8a1c7b59e04",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -364,6 +361,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -396,7 +398,8 @@
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "//Get scene variables\nvar variables = runtimeScene.getVariables();\nvar speech = variables.get(\"speech\").getAsString();\n\nspeak(speech);\n \n// say a message\nfunction speak(text, callback) {\n var u = new SpeechSynthesisUtterance();\n u.text = text;\n u.lang = 'en-US';\n \n u.onend = function () {\n if (callback) {\n callback();\n }\n };\n \n u.onerror = function (e) {\n if (callback) {\n callback(e);\n }\n };\n \n speechSynthesis.speak(u);\n}\n\n//Thanks to https://stephenwalther.com/archive/2015/01/05/using-html5-speech-recognition-and-text-to-speech\n//for the original code",
           "parameterObjects": "",
-          "useStrict": false
+          "useStrict": false,
+          "eventsSheetExpanded": false
         }
       ]
     }

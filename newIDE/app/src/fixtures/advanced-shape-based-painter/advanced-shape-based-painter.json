@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\advanced-shape-based-painter\\advanced-shape-based-painter.json",
+    "projectUuid": "d6437651-bf85-4831-b7c0-5c8550a55bd2",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -322,7 +319,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "761982d4-45e3-4dfd-abf9-2654b41309cd",
+          "persistentUuid": "f0dc8365-f103-4423-bba4-7a5acd740cdc",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -343,7 +340,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "4e1b1179-8410-4c6b-9054-376754849e86",
+          "persistentUuid": "feec3f6a-3868-41da-974b-a50c33c563ec",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -364,7 +361,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "35dee078-916a-455f-b359-3ee05336ef2c",
+          "persistentUuid": "40735708-babc-4921-a94a-b7fbd4176b98",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -385,7 +382,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "9c90af08-9097-4a56-9b74-a3add6c85f70",
+          "persistentUuid": "4800caf1-876b-4654-b140-01fe67cf383c",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -406,7 +403,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "a3a1783a-94e2-4226-88c7-da9cc08a7974",
+          "persistentUuid": "bcf77b07-ab01-4478-8bf1-b245cb432e8e",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -427,7 +424,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "54090c74-e762-4579-a6af-5a3d65dff82c",
+          "persistentUuid": "379b4b28-ade6-45e9-9bef-ecca8af77e83",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -2627,6 +2624,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

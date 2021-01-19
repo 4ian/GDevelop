@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/play-music-on-mobile/play-music-on-mobile.json",
+    "projectUuid": "abb29c82-8c95-47ad-8679-f6e1827708e4",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -156,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "b430d177-eeab-4229-ac73-5d4b26471ddc",
+          "persistentUuid": "b52e482f-1c9d-4672-93ce-e3ca439a5070",
           "width": 0,
           "x": 167,
           "y": 251,
@@ -172,7 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
-          "persistentUuid": "a8933e13-1450-4a54-95d3-772d6b720d93",
+          "persistentUuid": "099044f5-8738-488b-815c-68c63cecbd83",
           "width": 0,
           "x": 401,
           "y": 273,
@@ -257,6 +254,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

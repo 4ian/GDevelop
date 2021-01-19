@@ -98,7 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddAction(
           "LireFichierExp",
           _("Read a value"),
-          _("Read the value saved in the specified element and store it in a scene"
+          _("Read the value saved in the specified element and store it in a scene "
             "variable.\nSpecify the structure leading to the element using / "
             "(example : Root/Level/Current)\nSpaces are forbidden in element "
             "names."),

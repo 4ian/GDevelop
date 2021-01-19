@@ -25,11 +25,19 @@
 }
 
 .icon-facebook:before {
-  content: "\ea90";
+  content: "\e900";
+  margin-bottom: -2px;
 }
 .icon-twitter:before {
-  content: "\ea96";
+  content: "\e901";
+  margin-bottom: -2px;
 }
 .icon-discord:before {
-  content: "\e900";
+  content: "\e903";
+  margin-top: 3px;
+  margin-bottom: -3px;
+}
+.icon-reddit:before {
+  content: "\e902";
+  margin-bottom: -2px;
 }

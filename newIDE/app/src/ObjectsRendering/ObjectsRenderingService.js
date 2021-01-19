@@ -17,6 +17,11 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
 
+// Some PixiJS plugins like pixi-tilemap are not distributed as UMD modules,
+// or still require a global PIXI object to be accessible, so we expose PIXI here.
+// This can be removed if no more extension PixiJS plugin requires this.
+global.PIXI = PIXI;
+
 const requirableModules = {};
 
 /**
@@ -132,8 +137,18 @@ export default {
       }
       const originalNodeModuleLoad = module._load;
 
-      // Allow both "pixi.js" and "pixi.js-legacy" to be found.
-      const allowedModules = { 'pixi.js-legacy': PIXI, 'pixi.js': PIXI };
+      // Allow pixi.js to be required by extensions:
+      const allowedModules = {
+        'pixi.js-legacy': PIXI,
+        'pixi.js': PIXI,
+        '@pixi/core': PIXI,
+        '@pixi/display': PIXI,
+        '@pixi/constants': PIXI,
+        '@pixi/sprite': PIXI,
+        '@pixi/math': PIXI,
+        '@pixi/utils': PIXI,
+        '@pixi/graphics': PIXI,
+      };
       module._load = function hookedLoader(request, parent, isMain) {
         const loadedModule = allowedModules[request];
         if (loadedModule) return loadedModule;

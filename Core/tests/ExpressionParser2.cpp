@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
+
 #include "DummyPlatform.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
@@ -823,37 +824,41 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid object function name") {
-      auto node = parser.ParseExpression("string", "MyObject.MyFunc");
-      REQUIRE(node != nullptr);
-      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionName.objectName == "MyObject");
-      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyFunc");
+    auto node = parser.ParseExpression("string", "MyObject.MyFunc");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName =
+        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyFunc");
   }
 
   SECTION("Valid object behavior name") {
-      auto node = parser.ParseExpression("string", "MyObject.MyBehavior::MyFunc");
-      REQUIRE(node != nullptr);
-      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionName.objectName == "MyObject");
-      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
-      REQUIRE(objectFunctionName.behaviorFunctionName == "MyFunc");
+    auto node = parser.ParseExpression("string", "MyObject.MyBehavior::MyFunc");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName =
+        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
+    REQUIRE(objectFunctionName.behaviorFunctionName == "MyFunc");
   }
 
   SECTION("Unfinished object function name") {
-      auto node = parser.ParseExpression("string", "MyObject.");
-      REQUIRE(node != nullptr);
-      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionName.objectName == "MyObject");
-      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
+    auto node = parser.ParseExpression("string", "MyObject.");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName =
+        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
   }
 
   SECTION("Unfinished object behavior name") {
-      auto node = parser.ParseExpression("string", "MyObject.MyBehavior::");
-      REQUIRE(node != nullptr);
-      auto &objectFunctionName = dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionName.objectName == "MyObject");
-      REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
-      REQUIRE(objectFunctionName.behaviorFunctionName == "");
+    auto node = parser.ParseExpression("string", "MyObject.MyBehavior::");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName =
+        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
+    REQUIRE(objectFunctionName.behaviorFunctionName == "");
   }
 
   SECTION("Invalid function calls") {
@@ -948,7 +953,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid behavior function call, finishing with namespace separator") {
+  SECTION(
+      "Invalid behavior function call, finishing with namespace separator") {
     {
       auto node = parser.ParseExpression("number", "MyObject.MyBehavior::(12)");
       REQUIRE(node != nullptr);
@@ -1028,6 +1034,55 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &grandChildNode =
           dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
       REQUIRE(grandChildNode.name == "grandChild");
+    }
+  }
+
+  SECTION("Valid function call with object variable") {
+    {
+      // Note that in this test we need to use an expression with "objectvar",
+      // as the grammar of the parser depends on this parameter type
+      // information.
+      auto node = parser.ParseExpression(
+          "string",
+          "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObject1, "
+          "MyVar1, MyObject2, MyVar2)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      auto &identifierObject1Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
+      auto &variable1Node =
+          dynamic_cast<gd::VariableNode &>(*functionNode.parameters[1]);
+      auto &identifierObject2Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+      auto &variable2Node =
+          dynamic_cast<gd::VariableNode &>(*functionNode.parameters[3]);
+
+      REQUIRE(identifierObject1Node.identifierName == "MyObject1");
+      REQUIRE(identifierObject2Node.identifierName == "MyObject2");
+      REQUIRE(variable1Node.objectName == "MyObject1");
+      REQUIRE(variable1Node.name == "MyVar1");
+      REQUIRE(variable2Node.objectName == "MyObject2");
+      REQUIRE(variable2Node.name == "MyVar2");
+    }
+  }
+
+  SECTION("Invalid function call with object variable") {
+    {
+      // Note that in this test we need to use an expression with "objectvar",
+      // as the grammar of the parser depends on this parameter type
+      // information.
+      auto node = parser.ParseExpression(
+          "string",
+          "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(My "
+          "badly/written object1, MyVar1, MyObject2, MyVar2)");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "An object name was expected but something else was written. "
+              "Enter just the name of the object for this parameter.");
     }
   }
 

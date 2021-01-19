@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\buttons\\game.json",
+    "projectUuid": "e6569bdd-c84e-42c4-9709-278194b1a28f",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -174,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "7b8a05dd-f7a4-40fb-bf92-ffeaf2204835",
+          "persistentUuid": "a8777491-a17a-4a43-9468-48ee8bb23a04",
           "width": 0,
           "x": 186,
           "y": 274.5,
@@ -190,7 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "98dfc84a-50c2-41b4-b72a-aa6472c07765",
+          "persistentUuid": "030be58b-23a1-4e35-994d-a062e4c79e59",
           "width": 0,
           "x": 171,
           "y": 369.5,
@@ -573,6 +570,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -643,7 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "Button1",
-          "persistentUuid": "bf8500fc-92b2-4127-8f0b-04cff6db291d",
+          "persistentUuid": "eb72d6dc-b7ad-4b84-bc1b-d0e9daffb9a9",
           "width": 0,
           "x": 186,
           "y": 135.5,
@@ -659,7 +661,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "99c76ee7-5242-4d28-ba69-8dd60fd36916",
+          "persistentUuid": "929662a7-7615-4d39-a710-936a4e4bd85a",
           "width": 0,
           "x": 172,
           "y": 383.5,
@@ -675,7 +677,7 @@
           "layer": "",
           "locked": false,
           "name": "Button2",
-          "persistentUuid": "38350ba1-fad4-4856-a57f-bd1cc06142ba",
+          "persistentUuid": "81e98a8c-583b-4f77-8e06-e3b752f39861",
           "width": 0,
           "x": 184,
           "y": 199.5,
@@ -691,7 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "Button3",
-          "persistentUuid": "1c0fda19-7d1a-4483-b7bf-8b6cc08dc45d",
+          "persistentUuid": "7945ca6d-384c-4ebe-9975-9d35f8e632b5",
           "width": 0,
           "x": 187,
           "y": 265.5,
@@ -1473,6 +1475,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

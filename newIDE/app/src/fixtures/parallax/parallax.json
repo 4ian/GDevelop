@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/parallax/parallax.json",
+    "projectUuid": "42483bf1-b865-42b0-8689-ec9c75e02d2c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -180,7 +177,7 @@
           "layer": "",
           "locked": false,
           "name": "ObjectToFollow",
-          "persistentUuid": "8564d3b1-c8b6-4fac-b09e-14700dd06362",
+          "persistentUuid": "08a36e77-ccb6-4b2e-92ae-8ce691f83cdd",
           "width": 0,
           "x": -128,
           "y": 320,
@@ -196,7 +193,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "c0be3a54-69a9-45f5-b1c0-13278a00a620",
+          "persistentUuid": "96c9fbda-3c4c-4841-9280-1468bef0fbd5",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -212,7 +209,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "ef62ae0d-4137-45dd-84e3-e7c16dbd79ef",
+          "persistentUuid": "e63baef7-7c80-4c09-9b35-02230c8ee32e",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -233,7 +230,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "7a26c7c0-3c6a-4858-acfc-4ed5e71a3186",
+          "persistentUuid": "f9e6e1ae-309e-4aa3-9ecd-98411d767058",
           "width": 0,
           "x": -608,
           "y": -32,
@@ -254,7 +251,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "65b1984e-8960-4c68-bf54-011c31a892f4",
+          "persistentUuid": "9b470a79-d3be-47d1-9392-569bd4d80975",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -275,7 +272,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "e3675533-1f9d-452b-83f8-008c59bb7fd8",
+          "persistentUuid": "cd8487a0-77c3-4fde-acc3-e71d4b868ec5",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -296,7 +293,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
-          "persistentUuid": "434cb43b-4f49-4ecf-93fd-77609c27f345",
+          "persistentUuid": "20992eaf-ac7a-468c-9945-b3f6e510e240",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -706,6 +703,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer4",
           "visibility": true,
           "cameras": [
@@ -723,6 +725,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer3",
           "visibility": true,
           "cameras": [
@@ -740,6 +747,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer2",
           "visibility": true,
           "cameras": [
@@ -757,6 +769,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

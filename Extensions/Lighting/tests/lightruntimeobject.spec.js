@@ -53,6 +53,7 @@ const addLightObstacle = (runtimeScene, width, height) => {
 };
 
 describe('gdjs.LightRuntimeObject', function () {
+  PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {
@@ -61,12 +62,19 @@ describe('gdjs.LightRuntimeObject', function () {
     properties: { windowWidth: 800, windowHeight: 600 },
   });
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
   const lightObj = addLightObject(runtimeScene, 100);
   lightObj.setPosition(200, 200);
 
   it('check object properties', function () {
     expect(lightObj.getRadius()).to.be(100);
-    expect(lightObj.getColor()).to.eql([180, 180, 180]);
+    expect(lightObj.getColor()).to.eql("180;180;180");
     expect(lightObj.getDebugMode()).to.be(false);
     expect(lightObj.getDrawableX()).to.be(100);
     expect(lightObj.getDrawableY()).to.be(100);
@@ -85,6 +93,7 @@ describe('gdjs.LightRuntimeObject', function () {
 });
 
 describe('Light with obstacles around it', function () {
+  PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {
@@ -110,7 +119,7 @@ describe('Light with obstacles around it', function () {
     light.setPosition(200, 200);
     obstacle.setPosition(250, 250);
 
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
 
     const vertexBuffer = light._renderer._vertexBuffer;
@@ -140,7 +149,7 @@ describe('Light with obstacles around it', function () {
 
   it('Vertex and index buffers after obstacle is moved.', function () {
     obstacle.setPosition(150, 250);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
 
     const vertexBuffer = light._renderer._vertexBuffer;
@@ -156,7 +165,7 @@ describe('Light with obstacles around it', function () {
     const expectedIndexBuffer = [
       0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0,
       6, 7, 0, 7, 8, 0, 8, 9, 0, 9, 10, 0, 10, 11, 0,
-      11, 12, 0, 12, 13, 0, 13, 14, 0, 14, 15, 0, 15, 
+      11, 12, 0, 12, 13, 0, 13, 14, 0, 14, 15, 0, 15,
       16, 0, 16, 17, 0, 17, 18, 0, 18, 1,
     ];
 
@@ -170,7 +179,7 @@ describe('Light with obstacles around it', function () {
 
   it("Obstacle moved outside light's radius.", function () {
     obstacle.setPosition(400, 400);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
     // Ensure the fallback to simple quads. There shouldn't be anymore calculations
     // when the obstacle is not inside light's area.

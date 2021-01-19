@@ -13,7 +13,7 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import BuildProgress from './BuildProgress';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import format from 'date-fns/format';
-import difference_in_calendar_days from 'date-fns/difference_in_calendar_days';
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import Text from '../../UI/Text';
 
 type Props = {|
@@ -75,14 +75,14 @@ export default ({ builds, userProfile, onDownload }: Props) => {
             {builds.map((build: Build) => {
               const isOld =
                 build &&
-                difference_in_calendar_days(Date.now(), build.updatedAt) > 6;
+                differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
 
               return (
                 <Paper style={styles.buildContainer} key={build.id}>
                   <Text>
                     {formatBuildText(build.type)} -{' '}
                     <Trans>Last updated on</Trans>{' '}
-                    {format(build.updatedAt, 'YYYY-MM-DD HH:mm:ss')}
+                    {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
                   </Text>
                   {!isOld && (
                     <BuildProgress

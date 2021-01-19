@@ -1,91 +1,88 @@
+#include <GDCore/Events/Builtin/CommentEvent.h>
+#include <GDCore/Events/Builtin/ForEachEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
+#include <GDCore/Events/Builtin/GroupEvent.h>
+#include <GDCore/Events/Builtin/LinkEvent.h>
+#include <GDCore/Events/Builtin/RepeatEvent.h>
+#include <GDCore/Events/Builtin/StandardEvent.h>
+#include <GDCore/Events/Builtin/WhileEvent.h>
+#include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
+#include <GDCore/Events/Parsers/ExpressionParser2.h>
+#include <GDCore/Events/Parsers/ExpressionParser2Node.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Animation.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Direction.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/Sprite.h>
+#include <GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h>
+#include <GDCore/Extensions/Metadata/DependencyMetadata.h>
+#include <GDCore/Extensions/Metadata/EffectMetadata.h>
+#include <GDCore/Extensions/Metadata/MetadataProvider.h>
+#include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
+#include <GDCore/Extensions/Platform.h>
+#include <GDCore/IDE/AbstractFileSystem.h>
+#include <GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h>
+#include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
+#include <GDCore/IDE/Events/EventsContextAnalyzer.h>
+#include <GDCore/IDE/Events/EventsListUnfolder.h>
+#include <GDCore/IDE/Events/EventsParametersLister.h>
+#include <GDCore/IDE/Events/EventsRefactorer.h>
+#include <GDCore/IDE/Events/EventsRemover.h>
+#include <GDCore/IDE/Events/EventsTypesLister.h>
+#include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
+#include <GDCore/IDE/Events/ExpressionValidator.h>
+#include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
+#include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
+#include <GDCore/IDE/Events/TextFormatting.h>
+#include <GDCore/IDE/EventsFunctionTools.h>
+#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
+#include <GDCore/IDE/Project/ProjectResourcesAdder.h>
+#include <GDCore/IDE/Project/ProjectResourcesCopier.h>
+#include <GDCore/IDE/Project/ResourcesInUseHelper.h>
+#include <GDCore/IDE/Project/ResourcesMergingHelper.h>
+#include <GDCore/IDE/Project/ResourcesRenamer.h>
+#include <GDCore/IDE/WholeProjectRefactorer.h>
+#include <GDCore/Project/Behavior.h>
+#include <GDCore/Project/Effect.h>
+#include <GDCore/Project/EventsBasedBehavior.h>
+#include <GDCore/Project/EventsFunction.h>
+#include <GDCore/Project/EventsFunctionsExtension.h>
+#include <GDCore/Project/ExternalEvents.h>
+#include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/InitialInstance.h>
+#include <GDCore/Project/InitialInstancesContainer.h>
+#include <GDCore/Project/Layout.h>
+#include <GDCore/Project/NamedPropertyDescriptor.h>
+#include <GDCore/Project/Object.h>
+#include <GDCore/Project/Project.h>
+#include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/Variable.h>
+#include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Serialization/Serializer.h>
+#include <GDCore/Serialization/SerializerElement.h>
+#include <GDJS/Events/Builtin/JsCodeEvent.h>
+#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
+#include <GDJS/IDE/Exporter.h>
+#include <GDJS/IDE/ExporterHelper.h>
+#include <emscripten.h>
+
 #include <map>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <GDCore/Extensions/Platform.h>
-#include <GDCore/Project/Behavior.h>
-#include <GDCore/Project/ExternalEvents.h>
-#include <GDCore/Project/ExternalLayout.h>
-#include <GDCore/Project/InitialInstance.h>
-#include <GDCore/Project/InitialInstancesContainer.h>
-#include <GDCore/Project/Layout.h>
-#include <GDCore/Project/Object.h>
-#include <GDCore/Project/Project.h>
-#include <GDCore/Project/Variable.h>
-#include <GDCore/Project/EventsBasedBehavior.h>
-#include <GDCore/Project/VariablesContainer.h>
-#include <GDCore/Project/Effect.h>
-#include <GDCore/Serialization/Serializer.h>
-#include <GDCore/Serialization/SerializerElement.h>
-
-#include <GDCore/Events/Parsers/ExpressionParser2.h>
-#include <GDCore/Events/Parsers/ExpressionParser2Node.h>
-#include <GDCore/IDE/Events/ExpressionValidator.h>
-#include <GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h>
-#include <GDCore/Extensions/Metadata/EffectMetadata.h>
-#include <GDCore/Extensions/Metadata/MetadataProvider.h>
-#include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
-#include <GDCore/Project/EventsFunction.h>
-#include <GDCore/Project/EventsFunctionsExtension.h>
-#include <GDCore/IDE/AbstractFileSystem.h>
-#include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h>
-#include <GDCore/Project/PropertyDescriptor.h>
-#include <GDCore/Project/NamedPropertyDescriptor.h>
-#include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
-#include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
-#include <GDCore/IDE/Events/EventsContextAnalyzer.h>
-#include <GDCore/IDE/Events/EventsParametersLister.h>
-#include <GDCore/IDE/Events/EventsTypesLister.h>
-#include <GDCore/IDE/Events/EventsRefactorer.h>
-#include <GDCore/IDE/Events/EventsRemover.h>
-#include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
-#include <GDCore/IDE/Events/TextFormatting.h>
-#include <GDCore/IDE/Events/EventsListUnfolder.h>
-#include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
-#include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
-#include <GDCore/IDE/Project/ResourcesMergingHelper.h>
-#include <GDCore/IDE/Project/ResourcesInUseHelper.h>
-#include <GDCore/IDE/Project/ProjectResourcesAdder.h>
-#include <GDCore/IDE/Project/ProjectResourcesCopier.h>
-#include <GDCore/IDE/WholeProjectRefactorer.h>
-
-#include <GDCore/Events/Builtin/CommentEvent.h>
-#include <GDCore/Events/Builtin/ForEachEvent.h>
-#include <GDCore/Events/Builtin/GroupEvent.h>
-#include <GDCore/Events/Builtin/LinkEvent.h>
-#include <GDCore/Events/Builtin/RepeatEvent.h>
-#include <GDCore/Events/Builtin/StandardEvent.h>
-#include <GDCore/Events/Builtin/WhileEvent.h>
-
-#include <GDCore/Extensions/Builtin/SpriteExtension/Animation.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/Direction.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/Sprite.h>
-#include <GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h>
-
 #include "../../Extensions/PanelSpriteObject/PanelSpriteObject.h"
 #include "../../Extensions/ParticleSystem/ParticleEmitterObject.h"
 #include "../../Extensions/PrimitiveDrawing/ShapePainterObject.h"
+#include "../../Extensions/SkeletonObject/SkeletonObject.h"
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
-#include "../../Extensions/SkeletonObject/SkeletonObject.h"
-
-#include <GDJS/Events/Builtin/JsCodeEvent.h>
-#include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
-#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
-#include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
-#include <GDJS/IDE/Exporter.h>
-#include <GDJS/IDE/ExporterHelper.h>
-
-#include <emscripten.h>
-#include "ProjectHelper.h"
-
 #include "BehaviorJsImplementation.h"
 #include "BehaviorSharedDataJsImplementation.h"
 #include "ObjectJsImplementation.h"
+#include "ProjectHelper.h"
 
 /**
  * \brief Manual binding of gd::ArbitraryResourceWorker to allow overriding
@@ -341,8 +338,15 @@ void removeFromVectorVector2f(std::vector<sf::Vector2f> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
-void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec, size_t pos) {
+void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                       size_t pos) {
   vec.erase(vec.begin() + pos);
+}
+
+void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec, size_t oldIndex, size_t newIndex) {
+  if (oldIndex > vec.size() || newIndex > vec.size()) return;
+
+  std::swap(vec[oldIndex], vec[newIndex]);
 }
 
 // Implement a conversion from std::set<gd::String> to std::vector<gd::String>
@@ -378,23 +382,33 @@ typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<sf::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
 typedef std::vector<gd::ParameterMetadata> VectorParameterMetadata;
+typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
-typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
-typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
-typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor> NamedPropertyDescriptorsList;
-typedef ExpressionCompletionDescription::CompletionKind ExpressionCompletionDescription_CompletionKind;
-typedef std::vector<gd::ExpressionCompletionDescription> VectorExpressionCompletionDescription;
+typedef std::vector<gd::ExpressionParserDiagnostic *>
+    VectorExpressionParserDiagnostic;
+typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
+    EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
+    NamedPropertyDescriptorsList;
+typedef ExpressionCompletionDescription::CompletionKind
+    ExpressionCompletionDescription_CompletionKind;
+typedef std::vector<gd::ExpressionCompletionDescription>
+    VectorExpressionCompletionDescription;
+typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
+    MapExtensionProperties;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
 typedef ExtensionAndMetadata<EffectMetadata> ExtensionAndEffectMetadata;
-typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
-typedef ExtensionAndMetadata<InstructionMetadata> ExtensionAndInstructionMetadata;
+typedef ExtensionAndMetadata<InstructionMetadata>
+    ExtensionAndInstructionMetadata;
+typedef ExtensionAndMetadata<InstructionMetadata>
+    ExtensionAndInstructionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
@@ -468,12 +482,18 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetExtensionAndEffectMetadata GetExtensionAndEffectMetadata
 #define STATIC_GetExtensionAndActionMetadata GetExtensionAndActionMetadata
 #define STATIC_GetExtensionAndConditionMetadata GetExtensionAndConditionMetadata
-#define STATIC_GetExtensionAndExpressionMetadata GetExtensionAndExpressionMetadata
-#define STATIC_GetExtensionAndObjectExpressionMetadata GetExtensionAndObjectExpressionMetadata
-#define STATIC_GetExtensionAndBehaviorExpressionMetadata GetExtensionAndBehaviorExpressionMetadata
-#define STATIC_GetExtensionAndStrExpressionMetadata GetExtensionAndStrExpressionMetadata
-#define STATIC_GetExtensionAndObjectStrExpressionMetadata GetExtensionAndObjectStrExpressionMetadata
-#define STATIC_GetExtensionAndBehaviorStrExpressionMetadata GetExtensionAndBehaviorStrExpressionMetadata
+#define STATIC_GetExtensionAndExpressionMetadata \
+  GetExtensionAndExpressionMetadata
+#define STATIC_GetExtensionAndObjectExpressionMetadata \
+  GetExtensionAndObjectExpressionMetadata
+#define STATIC_GetExtensionAndBehaviorExpressionMetadata \
+  GetExtensionAndBehaviorExpressionMetadata
+#define STATIC_GetExtensionAndStrExpressionMetadata \
+  GetExtensionAndStrExpressionMetadata
+#define STATIC_GetExtensionAndObjectStrExpressionMetadata \
+  GetExtensionAndObjectStrExpressionMetadata
+#define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
+  GetExtensionAndBehaviorStrExpressionMetadata
 #define STATIC_HasCondition HasCondition
 #define STATIC_HasAction HasAction
 #define STATIC_HasObjectAction HasObjectAction
@@ -515,12 +535,16 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Date Date
 #define STATIC_ObjectOrGroupRenamedInLayout ObjectOrGroupRenamedInLayout
 #define STATIC_ObjectOrGroupRemovedInLayout ObjectOrGroupRemovedInLayout
-#define STATIC_ObjectOrGroupRemovedInEventsFunction ObjectOrGroupRemovedInEventsFunction
-#define STATIC_ObjectOrGroupRenamedInEventsFunction ObjectOrGroupRenamedInEventsFunction
+#define STATIC_ObjectOrGroupRemovedInEventsFunction \
+  ObjectOrGroupRemovedInEventsFunction
+#define STATIC_ObjectOrGroupRenamedInEventsFunction \
+  ObjectOrGroupRenamedInEventsFunction
 #define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
 #define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
-#define STATIC_GetAllObjectTypesUsingEventsBasedBehavior GetAllObjectTypesUsingEventsBasedBehavior
-#define STATIC_EnsureBehaviorEventsFunctionsProperParameters EnsureBehaviorEventsFunctionsProperParameters
+#define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \
+  GetAllObjectTypesUsingEventsBasedBehavior
+#define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
+  EnsureBehaviorEventsFunctionsProperParameters
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty
@@ -540,7 +564,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_MoveEventsFunctionParameter MoveEventsFunctionParameter
-#define STATIC_MoveBehaviorEventsFunctionParameter MoveBehaviorEventsFunctionParameter
+#define STATIC_MoveBehaviorEventsFunctionParameter \
+  MoveBehaviorEventsFunctionParameter
 #define STATIC_RenameBehaviorProperty RenameBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 
@@ -552,7 +577,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 
-#define STATIC_IsExtensionLifecycleEventsFunction IsExtensionLifecycleEventsFunction
+#define STATIC_IsExtensionLifecycleEventsFunction \
+  IsExtensionLifecycleEventsFunction
 
 #define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
 

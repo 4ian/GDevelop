@@ -15,6 +15,8 @@ declare class gdPropertyDescriptor {
   isHidden(): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  serializeValuesTo(element: gdSerializerElement): void;
+  unserializeValuesFrom(element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

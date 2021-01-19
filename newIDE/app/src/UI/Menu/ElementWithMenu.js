@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import ReactDOM from 'react-dom';
 import ContextMenu from './ContextMenu';
 import { type MenuItemTemplate } from './Menu.flow';
 
 type Props = {|
   element: React$Element<any>,
-  buildMenuTemplate: () => Array<MenuItemTemplate>,
+  buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
+  passExtraProps?: boolean,
 |};
 
 type State = {||};
@@ -20,7 +22,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenu;
   _wrappedElement: ?any;
 
-  open = (element: any) => {
+  open = () => {
     const { _contextMenu } = this;
     if (!_contextMenu) return;
 
@@ -40,14 +42,18 @@ export default class ElementWithMenu extends React.Component<Props, State> {
       element,
       buildMenuTemplate,
       openMenuWithSecondaryClick,
+      passExtraProps,
+      ...otherProps
     } = this.props;
 
     return (
       <React.Fragment>
         {React.cloneElement(element, {
           onContextMenu: this.open,
+          // $FlowFixMe - Flow complaining about using too much spread operators
           ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
+          ...(passExtraProps ? otherProps : {}),
         })}
         <ContextMenu
           ref={contextMenu => (this._contextMenu = contextMenu)}

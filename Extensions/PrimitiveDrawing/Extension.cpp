@@ -379,6 +379,37 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetFillColor")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "FillColorRed",
+        _("Filing color red component"),
+        _("Filing color red component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorR")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "FillColorGreen",
+        _("Filing color green component"),
+        _("Filing color green component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorG")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "FillColorBlue",
+        _("Filing color blue component"),
+        _("Filing color blue component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillColorB")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+
   obj.AddAction("OutlineColor",
                 _("Outline color"),
                 _("Modify the color of the outline of future drawings."),
@@ -390,6 +421,36 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("color", _("Color"))
       .SetFunctionName("SetOutlineColor")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "OutlineColorRed",
+        _("Outline color red component"),
+        _("Outline color red component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorR")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "OutlineColorGreen",
+        _("Outline color green component"),
+        _("Outline color green component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorG")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "OutlineColorBlue",
+        _("Outline color blue component"),
+        _("Outline color blue component"),
+        "",
+        "res/actions/color.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineColorB")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("OutlineSize",
@@ -416,6 +477,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardRelationalOperatorParameters("number")
+      .SetFunctionName("GetOutlineSize")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddExpression(
+        "OutlineSize",
+        _("Outline size"),
+        _("Outline size"),
+        "",
+        "res/conditions/outlineSize.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("GetOutlineSize")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -448,6 +519,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetFillOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "FillOpacity",
+        _("Filling opacity"),
+        _("Filling opacity"),
+        "",
+        "res/conditions/opacity.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetFillOpacity")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
   obj.AddAction(
          "OutlineOpacity",
          _("Outline opacity"),
@@ -477,6 +558,42 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetOutlineOpacity")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddExpression(
+        "OutlineOpacity",
+        _("Outline opacity"),
+        _("Outline opacity"),
+        "",
+        "res/conditions/opacity.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .SetFunctionName("GetOutlineOpacity")
+      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddAction("UseRelativeCoordinates",
+                  _("Use relative coordinates"),
+                  _("Set if the object should use relative coordinates (by default) or not. It's recommended to use relative coordinates."),
+                  _("Use relative coordinates for _PARAM0_: _PARAM1_"),
+                  _("Setup"),
+                  "res/actions/position24.png",
+                  "res/actions/position.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("yesorno", _("Use relative coordinates?"), "", false)
+        .SetDefaultValue("true")
+        .SetFunctionName("setCoordinatesRelative")
+        .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+    obj.AddCondition(
+          "AreCoordinatesRelative",
+          _("Relative coordinates"),
+          _("Check if the coordinates of the shape painter is relative."),
+          _("_PARAM0_ is using relative coordinates"),
+          _("Setup"),
+              "res/conditions/position24.png",
+              "res/conditions/position.png")
+
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .SetFunctionName("AreCoordinatesRelative")
+        .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      
 #endif
 }
 

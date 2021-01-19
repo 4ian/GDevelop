@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\GDevelop5\\change-angle\\game.json",
+    "projectUuid": "fd6cc3a0-f7ae-4625-8f62-755670c9d0bc",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -162,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "1eefb618-0a83-40bd-ab71-676d0fc07feb",
+          "persistentUuid": "1c2158aa-fbdd-4e92-ba7b-e584252a834a",
           "width": 0,
           "x": 336.849,
           "y": 241.534,
@@ -178,7 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "02d9fb1c-1cf7-4e00-a4af-c755bf0640c5",
+          "persistentUuid": "bae134f5-2768-477f-b729-2e98e186736d",
           "width": 0,
           "x": 120.547,
           "y": 2.59878,
@@ -194,7 +191,7 @@
           "layer": "",
           "locked": false,
           "name": "coin",
-          "persistentUuid": "8de2f61b-20e1-4d3a-85a0-cfda21411c3c",
+          "persistentUuid": "d3135792-cfdc-4783-808c-705e5ee8cf95",
           "width": 0,
           "x": 571.847,
           "y": 275.63,
@@ -403,6 +400,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

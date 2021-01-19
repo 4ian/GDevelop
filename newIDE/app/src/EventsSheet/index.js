@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+
 import * as React from 'react';
 import EventsTree from './EventsTree';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
@@ -567,6 +570,12 @@ export default class EventsSheet extends React.Component<Props, State> {
       this._saveChangesToHistory();
     }
 
+    if (this.state.inlineEditingAnchorEl) {
+      // Focus back the parameter - especially useful when editing
+      // with the keyboard only.
+      this.state.inlineEditingAnchorEl.focus();
+    }
+
     this.setState({
       inlineEditing: false,
       inlineEditingAnchorEl: null,
@@ -950,6 +959,20 @@ export default class EventsSheet extends React.Component<Props, State> {
           this.closeInstructionEditor();
           this.props.openInstructionOrExpression(extension, type);
         }}
+        canPasteInstructions={
+          this.state.editedInstruction.isCondition
+            ? hasClipboardConditions()
+            : hasClipboardActions()
+        }
+        onPasteInstructions={() => {
+          const { instrsList, isCondition } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          this.pasteInstructionsInInstructionsList({
+            instrsList,
+            isCondition,
+          });
+        }}
       />
     ) : (
       undefined
@@ -1076,6 +1099,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
+                          eventsSheetHeight={
+                            this._containerDiv.current
+                              ? this._containerDiv.current.clientHeight
+                              : 0
+                          }
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel
@@ -1143,9 +1171,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                           ref={eventContextMenu =>
                             (this.eventContextMenu = eventContextMenu)
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
-                              label: 'Edit',
+                              label: i18n._(t`Edit`),
                               click: () => this.openEventTextDialog(),
                               visible:
                                 filterEditableWithEventTextDialog(
@@ -1153,46 +1181,46 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 ).length > 0,
                             },
                             {
-                              label: 'Copy',
+                              label: i18n._(t`Copy`),
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
                             },
                             {
-                              label: 'Cut',
+                              label: i18n._(t`Cut`),
                               click: () => this.cutSelection(),
                               accelerator: 'CmdOrCtrl+X',
                             },
                             {
-                              label: 'Paste',
+                              label: i18n._(t`Paste`),
                               click: () => this.pasteEvents(),
                               enabled: hasClipboardEvents(),
                               accelerator: 'CmdOrCtrl+V',
                             },
                             {
-                              label: 'Delete',
+                              label: i18n._(t`Delete`),
                               click: () => this.deleteSelection(),
                               accelerator: 'Delete',
                             },
                             {
-                              label: 'Toggle disabled',
+                              label: i18n._(t`Toggle disabled`),
                               click: () => this.toggleDisabled(),
                               enabled: this._selectionCanToggleDisabled(),
                             },
                             { type: 'separator' },
                             {
-                              label: 'Add New Event Below',
+                              label: i18n._(t`Add New Event Below`),
                               click: () =>
                                 this.addNewEvent(
                                   'BuiltinCommonInstructions::Standard'
                                 ),
                             },
                             {
-                              label: 'Add Sub Event',
+                              label: i18n._(t`Add Sub Event`),
                               click: () => this.addSubEvents(),
                               enabled: this._selectionCanHaveSubEvents(),
                             },
                             {
-                              label: 'Add Other',
+                              label: i18n._(t`Add Other`),
                               submenu: this.state.allEventsMetadata.map(
                                 metadata => {
                                   return {
@@ -1205,28 +1233,30 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             { type: 'separator' },
                             {
-                              label: 'Undo',
+                              label: i18n._(t`Undo`),
                               click: this.undo,
                               enabled: canUndo(this.state.history),
                               accelerator: 'CmdOrCtrl+Z',
                             },
                             {
-                              label: 'Redo',
+                              label: i18n._(t`Redo`),
                               click: this.redo,
                               enabled: canRedo(this.state.history),
                               accelerator: 'CmdOrCtrl+Shift+Z',
                             },
                             { type: 'separator' },
                             {
-                              label: 'Extract Events to a Function',
+                              label: i18n._(t`Extract Events to a Function`),
                               click: () => this.extractEventsToFunction(),
                             },
                             {
-                              label: 'Move Events into a Group',
+                              label: i18n._(t`Move Events into a Group`),
                               click: () => this.moveEventsIntoNewGroup(),
                             },
                             {
-                              label: 'Analyze Objects Used in this Event',
+                              label: i18n._(
+                                t`Analyze Objects Used in this Event`
+                              ),
                               click: this._openEventsContextAnalyzer,
                             },
                           ]}
@@ -1235,19 +1265,19 @@ export default class EventsSheet extends React.Component<Props, State> {
                           ref={instructionContextMenu =>
                             (this.instructionContextMenu = instructionContextMenu)
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
-                              label: 'Copy',
+                              label: i18n._(t`Copy`),
                               click: () => this.copySelection(),
                               accelerator: 'CmdOrCtrl+C',
                             },
                             {
-                              label: 'Cut',
+                              label: i18n._(t`Cut`),
                               click: () => this.cutSelection(),
                               accelerator: 'CmdOrCtrl+X',
                             },
                             {
-                              label: 'Paste',
+                              label: i18n._(t`Paste`),
                               click: () => this.pasteInstructions(),
                               enabled:
                                 hasClipboardConditions() ||
@@ -1256,25 +1286,25 @@ export default class EventsSheet extends React.Component<Props, State> {
                             },
                             { type: 'separator' },
                             {
-                              label: 'Delete',
+                              label: i18n._(t`Delete`),
                               click: () => this.deleteSelection(),
                               accelerator: 'Delete',
                             },
                             { type: 'separator' },
                             {
-                              label: 'Undo',
+                              label: i18n._(t`Undo`),
                               click: this.undo,
                               enabled: canUndo(this.state.history),
                               accelerator: 'CmdOrCtrl+Z',
                             },
                             {
-                              label: 'Redo',
+                              label: i18n._(t`Redo`),
                               click: this.redo,
                               enabled: canRedo(this.state.history),
                               accelerator: 'CmdOrCtrl+Shift+Z',
                             },
                             {
-                              label: 'Invert Condition',
+                              label: i18n._(t`Invert Condition`),
                               click: () => this._invertSelectedConditions(),
                               visible: hasSelectedAtLeastOneCondition(
                                 this.state.selection

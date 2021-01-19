@@ -30,14 +30,14 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("SystemInfo/SystemInfoTools.h");
 
   extension
-      .AddCondition(
-          "IsWebGLSupported",
-          _("Is WebGL supported"),
-          _("Check if GPU accelerated WebGL is supported on the target device."),
-          _("WebGL is available"),
-          _("System information"),
-          "CppPlatform/Extensions/systeminfoicon24.png",
-          "CppPlatform/Extensions/systeminfoicon16.png")
+      .AddCondition("IsWebGLSupported",
+                    _("Is WebGL supported"),
+                    _("Check if GPU accelerated WebGL is supported on the "
+                      "target device."),
+                    _("WebGL is available"),
+                    _("System information"),
+                    "CppPlatform/Extensions/systeminfoicon24.png",
+                    "CppPlatform/Extensions/systeminfoicon16.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .SetFunctionName("SystemInfo::IsWebGLSupported")
@@ -47,11 +47,23 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       .AddCondition(
           "IsPreview",
           _("Is the game running as a preview"),
-          _(
-            "Check if the game is currently being previewed in the editor. "
-            "This can be used to enable a \"Debug mode\" or do some work only in previews."
-          ),
+          _("Check if the game is currently being previewed in the editor. "
+            "This can be used to enable a \"Debug mode\" or do some work only "
+            "in previews."),
           _("The game is being previewed in the editor"),
+          _("System information"),
+          "CppPlatform/Extensions/systeminfoicon24.png",
+          "CppPlatform/Extensions/systeminfoicon16.png")
+
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddCondition(
+          "HasTouchScreen",
+          _("Device has a touchscreen"),
+          _("Check if the device running the game has a touchscreen (typically "
+            "Android phones, iPhones, iPads, but also some laptops)."),
+          _("The device has a touchscreen"),
           _("System information"),
           "CppPlatform/Extensions/systeminfoicon24.png",
           "CppPlatform/Extensions/systeminfoicon16.png")

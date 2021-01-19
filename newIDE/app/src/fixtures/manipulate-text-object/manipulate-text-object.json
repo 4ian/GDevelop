@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\display-change-text\\game.json",
+    "projectUuid": "f6bdaf13-9e2d-41e1-905f-7dbb13a1d0ab",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,7 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "change_text",
-          "persistentUuid": "716e98e0-83f6-491a-b16a-e8f069488ccc",
+          "persistentUuid": "e34780c3-e3b1-4415-868b-68405e6db193",
           "width": 0,
           "x": 10.9457,
           "y": 205.185,
@@ -159,7 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_text",
-          "persistentUuid": "b6fef4df-e356-4682-afcb-e6212ae9109d",
+          "persistentUuid": "f98a9c94-e240-44fc-a048-3d31e499634b",
           "width": 0,
           "x": 117.72,
           "y": 309.31,
@@ -175,7 +172,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_text",
-          "persistentUuid": "ecfc3017-e223-435a-b6b9-4e502df561e1",
+          "persistentUuid": "b6bf7472-2bb5-48e4-9162-4aa799d80a9e",
           "width": 0,
           "x": 206.035,
           "y": 411.212,
@@ -764,6 +761,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

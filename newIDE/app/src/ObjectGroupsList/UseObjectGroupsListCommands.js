@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
-
-const editObjectGroupCommandText = t`Edit object group...`;
 
 type Props = {|
   project: gdProject,
@@ -16,7 +13,6 @@ const useObjectGroupsListCommands = (props: Props) => {
   const { project, layout, onEditObjectGroup } = props;
 
   useCommandWithOptions('EDIT_OBJECT_GROUP', true, {
-    displayText: editObjectGroupCommandText,
     generateOptions: React.useCallback(
       () =>
         [

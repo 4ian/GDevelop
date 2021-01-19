@@ -1,0 +1,45 @@
+/* Mosaic layout */
+.mosaic-gd-theme.mosaic {
+  background-color: var(--mosaic-layout-background-color) !important;
+}
+
+/* Mosaic window and tile */
+.mosaic-gd-theme .mosaic-window-toolbar {
+  background: var(--mosaic-toolbar-background-color) !important;
+}
+
+.mosaic-gd-theme .mosaic-window-body {
+  background: var(--mosaic-layout-background-color) !important;
+}
+
+.mosaic-gd-theme .mosaic-window .mosaic-window-title {
+  color: white !important;
+  font-weight: 400 !important;
+  font-family: var(--gdevelop-font-family);
+  font-size: 15px; /* Same as ClosableTabs font size */
+}
+
+/* Hovered titlebar background */
+.mosaic-gd-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+  background: var(--mosaic-toolbar-background-color) !important;
+}
+
+.mosaic-gd-theme .mosaic-split.-column {
+  background-color: var(--mosaic-layout-background-color) !important;
+}
+
+/* Separator draggable background */
+.mosaic-gd-theme .mosaic-split.-column .mosaic-split-line {
+  height: 1px;
+  border-top: 1px solid var(--mosaic-layout-border-color) !important;
+  width: 25px;
+  margin: auto;
+  bottom: 1px;
+}
+
+.mosaic-gd-theme .mosaic-split:hover .mosaic-split-line {
+  border-color: var(--mosaic-toolbar-border-color-hover) !important;
+  box-shadow: none !important;
+  cursor: ns-resize;
+}

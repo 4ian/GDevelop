@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PlaneAndClouds\\game.json",
+    "projectUuid": "c025eff8-ddca-40d9-a070-469499a36aaf",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -189,7 +186,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
-          "persistentUuid": "85c5898d-31b5-4f9e-bace-fc0f8acd38ff",
+          "persistentUuid": "2f2681fb-f98d-4ace-ace7-ca785f16cb6e",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -205,7 +202,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "787b3644-6fe4-45ae-8318-6ea57ddbce0f",
+          "persistentUuid": "09941112-c413-4a82-b2a2-88f1fd4ce62f",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -226,7 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "699fd23c-0151-46a1-93b6-ee1de74bff73",
+          "persistentUuid": "54c6ea7a-ce2d-41b8-b1ae-053414da8407",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -247,7 +244,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
-          "persistentUuid": "2fe85e8c-b5aa-4676-bf58-a88595df3d6f",
+          "persistentUuid": "7be2a22e-a9b1-4c9d-b740-1d0aa5d1f16a",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -263,7 +260,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
-          "persistentUuid": "986e2654-93ec-4df1-a144-6494d42b9978",
+          "persistentUuid": "f59fc332-8d66-490e-8379-3541602b9d0f",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -1561,6 +1558,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1578,6 +1580,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

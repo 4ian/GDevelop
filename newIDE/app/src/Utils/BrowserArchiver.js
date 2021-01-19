@@ -18,6 +18,15 @@ export type UrlFileDescriptor = {|
   url: string,
 |};
 
+const addSearchParameterToUrl = (
+  url: string,
+  urlEncodedParameterName: string,
+  urlEncodedValue: string
+) => {
+  const separator = url.indexOf('?') === -1 ? '?' : '&';
+  return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+};
+
 function eachCallback<T>(
   array: Array<T>,
   callback: (T, () => void) => void,
@@ -55,16 +64,56 @@ export const downloadUrlsToBlobs = async ({
     urlFiles
       .filter(({ url }) => url.indexOf('.h') === -1) // TODO
       .map(({ url, filePath }) => {
-        return fetch(url)
-          .then(response => {
-            if (!response.ok) {
-              console.error(`Error while downloading "${url}"`, response);
+        // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
+        // By doing so, we force browser to consider this URL as different than the one traditionally
+        // used to render the resource in the editor (usually as an `<img>` or as a background image).
+        // If we don't add this distinct parameter, it can happen that browsers fail to load the image
+        // as it's already in the **browser cache** but with slightly different request parameters -
+        // making the CORS checks fail (even if it's coming from the browser cache).
+        //
+        // It's happening sometimes (according to loading order probably) in Chrome and (more often)
+        // in Safari. It might be linked to Amazon S3 + CloudFront that "doesn't support the Vary: Origin header".
+        // To be safe, we entirely avoid the issue with this parameter, making the browsers consider
+        // the resources for use in Pixi.js and for the rest of the editor as entirely separate.
+        //
+        // See:
+        // - https://stackoverflow.com/questions/26140487/cross-origin-amazon-s3-not-working-using-chrome
+        // - https://stackoverflow.com/questions/20253472/cors-problems-with-amazon-s3-on-the-latest-chomium-and-google-canary
+        // - https://stackoverflow.com/a/20299333
+        //
+        // Search for "cors-cache-workaround" in the codebase for the same workarounds.
+        const urlWithParameters = addSearchParameterToUrl(
+          url,
+          'gdUsage',
+          'export'
+        );
+
+        return fetch(urlWithParameters)
+          .then(
+            response => {
+              if (!response.ok) {
+                console.error(
+                  `Error while downloading "${urlWithParameters}"`,
+                  response
+                );
+                throw new Error(
+                  `Error while downloading "${urlWithParameters}" (status: ${
+                    response.status
+                  })`
+                );
+              }
+              return response.blob();
+            },
+            error => {
+              console.error(
+                `Error while downloading "${urlWithParameters}"`,
+                error
+              );
               throw new Error(
-                `Error while downloading "${url}" (status: ${response.status})`
+                `Error while downloading "${urlWithParameters}" (network error)`
               );
             }
-            return response.blob();
-          })
+          )
           .then(blob => {
             count++;
             onProgress(count, urlFiles.length);
@@ -75,7 +124,7 @@ export const downloadUrlsToBlobs = async ({
           });
       })
   ).then((downloadedBlobs: Array<BlobFileDescriptor>) => {
-    console.info('All download done');
+    console.info('All downloads done');
     return downloadedBlobs;
   });
 };

@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\GDevelop5\\move-object\\game.json",
+    "projectUuid": "0057e206-18cb-457c-9baa-b5e9f0956558",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -162,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "d121288c-a77f-4234-807b-6741915a0e9e",
+          "persistentUuid": "49673f64-4027-4c28-bb09-63f4d4475130",
           "width": 0,
           "x": 336.849,
           "y": 241.534,
@@ -178,7 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "9faa961a-cc38-4c92-b122-17fc61675608",
+          "persistentUuid": "d264e9c6-82bd-4a9f-8b21-1d4981665244",
           "width": 0,
           "x": 117.085,
           "y": 1.20455,
@@ -742,6 +739,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

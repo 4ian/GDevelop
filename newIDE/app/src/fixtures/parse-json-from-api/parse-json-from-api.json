@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.gametemplates.itch",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\parse-json-from-api\\game.json",
+    "projectUuid": "f253aff3-b7e8-4ba4-9680-706cd5687429",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Parse JSON from SWAPI",
     "author": "gametemplates.itch.io",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -178,7 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "cc88d7ff-af9f-455a-a9c7-a4f86631ef0d",
+          "persistentUuid": "78c7d207-c3ba-4a01-ab5d-e79242970516",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -194,7 +191,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
-          "persistentUuid": "9d8af996-fbd4-4d0c-8a7f-b1ff25f70ff5",
+          "persistentUuid": "5998dbfb-bd16-42db-a095-7d55967532cd",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -210,7 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "d4b418f5-c7fe-4e3b-aadb-92ffd33b5528",
+          "persistentUuid": "f3bdce7c-4b34-4893-897d-52fba6c008ca",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,
@@ -431,6 +428,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

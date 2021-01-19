@@ -12,6 +12,8 @@ import ElementWithMenu from './Menu/ElementWithMenu';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   /** Disables text field. */
@@ -147,8 +149,8 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     this.props.onChange && this.props.onChange('');
   };
 
-  handleKeyPressed = (e: { charCode: number, key: string }) => {
-    if (e.charCode === 13 || e.key === 'Enter') {
+  handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+    if (shouldValidate(event)) {
       this.props.onRequestSearch(this.state.value);
     }
   };
@@ -229,3 +231,11 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     );
   }
 }
+
+export const useShouldAutofocusSearchbar = () => {
+  // Note: this is not a React hook but is named as one to encourage
+  // components to use it as such, so that it could be reworked
+  // at some point to use a context (verify in this case all usages).
+  const isTouchscreen = useScreenType() === 'touch';
+  return !isTouchscreen;
+};

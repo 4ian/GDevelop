@@ -10,7 +10,7 @@ type Props = {|
   onRetry?: () => void,
 |};
 
-export default ({ onRetry, children }: Props) => (
+const PlaceholderError = ({ onRetry, children }: Props) => (
   <Column expand alignItems="center">
     <EmptyMessage>{children}</EmptyMessage>
     <Line>
@@ -24,3 +24,5 @@ export default ({ onRetry, children }: Props) => (
     </Line>
   </Column>
 );
+
+export default PlaceholderError;

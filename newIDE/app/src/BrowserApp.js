@@ -26,7 +26,7 @@ import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProv
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
-import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
+import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -41,8 +41,9 @@ export const create = (authentification: Authentification) => {
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
+      resourceFetcher={BrowserResourceFetcher}
     >
-      {({ i18n, eventsFunctionsExtensionsState }) => (
+      {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
@@ -60,46 +61,38 @@ export const create = (authentification: Authentification) => {
             initialFileMetadataToOpen,
             getStorageProvider,
           }) => (
-            <UnsavedChangesContext.Consumer>
-              {unsavedChanges => (
-                <MainFrame
-                  i18n={i18n}
-                  eventsFunctionsExtensionsState={
-                    eventsFunctionsExtensionsState
-                  }
-                  renderPreviewLauncher={(props, ref) => (
-                    <BrowserS3PreviewLauncher {...props} ref={ref} />
-                  )}
-                  renderExportDialog={props => (
-                    <ExportDialog
-                      {...props}
-                      exporters={getBrowserExporters()}
-                      allExportersRequireOnline
-                    />
-                  )}
-                  renderCreateDialog={props => (
-                    <CreateProjectDialog
-                      {...props}
-                      examplesComponent={BrowserExamples}
-                      startersComponent={BrowserStarters}
-                    />
-                  )}
-                  introDialog={<BrowserIntroDialog />}
-                  storageProviders={storageProviders}
-                  getStorageProviderOperations={getStorageProviderOperations}
-                  getStorageProvider={getStorageProvider}
-                  resourceSources={browserResourceSources}
-                  resourceExternalEditors={browserResourceExternalEditors}
-                  extensionsLoader={makeExtensionsLoader({
-                    objectsEditorService: ObjectsEditorService,
-                    objectsRenderingService: ObjectsRenderingService,
-                    filterExamples: !Window.isDev(),
-                  })}
-                  initialFileMetadataToOpen={initialFileMetadataToOpen}
-                  unsavedChanges={unsavedChanges}
+            <MainFrame
+              i18n={i18n}
+              renderPreviewLauncher={(props, ref) => (
+                <BrowserS3PreviewLauncher {...props} ref={ref} />
+              )}
+              renderExportDialog={props => (
+                <ExportDialog
+                  {...props}
+                  exporters={getBrowserExporters()}
+                  allExportersRequireOnline
                 />
               )}
-            </UnsavedChangesContext.Consumer>
+              renderCreateDialog={props => (
+                <CreateProjectDialog
+                  {...props}
+                  examplesComponent={BrowserExamples}
+                  startersComponent={BrowserStarters}
+                />
+              )}
+              introDialog={<BrowserIntroDialog />}
+              storageProviders={storageProviders}
+              getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProvider={getStorageProvider}
+              resourceSources={browserResourceSources}
+              resourceExternalEditors={browserResourceExternalEditors}
+              extensionsLoader={makeExtensionsLoader({
+                objectsEditorService: ObjectsEditorService,
+                objectsRenderingService: ObjectsRenderingService,
+                filterExamples: !Window.isDev(),
+              })}
+              initialFileMetadataToOpen={initialFileMetadataToOpen}
+            />
           )}
         </ProjectStorageProviders>
       )}

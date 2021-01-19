@@ -9,11 +9,13 @@ declare class libGDevelop {
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
+  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
+  asForEachChildVariableEvent(gdBaseEvent): gdForEachChildVariableEvent;
   asCommentEvent(gdBaseEvent): gdCommentEvent;
   asGroupEvent(gdBaseEvent): gdGroupEvent;
   asLinkEvent(gdBaseEvent): gdLinkEvent;
@@ -34,6 +36,7 @@ declare class libGDevelop {
 
   VectorString: Class<gdVectorString>;
   VectorPlatformExtension: Class<gdVectorPlatformExtension>;
+  VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
@@ -41,6 +44,7 @@ declare class libGDevelop {
   MapStringExpressionMetadata: Class<gdMapStringExpressionMetadata>;
   MapStringInstructionMetadata: Class<gdMapStringInstructionMetadata>;
   MapStringEventMetadata: Class<gdMapStringEventMetadata>;
+  MapExtensionProperties: Class<gdMapExtensionProperties>;
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
   VersionWrapper: Class<gdVersionWrapper>;
@@ -55,6 +59,7 @@ declare class libGDevelop {
   LoadingScreen: Class<gdLoadingScreen>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorContent: Class<gdBehaviorContent>;
@@ -96,6 +101,7 @@ declare class libGDevelop {
   ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
+  DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
@@ -111,6 +117,7 @@ declare class libGDevelop {
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
+  ForEachChildVariableEvent: Class<gdForEachChildVariableEvent>;
   CommentEvent: Class<gdCommentEvent>;
   GroupEvent: Class<gdGroupEvent>;
   LinkEvent: Class<gdLinkEvent>;
@@ -156,6 +163,7 @@ declare class libGDevelop {
   ArbitraryResourceWorker: Class<gdArbitraryResourceWorker>;
   ArbitraryResourceWorkerJS: Class<gdArbitraryResourceWorkerJS>;
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
+  ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   LayoutEditorCanvasOptions: Class<gdLayoutEditorCanvasOptions>;

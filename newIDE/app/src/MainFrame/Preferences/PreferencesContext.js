@@ -4,6 +4,10 @@ import * as React from 'react';
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -27,7 +31,11 @@ export type AlertMessageIdentifier =
   | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
-  | 'lifecycle-events-function-included-only-if-extension-used';
+  | 'lifecycle-events-function-included-only-if-extension-used'
+  | 'p2p-broker-recommendation'
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation'
+  | 'extension-installed-explanation';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -124,6 +132,20 @@ export const allAlertMessages: Array<{
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
+  {
+    key: 'p2p-broker-recommendation',
+    label: <Trans>Peer to peer broker server recommendation</Trans>,
+  },
+  {
+    key: 'command-palette-shortcut',
+    label: <Trans>Command palette keyboard shortcut</Trans>,
+  },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
 ];
 
 /**
@@ -151,7 +173,9 @@ export type PreferencesValues = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
-  useCommandPalette: boolean,
+  userShortcutMap: ShortcutMap,
+  newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  isMenuBarHiddenInPreview: boolean,
 |};
 
 /**
@@ -196,14 +220,23 @@ export type Preferences = {|
   setAutoOpenMostRecentProject: (enabled: boolean) => void,
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
-  setUseCommandPalette: (enabled: boolean) => void,
+  resetShortcutsToDefault: () => void,
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
+  getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
+  setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getIsMenuBarHiddenInPreview: () => boolean,
+  setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName: electron
+      ? electron.remote.nativeTheme.shouldUseDarkColors
+        ? 'Nord'
+        : 'GDevelop default'
+      : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -220,7 +253,9 @@ export const initialPreferences = {
     recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    useCommandPalette: true,
+    userShortcutMap: {},
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    isMenuBarHiddenInPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -255,7 +290,12 @@ export const initialPreferences = {
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
-  setUseCommandPalette: (enabled: boolean) => {},
+  resetShortcutsToDefault: () => {},
+  setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
+  getNewObjectDialogDefaultTab: () => 'asset-store',
+  setNewObjectDialogDefaultTab: () => {},
+  getIsMenuBarHiddenInPreview: () => true,
+  setIsMenuBarHiddenInPreview: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

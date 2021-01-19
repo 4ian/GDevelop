@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shooting-bullets-explanation\\shooting-bullets-explanation.json",
+    "projectUuid": "5935ef21-e6be-42f4-8aab-724d02048d9e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Basic explanation about shooting bullets",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -177,7 +174,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "c8c6632a-7f09-4476-852f-63f452dd2c18",
+          "persistentUuid": "3458a491-0172-46e4-8ff4-f59843814e31",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -198,7 +195,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "a12631c3-c7e9-4174-aff0-6d3ab9a9c24d",
+          "persistentUuid": "4d8e19ba-2e10-4baf-9f3c-0f8d6d861496",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -522,6 +519,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -577,7 +579,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "219ac629-d272-4246-8b2f-e1f22705be6a",
+          "persistentUuid": "b720cae1-c5c3-4ea1-9195-96396d94868f",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -598,7 +600,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "1d686e4d-37a5-4011-9d0c-00a295767f61",
+          "persistentUuid": "ebd6f39b-6581-4fb4-8ab8-2465f62f5518",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -619,7 +621,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
-          "persistentUuid": "4fe96b36-11f5-4aa2-a388-a7067523865a",
+          "persistentUuid": "45be8aed-2d4a-4a27-b07f-ba4efdc4d49a",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -640,7 +642,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
-          "persistentUuid": "470baaf0-9274-44f2-b0e8-2c4d20e6c6bf",
+          "persistentUuid": "6299af59-ccf9-4b32-a893-dc5cbe563481",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -990,6 +992,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

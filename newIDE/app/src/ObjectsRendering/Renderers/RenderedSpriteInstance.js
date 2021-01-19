@@ -67,7 +67,7 @@ RenderedSpriteInstance.getThumbnail = function(
       .getDirection(0)
       .getSprite(0)
       .getImageName();
-    return resourcesLoader.getResourceFullUrl(project, imageName);
+    return resourcesLoader.getResourceFullUrl(project, imageName, {});
   }
 
   return 'res/unknown32.png';

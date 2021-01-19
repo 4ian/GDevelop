@@ -6,6 +6,7 @@ declare class gdPreviewExportOptions {
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
+  setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

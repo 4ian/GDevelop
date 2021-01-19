@@ -8,6 +8,7 @@ export type PreviewOptions = {|
   networkPreview: boolean,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
+  getIsMenuBarHiddenInPreview: () => boolean,
 |};
 
 /** The functions that PreviewLauncher must expose on their class */

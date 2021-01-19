@@ -293,7 +293,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition("NoMoreParticles",
                    _("No more particles"),
-                   _("Return true if the object does not emit particles "
+                   _("Check if the object does not emit particles "
                      "anylonger, so as to destroy it for example."),
                    _("_PARAM0_ does not emit anylonger."),
                    _("Common"),

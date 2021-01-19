@@ -56,7 +56,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("PathFound",
                      _("Path found"),
-                     _("Return true if a path has been found."),
+                     _("Check if a path has been found."),
                      _("A path has been found for _PARAM0_"),
                      "",
                      "CppPlatform/Extensions/AStaricon24.png",
@@ -69,7 +69,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("DestinationReached",
                      _("Destination reached"),
-                     _("Return true if the destination was reached."),
+                     _("Check if the destination was reached."),
                      _("_PARAM0_ reached its destination"),
                      "",
                      "CppPlatform/Extensions/AStaricon24.png",
@@ -338,7 +338,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("DiagonalsAllowed",
                      _("Diagonal movement"),
-                     _("Return true if the object is allowed to move "
+                     _("Check if the object is allowed to move "
                        "diagonally on the path"),
                      _("Diagonal moves allowed for _PARAM0_"),
                      _("Path"),
@@ -366,7 +366,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("ObjectRotated",
                      _("Object rotated"),
-                     _("Return true if the object is rotated when traveling on "
+                     _("Check if the object is rotated when traveling on "
                        "its path."),
                      _("_PARAM0_ is rotated when traveling on its path"),
                      _("Path"),
@@ -622,7 +622,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("IsImpassable",
                      _("Is object impassable?"),
-                     _("Return true if the obstacle is impassable"),
+                     _("Check if the obstacle is impassable"),
                      _("_PARAM0_ is impassable"),
                      _("Obstacles"),
                      "CppPlatform/Extensions/pathfindingobstacleicon24.png",

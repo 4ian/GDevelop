@@ -15,6 +15,8 @@ import {
 import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import { type CommandName } from '../../CommandPalette/CommandsList';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -26,6 +28,7 @@ type Props = {|
 type State = Preferences;
 
 const LocalStorageItem = 'gd-preferences';
+const MAX_RECENT_FILES_COUNT = 20;
 
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
@@ -64,7 +67,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
-    setUseCommandPalette: this._setUseCommandPalette.bind(this),
+    setShortcutForCommand: this._setShortcutForCommand.bind(this),
+    resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
+    getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
+    setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
+    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
   };
 
   componentDidMount() {
@@ -393,7 +401,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }
@@ -404,7 +412,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }
@@ -441,10 +449,57 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setUseCommandPalette(enabled: boolean) {
+  _resetShortcutsToDefault() {
     this.setState(
       state => ({
-        values: { ...state.values, useCommandPalette: enabled },
+        values: { ...state.values, userShortcutMap: {} },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShortcutForCommand(commandName: CommandName, shortcutString: string) {
+    const defaultShortcut = defaultShortcuts[commandName] || '';
+    const setToDefault = defaultShortcut === shortcutString;
+
+    const updatedShortcutMap = { ...this.state.values.userShortcutMap };
+    if (setToDefault) delete updatedShortcutMap[commandName];
+    else updatedShortcutMap[commandName] = shortcutString;
+
+    this.setState(
+      state => ({
+        values: { ...state.values, userShortcutMap: updatedShortcutMap },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getNewObjectDialogDefaultTab() {
+    return this.state.values.newObjectDialogDefaultTab;
+  }
+
+  _setNewObjectDialogDefaultTab(
+    newObjectDialogDefaultTab: 'asset-store' | 'new-object'
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, newObjectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getIsMenuBarHiddenInPreview() {
+    return this.state.values.isMenuBarHiddenInPreview;
+  }
+
+  _setIsMenuBarHiddenInPreview(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isMenuBarHiddenInPreview: enabled,
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

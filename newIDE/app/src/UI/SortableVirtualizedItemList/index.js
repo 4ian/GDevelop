@@ -28,6 +28,7 @@ type Props<Item> = {|
   buildMenuTemplate: (Item, index: number) => any,
   onMoveSelectionToItem: (destinationItem: Item) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  scaleUpItemIconWhenSelected?: boolean,
   reactDndType: string,
 |};
 
@@ -57,6 +58,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       onEditItem,
       renamedItem,
       getItemName,
+      scaleUpItemIconWhenSelected,
     } = this.props;
 
     const nameBeingEdited = renamedItem === item;
@@ -78,6 +80,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
         hideMenuButton={windowWidth === 'small'}
+        scaleUpItemIconWhenSelected={scaleUpItemIconWhenSelected}
         connectIconDragSource={connectIconDragSource || null}
       />
     );
@@ -94,6 +97,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       onAddNewItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
+      selectedItems,
     } = this.props;
     const { DragSourceAndDropTarget } = this;
 
@@ -134,6 +138,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   const item = fullList[index];
                   const nameBeingEdited = renamedItem === item;
+                  const selected = selectedItems.indexOf(item) !== -1;
 
                   return (
                     <div style={style} key={key}>
@@ -160,6 +165,13 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           isOver,
                           canDrop,
                         }) => {
+                          // If on a touch screen, setting the whole item to be
+                          // draggable would prevent scroll. Set the icon only to be
+                          // draggable if the item is not selected. When selected,
+                          // set the whole item to be draggable.
+                          const canDragOnlyIcon =
+                            screenType === 'touch' && !selected;
+
                           // Add an extra div because connectDropTarget/connectDragSource can
                           // only be used on native elements
                           const dropTarget = connectDropTarget(
@@ -169,16 +181,16 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                                 item,
                                 index,
                                 windowWidth,
-                                screenType === 'touch' // Set the icon to be draggable, only if on a touch screen
-                                  ? connectDragSource
-                                  : null
+                                // Only mark the icon as draggable if needed
+                                // (touchscreens).
+                                canDragOnlyIcon ? connectDragSource : null
                               )}
                             </div>
                           );
 
                           if (!dropTarget) return null;
 
-                          return screenType === 'touch'
+                          return canDragOnlyIcon
                             ? dropTarget
                             : connectDragSource(dropTarget);
                         }}

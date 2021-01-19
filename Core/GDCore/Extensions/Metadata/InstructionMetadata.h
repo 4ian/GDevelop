@@ -274,12 +274,12 @@ class GD_CORE_API InstructionMetadata {
   bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
   /**
-   * Get the help path of the instruction, relative to the documentation root.
+   * Get the help path of the instruction, relative to the GDevelop documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the instruction, relative to the documentation root.
+   * Set the help path of the instruction, relative to the GDevelop documentation root.
    */
   InstructionMetadata &SetHelpPath(const gd::String &path) {
     helpPath = path;

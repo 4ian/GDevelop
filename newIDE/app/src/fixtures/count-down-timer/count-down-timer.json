@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Documents/Projects/GDevelop/count-down-timer/game.json",
+    "projectUuid": "544cc070-3288-4a56-b73b-554b38851ebf",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -143,7 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "TimerText",
-          "persistentUuid": "2b1a3387-3dc4-4a61-ae4b-1791f137482e",
+          "persistentUuid": "addd86d8-b3fc-4588-9f83-dee7ae2d2655",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -424,6 +421,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -479,7 +481,7 @@
           "layer": "",
           "locked": false,
           "name": "GOText",
-          "persistentUuid": "4d7e283e-ca20-40fa-b050-fa73ee84f229",
+          "persistentUuid": "7ee41398-c0b8-4133-b0d1-1eb370bfd0b1",
           "width": 0,
           "x": 136,
           "y": 245,
@@ -513,6 +515,11 @@
       "events": [],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

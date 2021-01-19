@@ -41,6 +41,28 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Second angle"));
 
   extension
+      .AddExpression("AngleBetweenPositions",
+                     _("Angle between two positions"),
+                     _("Compute the angle between two positions."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("First point X position"))
+      .AddParameter("expression", _("First point Y position"))
+      .AddParameter("expression", _("Second point X position"))
+      .AddParameter("expression", _("Second point Y position"));
+
+  extension
+      .AddExpression("DistanceBetweenPositions",
+                     _("Distance between two positions"),
+                     _("Compute the distance between two positions."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("First point X position"))
+      .AddParameter("expression", _("First point Y position"))
+      .AddParameter("expression", _("Second point X position"))
+      .AddParameter("expression", _("Second point Y position"));
+
+  extension
       .AddExpression("mod",
                      _("Modulo"),
                      _("x mod y"),

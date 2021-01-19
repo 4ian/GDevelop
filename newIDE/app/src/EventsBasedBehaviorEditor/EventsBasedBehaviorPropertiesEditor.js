@@ -44,14 +44,17 @@ const validatePropertyName = (
   newName: string
 ) => {
   if (!newName) {
-    showWarningBox(i18n._(t`The name of a property cannot be empty.`));
+    showWarningBox(i18n._(t`The name of a property cannot be empty.`), {
+      delayToNextTick: true,
+    });
     return false;
   }
   if (newName === 'name' || newName === 'type') {
     showWarningBox(
       i18n._(
         t`The name of a property cannot be "name" or "type", as they are used by GDevelop internally.`
-      )
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -59,7 +62,8 @@ const validatePropertyName = (
     showWarningBox(
       i18n._(
         t`This name is already used by another property. Choose a unique name for each property.`
-      )
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -67,7 +71,8 @@ const validatePropertyName = (
     showWarningBox(
       i18n._(
         t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-      )
+      ),
+      { delayToNextTick: true }
     );
     return false;
   }
@@ -172,7 +177,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               <MoreVert />
                             </IconButton>
                           }
-                          buildMenuTemplate={() => [
+                          buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
                               click: () =>

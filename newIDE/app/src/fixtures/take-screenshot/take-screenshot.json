@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/ScreenshotExample/game.json",
+    "projectUuid": "f2a8c317-4709-4aae-b904-4c42a65bdd5b",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -178,7 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "Description",
-          "persistentUuid": "e70ef757-fa8e-427d-9c3a-0daf65a349cc",
+          "persistentUuid": "109c096f-a4fb-4d7b-a468-73d01c620c8d",
           "width": 0,
           "x": 26,
           "y": 14,
@@ -194,7 +191,7 @@
           "layer": "",
           "locked": false,
           "name": "GDLogo",
-          "persistentUuid": "c06fc5c3-f024-4f7a-93bf-8496bd76d26b",
+          "persistentUuid": "1abcdf86-5e1b-4046-801e-64cbc6bbce84",
           "width": 0,
           "x": 246,
           "y": 140,
@@ -210,7 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "48ebae01-6b0a-4b92-a560-06ed11075b9c",
+          "persistentUuid": "22e8d36a-259e-4bf8-aa40-f0cdfcbce74c",
           "width": 216,
           "x": 293,
           "y": 413,
@@ -226,7 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "ScreenshotPath",
-          "persistentUuid": "84c5af9d-0dd0-40a9-988b-66e3ed12ab32",
+          "persistentUuid": "ea3e82eb-b008-49d8-a45e-7bd95a18d7ec",
           "width": 0,
           "x": 381,
           "y": 288,
@@ -522,6 +519,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

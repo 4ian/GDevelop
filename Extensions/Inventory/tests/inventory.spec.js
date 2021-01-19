@@ -1,5 +1,5 @@
 describe('Inventory', function() {
-	var inventory = new Inventory();
+	var inventory = new gdjs.Inventory();
 
 	it('is empty when constructed', function() {
 		expect(inventory.has('sword')).to.be(false);

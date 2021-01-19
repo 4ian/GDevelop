@@ -120,12 +120,12 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& AddIncludeFile(const gd::String& includeFile);
 
   /**
-   * Get the help path of the behavior, relative to the documentation root.
+   * Get the help path of the behavior, relative to the GDevelop documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the behavior, relative to the documentation root.
+   * Set the help path of the behavior, relative to the GDevelop documentation root.
    *
    * The behavior instructions will have this help path set by
    * default, unless you call SetHelpPath on them.

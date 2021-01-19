@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { ListItem } from '../../../UI/List';
+import { ListItem, type ListItemRefType } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpression/CreateTree';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
@@ -17,7 +17,7 @@ type Props<T> = {|
   initiallyOpenedPath?: ?Array<string>,
 
   // Optional ref that will be filled with the selected ListItem
-  selectedItemRef?: { current: null | ListItem },
+  selectedItemRef?: { current: null | ListItemRefType },
 |};
 
 export const renderInstructionOrExpressionTree = <

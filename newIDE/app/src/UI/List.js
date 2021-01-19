@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemIcon from '@material-ui/core/ListItemIcon';
@@ -17,6 +18,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
+import { useLongTouch } from '../Utils/UseLongTouch';
 
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
@@ -39,7 +41,7 @@ type ListItemRightButtonProps =
     |}
   | {|
       displayMenuButton: boolean,
-      buildMenuTemplate: () => Array<MenuItemTemplate>,
+      buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
     |}
   | {|
       displayLinkButton: boolean,
@@ -88,102 +90,100 @@ type ListItemProps = {|
   secondaryTextLines?: 1 | 2,
 |};
 
-type ListItemState = {|
-  isOpen: boolean,
-|};
+export type ListItemRefType = any; // Should be a material-ui ListIten
 
 /**
  * A ListItem to be used in a List.
  *
  * Also used outside of a List by virtualized lists.
  */
-export class ListItem extends React.Component<ListItemProps, ListItemState> {
-  state = {
-    isOpen: !!this.props.initiallyOpen,
-  };
-  _elementWithMenu: ?ElementWithMenu;
+export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+  (props: ListItemProps, ref) => {
+    const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
+    const elementWithMenu = React.useRef<?ElementWithMenu>(null);
 
-  _renderListItemSecondaryAction = () => {
-    const { props } = this;
-    if (props.displayReloadButton) {
-      return (
-        <MUIListItemSecondaryAction>
-          <Tooltip title={props.reloadButtonTooltip}>
-            <IconButton
-              size="small"
-              edge="end"
-              aria-label="reload"
-              onClick={props.onReload}
-            >
-              <Refresh />
-            </IconButton>
-          </Tooltip>
-        </MUIListItemSecondaryAction>
-      );
-    }
-    if (props.buildMenuTemplate) {
-      return props.displayMenuButton ? (
-        <MUIListItemSecondaryAction>
-          <ElementWithMenu
-            ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
-            element={
-              <IconButton size="small" edge="end" aria-label="menu">
-                <MoreVert style={{ color: props.rightIconColor }} />
+    const openContextMenu = React.useCallback(
+      () => {
+        if (elementWithMenu.current) {
+          elementWithMenu.current.open();
+        }
+      },
+      [elementWithMenu]
+    );
+    const longTouchForContextMenuProps = useLongTouch(openContextMenu);
+
+    const renderListItemSecondaryAction = () => {
+      if (props.displayReloadButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <Tooltip title={props.reloadButtonTooltip}>
+              <IconButton
+                size="small"
+                edge="end"
+                aria-label="reload"
+                onClick={props.onReload}
+              >
+                <Refresh />
               </IconButton>
+            </Tooltip>
+          </MUIListItemSecondaryAction>
+        );
+      }
+      if (props.buildMenuTemplate) {
+        return props.displayMenuButton ? (
+          <MUIListItemSecondaryAction>
+            <ElementWithMenu
+              ref={elementWithMenu}
+              element={
+                <IconButton size="small" edge="end" aria-label="menu">
+                  <MoreVert style={{ color: props.rightIconColor }} />
+                </IconButton>
+              }
+              buildMenuTemplate={props.buildMenuTemplate}
+            />
+          </MUIListItemSecondaryAction>
+        ) : (
+          <ElementWithMenu
+            ref={elementWithMenu}
+            element={
+              <div /> /* We still need a dummy div for context menu placement */
             }
             buildMenuTemplate={props.buildMenuTemplate}
           />
-        </MUIListItemSecondaryAction>
-      ) : (
-        <ElementWithMenu
-          ref={elementWithMenu => (this._elementWithMenu = elementWithMenu)}
-          element={
-            <div /> /* We still need a dummy div for context menu placement */
-          }
-          buildMenuTemplate={props.buildMenuTemplate}
-        />
-      );
-    }
-    if (props.displayLinkButton) {
-      return (
-        <MUIListItemSecondaryAction>
-          <IconButton
-            size="small"
-            edge="end"
-            aria-label="open link"
-            onClick={props.onOpenLink}
-          >
-            <OpenInNew style={{ color: props.rightIconColor }} />
-          </IconButton>
-        </MUIListItemSecondaryAction>
-      );
-    }
-    if (props.displayRemoveButton) {
-      return (
-        <MUIListItemSecondaryAction>
-          <IconButton
-            size="small"
-            edge="end"
-            aria-label="remove"
-            onClick={props.onRemove}
-          >
-            <Remove style={{ color: props.rightIconColor }} />
-          </IconButton>
-        </MUIListItemSecondaryAction>
-      );
-    }
+        );
+      }
+      if (props.displayLinkButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <IconButton
+              size="small"
+              edge="end"
+              aria-label="open link"
+              onClick={props.onOpenLink}
+            >
+              <OpenInNew style={{ color: props.rightIconColor }} />
+            </IconButton>
+          </MUIListItemSecondaryAction>
+        );
+      }
+      if (props.displayRemoveButton) {
+        return (
+          <MUIListItemSecondaryAction>
+            <IconButton
+              size="small"
+              edge="end"
+              aria-label="remove"
+              onClick={props.onRemove}
+            >
+              <Remove style={{ color: props.rightIconColor }} />
+            </IconButton>
+          </MUIListItemSecondaryAction>
+        );
+      }
 
-    return null;
-  };
+      return null;
+    };
 
-  _openContextMenu = (event: any) => {
-    if (this._elementWithMenu) {
-      this._elementWithMenu.open(event);
-    }
-  };
-
-  render() {
-    const { props, state } = this;
     const { renderNestedItems } = props;
 
     if (!renderNestedItems) {
@@ -200,10 +200,10 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
           disabled={props.disabled}
           selected={props.selected}
           style={props.style}
-          onContextMenu={
-            props.buildMenuTemplate ? this._openContextMenu : undefined
-          }
+          onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
+          {...longTouchForContextMenuProps}
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
+          ref={ref}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -213,7 +213,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             primary={props.primaryText}
             secondary={props.secondaryText}
           />
-          {this._renderListItemSecondaryAction()}
+          {renderListItemSecondaryAction()}
           {props.displayAddIcon && (
             <Add style={{ color: props.rightIconColor }} />
           )}
@@ -223,7 +223,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
         </MUIListItem>
       );
     } else {
-      const isOpen = props.open === undefined ? state.isOpen : props.open;
+      const isItemOpen = props.open === undefined ? isOpen : props.open;
       return (
         <React.Fragment>
           <MUIListItem
@@ -231,13 +231,14 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             dense={useDenseLists}
             disableRipple
             onClick={() => {
-              this.setState(state => ({ isOpen: !state.isOpen }));
+              setIsOpen(!isItemOpen);
               if (props.onClick) {
                 props.onClick();
               }
             }}
             disabled={props.disabled}
             style={props.style}
+            ref={ref}
           >
             {props.leftIcon && (
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -248,15 +249,15 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
               secondary={props.secondaryText}
             />
             {props.autoGenerateNestedIndicator ? (
-              isOpen ? (
+              isItemOpen ? (
                 <ExpandLess />
               ) : (
                 <ExpandMore />
               )
             ) : null}
-            {this._renderListItemSecondaryAction()}
+            {renderListItemSecondaryAction()}
           </MUIListItem>
-          {isOpen && (
+          {isItemOpen && (
             <MUIList
               component="div"
               disablePadding
@@ -273,7 +274,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
       );
     }
   }
-}
+);
 
 // We support a subset of the props supported by Material-UI v0.x List
 // They should be self descriptive - refer to Material UI docs otherwise.

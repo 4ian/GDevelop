@@ -80,6 +80,17 @@ class GD_CORE_API Resource {
   virtual void SetFile(const gd::String& newFile){};
 
   /**
+   * TODO: make a ResourceOrigin object?
+   */
+  virtual void SetOrigin(const gd::String& originName_, const gd::String& originIdentifier_) {
+    originName = originName_;
+    originIdentifier = originIdentifier_;
+  }
+
+  virtual const gd::String& GetOriginName() const { return originName; }
+  virtual const gd::String& GetOriginIdentifier() const { return originIdentifier; }
+
+  /**
    * \brief Set the metadata (any string) associated to the resource.
    * \note Can be used by external editors to store extra information, for
    * example the configuration used to produce a sound.
@@ -142,6 +153,8 @@ class GD_CORE_API Resource {
   gd::String kind;
   gd::String name;
   gd::String metadata;
+  gd::String originName;
+  gd::String originIdentifier;
   bool userAdded;  ///< True if the resource was added by the user, and not
                    ///< automatically by GDevelop.
 
@@ -355,6 +368,18 @@ class GD_CORE_API ResourcesManager {
   bool HasResource(const gd::String& name) const;
 
   /**
+   * \brief Return the name of the resource with the given origin, if any.
+   * If not found, an empty string is returned.
+   */
+  const gd::String& GetResourceNameWithOrigin(const gd::String& originName, const gd::String& originIdentifier) const;
+
+  /**
+   * \brief Return the name of the first resource with the given file, if any.
+   * If not found, an empty string is returned.
+   */
+  const gd::String& GetResourceNameWithFile(const gd::String& file) const;
+
+  /**
    * \brief Return a reference to a resource.
    */
   Resource& GetResource(const gd::String& name);
@@ -487,6 +512,7 @@ class GD_CORE_API ResourcesManager {
   static ResourceFolder badFolder;
 #endif
   static Resource badResource;
+  static gd::String badResourceName;
 };
 
 #if defined(GD_IDE_ONLY)

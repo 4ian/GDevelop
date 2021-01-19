@@ -13,7 +13,10 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
@@ -22,6 +25,7 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/TinyXml/tinyxml.h"
@@ -30,6 +34,43 @@
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
+
+namespace {
+
+std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
+    const gd::Project &project,
+    const gd::String &extensionName,
+    const gd::DependencyMetadata &dependency) {
+  std::map<gd::String, gd::String> values;
+
+  for (const auto &extraSetting : dependency.GetAllExtraSettings()) {
+    const gd::String &type = extraSetting.second.GetType();
+    const gd::String extraSettingValue =
+        type == "ExtensionProperty"
+            ? project.GetExtensionProperties().GetValue(
+                  extensionName, extraSetting.second.GetValue())
+            : extraSetting.second.GetValue();
+
+    if (!extraSettingValue.empty())
+      values[extraSetting.first] = extraSettingValue;
+  }
+
+  return values;
+};
+
+bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
+                                   const std::set<gd::String> &set) {
+  bool missingKey = false;
+  for (auto &key : set) {
+    if (map.find(key) == map.end()) {
+      missingKey = true;
+    }
+  }
+
+  return missingKey;
+}
+
+}  // namespace
 
 namespace gdjs {
 
@@ -133,14 +174,15 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-  // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath);
+  // Copy all the dependencies and their source maps
+  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
                            gdjsRoot + "/Runtime/index.html",
                            options.exportPath,
                            includesFiles,
+                           options.nonRuntimeScriptsCacheBurst,
                            "gdjs.runtimeGameOptions"))
     return false;
 
@@ -172,11 +214,16 @@ bool ExporterHelper::ExportPixiIndexFile(
     gd::String source,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
   // Generate the file
-  if (!CompleteIndexFile(str, exportDir, includesFiles, additionalSpec))
+  if (!CompleteIndexFile(str,
+                         exportDir,
+                         includesFiles,
+                         nonRuntimeScriptsCacheBurst,
+                         additionalSpec))
     return false;
 
   // Write the index.html file
@@ -221,22 +268,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsIos = [&getIconFilename]() {
-    std::vector<gd::String> sizes = {"180",
-                                     "60",
-                                     "120",
-                                     "76",
-                                     "152",
-                                     "40",
-                                     "80",
-                                     "57",
-                                     "114",
-                                     "72",
-                                     "144",
-                                     "167",
-                                     "29",
-                                     "58",
-                                     "50",
-                                     "100"};
+    std::vector<gd::String> sizes = {
+        "180", "60",  "120", "76", "152", "40", "80", "57",  "114", "72",
+        "144", "167", "29",  "58", "87",  "50", "20", "100", "167", "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -256,20 +290,45 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace(
               "GDJS_PACKAGENAME",
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))
-          .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
-  if (!project.GetAdMobAppId().empty()) {
-    str = str.FindAndReplace(
-        "<!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->",
-        "<plugin name=\"cordova-plugin-admob-free\" spec=\"~0.21.0\">\n"
-        "\t\t<variable name=\"ADMOB_APP_ID\" value=\"" +
-            project.GetAdMobAppId() +
-            "\" />\n"
-            "\t</plugin>");
+  gd::String plugins = "";
+
+  for (std::shared_ptr<gd::PlatformExtension> extension :
+       project.GetCurrentPlatform().GetAllPlatformExtensions()) {
+    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
+      if (dependency.GetDependencyType() == "cordova") {
+        gd::String plugin;
+        plugin += "<plugin name=\"" + dependency.GetExportName();
+        if (dependency.GetVersion() != "") {
+          plugin += "\" spec=\"" + dependency.GetVersion();
+        }
+        plugin += "\">\n";
+
+        auto extraSettingValues = GetExtensionDependencyExtraSettingValues(
+            project, extension->GetName(), dependency);
+
+        // For Cordova, all settings are considered a plugin variable.
+        for (auto &extraSetting : extraSettingValues) {
+          plugin += "\t\t<variable name=\"" + extraSetting.first +
+                    "\" value=\"" + extraSetting.second + "\" />\n";
+        }
+
+        plugin += "\t</plugin>";
+
+        // Don't include the plugin if an extra setting was not fulfilled.
+        bool missingSetting = AreMapKeysMissingElementOfSet(
+            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
+        if (!missingSetting) plugins += plugin;
+      }
+    }
   }
+
+  // TODO: migrate the plugins to the package.json
+  str =
+      str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write Cordova config.xml file.";
@@ -331,7 +390,11 @@ bool ExporterHelper::ExportCocos2dFiles(
 
     // Generate the file
     std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(str, exportDir, noIncludesInThisFile, "")) {
+    if (!CompleteIndexFile(str,
+                           exportDir,
+                           noIncludesInThisFile,
+                           /*nonRuntimeScriptsCacheBurst=*/0,
+                           "")) {
       lastError = "Unable to complete Cocos2d-JS index.html file.";
       return false;
     }
@@ -421,6 +484,39 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
 
+    gd::String packages = "";
+
+    for (std::shared_ptr<gd::PlatformExtension> extension :
+         project.GetCurrentPlatform()
+             .GetAllPlatformExtensions()) {  // TODO Add a way to select only
+                                             // used Extensions
+      for (gd::DependencyMetadata dependency :
+           extension->GetAllDependencies()) {
+        if (dependency.GetDependencyType() == "npm") {
+          if (dependency.GetVersion() == "") {
+            gd::LogError(
+                "Latest Version not available for NPM dependencies, "
+                "dependency " +
+                dependency.GetName() +
+                " is not exported. Please specify a version when calling "
+                "addDependency.");
+            continue;
+          }
+          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
+                      dependency.GetVersion() + "\",";
+          // For node extra settings are ignored
+        }
+      }
+    }
+
+    if (!packages.empty()) {
+      // Remove the , at the end as last item cannot have , in JSON.
+      packages = packages.substr(0, packages.size() - 1);
+    }
+
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
+                             packages);
+
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";
       return false;
@@ -466,12 +562,14 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String &str,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
-  for (auto& include: includesFiles) {
-    gd::String scriptSrc = GetExportedIncludeFilename(include);
+  for (auto &include : includesFiles) {
+    gd::String scriptSrc =
+        GetExportedIncludeFilename(include, nonRuntimeScriptsCacheBurst);
 
     // Sanity check if the file exists - if not skip it to avoid
     // including it in the list of scripts.
@@ -674,7 +772,14 @@ bool ExporterHelper::ExportExternalSourceFiles(
 }
 
 gd::String ExporterHelper::GetExportedIncludeFilename(
-    const gd::String& include) {
+    const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst) {
+  auto addSearchParameterToUrl = [](const gd::String &url,
+                                    const gd::String &urlEncodedParameterName,
+                                    const gd::String &urlEncodedValue) {
+    gd::String separator = url.find("?") == gd::String::npos ? "?" : "&";
+    return url + separator + urlEncodedParameterName + "=" + urlEncodedValue;
+  };
+
   if (!fs.IsAbsolute(include)) {
     // By convention, an include file that is relative is relative to
     // the "<GDJS Root>/Runtime" folder, and will have the same relative
@@ -689,14 +794,27 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
   } else {
     // Note: all the code generated from events are generated in another
     // folder and fall in this case:
-    return fs.FileNameFrom(include);
+    gd::String resolvedInclude = fs.FileNameFrom(include);
+
+    if (nonRuntimeScriptsCacheBurst == 0) {
+      return resolvedInclude;
+    }
+
+    // Add the parameter to force the browser to reload the code - useful
+    // for cases where the browser is caching files that are getting
+    // overwritten.
+    return addSearchParameterToUrl(
+        resolvedInclude,
+        "gdCacheBurst",
+        gd::String::From(nonRuntimeScriptsCacheBurst));
   }
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
     const std::vector<gd::String> &includesFiles,
-    gd::String exportDir) {
-  for (auto& include : includesFiles) {
+    gd::String exportDir,
+    bool exportSourceMaps) {
+  for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
       // By convention, an include file that is relative is relative to
       // the "<GDJS Root>/Runtime" folder, and will have the same relative
@@ -707,6 +825,12 @@ bool ExporterHelper::ExportIncludesAndLibs(
         if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
+
+        gd::String sourceMap = source + ".map";
+        // Copy source map if present
+        if (exportSourceMaps && fs.FileExists(sourceMap)) {
+          fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
+        }
       } else {
         std::cout << "Could not find GDJS include file " << include
                   << std::endl;

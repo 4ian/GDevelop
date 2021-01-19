@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\candy-dragon\\game.json",
+    "projectUuid": "19c26d45-28d0-489c-a10e-1ff9de121abc",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -153,7 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "a517e5f7-b70c-4164-9bd7-7d14ccc3062c",
+          "persistentUuid": "dd3b2ce3-aa1b-4f44-973d-bff0899ee063",
           "width": 0,
           "x": 960,
           "y": 0,
@@ -169,7 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
-          "persistentUuid": "d8dcf771-1ba7-4a13-848b-7b02af0c3a84",
+          "persistentUuid": "5d587bc1-1999-42dc-b993-e0dcea4a4978",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -357,6 +354,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

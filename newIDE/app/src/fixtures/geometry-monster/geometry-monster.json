@@ -1,26 +1,21 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\efka\\Desktop\\Geometry Monster\\game.json",
+    "projectUuid": "6919c31a-1af9-4e4e-8d1e-14e3c5aaefaa",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Geometry Monster",
     "author": "mypoint13k",
     "windowWidth": 640,
@@ -33,6 +28,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -464,7 +460,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
-          "persistentUuid": "6694536e-eaeb-41c6-931c-e9b8328dccb1",
+          "persistentUuid": "10c7003e-d5dc-4f52-bdec-91b7e3a5131c",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -480,7 +476,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
-          "persistentUuid": "6aab73b7-e587-445b-a7bb-344d68c0cffa",
+          "persistentUuid": "892e1034-86c6-4d78-bc14-cd0a4f787ddd",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -777,6 +773,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -860,7 +861,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
-          "persistentUuid": "0de1008b-4526-4869-9612-307ac49b17a8",
+          "persistentUuid": "c9fea555-d326-495f-b4af-2a0f67f52226",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -876,7 +877,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
-          "persistentUuid": "e8c02ca6-44da-42d7-ba2d-8f387d2d7fca",
+          "persistentUuid": "59c2bfe0-b72c-4b2f-b9b2-b0d87adb606e",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -892,7 +893,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
-          "persistentUuid": "e98fb825-df2a-4d18-b403-77de521591dc",
+          "persistentUuid": "7ef31e14-c3c1-4267-b908-033929c558c2",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -908,7 +909,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
-          "persistentUuid": "bf8d175c-0d50-4c84-9a59-f73b37f0d7d1",
+          "persistentUuid": "7e89408b-439b-4d6b-aa5b-76146e40123e",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -924,7 +925,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
-          "persistentUuid": "59f46e63-2915-4efe-9519-e962ce6dbc7b",
+          "persistentUuid": "b7e93d15-d551-4976-a491-31d6b84fc730",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -940,7 +941,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
-          "persistentUuid": "d9ae3c3e-81df-4d70-a102-c7aee3d3034e",
+          "persistentUuid": "3bf781c1-bec1-4930-adae-c77450dfa745",
           "width": 0,
           "x": 110,
           "y": 406,
@@ -3388,6 +3389,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3428,10 +3434,17 @@
       "description": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
       "extensionNamespace": "",
       "fullName": "Stay On Screen",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "StayOnScreen",
+      "previewIconUrl": "",
       "shortDescription": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
-      "tags": "positioning, camera, screen",
       "version": "0.0.1",
+      "tags": [
+        "positioning",
+        "camera",
+        "screen"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3552,10 +3565,17 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "SineMovement",
+      "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3815,10 +3835,20 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Flash",
+      "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -4423,10 +4453,19 @@
       "description": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
       "extensionNamespace": "",
       "fullName": "Health (life points and damages for objects)",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Health",
+      "previewIconUrl": "",
       "shortDescription": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
-      "tags": "health, life, damage, hit, heal",
       "version": "0.0.1",
+      "tags": [
+        "health",
+        "life",
+        "damage",
+        "hit",
+        "heal"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {

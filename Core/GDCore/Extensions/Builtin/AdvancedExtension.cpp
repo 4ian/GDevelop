@@ -74,6 +74,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddCondition("GetArgumentAsBoolean",
+                    _("Check if a function parameter is set to true (or yes)"),
+                    _("Check if the specified function parameter (also called "
+                      "\"argument\") is set to True or Yes. If the argument is "
+                      "a string, an empty string is considered as \"false\". "
+                      "If it's a number, 0 is considered as \"false\"."),
+                    _("Parameter _PARAM0_ is true"),
+                    _("Functions"),
+                    "res/function24.png",
+                    "res/function16.png")
+      .AddParameter("string", "Parameter name")
+      .MarkAsAdvanced();
+
+  extension
       .AddExpression(
           "GetArgumentAsNumber",
           _("Get function parameter value"),

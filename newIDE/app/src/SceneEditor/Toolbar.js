@@ -1,5 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -110,22 +111,22 @@ export class Toolbar extends PureComponent<Props> {
                 tooltip={t`Toggle/edit grid`}
               />
             }
-            buildMenuTemplate={() => [
+            buildMenuTemplate={(i18n: I18nType) => [
               {
                 type: 'checkbox',
-                label: 'Show Mask',
+                label: i18n._(t`Show Mask`),
                 checked: this.props.isWindowMaskShown(),
                 click: () => this.props.toggleWindowMask(),
               },
               {
                 type: 'checkbox',
-                label: 'Show grid',
+                label: i18n._(t`Show grid`),
                 checked: this.props.isGridShown(),
                 click: () => this.props.toggleGrid(),
               },
               { type: 'separator' },
               {
-                label: 'Setup grid',
+                label: i18n._(t`Setup grid`),
                 click: () => this.props.openSetupGrid(),
               },
             ]}
@@ -137,19 +138,19 @@ export class Toolbar extends PureComponent<Props> {
                 tooltip={t`Change editor zoom`}
               />
             }
-            buildMenuTemplate={() => [
+            buildMenuTemplate={(i18n: I18nType) => [
               {
-                label: 'Zoom in',
+                label: i18n._(t`Zoom in`),
                 click: this.props.zoomIn,
                 accelerator: 'CmdOrCtrl+numadd',
               },
               {
-                label: 'Zoom out',
+                label: i18n._(t`Zoom out`),
                 click: this.props.zoomOut,
                 accelerator: 'CmdOrCtrl+numsub',
               },
               {
-                label: 'Center View',
+                label: i18n._(t`Center View`),
                 click: () => this.props.centerView(),
               },
               { type: 'separator' },

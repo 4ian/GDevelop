@@ -1,5 +1,10 @@
 // @flow
 import { type ExpressionAutocompletion } from '../../../ExpressionAutocompletion';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+  shouldFocusNextField,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
 
 export type AutocompletionsState = {|
   autocompletions: Array<ExpressionAutocompletion>,
@@ -91,14 +96,14 @@ export const handleAutocompletionsKeyDown = (
         (visibleAutocompletionsLength + state.selectedCompletionIndex - 1) %
         visibleAutocompletionsLength,
     };
-  } else if (event.key === 'Escape') {
+  } else if (shouldCloseOrCancel(event)) {
     // Stop propagation to avoid closing the modal the
     // field is contained in.
     event.preventDefault();
     event.stopPropagation();
 
     return getAutocompletionsInitialState();
-  } else if (event.key === 'Enter' || event.key === 'Tab') {
+  } else if (shouldValidate(event) || shouldFocusNextField(event)) {
     const autocompletion = state.autocompletions[state.selectedCompletionIndex];
     if (autocompletion) onInsertAutocompletion(autocompletion);
 

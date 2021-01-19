@@ -10,6 +10,7 @@ import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from '../UI/List';
+import Subheader from '../UI/Subheader';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import ListIcon from '../UI/ListIcon';
@@ -178,26 +179,6 @@ export default class LocalStarters extends Component<Props, State> {
                     leftIcon={
                       <ListIcon
                         iconSize={40}
-                        src="res/starters_icons/particle-effects-demo.png"
-                      />
-                    }
-                    primaryText={<Trans>Particle Effects Demo</Trans>}
-                    secondaryText={
-                      <Trans>
-                        A demo of various high quality particle effects (fire,
-                        magic, snow, rune spell...) that you can try and use in
-                        your game.
-                      </Trans>
-                    }
-                    secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'particle-effects-demo')
-                    }
-                  />
-                  <ListItem
-                    leftIcon={
-                      <ListIcon
-                        iconSize={40}
                         src="res/starters_icons/isometric-game.png"
                       />
                     }
@@ -251,12 +232,61 @@ export default class LocalStarters extends Component<Props, State> {
                     onClick={() => this.createFromExample(i18n, 'pairs')}
                   />
                   <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/new.png"
+                      />
+                    }
                     primaryText={<Trans>Empty game</Trans>}
                     secondaryText={
                       <Trans>Start a new game from scratch.</Trans>
                     }
                     secondaryTextLines={2}
                     onClick={() => this.createEmptyGame(i18n)}
+                  />
+                  <Subheader>
+                    <Trans>Advanced</Trans>
+                  </Subheader>
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/particle-effects-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Particle Effects Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo of various high quality particle effects (fire,
+                        magic, snow, rune spell...) that you can try and use in
+                        your game.
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'particle-effects-demo')
+                    }
+                  />
+                  <ListItem
+                    leftIcon={
+                      <ListIcon
+                        iconSize={40}
+                        src="res/starters_icons/game-feel-demo.png"
+                      />
+                    }
+                    primaryText={<Trans>Game Feel Demo</Trans>}
+                    secondaryText={
+                      <Trans>
+                        A demo showing how to enhance the "game feel" of your
+                        project: VFX, shot trail, ambient sounds and SFX,
+                        screenshake, wobble...
+                      </Trans>
+                    }
+                    secondaryTextLines={2}
+                    onClick={() =>
+                      this.createFromExample(i18n, 'game-feel-demo')
+                    }
                   />
                 </List>
                 <Line alignItems="center" justifyContent="center">

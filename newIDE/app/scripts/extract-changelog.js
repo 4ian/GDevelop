@@ -43,28 +43,42 @@ const extractCommitsFromGit = () => {
       .map(commit => {
         const lowerCaseMessage = commit.message.toLowerCase();
         const shouldHide =
-          lowerCaseMessage.includes('bump newide version') ||
+          lowerCaseMessage.includes("don't mention in changelog") ||
+          lowerCaseMessage.includes("don't mention in the changelog") ||
+          lowerCaseMessage.includes("don't show in changelog") ||
+          lowerCaseMessage.includes("don't show in the changelog") ||
+          lowerCaseMessage === 'update translations' ||
+          lowerCaseMessage === 'prettier' ||
+          lowerCaseMessage === 'update jsextension.js' ||
           lowerCaseMessage.includes('run code formatting') ||
           lowerCaseMessage.includes('fix formatting') ||
-          lowerCaseMessage.includes('fix warning') ||
-          lowerCaseMessage.includes('fix typo') ||
-          lowerCaseMessage === 'update translations' ||
-          lowerCaseMessage.includes('package-lock.json') ||
+          lowerCaseMessage.indexOf('run prettier') === 0 ||
+          lowerCaseMessage.indexOf('regen fixtures') === 0 ||
+          lowerCaseMessage.indexOf('regenerate fixtures') === 0 ||
+          lowerCaseMessage.indexOf('remove arrow function') === 0 ||
+          lowerCaseMessage.indexOf('update fixtures') === 0 ||
+          lowerCaseMessage.indexOf('try to fix flow') === 0 ||
+          lowerCaseMessage.indexOf('fix flow') === 0 ||
           lowerCaseMessage.indexOf('merge branch') === 0 ||
-          lowerCaseMessage.indexOf('merge pull request #') === 0;
-        const forceHide =
-          lowerCaseMessage.includes("don't mention in changelog") ||
-          lowerCaseMessage.includes("don't show in changelog");
+          lowerCaseMessage.indexOf('merge pull request #') === 0 ||
+          lowerCaseMessage.includes('bump newide version') ||
+          lowerCaseMessage.indexOf('fix warning') === 0 ||
+          lowerCaseMessage === 'fix compilation' ||
+          lowerCaseMessage.indexOf('fix typo') === 0 ||
+          lowerCaseMessage.includes('add files forgotten in last commit') ||
+          lowerCaseMessage.indexOf('apply review') === 0 ||
+          lowerCaseMessage.includes('package-lock.json') ||
+          lowerCaseMessage.includes('yarn.lock');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
+        const forDev = lowerCaseMessage.includes('developer changelog');
 
         return {
           message: commit.message.trim(),
           authorEmail: commit.authorEmail.trim(),
           authorNickname: '',
           isFix,
-          hidden:
-            forceHide ||
-            (commit.authorEmail === 'Florian.Rival@gmail.com' && shouldHide),
+          forDev,
+          hidden: shouldHide,
         };
       })
   );
@@ -144,7 +158,7 @@ const formatCommitMessage = commit => {
       }!)`
     : '';
 
-  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest) in (the )?changelog/i;
+  const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest )in (the )?changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
     foundIgnoreRest && foundIgnoreRest.index > 0
@@ -185,9 +199,9 @@ const formatHiddenCommitMessage = commit => {
 
   const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
   const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
+  const devCommits = displayedCommits.filter(commit => commit.forDev);
   const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix);
-
+  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix && !commit.forDev);
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
       .map(formatHiddenCommitMessage)
@@ -201,4 +215,9 @@ const formatHiddenCommitMessage = commit => {
 
   shell.echo(`\n## 🐛 Bug fixes\n`);
   shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
+
+  if (devCommits.length > 0) {
+    shell.echo(`\n### 🛠 Internal changes (for developers)\n`);
+    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
+  }
 })();

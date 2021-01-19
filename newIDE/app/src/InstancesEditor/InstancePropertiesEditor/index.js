@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+import { t } from '@lingui/macro';
+
 import * as React from 'react';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
@@ -24,13 +27,14 @@ type Props = {|
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
+  i18n: I18nType,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
   _instanceVariablesList: { current: null | VariablesList } = React.createRef();
   schema: Schema = [
     {
-      name: 'Object name',
+      name: this.props.i18n._(t`Object name`),
       valueType: 'string',
       disabled: true,
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
@@ -40,18 +44,18 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         this.props.onEditObjectByName(instance.getObjectName()),
     },
     {
-      name: 'Position',
+      name: this.props.i18n._(t`Position`),
       type: 'row',
       children: [
         {
-          name: 'X',
+          name: this.props.i18n._(t`X`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getX(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setX(newValue),
         },
         {
-          name: 'Y',
+          name: this.props.i18n._(t`Y`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getY(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
@@ -60,28 +64,28 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       ],
     },
     {
-      name: 'Angle',
+      name: this.props.i18n._(t`Angle`),
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setAngle(newValue),
     },
     {
-      name: 'Lock position/angle in the editor',
+      name: this.props.i18n._(t`Lock position/angle in the editor`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.isLocked(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setLocked(newValue),
     },
     {
-      name: 'Z Order',
+      name: this.props.i18n._(t`Z Order`),
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getZOrder(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setZOrder(newValue),
     },
     {
-      name: 'Layer',
+      name: this.props.i18n._(t`Layer`),
       valueType: 'string',
       getChoices: () => enumerateLayers(this.props.layout),
       getValue: (instance: gdInitialInstance) => instance.getLayer(),
@@ -89,25 +93,25 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setLayer(newValue),
     },
     {
-      name: 'Custom size?',
+      name: this.props.i18n._(t`Custom size?`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setHasCustomSize(newValue),
     },
     {
-      name: 'Custom size',
+      name: this.props.i18n._(t`Custom size`),
       type: 'row',
       children: [
         {
-          name: 'Width',
+          name: this.props.i18n._(t`Width`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setCustomWidth(newValue),
         },
         {
-          name: 'Height',
+          name: this.props.i18n._(t`Height`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) =>

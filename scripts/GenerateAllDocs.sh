@@ -23,4 +23,10 @@ npm install
 npm run generate-doc
 echo ℹ️ Generated GDJS Runtime docs
 cd ..
+cd newIDE/app/scripts
+npm install
+node extract-extensions-document.js
+node extract-reference-document.js
+cd ../../..
+echo ℹ️ Generated wiki docs
 cd scripts

@@ -1,5 +1,6 @@
 /Core/GDCore/Tools/VersionPriv.h
 /docs
+/docs-wiki
 /ExtLibs/SFML
 /ExtLibs/*.7z
 /scripts/logs/*.txt

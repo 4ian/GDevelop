@@ -2,6 +2,8 @@
 
 GDevelop relies a some dependencies that can have special requirements:
 
+* **TypeScript** here is only used to check the types in the `scripts/` files. The IDE uses Flow for static typing. TypeScript is used in the game engine too (see GDJS and Extensions folders).
+
 * **Storybook** is depending on webpack and babel.
   * It's important to have the same webpack version as the one provided by create-react-app, hence why `webpack` is specified in the `devDependencies`.
   * `@babel/core`, `babel-core` are also specified to avoid incompatibilities after upgrading to Storybook 4.

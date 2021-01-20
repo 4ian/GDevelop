@@ -811,16 +811,25 @@ const MainFrame = (props: Props) => {
     _onProjectItemModified();
   };
 
-  const closeEventsFunctionsExtensionTab = (
-    eventsFunctionsExtension: gdEventsFunctionsExtension
-  ) => {
-    setState(state => ({
-      ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        eventsFunctionsExtension
-      ),
-    }));
+  const onInstallExtension = (eventsFunctionsExtensionName: string) => {
+    //Close the extension tab before updating/reinstalling the extension
+    const hasEventsFunctionsExtension = currentProject.hasEventsFunctionsExtensionNamed(
+      eventsFunctionsExtensionName
+    );
+
+    if (hasEventsFunctionsExtension) {
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        eventsFunctionsExtensionName
+      );
+
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtension
+        ),
+      }));
+    }
   };
 
   const deleteLayout = (layout: gdLayout) => {
@@ -1985,9 +1994,7 @@ const MainFrame = (props: Props) => {
             onAddExternalLayout={addExternalLayout}
             onAddEventsFunctionsExtension={addEventsFunctionsExtension}
             onAddExternalEvents={addExternalEvents}
-            onCloseEventsFunctionsExtensionTab={
-              closeEventsFunctionsExtensionTab
-            }
+            onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
             onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

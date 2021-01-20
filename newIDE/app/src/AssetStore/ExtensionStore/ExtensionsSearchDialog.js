@@ -14,6 +14,7 @@ import InfoBar from '../../UI/Messages/InfoBar';
 type Props = {|
   project: gdProject,
   onClose: () => void,
+  onInstallExtension: (str: string) => void,
 |};
 
 /**
@@ -22,7 +23,7 @@ type Props = {|
 export default function ExtensionsSearchDialog({
   project,
   onClose,
-  onCloseEventsFunctionsExtensionTab,
+  onInstallExtension,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -92,9 +93,7 @@ export default function ExtensionsSearchDialog({
             }}
             project={project}
             showOnlyWithBehaviors={false}
-            onCloseEventsFunctionsExtensionTab={
-              onCloseEventsFunctionsExtensionTab
-            }
+            onInstallExtension={onInstallExtension}
           />
           <InfoBar
             identifier="extension-installed-explanation"

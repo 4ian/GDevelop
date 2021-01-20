@@ -24,9 +24,7 @@ type Props = {|
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<void>,
   showOnlyWithBehaviors: boolean,
-  onCloseEventsFunctionsExtensionTab: (
-    eventsFunctionsExtension: gdEventsFunctionsExtension
-  ) => void,
+  onInstallExtension: string => void,
 |};
 
 export const ExtensionStore = ({
@@ -34,7 +32,7 @@ export const ExtensionStore = ({
   project,
   onInstall,
   showOnlyWithBehaviors,
-  onCloseEventsFunctionsExtensionTab,
+  onInstallExtension,
 }: Props) => {
   const [
     selectedExtensionShortHeader,
@@ -121,10 +119,7 @@ export const ExtensionStore = ({
             selectedExtensionShortHeader.name
           )}
           onInstall={() => {
-            const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-              selectedExtensionShortHeader.name
-            );
-            onCloseEventsFunctionsExtensionTab(eventsFunctionsExtension);
+            onInstallExtension(selectedExtensionShortHeader.name);
             onInstall(selectedExtensionShortHeader);
           }}
           onClose={() => setSelectedExtensionShortHeader(null)}

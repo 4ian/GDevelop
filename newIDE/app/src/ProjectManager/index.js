@@ -289,6 +289,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onInstallExtension: string => void,
 |};
 
 type State = {|
@@ -756,6 +757,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project,
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
+      onInstallExtension,
     } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
@@ -1196,9 +1198,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ExtensionsSearchDialog
             project={project}
             onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
-            onCloseEventsFunctionsExtensionTab={
-              this.props.onCloseEventsFunctionsExtensionTab
-            }
+            onInstallExtension={onInstallExtension}
           />
         )}
       </div>

@@ -82,6 +82,7 @@ export default function ExtensionsSearchDialog({
             isInstalling={isInstalling}
             onInstall={async extensionShortHeader => {
               setIsInstalling(true);
+              onInstallExtension(extensionShortHeader);
               const wasExtensionInstalled = await installExtension(
                 i18n,
                 project,
@@ -94,7 +95,6 @@ export default function ExtensionsSearchDialog({
             }}
             project={project}
             showOnlyWithBehaviors={false}
-            onInstallExtension={onInstallExtension}
           />
           <InfoBar
             identifier="extension-installed-explanation"

@@ -813,13 +813,14 @@ const MainFrame = (props: Props) => {
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
-    //Close the extension tab before updating/reinstalling the extension
+    // Close the extension tab before updating/reinstalling the extension.
     const eventsFunctionsExtensionName = extensionShortHeader.name;
-    const hasEventsFunctionsExtension = currentProject.hasEventsFunctionsExtensionNamed(
-      eventsFunctionsExtensionName
-    );
 
-    if (hasEventsFunctionsExtension) {
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
       const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
         eventsFunctionsExtensionName
       );

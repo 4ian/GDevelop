@@ -12,11 +12,13 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinAudio",
-                               _("Audio"),
-                               _("Builtin audio extension"),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinAudio",
+          _("Audio"),
+          _("GDevelop provides several conditions and actions to play audio "
+            "files. They can be either long musics or short sound effects."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio");
 
 #if defined(GD_IDE_ONLY)

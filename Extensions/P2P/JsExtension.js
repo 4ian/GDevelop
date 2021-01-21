@@ -29,9 +29,7 @@ module.exports = {
       .setExtensionInformation(
         'P2P',
         _('Peer-to-Peer communication (experimental)'),
-        _(
-          'Allow game instances to communicate remotely using messages sent via WebRTC (P2P)'
-        ),
+        'Allow game instances to communicate remotely using messages sent via WebRTC (P2P).',
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )

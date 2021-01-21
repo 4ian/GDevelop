@@ -13,9 +13,10 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("DestroyOutsideBehavior",
                                _("Destroy Outside Screen Behavior"),
-                               _("This Extension can be used to destroy "
+                               _("This behavior can be used to destroy "
                                  "objects when they go outside of "
-                                 "the borders of the game's window."),
+                                 "the bounds of the camera. Useful for bullets "
+                                 "or other short-lived objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
@@ -81,7 +82,8 @@ class DestroyOutsideBehaviorCppExtension : public ExtensionBase {
         GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside"),
         "DestroyOutsideRuntimeBehavior");
     GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside")
-        .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
+        .SetIncludeFile(
+            "DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

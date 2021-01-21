@@ -9,30 +9,33 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"
-#include "PathfindingRuntimeBehavior.h"
 #include "PathfindingObstacleRuntimeBehavior.h"
+#include "PathfindingRuntimeBehavior.h"
 
 void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "PathfindingBehavior",
-      _("Pathfinding behavior"),
-      _("Compute paths for objects avoiding obstacles."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "PathfindingBehavior",
+          _("Pathfinding behavior"),
+          "Pathfinding allows to compute an efficient path for objects, "
+          "avoiding obstacles on the way.",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/pathfinding");
 
   {
-    gd::BehaviorMetadata& aut = extension.AddBehavior(
-        "PathfindingBehavior",
-        _("Pathfinding"),
-        "Pathfinding",
-        _("With this, characters will move while avoiding all objects that are "
-          "flagged as obstacles."),
-        "",
-        "CppPlatform/Extensions/AStaricon.png",
-        "PathfindingBehavior",
-        std::make_shared<PathfindingBehavior>(),
-        std::make_shared<gd::BehaviorsSharedData>());
+    gd::BehaviorMetadata& aut =
+        extension.AddBehavior("PathfindingBehavior",
+                              _("Pathfinding"),
+                              "Pathfinding",
+                              _("With this behavior, the object will move "
+                                "while avoiding all objects that are "
+                                "flagged as obstacles."),
+                              "",
+                              "CppPlatform/Extensions/AStaricon.png",
+                              "PathfindingBehavior",
+                              std::make_shared<PathfindingBehavior>(),
+                              std::make_shared<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
 
@@ -95,14 +98,13 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetCellWidth")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
-    aut.AddCondition(
-           "CellWidth",
-           _("Width of the virtual grid"),
-           _("Compare the width of the cells of the virtual grid."),
-           _("the width of the virtual cells"),
-           _("Virtual grid"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+    aut.AddCondition("CellWidth",
+                     _("Width of the virtual grid"),
+                     _("Compare the width of the cells of the virtual grid."),
+                     _("the width of the virtual cells"),
+                     _("Virtual grid"),
+                     "CppPlatform/Extensions/AStaricon24.png",
+                     "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -125,14 +127,13 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetGetter("GetCellHeight")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
-    aut.AddCondition(
-           "CellHeight",
-           _("Height of the virtual grid"),
-           _("Compare the height of the cells of the virtual grid."),
-           _("the height of the virtual cells"),
-           _("Virtual grid"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+    aut.AddCondition("CellHeight",
+                     _("Height of the virtual grid"),
+                     _("Compare the height of the cells of the virtual grid."),
+                     _("the height of the virtual cells"),
+                     _("Virtual grid"),
+                     "CppPlatform/Extensions/AStaricon24.png",
+                     "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -140,14 +141,13 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCellHeight")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
-    aut.AddAction(
-           "Acceleration",
-           _("Acceleration"),
-           _("Change the acceleration when moving the object"),
-           _("the acceleration on the path"),
-           _("Path"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+    aut.AddAction("Acceleration",
+                  _("Acceleration"),
+                  _("Change the acceleration when moving the object"),
+                  _("the acceleration on the path"),
+                  _("Path"),
+                  "CppPlatform/Extensions/AStaricon24.png",
+                  "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -170,14 +170,13 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetAcceleration")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
-    aut.AddAction(
-           "MaxSpeed",
-           _("Maximum speed"),
-           _("Change the maximum speed when moving the object"),
-           _("the max. speed on the path"),
-           _("Path"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+    aut.AddAction("MaxSpeed",
+                  _("Maximum speed"),
+                  _("Change the maximum speed when moving the object"),
+                  _("the max. speed on the path"),
+                  _("Path"),
+                  "CppPlatform/Extensions/AStaricon24.png",
+                  "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -575,7 +574,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-    aut.SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+    aut.SetIncludeFile(
+        "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddAction("Cost",
                   _("Cost"),
@@ -590,7 +590,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .UseStandardOperatorParameters("number")
         .SetFunctionName("SetCost")
         .SetGetter("GetCost")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddCondition("Cost",
                      _("Cost"),
@@ -604,7 +605,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .UseStandardRelationalOperatorParameters("number")
         .SetFunctionName("GetCost")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddAction("SetImpassable",
                   _("Should object be impassable?"),
@@ -618,7 +620,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .AddParameter("yesorno", _("Impassable?"))
         .SetFunctionName("SetImpassable")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddCondition("IsImpassable",
                      _("Is object impassable?"),
@@ -631,7 +634,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .SetFunctionName("IsImpassable")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddExpression("Cost",
                       _("Cost"),
@@ -641,7 +645,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .SetFunctionName("GetCost")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
 #endif
   }
@@ -668,7 +673,8 @@ class PathfindingBehaviorCppExtension : public ExtensionBase {
         GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle"),
         "PathfindingObstacleRuntimeBehavior");
     GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
+        .SetIncludeFile(
+            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

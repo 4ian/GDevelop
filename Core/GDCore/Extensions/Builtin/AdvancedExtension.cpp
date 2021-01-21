@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
   extension.SetExtensionInformation(
       "BuiltinAdvanced",
       _("Advanced control features"),
-      _("Built-in extension providing advanced control features."),
+      _("Advanced control features to be used in events."),
       "Florian Rival",
       "Open source (MIT License)");
 

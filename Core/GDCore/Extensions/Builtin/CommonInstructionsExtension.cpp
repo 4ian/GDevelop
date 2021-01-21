@@ -26,8 +26,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .SetExtensionInformation(
           "BuiltinCommonInstructions",
-          _("Standard events"),
-          _("Built-in extension providing standard events."),
+          _("Builtin events"),
+          "GDevelop comes with a set of events and conditions that allow to express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/advanced-conditions");

@@ -12,11 +12,15 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinCamera",
-                               _("Cameras and layers features"),
-                               _("Built-in camera extension"),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinCamera",
+          _("Cameras and layers features"),
+          "Each scene can be composed of multiple layers. These conditions "
+          "and actions allow to manipulate them during the game. In "
+          "particular, you can move the camera of a layer to center it on an "
+          "object or a position.",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
 
 #if defined(GD_IDE_ONLY)

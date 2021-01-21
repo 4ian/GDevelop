@@ -20,17 +20,21 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      "DeviceVibration",
-      _("Device vibration"),
-      _(
-        "Use the vibration of mobile devices."
-      ),
-      "Matthias Meike",
-      "Open source (MIT License)"
-    ).setExtensionHelpPath("/all-features/device-vibration");
+    extension
+      .setExtensionInformation(
+        'DeviceVibration',
+        _('Device vibration'),
+
+        'This allows to trigger vibrations on mobile devices.',
+        'Matthias Meike',
+        'Open source (MIT License)'
+      )
+      .setExtensionHelpPath('/all-features/device-vibration');
 
     extension
       .addDependency()
@@ -41,55 +45,61 @@ module.exports = {
 
     extension
       .addAction(
-        "StartVibration",
-        _("Vibrate"),
-        _("Vibrate (Duration in ms)."),
-        _("Start vibration for _PARAM0_ ms"),
-        _("Vibration"),
-        "JsPlatform/Extensions/vibration_start24.png",
-        "JsPlatform/Extensions/vibration_start32.png"
+        'StartVibration',
+        _('Vibrate'),
+        _('Vibrate (Duration in ms).'),
+        _('Start vibration for _PARAM0_ ms'),
+        _('Vibration'),
+        'JsPlatform/Extensions/vibration_start24.png',
+        'JsPlatform/Extensions/vibration_start32.png'
       )
-        .addParameter("expression", _("Duration"), "", false)
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceVibration/devicevibrationtools.js"
-      )
-      .setFunctionName("gdjs.deviceVibration.startVibration");
+      .addParameter('expression', _('Duration'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DeviceVibration/devicevibrationtools.js')
+      .setFunctionName('gdjs.deviceVibration.startVibration');
 
-      extension
+    extension
       .addAction(
-        "StartVibrationPattern",
-        _("Vibrate by pattern"),
-        _("Vibrate (Duration in ms). You can add multiple comma-separated values where every second value determines the period of silence between two vibrations. This is a string value so use quotes."),
-        _("Start vibration for _PARAM0_ ms"),
-        _("Vibration"),
-        "JsPlatform/Extensions/vibration_pattern_start24.png",
-        "JsPlatform/Extensions/vibration_pattern_start32.png"
+        'StartVibrationPattern',
+        _('Vibrate by pattern'),
+        _(
+          'Vibrate (Duration in ms). You can add multiple comma-separated values where every second value determines the period of silence between two vibrations. This is a string value so use quotes.'
+        ),
+        _('Start vibration for _PARAM0_ ms'),
+        _('Vibration'),
+        'JsPlatform/Extensions/vibration_pattern_start24.png',
+        'JsPlatform/Extensions/vibration_pattern_start32.png'
       )
-        .addParameter("string", _("Intervals (for example \"500,100,200\""), "", false)
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceVibration/devicevibrationtools.js"
+      .addParameter(
+        'string',
+        _('Intervals (for example "500,100,200"'),
+        '',
+        false
       )
-      .setFunctionName("gdjs.deviceVibration.startVibrationPattern");
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DeviceVibration/devicevibrationtools.js')
+      .setFunctionName('gdjs.deviceVibration.startVibrationPattern');
 
-      extension
+    extension
       .addAction(
-        "StopVibration",
-        _("Stop vibration"),
-        _("Stop the vibration"),
-        _("Stop vibration"),
-        _("Vibration"),
-        "JsPlatform/Extensions/vibration_stop24.png",
-        "JsPlatform/Extensions/vibration_stop32.png"
+        'StopVibration',
+        _('Stop vibration'),
+        _('Stop the vibration'),
+        _('Stop vibration'),
+        _('Vibration'),
+        'JsPlatform/Extensions/vibration_stop24.png',
+        'JsPlatform/Extensions/vibration_stop32.png'
       )
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceVibration/devicevibrationtools.js"
-      )
-      .setFunctionName("gdjs.deviceVibration.stopVibration");
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DeviceVibration/devicevibrationtools.js')
+      .setFunctionName('gdjs.deviceVibration.stopVibration');
 
     return extension;
   },
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) { return []; },
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
+    return [];
+  },
 };

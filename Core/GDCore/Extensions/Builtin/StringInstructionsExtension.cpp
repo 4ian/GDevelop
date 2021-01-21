@@ -16,8 +16,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .SetExtensionInformation(
           "BuiltinStringInstructions",
           _("Text manipulation"),
-          _("Built-in extension providing expressions for manipulating text "
-            "objects."),
+          "Provides expressions to manipulate strings (also called texts).",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
@@ -121,15 +120,17 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
-      .SetHidden(); // Deprecated, see StrFindLast instead.
+      .SetHidden();  // Deprecated, see StrFindLast instead.
 
   extension
-      .AddExpression("StrFindLast",
-                     _("Search the last occurence in a text"),
-                     _("Search the last occurence in a string (return the position of "
-                       "the result, from the beginning of the string, or -1 if not found)"),
-                     _("Manipulation of text"),
-                     "res/conditions/toujours24.png")
+      .AddExpression(
+          "StrFindLast",
+          _("Search the last occurence in a text"),
+          _("Search the last occurence in a string (return the position of "
+            "the result, from the beginning of the string, or -1 if not "
+            "found)"),
+          _("Manipulation of text"),
+          "res/conditions/toujours24.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
@@ -162,14 +163,16 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddParameter("expression",
                     _("Position of the last character in the string to be "
                       "considered in the search"))
-      .SetHidden(); // Deprecated, see StrFindLastFrom instead.
+      .SetHidden();  // Deprecated, see StrFindLastFrom instead.
 
   extension
       .AddExpression(
           "StrFindLastFrom",
           _("Search the last occurence in a text, starting from a position"),
-          _("Search in a text the last occurence, starting from a position (return "
-            " the position of the result, from the beginning of the string, or -1 if not found)"),
+          _("Search in a text the last occurence, starting from a position "
+            "(return "
+            " the position of the result, from the beginning of the string, or "
+            "-1 if not found)"),
           _("Manipulation of text"),
           "res/conditions/toujours24.png")
 

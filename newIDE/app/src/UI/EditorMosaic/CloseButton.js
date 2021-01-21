@@ -15,7 +15,11 @@ const styles = {
   },
 };
 
-export default class CloseButton extends Component {
+type Props = {|
+  closeActions?: () => void,
+|};
+
+export default class CloseButton extends Component<Props> {
   render() {
     return (
       <MosaicContext.Consumer>

@@ -3,6 +3,7 @@ import * as React from 'react';
 import IconButton from './IconButton';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { bool } from 'prop-types';
 
 type Props = {|
   src: string,
@@ -11,6 +12,7 @@ type Props = {|
   disabled?: boolean,
   onClick?: () => void,
   onContextMenu?: () => void,
+  showComponent?: boolean,
 |};
 
 /**

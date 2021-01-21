@@ -50,6 +50,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -289,7 +290,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: string => void,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 type State = {|

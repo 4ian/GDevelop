@@ -116,6 +116,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -811,8 +812,9 @@ const MainFrame = (props: Props) => {
     _onProjectItemModified();
   };
 
-  const onInstallExtension = (eventsFunctionsExtensionName: string) => {
+  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     //Close the extension tab before updating/reinstalling the extension
+    const eventsFunctionsExtensionName = extensionShortHeader.name;
     const hasEventsFunctionsExtension = currentProject.hasEventsFunctionsExtensionNamed(
       eventsFunctionsExtensionName
     );

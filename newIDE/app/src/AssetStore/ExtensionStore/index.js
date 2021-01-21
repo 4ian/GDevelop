@@ -24,7 +24,7 @@ type Props = {|
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<void>,
   showOnlyWithBehaviors: boolean,
-  onInstallExtension: string => void,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 export const ExtensionStore = ({
@@ -119,7 +119,7 @@ export const ExtensionStore = ({
             selectedExtensionShortHeader.name
           )}
           onInstall={() => {
-            onInstallExtension(selectedExtensionShortHeader.name);
+            onInstallExtension(selectedExtensionShortHeader);
             onInstall(selectedExtensionShortHeader);
           }}
           onClose={() => setSelectedExtensionShortHeader(null)}

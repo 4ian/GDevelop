@@ -10,11 +10,12 @@ import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoa
 import HelpButton from '../../UI/HelpButton';
 import { importExtension, installExtension } from './InstallExtension';
 import InfoBar from '../../UI/Messages/InfoBar';
+import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
-  onInstallExtension: (str: string) => void,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 /**

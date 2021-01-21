@@ -4,6 +4,10 @@ import {
   getElectronAccelerator,
 } from './index';
 
+/**
+ * Creates a KeyboardEvent-like object for testing
+ * functions that take event objects as input
+ */
 const keyEvent = (ctrlKey, shiftKey, altKey, code) => ({
   ctrlKey,
   shiftKey,

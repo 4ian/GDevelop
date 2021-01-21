@@ -59,27 +59,27 @@ export class Toolbar extends PureComponent<Props> {
           <ToolbarIcon
             onClick={this.props.toggleObjectsList}
             src="res/ribbon_default/objects64.png"
-            tooltip={t`Open the objects editor`}
+            tooltip={t`Toggle the objects editor`}
           />
           <ToolbarIcon
             onClick={this.props.toggleObjectGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
-            tooltip={t`Open the objects groups editor`}
+            tooltip={t`Toggle the objects groups editor`}
           />
           <ToolbarIcon
             onClick={this.props.toggleProperties}
             src="res/ribbon_default/editprop32.png"
-            tooltip={t`Open the properties panel`}
+            tooltip={t`Toggle the properties panel`}
           />
           <ToolbarIcon
             onClick={this.props.toggleInstancesList}
             src="res/ribbon_default/ObjectsPositionsList32.png"
-            tooltip={t`Open the list of instances`}
+            tooltip={t`Toggle the list of instances`}
           />
           <ToolbarIcon
             onClick={this.props.toggleLayersList}
             src="res/ribbon_default/layers32.png"
-            tooltip={t`Open the layers editor`}
+            tooltip={t`Toggle the layers editor`}
           />
           <ToolbarSeparator />
           <ToolbarIcon

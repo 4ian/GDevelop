@@ -214,7 +214,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    //Get the window width
+    // Get the window width.
     const windowWidth =
       window.innerWidth < 750 || window.innerHeight < 350
         ? 'small'
@@ -222,7 +222,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         ? 'medium'
         : 'large';
 
-    //Get initial editor nodes based on window width and scene editor
+    // Get initial editor nodes based on window width and scene editor.
     const initialNodes =
       windowWidth === 'small'
         ? this.context.getDefaultEditorMosaicNode('scene-editor-small') ||
@@ -230,10 +230,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         : this.context.getDefaultEditorMosaicNode('scene-editor') ||
           initialMosaicEditorNodes;
 
-    //converting the nodes of tree in array
+    // Convert the nodes of tree in array.
     let namesOfInitialNodes = getLeaves(initialNodes);
 
-    //creating the initial state from nodes in array
+    // Create the initial state from nodes in the array.
     let finalState = {};
     namesOfInitialNodes.forEach(editorName => {
       switch (editorName) {
@@ -257,7 +257,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
 
-    //setting the initial state
+    // Set the initial state.
     this.setState(finalState);
   }
 

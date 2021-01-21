@@ -34,7 +34,7 @@ export type EditorMosaicNode =
     |}
   | string;
 
-//check for a node inside the mosaicTree
+// Check for a node in the mosaicTree.
 const hasNode = (nodeName: string, mosaicNode: ?EditorMosaicNode): boolean => {
   const nodeNames = getLeaves(mosaicNode);
   if (nodeNames.indexOf(nodeName) !== -1) return true;
@@ -42,7 +42,7 @@ const hasNode = (nodeName: string, mosaicNode: ?EditorMosaicNode): boolean => {
   return false;
 };
 
-//get path of a node in the mosaicTree
+// Get path of a node in the mosaicTree.
 const getPathOfNode = (
   nodeName: string,
   mosaicNode: ?EditorMosaicNode
@@ -81,7 +81,7 @@ const getPathOfNode = (
   return path;
 };
 
-//remove a node in the mosaicTree
+// Remove a node in the mosaicTree.
 const removeNode = (
   editorName: string,
   mosaicNodeRoot: ?EditorMosaicNode

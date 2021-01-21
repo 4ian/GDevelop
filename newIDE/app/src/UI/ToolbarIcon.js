@@ -11,7 +11,6 @@ type Props = {|
   disabled?: boolean,
   onClick?: () => void,
   onContextMenu?: () => void,
-  showComponent?: boolean,
 |};
 
 /**
@@ -26,23 +25,6 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
     onClick,
     onContextMenu,
   } = props;
-
-  //We can use here (showComponent) value from props to set the UI texture of the button to ON/OFF state
-  //Following example shows how to use this in simple manner
-  // let buttonStyle = {};
-  // if (showComponent !== undefined) {
-  //   buttonStyle = showComponent
-  //     ? {
-  //         border: '5px solid #80BE1F',
-  //         backgroundColor: '#80BE1F',
-  //         marginRight: '5px',
-  //       }
-  //     : {
-  //         border: '5px solid #FF3232',
-  //         backgroundColor: '#FF3232',
-  //         marginRight: '5px',
-  //       };
-  // }
 
   return (
     <ThemeConsumer>

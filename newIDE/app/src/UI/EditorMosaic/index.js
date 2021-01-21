@@ -5,7 +5,8 @@ import {
   MosaicWindow as RMMosaicWindow,
   MosaicWithoutDragDropContext,
   getLeaves,
-  MosaicContext,
+  createRemoveUpdate,
+  updateTree,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
 import ThemeConsumer from '../Theme/ThemeConsumer';
@@ -32,6 +33,65 @@ export type EditorMosaicNode =
       second: ?EditorMosaicNode,
     |}
   | string;
+
+//check for a node inside the mosaicTree
+const hasNode = (nodeName: string, mosaicNode: ?EditorMosaicNode): boolean => {
+  const nodeNames = getLeaves(mosaicNode);
+  if (nodeNames.indexOf(nodeName) !== -1) return true;
+
+  return false;
+};
+
+//get path of a node in the mosaicTree
+const getPathOfNode = (
+  nodeName: string,
+  mosaicNode: ?EditorMosaicNode
+): Array => {
+  let path = [];
+  const hasPath = mosaicNode => {
+    if (typeof mosaicNode.first === 'string') {
+      if (mosaicNode.first === nodeName) {
+        path.push('first');
+        return true;
+      }
+    }
+
+    if (typeof mosaicNode.second === 'string') {
+      if (mosaicNode.second === nodeName) {
+        path.push('second');
+        return true;
+      }
+    }
+
+    if (typeof mosaicNode.first !== 'string') {
+      path.push('first');
+      if (hasPath(mosaicNode.first)) return true;
+    }
+
+    if (typeof mosaicNode.second !== 'string') {
+      path.push('second');
+      if (hasPath(mosaicNode.second)) return true;
+    }
+
+    return false;
+  };
+
+  if (hasPath(mosaicNode)) return path;
+
+  return path;
+};
+
+//remove a node in the mosaicTree
+const removeNode = (
+  editorName: string,
+  mosaicNodeRoot: ?EditorMosaicNode
+): EditorMosaicNode => {
+  const path = getPathOfNode(editorName, mosaicNodeRoot);
+  const mosiacUpdates = [createRemoveUpdate(mosaicNodeRoot, path)];
+  const updatedTree = updateTree(mosaicNodeRoot, mosiacUpdates);
+
+  return updatedTree;
+};
 
 // Add a node (an editor) in the mosaic.
 const addNode = (
@@ -175,7 +235,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
 
     const openedEditorNames = getLeaves(this.state.mosaicNode);
     if (openedEditorNames.indexOf(editorName) !== -1) {
-      return false;
+      return true;
     }
 
     if (limitToOneSecondaryEditor && editor.type === 'secondary') {
@@ -212,6 +272,21 @@ export default class EditorMosaic extends React.Component<Props, State> {
     return true;
   };
 
+  closeEditor = editorName => {
+    const { editors } = this.props;
+
+    const editor = editors[editorName];
+    if (!editor) return false;
+
+    if (!hasNode(editorName, this.state.mosaicNode)) return true;
+
+    this.setState({
+      mosaicNode: removeNode(editorName, this.state.mosaicNode),
+    });
+
+    return true;
+  };
+
   _onChange = (mosaicNode: EditorMosaicNode) => {
     this.setState({ mosaicNode });
     this._persistNodes();
@@ -241,36 +316,23 @@ export default class EditorMosaic extends React.Component<Props, State> {
                 return null;
               }
 
-              if (
-                typeof editor.showComponent === 'boolean' &&
-                !editor.showComponent
-              ) {
-                return (
-                  <MosaicContext.Consumer>
-                    {({ mosaicActions }) => {
-                      mosaicActions.remove(path);
-                    }}
-                  </MosaicContext.Consumer>
-                );
-              } else {
-                if (editor.noTitleBar) {
-                  return editor.renderEditor();
-                }
-
-                return (
-                  <I18n>
-                    {({ i18n }) => (
-                      <MosaicWindow
-                        path={path}
-                        title={i18n._(editor.title)}
-                        toolbarControls={editor.toolbarControls}
-                      >
-                        {editor.renderEditor()}
-                      </MosaicWindow>
-                    )}
-                  </I18n>
-                );
+              if (editor.noTitleBar) {
+                return editor.renderEditor();
               }
+
+              return (
+                <I18n>
+                  {({ i18n }) => (
+                    <MosaicWindow
+                      path={path}
+                      title={i18n._(editor.title)}
+                      toolbarControls={editor.toolbarControls}
+                    >
+                      {editor.renderEditor()}
+                    </MosaicWindow>
+                  )}
+                </I18n>
+              );
             }}
             value={this.state.mosaicNode}
             onChange={this._onChange}

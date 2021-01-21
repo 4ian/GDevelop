@@ -28,9 +28,9 @@ export type CommandName =
   | 'OPEN_EXTENSION'
   | 'OPEN_SCENE_PROPERTIES'
   | 'OPEN_SCENE_VARIABLES'
-  | 'OPEN_OBJECTS_PANEL'
-  | 'OPEN_OBJECT_GROUPS_PANEL'
-  | 'OPEN_PROPERTIES_PANEL'
+  | 'TOGGLE_OBJECTS_PANEL'
+  | 'TOGGLE_OBJECT_GROUPS_PANEL'
+  | 'TOGGLE_PROPERTIES_PANEL'
   | 'TOGGLE_INSTANCES_PANEL'
   | 'TOGGLE_LAYERS_PANEL'
   | 'SCENE_EDITOR_UNDO'
@@ -190,25 +190,25 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
 
   // Scene editor toolbar commands
-  OPEN_OBJECTS_PANEL: {
+  TOGGLE_OBJECTS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the objects editor`,
+    displayText: t`Toggle the objects editor`,
   },
-  OPEN_OBJECT_GROUPS_PANEL: {
+  TOGGLE_OBJECT_GROUPS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the object groups editor`,
+    displayText: t`Toggle the object groups editor`,
   },
-  OPEN_PROPERTIES_PANEL: {
+  TOGGLE_PROPERTIES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the properties panel`,
+    displayText: t`Toggle the properties panel`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the list of instances`,
+    displayText: t`Toggle the list of instances`,
   },
   TOGGLE_LAYERS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the layers editor`,
+    displayText: t`Toggle the layers editor`,
   },
   SCENE_EDITOR_UNDO: {
     area: 'SCENE',

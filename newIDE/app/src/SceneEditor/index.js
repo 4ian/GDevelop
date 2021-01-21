@@ -71,6 +71,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { getLeaves } from 'react-mosaic-component';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -230,18 +231,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           initialMosaicEditorNodes;
 
     //converting the nodes of tree in array
-    let namesOfInitialNodes = [];
-    const getNodes = node => {
-      if (typeof node === 'string') {
-        namesOfInitialNodes.push(node);
-        return;
-      }
+    let namesOfInitialNodes = getLeaves(initialNodes);
 
-      getNodes(node.first);
-      getNodes(node.second);
-    };
-
-    getNodes(initialNodes);
     //creating the initial state from nodes in array
     let finalState = {};
     namesOfInitialNodes.forEach(editorName => {
@@ -304,11 +295,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         zoomIn={this.zoomIn}
         zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
-        showObjectsListInfoBar={this.state.showObjectsListInfoBar}
-        showObjectGroupsListInfoBar={this.state.showObjectGroupsListInfoBar}
-        showPropertiesInfoBar={this.state.showPropertiesInfoBar}
-        showLayersInfoBar={this.state.showLayersInfoBar}
-        showInstancesInfoBar={this.state.showInstancesInfoBar}
       />
     );
   }
@@ -328,49 +314,84 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column'))
-      this.setState({ showObjectsListInfoBar: false });
-    this.setState({
-      showObjectsListInfoBar: !this.state.showObjectsListInfoBar,
-    });
+    if (
+      !this.state.showObjectsListInfoBar &&
+      this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')
+    )
+      this.setState({ showObjectsListInfoBar: true });
+    else if (
+      this.state.showObjectsListInfoBar &&
+      this.editorMosaic.closeEditor('objects-list')
+    )
+      this.setState({
+        showObjectsListInfoBar: false,
+      });
   };
 
   toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column'))
-      this.setState({ showPropertiesInfoBar: false });
-    this.setState({
-      showPropertiesInfoBar: !this.state.showPropertiesInfoBar,
-    });
+    if (
+      !this.state.showPropertiesInfoBar &&
+      this.editorMosaic.openEditor('properties', 'start', 25, 'column')
+    )
+      this.setState({ showPropertiesInfoBar: true });
+    else if (
+      this.state.showPropertiesInfoBar &&
+      this.editorMosaic.closeEditor('properties')
+    )
+      this.setState({
+        showPropertiesInfoBar: false,
+      });
   };
 
   toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
     if (
-      !this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column')
+      !this.state.showObjectGroupsListInfoBar &&
+      this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column')
     )
-      this.setState({ showObjectGroupsListInfoBar: false });
-    this.setState({
-      showObjectGroupsListInfoBar: !this.state.showObjectGroupsListInfoBar,
-    });
+      this.setState({ showObjectGroupsListInfoBar: true });
+    else if (
+      this.state.showObjectGroupsListInfoBar &&
+      this.editorMosaic.closeEditor('object-groups-list')
+    )
+      this.setState({
+        showObjectGroupsListInfoBar: false,
+      });
   };
 
   toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('instances-list', 'end', 75, 'row'))
-      this.setState({ showInstancesInfoBar: false });
-    this.setState({
-      showInstancesInfoBar: !this.state.showInstancesInfoBar,
-    });
+    if (
+      !this.state.showInstancesInfoBar &&
+      this.editorMosaic.openEditor('instances-list', 'end', 75, 'row')
+    )
+      this.setState({
+        showInstancesInfoBar: true,
+      });
+    else if (
+      this.state.showInstancesInfoBar &&
+      this.editorMosaic.closeEditor('instances-list')
+    )
+      this.setState({
+        showInstancesInfoBar: false,
+      });
   };
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('layers-list', 'end', 75, 'row'))
+    if (
+      !this.state.showLayersInfoBar &&
+      this.editorMosaic.openEditor('layers-list', 'end', 75, 'row')
+    )
+      this.setState({
+        showLayersInfoBar: true,
+      });
+    else if (
+      this.state.showLayersInfoBar &&
+      this.editorMosaic.closeEditor('layers-list')
+    )
       this.setState({ showLayersInfoBar: false });
-    this.setState({
-      showLayersInfoBar: !this.state.showLayersInfoBar,
-    });
   };
 
   toggleWindowMask = () => {
@@ -1028,7 +1049,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              this.setState({ showPropertiesInfoBar: false });
+              if (this.editorMosaic.closeEditor('properties'))
+                this.setState({
+                  showPropertiesInfoBar: false,
+                });
             }}
           />,
         ],
@@ -1060,7 +1084,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              this.setState({ showLayersInfoBar: false });
+              if (this.editorMosaic.closeEditor('layers-list'))
+                this.setState({ showLayersInfoBar: false });
             }}
           />,
         ],
@@ -1089,7 +1114,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              this.setState({ showInstancesInfoBar: false });
+              if (this.editorMosaic.closeEditor('instances-list'))
+                this.setState({
+                  showInstancesInfoBar: false,
+                });
             }}
           />,
         ],
@@ -1152,7 +1180,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              this.setState({ showObjectsListInfoBar: false });
+              if (this.editorMosaic.closeEditor('objects-list'))
+                this.setState({
+                  showObjectsListInfoBar: false,
+                });
             }}
           />,
         ],
@@ -1198,7 +1229,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              this.setState({ showObjectGroupsListInfoBar: false });
+              if (this.editorMosaic.closeEditor('object-groups-list'))
+                this.setState({
+                  showObjectGroupsListInfoBar: false,
+                });
             }}
           />,
         ],

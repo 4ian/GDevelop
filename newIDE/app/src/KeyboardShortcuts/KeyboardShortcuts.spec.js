@@ -8,7 +8,7 @@ import {
  * Creates a KeyboardEvent-like object for testing
  * functions that take event objects as input
  */
-const keyEvent = (ctrlKey, shiftKey, altKey, code) => ({
+const makeKeyEvent = (ctrlKey, shiftKey, altKey, code) => ({
   ctrlKey,
   shiftKey,
   altKey,
@@ -16,25 +16,25 @@ const keyEvent = (ctrlKey, shiftKey, altKey, code) => ({
 });
 
 // Action key, with various modifiers
-const keyA = keyEvent(false, false, false, 'KeyA'); // A
-const ctrlA = keyEvent(true, false, false, 'KeyA'); // Ctrl+A
-const shiftA = keyEvent(false, true, false, 'KeyA'); // Shift+A
-const altA = keyEvent(false, false, true, 'KeyA'); // Alt+A
-const ctrlShiftAltA = keyEvent(true, true, true, 'KeyA'); // Ctrl+Shift+Alt+A
+const keyA = makeKeyEvent(false, false, false, 'KeyA'); // A
+const ctrlA = makeKeyEvent(true, false, false, 'KeyA'); // Ctrl+A
+const shiftA = makeKeyEvent(false, true, false, 'KeyA'); // Shift+A
+const altA = makeKeyEvent(false, false, true, 'KeyA'); // Alt+A
+const ctrlShiftAltA = makeKeyEvent(true, true, true, 'KeyA'); // Ctrl+Shift+Alt+A
 
 // Partial or invalid shortcut keypresses
-const ctrlShiftAlt = keyEvent(true, true, true, ''); // Ctrl+Shift+Alt+
-const ctrlShiftAltUp = keyEvent(true, true, true, 'ArrowUp'); // Ctrl+Shift+Alt+Up
+const ctrlShiftAlt = makeKeyEvent(true, true, true, ''); // Ctrl+Shift+Alt+
+const ctrlShiftAltUp = makeKeyEvent(true, true, true, 'ArrowUp'); // Ctrl+Shift+Alt+Up
 
 // Edge cases of restricted shortcuts
-const keyTab = keyEvent(false, false, false, 'Tab'); // Tab
-const shiftTab = keyEvent(false, true, false, 'Tab'); // Shift+Tab
-const ctrlTab = keyEvent(true, false, false, 'Tab'); // Ctrl+Tab
-const altTab = keyEvent(false, false, true, 'Tab'); // Alt+Tab
-const keySpace = keyEvent(false, false, false, 'Space'); // Space
-const shiftSpace = keyEvent(false, true, false, 'Space'); // Shift+Space
-const ctrlSpace = keyEvent(true, false, false, 'Space'); // Ctrl+Space
-const altSpace = keyEvent(false, false, true, 'Space'); // Alt+Space
+const keyTab = makeKeyEvent(false, false, false, 'Tab'); // Tab
+const shiftTab = makeKeyEvent(false, true, false, 'Tab'); // Shift+Tab
+const ctrlTab = makeKeyEvent(true, false, false, 'Tab'); // Ctrl+Tab
+const altTab = makeKeyEvent(false, false, true, 'Tab'); // Alt+Tab
+const keySpace = makeKeyEvent(false, false, false, 'Space'); // Space
+const shiftSpace = makeKeyEvent(false, true, false, 'Space'); // Shift+Space
+const ctrlSpace = makeKeyEvent(true, false, false, 'Space'); // Ctrl+Space
+const altSpace = makeKeyEvent(false, false, true, 'Space'); // Alt+Space
 
 describe('KeyboardShortcuts', () => {
   it('creates shortcut strings from events correctly', () => {

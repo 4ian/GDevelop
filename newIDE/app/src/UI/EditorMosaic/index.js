@@ -48,7 +48,9 @@ const getPathOfNode = (
   mosaicNode: ?EditorMosaicNode
 ): Array<?string> => {
   let path = [];
-  const hasPath = (node: EditorMosaicNode) => {
+  const hasPath = (node: ?EditorMosaicNode) => {
+    if (!node) return;
+
     if (typeof node.first === 'string') {
       if (node.first === nodeName) {
         path.push('first');

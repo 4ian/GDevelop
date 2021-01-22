@@ -1,3 +1,4 @@
+// @flow
 import {
   getShortcutStringFromEvent,
   isValidShortcutEvent,
@@ -8,12 +9,10 @@ import {
  * Creates a KeyboardEvent-like object for testing
  * functions that take event objects as input
  */
-const makeKeyEvent = (ctrlKey, shiftKey, altKey, code) => ({
-  ctrlKey,
-  shiftKey,
-  altKey,
-  code,
-});
+const makeKeyEvent = (ctrlKey, shiftKey, altKey, code): KeyboardEvent => {
+  // $FlowIgnore - create fake KeyboardEvent object
+  return { ctrlKey, shiftKey, altKey, code };
+};
 
 // Action key, with various modifiers
 const keyA = makeKeyEvent(false, false, false, 'KeyA'); // A

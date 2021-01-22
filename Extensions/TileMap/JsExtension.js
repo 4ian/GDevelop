@@ -33,7 +33,7 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/tile_map');
+      .setExtensionHelpPath('/objects/tilemap');
 
     var objectTileMap = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object

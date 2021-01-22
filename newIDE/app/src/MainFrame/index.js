@@ -813,6 +813,9 @@ const MainFrame = (props: Props) => {
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
     // Close the extension tab before updating/reinstalling the extension.
     const eventsFunctionsExtensionName = extensionShortHeader.name;
 

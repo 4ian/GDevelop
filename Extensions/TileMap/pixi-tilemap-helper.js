@@ -139,7 +139,6 @@
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
         // @ts-ignore - atlasTexture is never null here.
         const texture = new PIXI.Texture(atlasTexture, rect);
-        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
         textureCache[frame] = texture;
       } catch (error) {

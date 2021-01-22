@@ -65,12 +65,12 @@ const getPathOfNode = (
       }
     }
 
-    if (typeof node.first !== 'string') {
+    if (typeof node !== 'string') {
       path.push('first');
       if (hasPath(node.first)) return true;
     }
 
-    if (typeof node.second !== 'string') {
+    if (typeof node !== 'string') {
       path.push('second');
       if (hasPath(node.second)) return true;
     }

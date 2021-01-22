@@ -158,6 +158,8 @@ type State = {|
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
 
 export default class SceneEditor extends React.Component<Props, State> {
+  static contextType = PreferencesContext;
+
   static defaultProps = {
     setToolbar: () => {},
   };
@@ -1044,12 +1046,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       properties: {
         type: 'secondary',
         title: t`Properties`,
-        showComponent: this.state.showPropertiesInfoBar,
         toolbarControls: [
           <CloseButton
             key="close"
             closeActions={() => {
-              if (this.editorMosaic.closeEditor('properties'))
+              if (
+                this.editorMosaic &&
+                this.editorMosaic.closeEditor('properties')
+              )
                 this.setState({
                   showPropertiesInfoBar: false,
                 });
@@ -1079,12 +1083,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       'layers-list': {
         type: 'secondary',
         title: t`Layers`,
-        showComponent: this.state.showLayersInfoBar,
         toolbarControls: [
           <CloseButton
             key="close"
             closeActions={() => {
-              if (this.editorMosaic.closeEditor('layers-list'))
+              if (
+                this.editorMosaic &&
+                this.editorMosaic.closeEditor('layers-list')
+              )
                 this.setState({ showLayersInfoBar: false });
             }}
           />,
@@ -1109,12 +1115,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-list': {
         type: 'secondary',
         title: t`Instances list`,
-        showComponent: this.state.showInstancesInfoBar,
         toolbarControls: [
           <CloseButton
             key="close"
             closeActions={() => {
-              if (this.editorMosaic.closeEditor('instances-list'))
+              if (
+                this.editorMosaic &&
+                this.editorMosaic.closeEditor('instances-list')
+              )
                 this.setState({
                   showInstancesInfoBar: false,
                 });
@@ -1132,7 +1140,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-editor': {
         type: 'primary',
         noTitleBar: true,
-        showComponent: true,
         renderEditor: () => (
           <FullSizeInstancesEditorWithScrollbars
             project={project}
@@ -1180,14 +1187,16 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton
             key="close"
             closeActions={() => {
-              if (this.editorMosaic.closeEditor('objects-list'))
+              if (
+                this.editorMosaic &&
+                this.editorMosaic.closeEditor('objects-list')
+              )
                 this.setState({
                   showObjectsListInfoBar: false,
                 });
             }}
           />,
         ],
-        showComponent: this.state.showObjectsListInfoBar,
         renderEditor: () => (
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
@@ -1224,12 +1233,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': {
         type: 'secondary',
         title: t`Object Groups`,
-        showComponent: this.state.showObjectGroupsListInfoBar,
         toolbarControls: [
           <CloseButton
             key="close"
             closeActions={() => {
-              if (this.editorMosaic.closeEditor('object-groups-list'))
+              if (
+                this.editorMosaic &&
+                this.editorMosaic.closeEditor('object-groups-list')
+              )
                 this.setState({
                   showObjectGroupsListInfoBar: false,
                 });
@@ -1598,5 +1609,3 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   }
 }
-
-SceneEditor.contextType = PreferencesContext;

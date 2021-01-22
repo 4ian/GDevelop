@@ -46,31 +46,31 @@ const hasNode = (nodeName: string, mosaicNode: ?EditorMosaicNode): boolean => {
 const getPathOfNode = (
   nodeName: string,
   mosaicNode: ?EditorMosaicNode
-): Array => {
+): Array<?string> => {
   let path = [];
-  const hasPath = mosaicNode => {
-    if (typeof mosaicNode.first === 'string') {
-      if (mosaicNode.first === nodeName) {
+  const hasPath = (node: ?EditorMosaicNode) => {
+    if (typeof node.first === 'string') {
+      if (node.first === nodeName) {
         path.push('first');
         return true;
       }
     }
 
-    if (typeof mosaicNode.second === 'string') {
-      if (mosaicNode.second === nodeName) {
+    if (typeof node.second === 'string') {
+      if (node.second === nodeName) {
         path.push('second');
         return true;
       }
     }
 
-    if (typeof mosaicNode.first !== 'string') {
+    if (node.first && typeof node.first !== 'string') {
       path.push('first');
-      if (hasPath(mosaicNode.first)) return true;
+      if (hasPath(node.first)) return true;
     }
 
-    if (typeof mosaicNode.second !== 'string') {
+    if (node.second && typeof node.second !== 'string') {
       path.push('second');
-      if (hasPath(mosaicNode.second)) return true;
+      if (hasPath(node.second)) return true;
     }
 
     return false;
@@ -272,7 +272,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
     return true;
   };
 
-  closeEditor = editorName => {
+  closeEditor = (editorName: string) => {
     const { editors } = this.props;
 
     const editor = editors[editorName];

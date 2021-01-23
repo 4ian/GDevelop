@@ -4214,6 +4214,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4255,6 +4256,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4947,6 +4949,7 @@ storiesOf('AssetStore/ExtensionsSearchDialog', module)
             <ExtensionsSearchDialog
               project={testProject.project}
               onClose={action('on close')}
+              onInstallExtension={action('onInstallExtension')}
             />
           </ExtensionStoreStateProvider>
         </EventsFunctionsExtensionsProvider>

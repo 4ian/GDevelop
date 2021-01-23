@@ -50,6 +50,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -289,6 +290,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 type State = {|
@@ -756,6 +758,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project,
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
+      onInstallExtension,
     } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
@@ -1196,6 +1199,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ExtensionsSearchDialog
             project={project}
             onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
+            onInstallExtension={onInstallExtension}
           />
         )}
       </div>

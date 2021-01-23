@@ -116,6 +116,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -809,6 +810,32 @@ const MainFrame = (props: Props) => {
       currentProject.getEventsFunctionsExtensionsCount()
     );
     _onProjectItemModified();
+  };
+
+  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    // Close the extension tab before updating/reinstalling the extension.
+    const eventsFunctionsExtensionName = extensionShortHeader.name;
+
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        eventsFunctionsExtensionName
+      );
+
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtension
+        ),
+      }));
+    }
   };
 
   const deleteLayout = (layout: gdLayout) => {
@@ -1973,6 +2000,7 @@ const MainFrame = (props: Props) => {
             onAddExternalLayout={addExternalLayout}
             onAddEventsFunctionsExtension={addEventsFunctionsExtension}
             onAddExternalEvents={addExternalEvents}
+            onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
             onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

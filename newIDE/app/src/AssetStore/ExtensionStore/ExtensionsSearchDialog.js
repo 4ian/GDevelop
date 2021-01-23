@@ -10,16 +10,22 @@ import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoa
 import HelpButton from '../../UI/HelpButton';
 import { importExtension, installExtension } from './InstallExtension';
 import InfoBar from '../../UI/Messages/InfoBar';
+import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 /**
  * Allows to browse and install events based extensions.
  */
-export default function ExtensionsSearchDialog({ project, onClose }: Props) {
+export default function ExtensionsSearchDialog({
+  project,
+  onClose,
+  onInstallExtension,
+}: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -76,6 +82,7 @@ export default function ExtensionsSearchDialog({ project, onClose }: Props) {
             isInstalling={isInstalling}
             onInstall={async extensionShortHeader => {
               setIsInstalling(true);
+              onInstallExtension(extensionShortHeader);
               const wasExtensionInstalled = await installExtension(
                 i18n,
                 project,

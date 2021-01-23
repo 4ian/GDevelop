@@ -95,7 +95,7 @@ export const pasteEventsFromClipboardInSelection = (
   if (!hasEventSelected(selection) || !hasClipboardEvents()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-  const eventsListContent = SafeExtractor.extractObjectProperty(
+  const eventsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'eventsList'
   );
@@ -133,11 +133,11 @@ export const pasteInstructionsFromClipboardInSelection = (
     return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-  const actionsListContent = SafeExtractor.extractObjectProperty(
+  const actionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'actionsList'
   );
-  const conditionsListContent = SafeExtractor.extractObjectProperty(
+  const conditionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'conditionsList'
   );
@@ -206,11 +206,11 @@ export const pasteInstructionsFromClipboardInInstructionsList = (
   if (!hasClipboardConditions() && !hasClipboardActions()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-  const actionsListContent = SafeExtractor.extractObjectProperty(
+  const actionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'actionsList'
   );
-  const conditionsListContent = SafeExtractor.extractObjectProperty(
+  const conditionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'conditionsList'
   );

@@ -317,6 +317,8 @@ export const insertAutocompletionInExpression = (
     endString: string,
     startString: string
   ): boolean => {
+    if (!startString || !endString) return false;
+
     for (let index = 0; index < endString.length; index++) {
       let subStr = endString.substring(index);
       if (startString.indexOf(subStr) === 0) {
@@ -328,7 +330,7 @@ export const insertAutocompletionInExpression = (
 
   const formatCompletion = (
     nextCharacter: ?string,
-    newExpressionStart: string
+    newExpressionStart: ?string
   ) => {
     const suffix = insertedAutocompletion.addDot
       ? '.'
@@ -347,7 +349,7 @@ export const insertAutocompletionInExpression = (
 
     // If the result from insertedAutocompletion.completion is redundant with startOfTheExpression then takes only function/object part of the expression.
     if (compareExpressionsForRedundancy(newExpressionStart, endExpression)) {
-      let charSeparatorPosition: Number = endExpression.length - 1;
+      let charSeparatorPosition = endExpression.length - 1;
       while (
         charSeparatorPosition > 0 &&
         !isSeparatorChar(endExpression[charSeparatorPosition])
@@ -366,7 +368,7 @@ export const insertAutocompletionInExpression = (
   }
 
   if (caretLocation === 0 || !expression) {
-    const newExpression = formatCompletion(undefined) + expression;
+    const newExpression = formatCompletion(undefined, undefined) + expression;
     return {
       caretLocation: newExpression.length,
       expression: newExpression,

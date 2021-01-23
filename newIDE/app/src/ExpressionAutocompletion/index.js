@@ -314,8 +314,8 @@ export const insertAutocompletionInExpression = (
 ): ExpressionAndCaretLocation => {
   // Compare two expressions one from end and one from start.
   const compareExpressionsForRedundancy = (
-    endString: string,
-    startString: string
+    endString: ?string,
+    startString: ?string
   ): boolean => {
     if (!startString || !endString) return false;
 

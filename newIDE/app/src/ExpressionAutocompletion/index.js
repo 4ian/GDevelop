@@ -312,7 +312,24 @@ export const insertAutocompletionInExpression = (
   { expression, caretLocation }: ExpressionAndCaretLocation,
   insertedAutocompletion: InsertedAutocompletion
 ): ExpressionAndCaretLocation => {
-  const formatCompletion = (nextCharacter: ?string) => {
+  // Compare two expressions one from end and one from start.
+  const compareExpressionsForRedundancy = (
+    endString: string,
+    startString: string
+  ): boolean => {
+    for (let index = 0; index < endString.length; index++) {
+      let subStr = endString.substring(index);
+      if (startString.indexOf(subStr) === 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const formatCompletion = (
+    nextCharacter: ?string,
+    newExpressionStart: string
+  ) => {
     const suffix = insertedAutocompletion.addDot
       ? '.'
       : insertedAutocompletion.addNamespaceSeparator
@@ -326,7 +343,22 @@ export const insertAutocompletionInExpression = (
     const addSuffix =
       !nextCharacter || !suffix || nextCharacter[0] !== suffix[0];
 
-    return insertedAutocompletion.completion + (addSuffix ? suffix : '');
+    let endExpression: string = insertedAutocompletion.completion;
+
+    // If the result from insertedAutocompletion.completion is redundant with startOfTheExpression then takes only function/object part of the expression.
+    if (compareExpressionsForRedundancy(newExpressionStart, endExpression)) {
+      let charSeparatorPosition: Number = endExpression.length - 1;
+      while (
+        charSeparatorPosition > 0 &&
+        !isSeparatorChar(endExpression[charSeparatorPosition])
+      ) {
+        charSeparatorPosition--;
+      }
+
+      endExpression = endExpression.substr(charSeparatorPosition + 1);
+    }
+
+    return endExpression + (addSuffix ? suffix : '');
   };
 
   if (caretLocation > expression.length) {
@@ -380,7 +412,7 @@ export const insertAutocompletionInExpression = (
   const maybeNextCharacter: ?string = expression[wordEndPosition + 1];
 
   const newExpressionStart = expression.substring(0, wordStartPosition);
-  const insertedWord = formatCompletion(maybeNextCharacter);
+  const insertedWord = formatCompletion(maybeNextCharacter, newExpressionStart);
   const newExpressionEnd = expression.substring(wordEndPosition + 1);
 
   return {

@@ -76,7 +76,7 @@ export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
  */
 export const getShortcutMetadataFromEvent = (
   e: KeyboardEvent
-): {| shortcutString: string, isValid: boolean, invalidType?: string |} => {
+): {| shortcutString: string, isValid: boolean |} => {
   const shortcutString = getShortcutStringFromEvent(e);
   const isValidKey = isValidShortcutEvent(e);
   const isReserved = reservedShortcuts.includes(shortcutString);
@@ -183,8 +183,8 @@ export const getElectronAccelerator = (shortcutString: string) => {
   return shortcutString
     .split('+')
     .map<string>(keyCode => {
-      if (keyCode === 'CmdOrCtrl') return 'CmdOrCtrl';
-      if (keyCode === 'Shift' || keyCode === 'Alt') return keyCode;
+      if (keyCode === 'CmdOrCtrl' || keyCode === 'Shift' || keyCode === 'Alt')
+        return keyCode;
       return getElectronKeyString(keyCode);
     })
     .join('+');

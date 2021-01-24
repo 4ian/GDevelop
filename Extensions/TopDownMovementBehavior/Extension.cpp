@@ -21,6 +21,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/topdown");
 
+  {
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "TopDownMovementBehavior",
       _("Top-down movement (4 or 8 directions)"),
@@ -513,6 +514,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 #endif
+  }
 }
 
 /**

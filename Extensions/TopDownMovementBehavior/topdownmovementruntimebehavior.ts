@@ -9,6 +9,11 @@ namespace gdjs {
    * and rotation.
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
+    static TOP_DOWN = 0;
+    static PIXEL_ISOMETRIE = 1;
+    static TRUE_ISOMETRY = 2;
+    static CUSTOM_ISOMETRY = 2;
+    
     //Behavior configuration:
     _allowDiagonals: any;
     _acceleration: any;
@@ -18,11 +23,15 @@ namespace gdjs {
     _rotateObject: any;
     _angleOffset: any;
     _ignoreDefaultControls: any;
+    _viewpoint: any;
+    _customIsometryAngle: any;
 
     /** The latest angle of movement, in degrees. */
     _angle: float = 0;
 
     //Attributes used when moving
+    _x: number = 0;
+    _y: number = 0;
     _xVelocity: float = 0;
     _yVelocity: float = 0;
     _angularSpeed: number = 0;
@@ -30,6 +39,10 @@ namespace gdjs {
     _rightKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
+    
+    // @ts-ignore
+    _basisTransformation: BasisTransformation;
+    _point: number[] = [0, 0];
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
@@ -41,6 +54,7 @@ namespace gdjs {
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
+      this.setViewpoint(behaviorData.viewpoint, behaviorData.customIsometryAngle);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -71,7 +85,31 @@ namespace gdjs {
       ) {
         this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
       }
+      if (oldBehaviorData.platformType !== newBehaviorData.platformType
+       || oldBehaviorData.customIsometryAngle !== newBehaviorData.customIsometryAngle) {
+        this.setViewpoint(newBehaviorData.platformType, newBehaviorData.customIsometryAngle);
+      }
       return true;
+    }
+
+    setViewpoint(viewpoint: string, customIsometryAngle: number): void {
+      this._customIsometryAngle = customIsometryAngle;
+      if (viewpoint == 'PixelIsometry') {
+        this._viewpoint = TopDownMovementRuntimeBehavior.PIXEL_ISOMETRIE;
+        this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
+      }
+      else if (viewpoint == 'TrueIsometry') {
+        this._viewpoint = TopDownMovementRuntimeBehavior.TRUE_ISOMETRY;
+      this._basisTransformation = new IsometryTransformation(Math.PI / 6);
+      }
+      else if (viewpoint == 'CustomIsometry') {
+        this._viewpoint = TopDownMovementRuntimeBehavior.CUSTOM_ISOMETRY;
+        this._basisTransformation = new IsometryTransformation(this._customIsometryAngle * Math.PI / 180);
+      }
+      else {
+        this._viewpoint = TopDownMovementRuntimeBehavior.TOP_DOWN;
+        this._basisTransformation = new IdentityTransformation();
+      }
     }
 
     setAcceleration(acceleration): void {
@@ -153,11 +191,30 @@ namespace gdjs {
     }
 
     doStepPreEvents(runtimeScene) {
+      
+      const object = this.owner;
+      
+      /* Check if the object has moved
+       * To avoid to loop on the transform and its inverse
+       * beacause of float approximation.
+       */
+      this._point[0] = this._x;
+      this._point[1] = this._y;
+      this._basisTransformation.toScreen(this._point, this._point)
+      if (object.getX() != this._point[0]
+       || object.getY() != this._point[1])
+      {
+        this._point[0] = object.getX();
+        this._point[1] = object.getY();
+        this._basisTransformation.toWorld(this._point, this._point);
+        this._x = this._point[0];
+        this._y = this._point[1];
+      }
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
       const DOWNKEY = 40;
-      const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
       //Get the player input:
@@ -270,8 +327,8 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      object.setX(object.getX() + this._xVelocity * timeDelta);
-      object.setY(object.getY() + this._yVelocity * timeDelta);
+      this._x += this._xVelocity * timeDelta;
+      this._y += this._yVelocity * timeDelta;
 
       //Also update angle if needed
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
@@ -284,10 +341,17 @@ namespace gdjs {
           );
         }
       }
+
       this._leftKey = false;
       this._rightKey = false;
       this._upKey = false;
       this._downKey = false;
+      
+      this._point[0] = this._x;
+      this._point[1] = this._y;
+      this._basisTransformation.toScreen(this._point, this._point)
+      object.setX(this._point[0]);
+      object.setY(this._point[1]);
     }
 
     simulateControl(input) {
@@ -322,6 +386,67 @@ namespace gdjs {
       this._downKey = true;
     }
   }
+
+  export interface BasisTransformation {
+    
+    toScreen(worldPoint: number[], screenPoint: number[]): void;
+    
+    toWorld(screenPoint: number[], worldPoint: number[]): void;
+  }
+  
+  export class IdentityTransformation implements BasisTransformation {
+    
+    toScreen(wordPoint: number[], screenPoint: number[]): void {
+      screenPoint[0] = wordPoint[0];
+      screenPoint[1] = wordPoint[1];
+    }
+    
+    toWorld(screenPoint: number[], wordPoint: number[]): void {
+      wordPoint[0] = screenPoint[0];
+      wordPoint[1] = screenPoint[1];
+    }
+  }
+  
+  export class IsometryTransformation implements BasisTransformation {
+    
+    screen: number[][];
+    world: number[][];
+    
+    constructor(angle: number) {
+      const alpha = Math.asin(Math.tan(angle));
+      const sinA = Math.sin(alpha);
+      const cosB = Math.cos(Math.PI / 4);
+      const sinB = Math.sin(Math.PI / 4);
+      /* https://en.wikipedia.org/wiki/Isometric_projection
+       * 
+       *   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
+       *   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
+       *   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
+       */
+      this.screen =
+        [[cosB     , -sinB],
+         [sinA*sinB, sinA*cosB]];
+      // invert
+      this.world = 
+        [[ cosB, sinB/sinA],
+         [-sinB, cosB/sinA]];
+    }
+    
+    toScreen(wordPoint: number[], screenPoint: number[]): void {
+      const x = this.screen[0][0] * wordPoint[0] + this.screen[0][1] * wordPoint[1];
+      const y = this.screen[1][0] * wordPoint[0] + this.screen[1][1] * wordPoint[1];
+      screenPoint[0] = x;
+      screenPoint[1] = y;
+    }
+    
+    toWorld(screenPoint: number[], wordPoint: number[]): void {
+      const x = this.world[0][0] * screenPoint[0] + this.world[0][1] * screenPoint[1];
+      const y = this.world[1][0] * screenPoint[0] + this.world[1][1] * screenPoint[1];
+      wordPoint[0] = x;
+      wordPoint[1] = y;
+    }
+  }
+
   gdjs.registerBehavior(
     'TopDownMovementBehavior::TopDownMovementBehavior',
     gdjs.TopDownMovementRuntimeBehavior

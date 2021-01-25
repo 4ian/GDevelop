@@ -7,6 +7,81 @@ namespace gdjs {
      */
     export namespace p2p {
       /**
+       * The type of the data that is sent across peerjs.
+       */
+      type NetworkEvent = {
+        eventName: string;
+        data: string;
+      };
+
+      const isValidNetworkEvent = (event): event is NetworkEvent =>
+        typeof event.eventName === 'string' && typeof event.data === 'string';
+
+      /**
+       * The data bound to an event that got triggered.
+       */
+      class EventData {
+        constructor(data: string, sender: string) {
+          this.data = data;
+          this.sender = sender;
+        }
+
+        /**
+         * The data sent alongside the event.
+         */
+        public readonly data: string = '';
+
+        /**
+         * The ID of the sender of the event.
+         */
+        public readonly sender: string = '';
+      }
+
+      /**
+       * An event that can be listened to.
+       */
+      class Event {
+        private data: EventData[] = [];
+        public dataloss = false;
+
+        /**
+         * Returns true if the event is triggered.
+         */
+        isTriggered() {
+          return this.data.length > 0;
+        }
+
+        /**
+         * Add new data, to be called with the event data each time the event is triggered.
+         */
+        pushData(newData: EventData) {
+          if (this.dataloss && this.data.length > 0) return;
+          else this.data.push(newData);
+        }
+
+        /**
+         * Deleted the last event data, to be called when it is sure the event was processed throughly.
+         */
+        popData() {
+          this.data.shift();
+        }
+
+        /**
+         * Get the data sent with the last event triggering.
+         */
+        getData() {
+          return this.data.length === 0 ? '' : this.data[0].data;
+        }
+
+        /**
+         * Get the sender of the last event triggering.
+         */
+        getSender() {
+          return this.data.length === 0 ? '' : this.data[0].sender;
+        }
+      }
+
+      /**
        * The peer to peer configuration.
        */
       let peerConfig: Peer.PeerJSOption = { debug: 1 };
@@ -14,36 +89,18 @@ namespace gdjs {
       /**
        * The p2p client.
        */
-      let peer: Peer | null = null;
+      let peer: Peer<NetworkEvent> | null = null;
 
       /**
        * All connected p2p clients, keyed by their ID.
        */
-      const connections: Record<string, Peer.DataConnection> = {};
+      const connections: Record<string, Peer.DataConnection<NetworkEvent>> = {};
 
       /**
-       * Contains a list of events triggered by other p2p clients.
-       * Maps an event name (string) to a boolean:
-       * true if the event has been triggered, otherwise false.
-       * @note This is ignored if the event is in no dataloss mode.
+       * Contains a map of events triggered by other p2p clients.
+       * It is keyed by the event name.
        */
-      const triggeredEvents: Record<string, boolean> = {};
-
-      /**
-       * Contains the latest data sent with each event.
-       * If the event is in dataloss mode, maps an event name
-       * to the string sent with that event.
-       * If the event is in no dataloss mode, maps an event name
-       * to an array containing the data of each call of that event.
-       */
-      const lastEventData: Record<string, string | string[]> = {};
-
-      /**
-       * Tells how to handle an event (with or without data loss).
-       * Maps the event name (string) to a boolean:
-       * true for dataloss, false for no dataloss.
-       */
-      const eventHandling: Record<string, boolean> = {};
+      const events: Record<string, Event> = {};
 
       /**
        * True if PeerJS is initialized and ready.
@@ -71,10 +128,10 @@ namespace gdjs {
       const connectedPeers: string[] = [];
 
       /**
-       * Internal function called to initialize PeerJS after its
-       * broker server has been configured.
+       * Internal function called to initialize PeerJS after it
+       * has been configured.
        */
-      const _loadPeerJS = () => {
+      const loadPeerJS = () => {
         if (peer !== null) return;
         peer = new Peer(peerConfig);
         peer.on('open', () => {
@@ -92,7 +149,7 @@ namespace gdjs {
         });
         peer.on('close', () => {
           peer = null;
-          _loadPeerJS();
+          loadPeerJS();
         });
         peer.on('disconnected', peer.reconnect);
       };
@@ -101,25 +158,19 @@ namespace gdjs {
        * Internal function called when a connection with a remote peer is initiated.
        * @param connection The DataConnection of the peer
        */
-      const _onConnection = (connection: Peer.DataConnection) => {
+      const _onConnection = (connection: Peer.DataConnection<NetworkEvent>) => {
         connections[connection.peer] = connection;
         connection.on('data', (data) => {
-          if (data.eventName === undefined) {
-            return;
-          }
-          const dataLoss = eventHandling[data.eventName];
-          if (typeof dataLoss === 'undefined' || dataLoss === false) {
-            if (typeof lastEventData[data.eventName] !== 'object')
-              lastEventData[data.eventName] = [];
-
-            (lastEventData[data.eventName] as string[]).push(data.data);
-          } else {
-            triggeredEvents[data.eventName] = true;
-            lastEventData[data.eventName] = data.data;
-          }
+          if (isValidNetworkEvent(data))
+            getEvent(data.eventName).pushData(
+              new EventData(data.data, connection.peer)
+            );
         });
+
+        // Close event is only for graceful disconnection,
+        // but we want onDisconnect to trigger for any type of disconnection,
+        // so we register a listener for both event types.
         connection.on('error', () => {
-          // Close event is only for graceful disconnection, also handle error aka ungraceful disconnection
           _onDisconnect(connection.peer);
         });
         connection.on('close', () => {
@@ -130,11 +181,12 @@ namespace gdjs {
         (function disconnectChecker() {
           if (
             connection.peerConnection.connectionState === 'failed' ||
-            connection.peerConnection.connectionState === 'disconnected'
+            connection.peerConnection.connectionState === 'disconnected' ||
+            connection.peerConnection.connectionState === 'closed'
           ) {
             _onDisconnect(connection.peer);
           } else {
-            setTimeout(disconnectChecker, 500);
+            setTimeout(disconnectChecker, 1000);
           }
         })();
       };
@@ -144,8 +196,18 @@ namespace gdjs {
        * @param connectionID The ID of the peer that disconnected.
        */
       const _onDisconnect = (connectionID: string) => {
+        if (!connections.hasOwnProperty(connectionID)) return;
         disconnectedPeers.push(connectionID);
         delete connections[connectionID];
+      };
+
+      /**
+       * Gets an event from {@link events}
+       * or creates it if it doesn't exist.
+       */
+      export const getEvent = (name: string) => {
+        if (!events.hasOwnProperty(name)) events[name] = new Event();
+        return events[name];
       };
 
       /**
@@ -168,25 +230,9 @@ namespace gdjs {
         eventName: string,
         defaultDataLoss: boolean
       ): boolean => {
-        const dataLoss = eventHandling[eventName];
-        if (dataLoss == undefined) {
-          eventHandling[eventName] = defaultDataLoss;
-          return onEvent(eventName, defaultDataLoss);
-        }
-        if (dataLoss) {
-          let returnValue = triggeredEvents[eventName];
-          if (typeof returnValue === 'undefined') {
-            return false;
-          }
-          triggeredEvents[eventName] = false;
-          return returnValue;
-        } else {
-          let returnValue = lastEventData[eventName];
-          if (typeof returnValue === 'undefined') {
-            return false;
-          }
-          return returnValue.length !== 0;
-        }
+        const event = getEvent(eventName);
+        event.dataloss = defaultDataLoss;
+        return event.isTriggered();
       };
 
       /**
@@ -198,7 +244,7 @@ namespace gdjs {
       export const sendDataTo = (
         id: string,
         eventName: string,
-        eventData?: string
+        eventData: string
       ) => {
         if (connections[id]) {
           connections[id].send({
@@ -213,13 +259,8 @@ namespace gdjs {
        * @param eventName - The event to trigger.
        * @param [eventData] - Additional data to send with the event.
        */
-      export const sendDataToAll = (eventName: string, eventData?: string) => {
-        for (const id in connections) {
-          connections[id].send({
-            eventName: eventName,
-            data: eventData,
-          });
-        }
+      export const sendDataToAll = (eventName: string, eventData: string) => {
+        for (const id in connections) sendDataTo(id, eventName, eventData);
       };
 
       /**
@@ -260,15 +301,15 @@ namespace gdjs {
        * @param eventName - The event to get data from.
        * @returns - The data as JSON.
        */
-      export const getEventData = (eventName: string): string => {
-        const dataLoss = eventHandling[eventName];
-        if (typeof dataLoss === 'undefined' || dataLoss === false) {
-          const event = lastEventData[eventName];
-          return event[event.length - 1];
-        } else {
-          return lastEventData[eventName] as string;
-        }
-      };
+      export const getEventData = (eventName: string) =>
+        getEvent(eventName).getData();
+
+      /**
+       * Get the id of peer that caused the last trigger of an event.
+       * @param eventName - The event to get the sender from.
+       */
+      export const getEventSender = (eventName: string) =>
+        getEvent(eventName).getSender();
 
       /**
        * Get a variable associated to the last trigger of an event.
@@ -300,16 +341,16 @@ namespace gdjs {
         key: string,
         ssl: boolean
       ) => {
-        // All servers have "peerjs" as default key
         peerConfig = {
           debug: 1,
           host,
           port,
           path,
           secure: ssl,
+          // All servers have "peerjs" as default key
           key: key.length === 0 ? 'peerjs' : key,
         };
-        _loadPeerJS();
+        loadPeerJS();
       };
 
       /**
@@ -317,16 +358,14 @@ namespace gdjs {
        * This is not recommended for published games,
        * this server should only be used for quick testing in development.
        */
-      export const useDefaultBrokerServer = _loadPeerJS;
+      export const useDefaultBrokerServer = loadPeerJS;
 
       /**
        * Returns the own current peer ID.
        * @see Peer.id
        */
       export const getCurrentId = (): string => {
-        if (peer == undefined) {
-          return '';
-        }
+        if (peer == undefined) return '';
         return peer.id || '';
       };
 
@@ -334,9 +373,7 @@ namespace gdjs {
        * Returns true once PeerJS finished initialization.
        * @see ready
        */
-      export const isReady = (): boolean => {
-        return ready;
-      };
+      export const isReady = () => ready;
 
       /**
        * Returns true once when there is an error.
@@ -350,52 +387,38 @@ namespace gdjs {
       /**
        * Returns the latest error message.
        */
-      export const getLastError = (): string => {
-        return lastError;
-      };
+      export const getLastError = () => lastError;
 
       /**
        * Returns true once a peer disconnected.
        */
-      export const onDisconnect = (): boolean => {
-        return disconnectedPeers.length > 0;
-      };
+      export const onDisconnect = () => disconnectedPeers.length > 0;
 
       /**
        * Get the ID of the peer that triggered onDisconnect.
        */
-      export const getDisconnectedPeer = (): string => {
-        return disconnectedPeers[disconnectedPeers.length - 1] || '';
-      };
+      export const getDisconnectedPeer = () => disconnectedPeers[0] || '';
 
       /**
        * Returns true once if a remote peer just initiated a connection.
        */
-      export const onConnection = (): boolean => {
-        return connectedPeers.length > 0;
-      };
+      export const onConnection = () => connectedPeers.length > 0;
 
       /**
        * Get the ID of the peer that triggered onConnection.
        */
-      export const getConnectedPeer = (): string => {
-        return connectedPeers[connectedPeers.length - 1] || '';
-      };
+      export const getConnectedPeer = (): string => connectedPeers[0] || '';
 
       gdjs.callbacksRuntimeScenePostEvents.push(() => {
-        for (const i in lastEventData) {
-          if (
-            typeof lastEventData[i] === 'object' &&
-            lastEventData[i].length > 0
-          ) {
-            (lastEventData[i] as string[]).pop();
-          }
+        for (const eventName in events) {
+          if (!events.hasOwnProperty(eventName)) continue;
+          events[eventName].popData();
         }
         if (disconnectedPeers.length > 0) {
-          disconnectedPeers.pop();
+          disconnectedPeers.shift();
         }
         if (connectedPeers.length > 0) {
-          connectedPeers.pop();
+          connectedPeers.shift();
         }
       });
     }

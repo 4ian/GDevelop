@@ -15,7 +15,7 @@ import {
   enumerateEventsBasedBehaviors,
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
@@ -183,10 +183,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
   _pasteEventsBasedBehavior = (index: number) => {
     if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
 
-    const {
-      eventsBasedBehavior: copiedEventsBasedBehavior,
-      name,
-    } = Clipboard.get(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND);
+    const clipboardContent = Clipboard.get(
+      EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND
+    );
+    const copiedEventsBasedBehavior = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'eventsBasedBehavior'
+    );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedEventsBasedBehavior) return;
+
     const { project, eventsBasedBehaviorsList } = this.props;
 
     const newName = newNameGenerator(name, name =>

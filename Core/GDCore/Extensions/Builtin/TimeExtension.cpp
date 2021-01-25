@@ -12,12 +12,14 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinTime",
-                               _("Time"),
-                               _("Built-in extension providing actions and "
-                                 "conditions related to time."),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinTime",
+          _("Time"),
+          "Actions and conditions to run timers, get the current time or "
+          "modify the time scale (speed at which the game is running - useful "
+          "for slow motion effects).",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers");
 
 #if defined(GD_IDE_ONLY)

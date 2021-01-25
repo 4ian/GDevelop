@@ -1,12 +1,12 @@
-/**
+/*
 GDevelop - Top-down movement Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
   /**
-   * TopDownMovementRuntimeBehavior represents a behavior allowing objects to
-   * follow a path computed to avoid obstacles.
+   * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
+   * and rotation.
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:

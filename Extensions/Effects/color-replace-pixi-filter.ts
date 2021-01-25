@@ -14,9 +14,13 @@ namespace gdjs {
     updateStringParameter: function (filter, parameterName, value) {
       const colorReplaceFilter = filter as PIXI.filters.ColorReplaceFilter;
       if (parameterName === 'originalColor') {
-        colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          value
+        );
       } else if (parameterName === 'newColor') {
-        colorReplaceFilter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
+        colorReplaceFilter.newColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
+          value
+        );
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {},

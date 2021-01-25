@@ -11,7 +11,10 @@ namespace gdjs {
       if (parameterName !== 'brightness') {
         return;
       }
-      brightnessFilter.brightness(gdjs.PixiFiltersTools.clampValue(value, 0, 1), false);
+      brightnessFilter.brightness(
+        gdjs.PixiFiltersTools.clampValue(value, 0, 1),
+        false
+      );
     },
     updateStringParameter: function (filter, parameterName, value) {},
     updateBooleanParameter: function (filter, parameterName, value) {},

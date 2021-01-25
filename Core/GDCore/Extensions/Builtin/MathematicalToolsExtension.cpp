@@ -15,7 +15,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension.SetExtensionInformation(
       "BuiltinMathematicalTools",
       _("Mathematical tools"),
-      _("Built-in extension providing mathematical tools"),
+      "A set of mathematical functions that can be used in expressions.",
       "Florian Rival",
       "Open source (MIT License)");
 

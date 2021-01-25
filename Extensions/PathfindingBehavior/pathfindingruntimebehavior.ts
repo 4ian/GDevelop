@@ -1,7 +1,8 @@
-/**
+/*
 GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
+type FloatPoint = [number, number];
 
 namespace gdjs {
   /**
@@ -9,7 +10,7 @@ namespace gdjs {
    * follow a path computed to avoid obstacles.
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _path: any = [];
+    _path: Array<FloatPoint> = [];
 
     //Behavior configuration:
     _allowDiagonals: any;
@@ -200,7 +201,7 @@ namespace gdjs {
       if (this._currentSegment + 1 < this._path.length) {
         return this._path[this._currentSegment + 1][0];
       } else {
-        return this._path.back()[0];
+        return this._path[this._path.length - 1][0];
       }
     }
 
@@ -211,7 +212,7 @@ namespace gdjs {
       if (this._currentSegment + 1 < this._path.length) {
         return this._path[this._currentSegment + 1][1];
       } else {
-        return this._path.back()[1];
+        return this._path[this._path.length - 1][1];
       }
     }
 
@@ -241,14 +242,14 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path.back()[0];
+      return this._path[this._path.length - 1][0];
     }
 
     getDestinationY(): float {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path.back()[1];
+      return this._path[this._path.length - 1][1];
     }
 
     /**
@@ -461,6 +462,7 @@ namespace gdjs {
     /**
      * Internal tool class containing the structures used by A* and members functions related
      * to them.
+     * @ignore
      */
     export class SearchContext {
       _obstacles: any = null;

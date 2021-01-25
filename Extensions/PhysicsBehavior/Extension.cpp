@@ -19,9 +19,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("PhysicsBehavior",
                                _("Physics Engine (deprecated)"),
-                               _("This extension enables the movement of "
-                                 "objects as if they are subject "
-                                 "to the laws of physics."),
+                               "This is the old, deprecated physics engine. Prefer to use the Physics Engine 2.0.",
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/physics");

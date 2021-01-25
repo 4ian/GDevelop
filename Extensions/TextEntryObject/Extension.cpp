@@ -6,23 +6,23 @@ This project is released under the MIT License.
 */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-
 #include "TextEntryObject.h"
 
 void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "TextEntryObject",
-      _("Text entry object"),
-      _("This Extension enables the use of an object that captures text "
-        "entered with a keyboard by a player."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "TextEntryObject",
+          _("Text entry object"),
+          _("An object that can be used to capture the text "
+            "entered with a keyboard by a player."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/text_entry");
 
   gd::ObjectMetadata& obj = extension.AddObject<TextEntryObject>(
       "TextEntry",
       _("Text entry"),
-      _("Invisible object used to get the text entered with the keyboard"),
+      _("Invisible object used to get the text entered with the keyboard."),
       "CppPlatform/Extensions/textentry.png");
 
 #if defined(GD_IDE_ONLY)

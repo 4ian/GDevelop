@@ -11,11 +11,13 @@ import {
   findInTree,
 } from '../../InstructionOrExpression/CreateTree';
 import {
+  enumerateAllInstructions,
   enumerateFreeInstructions,
   filterInstructionsList,
+  deduplicateInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
-import { List, type ListItemRefType } from '../../UI/List';
+import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
@@ -85,15 +87,22 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
 
-  instructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
+  // Free instructions, to be displayed in a tab next to the objects.
+  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
     this.props.isCondition
   );
-  instructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.instructionsInfo
+  freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
+    this.freeInstructionsInfo
   );
   initialInstructionTypePath = findInTree(
-    this.instructionsInfoTree,
+    this.freeInstructionsInfoTree,
     this.props.chosenInstructionType
+  );
+
+  // All the instructions, to be used when searching, so that the search is done
+  // across all the instructions (including object and behaviors instructions).
+  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateAllInstructions(
+    this.props.isCondition
   );
 
   componentDidMount() {
@@ -168,11 +177,25 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const displayedObjectGroupsList = selectedObjectTags.length
       ? []
       : filterGroupsList(allGroupsList, searchText);
-    const displayedInstructionsList = filterInstructionsList(
-      this.instructionsInfo,
+    const isSearching = !!searchText;
+
+    const filteredInstructionsList = filterInstructionsList(
+      // When searching, search among all the instructions
+      isSearching ? this.allInstructionsInfo : this.freeInstructionsInfo,
       { searchText }
     );
-    const isSearching = !!searchText;
+
+    // When searching, we can have a lot of results. Keep only the first ones.
+    // Also ensure no duplicate is shown (could be the case for the "Create" action,
+    // as both present in the object actions list and in the free actions list).
+    const displayedInstructionsList = isSearching
+      ? deduplicateInstructionsList(filteredInstructionsList.slice(0, 20))
+      : filteredInstructionsList;
+
+    const remainingResultsCount = isSearching
+      ? Math.max(filteredInstructionsList.length - 20, 0)
+      : 0;
+
     const hasResults =
       !isSearching ||
       !!displayedObjectsList.length ||
@@ -265,49 +288,53 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   )}
                   {hasResults && (
                     <List>
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectsList.map(objectWithContext =>
-                          renderObjectListItem({
-                            project: project,
-                            objectWithContext: objectWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(
-                                objectWithContext.object.getName()
-                              ),
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                          })
-                        )}
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectGroupsList.length > 0 && (
-                          <Subheader>
-                            <Trans>Object groups</Trans>
-                          </Subheader>
-                        )}
-                      {(isSearching || currentTab === 'objects') &&
-                        displayedObjectGroupsList.map(groupWithContext =>
-                          renderGroupObjectsListItem({
-                            groupWithContext: groupWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(groupWithContext.group.getName()),
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                          })
-                        )}
+                      {(isSearching || currentTab === 'objects') && (
+                        <React.Fragment>
+                          {displayedObjectsList.map(objectWithContext =>
+                            renderObjectListItem({
+                              project: project,
+                              objectWithContext: objectWithContext,
+                              iconSize: iconSize,
+                              onClick: () =>
+                                onChooseObject(
+                                  objectWithContext.object.getName()
+                                ),
+                              selectedValue: chosenObjectName
+                                ? getObjectOrObjectGroupListItemValue(
+                                    chosenObjectName
+                                  )
+                                : undefined,
+                            })
+                          )}
+
+                          {displayedObjectGroupsList.length > 0 && (
+                            <Subheader>
+                              <Trans>Object groups</Trans>
+                            </Subheader>
+                          )}
+                          {displayedObjectGroupsList.map(groupWithContext =>
+                            renderGroupObjectsListItem({
+                              groupWithContext: groupWithContext,
+                              iconSize: iconSize,
+                              onClick: () =>
+                                onChooseObject(
+                                  groupWithContext.group.getName()
+                                ),
+                              selectedValue: chosenObjectName
+                                ? getObjectOrObjectGroupListItemValue(
+                                    chosenObjectName
+                                  )
+                                : undefined,
+                            })
+                          )}
+                        </React.Fragment>
+                      )}
                       {isSearching && displayedInstructionsList.length > 0 && (
                         <Subheader>
                           {isCondition ? (
-                            <Trans>Non-objects and other conditions</Trans>
+                            <Trans>Conditions</Trans>
                           ) : (
-                            <Trans>Non-objects and other actions</Trans>
+                            <Trans>Actions</Trans>
                           )}
                         </Subheader>
                       )}
@@ -331,7 +358,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       {!isSearching &&
                         currentTab === 'free-instructions' &&
                         renderInstructionOrExpressionTree({
-                          instructionTreeNode: this.instructionsInfoTree,
+                          instructionTreeNode: this.freeInstructionsInfoTree,
                           onChoose: onChooseInstruction,
                           iconSize,
                           selectedValue: chosenInstructionType
@@ -340,6 +367,22 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           initiallyOpenedPath: this.initialInstructionTypePath,
                           selectedItemRef: this._selectedItem,
                         })}
+                      {remainingResultsCount > 0 && (
+                        <ListItem
+                          primaryText={
+                            <Trans>
+                              And {remainingResultsCount} more results.
+                            </Trans>
+                          }
+                          disabled
+                          secondaryText={
+                            <Trans>
+                              Refine your search with more specific keyword to
+                              see them.
+                            </Trans>
+                          }
+                        />
+                      )}
                     </List>
                   )}
                   {!isSearching &&

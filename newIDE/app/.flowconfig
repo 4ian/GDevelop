@@ -2,6 +2,7 @@
 <PROJECT_ROOT>/resources/.*
 <PROJECT_ROOT>/node_modules/protobufjs/src/bower.json
 <PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Cocos2d/project.json
+<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime-sources/.*
 
 [declarations]
 # lingui-js triggers some Flow errors

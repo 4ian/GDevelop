@@ -15,13 +15,6 @@ namespace gdjs {
   /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
-   * The constructor can be called on an already existing RuntimeObject:
-   * In this case, the constructor will try to reuse as much already existing members
-   * as possible (recycling).
-   *
-   * However, you should not be calling the constructor on an already existing object
-   * which is not a RuntimeObject.
-   *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
@@ -67,7 +60,7 @@ namespace gdjs {
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
-    _averageForce: any;
+    _averageForce: gdjs.Force;
 
     /**
      * Contains the behaviors of the object.

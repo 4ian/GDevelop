@@ -111,12 +111,27 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClearBetweenFrames"]
         .SetFunctionName("isClearedBetweenFrames");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillColor"]
         .SetFunctionName("setFillColor");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorRed"]
+        .SetFunctionName("getFillColorR");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorGreen"]
+        .SetFunctionName("getFillColorG");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillColorBlue"]
+        .SetFunctionName("getFillColorB");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineColor"]
         .SetFunctionName("setOutlineColor");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorRed"]
+        .SetFunctionName("getOutlineColorR");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorGreen"]
+        .SetFunctionName("getOutlineColorG");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineColorBlue"]
+        .SetFunctionName("getOutlineColorB");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"]
         .SetFunctionName("setOutlineSize")
@@ -124,6 +139,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineSize"]
         .SetFunctionName("getOutlineSize");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineSize"]
+        .SetFunctionName("getOutlineSize");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"]
         .SetFunctionName("setFillOpacity")
@@ -131,6 +149,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FillOpacity"]
         .SetFunctionName("getFillOpacity");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["FillOpacity"]
+        .SetFunctionName("getFillOpacity");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("setOutlineOpacity")
@@ -138,6 +159,15 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::OutlineOpacity"]
         .SetFunctionName("getOutlineOpacity");
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["OutlineOpacity"]
+        .SetFunctionName("getOutlineOpacity");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::UseRelativeCoordinates"]
+        .SetFunctionName("setCoordinatesRelative");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::AreCoordinatesRelative"]
+        .SetFunctionName("areCoordinatesRelative");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

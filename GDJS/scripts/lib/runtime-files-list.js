@@ -7,7 +7,7 @@ const gdjsRootPath = path.join(__dirname, '..', '..');
 
 const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
-const bundledOutPath = path.join(gdjsRootPath, 'Runtime-bundled');
+const bundledOutPath = path.join(gdjsRootPath, 'Runtime-dist');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
 const allowedExtensions = ['.js', '.ts', '.html', '.json', '.xml'];

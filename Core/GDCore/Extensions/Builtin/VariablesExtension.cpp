@@ -15,7 +15,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetExtensionInformation(
           "BuiltinVariables",
           _("Variable features"),
-          _("Built-in extension allowing to manipulate variables"),
+          "Actions, conditions and expressions to handle variables, from "
+          "simple variables like the player score, the number of remaining "
+          "lives to complex variables containing arbitrary data like an "
+          "inventory or the result of a web request.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/variables");
@@ -114,6 +117,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Variables/Global variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
+<<<<<<< HEAD
       .AddParameter("globalvar", _("Variable"))
       .UseStandardRelationalOperatorParameters("string")
       .MarkAsAdvanced();
@@ -127,6 +131,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("Variables/Global variables"),
           "res/conditions/var24.png",
           "res/conditions/var.png")
+=======
+>>>>>>> master
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true");

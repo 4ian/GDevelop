@@ -7,10 +7,14 @@ namespace gdjs {
     },
     update: function (filter, layer) {
       const twistFilter = filter as PIXI.filters.TwistFilter;
-      // @ts-ignore - extra properties are stored on the filter.
-      twistFilter.offset.x = Math.round(twistFilter._offsetX * layer.getWidth());
-      // @ts-ignore - extra properties are stored on the filter.
-      twistFilter.offset.y = Math.round(twistFilter._offsetY * layer.getHeight());
+      twistFilter.offset.x = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
+        twistFilter._offsetX * layer.getWidth()
+      );
+      twistFilter.offset.y = Math.round(
+        // @ts-ignore - extra properties are stored on the filter.
+        twistFilter._offsetY * layer.getHeight()
+      );
     },
     updateDoubleParameter: function (filter, parameterName, value) {
       const twistFilter = filter as PIXI.filters.TwistFilter;

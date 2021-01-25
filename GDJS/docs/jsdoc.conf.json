@@ -3,7 +3,7 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["./Runtime/"],
+    "include": ["./Runtime/", "../Extensions"],
     "exclude": [
       "./Runtime/Cocos2d/",
       "./Runtime/cocos-renderers/",
@@ -12,8 +12,8 @@
       "./Runtime/Electron/",
       "./Runtime/FacebookInstantGames/"
     ],
-    "includePattern": "\\.(jsx|js|ts|tsx)$",
-    "excludePattern": "(^|\\/|\\\\)_"
+    "includePattern": "\\.ts$",
+    "excludePattern": "((^|\\/|\\\\)_|\\cocos-renderer\\.ts$)"
   },
   "plugins": [
     "plugins/markdown",

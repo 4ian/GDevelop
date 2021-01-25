@@ -1023,6 +1023,7 @@ namespace gdjs {
   export namespace TweenRuntimeBehavior {
     /**
      * A tween being played in a behavior.
+     * @ignore
      */
     export class TweenInstance {
       instance: shifty.Tweenable;

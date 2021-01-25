@@ -139,7 +139,6 @@
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
         // @ts-ignore - atlasTexture is never null here.
         const texture = new PIXI.Texture(atlasTexture, rect);
-        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
         textureCache[frame] = texture;
       } catch (error) {
@@ -286,15 +285,17 @@
     }
     const trim = orig.clone();
 
+    // Get the rotation "D8" number.
+    // See https://pixijs.io/examples/#/textures/texture-rotate.js
     let rotate = 0;
     if (flippedDiagonally) {
-      rotate = 6;
+      rotate = 10;
       if (!flippedHorizontally && flippedVertically) {
-        rotate = 14;
-      } else if (flippedHorizontally && !flippedVertically) {
-        rotate = 10;
-      } else if (flippedHorizontally && flippedVertically) {
         rotate = 2;
+      } else if (flippedHorizontally && !flippedVertically) {
+        rotate = 6;
+      } else if (flippedHorizontally && flippedVertically) {
+        rotate = 14;
       }
     } else {
       rotate = 0;

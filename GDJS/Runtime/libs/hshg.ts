@@ -363,12 +363,8 @@ namespace gdjs {
     HSHG.update_REMOVEALL = update_REMOVEALL;
 
     /**
-     * Grid
-     *
-     * @param cellSize {int} the pixel size of each cell of the grid
-     * @param cellCount {int} the total number of cells for the grid (width x height)
-     * @param parentHierarchy {HSHG} the HSHG to which this grid belongs
-     * @return void
+     * Grid of the HSHG
+     * @ignore
      */
     class Grid {
       cellSize: any;
@@ -381,6 +377,12 @@ namespace gdjs {
       sharedInnerOffsets: any = [];
       _parentHierarchy: any;
 
+      /**
+       *
+       * @param cellSize the pixel size of each cell of the grid
+       * @param cellCount the total number of cells for the grid (width x height)
+       * @param parentHierarchy the HSHG to which this grid belongs
+       */
       constructor(cellSize, cellCount, parentHierarchy) {
         this.cellSize = cellSize;
         this.inverseCellSize = 1 / cellSize;
@@ -638,7 +640,8 @@ namespace gdjs {
     }
 
     /**
-     * A cell of a grid
+     * A cell of a Grid
+     * @ignore
      */
     class Cell {
       objectContainer: any = [];

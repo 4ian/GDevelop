@@ -1132,6 +1132,7 @@ interface VectorParameterMetadata {
     [Ref] ParameterMetadata at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
     void FREE_removeFromVectorParameterMetadata(unsigned long index);
+    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 

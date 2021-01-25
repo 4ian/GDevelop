@@ -274,6 +274,14 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
+    setCoordinatesRelative(value): void {
+      this._absoluteCoordinates = !value;
+    }
+
+    areCoordinatesRelative(): boolean {
+      return !this._absoluteCoordinates;
+    }
+
     setFillColor(rgbColor): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
@@ -287,6 +295,16 @@ namespace gdjs {
         ),
         16
       );
+    }
+
+    getFillColorR(): integer {
+      return gdjs.hexNumberToRGB(this._fillColor).r;
+    }
+    getFillColorG(): integer {
+      return gdjs.hexNumberToRGB(this._fillColor).g;
+    }
+    getFillColorB(): integer {
+      return gdjs.hexNumberToRGB(this._fillColor).b;
     }
 
     setOutlineColor(rgbColor): void {
@@ -303,6 +321,16 @@ namespace gdjs {
         16
       );
       this._renderer.updateOutline();
+    }
+
+    getOutlineColorR(): integer {
+      return gdjs.hexNumberToRGB(this._outlineColor).r;
+    }
+    getOutlineColorG(): integer {
+      return gdjs.hexNumberToRGB(this._outlineColor).g;
+    }
+    getOutlineColorB(): integer {
+      return gdjs.hexNumberToRGB(this._outlineColor).b;
     }
 
     setOutlineSize(size): void {

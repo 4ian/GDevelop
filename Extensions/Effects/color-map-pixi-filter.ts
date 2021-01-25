@@ -22,7 +22,11 @@ namespace gdjs {
     updateDoubleParameter: function (filter, parameterName, value) {
       const colorMapFilter = filter as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {
-        colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(value / 100, 0, 1);
+        colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(
+          value / 100,
+          0,
+          1
+        );
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

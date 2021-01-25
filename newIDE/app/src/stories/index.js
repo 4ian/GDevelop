@@ -3159,59 +3159,77 @@ storiesOf('NewInstructionEditorDialog', module)
     />
   ))
   .add('New condition (scope: without layout)', () => (
-    <NewInstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ layout: null }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={true}
-      instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <NewInstructionEditorDialog
+        open
+        project={testProject.project}
+        scope={{ layout: null }}
+        globalObjectsContainer={testProject.project}
+        objectsContainer={testProject.testLayout}
+        isCondition
+        isNewInstruction={true}
+        instruction={testProject.testInstruction}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+        canPasteInstructions={true}
+        onPasteInstructions={action('paste instructions')}
+      />
+    </Column>
   ));
 
 storiesOf('NewInstructionEditorMenu', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <PopoverButton>
-      {({ buttonElement, onClose }) => (
-        <NewInstructionEditorMenu
-          open
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          isCondition
-          isNewInstruction={false}
-          instruction={testProject.testInstruction}
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onChooseResource={() => {
-            action('onChooseResource');
-            return Promise.reject();
-          }}
-          resourceSources={[]}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCancel={onClose}
-          onSubmit={onClose}
-          anchorEl={buttonElement}
-          canPasteInstructions={true}
-          onPasteInstructions={action('paste instructions')}
-        />
-      )}
-    </PopoverButton>
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <PopoverButton>
+        {({ buttonElement, onClose }) => (
+          <NewInstructionEditorMenu
+            open
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            isCondition
+            isNewInstruction={false}
+            instruction={testProject.testInstruction}
+            resourceExternalEditors={fakeResourceExternalEditors}
+            onChooseResource={() => {
+              action('onChooseResource');
+              return Promise.reject();
+            }}
+            resourceSources={[]}
+            openInstructionOrExpression={action(
+              'open instruction or expression'
+            )}
+            onCancel={onClose}
+            onSubmit={onClose}
+            anchorEl={buttonElement}
+            canPasteInstructions={true}
+            onPasteInstructions={action('paste instructions')}
+          />
+        )}
+      </PopoverButton>
+    </Column>
   ));
 
 storiesOf('TextEditor', module)
@@ -4196,6 +4214,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4237,6 +4256,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4929,6 +4949,7 @@ storiesOf('AssetStore/ExtensionsSearchDialog', module)
             <ExtensionsSearchDialog
               project={testProject.project}
               onClose={action('on close')}
+              onInstallExtension={action('onInstallExtension')}
             />
           </ExtensionStoreStateProvider>
         </EventsFunctionsExtensionsProvider>

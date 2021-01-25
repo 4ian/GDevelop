@@ -25,6 +25,7 @@
     "recursive-readdir": "^2.2.2",
     "shelljs": "0.8.4",
     "style-dictionary": "^2.10.2",
+    "typescript": "^4.1.3",
     "unzipper": "^0.9.11",
     "webpack": "4.41.5",
     "workbox-build": "^4.3.1"
@@ -94,6 +95,7 @@
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "test": "react-scripts test --env=node",
     "flow": "flow",
+    "check-script-types": "cd scripts && tsc",
     "storybook": "start-storybook -p 9009 -s public",
     "analyze-test-coverage": "react-scripts test --env=node --coverage",
     "analyze-flow-coverage": "flow-coverage-report",

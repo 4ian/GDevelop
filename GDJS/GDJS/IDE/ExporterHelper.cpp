@@ -174,8 +174,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-  // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath);
+  // Copy all the dependencies and their source maps
+  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -268,26 +268,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsIos = [&getIconFilename]() {
-    std::vector<gd::String> sizes = {"180",
-                                     "60",
-                                     "120",
-                                     "76",
-                                     "152",
-                                     "40",
-                                     "80",
-                                     "57",
-                                     "114",
-                                     "72",
-                                     "144",
-                                     "167",
-                                     "29",
-                                     "58",
-                                     "87",
-                                     "50",
-                                     "20",
-                                     "100",
-                                     "167",
-                                     "1024"};
+    std::vector<gd::String> sizes = {
+        "180", "60",  "120", "76", "152", "40", "80", "57",  "114", "72",
+        "144", "167", "29",  "58", "87",  "50", "20", "100", "167", "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -828,7 +811,9 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    const std::vector<gd::String> &includesFiles, gd::String exportDir) {
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
+    bool exportSourceMaps) {
   for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
       // By convention, an include file that is relative is relative to
@@ -840,6 +825,12 @@ bool ExporterHelper::ExportIncludesAndLibs(
         if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
+
+        gd::String sourceMap = source + ".map";
+        // Copy source map if present
+        if (exportSourceMaps && fs.FileExists(sourceMap)) {
+          fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
+        }
       } else {
         std::cout << "Could not find GDJS include file " << include
                   << std::endl;

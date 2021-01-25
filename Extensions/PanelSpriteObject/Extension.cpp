@@ -10,17 +10,18 @@ This project is released under the MIT License.
  */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-
 #include "PanelSpriteObject.h"
 
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("PanelSpriteObject",
-                               _("Panel Sprite (9-patch) Object"),
-                               _("This Extension enables the use of Panel "
-                                 "Sprite (\"9-patch\") Objects."),
-                               "Victor Levasseur and Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "PanelSpriteObject",
+          _("Panel Sprite (9-patch) Object"),
+          "Panel Sprite, also called 9-patch, is an object showing an image "
+          "that can be resized by stretching or repeating the edges and "
+          "corners as well as the filling.",
+          "Victor Levasseur and Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/panel_sprite");
 
   gd::ObjectMetadata& obj = extension.AddObject<PanelSpriteObject>(
@@ -45,14 +46,15 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddAction("SetOpacity",
-                _("Change Panel Sprite opacity"),
-                _("Change the opacity of a Panel Sprite. 0 is fully transparent, 255 "
-                  "is opaque (default)."),
-                _("the opacity"),
-                _("Visibility"),
-                "res/actions/opacity24.png",
-                "res/actions/opacity.png")
+  obj.AddAction(
+         "SetOpacity",
+         _("Change Panel Sprite opacity"),
+         _("Change the opacity of a Panel Sprite. 0 is fully transparent, 255 "
+           "is opaque (default)."),
+         _("the opacity"),
+         _("Visibility"),
+         "res/actions/opacity24.png",
+         "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardOperatorParameters("number");

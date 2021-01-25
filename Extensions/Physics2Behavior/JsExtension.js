@@ -28,7 +28,7 @@ module.exports = {
     extension.setExtensionInformation(
       'Physics2',
       'Physics Engine 2.0',
-      'Simulate physics',
+      "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
       'Florian Rival, Franco Maciel',
       'MIT'
     );

@@ -29,13 +29,11 @@ module.exports = {
       .setExtensionInformation(
         'TileMap',
         _('Tilemap'),
-        _(
-          'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
-        ),
+        "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc...",
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/tile_map');
+      .setExtensionHelpPath('/objects/tilemap');
 
     var objectTileMap = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -160,7 +158,7 @@ module.exports = {
         'TileMap',
         _('Tilemap'),
         _(
-          'Displays a tiled-based map, made with Tiled Map Editor (mapeditor.org).'
+          'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
         ),
         'JsPlatform/Extensions/tile_map32.png',
         objectTileMap

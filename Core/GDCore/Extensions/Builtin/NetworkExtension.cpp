@@ -15,7 +15,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .SetExtensionInformation(
           "BuiltinNetwork",
           _("Basic internet features"),
-          _("Built-in extension providing network features."),
+          _("Features to send web requests, communicate with external \"APIs\" and other network related tasks."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/network");

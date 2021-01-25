@@ -55,7 +55,7 @@ namespace gdjs {
          * Add new data, to be called with the event data each time the event is triggered.
          */
         pushData(newData: EventData) {
-          if (this.dataloss && this.data.length > 0) return;
+          if (this.dataloss && this.data.length > 0) this.data[0] = newData;
           else this.data.push(newData);
         }
 

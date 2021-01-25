@@ -128,15 +128,6 @@ namespace gdjs {
       const connectedPeers: string[] = [];
 
       /**
-       * Internal function to get an event from {@link events}
-       * or create it if it doesn't exist.
-       */
-      const getEvent = (name: string) => {
-        if (!events.hasOwnProperty(name)) events[name] = new Event();
-        return events[name];
-      };
-
-      /**
        * Internal function called to initialize PeerJS after it
        * has been configured.
        */
@@ -208,6 +199,15 @@ namespace gdjs {
         if (!connections.hasOwnProperty(connectionID)) return;
         disconnectedPeers.push(connectionID);
         delete connections[connectionID];
+      };
+
+      /**
+       * Gets an event from {@link events}
+       * or creates it if it doesn't exist.
+       */
+      export const getEvent = (name: string) => {
+        if (!events.hasOwnProperty(name)) events[name] = new Event();
+        return events[name];
       };
 
       /**

@@ -2,7 +2,7 @@
 // Original definitions by Toshiya Nakakura <https://github.com/nakakura>
 // at https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare class Peer {
+declare class Peer<T> {
   prototype: RTCIceServer;
 
   /**
@@ -24,7 +24,10 @@ declare class Peer {
    * @param id The brokering ID of the remote peer (their peer.id).
    * @param options for specifying details about Peer Connection
    */
-  connect(id: string, options?: Peer.PeerConnectOption): Peer.DataConnection;
+  connect(
+    id: string,
+    options?: Peer.PeerConnectOption
+  ): Peer.DataConnection<T>;
   /**
    * Calls the remote peer specified by id and returns a media connection.
    * @param id The brokering ID of the remote peer (their peer.id).
@@ -55,7 +58,7 @@ declare class Peer {
    */
   on(
     event: 'connection',
-    cb: (dataConnection: Peer.DataConnection) => void
+    cb: (dataConnection: Peer.DataConnection<T>) => void
   ): void;
   /**
    * Emitted when a remote peer attempts to call you.
@@ -109,7 +112,7 @@ declare class Peer {
   getConnection(
     peerId: string,
     connectionId: string
-  ): Peer.MediaConnection | Peer.DataConnection | null;
+  ): Peer.MediaConnection | Peer.DataConnection<T> | null;
 
   /**
    * Get a list of available peer IDs
@@ -161,11 +164,11 @@ declare namespace Peer {
     sdpTransform?: Function;
   }
 
-  interface DataConnection {
-    send(data: any): void;
+  interface DataConnection<T> {
+    send(data: T): void;
     close(): void;
     on(event: string, cb: () => void): void;
-    on(event: 'data', cb: (data: any) => void): void;
+    on(event: 'data', cb: (data: T) => void): void;
     on(event: 'open', cb: () => void): void;
     on(event: 'close', cb: () => void): void;
     on(event: 'error', cb: (err: any) => void): void;

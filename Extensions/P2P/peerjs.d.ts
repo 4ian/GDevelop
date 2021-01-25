@@ -24,10 +24,7 @@ declare class Peer<T> {
    * @param id The brokering ID of the remote peer (their peer.id).
    * @param options for specifying details about Peer Connection
    */
-  connect(
-    id: string,
-    options?: Peer.PeerConnectOption
-  ): Peer.DataConnection<T>;
+  connect(id: string, options?: Peer.PeerConnectOption): Peer.DataConnection<T>;
   /**
    * Calls the remote peer specified by id and returns a media connection.
    * @param id The brokering ID of the remote peer (their peer.id).

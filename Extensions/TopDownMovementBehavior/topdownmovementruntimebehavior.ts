@@ -4,16 +4,17 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  type FloatPoint = [float, float];
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     static TOP_DOWN = 0;
-    static PIXEL_ISOMETRIE = 1;
+    static PIXEL_ISOMETRY = 1;
     static TRUE_ISOMETRY = 2;
     static CUSTOM_ISOMETRY = 2;
-    
+
     //Behavior configuration:
     _allowDiagonals: any;
     _acceleration: any;
@@ -30,19 +31,19 @@ namespace gdjs {
     _angle: float = 0;
 
     //Attributes used when moving
-    _x: number = 0;
-    _y: number = 0;
+    _x: float = 0;
+    _y: float = 0;
     _xVelocity: float = 0;
     _yVelocity: float = 0;
-    _angularSpeed: number = 0;
+    _angularSpeed: float = 0;
     _leftKey: boolean = false;
     _rightKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
-    
-    // @ts-ignore
+
+    // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
     _basisTransformation: BasisTransformation;
-    _point: number[] = [0, 0];
+    _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
@@ -54,7 +55,10 @@ namespace gdjs {
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
-      this.setViewpoint(behaviorData.viewpoint, behaviorData.customIsometryAngle);
+      this.setViewpoint(
+        behaviorData.viewpoint,
+        behaviorData.customIsometryAngle
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -85,28 +89,33 @@ namespace gdjs {
       ) {
         this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
       }
-      if (oldBehaviorData.platformType !== newBehaviorData.platformType
-       || oldBehaviorData.customIsometryAngle !== newBehaviorData.customIsometryAngle) {
-        this.setViewpoint(newBehaviorData.platformType, newBehaviorData.customIsometryAngle);
+      if (
+        oldBehaviorData.platformType !== newBehaviorData.platformType ||
+        oldBehaviorData.customIsometryAngle !==
+          newBehaviorData.customIsometryAngle
+      ) {
+        this.setViewpoint(
+          newBehaviorData.platformType,
+          newBehaviorData.customIsometryAngle
+        );
       }
       return true;
     }
 
-    setViewpoint(viewpoint: string, customIsometryAngle: number): void {
+    setViewpoint(viewpoint: string, customIsometryAngle: float): void {
       this._customIsometryAngle = customIsometryAngle;
       if (viewpoint == 'PixelIsometry') {
-        this._viewpoint = TopDownMovementRuntimeBehavior.PIXEL_ISOMETRIE;
+        this._viewpoint = TopDownMovementRuntimeBehavior.PIXEL_ISOMETRY;
         this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
-      }
-      else if (viewpoint == 'TrueIsometry') {
+      } else if (viewpoint == 'TrueIsometry') {
         this._viewpoint = TopDownMovementRuntimeBehavior.TRUE_ISOMETRY;
-      this._basisTransformation = new IsometryTransformation(Math.PI / 6);
-      }
-      else if (viewpoint == 'CustomIsometry') {
+        this._basisTransformation = new IsometryTransformation(Math.PI / 6);
+      } else if (viewpoint == 'CustomIsometry') {
         this._viewpoint = TopDownMovementRuntimeBehavior.CUSTOM_ISOMETRY;
-        this._basisTransformation = new IsometryTransformation(this._customIsometryAngle * Math.PI / 180);
-      }
-      else {
+        this._basisTransformation = new IsometryTransformation(
+          (this._customIsometryAngle * Math.PI) / 180
+        );
+      } else {
         this._viewpoint = TopDownMovementRuntimeBehavior.TOP_DOWN;
         this._basisTransformation = new IdentityTransformation();
       }
@@ -191,30 +200,11 @@ namespace gdjs {
     }
 
     doStepPreEvents(runtimeScene) {
-      
-      const object = this.owner;
-      
-      /* Check if the object has moved
-       * To avoid to loop on the transform and its inverse
-       * beacause of float approximation.
-       */
-      this._point[0] = this._x;
-      this._point[1] = this._y;
-      this._basisTransformation.toScreen(this._point, this._point)
-      if (object.getX() != this._point[0]
-       || object.getY() != this._point[1])
-      {
-        this._point[0] = object.getX();
-        this._point[1] = object.getY();
-        this._basisTransformation.toWorld(this._point, this._point);
-        this._x = this._point[0];
-        this._y = this._point[1];
-      }
-
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
       const DOWNKEY = 40;
+      const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
       //Get the player input:
@@ -327,8 +317,12 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      this._x += this._xVelocity * timeDelta;
-      this._y += this._yVelocity * timeDelta;
+      const point = this._temporaryPointForTransformations;
+      point[0] = this._xVelocity * timeDelta;
+      point[1] = this._yVelocity * timeDelta;
+      this._basisTransformation.toScreen(point, point);
+      object.setX(object.getX() + point[0]);
+      object.setY(object.getY() + point[1]);
 
       //Also update angle if needed
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
@@ -346,12 +340,6 @@ namespace gdjs {
       this._rightKey = false;
       this._upKey = false;
       this._downKey = false;
-      
-      this._point[0] = this._x;
-      this._point[1] = this._y;
-      this._basisTransformation.toScreen(this._point, this._point)
-      object.setX(this._point[0]);
-      object.setY(this._point[1]);
     }
 
     simulateControl(input) {
@@ -388,60 +376,62 @@ namespace gdjs {
   }
 
   export interface BasisTransformation {
-    
-    toScreen(worldPoint: number[], screenPoint: number[]): void;
-    
-    toWorld(screenPoint: number[], worldPoint: number[]): void;
+    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
+
+    toWorld(screenPoint: FloatPoint, worldPoint: FloatPoint): void;
   }
-  
+
   export class IdentityTransformation implements BasisTransformation {
-    
-    toScreen(wordPoint: number[], screenPoint: number[]): void {
+    toScreen(wordPoint: FloatPoint, screenPoint: FloatPoint): void {
       screenPoint[0] = wordPoint[0];
       screenPoint[1] = wordPoint[1];
     }
-    
-    toWorld(screenPoint: number[], wordPoint: number[]): void {
+
+    toWorld(screenPoint: FloatPoint, wordPoint: FloatPoint): void {
       wordPoint[0] = screenPoint[0];
       wordPoint[1] = screenPoint[1];
     }
   }
-  
+
   export class IsometryTransformation implements BasisTransformation {
-    
-    screen: number[][];
-    world: number[][];
-    
-    constructor(angle: number) {
+    screen: float[][];
+    world: float[][];
+
+    constructor(angle: float) {
       const alpha = Math.asin(Math.tan(angle));
       const sinA = Math.sin(alpha);
       const cosB = Math.cos(Math.PI / 4);
-      const sinB = Math.sin(Math.PI / 4);
-      /* https://en.wikipedia.org/wiki/Isometric_projection
-       * 
-       *   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
-       *   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
-       *   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
-       */
-      this.screen =
-        [[cosB     , -sinB],
-         [sinA*sinB, sinA*cosB]];
+      const sinB = cosB;
+      // https://en.wikipedia.org/wiki/Isometric_projection
+      //
+      //   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
+      //   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
+      //   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
+      this.screen = [
+        [cosB, -sinB],
+        [sinA * sinB, sinA * cosB],
+      ];
       // invert
-      this.world = 
-        [[ cosB, sinB/sinA],
-         [-sinB, cosB/sinA]];
+      this.world = [
+        [cosB, sinB / sinA],
+        [-sinB, cosB / sinA],
+      ];
     }
-    
-    toScreen(wordPoint: number[], screenPoint: number[]): void {
-      const x = this.screen[0][0] * wordPoint[0] + this.screen[0][1] * wordPoint[1];
-      const y = this.screen[1][0] * wordPoint[0] + this.screen[1][1] * wordPoint[1];
+
+    toScreen(wordPoint: FloatPoint, screenPoint: FloatPoint): void {
+      const x =
+        this.screen[0][0] * wordPoint[0] + this.screen[0][1] * wordPoint[1];
+      const y =
+        this.screen[1][0] * wordPoint[0] + this.screen[1][1] * wordPoint[1];
       screenPoint[0] = x;
       screenPoint[1] = y;
     }
-    
-    toWorld(screenPoint: number[], wordPoint: number[]): void {
-      const x = this.world[0][0] * screenPoint[0] + this.world[0][1] * screenPoint[1];
-      const y = this.world[1][0] * screenPoint[0] + this.world[1][1] * screenPoint[1];
+
+    toWorld(screenPoint: FloatPoint, wordPoint: FloatPoint): void {
+      const x =
+        this.world[0][0] * screenPoint[0] + this.world[0][1] * screenPoint[1];
+      const y =
+        this.world[1][0] * screenPoint[0] + this.world[1][1] * screenPoint[1];
       wordPoint[0] = x;
       wordPoint[1] = y;
     }

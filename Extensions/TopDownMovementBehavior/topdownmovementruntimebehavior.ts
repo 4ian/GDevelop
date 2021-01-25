@@ -382,14 +382,14 @@ namespace gdjs {
   }
 
   export class IdentityTransformation implements BasisTransformation {
-    toScreen(wordPoint: FloatPoint, screenPoint: FloatPoint): void {
-      screenPoint[0] = wordPoint[0];
-      screenPoint[1] = wordPoint[1];
+    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
+      screenPoint[0] = worldPoint[0];
+      screenPoint[1] = worldPoint[1];
     }
 
-    toWorld(screenPoint: FloatPoint, wordPoint: FloatPoint): void {
-      wordPoint[0] = screenPoint[0];
-      wordPoint[1] = screenPoint[1];
+    toWorld(screenPoint: FloatPoint, worldPoint: FloatPoint): void {
+      worldPoint[0] = screenPoint[0];
+      worldPoint[1] = screenPoint[1];
     }
   }
 
@@ -418,22 +418,22 @@ namespace gdjs {
       ];
     }
 
-    toScreen(wordPoint: FloatPoint, screenPoint: FloatPoint): void {
+    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
       const x =
-        this.screen[0][0] * wordPoint[0] + this.screen[0][1] * wordPoint[1];
+        this.screen[0][0] * worldPoint[0] + this.screen[0][1] * worldPoint[1];
       const y =
-        this.screen[1][0] * wordPoint[0] + this.screen[1][1] * wordPoint[1];
+        this.screen[1][0] * worldPoint[0] + this.screen[1][1] * worldPoint[1];
       screenPoint[0] = x;
       screenPoint[1] = y;
     }
 
-    toWorld(screenPoint: FloatPoint, wordPoint: FloatPoint): void {
+    toWorld(screenPoint: FloatPoint, worldPoint: FloatPoint): void {
       const x =
         this.world[0][0] * screenPoint[0] + this.world[0][1] * screenPoint[1];
       const y =
         this.world[1][0] * screenPoint[0] + this.world[1][1] * screenPoint[1];
-      wordPoint[0] = x;
-      wordPoint[1] = y;
+      worldPoint[0] = x;
+      worldPoint[1] = y;
     }
   }
 

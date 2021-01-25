@@ -15,7 +15,7 @@ namespace gdjs {
       };
 
       const isValidNetworkEvent = (event): event is NetworkEvent =>
-        typeof event.eventName === 'string' || typeof event.data === 'string';
+        typeof event.eventName === 'string' && typeof event.data === 'string';
 
       /**
        * The data bound to an event that got triggered.
@@ -47,7 +47,7 @@ namespace gdjs {
         /**
          * Returns true if the event is triggered.
          */
-        isTrigerred() {
+        isTriggered() {
           return this.data.length > 0;
         }
 
@@ -69,14 +69,14 @@ namespace gdjs {
         /**
          * Get the data sent with the last event triggering.
          */
-        getEventData() {
+        getData() {
           return this.data.length === 0 ? '' : this.data[0].data;
         }
 
         /**
          * Get the sender of the last event triggering.
          */
-        getEventSender() {
+        getSender() {
           return this.data.length === 0 ? '' : this.data[0].sender;
         }
       }
@@ -99,7 +99,6 @@ namespace gdjs {
       /**
        * Contains a map of events triggered by other p2p clients.
        * It is keyed by the event name.
-       * @note This is ignored if the event is in no dataloss mode.
        */
       const events: Record<string, Event> = {};
 
@@ -178,7 +177,7 @@ namespace gdjs {
         });
 
         // Close event is only for graceful disconnection,
-        // but we want onDisconnect to trigger for any type of dsiconnection,
+        // but we want onDisconnect to trigger for any type of disconnection,
         // so we register a listener for both event types.
         connection.on('error', () => {
           _onDisconnect(connection.peer);
@@ -233,7 +232,7 @@ namespace gdjs {
       ): boolean => {
         const event = getEvent(eventName);
         event.dataloss = defaultDataLoss;
-        return event.isTrigerred();
+        return event.isTriggered();
       };
 
       /**
@@ -303,7 +302,14 @@ namespace gdjs {
        * @returns - The data as JSON.
        */
       export const getEventData = (eventName: string) =>
-        getEvent(eventName).getEventData();
+        getEvent(eventName).getData();
+
+      /**
+       * Get the id of peer that caused the last trigger of an event.
+       * @param eventName - The event to get the sender from.
+       */
+      export const getEventSender = (eventName: string) =>
+        getEvent(eventName).getSender();
 
       /**
        * Get a variable associated to the last trigger of an event.
@@ -404,9 +410,9 @@ namespace gdjs {
       export const getConnectedPeer = (): string => connectedPeers[0] || '';
 
       gdjs.callbacksRuntimeScenePostEvents.push(() => {
-        for (const i in events) {
-          if (!events.hasOwnProperty(i)) continue;
-          events[i].popData();
+        for (const eventName in events) {
+          if (!events.hasOwnProperty(eventName)) continue;
+          events[eventName].popData();
         }
         if (disconnectedPeers.length > 0) {
           disconnectedPeers.shift();

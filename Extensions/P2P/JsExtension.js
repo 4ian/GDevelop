@@ -298,6 +298,22 @@ module.exports = {
 
     extension
       .addStrExpression(
+        'GetEventSender',
+        _('Get event sender'),
+        _(
+          'Returns the id of the peer that triggered the event'
+        ),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('Event name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.getEventSender');
+
+    extension
+      .addStrExpression(
         'GetID',
         _('Get client ID'),
         _('Gets the client ID of the current game instance'),

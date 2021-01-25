@@ -751,7 +751,7 @@ describe('libGD.js', function () {
       expect(variable.hasChild('FirstChild')).toBe(false);
       expect(variable.getType()).toBe(gd.Variable.Structure);
       variable.removeChild('SecondChild');
-      expect(variable.getType()).toBe(gd.Variable.Number);
+      expect(variable.getType()).toBe(gd.Variable.Structure);
     });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
@@ -780,7 +780,7 @@ describe('libGD.js', function () {
       expect(variable.getType()).toBe(gd.Variable.Array);
       variable.removeAtIndex(1);
       variable.removeAtIndex(0);
-      expect(variable.getType()).toBe(gd.Variable.Number);
+      expect(variable.getType()).toBe(gd.Variable.Array);
     });
     it('can search inside children and remove them recursively', function () {
       var parentVariable = new gd.Variable();
@@ -817,7 +817,7 @@ describe('libGD.js', function () {
       expect(grandChild1.contains(child1, false)).toBe(false);
       expect(grandChild1.contains(child2, false)).toBe(false);
       expect(grandChild1.contains(parentVariable, false)).toBe(false);
-      
+
       expect(grandChild2.contains(grandChild1, true)).toBe(false);
       expect(grandChild2.contains(grandChild1, false)).toBe(false);
       expect(grandChild2.contains(child1, true)).toBe(false);

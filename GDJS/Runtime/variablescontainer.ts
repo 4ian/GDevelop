@@ -256,7 +256,7 @@ namespace gdjs {
       getAllChildren: function () {
         return {};
       },
-      getAllChildrenList: function () {
+      getAllChildrenArray: function () {
         return [];
       },
       getAtIndex: function () {

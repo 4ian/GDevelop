@@ -772,7 +772,7 @@ describe('libGD.js', function () {
       variable.getAtIndex(0).setValue(1);
       expect(variable.getType()).toBe(gd.Variable.Array);
       variable.getAtIndex(2).setString('three');
-      expect(variable.getAllChildrenList().size()).toBe(3);
+      expect(variable.getAllChildrenArray().size()).toBe(3);
       expect(variable.getAtIndex(0).getValue()).toBe(1);
       expect(variable.getAtIndex(1).getValue()).toBe(0);
       expect(variable.getAtIndex(2).getType()).toBe(gd.Variable.String);
@@ -833,7 +833,7 @@ describe('libGD.js', function () {
       expect(parentVariable.getChildrenCount()).toBe(2);
 
       parentVariable.removeRecursively(grandChild2);
-      expect(child2.getAllChildrenList().size()).toBe(0);
+      expect(child2.getAllChildrenArray().size()).toBe(0);
       expect(child2.getChildrenCount()).toBe(0);
       expect(parentVariable.getChildrenCount()).toBe(2);
 

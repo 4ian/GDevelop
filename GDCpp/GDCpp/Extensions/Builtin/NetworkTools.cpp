@@ -202,8 +202,8 @@ gd::String GD_API VariableStructureToJSON(const gd::Variable& variable) {
   } else {
     gd::String str = "[";
     bool firstChild = true;
-    for (auto i = variable.GetAllChildrenList().begin();
-         i != variable.GetAllChildrenList().end();
+    for (auto i = variable.GetAllChildrenArray().begin();
+         i != variable.GetAllChildrenArray().end();
          ++i) {
       if (!firstChild) str += ",";
       str += VariableStructureToJSON(**i);

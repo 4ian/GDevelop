@@ -243,9 +243,7 @@ export default class PixiResourcesLoader {
     });
     if (!fullUrl) {
       return Promise.reject(
-        new Error(
-          `The resource called ${resourceName} was no found.`
-        )
+        new Error(`The resource called ${resourceName} was no found.`)
       );
     }
 

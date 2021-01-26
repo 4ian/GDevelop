@@ -39,7 +39,9 @@ gdjs.RuntimeGame = function (data, options) {
   this._soundManager = new gdjs.SoundManager(this._data.resources.resources);
   this._fontManager = new gdjs.FontManager(this._data.resources.resources);
   this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
-  this._bitmapFontManager = new gdjs.BitmapFontManager(this._data.resources.resources);
+  this._bitmapFontManager = new gdjs.BitmapFontManager(
+    this._data.resources.resources
+  );
   this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
   this._minFPS = this._data ? this._data.properties.minFPS : 15;
 
@@ -152,7 +154,7 @@ gdjs.RuntimeGame.prototype.getFontManager = function () {
  * Get the gdjs.BitmapFontManager of the RuntimeGame.
  * @return {gdjs.BitmapFontManager} The font manager.
  */
-gdjs.RuntimeGame.prototype.getBitmapFontManager = function() {
+gdjs.RuntimeGame.prototype.getBitmapFontManager = function () {
   return this._bitmapFontManager;
 };
 
@@ -454,9 +456,26 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function (
                   loadingScreen.render(percent);
                   if (progressCallback) progressCallback(percent);
                 },
-                function () {
-                  loadingScreen.unload();
-                  callback();
+                function (jsonTotalCount) {
+                  that._bitmapFontManager.preloadBitmapFontData(
+                    function (count, total) {
+                      var percent = Math.floor(
+                        ((texturesTotalCount +
+                          audioTotalCount +
+                          fontTotalCount +
+                          jsonTotalCount +
+                          count) /
+                          allAssetsTotal) *
+                          100
+                      );
+                      loadingScreen.render(percent);
+                      if (progressCallback) progressCallback(percent);
+                    },
+                    function () {
+                      loadingScreen.unload();
+                      callback();
+                    }
+                  );
                 }
               );
             }

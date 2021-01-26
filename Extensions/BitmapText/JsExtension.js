@@ -93,16 +93,16 @@ module.exports = {
         .setLabel(_('Bitmap texture'));
 
       objectProperties
-        .getOrCreate('fontSize')
-        .setValue(objectContent.fontSize.toString())
+        .getOrCreate('scale')
+        .setValue(objectContent.scale.toString())
         .setType('number')
-        .setLabel(_('Font Size'));
+        .setLabel(_('Text scale'));
 
       objectProperties
-        .getOrCreate('fontColor')
-        .setValue(objectContent.fontColor)
+        .getOrCreate('tint')
+        .setValue(objectContent.tint)
         .setType('color')
-        .setLabel(_('Font Color'));
+        .setLabel(_('Font tint'));
 
       objectProperties
         .getOrCreate('wordWrap')
@@ -117,8 +117,9 @@ module.exports = {
         text:
           'This text use the default bitmap font,\nadd your files in the object properties.',
         opacity: 255,
-        fontSize: 20,
-        fontColor: '#000000',
+        scale: 1,
+        fontSize: 60,
+        tint: '#000000',
         bitmapFontFile: '',
         bitmapTextureFile: '',
         align: 'left',
@@ -165,7 +166,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetText',
+        'Text',
         _('Compare the text'),
         _('Compare the text of the Bitmap text object.'),
         _('the text'),
@@ -180,7 +181,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetOpacity',
+        'Opacity',
         _('Opacity'),
         _(
           'Compare the opacity of the Bitmap text object, between 0 (fully transparent) to 255 (opaque).'
@@ -197,7 +198,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetFontSize',
+        'FontSize',
         _('Font size'),
         _('Compare the font size of the Bitmap text object.'),
         _('the font size'),
@@ -212,7 +213,22 @@ module.exports = {
 
     object
       .addCondition(
-        'GetFont',
+        'Scale',
+        _('Scale'),
+        _('Compare the scale of the Bitmap text object.'),
+        _('the scale'),
+        '',
+        'res/actions/scale24.png',
+        'res/actions/scale.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardRelationalOperatorParameters('number')
+      .getCodeExtraInformation()
+      .setFunctionName('getScale');
+
+    object
+      .addCondition(
+        'Font',
         _('Font'),
         _(
           'Compare the name of the font resource used for the Bitmap text object.'
@@ -225,11 +241,11 @@ module.exports = {
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardRelationalOperatorParameters('string')
       .getCodeExtraInformation()
-      .setFunctionName('getBitmapFontResourceName');
+      .setFunctionName('getBitmapFontResourceName'); //TODO
 
     object
       .addCondition(
-        'GetAlignment',
+        'Alignment',
         _('Alignment'),
         _('Compare the alignment of the Bitmap text object.'),
         _('the alignment'),
@@ -244,7 +260,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetWordWrap',
+        'WordWrap',
         _('Wrapping'),
         _('Check if word wrap is enabled.'),
         _('_PARAM0_ word wrapping is activated'),
@@ -258,7 +274,7 @@ module.exports = {
 
     object
       .addCondition(
-        'GetWrappingWidth',
+        'WrappingWidth',
         _('Wrapping width'),
         _(
           'Compare the width, in pixels, after which the text is wrapped on next line.'
@@ -275,8 +291,8 @@ module.exports = {
 
     object
       .addAction(
-        'SetText',
-        _('Text'),
+        'Text',
+        _('Modify the text'),
         _('Modify the text of a Bitmap text object.'),
         _('the Bitmap text'),
         '',
@@ -291,24 +307,24 @@ module.exports = {
 
     object
       .addAction(
-        'SetColor',
-        _('Color'),
-        _('Change the color of the text.'),
-        _('Change color of _PARAM0_ to _PARAM1_'),
-        _('Style'),
+        'Tint',
+        _('Tint'),
+        _('Change the tint of an object. The default color is white.'),
+        _('Change tint of _PARAM0_ to _PARAM1_'),
+        _('Effects'),
         'res/actions/color24.png',
-        'res/actions/color.png'
+        'res/actions/color24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('color', _('Color'), '', false)
       .setDefaultValue('0;0;0')
       .getCodeExtraInformation()
-      .setFunctionName('setColor');
+      .setFunctionName('setTint');
 
     object
       .addAction(
-        'SetOpacity',
-        _('Opacity'),
+        'Opacity',
+        _('Change text opacity'),
         _('Modify the opacity of a Bitmap text object.'),
         _('the opacity'),
         '',
@@ -323,23 +339,23 @@ module.exports = {
 
     object
       .addAction(
-        'SetFontSize',
-        _('Font size'),
-        _('Modify the font size of a Bitmap text object.'),
-        _('the font size'),
+        'Scale',
+        _('Scale'),
+        _('Modify the scale of a Bitmap text object.'),
+        _('the scale'),
         '',
-        'res/actions/font24.png',
-        'res/actions/font.png'
+        'res/actions/scale24.png',
+        'res/actions/scale.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardOperatorParameters('number')
       .getCodeExtraInformation()
-      .setFunctionName('setFontSize')
-      .setGetter('getFontSize');
+      .setFunctionName('setScale')
+      .setGetter('getScale');
 
     object
       .addAction(
-        'SetBitmapFontResourceName',
+        'BitmapFontName',
         _('Font'),
         _('Change the font used by the Bitmap text object.'),
         _('Set the font of _PARAM0_ to _PARAM1_'),
@@ -354,7 +370,7 @@ module.exports = {
 
     object
       .addAction(
-        'SetAlignment',
+        'Alignment',
         _('Alignment'),
         _('Change the alignment of a Bitmap text object.'),
         _('Set alignement of _PARAM0_ to _PARAM1_'),
@@ -374,7 +390,7 @@ module.exports = {
 
     object
       .addAction(
-        'SetWordWrap',
+        'WordWrap',
         _('Word wrap'),
         _('Modify the word wrap of a Bitmap text object.'),
         _('Set word wrapping of _PARAM0_: _PARAM1_'),
@@ -389,7 +405,7 @@ module.exports = {
 
     object
       .addAction(
-        'SetWrappingWidth',
+        'WrappingWidth',
         _('Wrapping width'),
         _(
           'Change the width, in pixels, after which the text is wrapped on next line.'
@@ -404,6 +420,58 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
+
+    object
+      .addExpression(
+        'Scale',
+        _('Scale'),
+        _('Scale'),
+        _('Scale'),
+        'res/actions/scale24.png',
+        'res/actions/scale24.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getScale');
+
+    object
+      .addExpression(
+        'FontSize',
+        _('Font size'),
+        _('Font size'),
+        _('Font'),
+        'res/actions/characterSize24.png',
+        'res/actions/characterSize24.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getFontSize');
+
+    object
+      .addExpression(
+        'Text',
+        _('Text'),
+        _('Text'),
+        '',
+        'res/actions/characterSize24.png',
+        'res/actions/characterSize24.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getText');
+
+    object
+      .addExpression(
+        'FontName',
+        _('Font name'),
+        _('Font name'),
+        _('Font'),
+        'res/actions/characterSize24.png',
+        'res/actions/characterSize24.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getFont');
 
     return extension;
   },
@@ -475,14 +543,13 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      text: 'This text use the default bitmap font,\nadd your files in the object properties.',
-        // Set up a and generate a default bitmap font
-        // It will then be replaced with the bitmap font setup by the user (see `update` method)
+      // Set up a and generate a default bitmap font
+      // It will then be replaced with the bitmap font setup by the user (see `update` method)
 
-        // Define same as  bitmapTextObject.setRawJSONContent() on top of this file
-        (this._bitmapFontStyle = new PIXI.TextStyle());
+      // Define same as  bitmapTextObject.setRawJSONContent() on top of this file
+      this._bitmapFontStyle = new PIXI.TextStyle();
       this._bitmapFontStyle.fontFamily = 'Arial';
-      this._bitmapFontStyle.fontSize = 20;
+      this._bitmapFontStyle.fontSize = 60;
       this._bitmapFontStyle.align = 'left';
       this._bitmapFontStyle.wordWrap = true;
       this._bitmapFontStyle.fill = '#000000';
@@ -612,12 +679,11 @@ module.exports = {
       const align = properties.get('align').getValue();
       this._pixiObject.align = align;
 
-      const fontColor = properties.get('fontColor').getValue();
-      this._bitmapFontStyle.fill = fontColor;
+      const color = properties.get('tint').getValue();
+      this._pixiObject.tint = color;
 
-      const fontSize = Number(properties.get('fontSize').getValue()) || 1;
-      this._bitmapFontStyle.fontSize = fontSize;
-      this._pixiObject.fontSize = fontSize;
+      const scale = properties.get('scale').getValue() || 1;
+      this._pixiObject.scale.set(scale);
 
       // Track the changes in font to load the new requested font.
       const bitmapFontFile = properties.get('bitmapFontFile').getValue();
@@ -654,16 +720,16 @@ module.exports = {
       // Set up the wrapping width if enabled.
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap && this._instance.hasCustomSize()) {
-        this._pixiObject.maxWidth = this._instance.getCustomWidth();
+        this._pixiObject.maxWidth =
+          this._instance.getCustomWidth() / this._pixiObject.scale.x;
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
 
-      // Note: use `textWidth` as `width` seems unreliable.
       this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.textWidth / 2;
+        this._instance.getX() + this._pixiObject.width / 2;
       this._pixiObject.position.y =
         this._instance.getY() + this._pixiObject.height / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(

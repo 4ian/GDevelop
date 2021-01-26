@@ -12,6 +12,7 @@ gdjs.BitmapFontManager = function (resources) {
   this._resources = resources;
   this._fontUsed = {};
   this._fontTobeUnloaded = [];
+  this._loadedFontsData = [];
 };
 
 /**
@@ -75,10 +76,21 @@ gdjs.BitmapFontManager.prototype.removeFontUsed = function (name) {
 };
 
 // This method is asynchronous and return a promise with the fontName.
-gdjs.BitmapFontManager.prototype.loadBitmapFont = async function (
+gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
   bitmapFontResourceName,
   texture
 ) {
+  // Reuse an existing bitmapFont that is already in memory and already installed
+  for (var i = 0; i < this._loadedFontsData.length; ++i) {
+    let loadedFontData = this._loadedFontsData[i];
+    if (
+      loadedFontData.fontResourceFileName === bitmapFontResourceName &&
+      PIXI.BitmapFont.available[loadedFontData.fontName]
+    ) {
+      return PIXI.BitmapFont.available[loadedFontData.fontName].font;
+    }
+  }
+
   let bitmapFontResource = this._resources.find(function (resource) {
     return (
       resource.kind === 'bitmapFont' && resource.name === bitmapFontResourceName
@@ -86,31 +98,25 @@ gdjs.BitmapFontManager.prototype.loadBitmapFont = async function (
   });
 
   if (!bitmapFontResource) {
-    return Promise.reject(
-      new Error(
-        'Can\'t find resource with name: "' +
-          bitmapFontResourceName +
-          '" (or is not a bitmapFont file).'
-      )
+    console.log(
+      'Can\'t find resource with name: "' +
+        bitmapFontResourceName +
+        '" (or is not a bitmapFont file).'
     );
+    return 'Arial-60-#000000-bitmapFont'; // TODO retourné une font par default, le slug Arial par default ou alors une bitmapFont include par default dans GD?
   }
 
-  let response = await fetch(bitmapFontResource.file);
-  if (!response.ok) {
-    return Promise.reject(
-      new Error(
-        "Can't fetch the bitmap font file, error: " +
-          response.status +
-          '(' +
-          response.statusText +
-          ')'
-      )
-    );
-  }
+  for (var i = 0; i < this._loadedFontsData.length; ++i) {
+    if (
+      this._loadedFontsData[i].fontResourceFileName === bitmapFontResourceName
+    ) {
+      let fontData = this._loadedFontsData[i].fontData;
+      let bitmapFont = PIXI.BitmapFont.install(fontData, texture);
 
-  let fontData = await response.text();
-  let bitmapFont = PIXI.BitmapFont.install(fontData, texture);
-  return Promise.resolve(bitmapFont.font);
+      this._loadedFontsData[i].fontName = bitmapFont.font;
+      return bitmapFont.font;
+    }
+  }
 };
 
 /**
@@ -122,10 +128,7 @@ gdjs.BitmapFontManager.prototype.isBitmapFontLoaded = function (fontName) {
   return !!PIXI.BitmapFont.available[fontName];
 };
 
-// function not yet used, because not complete
-// At the end loadBitmapFont() must use as arguments bitmapFontResourceName and texture
-// But texture isn't yet setup in this function
-gdjs.BitmapFontManager.prototype.preloadBitmapFonts = function (
+gdjs.BitmapFontManager.prototype.preloadBitmapFontData = async function (
   onProgress,
   onComplete
 ) {
@@ -153,14 +156,27 @@ gdjs.BitmapFontManager.prototype.preloadBitmapFonts = function (
   };
 
   for (var i = 0; i < bitmapFontResources.length; ++i) {
-    this.loadBitmapFont(bitmapFontResources[i].name, texture)
-      .then((fontName) => {
-        this._pixiObject.fontName = fontName;
-        this._pixiObject.dirty = true;
-      })
-      .catch((error) => {
-        console.error('Error while preloading a bitmapFont resource:', error);
-      });
+    let response = await fetch(bitmapFontResources[i].file);
+    if (!response.ok) {
+      return Promise.reject(
+        new Error(
+          "Can't fetch the bitmap font file, error: " +
+            response.status +
+            '(' +
+            response.statusText +
+            ')'
+        )
+      );
+    }
+
+    let fontData = await response.text();
+
+    this._loadedFontsData.push({
+      fontResourceFileName: bitmapFontResources[i].name,
+      fontData: fontData,
+      fontName: '',
+    });
+    onLoad();
   }
 };
 

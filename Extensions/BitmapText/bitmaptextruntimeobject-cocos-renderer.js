@@ -18,11 +18,13 @@ gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.onDestroy = function() {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype._ensureFontAvailableAndGetFontName = function(oldFont) {};
 
-gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateColor = function() {};
+gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateTint = function() {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateFont = function() {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateFontSize = function() {};
+
+gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateScale = function() {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateWrappingWidth = function() {};
 

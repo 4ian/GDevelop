@@ -15,14 +15,10 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   // Set up the object to track the font we're using.
   this._bitmapFontStyle = new PIXI.TextStyle();
   this._bitmapFontStyle.fontFamily = 'Arial';
-  this._bitmapFontStyle.fontSize = runtimeObject._fontSize;
+  this._bitmapFontStyle.fontSize = 60;
   this._bitmapFontStyle.align = runtimeObject._align;
   this._bitmapFontStyle.wordWrap = runtimeObject._wordWrap;
-  this._bitmapFontStyle.fill = gdjs.rgbToHexNumber(
-    runtimeObject._fontColor[0],
-    runtimeObject._fontColor[1],
-    runtimeObject._fontColor[2]
-  );
+  this._bitmapFontStyle.fill = "#000000";
 
   const defaultSlugFontName =
     this._bitmapFontStyle.fontFamily +
@@ -55,20 +51,15 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
       .getPIXITexture(bitmapTextureResourceName);
 
     // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
-    runtimeScene
+    this._pixiObject.fontName = runtimeScene
       .getGame()
       .getBitmapFontManager()
-      .loadBitmapFont(bitmapFontResourceName, texture)
-      .then((fontName) => {
-        this._pixiObject.fontName = fontName;
-        this.updatePosition();
-      })
-      .catch((error) => {
-        console.error('Error while loading a bitmapFont resource:', error);
-      });
+      .getBitmapFontFromData(bitmapFontResourceName, texture);
+
+    this.updatePosition();
   } else {
     this.updateFont();
-    this.updateFontSize();
+    this.updateScale();
   }
 
   runtimeScene
@@ -86,6 +77,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
+  this.updateScale();
   this.updateWrappingWidth();
 };
 
@@ -145,33 +137,53 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
     .getPIXITexture(bitmapTextureResourceName);
 
   // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
-  this._object._runtimeScene
+  this._pixiObject.fontName = runtimeScene
     .getGame()
     .getBitmapFontManager()
-    .loadBitmapFont(bitmapFontResourceName, texture)
-    .then((fontName) => {
-      this._pixiObject.fontName = fontName;
-    })
-    .catch((error) => {
-      console.error('Error while loading a bitmapFont resource:', error);
-    });
+    .getBitmapFontFromData(bitmapFontResourceName, texture);
 
   this.updatePosition();
 };
 
-gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFontSize = function () {
-  this._bitmapFontStyle.fontSize = this._object._fontSize;
-  this._pixiObject.fontSize = this._object._fontSize;
-  this._pixiObject.fontName = this._ensureFontAvailableAndGetFontName(
-    this._pixiObject.fontName
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTint = function () {
+  this._pixiObject.tint = gdjs.rgbToHexNumber(
+    this._object._tint[0],
+    this._object._tint[1],
+    this._object._tint[2]
   );
+  this._pixiObject.dirty = true;
+};
+/*
+  this._pixiObject.tint =
+    '0x' +
+    gdjs.rgbToHex(
+      parseInt(colors[0], 10),
+      parseInt(colors[1], 10),
+      parseInt(colors[2], 10)
+    );
+    */
+
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getTint = function () {
+  return this._pixiObject.tint;
+};
+
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateScale = function () {
+  this._pixiObject.scale.set(this._object._scale);
+};
+
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getScale = function () {
+  return this._pixiObject.scale.x && this._pixiObject.scale.y; // both should be equal, return the biggest
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function () {
   if (this._object._wordWrap) {
-    this._pixiObject.maxWidth = this._object._wrappingWidth;
+    this._pixiObject.maxWidth =
+      this._object._wrappingWidth / this._object._scale;
+    this._pixiObject.dirty = true;
+    console.log(this._pixiObject.maxWidth);
   } else {
     this._pixiObject.maxWidth = 0;
+    this._pixiObject.dirty = true;
   }
   this.updatePosition();
 };
@@ -187,8 +199,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateAlignment = function ()
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updatePosition = function () {
-  // Note: use `textWidth` as `width` seems unreliable.
-  this._pixiObject.position.x = this._object.x + this._pixiObject.textWidth / 2;
+  this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
   this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };
 

@@ -3,10 +3,10 @@
  * @property {Object} content The base parameters of the BitmapText
  * @property {number} content.opacity The opacity of the BitmapText
  * @property {string} content.text Content of the text
- * @property {string} content.fontColor The color of the font of the text
+ * @property {string} content.tint The tint of the object
  * @property {string} content.bitmapFontResourceName The bitmap font file used for the text
  * @property {string} content.bitmapTextureResourceName The bitmap texture used with the bitmap font file
- * @property {number} content.fontSize The size of the font of the text
+ * @property {number} content.scale The scale of the bitmap text object
  * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
  *
@@ -32,15 +32,13 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
-  this._fontColor = gdjs.hexToRGBColor(
-    objectData.content.fontColor
-  );
+  this._tint = gdjs.hexToRGBColor(objectData.content.tint);
   /** @type {string} */
   this._bitmapFontFile = objectData.content.bitmapFontFile; // fnt/xml files
   /** @type {string} */
   this._bitmapTextureFile = objectData.content.bitmapTextureFile; // texture file used with fnt/xml (bitmap font file)
   /** @type {number} */
-  this._fontSize = objectData.content.fontSize;
+  this._scale = objectData.content.scale;
   /** @type {boolean} */
   this._wordWrap = objectData.content.wordWrap;
   /** @type {number} */
@@ -67,7 +65,10 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
 gdjs.BitmapTextRuntimeObject.prototype = Object.create(
   gdjs.RuntimeObject.prototype
 );
-gdjs.registerObject('BitmapText::BitmapTextObject', gdjs.BitmapTextRuntimeObject);
+gdjs.registerObject(
+  'BitmapText::BitmapTextObject',
+  gdjs.BitmapTextRuntimeObject
+);
 
 gdjs.BitmapTextRuntimeObject.prototype.getRendererObject = function () {
   return this._renderer.getRendererObject();
@@ -87,11 +88,9 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
   if (oldObjectData.content.text !== newObjectData.content.text) {
     this.setText(newObjectData.content.text);
   }
-  if (oldObjectData.content.fontColor !== newObjectData.content.fontColor) {
-    this._fontColor = gdjs.hexToRGBColor(
-      newObjectData.content.fontColor
-    );
-    this._renderer.updateColor();
+  if (oldObjectData.content.tint !== newObjectData.content.tint) {
+   // this._tint = gdjs.hexToRGBColor(newObjectData.content.tint);
+   // this._renderer.updateTint();
   }
   if (
     oldObjectData.content.bitmapFontFile !==
@@ -105,8 +104,8 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
   ) {
     this.setTexture(newObjectData.content.bitmapTextureFile);
   }
-  if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
-    this.setFontSize(newObjectData.content.fontSize);
+  if (oldObjectData.content.scale !== newObjectData.content.scale) {
+    this.setScale(newObjectData.content.scale);
   }
   if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
     this.setWordWrap(newObjectData.content.wordWrap);
@@ -152,34 +151,36 @@ gdjs.BitmapTextRuntimeObject.prototype.getText = function () {
   return this._text;
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setColor = function (rgbColorString) {
+gdjs.BitmapTextRuntimeObject.prototype.setTint = function (rgbColorString) {
+  /*
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
 
-  this._fontColor[0] = parseInt(splitValue[0], 10);
-  this._fontColor[1] = parseInt(splitValue[1], 10);
-  this._fontColor[2] = parseInt(splitValue[2], 10);
-  this._renderer.updateColor();
+  this._tint[0] = parseInt(splitValue[0], 10);
+  this._tint[1] = parseInt(splitValue[1], 10);
+  this._tint[2] = parseInt(splitValue[2], 10);
+  this._renderer.updateTint();
+  */
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.getColor = function () {
-  return (
-    this._fontColor[0] + ';' + this._fontColor[1] + ';' + this._fontColor[2]
-  );
+gdjs.BitmapTextRuntimeObject.prototype.getTint = function () {
+  return this._tint[0] + ';' + this._tint[1] + ';' + this._tint[2];
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setFontSize = function (fontSize) {
-  this._fontSize = fontSize;
-  this._renderer.updateFontSize();
+gdjs.BitmapTextRuntimeObject.prototype.setScale = function (scale) {
+  this._scale = scale;
+  this._renderer.updateScale();
+};
+
+gdjs.BitmapTextRuntimeObject.prototype.getScale = function () {
+  return this._scale;
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.getFontSize = function () {
   return this._fontSize;
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setFont = function (
-  fontResourceName
-) {
+gdjs.BitmapTextRuntimeObject.prototype.setFont = function (fontResourceName) {
   this._bitmapFontFile = fontResourceName;
   this._renderer.updateFont();
 };

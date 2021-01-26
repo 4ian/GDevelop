@@ -9,6 +9,7 @@ const gd: libGDevelop = global.gd;
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+const defaultBitmapFontFile = 'res/fonts/bitmapFont/silver.fnt';
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -238,13 +239,14 @@ export default class PixiResourcesLoader {
         )
       );
 
-    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+    let fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
     if (!fullUrl) {
-      return Promise.reject(
-        new Error(`The resource called ${resourceName} was no found.`)
+      console.warn(
+        `The resource called ${resourceName} was no found.\nThe default bitmap font will be used.`
       );
+      fullUrl = defaultBitmapFontFile;
     }
 
     return axios.get(fullUrl).then(response => response.data);

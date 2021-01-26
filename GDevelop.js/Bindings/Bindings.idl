@@ -207,7 +207,7 @@ interface Variable {
     [Ref] Variable GetAtIndex([Const] unsigned long index);
     [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
-    [Const, Ref] VectorVariable GetAllChildrenList();
+    [Const, Ref] VectorVariable GetAllChildrenArray();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

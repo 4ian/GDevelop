@@ -476,7 +476,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "    $ITERABLE_REFERENCE.getType() === \"structure\"\n"
             "      ? $ITERABLE_REFERENCE.getAllChildren()\n"
             "      : $ITERABLE_REFERENCE.getType() === \"array\"\n"
-            "        ? $ITERABLE_REFERENCE.getAllChildrenList()\n"
+            "        ? $ITERABLE_REFERENCE.getAllChildrenArray()\n"
             "        : []\n"
             ") {\n";
         
@@ -498,7 +498,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
             "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"array\") {\n"
             "        // Arrays are passed by reference like JS objects\n"
-            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenList($STRUCTURE_CHILD_VARIABLE.getAllChildrenList());\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n";
         
         // Now do the rest of standard event generation

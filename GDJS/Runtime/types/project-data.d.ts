@@ -25,9 +25,9 @@ declare type ObjectData = {
   /** The object type. */
   type: string;
   /** The list of default variables. */
-  variables: VariableData[];
+  variables: Array<VariableData>;
   /** The list of default behaviors. */
-  behaviors: BehaviorData[];
+  behaviors: Array<BehaviorData>;
 };
 
 declare type VariableType =

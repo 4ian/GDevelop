@@ -75,7 +75,7 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.variableClearChildren");
 
   GetAllActions()["SceneVariablePush"].SetFunctionName(
-      "gdjs.evtTools.common.variablePush");
+      "gdjs.evtTools.common.variablePushCopy");
   GetAllActions()["SceneVariablePushString"].SetFunctionName(
       "gdjs.evtTools.common.valuePush");
   GetAllActions()["SceneVariablePushNumber"].SetFunctionName(
@@ -85,7 +85,7 @@ VariablesExtension::VariablesExtension() {
   GetAllActions()["SceneVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.common.variableRemoveAt");
   GetAllActions()["GlobalVariablePush"].SetFunctionName(
-      "gdjs.evtTools.common.variablePush");
+      "gdjs.evtTools.common.variablePushCopy");
   GetAllActions()["GlobalVariablePushString"].SetFunctionName(
       "gdjs.evtTools.common.valuePush");
   GetAllActions()["GlobalVariablePushNumber"].SetFunctionName(

@@ -27,6 +27,7 @@ namespace gd {
  */
 class GD_CORE_API Variable {
  public:
+  static gd::Variable badVariable;
   enum Type {
     // Primitive types
     String,
@@ -99,12 +100,12 @@ class GD_CORE_API Variable {
   }
 
   /**
-   * \brief Return the content of the variable, considered as a number.
+   * \brief Return the content of the variable, considered as a boolean.
    */
   bool GetBool() const;
 
   /**
-   * \brief Change the content of the variable, considered as a number.
+   * \brief Change the content of the variable, considered as a boolean.
    */
   void SetBool(bool val) {
     boolVal = val;
@@ -167,7 +168,7 @@ class GD_CORE_API Variable {
    */
   void ClearChildren() {
     children.clear();
-    childrenList.clear();
+    childrenArray.clear();
   };
 
   /**
@@ -176,7 +177,7 @@ class GD_CORE_API Variable {
   size_t GetChildrenCount() const {
     return type == Type::Structure
                ? children.size()
-               : type == Type::Array ? childrenList.size() : 0;
+               : type == Type::Array ? childrenArray.size() : 0;
   };
 
   /** \name Structure
@@ -282,8 +283,8 @@ class GD_CORE_API Variable {
   /**
    * \brief Get the vector containing all the children.
    */
-  const std::vector<std::shared_ptr<Variable>>& GetAllChildrenList() const {
-    return childrenList;
+  const std::vector<std::shared_ptr<Variable>>& GetAllChildrenArray() const {
+    return childrenArray;
   }
   ///@}
   ///@}
@@ -321,7 +322,7 @@ class GD_CORE_API Variable {
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.
   mutable std::vector<std::shared_ptr<Variable>>
-      childrenList;  ///< Children, when the variable is considered as an array.
+      childrenArray;  ///< Children, when the variable is considered as an array.
 
   /**
    * Initialize children by copying them from another variable.  Used by

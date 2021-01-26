@@ -557,7 +557,7 @@ namespace gdjs {
 
     /**
      * Shortcut to set the value of a variable considered as a boolean.
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      *
      * @private
      * @param {gdjs.Variable} variable
@@ -572,7 +572,7 @@ namespace gdjs {
 
     /**
      * Shortcut to compare the value of a variable considered as a boolean.
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      *
      * @private
      * @param {gdjs.Variable} variable
@@ -588,7 +588,7 @@ namespace gdjs {
 
     /**
      * Toggles a variable.
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      *
      * @private
      * @param {gdjs.Variable} variable
@@ -662,18 +662,18 @@ namespace gdjs {
     }
 
     /**
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      * @private
      */
-    static variablePush = function (
+    static variablePushCopy = function (
       array: gdjs.Variable,
       variable: gdjs.Variable
     ) {
-      array.pushVariable(variable);
+      array.pushVariableCopy(variable);
     };
 
     /**
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      * @private
      */
     static valuePush = function (
@@ -684,7 +684,7 @@ namespace gdjs {
     };
 
     /**
-     * This shorcut function is needed for events code generation.
+     * This shortcut function is needed for events code generation.
      * @private
      */
     static variableRemoveAt = function (array: gdjs.Variable, index: number) {
@@ -1824,7 +1824,7 @@ namespace gdjs {
     variableChildExists = RuntimeObject.variableChildExists;
     variableRemoveChild = RuntimeObject.variableRemoveChild;
     variableClearChildren = RuntimeObject.variableClearChildren;
-    variablePush = RuntimeObject.variablePush;
+    variablePushCopy = RuntimeObject.variablePushCopy;
     valuePush = RuntimeObject.valuePush;
     variableRemoveAt = RuntimeObject.variableRemoveAt;
 

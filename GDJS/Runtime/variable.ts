@@ -18,11 +18,11 @@ namespace gdjs {
     _str: string = '0';
     _bool: boolean = false;
     _children: Children = {};
-    _childrenList: gdjs.Variable[] = [];
+    _childrenArray: gdjs.Variable[] = [];
     _undefinedInContainer: boolean = false;
 
     /**
-     * @param {VariableData} [varData] The optional initial content of the variable.
+     * @param [varData] The optional initial content of the variable.
      */
     constructor(varData?: VariableData) {
       this.reinitialize(varData);
@@ -34,13 +34,14 @@ namespace gdjs {
       this._str = '0';
       this._bool = false;
       this._children = {};
-      this._childrenList = [];
+      this._childrenArray = [];
       this._undefinedInContainer = false;
 
       if (varData !== undefined) {
         this._type = varData.type || 'number';
         if (this._type === 'number') {
           this._value = parseFloat((varData.value as string) || '0');
+          // Protect against NaN.
           if (this._value !== this._value) this._value = 0;
         } else if (this._type === 'string') {
           this._str = '' + varData.value || '0';
@@ -56,15 +57,13 @@ namespace gdjs {
           }
         } else if (this._type === 'array' && varData.children) {
           for (const childData of varData.children)
-            this._childrenList.push(new gdjs.Variable(childData));
+            this._childrenArray.push(new gdjs.Variable(childData));
         }
       }
     }
 
     /**
      * Return true if the variable type is a primitive type.
-     * @param {VariableType} type
-     * @return {boolean}
      */
     static isPrimitive(
       type: VariableType
@@ -90,19 +89,19 @@ namespace gdjs {
         target.setValue(source.getValue());
       } else if (source.getType() === 'structure') {
         const children = source.getAllChildren();
-        for (const p in source.getAllChildren()) {
+        for (const p in children) {
           if (children.hasOwnProperty(p))
             target.addChild(p, children[p].clone());
         }
       } else if (source.getType() === 'array') {
-        for (const p of source.getAllChildrenList()) target.pushVariable(p);
+        for (const p of source.getAllChildrenArray())
+          target.pushVariableCopy(p);
       }
       return target;
     }
 
     /**
      * Return true if the type of the variable is a primitive type.
-     * @return {boolean}
      */
     isPrimitive() {
       return gdjs.Variable.isPrimitive(this._type);
@@ -134,7 +133,7 @@ namespace gdjs {
 
     /**
      * Converts the variable into another type.
-     * @param {VariableType} newType
+     * @param newType The new type of the variable
      */
     castTo(newType: VariableType) {
       if (newType === 'string') this.setString(this.getAsString());
@@ -146,7 +145,7 @@ namespace gdjs {
         this._type = 'structure';
       } else if (newType === 'array') {
         if (this._type === 'array') return;
-        this._childrenList = this.getAllChildrenList();
+        this._childrenArray = this.getAllChildrenArray();
         this._type = 'array';
       }
     }
@@ -216,7 +215,7 @@ namespace gdjs {
      */
     clearChildren() {
       this._children = {};
-      this._childrenList = [];
+      this._childrenArray = [];
     }
 
     /**
@@ -230,11 +229,11 @@ namespace gdjs {
 
     /**
      * Replaces all the children with a new array of children.
-     * @param {gdjs.Variable[]} newChildren The array of new children.
+     * @param newChildren The array of new children.
      */
-    replaceChildrenList(newChildren: gdjs.Variable[]) {
+    replaceChildrenArray(newChildren: gdjs.Variable[]) {
       this._type = 'array';
-      this._childrenList = newChildren;
+      this._childrenArray = newChildren;
     }
 
     /**
@@ -291,14 +290,14 @@ namespace gdjs {
 
     /**
      * Get the value of the variable, considered as a boolean
-     * @return {boolean}
+     * @return The boolean value of the variable.
      */
     getAsBoolean(): boolean {
       if (this._type !== 'boolean') {
         if (this._type === 'number') return this._value !== 0;
         else if (this._type === 'string')
           return this._str !== '0' && this._str !== '' && this._str !== 'false';
-        else return this.getChildrenCount() !== 0;
+        else return true;
       }
 
       return this._bool;
@@ -306,7 +305,7 @@ namespace gdjs {
 
     /**
      * Change the value of the variable, considered as a boolean
-     * @param {boolean} newValue
+     * @param newValue The new boolean to be set.
      */
     setBoolean(newValue: boolean) {
       this._type = 'boolean';
@@ -315,7 +314,7 @@ namespace gdjs {
 
     /**
      * Sets the primitive value using the setter of the current type.
-     * @param {any} newValue
+     * @param newValue The primitive value of the variable.
      */
     setValue(newValue: string | float | boolean) {
       if (this._type === 'string') this.setString(newValue as string);
@@ -325,7 +324,6 @@ namespace gdjs {
 
     /**
      * Gets the primitive value using the getter of the current type.
-     * @param {any} newValue
      */
     getValue(): string | float | boolean {
       return this._type === 'number'
@@ -355,7 +353,6 @@ namespace gdjs {
 
     /**
      * Returns the type of the variable.
-     * @return {VariableType}
      */
     getType(): VariableType {
       return this._type;
@@ -369,29 +366,27 @@ namespace gdjs {
       return this._type === 'structure'
         ? this._children
         : this._type === 'array'
-        ? ((Object.assign({}, this._childrenList) as unknown) as Children)
+        ? ((Object.assign({}, this._childrenArray) as unknown) as Children)
         : {};
     }
 
     /**
      * Return an Array containing all the children of the variable
-     * @return {gdjs.Variable[]}
      */
-    getAllChildrenList(): gdjs.Variable[] {
+    getAllChildrenArray(): gdjs.Variable[] {
       return this._type === 'structure'
         ? Object.values(this._children)
         : this._type === 'array'
-        ? this._childrenList
+        ? this._childrenArray
         : [];
     }
 
     /**
      * Return the length of the collection
-     * @return {number}
      */
     getChildrenCount() {
       if (this.isPrimitive()) return 0;
-      return this.getAllChildrenList().length;
+      return this.getAllChildrenArray().length;
     }
 
     /**
@@ -443,42 +438,38 @@ namespace gdjs {
 
     /**
      * Get a variable at a given index of the array.
-     * @param {number} index
      */
     getChildAt(index: integer) {
       this.castTo('array');
       if (
-        this._childrenList[index] === undefined ||
-        this._childrenList[index] === null
+        this._childrenArray[index] === undefined ||
+        this._childrenArray[index] === null
       )
-        this._childrenList[index] = new gdjs.Variable();
-      return this._childrenList[index];
+        this._childrenArray[index] = new gdjs.Variable();
+      return this._childrenArray[index];
     }
 
     /**
      * Removes a variable at a given index of the array.
-     * @param {number} index
      */
     removeAtIndex(index: integer) {
-      if (this._type === 'array') this._childrenList.splice(index, 1);
+      if (this._type === 'array') this._childrenArray.splice(index, 1);
     }
 
     /**
      * Pushes a copy of a variable onto the array.
-     * @param {gdjs.Variable} variable
      */
-    pushVariable(variable: gdjs.Variable) {
+    pushVariableCopy(variable: gdjs.Variable) {
       this.castTo('array');
-      this._childrenList.push(variable.clone());
+      this._childrenArray.push(variable.clone());
     }
 
     /**
      * Pushes a value onto the array.
-     * @param
      */
     pushValue(value: string | float | boolean) {
       this.castTo('array');
-      this._childrenList.push(
+      this._childrenArray.push(
         new gdjs.Variable({
           type: typeof value as 'string' | 'number' | 'boolean',
           value,

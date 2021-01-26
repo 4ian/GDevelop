@@ -15,6 +15,8 @@ using namespace std;
 
 namespace gd {
 
+gd::Variable Variable::badVariable;
+
 gd::String Variable::TypeAsString(Type t) {
   switch (t) {
     case Type::String:
@@ -64,18 +66,18 @@ void Variable::CastTo(const Type newType) {
 
     // Conversion is only possible for non prmitive types
     if (type == Type::Array)
-      for (auto i = childrenList.begin(); i != childrenList.end(); ++i)
+      for (auto i = childrenArray.begin(); i != childrenArray.end(); ++i)
         children.insert(
-            std::make_pair(gd::String::From(i - childrenList.begin()), (*i)));
+            std::make_pair(gd::String::From(i - childrenArray.begin()), (*i)));
 
     type = Type::Structure;
   } else if (newType == Type::Array) {
-    childrenList.clear();
+    childrenArray.clear();
 
     // Conversion is only possible for non prmitive types
     if (type == Type::Structure)
       for (auto i = children.begin(); i != children.end(); ++i)
-        childrenList.push_back((*i).second);
+        childrenArray.push_back((*i).second);
 
     type = Type::Array;
   }
@@ -105,7 +107,7 @@ const gd::String& Variable::GetString() const {
     return str;
   }
 
-  // It isn't possible to convert a structural type to a string
+  // It isn't possible to convert a non-primitive type to a string
   str = "0";
   return str;
 }
@@ -175,21 +177,21 @@ bool Variable::RenameChild(const gd::String& oldName,
 
 Variable& Variable::GetAtIndex(const size_t index) {
   type = Type::Array;
-  while (childrenList.size() <= index)
-    childrenList.push_back(std::make_shared<gd::Variable>());
-  return *childrenList[index];
+  while (childrenArray.size() <= index)
+    childrenArray.push_back(std::make_shared<gd::Variable>());
+  return *childrenArray[index];
 };
 
 const Variable& Variable::GetAtIndex(const size_t index) const {
-  if (childrenList.size() <= index) return *std::make_shared<gd::Variable>();
-  return *childrenList.at(index);
+  if (childrenArray.size() <= index) return badVariable;
+  return *childrenArray.at(index);
 };
 
 Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
 
 void Variable::RemoveAtIndex(const size_t index) {
-  if (index >= childrenList.size()) return;
-  childrenList.erase(childrenList.begin() + index);
+  if (index >= childrenArray.size()) return;
+  childrenArray.erase(childrenArray.begin() + index);
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
@@ -212,7 +214,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
   } else if (type == Type::Array) {
     SerializerElement& childrenElement = element.AddChild("children");
     childrenElement.ConsiderAsArrayOf("variable");
-    for (auto child : childrenList) {
+    for (auto child : childrenArray) {
       child->SerializeTo(childrenElement.AddChild("variable"));
     }
   }
@@ -273,7 +275,7 @@ bool Variable::Contains(const gd::Variable& variableToSearch,
     if (it.second.get() == &variableToSearch) return true;
     if (recursive && it.second->Contains(variableToSearch, true)) return true;
   }
-  for (auto& it : childrenList) {
+  for (auto& it : childrenArray) {
     if (it.get() == &variableToSearch) return true;
     if (recursive && it->Contains(variableToSearch, true)) return true;
   }
@@ -290,9 +292,9 @@ void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
       it++;
     }
   }
-  for (auto it = childrenList.begin(); it != childrenList.end();)
+  for (auto it = childrenArray.begin(); it != childrenArray.end();)
     if (it->get() == &variableToRemove)
-      childrenList.erase(it);
+      childrenArray.erase(it);
     else {
       (*it)->RemoveRecursively(variableToRemove);
       it++;
@@ -324,8 +326,8 @@ void Variable::CopyChildren(const gd::Variable& other) {
   for (auto& it : other.children) {
     children[it.first] = std::make_shared<gd::Variable>(*it.second);
   }
-  for (auto child : other.childrenList) {
-    childrenList.push_back(std::make_shared<gd::Variable>(*child.get()));
+  for (auto child : other.childrenArray) {
+    childrenArray.push_back(std::make_shared<gd::Variable>(*child.get()));
   }
 }
 }  // namespace gd

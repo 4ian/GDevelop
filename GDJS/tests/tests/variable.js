@@ -120,8 +120,8 @@ describe('gdjs.Variable', function () {
 
     expect(array.getChild('0').getAsString()).to.be('Hello');
     expect(array.getChildAt(0).getAsString()).to.be('Hello');
-    expect(array.getAllChildrenList()[1].getAsString()).to.be('World');
-    expect(structure.getAllChildrenList()[0].getAsString()).to.be('Hello');
+    expect(array.getAllChildrenArray()[1].getAsString()).to.be('World');
+    expect(structure.getAllChildrenArray()[0].getAsString()).to.be('Hello');
   });
 
   it('can be serialized to JSON', function () {
@@ -138,7 +138,7 @@ describe('gdjs.Variable', function () {
     const array = structure.getChild('c');
     array.castTo('array');
     array.pushValue(49);
-    array.pushVariable(structure.getChild('b'));
+    array.pushVariableCopy(structure.getChild('b'));
 
     const b =
       '{"alpha": "Apples","beta": true,"Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';

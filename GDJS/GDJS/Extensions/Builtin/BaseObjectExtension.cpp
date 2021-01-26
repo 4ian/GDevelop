@@ -266,7 +266,7 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
 
   objectActions["ObjectVariablePush"]
-      .SetFunctionName("variablePush")
+      .SetFunctionName("variablePushCopy")
       .SetIncludeFile("runtimeobject.js");
   objectActions["ObjectVariablePushString"]
       .SetFunctionName("valuePush")

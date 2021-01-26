@@ -117,7 +117,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Variables/Global variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-<<<<<<< HEAD
       .AddParameter("globalvar", _("Variable"))
       .UseStandardRelationalOperatorParameters("string")
       .MarkAsAdvanced();
@@ -131,8 +130,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("Variables/Global variables"),
           "res/conditions/var24.png",
           "res/conditions/var.png")
-=======
->>>>>>> master
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true");

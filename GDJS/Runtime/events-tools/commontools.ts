@@ -135,11 +135,11 @@ namespace gdjs {
        * @param {gdjs.Variable} variable
        * @private
        */
-      export const variablePush = function (
+      export const variablePushCopy = function (
         array: gdjs.Variable,
         variable: gdjs.Variable
       ) {
-        array.pushVariable(variable);
+        array.pushVariableCopy(variable);
       };
 
       /**

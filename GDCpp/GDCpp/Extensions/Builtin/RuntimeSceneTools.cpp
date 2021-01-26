@@ -323,7 +323,7 @@ void GD_API VariableClearChildren(gd::Variable &variable) {
 }
 
 unsigned int GD_API GetVariableChildCount(gd::Variable &variable) {
-  if (variable.GetType() != gd::Variable::Type::Structure) return 0;
+  if (variable.IsPrimitive()) return 0;
 
   return variable.GetChildrenCount();
 }

@@ -81,8 +81,7 @@ const constructPathToVariable = (
     if (variable._type === 'structure') {
       path.push('_children', variableName);
       variable = variable._children[variableName];
-    }
-    else if (variable._type === 'array') {
+    } else if (variable._type === 'array') {
       path.push('_childrenArray', variableName);
       variable = variable._childrenArray[parseInt(variableName, 10)];
     }
@@ -97,7 +96,10 @@ const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
   if (!variablesContainer) return;
 
   // Reconstruct the variable to edit from the path
-  const { path, variable } = constructPathToVariable(edit.namespace, variablesContainer);
+  const { path, variable } = constructPathToVariable(
+    edit.namespace,
+    variablesContainer
+  );
   if (!path) {
     console.error('Invalid path passed to the debugger: ', edit);
     return false;

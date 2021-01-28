@@ -1,14 +1,14 @@
 # GDevelop.js
 
-This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
+This is the port of GDevelop core classes to JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
-> 🎮 GDevelop is a full featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
+> 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
 
 ## How to build
 
-> 👋 Usually if you're working on GDevelop editor or extensions in JavaScript, you don't need rebuilding GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
+> 👋 Usually, if you're working on the GDevelop editor or extensions in JavaScript, you don't need to rebuild GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
 
-- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](nodejs.org/) installed.
+- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](https://nodejs.org/) installed.
 
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 

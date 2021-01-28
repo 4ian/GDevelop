@@ -53,7 +53,15 @@ export const getExtraObjectsInformation = (): {
   'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop.`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
+    },
+    {
+      kind: 'info',
+      message: t`For a pixel type font, you must disable the Smooth checkbox related to your texture in the game resources to disable anti-aliasing.`,
+    },
+    {
+      kind: 'info',
+      message: t`For editing the font size you have to make a new export in an external editor like bmFont, click on help button bellow for more help.`,
     },
   ],
   'SkeletonObject::Skeleton': [
@@ -76,6 +84,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   use for all your objects the behavior called "Physics2" and the
   associated actions (in this case, all objects must be set up to use
   Physics2, you can't mix the behaviors).`,
+    };
+  }
+  if (type === 'BitmapText::Scale') {
+    return {
+      kind: 'info',
+      message: t`A scale under 1 on a Bitmap text object can downgrade the quality text, prefer to remake a bitmap font smaller in the external bmFont editor.`,
     };
   }
   if (type === 'TextObject::Size') {

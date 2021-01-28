@@ -13,85 +13,103 @@ const gd: libGDevelop = global.gd;
 const jsExtensions = [
   {
     name: 'AdMob',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdMob/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'FacebookInstantGames',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'DeviceSensors',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'DeviceVibration',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'Physics2',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'ExampleJsExtension',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'Tween',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'Video',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'FileSystem',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FileSystem/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'Firebase',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Firebase/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'DialogueTree',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'BBText',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BBText/JsExtension.js'),
     objectsRenderingServiceModules: {
+      // $FlowExpectedError - this path is ignored for Flow.
       'pixi-multistyle-text/dist/pixi-multistyle-text.umd': require('GDJS-for-web-app-only/Runtime/Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd'),
     },
   },
   {
     name: 'TileMap',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/JsExtension.js'),
     objectsRenderingServiceModules: {
+      // $FlowExpectedError - this path is ignored for Flow.
       'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
     },
   },
   {
     name: 'Effects',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'P2P',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {
     name: 'Lighting',
+    // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Lighting/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },

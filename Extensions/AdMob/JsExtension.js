@@ -28,37 +28,78 @@ module.exports = {
     extension.setExtensionInformation(
       'AdMob',
       _('AdMob'),
-      _(
-        'Allow the game to display AdMob banner, interstitial and reward video ads'
-      ),
-      'Franco Maciel',
+      _('Allow to display AdMob banners, interstitials and reward video ads.'),
+      'Florian Rival',
       'MIT'
     );
 
     extension
-      .registerProperty('AdMobAppId')
-      .setLabel(_('AdMob App ID'))
+      .registerProperty('AdMobAppIdAndroid')
+      .setLabel(_('AdMob Android App ID'))
+      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY')
+      .setType('string');
+
+    extension
+      .registerProperty('AdMobAppIdIos')
+      .setLabel(_('AdMob iOS App ID'))
       .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY')
       .setType('string');
 
     extension
       .addDependency()
-      .setName('AdMob Cordova Extension')
+      .setName('AdMob Cordova plugin')
       .setDependencyType('cordova')
-      .setExportName('cordova-plugin-admob-free')
-      .setVersion('~0.21.0')
+      .setExportName('gdevelop-cordova-admob-plus')
+      .setVersion('0.43.0')
       .setExtraSetting(
-        'ADMOB_APP_ID',
-        new gd.PropertyDescriptor('AdMobAppId').setType('ExtensionProperty')
+        'APP_ID_ANDROID',
+        new gd.PropertyDescriptor('AdMobAppIdAndroid').setType(
+          'ExtensionProperty'
+        )
       )
-      .onlyIfExtraSettingIsNonEmpty('ADMOB_APP_ID');
+      .onlyIfExtraSettingIsNonEmpty('APP_ID_ANDROID') // TODO
+      .setExtraSetting(
+        'APP_ID_IOS',
+        new gd.PropertyDescriptor('AdMobAppIdIos').setType('ExtensionProperty')
+      )
+      .onlyIfExtraSettingIsNonEmpty('APP_ID_IOS'); // TODO
+
+    extension
+      .addDependency()
+      .setName('Consent Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('cordova-plugin-consent');
+
+    extension
+      .addAction(
+        'SetTestMode',
+        _('Enable test mode'),
+        _(
+          'Activate or deactivate the test mode ("development" mode).\n' +
+            'When activated, tests ads will be served instead of real ones.\n' +
+            '\n' +
+            'It is important to enable test ads during development so that you can click on them without ' +
+            'charging advertisers. If you click on too many ads without being in test mode, you risk your ' +
+            'account being flagged for invalid activity.'
+        ),
+        _('Enable test mode (serving test ads, for development): _PARAM0_'),
+        _('AdMob'),
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .addParameter('yesorno', _('Enable test mode?'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.setTestMode');
 
     // Banner
     extension
       .addCondition(
         'BannerLoading',
         _('Banner loading'),
-        _('Check if a banner is currently loading.'),
+        _(
+          'Check if a banner is currently loading. It will be shown automatically when loaded.'
+        ),
         _('Banner is loading'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
@@ -67,20 +108,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.isBannerLoading');
-
-    extension
-      .addCondition(
-        'BannerReady',
-        _('Banner ready'),
-        _('Check if a banner is ready to be displayed.'),
-        _('Banner is ready'),
-        _('AdMob'),
-        'JsPlatform/Extensions/admobicon24.png',
-        'JsPlatform/Extensions/admobicon16.png'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.isBannerReady');
 
     extension
       .addCondition(
@@ -98,56 +125,66 @@ module.exports = {
 
     extension
       .addCondition(
-        'BannerExists',
-        _('Banner exists'),
-        _('Check if there is a banner in memory (visible or hidden).'),
-        _('Banner exists'),
+        'BannerErrored',
+        _('Banner had an error'),
+        _('Check if there was a error while displaying a banner.'),
+        _('Banner ad had an error'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.existBanner');
+      .setFunctionName('gdjs.adMob.isBannerErrored');
+
+    // Deprecated conditions, as banners can't be pre-loaded anymore.
+    extension
+      .addDuplicatedCondition('BannerReady', 'BannerShowing')
+      .setHidden();
+    extension
+      .addDuplicatedCondition('BannerExists', 'BannerShowing')
+      .setHidden();
 
     extension
       .addAction(
-        'LoadBanner',
-        _('Load banner'),
+        'SetupBanner',
+        _('Configure the banner'),
         _(
-          'Start loading a banner, you can display it automatically when finish loading.\nIf test mode is set to true a test banner will be displayed.'
+          "Configure a banner, which can then be displayed.\nIf test mode is set, a test banner will be displayed.\n\nOnce a banner is positioned (at the top or bottom of the game), it can't be moved anymore."
         ),
         _(
-          'Load banner (at top: _PARAM2_, overlap: _PARAM3_, show on load: _PARAM4_, test mode: _PARAM5_)'
+          'Configure the banner with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_, display at top: _PARAM2_'
         ),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('Android banner ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/6300978111"` for showing a test banner.'
+      )
       .addParameter('string', _('iOS banner ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/6300978111"` for showing a test banner.'
+      )
       .addParameter(
         'yesorno',
         _('Display at top? (bottom otherwise)'),
         '',
         false
       )
-      .setDefaultValue('false')
-      .addParameter('yesorno', _('Overlap webview?'), '', false)
-      .setDefaultValue('true')
-      .addParameter('yesorno', _('Display on load complete?'), '', false)
-      .setDefaultValue('true')
-      .addParameter('yesorno', _('Test mode?'), '', false)
-      .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.loadBanner');
+      .setFunctionName('gdjs.adMob.setupBanner');
+
+    // Deprecated action (was renamed):
+    extension.addDuplicatedAction('LoadBanner', 'SetupBanner').setHidden();
 
     extension
       .addAction(
         'ShowBanner',
         _('Show banner'),
-        _('Show the banner, will work only when the banner is fully loaded.'),
+        _('Show the banner that was previously set up.'),
         _('Show banner'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
@@ -173,21 +210,8 @@ module.exports = {
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.hideBanner');
 
-    extension
-      .addAction(
-        'RemoveBanner',
-        _('Remove banner'),
-        _(
-          'Remove the banner. You have to load another banner to show it again.'
-        ),
-        _('Remove banner'),
-        _('AdMob'),
-        'JsPlatform/Extensions/admobicon24.png',
-        'JsPlatform/Extensions/admobicon16.png'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.removeBanner');
+    // Deprecated action (not applicable anymore):
+    extension.addDuplicatedAction('RemoveBanner', 'HideBanner').setHidden();
 
     // Interstitial
     extension
@@ -233,22 +257,47 @@ module.exports = {
       .setFunctionName('gdjs.adMob.isInterstitialShowing');
 
     extension
+      .addCondition(
+        'InterstitialErrored',
+        _('Interstitial had an error'),
+        _('Check if there was a error while loading the interstitial.'),
+        _('Interstitial ad had an error'),
+        _('AdMob'),
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isInterstitialErrored');
+
+    extension
       .addAction(
         'LoadInterstitial',
         _('Load interstitial'),
         _(
-          'Start loading an interstitial, you can display it automatically when finish loading.\nIf test mode is set to true a test interstitial will be displayed.'
+          'Start loading an interstitial (that can be displayed automatically when the loading is finished).\nIf test mode is set, a test interstitial will be displayed.'
         ),
-        _('Load interstitial (show on load: _PARAM2_, test mode: _PARAM3_)'),
+        _(
+          'Load interstitial with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (display automatically when loaded: _PARAM2_)'
+        ),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('Android interstitial ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/1033173712"` for loading a test interstitial.'
+      )
       .addParameter('string', _('iOS interstitial ID'), '', false)
-      .addParameter('yesorno', _('Display on load complete?'), '', false)
-      .setDefaultValue('true')
-      .addParameter('yesorno', _('Test mode?'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/1033173712"` for loading a test interstitial.'
+      )
+      .addParameter(
+        'yesorno',
+        _('Displayed automatically when loading is finished?'),
+        '',
+        false
+      )
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -259,9 +308,9 @@ module.exports = {
         'ShowInterstitial',
         _('Show interstitial'),
         _(
-          'Show the interstitial, will work only when the interstitial is fully loaded.'
+          'Show the interstitial that was loaded. Will work only when the interstitial is fully loaded.'
         ),
-        _('Show interstitial'),
+        _('Show the loaded interstitial'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
@@ -315,39 +364,69 @@ module.exports = {
 
     extension
       .addCondition(
-        'VideoReward',
-        _('Video reward'),
-        _(
-          'Check if there is a video reward.\nYou can mark it as non-claimed yet, so you can check this reward in other events.'
-        ),
-        _('Video reward given'),
+        'VideoErrored',
+        _('Video had an error'),
+        _('Check if there was a error while loading the rewarded video.'),
+        _('Video ad had an error'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
-      .addParameter('yesorno', _('Mark as claimed'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isVideoErrored');
+
+    extension
+      .addCondition(
+        'VideoReward',
+        _('Video reward received'),
+        _(
+          'Check if the reward of the video was given to the user.\nYou can mark this reward as cleared, so that the condition will be false and you can show later another reward video.'
+        ),
+        _('User got the reward of the video (and clear this reward: _PARAM0_)'),
+        _('AdMob'),
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .addParameter(
+        'yesorno',
+        _('Clear the reward (needed to show another video)'),
+        '',
+        false
+      )
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.existVideoReward');
+      .setFunctionName('gdjs.adMob.wasVideoRewardReceived');
 
     extension
       .addAction(
         'LoadVideo',
         _('Load video'),
         _(
-          'Start loading a reward video, you can display it automatically when finish loading.\nIf test mode is set to true a test video will be displayed.'
+          'Start loading a reward video (that can be displayed automatically when the loading is finished).\nIf test mode is set, a test video will be displayed.'
         ),
-        _('Load reward video (show on load: _PARAM2_, test mode: _PARAM3_)'),
+        _(
+          'Load reward video with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (display automatically when loaded: _PARAM2_)'
+        ),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .addParameter('string', _('Android reward video ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5224354917"` for loading a test rewarded video.'
+      )
       .addParameter('string', _('iOS reward video ID'), '', false)
-      .addParameter('yesorno', _('Display on load complete?'), '', false)
-      .setDefaultValue('true')
-      .addParameter('yesorno', _('Test mode?'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5224354917"` for loading a test rewarded video.'
+      )
+      .addParameter(
+        'yesorno',
+        _('Displayed automatically when loading is finished?'),
+        '',
+        false
+      )
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -358,9 +437,9 @@ module.exports = {
         'ShowVideo',
         _('Show video'),
         _(
-          'Show the reward video, will work only when the video is fully loaded.'
+          'Show the reward video that was loaded. Will work only when the video is fully loaded.'
         ),
-        _('Show reward video'),
+        _('Show the loaded reward video'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
@@ -372,16 +451,18 @@ module.exports = {
     extension
       .addAction(
         'ClaimReward',
-        _('Claim reward'),
-        _('Mark the video reward as claimed.'),
-        _('Claim video reward'),
+        _('Mark the reward of the video as claimed'),
+        _(
+          'Mark the video reward as claimed. Useful if you used the condition to check if the reward was given to the user without clearing the reward.'
+        ),
+        _('Mark the reward of the video as claimed'),
         _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.claimVideoReward');
+      .setFunctionName('gdjs.adMob.markVideoRewardAsClaimed');
 
     return extension;
   },

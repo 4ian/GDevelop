@@ -298,7 +298,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   for (std::shared_ptr<gd::PlatformExtension> extension :
        project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
+    for (gd::DependencyMetadata &dependency : extension->GetAllDependencies()) {
       if (dependency.GetDependencyType() == "cordova") {
         gd::String plugin;
         plugin += "<plugin name=\"" + dependency.GetExportName();

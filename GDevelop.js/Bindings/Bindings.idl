@@ -1317,6 +1317,19 @@ interface PlatformExtension {
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+
     [Value] VectorString GetExtensionObjectsTypes();
     [Value] VectorString GetBehaviorsTypes();
     [Value] VectorString GetExtensionEffectTypes();

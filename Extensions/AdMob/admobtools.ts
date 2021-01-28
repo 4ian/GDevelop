@@ -2,342 +2,389 @@ namespace gdjs {
   declare var admob: any;
 
   export namespace adMob {
+    export enum AdSizeType {
+      BANNER,
+      LARGE_BANNER,
+      MEDIUM_RECTANGLE,
+      FULL_BANNER,
+      LEADERBOARD,
+      SMART_BANNER,
+    }
+
     // Banner
-    export let bannerLoading = false;
-    export let bannerReady = false;
-    export let bannerShowing = false;
-    export let bannerExists = false;
-    export let bannerAutoshow = false;
-    // Needed because the banner event listeners bug
+    let bannerAndroidId = '';
+    let bannerIosId = '';
+    let bannerPosition: 'top' | 'bottom' = 'top';
+    let bannerRequestedAdSizeType: AdSizeType = AdSizeType.SMART_BANNER;
+
+    let bannerLoading = false;
+    let bannerErrored = false;
+    let bannerShowing = false;
+
     // Interstitial
-    export let interstitialLoading = false;
-    export let interstitialReady = false;
-    export let interstitialShowing = false;
-    // Reward video
-    export let videoLoading = false;
-    export let videoReady = false;
-    export let videoShowing = false;
-    export let videoReward = false;
+    let interstitialLoading = false;
+    let interstitialReady = false;
+    let interstitialErrored = false;
+    let interstitialShowing = false;
 
-    export const _getPlatformName = function () {
-      if (/(android)/i.test(navigator.userAgent)) {
-        return 'android';
-      } else {
-        if (/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
-          return 'ios';
-        } else {
-          return 'windowsPhone';
-        }
+    // Reward video
+    let videoLoading = false;
+    let videoReady = false;
+    let videoErrored = false;
+    let videoShowing = false;
+    let videoRewardReceived = false;
+
+    let npaValue = '0'; // TODO: expose an API to change this and also an automatic way using the consent SDK.
+
+    /**
+     * Activate or deactivate the test mode ("development" mode).
+     * When activated, tests ads will be served instead of real ones.
+     *
+     * It is important to enable test ads during development so that you can click on them without
+     * charging advertisers. If you click on too many ads without being in test mode, you risk your
+     * account being flagged for invalid activity.
+     */
+    export const setTestMode = (enable: boolean) => {
+      if (typeof admob === 'undefined') {
+        return;
       }
+
+      admob.setDevMode(enable);
     };
 
     // Banner
-    export const isBannerLoading = function () {
-      return gdjs.adMob.bannerLoading;
+    /** Check if a banner is loading. */
+    export const isBannerLoading = () => {
+      return bannerLoading;
     };
-    export const isBannerReady = function () {
-      // This block is needed because the banner event listeners bug
-      if (gdjs.adMob.bannerAutoshow && gdjs.adMob.bannerReady) {
-        gdjs.adMob.bannerReady = false;
-        gdjs.adMob.bannerShowing = true;
-        gdjs.adMob.bannerExists = true;
-      }
-      return gdjs.adMob.bannerReady;
+    /** Check if a banner is being shown on screen. */
+    export const isBannerShowing = () => {
+      return bannerShowing;
     };
-    export const isBannerShowing = function () {
-      // This block is needed because the banner event listeners bug
-      if (gdjs.adMob.bannerAutoshow && gdjs.adMob.bannerReady) {
-        gdjs.adMob.bannerReady = false;
-        gdjs.adMob.bannerShowing = true;
-        gdjs.adMob.bannerExists = true;
-      }
-      return gdjs.adMob.bannerShowing;
+    /** Check if the banner had an error while loading it. */
+    export const isBannerErrored = () => {
+      return bannerErrored;
     };
-    export const existBanner = function () {
-      // This block is needed because the banner event listeners bug
-      if (gdjs.adMob.bannerAutoshow && gdjs.adMob.bannerReady) {
-        gdjs.adMob.bannerReady = false;
-        gdjs.adMob.bannerShowing = true;
-        gdjs.adMob.bannerExists = true;
-      }
-      return gdjs.adMob.bannerExists;
-    };
-    export const loadBanner = function (
+
+    /**
+     * Set up a banner that can then be displayed by calling `showBanner`.
+     */
+    export const setupBanner = function (
       androidID,
       iosID,
       atTop,
-      overlap,
-      displayOnLoading,
-      testMode
     ) {
       if (typeof admob === 'undefined') {
         return;
       }
-      if (
-        gdjs.adMob.bannerLoading ||
-        gdjs.adMob.bannerReady ||
-        gdjs.adMob.bannerExists
-      ) {
+
+      bannerAndroidId = androidID;
+      bannerIosId = iosID;
+      bannerPosition = atTop ? 'top' : 'bottom';
+    };
+    /**
+     * Set the size of the banner to be shown when `showBanner` is called.
+     * @param bannerAdSizeType The type of the banner to displayed
+     */
+    export const setBannerAdSizeType = (
+      bannerAdSizeType:
+        | 'BANNER'
+        | 'LARGE_BANNER'
+        | 'MEDIUM_RECTANGLE'
+        | 'FULL_BANNER'
+        | 'LEADERBOARD'
+        | 'SMART_BANNER'
+    ) => {
+      const adSizeTypes = {
+        BANNER: AdSizeType.BANNER,
+        LARGE_BANNER: AdSizeType.LARGE_BANNER,
+        MEDIUM_RECTANGLE: AdSizeType.MEDIUM_RECTANGLE,
+        FULL_BANNER: AdSizeType.FULL_BANNER,
+        LEADERBOARD: AdSizeType.LEADERBOARD,
+        SMART_BANNER: AdSizeType.SMART_BANNER,
+      };
+
+      bannerRequestedAdSizeType =
+        adSizeTypes[bannerAdSizeType] || AdSizeType.SMART_BANNER;
+    };
+    /**
+     * Display the banner that was set up with `loadBanner` (and `setBannerAdSizeType`).
+     */
+    export const showBanner = () => {
+      if (typeof admob === 'undefined') {
         return;
       }
-      admob.banner.config({
-        id:
-          // Support Android & iOS
-          gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID,
-        bannerAtTop: atTop,
-        overlap: overlap,
-        autoShow: displayOnLoading,
-        isTesting: testMode,
+
+      bannerLoading = true;
+      bannerShowing = false;
+      bannerErrored = false;
+      admob.banner
+        .show({
+          id: {
+            android: bannerAndroidId,
+            ios: bannerIosId,
+          },
+          position: bannerPosition,
+          size: bannerRequestedAdSizeType,
+        })
+        .then(
+          () => {
+            bannerShowing = true;
+            bannerLoading = false;
+            console.info('AdMob banner successfully shown.');
+          },
+          (error) => {
+            bannerShowing = false;
+            bannerLoading = false;
+            bannerErrored = true;
+            console.error('Error while showing an AdMob banner:', error);
+          }
+        );
+    };
+    /** Hide the banner shown on screen. */
+    export const hideBanner = () => {
+      if (typeof admob === 'undefined') {
+        return;
+      }
+
+      bannerShowing = false;
+      admob.banner.hide({
+        android: bannerAndroidId,
+        ios: bannerIosId,
       });
-      admob.banner.prepare();
-      gdjs.adMob.bannerLoading = true;
-      gdjs.adMob.bannerReady = false;
-
-      // These lines are needed because the banner event listeners bug
-      gdjs.adMob.bannerAutoshow = displayOnLoading;
-      gdjs.adMob.bannerShowing = false;
-      gdjs.adMob.bannerExists = false;
-    };
-    export const showBanner = function () {
-      if (typeof admob === 'undefined') {
-        return;
-      }
-
-      // This block is needed because the banner event listeners bug
-      if (gdjs.adMob.bannerReady) {
-        gdjs.adMob.bannerReady = false;
-        gdjs.adMob.bannerExists = true;
-      }
-      if (gdjs.adMob.bannerExists) {
-        gdjs.adMob.bannerShowing = true;
-      }
-      admob.banner.show();
-    };
-    export const hideBanner = function () {
-      if (typeof admob === 'undefined') {
-        return;
-      }
-      if (gdjs.adMob.bannerExists) {
-        gdjs.adMob.bannerShowing = false;
-      }
-      admob.banner.hide();
-    };
-    export const removeBanner = function () {
-      if (typeof admob === 'undefined') {
-        return;
-      }
-
-      // These lines are needed because the banner event listeners bug
-      gdjs.adMob.bannerExists = false;
-      gdjs.adMob.bannerShowing = false;
-      admob.banner.remove();
     };
 
     // Interstitial
-    export const isInterstitialLoading = function () {
-      return gdjs.adMob.interstitialLoading;
+    /** Check if the interstitial is loading. */
+    export const isInterstitialLoading = () => {
+      return interstitialLoading;
     };
-    export const isInterstitialReady = function () {
-      return gdjs.adMob.interstitialReady;
+    /** Check if the interstitial is ready to display. */
+    export const isInterstitialReady = () => {
+      return interstitialReady;
     };
-    export const isInterstitialShowing = function () {
-      return gdjs.adMob.interstitialShowing;
+    /** Check if the interstitial is shown on screen. */
+    export const isInterstitialShowing = () => {
+      return interstitialShowing;
     };
-    export const loadInterstitial = function (
+    /** Check if the interstitial had an error while loading it. */
+    export const isInterstitialErrored = () => {
+      return interstitialErrored;
+    };
+
+    /** Load an interstitial. */
+    export const loadInterstitial = (
       androidID,
       iosID,
-      displayOnLoading,
-      testMode
-    ) {
+      displayWhenLoaded
+    ) => {
       if (typeof admob === 'undefined') {
         return;
       }
-      if (
-        gdjs.adMob.interstitialLoading ||
-        gdjs.adMob.interstitialReady ||
-        gdjs.adMob.interstitialShowing
-      ) {
+      if (interstitialLoading || interstitialReady || interstitialShowing) {
         return;
       }
-      admob.interstitial.config({
-        id:
-          // Support Android & iOS
-          gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID,
-        autoShow: displayOnLoading,
-        isTesting: testMode,
-      });
-      admob.interstitial.prepare();
-      gdjs.adMob.interstitialLoading = true;
-      gdjs.adMob.interstitialReady = false;
+
+      interstitialLoading = true;
+      interstitialReady = false;
+      interstitialErrored = false;
+      admob.interstitial
+        .load({
+          id: {
+            android: androidID,
+            ios: iosID,
+          },
+          npa: npaValue,
+        })
+        .then(
+          () => {
+            console.info('AdMob interstitial successfully loaded.');
+            if (displayWhenLoaded) showInterstitial();
+          },
+          (error) => {
+            interstitialLoading = false;
+            interstitialReady = false;
+            interstitialErrored = true;
+            console.error('Error while loading a interstitial:', error);
+          }
+        );
     };
-    export const showInterstitial = function () {
+
+    /** Show the loaded interstitial. */
+    export const showInterstitial = () => {
       if (typeof admob === 'undefined') {
         return;
       }
-      admob.interstitial.show();
+      admob.interstitial.show().then(
+        () => {
+          // Interstitial will be shown and
+          // `interstitialShowing` will be updated thanks to events
+          // (but it's too early to change it now).
+        },
+        (error) => {
+          interstitialShowing = false;
+          interstitialErrored = true;
+          console.error('Error while trying to show an interstitial:', error);
+        }
+      );
     };
 
     // Reward video
-    export const isVideoLoading = function () {
-      return gdjs.adMob.videoLoading;
+    /** Check if the video is loading. */
+    export const isVideoLoading = () => {
+      return videoLoading;
     };
-    export const isVideoReady = function () {
-      return gdjs.adMob.videoReady;
+    /** Check if the video is ready to display. */
+    export const isVideoReady = () => {
+      return videoReady;
     };
-    export const isVideoShowing = function () {
-      return gdjs.adMob.videoShowing;
+    /** Check if the video is shown on screen. */
+    export const isVideoShowing = () => {
+      return videoShowing;
     };
-    export const existVideoReward = function (markAsClaimed) {
-      const reward = gdjs.adMob.videoReward;
+    /** Check if the video had an error while loading it. */
+    export const isVideoErrored = () => {
+      return videoErrored;
+    };
+
+    /** Check if the reward of the video was received. */
+    export const wasVideoRewardReceived = function (markAsClaimed) {
+      const reward = videoRewardReceived;
       if (markAsClaimed) {
-        gdjs.adMob.videoReward = false;
+        videoRewardReceived = false;
       }
       return reward;
     };
+
+    /** Load a reward video. */
     export const loadVideo = function (
       androidID,
       iosID,
-      displayOnLoading,
-      testMode
+      displayWhenLoaded,
     ) {
       if (typeof admob === 'undefined') {
         return;
       }
-      if (
-        gdjs.adMob.videoLoading ||
-        gdjs.adMob.videoReady ||
-        gdjs.adMob.videoShowing
-      ) {
+      if (videoLoading || videoReady || videoShowing) {
         return;
       }
-      admob.rewardvideo.config({
-        id:
-          // Support Android & iOS
-          gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID,
-        autoShow: displayOnLoading,
-        isTesting: testMode,
-      });
-      admob.rewardvideo.prepare();
-      gdjs.adMob.videoLoading = true;
-      gdjs.adMob.videoReady = false;
+
+      videoLoading = true;
+      videoReady = false;
+      videoErrored = false;
+      admob.rewardVideo
+        .load({
+          id: {
+            android: androidID,
+            ios: iosID,
+          },
+          npa: npaValue,
+        })
+        .then(
+          () => {
+            console.info('AdMob reward video successfully loaded.');
+
+            if (displayWhenLoaded) showVideo();
+          },
+          (error) => {
+            videoLoading = false;
+            videoReady = false;
+            videoErrored = true;
+            console.error('Error while loading a reward video:', error);
+          }
+        );
     };
-    export const showVideo = function () {
+
+    /** Show the loaded reward video. */
+    export const showVideo = () => {
       if (typeof admob === 'undefined') {
         return;
       }
-      admob.rewardvideo.show();
-    };
-    export const claimVideoReward = function () {
-      gdjs.adMob.videoReward = false;
+
+      admob.rewardVideo.show().then(
+        () => {
+          // Video will be shown and
+          // `videoShowing` will be updated thanks to events
+          // (but it's too early to change it now).
+        },
+        (error) => {
+          videoShowing = false;
+          videoErrored = true;
+          console.error('Error while trying to show a reward video:', error);
+        }
+      );
     };
 
-    // Banner event listeners
-    document.addEventListener(
-      'admob.banner.events.LOAD',
-      function () {
-        gdjs.adMob.bannerReady = true;
-        gdjs.adMob.bannerLoading = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.banner.events.LOAD_FAIL',
-      function () {
-        gdjs.adMob.bannerLoading = false;
-      },
-      false
-    );
+    /** Mark the reward of the video as claimed. */
+    export const markVideoRewardAsClaimed = () => {
+      videoRewardReceived = false;
+    };
 
-    // BUG: These two never get called
-    /*
-document.addEventListener(
-  "admob.banner.events.OPEN",
-  function() {
-    gdjs.adMob.bannerExists = true;
-    gdjs.adMob.bannerShowing = true;
-    gdjs.adMob.bannerReady = false;
-  },
-  false
-);
-document.addEventListener(
-  "admob.banner.events.CLOSE",
-  function() {
-    gdjs.adMob.bannerExists = false;
-    gdjs.adMob.bannerShowing = false;
-  },
-  false
-);
-*/
+    // Banner event listeners:
+    document.addEventListener('admob.banner.load', () => {
+      bannerShowing = true;
+      bannerLoading = false;
+    });
+    document.addEventListener('admob.banner.load_fail', () => {
+      bannerLoading = false;
+    });
+
+    document.addEventListener('admob.banner.open', () => {
+      // Not implemented.
+    });
+
+    document.addEventListener('admob.banner.exit_app', () => {
+      // Not implemented.
+    });
+    document.addEventListener('admob.banner.close', () => {
+      // Not implemented.
+    });
 
     // Interstitial event listeners
-    document.addEventListener(
-      'admob.interstitial.events.LOAD',
-      function () {
-        gdjs.adMob.interstitialReady = true;
-        gdjs.adMob.interstitialLoading = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.interstitial.events.LOAD_FAIL',
-      function () {
-        gdjs.adMob.interstitialLoading = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.interstitial.events.OPEN',
-      function () {
-        gdjs.adMob.interstitialShowing = true;
-        gdjs.adMob.interstitialReady = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.interstitial.events.CLOSE',
-      function () {
-        gdjs.adMob.interstitialShowing = false;
-      },
-      false
-    );
+    document.addEventListener('admob.interstitial.load', () => {
+      interstitialReady = true;
+      interstitialLoading = false;
+    });
+    document.addEventListener('admob.interstitial.load_fail', () => {
+      interstitialLoading = false;
+    });
+    document.addEventListener('admob.interstitial.open', () => {
+      interstitialShowing = true;
+      interstitialReady = false;
+    });
+    document.addEventListener('admob.interstitial.close', () => {
+      interstitialShowing = false;
+    });
+    document.addEventListener('admob.interstitial.exit_app', () => {
+      // Not implemented.
+    });
 
     // Reward video event listeners
-    document.addEventListener(
-      'admob.rewardvideo.events.LOAD',
-      function () {
-        gdjs.adMob.videoReady = true;
-        gdjs.adMob.videoLoading = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.rewardvideo.events.LOAD_FAIL',
-      function () {
-        gdjs.adMob.videoLoading = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.rewardvideo.events.OPEN',
-      function () {
-        gdjs.adMob.videoShowing = true;
-        gdjs.adMob.videoReady = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.rewardvideo.events.CLOSE',
-      function () {
-        gdjs.adMob.videoShowing = false;
-      },
-      false
-    );
-    document.addEventListener(
-      'admob.rewardvideo.events.REWARD',
-      function () {
-        gdjs.adMob.videoReward = true;
-      },
-      false
-    );
+    document.addEventListener('admob.reward_video.load', () => {
+      videoReady = true;
+      videoLoading = false;
+    });
+    document.addEventListener('admob.reward_video.load_fail', () => {
+      videoLoading = false;
+    });
+    document.addEventListener('admob.reward_video.open', () => {
+      videoShowing = true;
+      videoReady = false;
+    });
+    document.addEventListener('admob.reward_video.close', () => {
+      videoShowing = false;
+    });
+    document.addEventListener('admob.reward_video.start', () => {
+      // Not implemented.
+    });
+    document.addEventListener('admob.reward_video.complete', () => {
+      // Not implemented.
+    });
+    document.addEventListener('admob.reward_video.reward', () => {
+      videoRewardReceived = true;
+    });
+    document.addEventListener('admob.reward_video.exit_app', () => {
+      // Not implemented.
+    });
   }
 }

@@ -2999,7 +2999,7 @@ describe('libGD.js', function () {
   });
 
   describe('gd.PlatformExtension', function () {
-    it('can be created and have basic information filled', function () {
+    const makeTestExtension = () => {
       const extension = new gd.PlatformExtension();
       extension
         .setExtensionInformation(
@@ -3010,6 +3010,11 @@ describe('libGD.js', function () {
           'License of test extension'
         )
         .setExtensionHelpPath('/path/to/extension/help');
+      return extension;
+    };
+
+    it('can be created and have basic information filled', function () {
+      const extension = makeTestExtension();
 
       expect(extension.getName()).toBe('TestExtensionName');
       expect(extension.getFullName()).toBe('Full name of test extension');
@@ -3018,6 +3023,46 @@ describe('libGD.js', function () {
       expect(extension.getLicense()).toBe('License of test extension');
       expect(extension.getHelpPath()).toBe('/path/to/extension/help');
       extension.delete();
+    });
+
+    it('can have actions and conditions added', function () {
+      const extension = makeTestExtension();
+      extension
+        .addCondition(
+          'BannerShowing',
+          'Banner showing',
+          'Check if there is a banner being displayed.',
+          'Banner is showing',
+          'AdMob',
+          'JsPlatform/Extensions/admobicon24.png',
+          'JsPlatform/Extensions/admobicon16.png'
+        )
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/AdMob/admobtools.js')
+        .setFunctionName('gdjs.adMob.isBannerShowing');
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::BannerShowing')
+      ).toBe(true);
+      const condition = extension
+        .getAllConditions()
+        .get('TestExtensionName::BannerShowing');
+      expect(condition.getFullName()).toBe('Banner showing');
+      expect(condition.isHidden()).toBe(false);
+
+      // Check also the API to duplicate a condition.
+      extension
+        .addDuplicatedCondition('AnotherCondition', 'BannerShowing')
+        .setHidden();
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::AnotherCondition')
+      ).toBe(true);
+      const copiedCondition = extension
+        .getAllConditions()
+        .get('TestExtensionName::AnotherCondition');
+      expect(copiedCondition.getFullName()).toBe('Banner showing');
+      expect(copiedCondition.isHidden()).toBe(true);
     });
   });
 

@@ -13,6 +13,7 @@ shell.exec('node import-GDJS-Runtime.js');
 
 const ignoredExtensionNames = ['BuiltinJoystick'];
 const renamedExtensionNames = {
+  AdMob: 'Admob',
   BuiltinFile: 'Storage',
   FileSystem: 'Filesystem',
   TileMap: 'Tilemap',

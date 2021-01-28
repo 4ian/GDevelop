@@ -30,7 +30,7 @@ gdjs.BBTextRuntimeObject = function(runtimeScene, objectData) {
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
-  this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(objectData.content.color);
+  this._color = gdjs.hexToRGBColor(objectData.content.color);
   /** @type {string} */
   this._fontFamily = objectData.content.fontFamily;
   /** @type {number} */
@@ -61,11 +61,6 @@ gdjs.BBTextRuntimeObject.prototype = Object.create(
 );
 gdjs.registerObject('BBText::BBText', gdjs.BBTextRuntimeObject);
 
-gdjs.BBTextRuntimeObject.hexToRGBColor = function (hex) {
-  var hexNumber = parseInt(hex.replace('#', ''), 16);
-  return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
-};
-
 gdjs.BBTextRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
 };
@@ -85,7 +80,7 @@ gdjs.BBTextRuntimeObject.prototype.updateFromObjectData = function(oldObjectData
     this.setBBText(newObjectData.content.text);
   }
   if (oldObjectData.content.color !== newObjectData.content.color) {
-    this._color = gdjs.BBTextRuntimeObject.hexToRGBColor(newObjectData.content.color);
+    this._color = gdjs.hexToRGBColor(newObjectData.content.color);
     this._renderer.updateColor();
   }
   if (oldObjectData.content.fontFamily !== newObjectData.content.fontFamily) {

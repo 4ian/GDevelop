@@ -17,7 +17,7 @@ GDevelop relies on some dependencies that can have special requirements:
 > - `yarn why react-dnd`
 > - `npm ls webpack`
 
-- The latest versions of `react-sortable-hoc` seem to be breaking the lists. The exact version in which this occurs was not determined.
+- Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exact version in which this occurs was not determined.
 
 A few fixes have been applied:
 

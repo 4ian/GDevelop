@@ -18,28 +18,28 @@ GDJS is composed of two parts:
 
 ### GDJS Runtime (game engine)
 
-The game engine is in the _Runtime_ folder. If you want to work on the engine directly, follow the [GDevelop 5 README about development of the game engine](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-game-engine).
+The game engine is in the _Runtime_ folder. If you want to work on the engine directly, follow the [GDevelop 5 README about the development of the game engine](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-game-engine).
 
-* To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation)**.
+- To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation)**.
 
-* To run tests for the game engine, go to `GDJS/tests`, run `npm install` and `npm test`. More information in the [README for the tests](https://github.com/4ian/GDevelop/tree/master/GDJS/tests).
+- To run tests for the game engine, go to `GDJS/tests`, run `npm install` and `npm test`. More information in the [README for the tests](https://github.com/4ian/GDevelop/tree/master/GDJS/tests).
 
-* To launch type checking with TypeScript, run `npm install` and `npm run check-types` in `GDJS` folder.
+- To launch type checking with TypeScript, run `npm install` and `npm run check-types` in `GDJS` folder.
 
 ### GDJS Platform (exporters, code generation...)
 
-Check the [GDJS Platform](https://docs.gdevelop-app.com/GDJS%20Documentation/index.html) documentation, or the [full GDevelop developers documentation](https://docs.gdevelop-app.com/).
+Check the [GDJS Platform](https://docs.gdevelop-app.com/GDJS%20Documentation/index.html) documentation or the [full GDevelop developers documentation](https://docs.gdevelop-app.com/).
 
 ## 3) How to contribute 😎
 
 Any contribution is welcome! Whether you want to submit a bug report, a feature request
 or any pull request to add a feature, do not hesitate to get in touch.
 
-* Check the [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+- Check [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
 
-* Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
+- Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
 
-* To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+- To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
 ## License
 

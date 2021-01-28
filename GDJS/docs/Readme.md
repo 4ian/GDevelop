@@ -1,6 +1,6 @@
 # GDJS Documentation
 
-📚 Read the documentation online: **[GDJS Runtime (game engine) documentation](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html)** or [GDJS Platform documentation for the IDE](http://4ian.github.io/GD-Documentation/GDJS%20Documentation/index.html).
+📚 Read the documentation online: **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html)** or [GDJS Platform documentation for the IDE](https://docs.gdevelop-app.com/GDJS%20Documentation/index.html).
 
 ## How to generate the documentation
 
@@ -13,7 +13,7 @@
 
   Output will be in `<GDevelop repository>/docs/GDJS Documentation`.
 
-- To generate the GDJS Platform documentation for the IDE, install [Doxygen](www.doxygen.org). Then:
+- To generate the GDJS Platform documentation for the IDE, install [Doxygen](https://www.doxygen.nl/index.html). Then:
 
   ```bash
   cd <GDevelop repository>/GDJS/docs

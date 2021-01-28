@@ -1,5 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
@@ -12,7 +13,7 @@ import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';
-import BooleanEditor from '../UI/BooleanField';
+import BooleanField from '../UI/BooleanField';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
@@ -129,7 +130,7 @@ const VariableRow = ({
             value={
               type === gd.Variable.String
                 ? variable.getString()
-                : variable.getValue()
+                : '' + variable.getValue()
             }
             onChange={newValue => {
               if (
@@ -137,6 +138,8 @@ const VariableRow = ({
                   ? variable.getString() !== newValue
                   : variable.getValue() !== newValue
               ) {
+                // Note that onChangeValue pass all the values as strings.
+                // It's the parent responsibility to cast them back according to the variable type.
                 onChangeValue(newValue);
               }
             }}
@@ -148,9 +151,13 @@ const VariableRow = ({
     else
       columns.push(
         <TreeTableCell key="value" expand>
-          <BooleanEditor
+          <BooleanField
             value={variable.getBool()}
-            onChange={onChangeValue}
+            onChange={newValue => {
+              // Note that onChangeValue pass all the values as strings.
+              // It's the parent responsibility to cast them back according to the variable type.
+              onChangeValue('' + newValue);
+            }}
             disabled={origin === 'parent' && depth !== 0}
           />
         </TreeTableCell>

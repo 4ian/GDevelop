@@ -14,7 +14,7 @@ type Props = {|
   disabled: boolean,
 |};
 
-const BooleanEditor = ({ value, onChange, disabled }: Props) => {
+const BooleanField = ({ value, onChange, disabled }: Props) => {
   return (
     <Line>
       <Column noMargin>
@@ -41,4 +41,4 @@ const BooleanEditor = ({ value, onChange, disabled }: Props) => {
   );
 };
 
-export default BooleanEditor;
+export default BooleanField;

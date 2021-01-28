@@ -154,6 +154,8 @@ export default class VariablesList extends React.Component<Props, State> {
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
+    // If editing a variable from the parent container, clone it
+    // inside this container, before updating its value.
     if (inheritedVariablesContainer && origin === 'parent') {
       const serializedVariable = serializeToJSObject(
         inheritedVariablesContainer.get(name)
@@ -165,18 +167,21 @@ export default class VariablesList extends React.Component<Props, State> {
 
       variable = variablesContainer.get(name);
     }
+
     switch (variable.getType()) {
       case gd.Variable.String:
         variable.setString(newValue);
         break;
       case gd.Variable.Number:
-        variable.setValue(newValue);
+        variable.setValue(parseFloat(newValue));
         break;
       case gd.Variable.Boolean:
-        variable.setBool(newValue);
+        variable.setBool(newValue === 'true');
         break;
       default:
-        console.error('Cannot set variable with type ', variable.getType());
+        console.error(
+          `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
+        );
     }
   };
 

@@ -45,11 +45,11 @@ export default ({
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
     style={{
+      width: fullWidth ? '100%' : undefined,
       ...style,
       flexShrink: noShrink ? 0 : undefined,
       marginTop: noMargin ? 0 : 6,
       marginBottom: noMargin ? 0 : 6,
-      ...(fullWidth ? { width: '100%' } : {}),
     }}
     align={align || 'inherit'}
   >

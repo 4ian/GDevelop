@@ -7,29 +7,25 @@ import {
 } from '../GDJSInspectorDescriptions';
 import mapValues from 'lodash/mapValues';
 
+// This mirrors the internals of gdjs.Variable.
 type Variable = {|
   _type: 'string' | 'number' | 'boolean' | 'structure' | 'array',
   _str: string,
   _value: number,
   _bool: boolean,
   _children: { [string]: Variable },
-  _childrenArray: Variable[],
+  _childrenArray: Array<Variable>,
 |};
 
+// This mirrors the internals of gdjs.VariablesContainer.
 type VariablesContainer = {|
   _variables: { items: { [string]: Variable } },
-|};
-
-type Props = {|
-  variablesContainer: VariablesContainer,
-  onCall: CallFunction,
-  onEdit: EditFunction,
 |};
 
 const transformVariable = (variable: Variable) => {
   if (!variable) return null;
 
-  const transformedVariable = {
+  const transformedVariable: any = {
     type: variable._type,
     value: null,
   };
@@ -61,10 +57,14 @@ const transform = (variablesContainer: VariablesContainer) => {
   return mapValues(variablesContainer._variables.items, transformVariable);
 };
 
-const constructPath = (
-  editPath: string[],
+/**
+ * Returns the list of properties to access the variable at the specified path in the specified variables container.
+ * Also returns the variable already living there.
+ */
+const constructPathToVariable = (
+  editPath: Array<string>,
   variablesContainer: VariablesContainer
-) => {
+): {| path: ?Array<string>, variable: ?Variable |} => {
   const variableInContainerName = editPath.shift();
   const path = ['_variables', 'items', variableInContainerName];
   let variable = variablesContainer._variables.items[variableInContainerName];
@@ -77,22 +77,27 @@ const constructPath = (
     skip = !skip;
     if (skip) continue;
 
-    let variablePath: string;
-    if (variable._type === 'structure') variablePath = '_children';
-    else if (variable._type === 'array') variablePath = '_childrenArray';
+    // Walk down in the children of the collection.
+    if (variable._type === 'structure') {
+      path.push('_children', variableName);
+      variable = variable._children[variableName];
+    }
+    else if (variable._type === 'array') {
+      path.push('_childrenArray', variableName);
+      variable = variable._childrenArray[parseInt(variableName, 10)];
+    }
     // Bad path: abort.
-    else return false;
-
-    path.push(variablePath, variableName);
-    variable = variable[variablePath][variableName];
+    else return { path: null, variable: null };
   }
 
   return { path, variable };
 };
 
 const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
+  if (!variablesContainer) return;
+
   // Reconstruct the variable to edit from the path
-  const { path, variable } = constructPath(edit.namespace, variablesContainer);
+  const { path, variable } = constructPathToVariable(edit.namespace, variablesContainer);
   if (!path) {
     console.error('Invalid path passed to the debugger: ', edit);
     return false;
@@ -140,6 +145,12 @@ const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
 
   return true;
 };
+
+type Props = {|
+  variablesContainer: ?VariablesContainer,
+  onCall: CallFunction,
+  onEdit: EditFunction,
+|};
 
 export default (props: Props) => (
   <ReactJsonView

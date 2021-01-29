@@ -15,10 +15,10 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   // Set up the object to track the font we're using.
   this._bitmapFontStyle = new PIXI.TextStyle();
   this._bitmapFontStyle.fontFamily = 'Arial';
-  this._bitmapFontStyle.fontSize = 60;
+  this._bitmapFontStyle.fontSize = 20;
   this._bitmapFontStyle.align = runtimeObject._align;
   this._bitmapFontStyle.wordWrap = runtimeObject._wordWrap;
-  this._bitmapFontStyle.fill = "#000000";
+  this._bitmapFontStyle.fill = '#000000';
 
   const defaultSlugFontName =
     this._bitmapFontStyle.fontFamily +
@@ -51,10 +51,12 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
       .getPIXITexture(bitmapTextureResourceName);
 
     // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
-    this._pixiObject.fontName = runtimeScene
+    const bitmapFont = runtimeScene
       .getGame()
       .getBitmapFontManager()
       .getBitmapFontFromData(bitmapFontResourceName, texture);
+    this._pixiObject.fontName = bitmapFont.font;
+    this._pixiObject.fontSize = bitmapFont.size;
 
     this.updatePosition();
   } else {
@@ -79,6 +81,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   this.updateOpacity();
   this.updateScale();
   this.updateWrappingWidth();
+  this.updateTint();
 };
 
 gdjs.BitmapTextRuntimeObjectRenderer = gdjs.BitmapTextRuntimeObjectPixiRenderer;
@@ -92,40 +95,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.onDestroy = function () {
   gdjs.BitmapFontManager.removeFontUsed(this._pixiObject._fontName);
 };
 
-gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype._ensureFontAvailableAndGetFontName = function (
-  oldFont
-) {
-  const slugFontName =
-    this._bitmapFontStyle.fontFamily +
-    '-' +
-    this._bitmapFontStyle.fontSize +
-    '-' +
-    this._bitmapFontStyle.fill +
-    '-bitmapFont';
-
-  // Load the font if it's not available yet.
-  if (!PIXI.BitmapFont.available[slugFontName]) {
-    console.info('Generating font "' + slugFontName + '" for BitmapText.');
-    PIXI.BitmapFont.from(slugFontName, this._bitmapFontStyle, {
-      chars: [
-        [' ', '~'], // All the printable ASCII characters
-      ],
-    });
-  }
-
-  gdjs.BitmapFontManager.setFontUsed(slugFontName);
-
-  if (oldFont) {
-    gdjs.BitmapFontManager.removeFontUsed(oldFont);
-  }
-
-  // TODO: find a way to unload the BitmapFont that are not used anymore, otherwise
-  // we risk filling up the memory with useless BitmapFont - especially when the user
-  // plays with the color/size.
-
-  return slugFontName;
-};
-
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
   let bitmapFontResourceName = this._object._bitmapFontFile;
   let bitmapTextureResourceName = this._object._bitmapTextureFile;
@@ -137,10 +106,12 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
     .getPIXITexture(bitmapTextureResourceName);
 
   // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
-  this._pixiObject.fontName = runtimeScene
+  const bitmapFont = this._object._runtimeScene
     .getGame()
     .getBitmapFontManager()
     .getBitmapFontFromData(bitmapFontResourceName, texture);
+  this._pixiObject.fontName = bitmapFont.font;
+  this._pixiObject.fontSize = bitmapFont.size;
 
   this.updatePosition();
 };
@@ -153,15 +124,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTint = function () {
   );
   this._pixiObject.dirty = true;
 };
-/*
-  this._pixiObject.tint =
-    '0x' +
-    gdjs.rgbToHex(
-      parseInt(colors[0], 10),
-      parseInt(colors[1], 10),
-      parseInt(colors[2], 10)
-    );
-    */
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getTint = function () {
   return this._pixiObject.tint;
@@ -180,7 +142,6 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = functio
     this._pixiObject.maxWidth =
       this._object._wrappingWidth / this._object._scale;
     this._pixiObject.dirty = true;
-    console.log(this._pixiObject.maxWidth);
   } else {
     this._pixiObject.maxWidth = 0;
     this._pixiObject.dirty = true;

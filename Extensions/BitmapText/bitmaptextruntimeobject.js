@@ -32,7 +32,9 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
-  this._tint = gdjs.hexToRGBColor(objectData.content.tint);
+  this._tint = gdjs.hexToRGBColor(
+    objectData.content.tint
+  );
   /** @type {string} */
   this._bitmapFontFile = objectData.content.bitmapFontFile; // fnt/xml files
   /** @type {string} */
@@ -89,8 +91,10 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
     this.setText(newObjectData.content.text);
   }
   if (oldObjectData.content.tint !== newObjectData.content.tint) {
-   // this._tint = gdjs.hexToRGBColor(newObjectData.content.tint);
-   // this._renderer.updateTint();
+    this._tint = gdjs.hexToRGBColor(
+      newObjectData.content.tint
+    );
+    this._renderer.updateTint();
   }
   if (
     oldObjectData.content.bitmapFontFile !==
@@ -152,7 +156,6 @@ gdjs.BitmapTextRuntimeObject.prototype.getText = function () {
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.setTint = function (rgbColorString) {
-  /*
   const splitValue = rgbColorString.split(';');
   if (splitValue.length !== 3) return;
 
@@ -160,7 +163,6 @@ gdjs.BitmapTextRuntimeObject.prototype.setTint = function (rgbColorString) {
   this._tint[1] = parseInt(splitValue[1], 10);
   this._tint[2] = parseInt(splitValue[2], 10);
   this._renderer.updateTint();
-  */
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.getTint = function () {
@@ -185,8 +187,8 @@ gdjs.BitmapTextRuntimeObject.prototype.setFont = function (fontResourceName) {
   this._renderer.updateFont();
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.getFont = function () {
-  return this._bitmapFontFile;
+gdjs.BitmapTextRuntimeObject.prototype.getFontName = function () {
+  return this._renderer.getRendererObject().fontName;
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.setTexture = function (

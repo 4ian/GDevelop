@@ -9,7 +9,7 @@ const gd: libGDevelop = global.gd;
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
-const defaultBitmapFontFile = 'res/fonts/bitmapFont/silver.fnt';
+const defaultBitmapFontUrl = 'res/fonts/bitmapFont/silver.fnt';
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -220,7 +220,7 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Get the the data from a bitmap font (fnt/xml) resource in the IDE.
+   * Get the the data from a bitmap font file (fnt/xml) resource in the IDE.
    */
   static getResourceBitmapFont(
     project: gdProject,
@@ -246,7 +246,7 @@ export default class PixiResourcesLoader {
       console.warn(
         `The resource called ${resourceName} was no found.\nThe default bitmap font will be used.`
       );
-      fullUrl = defaultBitmapFontFile;
+      return;
     }
 
     return axios.get(fullUrl).then(response => response.data);

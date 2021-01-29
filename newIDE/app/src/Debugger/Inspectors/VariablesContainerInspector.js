@@ -125,18 +125,26 @@ const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
     }
   } else if (edit.name === 'value') {
     // Validate data type
-    if (
-      (variable._type === 'string' && typeof edit.new_value !== 'string') ||
-      (variable._type === 'number' && typeof edit.new_value !== 'number') ||
-      (variable._type === 'boolean' && typeof edit.new_value !== 'boolean')
+    if (variable._type === 'string' && typeof edit.new_value !== 'string')
+      edit.new_value = '' + edit.new_value;
+    else if (
+      variable._type === 'number' &&
+      typeof edit.new_value !== 'number'
     ) {
-      console.error(
-        `Invalid value type: expected value of type '${
-          variable._type
-        }' but received a value of type '${typeof edit.new_value}'.`
-      );
-      return false;
-    } else if (variable._type === 'structure' || variable._type === 'array') {
+      edit.new_value = parseFloat(edit.new_value);
+      if (isNaN(edit.new_value)) {
+        console.error(`Cannot set variable of type number to NaN!`);
+        return false;
+      }
+    } else if (
+      variable._type === 'boolean' &&
+      typeof edit.new_value !== 'boolean'
+    )
+      edit.new_value =
+        typeof edit.new_value === 'string'
+          ? edit.new_value.toLowerCase() !== 'false' && edit.new_value !== '0'
+          : !!edit.new_value;
+    else if (variable._type === 'structure' || variable._type === 'array') {
       console.error('Cannot set the value of a collection.');
       return false;
     }

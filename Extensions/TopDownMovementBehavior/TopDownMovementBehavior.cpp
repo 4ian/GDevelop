@@ -132,7 +132,7 @@ bool TopDownMovementBehavior::UpdateProperty(
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());
   else if (name == _("Custom isometry angle")) {
-    if (value.To<float>() < 1 || value.To<float>() > 45) return false;
+    if (value.To<float>() < 1 || value.To<float>() > 44) return false;
     behaviorContent.SetAttribute("customIsometryAngle", value.To<float>());
   }
   else

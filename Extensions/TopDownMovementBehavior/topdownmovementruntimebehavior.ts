@@ -381,9 +381,16 @@ namespace gdjs {
   }
 
   export class IsometryTransformation implements BasisTransformation {
-    screen: float[][];
+    _screen: float[][];
 
+    /**
+     * @param angle between the x axis and the projected isometric x axis.
+     * @throws if the angle is not in ]0; pi/4[. Note that 0 is a front viewpoint and pi/4 a top-down viewpoint.
+     */
     constructor(angle: float) {
+      if (angle <= 0 || angle >= Math.PI / 4)
+        throw new RangeError("An isometry angle must be in ]0; pi/4] but was: " + angle);
+      
       const alpha = Math.asin(Math.tan(angle));
       const sinA = Math.sin(alpha);
       const cosB = Math.cos(Math.PI / 4);
@@ -393,7 +400,7 @@ namespace gdjs {
       //   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
       //   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
       //   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
-      this.screen = [
+      this._screen = [
         [cosB, -sinB],
         [sinA * sinB, sinA * cosB],
       ];
@@ -401,9 +408,9 @@ namespace gdjs {
 
     toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
       const x =
-        this.screen[0][0] * worldPoint[0] + this.screen[0][1] * worldPoint[1];
+        this._screen[0][0] * worldPoint[0] + this._screen[0][1] * worldPoint[1];
       const y =
-        this.screen[1][0] * worldPoint[0] + this.screen[1][1] * worldPoint[1];
+        this._screen[1][0] * worldPoint[0] + this._screen[1][1] * worldPoint[1];
       screenPoint[0] = x;
       screenPoint[1] = y;
     }

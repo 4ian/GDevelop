@@ -69,11 +69,7 @@ namespace gdjs {
     /**
      * Set up a banner that can then be displayed by calling `showBanner`.
      */
-    export const setupBanner = function (
-      androidID,
-      iosID,
-      atTop,
-    ) {
+    export const setupBanner = function (androidID, iosID, atTop) {
       if (typeof admob === 'undefined') {
         return;
       }
@@ -173,11 +169,7 @@ namespace gdjs {
     };
 
     /** Load an interstitial. */
-    export const loadInterstitial = (
-      androidID,
-      iosID,
-      displayWhenLoaded
-    ) => {
+    export const loadInterstitial = (androidID, iosID, displayWhenLoaded) => {
       if (typeof admob === 'undefined') {
         return;
       }
@@ -257,11 +249,7 @@ namespace gdjs {
     };
 
     /** Load a reward video. */
-    export const loadVideo = function (
-      androidID,
-      iosID,
-      displayWhenLoaded,
-    ) {
+    export const loadVideo = function (androidID, iosID, displayWhenLoaded) {
       if (typeof admob === 'undefined') {
         return;
       }

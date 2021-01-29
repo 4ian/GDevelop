@@ -737,7 +737,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "press r to generate a new world",
+          "string": "left click or tap to generate a new world",
           "font": "",
           "characterSize": 20,
           "color": {
@@ -805,7 +805,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -828,11 +828,11 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "KeyReleased"
+                    "value": "MouseButtonReleased"
                   },
                   "parameters": [
                     "",
-                    "r"
+                    "Left"
                   ],
                   "subInstructions": []
                 }
@@ -891,60 +891,19 @@
           ],
           "events": [
             {
-              "colorB": 228,
-              "colorG": 176,
-              "colorR": 74,
-              "creationTime": 0,
-              "disabled": true,
-              "folded": true,
-              "name": "Delete old grid",
-              "source": "",
-              "type": "BuiltinCommonInstructions::Group",
-              "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "colour",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "colour",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "tile",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "tile",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": []
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Delete old grid",
+              "comment2": ""
             },
             {
               "disabled": false,
@@ -983,14 +942,14 @@
               "colorR": 74,
               "creationTime": 0,
               "disabled": false,
-              "folded": true,
+              "folded": false,
               "name": "Draw the grid",
               "source": "",
               "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
                   "disabled": false,
-                  "folded": true,
+                  "folded": false,
                   "infiniteLoopWarning": true,
                   "type": "BuiltinCommonInstructions::While",
                   "whileConditions": [
@@ -1080,7 +1039,7 @@
                     },
                     {
                       "disabled": false,
-                      "folded": true,
+                      "folded": false,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -1185,7 +1144,7 @@
               "colorR": 74,
               "creationTime": 0,
               "disabled": false,
-              "folded": true,
+              "folded": false,
               "name": "Colour the grid",
               "source": "",
               "type": "BuiltinCommonInstructions::Group",

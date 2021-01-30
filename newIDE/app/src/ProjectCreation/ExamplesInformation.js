@@ -3526,7 +3526,40 @@ module.exports = {
   },
   "procedural-generation": {
     "description": "An example showing how to create a simple top down procedural generation system.\r\n",
-    "usedExtensions": []
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      }
+    ]
   },
   "racing-game": {
     "description": "A top-down racing game made using the Physics engine.",

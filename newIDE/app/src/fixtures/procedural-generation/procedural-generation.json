@@ -17,7 +17,7 @@
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Procedural Generation Project",
-    "author": "add_",
+    "author": "Add00",
     "windowWidth": 800,
     "windowHeight": 600,
     "latestCompilationDirectory": "",
@@ -99,7 +99,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "black.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/black.png",
         "kind": "image",
         "metadata": "",
         "name": "black.png",
@@ -108,7 +108,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "blue.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/blue.png",
         "kind": "image",
         "metadata": "",
         "name": "blue.png",
@@ -117,7 +117,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "yellow.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/yellow.png",
         "kind": "image",
         "metadata": "",
         "name": "yellow.png",
@@ -126,7 +126,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "green.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/green.png",
         "kind": "image",
         "metadata": "",
         "name": "green.png",
@@ -135,7 +135,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "grey.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/grey.png",
         "kind": "image",
         "metadata": "",
         "name": "grey.png",
@@ -144,7 +144,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "transparent.png",
+        "file": "https://resources.gdevelop-app.com/examples/procedural-generation/transparent.png",
         "kind": "image",
         "metadata": "",
         "name": "transparent.png",

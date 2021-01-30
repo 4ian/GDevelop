@@ -3,13 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
 
 #include <iostream>
 #include <vector>
 
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
+#include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/ImageManager.h"

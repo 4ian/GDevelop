@@ -21,11 +21,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -42,7 +42,7 @@ module.exports = {
     "description": "Show how to use Shape Painter objects to create a simple drawing app.",
     "usedExtensions": [
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -58,11 +58,11 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -115,7 +115,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -123,7 +123,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -148,11 +148,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -209,7 +209,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -242,7 +242,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -279,7 +279,7 @@ module.exports = {
         "name": "SystemInfo"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -295,7 +295,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -309,7 +309,7 @@ module.exports = {
     ]
   },
   "bbtext-object-demo": {
-    "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\n",
+    "description": "This shows how to change the bbcode text of a BBText object displayed on the screen.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -324,7 +324,7 @@ module.exports = {
         "name": "DraggableBehavior"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -332,7 +332,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -389,7 +389,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -413,13 +413,13 @@ module.exports = {
         "name": "BuiltinAudio"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       }
     ]
   },
   "board-walk-with-raycast": {
-    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
+    "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -442,7 +442,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -475,7 +475,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -504,7 +504,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -512,7 +512,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -532,7 +532,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -542,7 +542,7 @@ module.exports = {
     ]
   },
   "breakout": {
-    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\n",
+    "description": "The classic Breakout arcade game adapted in GDevelop. Read the tutorial about it to learn how to make a game like this.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -553,7 +553,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -577,7 +577,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -610,7 +610,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -620,7 +620,7 @@ module.exports = {
     ]
   },
   "cannon-ball-with-physics": {
-    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\n",
+    "description": "An example showing how to launch a ball from a cannon when using the Physics engine.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -643,11 +643,11 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -680,7 +680,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -709,11 +709,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -738,11 +738,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -763,11 +763,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -788,11 +788,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -842,7 +842,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -874,7 +874,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -892,7 +892,7 @@ module.exports = {
     ]
   },
   "count-down-timer": {
-    "description": "Show how to use a variable as a timer and display it on screen like a bomb count down timer.\n",
+    "description": "Show how to use a variable as a timer and display it on screen like a bomb count down timer.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -920,11 +920,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -934,7 +934,7 @@ module.exports = {
     ]
   },
   "create-random-object": {
-    "description": "Show how to create a object randomly picked in a list.\n",
+    "description": "Show how to create a object randomly picked in a list.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -945,11 +945,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -976,7 +976,7 @@ module.exports = {
     ]
   },
   "custom-mouse-pointer": {
-    "description": "Learn how to replace the mouse cursor by a custom image.\n",
+    "description": "Learn how to replace the mouse cursor by a custom image.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -991,7 +991,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1024,7 +1024,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1057,7 +1057,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1103,7 +1103,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1113,7 +1113,7 @@ module.exports = {
     ]
   },
   "dialogue-tree-with-yarn": {
-    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\n",
+    "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1160,7 +1160,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1180,7 +1180,7 @@ module.exports = {
         "name": "BuiltinAudio"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1209,7 +1209,7 @@ module.exports = {
         "name": "PanelSpriteObject"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -1233,7 +1233,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1245,7 +1245,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1278,11 +1278,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1307,7 +1307,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1315,7 +1315,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       }
     ]
@@ -1348,7 +1348,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1368,7 +1368,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       }
     ]
@@ -1381,7 +1381,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1406,7 +1406,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1414,7 +1414,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1428,7 +1428,7 @@ module.exports = {
     ]
   },
   "filesystem-create-directory": {
-    "description": "Show how to ask the user for a folder name and create it on the disk.\n",
+    "description": "Show how to ask the user for a folder name and create it on the disk.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1443,7 +1443,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1480,11 +1480,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1525,7 +1525,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1533,7 +1533,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1551,7 +1551,7 @@ module.exports = {
     ]
   },
   "flappy-bird": {
-    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\n",
+    "description": "A clone of the challenging and popular Flappy Bird game, where you control a bird which has to avoid pipes.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1574,7 +1574,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1586,7 +1586,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1620,7 +1620,7 @@ module.exports = {
     ]
   },
   "game-feel-demo": {
-    "description": "A demo showing how to enhance the \"game feel\" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...\n",
+    "description": "A demo showing how to enhance the \"game feel\" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1631,11 +1631,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1684,7 +1684,7 @@ module.exports = {
         "name": "BuiltinAudio"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1716,7 +1716,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1730,7 +1730,7 @@ module.exports = {
     ]
   },
   "geometry-monster": {
-    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n",
+    "description": "A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1745,7 +1745,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1810,7 +1810,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1834,7 +1834,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       }
     ]
@@ -1876,7 +1876,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1896,7 +1896,7 @@ module.exports = {
         "name": "Inventory"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1929,7 +1929,7 @@ module.exports = {
         "name": "TopDownMovementBehavior"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -1978,7 +1978,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -1998,7 +1998,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2035,11 +2035,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2068,7 +2068,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2076,7 +2076,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2094,7 +2094,7 @@ module.exports = {
     ]
   },
   "level-editor": {
-    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
+    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2105,11 +2105,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2121,7 +2121,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -2155,7 +2155,7 @@ module.exports = {
     ]
   },
   "level-selection-unlock": {
-    "description": "Show how to save user progress and progressively unlock levels.\n",
+    "description": "Show how to save user progress and progressively unlock levels.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2174,11 +2174,11 @@ module.exports = {
         "name": "BuiltinFile"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2188,7 +2188,7 @@ module.exports = {
     ]
   },
   "lights": {
-    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\n",
+    "description": "Example showing the usage of multiple light objects, setting other objects as light obstacles and using a slight blur effect to soften shadows.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2228,7 +2228,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2236,7 +2236,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2286,11 +2286,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2300,7 +2300,7 @@ module.exports = {
     ]
   },
   "menu-with-functions-and-text-effects": {
-    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\n",
+    "description": "How to implement the same menu across multiple scenes using functions and text effects for hover/active states.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2340,7 +2340,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2354,7 +2354,7 @@ module.exports = {
     ]
   },
   "move-object-back-and-forth": {
-    "description": "Use events to move objects back and forth vertically or horizontally.\n",
+    "description": "Use events to move objects back and forth vertically or horizontally.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2373,7 +2373,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       }
     ]
@@ -2415,11 +2415,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2444,7 +2444,7 @@ module.exports = {
         "name": "Physics2"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2473,11 +2473,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2487,7 +2487,7 @@ module.exports = {
     ]
   },
   "multi-language-menu": {
-    "description": "Show how to translate a menu (titles, buttons) in multiple languages and add an option for the player to choose the language.\n",
+    "description": "Show how to translate a menu (titles, buttons) in multiple languages and add an option for the player to choose the language.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -2506,7 +2506,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2514,13 +2514,13 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       }
     ]
   },
   "multiplayer-platformer-with-gamepads": {
-    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\n",
+    "description": "Example showing how to use the Gamepads extension to read the state of gamepads (or controllers), for 2 players.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2551,7 +2551,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2571,7 +2571,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2596,7 +2596,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2621,7 +2621,7 @@ module.exports = {
         "name": "Physics2"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2646,11 +2646,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2683,11 +2683,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       }
     ]
@@ -2700,11 +2700,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2737,7 +2737,7 @@ module.exports = {
         "name": "P2P"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2745,12 +2745,12 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
       },
       {
         "fullName": "",
@@ -2763,7 +2763,7 @@ module.exports = {
     ]
   },
   "pairs": {
-    "description": "Find all matching pairs of cards in this relaxing game. Use tweens to create smooth, natural animations with a few events.\n",
+    "description": "Find all matching pairs of cards in this relaxing game. Use tweens to create smooth, natural animations with a few events.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2778,7 +2778,7 @@ module.exports = {
         "name": "ParticleSystem"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -2794,7 +2794,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2802,7 +2802,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2885,7 +2885,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -2893,7 +2893,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -2924,7 +2924,7 @@ module.exports = {
     ]
   },
   "particle-effects-demo": {
-    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\n",
+    "description": "A demo of various high quality particle effects (fire, magic, snow, rune spell...) that you can try and use in your game.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -2943,7 +2943,7 @@ module.exports = {
         "name": "DraggableBehavior"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -2955,11 +2955,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3030,11 +3030,11 @@ module.exports = {
         "name": "PathfindingBehavior"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3067,11 +3067,11 @@ module.exports = {
         "name": "DraggableBehavior"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3100,11 +3100,11 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3121,7 +3121,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -3137,11 +3137,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3170,7 +3170,7 @@ module.exports = {
         "name": "Physics2"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3182,7 +3182,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -3190,7 +3190,7 @@ module.exports = {
         "name": ""
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3306,7 +3306,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3335,7 +3335,7 @@ module.exports = {
         "name": "PlatformBehavior"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -3351,7 +3351,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3379,7 +3379,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       }
     ]
@@ -3416,7 +3416,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3436,7 +3436,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3446,7 +3446,7 @@ module.exports = {
     ]
   },
   "platformer-with-tilemap": {
-    "description": "Shows how to create a platformer game with a Tilemap object for designing the level, and invisible objects to mark platforms and ladders.\n",
+    "description": "Shows how to create a platformer game with a Tilemap object for designing the level, and invisible objects to mark platforms and ladders.\r\n",
     "usedExtensions": [
       {
         "fullName": "Tilemap",
@@ -3507,11 +3507,11 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3521,6 +3521,43 @@ module.exports = {
       {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "procedural-generation": {
+    "description": "An example showing how to create a simple top down procedural generation system.\r\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },
@@ -3593,7 +3630,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3605,7 +3642,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3675,7 +3712,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3709,11 +3746,11 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3755,7 +3792,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3800,7 +3837,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3841,7 +3878,7 @@ module.exports = {
         "name": "DraggableBehavior"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3853,7 +3890,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3882,11 +3919,11 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3915,7 +3952,7 @@ module.exports = {
         "name": "DestroyOutsideBehavior"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -3968,11 +4005,11 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -3993,7 +4030,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -4054,7 +4091,7 @@ module.exports = {
         "name": "BuiltinTime"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4066,7 +4103,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4084,7 +4121,7 @@ module.exports = {
     ]
   },
   "space-shooter": {
-    "description": "A beautiful, retro side-scrolling shooter where you must defeat incoming enemies with your mecha transforming spaceship. Huge boss included!\n",
+    "description": "A beautiful, retro side-scrolling shooter where you must defeat incoming enemies with your mecha transforming spaceship. Huge boss included!\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -4123,7 +4160,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4183,7 +4220,7 @@ module.exports = {
     ]
   },
   "tabbed-menu-with-layers": {
-    "description": "Example showing how to create a menu with multiple tabs.\n",
+    "description": "Example showing how to create a menu with multiple tabs.\r\n",
     "usedExtensions": [
       {
         "fullName": "Text object",
@@ -4198,11 +4235,11 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4210,7 +4247,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4247,7 +4284,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4261,7 +4298,7 @@ module.exports = {
     ]
   },
   "tetris-demo": {
-    "description": "A complete demo of a Tetris game, with all the concepts of modern Tetris such as SRS (Super Rotation System) and ghost piece, with high scores, music, sound effects.\n",
+    "description": "A complete demo of a Tetris game, with all the concepts of modern Tetris such as SRS (Super Rotation System) and ghost piece, with high scores, music, sound effects.\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -4292,11 +4329,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4381,7 +4418,7 @@ module.exports = {
     ]
   },
   "tilemaps-made-with-tiled-editor": {
-    "description": "Shows different examples of Tilemaps made with the Tiled editor (that can be downloaded on mapeditor.org), including some with animations.\n",
+    "description": "Shows different examples of Tilemaps made with the Tiled editor (that can be downloaded on mapeditor.org), including some with animations.\r\n",
     "usedExtensions": [
       {
         "fullName": "Tilemap",
@@ -4408,12 +4445,16 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Features for all objects",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },
@@ -4433,7 +4474,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4441,7 +4482,7 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4462,7 +4503,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -4483,7 +4524,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -4507,11 +4548,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       }
     ]
@@ -4532,7 +4573,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
@@ -4540,7 +4581,7 @@ module.exports = {
         "name": "BuiltinKeyboard"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4554,7 +4595,7 @@ module.exports = {
     ]
   },
   "unlock-items": {
-    "description": "Show how to save the items unlocked by the user and load them later (when the game is launched again for example, or when starting a saved game).\n",
+    "description": "Show how to save the items unlocked by the user and load them later (when the game is launched again for example, or when starting a saved game).\r\n",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -4569,7 +4610,7 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4602,7 +4643,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Tween animation",
+        "fullName": "Tweening",
         "name": "Tween"
       },
       {
@@ -4610,11 +4651,11 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4663,11 +4704,11 @@ module.exports = {
         "name": "BuiltinScene"
       },
       {
-        "fullName": "Standard events",
+        "fullName": "Builtin events",
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {
@@ -4688,7 +4729,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Primitive drawing",
+        "fullName": "Shape painter",
         "name": "PrimitiveDrawing"
       },
       {
@@ -4708,7 +4749,7 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Mouse features",
+        "fullName": "Mouse and touch",
         "name": "BuiltinMouse"
       },
       {

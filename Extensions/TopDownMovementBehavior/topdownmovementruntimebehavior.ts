@@ -314,8 +314,7 @@ namespace gdjs {
         // Top-down pointview
         object.setX(object.getX() + this._xVelocity * timeDelta);
         object.setY(object.getY() + this._yVelocity * timeDelta);
-      }
-      else {
+      } else {
         // Isometry pointview
         const point = this._temporaryPointForTransformations;
         point[0] = this._xVelocity * timeDelta;
@@ -389,8 +388,10 @@ namespace gdjs {
      */
     constructor(angle: float) {
       if (angle <= 0 || angle >= Math.PI / 4)
-        throw new RangeError("An isometry angle must be in ]0; pi/4] but was: " + angle);
-      
+        throw new RangeError(
+          'An isometry angle must be in ]0; pi/4] but was: ' + angle
+        );
+
       const alpha = Math.asin(Math.tan(angle));
       const sinA = Math.sin(alpha);
       const cosB = Math.cos(Math.PI / 4);

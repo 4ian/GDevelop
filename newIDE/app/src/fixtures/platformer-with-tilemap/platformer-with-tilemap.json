@@ -525,22 +525,6 @@
       ],
       "objects": [
         {
-          "name": "PlatformerMap",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "my platformer map.json",
-            "tilesetJsonFile": "",
-            "tilemapAtlasImage": "cavesofgallet_tiles.png",
-            "displayMode": "visible",
-            "layerIndex": 0,
-            "animationSpeedScale": 1,
-            "animationFps": 4
-          }
-        },
-        {
           "name": "Platform",
           "tags": "",
           "type": "Sprite",

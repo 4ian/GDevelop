@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectUuid": "661042d5-e005-4302-b16a-65d70b3331ad",
+    "projectUuid": "17bfc3f5-2980-4855-9be7-785608a3fa24",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -2295,7 +2295,7 @@
               "parameters": [
                 "Shapes",
                 "=",
-                "RandomInRange(0.8, 1.6)"
+                "RandomFloatInRange(0.8, 1.6)"
               ],
               "subInstructions": []
             },

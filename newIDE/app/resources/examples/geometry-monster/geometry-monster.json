@@ -2295,7 +2295,7 @@
               "parameters": [
                 "Shapes",
                 "=",
-                "RandomInRange(0.8, 1.6)"
+                "RandomFloatInRange(0.8, 1.6)"
               ],
               "subInstructions": []
             },

@@ -469,36 +469,6 @@
       ],
       "objects": [
         {
-          "name": "AnotherIslandMap",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "anotherIsland.json",
-            "tilemapAtlasImage": "islandTilesetAtlas.png",
-            "displayMode": "visible",
-            "layerIndex": "0",
-            "animationSpeedScale": "1",
-            "animationFps": "4"
-          }
-        },
-        {
-          "name": "IslandMap",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "island.json",
-            "tilemapAtlasImage": "islandTilesetAtlas.png",
-            "displayMode": "visible",
-            "layerIndex": 0,
-            "animationSpeedScale": 1,
-            "animationFps": 4
-          }
-        },
-        {
           "bold": false,
           "italic": false,
           "name": "About",
@@ -692,22 +662,6 @@
           }
         },
         {
-          "name": "MapWithSpacingAndCompressedData",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "desert\\desert-noTilesetEmbeded.json",
-            "tilesetJsonFile": "desert\\desert-externalTilesetFile.json",
-            "tilemapAtlasImage": "desert\\tmw_desert_spacing.png",
-            "displayMode": "visible",
-            "layerIndex": "0",
-            "animationSpeedScale": 1,
-            "animationFps": 4
-          }
-        },
-        {
           "bold": false,
           "italic": false,
           "name": "AboutAtlas",
@@ -724,22 +678,6 @@
             "b": 255,
             "g": 255,
             "r": 255
-          }
-        },
-        {
-          "name": "PlatformerMapWithRotatedTiles",
-          "tags": "",
-          "type": "TileMap::TileMap",
-          "variables": [],
-          "behaviors": [],
-          "content": {
-            "tilemapJsonFile": "Typical_2d_platformer.json",
-            "tilesetJsonFile": "",
-            "tilemapAtlasImage": "SunnyLand_by_Ansimuz-extended.png",
-            "displayMode": "visible",
-            "layerIndex": 0,
-            "animationSpeedScale": 1,
-            "animationFps": 4
           }
         },
         {

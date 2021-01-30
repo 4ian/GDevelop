@@ -1,4 +1,4 @@
-This folder contains sources to embed Yarn editor (https://github.com/InfiniteAmmoInc/Yarn) so that it can
+This folder contains sources to embed Yarn editor (https://github.com/YarnSpinnerTool/YarnEditor) so that it can
 be used directly from GDevelop to edit/create Dialogue Trees.
 
 Yarn sources are downloaded by `import-zipped-editor.js` script. They are raw, unchanged sources

@@ -96,20 +96,17 @@ double Variable::GetValue() const {
   return 0.0;
 }
 
-const gd::String& Variable::GetString() const {
+gd::String Variable::GetString() const {
   if (type == Type::String) {
     return str;
   } else if (type == Type::Number) {
-    str = gd::String::From(value);
-    return str;
+    return gd::String::From(value);
   } else if (type == Type::Boolean) {
-    str = boolVal ? "1" : "0";
-    return str;
+    return boolVal ? "1" : "0";
   }
 
   // It isn't possible to convert a non-primitive type to a string
-  str = "0";
-  return str;
+  return "0";
 }
 
 bool Variable::GetBool() const {

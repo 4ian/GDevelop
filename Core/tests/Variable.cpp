@@ -35,14 +35,14 @@ TEST_CASE("Variable", "[common][variables]") {
   SECTION("Conversions") {
     gd::Variable variable;
     variable.SetValue(50);
-    REQUIRE(variable.GetString() == "50");  // Used as a string...
-    REQUIRE(variable.GetType() ==
-            gd::Variable::Type::String);  //...so consider as a string
+    variable.CastTo(gd::Variable::Type::String);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
+    REQUIRE(variable.GetString() == "50");
 
     variable.SetString("MyString");
-    REQUIRE(variable.GetValue() == 0);  // Used as a number...
-    REQUIRE(variable.GetType() ==
-            gd::Variable::Type::Number);  //...so consider as a number
+    variable.CastTo(gd::Variable::Type::Number);
+    REQUIRE(variable.GetType() == gd::Variable::Type::Number);
+    REQUIRE(variable.GetValue() == 0);
   }
   SECTION("Use with int and string like semantics") {
     gd::Variable variable;

@@ -76,7 +76,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Return the content of the variable, considered as a string.
    */
-  const gd::String& GetString() const;
+  gd::String GetString() const;
 
   /**
    * \brief Change the content of the variable, considered as a string.
@@ -148,6 +148,13 @@ class GD_CORE_API Variable {
 
   bool operator==(const gd::String& val) const { return GetString() == val; };
   bool operator!=(const gd::String& val) const { return GetString() != val; };
+
+  // Avoid ambiguous operators
+  void operator=(const char* val) { SetString(val); };
+  void operator+=(const char* val) { SetString(GetString() + val); }
+
+  bool operator==(const char* val) const { return GetString() == val; };
+  bool operator!=(const char* val) const { return GetString() != val; };
 
   // Operators are overloaded to allow accessing to variable using a simple
   // bool-like semantic.
@@ -322,7 +329,8 @@ class GD_CORE_API Variable {
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.
   mutable std::vector<std::shared_ptr<Variable>>
-      childrenArray;  ///< Children, when the variable is considered as an array.
+      childrenArray;  ///< Children, when the variable is considered as an
+                      ///< array.
 
   /**
    * Initialize children by copying them from another variable.  Used by

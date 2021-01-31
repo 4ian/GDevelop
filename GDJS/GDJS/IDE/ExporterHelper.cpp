@@ -58,18 +58,6 @@ std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
   return values;
 };
 
-bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
-                                   const std::set<gd::String> &set) {
-  bool missingKey = false;
-  for (auto &key : set) {
-    if (map.find(key) == map.end()) {
-      missingKey = true;
-    }
-  }
-
-  return missingKey;
-}
-
 }  // namespace
 
 namespace gdjs {
@@ -318,10 +306,10 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
         plugin += "\t</plugin>";
 
-        // Don't include the plugin if an extra setting was not fulfilled.
-        bool missingSetting = AreMapKeysMissingElementOfSet(
-            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
-        if (!missingSetting) plugins += plugin;
+        // Don't include the plugin if no extra setting was fulfilled.
+        bool hasExtraSettings = !extraSettingValues.empty();
+        if (!dependency.IsOnlyIfSomeExtraSettingsNonEmpty() || hasExtraSettings)
+          plugins += plugin;
       }
     }
   }

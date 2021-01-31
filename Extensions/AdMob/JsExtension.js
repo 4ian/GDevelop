@@ -57,12 +57,11 @@ module.exports = {
           'ExtensionProperty'
         )
       )
-      .onlyIfExtraSettingIsNonEmpty('APP_ID_ANDROID') // TODO
       .setExtraSetting(
         'APP_ID_IOS',
         new gd.PropertyDescriptor('AdMobAppIdIos').setType('ExtensionProperty')
       )
-      .onlyIfExtraSettingIsNonEmpty('APP_ID_IOS'); // TODO
+      .onlyIfSomeExtraSettingsNonEmpty();
 
     extension
       .addDependency()

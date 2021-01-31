@@ -20,6 +20,14 @@ namespace gd {
 class GD_CORE_API DependencyMetadata {
  public:
   /**
+   * Construct a new dependency metadata, though you probably want to call
+   * `AddDependency` on gd::PlatformExtension.
+   *
+   * \see gd::PlatformExtension
+   */
+  DependencyMetadata() : onlyIfSomeExtraSettingsNonEmpty(false){};
+
+  /**
    * \brief Sets the name shown to users.
    */
   DependencyMetadata& SetName(const gd::String& name_) {
@@ -77,24 +85,20 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Mark the dependency to be included in the export only if the
-   * specified setting is not empty.
-   *
-   * If this is called for multiple settings, all settings must be fulfilled for
-   * the dependency to be exported.
+   * \brief Mark the dependency to be included in the export only if at least
+   * one of the extra settings is set.
    */
-  DependencyMetadata& OnlyIfExtraSettingIsNonEmpty(
-      const gd::String& settingName) {
-    nonEmptyExtraSettingsForExport.insert(settingName);
+  DependencyMetadata& OnlyIfSomeExtraSettingsNonEmpty() {
+    onlyIfSomeExtraSettingsNonEmpty = true;
     return *this;
   };
 
   /**
-   * \brief Get the list of extra settings that must be fulfilled for the
-   * dependency to be exported.
+   * \brief Check if at least one of the extra settings must be set for the
+   * dependency to be included in the export.
    */
-  const std::set<gd::String>& GetRequiredExtraSettingsForExport() const {
-    return nonEmptyExtraSettingsForExport;
+  bool IsOnlyIfSomeExtraSettingsNonEmpty() const {
+    return onlyIfSomeExtraSettingsNonEmpty;
   };
 
   const gd::String& GetName() const { return name; };
@@ -120,10 +124,9 @@ class GD_CORE_API DependencyMetadata {
   std::map<gd::String, gd::PropertyDescriptor>
       extraData;  ///< Contains dependency type specific additional parameters
                   ///< for the dependency.
-  std::set<gd::String>
-      nonEmptyExtraSettingsForExport;  ///< The set of extra settings that must
-                                       ///< be non empty for this dependency to
-                                       ///< be included by the exporter.
+  bool onlyIfSomeExtraSettingsNonEmpty;  ///< If true, only use this dependency
+                                         ///< if at least one of the extra
+                                         ///< settings is set.
 };
 }  // namespace gd
 #endif  // DEPENDENCYMETADATA_H

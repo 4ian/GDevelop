@@ -25,13 +25,17 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'AdMob',
-      _('AdMob'),
-      _('Allow to display AdMob banners, interstitials and reward video ads.'),
-      'Florian Rival',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'AdMob',
+        _('AdMob'),
+        _(
+          'Allow to display AdMob banners, interstitials and reward video ads.'
+        ),
+        'Florian Rival',
+        'MIT'
+      )
+      .setExtensionHelpPath('/all-features/admob');
 
     extension
       .registerProperty('AdMobAppIdAndroid')

@@ -76,7 +76,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Return the content of the variable, considered as a string.
    */
-  gd::String GetString() const;
+  const gd::String& GetString() const;
 
   /**
    * \brief Change the content of the variable, considered as a string.

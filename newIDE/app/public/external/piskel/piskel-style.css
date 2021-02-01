@@ -7,11 +7,12 @@ body {
   font-family: Helvetica;
   margin: 0;
   overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 #piskel-frame {
-  width: 100%;
-  height: 100%;
+  flex: 1;
   border: none;
   overflow-y: hidden;
 }

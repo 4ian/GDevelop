@@ -64,22 +64,26 @@ void Variable::CastTo(const Type newType) {
   else if (newType == Type::Structure) {
     children.clear();
 
-    // Conversion is only possible for non prmitive types
+    // Conversion is only possible for non primitive types
     if (type == Type::Array)
       for (auto i = childrenArray.begin(); i != childrenArray.end(); ++i)
         children.insert(
             std::make_pair(gd::String::From(i - childrenArray.begin()), (*i)));
 
     type = Type::Structure;
+    // Free now unused memory
+    childrenArray.clear();
   } else if (newType == Type::Array) {
     childrenArray.clear();
 
-    // Conversion is only possible for non prmitive types
+    // Conversion is only possible for non primitive types
     if (type == Type::Structure)
       for (auto i = children.begin(); i != children.end(); ++i)
         childrenArray.push_back((*i).second);
 
     type = Type::Array;
+    // Free now unused memory
+    children.clear();
   }
 }
 
@@ -111,7 +115,7 @@ bool Variable::GetBool() const {
   if (type == Type::Boolean) {
     return boolVal;
   } else if (type == Type::String) {
-    return !str.empty() && str != "0" && str != "false";
+    return !str.empty();
   } else if (type == Type::Number) {
     return value != 0;
   }

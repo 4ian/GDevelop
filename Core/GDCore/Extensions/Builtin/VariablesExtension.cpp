@@ -184,9 +184,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ToggleSceneVariableAsBoolean",
                  _("Toggle boolean value of a scene variable"),
-                 _("Toggle the boolean value of a scene variable.\n"
-                   "If it was true, it will become false, and if it was false "
-                   "it will become true."),
+                 _("Toggle the boolean value of a scene variable.") + "\n" +
+                     _("If it was true, it will become false, and if it was "
+                       "false it will become true."),
                  _("Toggle the boolean value of scene variable _PARAM0_"),
                  _("Variables"),
                  "res/conditions/var24.png",
@@ -232,9 +232,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ToggleGlobalVariableAsBoolean",
                  _("Toggle boolean value of a global variable"),
-                 _("Toggle the boolean value of a global variable.\n"
-                   "If it was true, it will become false, and if it was false "
-                   "it will become true."),
+                 _("Toggle the boolean value of a global variable.") + "\n" +
+                     _("If it was true, it will become false, and if it was "
+                       "false it will become true."),
                  _("Toggle the boolean value of global variable _PARAM0_"),
                  _("Variables/Global variables"),
                  "res/conditions/var24.png",
@@ -289,57 +289,57 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("SceneVariablePush",
-                 _("Push variable on a scene array"),
+                 _("Append variable to a scene array"),
                  _("Appends a variable at the end of a scene array variable."),
                  _("Append variable _PARAM0_ to array variable _PARAM1_"),
                  _("Variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to push"))
+      .AddParameter("scenevar", _("Variable to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePushString",
-                 _("Push a string on a scene array"),
+                 _("Append a string to a scene array"),
                  _("Appends a string at the end of a scene array variable."),
                  _("Append string _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("string", _("String to push"))
+      .AddParameter("string", _("String to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePushNumber",
-                 _("Push a number on a scene array"),
+                 _("Append a number to a scene array"),
                  _("Appends a number at the end of a scene array variable."),
                  _("Append number _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("expression", _("Number to push"))
+      .AddParameter("expression", _("Number to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePushBool",
-                 _("Push a boolean on a scene array"),
+                 _("Append a boolean to a scene array"),
                  _("Appends a boolean at the end of a scene array variable."),
                  _("Append boolean _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to push"))
+      .AddParameter("trueorfalse", _("Boolean to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction(
           "SceneVariableRemoveAt",
-          _("Remove index of scene array"),
-          _("Removes a variable at an index of a scene array variable."),
+          _("Remove variable from a scene array (by index)"),
+          _("Removes a variable at the specified index of a scene array variable."),
           _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
           _("Variables/Collections/Arrays"),
           "res/actions/var24.png",
@@ -350,21 +350,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("GlobalVariablePush",
-                 _("Push variable on a global array"),
+                 _("Append variable to a global array"),
                  _("Appends a variable at the end of a global array variable."),
                  _("Append variable _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Global variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to push"))
+      .AddParameter("scenevar", _("Variable to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction(
           "GlobalVariableRemoveAt",
-          _("Remove index of global array"),
-          _("Removes a variable at an index of a global array variable."),
+          _("Remove variable from a global array (by index)"),
+          _("Removes a variable at the specified index of a global array variable."),
           _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
           _("Variables/Global variables/Collections/Arrays"),
           "res/actions/var24.png",
@@ -375,38 +375,38 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("GlobalVariablePushString",
-                 _("Push a string on a global array"),
+                 _("Append a string to a global array"),
                  _("Appends a string at the end of a global array variable."),
                  _("Append string _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Global variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("string", _("String to push"))
+      .AddParameter("string", _("String to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariablePushNumber",
-                 _("Push a number on a global array"),
+                 _("Append a number to a global array"),
                  _("Appends a number at the end of a global array variable."),
                  _("Append number _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Global variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("expression", _("Number to push"))
+      .AddParameter("expression", _("Number to append"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariablePushBool",
-                 _("Push a boolean on a global array"),
+                 _("Append a boolean to a global array"),
                  _("Appends a boolean at the end of a global array variable."),
                  _("Append boolean _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Global variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to push"))
+      .AddParameter("trueorfalse", _("Boolean to append"))
       .MarkAsAdvanced();
 
   extension

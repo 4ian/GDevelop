@@ -320,16 +320,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"));
 
-  obj.AddAction("ToggleObjectVariableAsBoolean",
-                _("Toggle the boolean value of a variable of an object"),
-                _("Toggles the boolean value of a variable of an object.\n"
-                  "If it was true, it will become false, and if it was false "
-                  "it will become true."),
-                _("Toggle the boolean value of the variable _PARAM1_ of object "
-                  "_PARAM0_"),
-                _("Variables"),
-                "res/actions/var24.png",
-                "res/actions/var.png")
+  obj.AddAction(
+         "ToggleObjectVariableAsBoolean",
+         _("Toggle the boolean value of a variable of an object"),
+         _("Toggles the boolean value of a variable of an object.") + "\n" +
+             _("If it was true, it will become false, and if it was false "
+               "it will become true."),
+         _("Toggle the boolean value of the variable _PARAM1_ of object "
+           "_PARAM0_"),
+         _("Variables"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"));
@@ -536,59 +537,63 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Variable"))
       .SetHidden();
 
-  obj.AddAction("ObjectVariablePush",
-                _("Push variable on an object array"),
-                _("Appends a variable at the end of a object array variable."),
-                _("Append variable _PARAM2_ to array variable _PARAM1_ of "
-                  "object _PARAM0_"),
-                _("Variables/Collections/Arrays"),
-                "res/actions/var24.png",
-                "res/actions/var.png")
+  obj.AddAction(
+         "ObjectVariablePush",
+         _("Append variable to an object array"),
+         _("Appends a variable to the end of an object array variable."),
+         _("Append variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Collections/Arrays"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to push"))
+      .AddParameter("scenevar", _("Variable to append"))
       .MarkAsAdvanced();
 
-  obj.AddAction("ObjectVariablePushString",
-                _("Push a string on an object array"),
-                _("Appends a string at the end of an object array variable."),
-                _("Append string _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Collections/Arrays"),
-                "res/actions/var24.png",
-                "res/actions/var.png")
+  obj.AddAction(
+         "ObjectVariablePushString",
+         _("Append a string to an object array"),
+         _("Appends a string to the end of an object array variable."),
+         _("Append string _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Collections/Arrays"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("string", _("String to push"))
+      .AddParameter("string", _("String to append"))
       .MarkAsAdvanced();
 
-  obj.AddAction("ObjectVariablePushNumber",
-                _("Push a number on an object array"),
-                _("Appends a number at the end of an object array variable."),
-                _("Append number _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Collections/Arrays"),
-                "res/actions/var24.png",
-                "res/actions/var.png")
+  obj.AddAction(
+         "ObjectVariablePushNumber",
+         _("Append a number to an object array"),
+         _("Appends a number to the end of an object array variable."),
+         _("Append number _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Collections/Arrays"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("expression", _("Number to push"))
+      .AddParameter("expression", _("Number to append"))
       .MarkAsAdvanced();
 
-  obj.AddAction("ObjectVariablePushBool",
-                _("Push a boolean on an object array"),
-                _("Appends a boolean at the end of an object array variable."),
-                _("Append boolean _PARAM1_ to array variable _PARAM0_"),
-                _("Variables/Collections/Arrays"),
-                "res/actions/var24.png",
-                "res/actions/var.png")
+  obj.AddAction(
+         "ObjectVariablePushBool",
+         _("Append a boolean to an object array"),
+         _("Appends a boolean to the end of an object array variable."),
+         _("Append boolean _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Collections/Arrays"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to push"))
+      .AddParameter("trueorfalse", _("Boolean to append"))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "ObjectVariableRemoveAt",
-         _("Remove index of object array"),
-         _("Removes a variable at an index of an object array variable."),
+         _("Remove variable from an object array (by index)"),
+         _("Removes a variable at the specified index of an object array "
+           "variable."),
          _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
            "object _PARAM0_"),
          _("Variables/Collections/Arrays"),

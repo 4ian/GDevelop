@@ -457,7 +457,7 @@ namespace gdjs {
     }
 
     /**
-     * Pushes a copy of a variable onto the array.
+     * Pushes a copy of a variable into the array.
      */
     pushVariableCopy(variable: gdjs.Variable) {
       this.castTo('array');
@@ -465,7 +465,7 @@ namespace gdjs {
     }
 
     /**
-     * Pushes a value onto the array.
+     * Pushes a value into the array.
      */
     pushValue(value: string | float | boolean) {
       this.castTo('array');

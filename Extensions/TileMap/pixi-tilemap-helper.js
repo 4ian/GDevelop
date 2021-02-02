@@ -338,7 +338,7 @@
     pixiTileMap.clear();
 
     genericTileMapData.layers.forEach(function (layer, index) {
-      if (displayMode === 'index' && layerIndex !== index) return;
+      if (displayMode === 'index' && layerIndex != index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
       if (layer.type === 'objectgroup') {

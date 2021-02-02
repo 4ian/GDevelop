@@ -12,7 +12,7 @@ namespace gdjs {
     _tilesetJsonFile: string;
     _tilemapAtlasImage: string;
     _displayMode: string;
-    _layerIndex: number;
+    _layerIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
     _renderer: any;

@@ -45,6 +45,8 @@ module.exports = {
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
+        else if (typeof objectContent[propertyName] === 'number')
+          objectContent[propertyName] = parseFloat(newValue);
         else objectContent[propertyName] = newValue;
         return true;
       }

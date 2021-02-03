@@ -31,6 +31,8 @@ describe('gdjs.InputManager', function() {
     expect(inputManager.wasKeyReleased(33)).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(false);
     expect(inputManager.anyKeyReleased()).to.be(true);
+    inputManager.onFrameEnded();
+    
     // Pressed Right shift
     inputManager.onKeyPressed(16, 2);
     expect(inputManager.anyKeyPressed()).to.be(true);

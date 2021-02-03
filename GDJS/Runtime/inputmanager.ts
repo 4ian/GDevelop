@@ -126,7 +126,7 @@ namespace gdjs {
      * Return true if the key corresponding to the location-aware keyCode was released during the last frame.
      * @param locationAwareKeyCode The location-aware key code to be tested.
      */
-    wasKeyReleased(locationAwareKeyCode: string|number) {
+    wasKeyReleased(locationAwareKeyCode: number) {
       return (
         this._releasedKeys.containsKey(locationAwareKeyCode) &&
         this._releasedKeys.get(locationAwareKeyCode)

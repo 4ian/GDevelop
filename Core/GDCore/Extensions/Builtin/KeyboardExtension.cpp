@@ -84,7 +84,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
 
  extension
       .AddCondition("AnyKeyReleased",
-                    _("Any key Released"),
+                    _("Any key released"),
                     _("Test if any key is released"),
                     _("Any key is released"),
                     _("Keyboard"),

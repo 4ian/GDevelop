@@ -147,6 +147,20 @@ namespace gdjs {
       }
       return false;
     }
+    /**
+     * Return true if any key is released.
+     * @return true if any key is released.
+     */
+    anyKeyReleased(): boolean {
+      for (const keyCode in this._releasedKeys.items) {
+        if (this._releasedKeys.items.hasOwnProperty(keyCode)) {
+          if (this._releasedKeys.items[keyCode]) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 
     /**
      * Should be called when the mouse is moved.

@@ -179,6 +179,9 @@ namespace gdjs {
       export const anyKeyPressed = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().anyKeyPressed();
       };
+      export const anyKeyReleased = function (runtimeScene) {
+        return runtimeScene.getGame().getInputManager().anyKeyReleased();
+      };
       export const isMouseButtonPressed = function (runtimeScene, button) {
         if (button === 'Left') {
           return runtimeScene

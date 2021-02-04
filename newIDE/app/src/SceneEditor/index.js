@@ -152,8 +152,6 @@ type State = {|
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
 
 export default class SceneEditor extends React.Component<Props, State> {
-  static contextType = PreferencesContext;
-
   static defaultProps = {
     setToolbar: () => {},
   };

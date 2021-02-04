@@ -13,28 +13,32 @@ namespace gdjs {
     _path: Array<FloatPoint> = [];
 
     //Behavior configuration:
-    _allowDiagonals: any;
-    _acceleration: any;
-    _maxSpeed: any;
-    _angularMaxSpeed: any;
-    _rotateObject: any;
-    _angleOffset: any;
-    _cellWidth: float;
-    _cellHeight: float;
-    _extraBorder: any;
+    _allowDiagonals: boolean;
+    _acceleration: float;
+    _maxSpeed: float;
+    _angularMaxSpeed: float;
+    _rotateObject: boolean;
+    _angleOffset: float;
+    _cellWidth: integer;
+    _cellHeight: integer;
+    _extraBorder: float;
 
     //Attributes used for traveling on the path:
     _pathFound: boolean = false;
-    _speed: number = 0;
-    _angularSpeed: number = 0;
-    _timeOnSegment: number = 0;
+    _speed: float = 0;
+    _angularSpeed: float = 0;
+    _timeOnSegment: float = 0;
     _totalSegmentTime: float = 0;
-    _currentSegment: number = 0;
+    _currentSegment: integer = 0;
     _reachedEnd: boolean = false;
-    _manager: any;
-    _searchContext: any;
+    _manager: PathfindingObstaclesManager;
+    _searchContext: PathfindingRuntimeBehavior.SearchContext;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
 
       //The path computed and followed by the object (Array of arrays containing x and y position)
@@ -52,9 +56,9 @@ namespace gdjs {
       this._cellHeight = behaviorData.cellHeight;
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
-      if (this._searchContext === undefined) {
-        this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext();
-      }
+      this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
+        this._manager
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -88,23 +92,23 @@ namespace gdjs {
       return true;
     }
 
-    setCellWidth(width): void {
+    setCellWidth(width: integer): void {
       this._cellWidth = width;
     }
 
-    getCellWidth(): float {
+    getCellWidth(): integer {
       return this._cellWidth;
     }
 
-    setCellHeight(height): void {
+    setCellHeight(height: integer): void {
       this._cellHeight = height;
     }
 
-    getCellHeight(): float {
+    getCellHeight(): integer {
       return this._cellHeight;
     }
 
-    setAcceleration(acceleration): void {
+    setAcceleration(acceleration: float): void {
       this._acceleration = acceleration;
     }
 
@@ -112,7 +116,7 @@ namespace gdjs {
       return this._acceleration;
     }
 
-    setMaxSpeed(maxSpeed): void {
+    setMaxSpeed(maxSpeed: float): void {
       this._maxSpeed = maxSpeed;
     }
 
@@ -120,7 +124,7 @@ namespace gdjs {
       return this._maxSpeed;
     }
 
-    setSpeed(speed): void {
+    setSpeed(speed: float): void {
       this._speed = speed;
     }
 
@@ -128,7 +132,7 @@ namespace gdjs {
       return this._speed;
     }
 
-    setAngularMaxSpeed(angularMaxSpeed): void {
+    setAngularMaxSpeed(angularMaxSpeed: float): void {
       this._angularMaxSpeed = angularMaxSpeed;
     }
 
@@ -136,7 +140,7 @@ namespace gdjs {
       return this._angularMaxSpeed;
     }
 
-    setAngleOffset(angleOffset): void {
+    setAngleOffset(angleOffset: float): void {
       this._angleOffset = angleOffset;
     }
 
@@ -152,7 +156,7 @@ namespace gdjs {
       return this._extraBorder;
     }
 
-    allowDiagonals(allow) {
+    allowDiagonals(allow: boolean) {
       this._allowDiagonals = allow;
     }
 
@@ -160,7 +164,7 @@ namespace gdjs {
       return this._allowDiagonals;
     }
 
-    setRotateObject(allow): void {
+    setRotateObject(allow: boolean): void {
       this._rotateObject = allow;
     }
 
@@ -168,14 +172,14 @@ namespace gdjs {
       return this._rotateObject;
     }
 
-    getNodeX(index): float {
+    getNodeX(index: integer): float {
       if (index < this._path.length) {
         return this._path[index][0];
       }
       return 0;
     }
 
-    getNodeY(index): float {
+    getNodeY(index: integer): float {
       if (index < this._path.length) {
         return this._path[index][1];
       }
@@ -269,7 +273,7 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(runtimeScene, x, y) {
+    moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
@@ -327,7 +331,7 @@ namespace gdjs {
       this._pathFound = false;
     }
 
-    _enterSegment(segmentNumber) {
+    _enterSegment(segmentNumber: integer) {
       if (this._path.length === 0) {
         return;
       }
@@ -348,7 +352,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       if (this._path.length === 0 || this._reachedEnd) {
         return;
       }
@@ -407,13 +411,13 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     /**
      * Compute the euclidean distance between two positions.
      * @memberof gdjs.PathfindingRuntimeBehavior
      */
-    static euclideanDistance(a, b) {
+    static euclideanDistance(a: FloatPoint, b: FloatPoint) {
       return Math.sqrt(
         (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1])
       );
@@ -423,7 +427,7 @@ namespace gdjs {
      * Compute the taxi distance between two positions.
      * @memberof gdjs.PathfindingRuntimeBehavior
      */
-    static manhattanDistance(a, b) {
+    static manhattanDistance(a: FloatPoint, b: FloatPoint) {
       return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
     }
   }
@@ -437,11 +441,11 @@ namespace gdjs {
      * Internal tool class representing a node when looking for a path
      */
     export class Node {
-      pos: any;
-      cost: number = 0;
-      smallestCost: any = -1;
-      estimateCost: any = -1;
-      parent: any = null;
+      pos: FloatPoint;
+      cost: integer = 0;
+      smallestCost: integer = -1;
+      estimateCost: integer = -1;
+      parent: Node | null = null;
       open: boolean = true;
 
       constructor(xPos: float, yPos: float) {
@@ -465,12 +469,12 @@ namespace gdjs {
      * @ignore
      */
     export class SearchContext {
-      _obstacles: any = null;
-      _finalNode: any = null;
-      _destination: any = [0, 0];
-      _start: any = [0, 0];
-      _startX: number = 0;
-      _startY: number = 0;
+      _obstacles: PathfindingObstaclesManager;
+      _finalNode: Node | null = null;
+      _destination: FloatPoint = [0, 0];
+      _start: FloatPoint = [0, 0];
+      _startX: float = 0;
+      _startY: float = 0;
       _allowDiagonals: boolean = true;
       _maxComplexityFactor: integer = 50;
       _cellWidth: float = 20;
@@ -479,24 +483,27 @@ namespace gdjs {
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
       _bottomBorder: integer = 0;
-      _distanceFunction: any;
-      _allNodes: any = [];
+      _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
+      _allNodes: Node[][] = [];
 
       //An array of array. Nodes are indexed by their x position, and then by their y position.
-      _openNodes: any = [];
-      _closeObstacles: any = [];
+      _openNodes: Node[] = [];
+      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
 
       //Used by getNodes to temporarily store obstacles near a position.
-      _nodeCache: any = [];
+      _nodeCache: Node[] = [];
 
-      constructor() {
+      constructor(obstacles: PathfindingObstaclesManager) {
+        this._obstacles = obstacles;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
 
         //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       }
 
       //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
-      setObstacles(obstacles): PathfindingRuntimeBehavior.SearchContext {
+      setObstacles(
+        obstacles: PathfindingObstaclesManager
+      ): PathfindingRuntimeBehavior.SearchContext {
         this._obstacles = obstacles;
         return this;
       }
@@ -505,7 +512,7 @@ namespace gdjs {
         return this._finalNode;
       }
 
-      allowDiagonals(allowDiagonals) {
+      allowDiagonals(allowDiagonals: boolean) {
         this._allowDiagonals = allowDiagonals;
         this._distanceFunction = allowDiagonals
           ? PathfindingRuntimeBehavior.euclideanDistance
@@ -513,17 +520,20 @@ namespace gdjs {
         return this;
       }
 
-      setStartPosition(x, y): PathfindingRuntimeBehavior.SearchContext {
+      setStartPosition(
+        x: float,
+        y: float
+      ): PathfindingRuntimeBehavior.SearchContext {
         this._startX = x;
         this._startY = y;
         return this;
       }
 
       setObjectSize(
-        leftBorder,
-        topBorder,
-        rightBorder,
-        bottomBorder
+        leftBorder: integer,
+        topBorder: integer,
+        rightBorder: integer,
+        bottomBorder: integer
       ): PathfindingRuntimeBehavior.SearchContext {
         this._leftBorder = leftBorder;
         this._rightBorder = rightBorder;
@@ -533,15 +543,15 @@ namespace gdjs {
       }
 
       setCellSize(
-        cellWidth,
-        cellHeight
+        cellWidth: float,
+        cellHeight: float
       ): PathfindingRuntimeBehavior.SearchContext {
         this._cellWidth = cellWidth;
         this._cellHeight = cellHeight;
         return this;
       }
 
-      computePathTo(targetX, targetY) {
+      computePathTo(targetX: float, targetY: float) {
         if (this._obstacles === null) {
           console.log(
             'You tried to compute a path without specifying the obstacles'
@@ -567,17 +577,15 @@ namespace gdjs {
         const maxIterationCount =
           startNode.estimateCost * this._maxComplexityFactor;
         while (this._openNodes.length !== 0) {
+          //Make sure we do not search forever.
           if (iterationCount++ > maxIterationCount) {
             return false;
           }
 
-          //Make sure we do not search forever.
-          const n =
-            //Get the most promising node...
-            this._openNodes.shift();
-          n.open = false;
-
+          //Get the most promising node...
+          const n = this._openNodes.shift()!;
           //...and flag it as explored
+          n.open = false;
 
           //Check if we reached destination?
           if (
@@ -607,14 +615,14 @@ namespace gdjs {
             }
           }
         }
-        this._allNodes = {};
+        this._allNodes = [];
       }
 
       /**
        * Insert the neighbors of the current node in the open list
        * (Only if they are not closed, and if the cost is better than the already existing smallest cost).
        */
-      _insertNeighbors(currentNode) {
+      _insertNeighbors(currentNode: Node) {
         this._addOrUpdateNode(
           currentNode.pos[0] + 1,
           currentNode.pos[1],
@@ -673,7 +681,7 @@ namespace gdjs {
        * *All* nodes should be created using this method: The cost of the node is computed thanks
        * to the objects flagged as obstacles.
        */
-      _getNode(xPos, yPos): Node {
+      _getNode(xPos: float, yPos: float): Node {
         //First check if their is a node a the specified position.
         if (this._allNodes.hasOwnProperty(xPos)) {
           if (this._allNodes[xPos].hasOwnProperty(yPos)) {
@@ -684,13 +692,12 @@ namespace gdjs {
         }
 
         //No so construct a new node (or get it from the cache)...
-        // @ts-ignore
-        let newNode: gdjs.PathfindingRuntimeBehavior.Node = null;
+        let newNode: Node;
         if (this._nodeCache.length !== 0) {
-          newNode = this._nodeCache.shift();
+          newNode = this._nodeCache.shift()!;
           newNode.reinitialize(xPos, yPos);
         } else {
-          newNode = new gdjs.PathfindingRuntimeBehavior.Node(xPos, yPos);
+          newNode = new Node(xPos, yPos);
         }
 
         //...and update its cost according to obstacles
@@ -752,7 +759,12 @@ namespace gdjs {
       /**
        * Add a node to the openNodes (only if the cost to reach it is less than the existing cost, if any).
        */
-      _addOrUpdateNode(newNodeX, newNodeY, currentNode, factor) {
+      _addOrUpdateNode(
+        newNodeX: float,
+        newNodeY: float,
+        currentNode: Node,
+        factor: float
+      ) {
         const neighbor = this._getNode(newNodeX, newNodeY);
 
         //cost < 0 means impassable obstacle

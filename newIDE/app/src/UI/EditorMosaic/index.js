@@ -48,7 +48,7 @@ const getPathOfNode = (
   mosaicNode: ?EditorMosaicNode
 ): Array<?string> => {
   let path = [];
-  const hasPath = (node: ?EditorMosaicNode) => {
+  const hasPath = node => {
     if (!node) return;
 
     if (typeof node.first === 'string') {
@@ -65,12 +65,12 @@ const getPathOfNode = (
       }
     }
 
-    if (node.first && typeof node.first !== 'string') {
+    if (typeof node.first !== 'string') {
       path.push('first');
       if (hasPath(node.first)) return true;
     }
 
-    if (node.second && typeof node.second !== 'string') {
+    if (typeof node.second !== 'string') {
       path.push('second');
       if (hasPath(node.second)) return true;
     }

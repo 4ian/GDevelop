@@ -112,7 +112,7 @@ namespace gdjs {
     _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene: RuntimeScene, behaviorData, owner: RuntimeObject) {
+    constructor(runtimeScene: gdjs.RuntimeScene, behaviorData, owner: gdjs.RuntimeObject) {
       super(runtimeScene, behaviorData, owner);
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;
@@ -138,7 +138,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //No need for update as we take care of this below.
       /*if ( this._hshgNeedUpdate ) {
           this._manager._obstaclesHSHG.update();
@@ -174,7 +174,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene: RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     getAABB() {
       return this.owner.getAABB();

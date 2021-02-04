@@ -34,7 +34,7 @@ namespace gdjs {
     _manager: PathfindingObstaclesManager;
     _searchContext: PathfindingRuntimeBehavior.SearchContext;
 
-    constructor(runtimeScene: RuntimeScene, behaviorData, owner: RuntimeObject) {
+    constructor(runtimeScene: gdjs.RuntimeScene, behaviorData, owner: gdjs.RuntimeObject) {
       super(runtimeScene, behaviorData, owner);
 
       //The path computed and followed by the object (Array of arrays containing x and y position)
@@ -267,7 +267,7 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(runtimeScene: RuntimeScene, x: float, y: float) {
+    moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
@@ -346,7 +346,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       if (this._path.length === 0 || this._reachedEnd) {
         return;
       }
@@ -405,7 +405,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene: RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     /**
      * Compute the euclidean distance between two positions.
@@ -477,7 +477,7 @@ namespace gdjs {
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
       _bottomBorder: integer = 0;
-      _distanceFunction: Function;
+      _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
       _allNodes: Node[][] = [];
 
       //An array of array. Nodes are indexed by their x position, and then by their y position.
@@ -566,19 +566,15 @@ namespace gdjs {
         const maxIterationCount =
           startNode.estimateCost * this._maxComplexityFactor;
         while (this._openNodes.length !== 0) {
+          //Make sure we do not search forever.
           if (iterationCount++ > maxIterationCount) {
             return false;
           }
 
-          //Make sure we do not search forever.
-          const n =
-            //Get the most promising node...
-            this._openNodes.shift() || null;
-          if (n == null)
-            return false;
-          n.open = false;
-
+          //Get the most promising node...
+          const n = this._openNodes.shift()!;
           //...and flag it as explored
+          n.open = false;
 
           //Check if we reached destination?
           if (
@@ -685,10 +681,9 @@ namespace gdjs {
         }
 
         //No so construct a new node (or get it from the cache)...
-        // @ts-ignore
-        let newNode: Node | undefinied;
+        let newNode: Node;
         if (this._nodeCache.length !== 0) {
-          newNode = this._nodeCache.shift();
+          newNode = this._nodeCache.shift()!;
           newNode.reinitialize(xPos, yPos);
         } else {
           newNode = new Node(xPos, yPos);

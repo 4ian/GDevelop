@@ -34,7 +34,11 @@ namespace gdjs {
     _manager: PathfindingObstaclesManager;
     _searchContext: PathfindingRuntimeBehavior.SearchContext;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, behaviorData, owner: gdjs.RuntimeObject) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
 
       //The path computed and followed by the object (Array of arrays containing x and y position)
@@ -52,7 +56,9 @@ namespace gdjs {
       this._cellHeight = behaviorData.cellHeight;
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
-      this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(this._manager);
+      this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
+        this._manager
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -495,7 +501,9 @@ namespace gdjs {
       }
 
       //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
-      setObstacles(obstacles: PathfindingObstaclesManager): PathfindingRuntimeBehavior.SearchContext {
+      setObstacles(
+        obstacles: PathfindingObstaclesManager
+      ): PathfindingRuntimeBehavior.SearchContext {
         this._obstacles = obstacles;
         return this;
       }
@@ -512,7 +520,10 @@ namespace gdjs {
         return this;
       }
 
-      setStartPosition(x: float, y: float): PathfindingRuntimeBehavior.SearchContext {
+      setStartPosition(
+        x: float,
+        y: float
+      ): PathfindingRuntimeBehavior.SearchContext {
         this._startX = x;
         this._startY = y;
         return this;
@@ -748,7 +759,12 @@ namespace gdjs {
       /**
        * Add a node to the openNodes (only if the cost to reach it is less than the existing cost, if any).
        */
-      _addOrUpdateNode(newNodeX: float, newNodeY: float, currentNode: Node, factor: float) {
+      _addOrUpdateNode(
+        newNodeX: float,
+        newNodeY: float,
+        currentNode: Node,
+        factor: float
+      ) {
         const neighbor = this._getNode(newNodeX, newNodeY);
 
         //cost < 0 means impassable obstacle

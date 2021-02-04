@@ -71,7 +71,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { getLeaves } from 'react-mosaic-component';
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -142,12 +141,7 @@ type State = {|
   uiSettings: Object,
   history: HistoryState,
 
-  showObjectsListInfoBar: boolean,
-  showObjectGroupsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
-  showPropertiesInfoBar: boolean,
-  showLayersInfoBar: boolean,
-  showInstancesInfoBar: boolean,
   showAdditionalWorkInfoBar: boolean,
   additionalWorkInfoBar: InfoBarDetails,
 
@@ -197,12 +191,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         historyMaxSize: 50,
       }),
 
-      showObjectsListInfoBar: false,
-      showObjectGroupsListInfoBar: false,
       layoutVariablesDialogOpen: false,
-      showPropertiesInfoBar: false,
-      showLayersInfoBar: false,
-      showInstancesInfoBar: false,
 
       showAdditionalWorkInfoBar: false,
       additionalWorkInfoBar: {
@@ -213,54 +202,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       selectedObjectTags: [],
     };
-  }
-
-  componentWillMount() {
-    // Get the window width.
-    const windowWidth =
-      window.innerWidth < 750 || window.innerHeight < 350
-        ? 'small'
-        : window.innerWidth < 1150
-        ? 'medium'
-        : 'large';
-
-    // Get initial editor nodes based on window width and scene editor.
-    const initialNodes =
-      windowWidth === 'small'
-        ? this.context.getDefaultEditorMosaicNode('scene-editor-small') ||
-          initialMosaicEditorNodesSmallWindow
-        : this.context.getDefaultEditorMosaicNode('scene-editor') ||
-          initialMosaicEditorNodes;
-
-    // Convert the nodes of tree in array.
-    let namesOfInitialNodes = getLeaves(initialNodes);
-
-    // Create the initial state from nodes in the array.
-    let finalState = {};
-    namesOfInitialNodes.forEach(editorName => {
-      switch (editorName) {
-        case 'objects-list':
-          finalState = { ...finalState, showObjectsListInfoBar: true };
-          break;
-        case 'properties':
-          finalState = { ...finalState, showPropertiesInfoBar: true };
-          break;
-        case 'object-groups-list':
-          finalState = { ...finalState, showObjectGroupsListInfoBar: true };
-          break;
-        case 'instances-list':
-          finalState = { ...finalState, showInstancesInfoBar: true };
-          break;
-        case 'layers-list':
-          finalState = { ...finalState, showLayersInfoBar: true };
-          break;
-        default:
-          break;
-      }
-    });
-
-    // Set the initial state.
-    this.setState(finalState);
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -316,84 +257,27 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (
-      !this.state.showObjectsListInfoBar &&
-      this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')
-    )
-      this.setState({ showObjectsListInfoBar: true });
-    else if (
-      this.state.showObjectsListInfoBar &&
-      this.editorMosaic.closeEditor('objects-list')
-    )
-      this.setState({
-        showObjectsListInfoBar: false,
-      });
+    this.editorMosaic.toggleEditor('objects-list', 'end', 75, 'column');
   };
 
   toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (
-      !this.state.showPropertiesInfoBar &&
-      this.editorMosaic.openEditor('properties', 'start', 25, 'column')
-    )
-      this.setState({ showPropertiesInfoBar: true });
-    else if (
-      this.state.showPropertiesInfoBar &&
-      this.editorMosaic.closeEditor('properties')
-    )
-      this.setState({
-        showPropertiesInfoBar: false,
-      });
+    this.editorMosaic.toggleEditor('properties', 'start', 25, 'column');
   };
 
   toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    if (
-      !this.state.showObjectGroupsListInfoBar &&
-      this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column')
-    )
-      this.setState({ showObjectGroupsListInfoBar: true });
-    else if (
-      this.state.showObjectGroupsListInfoBar &&
-      this.editorMosaic.closeEditor('object-groups-list')
-    )
-      this.setState({
-        showObjectGroupsListInfoBar: false,
-      });
+    this.editorMosaic.toggleEditor('object-groups-list', 'end', 75, 'column');
   };
 
   toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    if (
-      !this.state.showInstancesInfoBar &&
-      this.editorMosaic.openEditor('instances-list', 'end', 75, 'row')
-    )
-      this.setState({
-        showInstancesInfoBar: true,
-      });
-    else if (
-      this.state.showInstancesInfoBar &&
-      this.editorMosaic.closeEditor('instances-list')
-    )
-      this.setState({
-        showInstancesInfoBar: false,
-      });
+    this.editorMosaic.toggleEditor('instances-list', 'end', 75, 'row');
   };
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (
-      !this.state.showLayersInfoBar &&
-      this.editorMosaic.openEditor('layers-list', 'end', 75, 'row')
-    )
-      this.setState({
-        showLayersInfoBar: true,
-      });
-    else if (
-      this.state.showLayersInfoBar &&
-      this.editorMosaic.closeEditor('layers-list')
-    )
-      this.setState({ showLayersInfoBar: false });
+    this.editorMosaic.toggleEditor('layers-list', 'end', 75, 'row');
   };
 
   toggleWindowMask = () => {
@@ -1046,20 +930,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       properties: {
         type: 'secondary',
         title: t`Properties`,
-        toolbarControls: [
-          <CloseButton
-            key="close"
-            closeActions={() => {
-              if (
-                this.editorMosaic &&
-                this.editorMosaic.closeEditor('properties')
-              )
-                this.setState({
-                  showPropertiesInfoBar: false,
-                });
-            }}
-          />,
-        ],
+        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
@@ -1083,18 +954,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'layers-list': {
         type: 'secondary',
         title: t`Layers`,
-        toolbarControls: [
-          <CloseButton
-            key="close"
-            closeActions={() => {
-              if (
-                this.editorMosaic &&
-                this.editorMosaic.closeEditor('layers-list')
-              )
-                this.setState({ showLayersInfoBar: false });
-            }}
-          />,
-        ],
+        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <LayersList
             project={project}
@@ -1115,20 +975,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-list': {
         type: 'secondary',
         title: t`Instances list`,
-        toolbarControls: [
-          <CloseButton
-            key="close"
-            closeActions={() => {
-              if (
-                this.editorMosaic &&
-                this.editorMosaic.closeEditor('instances-list')
-              )
-                this.setState({
-                  showInstancesInfoBar: false,
-                });
-            }}
-          />,
-        ],
+        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}
@@ -1184,18 +1031,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
             )}
           </I18n>,
-          <CloseButton
-            key="close"
-            closeActions={() => {
-              if (
-                this.editorMosaic &&
-                this.editorMosaic.closeEditor('objects-list')
-              )
-                this.setState({
-                  showObjectsListInfoBar: false,
-                });
-            }}
-          />,
+          <CloseButton key="close" />,
         ],
         renderEditor: () => (
           <ObjectsList
@@ -1233,20 +1069,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': {
         type: 'secondary',
         title: t`Object Groups`,
-        toolbarControls: [
-          <CloseButton
-            key="close"
-            closeActions={() => {
-              if (
-                this.editorMosaic &&
-                this.editorMosaic.closeEditor('object-groups-list')
-              )
-                this.setState({
-                  showObjectGroupsListInfoBar: false,
-                });
-            }}
-          />,
-        ],
+        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}
@@ -1363,45 +1186,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             </Trans>
           }
           show={!!this.state.selectedObjectNames.length}
-        />
-        <InfoBar
-          identifier="objects-panel-explanation"
-          message={
-            <Trans>
-              Objects panel is already opened: use it to add and edit objects.
-            </Trans>
-          }
-          show={!!this.state.showObjectsListInfoBar}
-        />
-        <InfoBar
-          identifier="instance-properties-panel-explanation"
-          message={
-            <Trans>
-              Properties panel is already opened. After selecting an instance on
-              the scene, inspect and change its properties from this panel.
-            </Trans>
-          }
-          show={!!this.state.showPropertiesInfoBar}
-        />
-        <InfoBar
-          identifier="layers-panel-explanation"
-          message={
-            <Trans>
-              Layers panel is already opened. You can add new layers and apply
-              effects on them from this panel.
-            </Trans>
-          }
-          show={!!this.state.showLayersInfoBar}
-        />
-        <InfoBar
-          identifier="instances-panel-explanation"
-          message={
-            <Trans>
-              Instances panel is already opened. You can search instances in the
-              scene and click one to move the view to it.
-            </Trans>
-          }
-          show={!!this.state.showInstancesInfoBar}
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog

@@ -65,12 +65,12 @@ const getPathOfNode = (
       }
     }
 
-    if (typeof node !== 'string') {
+    if (typeof node.first !== 'string') {
       path.push('first');
       if (hasPath(node.first)) return true;
     }
 
-    if (typeof node !== 'string') {
+    if (typeof node.second !== 'string') {
       path.push('second');
       if (hasPath(node.second)) return true;
     }
@@ -275,16 +275,39 @@ export default class EditorMosaic extends React.Component<Props, State> {
   };
 
   closeEditor = (editorName: string) => {
-    const { editors } = this.props;
-
-    const editor = editors[editorName];
-    if (!editor) return false;
+    if (!this._isEditorExist(editorName)) return false;
 
     if (!hasNode(editorName, this.state.mosaicNode)) return true;
 
     this.setState({
       mosaicNode: removeNode(editorName, this.state.mosaicNode),
     });
+
+    return true;
+  };
+
+  isEditorOpen = (editorName: string) => {
+    if (!this._isEditorExist(editorName)) return false;
+    if (hasNode(editorName, this.state.mosaicNode)) return true;
+
+    return false;
+  };
+
+  toggleEditor = (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number,
+    direction: 'row' | 'column'
+  ) => {
+    if (this.isEditorOpen(editorName)) this.closeEditor(editorName);
+    else this.openEditor(editorName, position, splitPercentage, direction);
+  };
+
+  _isEditorExist = (editorName: string) => {
+    const { editors } = this.props;
+
+    const editor = editors[editorName];
+    if (!editor) return false;
 
     return true;
   };

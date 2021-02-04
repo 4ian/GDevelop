@@ -15,10 +15,6 @@ const styles = {
   },
 };
 
-type Props = {|
-  closeActions?: () => void,
-|};
-
 export default class CloseButton extends Component<Props> {
   render() {
     return (
@@ -28,7 +24,6 @@ export default class CloseButton extends Component<Props> {
             {({ mosaicWindowActions }) => (
               <IconButton
                 onClick={() => {
-                  if (this.props.closeActions) this.props.closeActions();
                   mosaicActions.remove(mosaicWindowActions.getPath());
                 }}
                 style={styles.container}

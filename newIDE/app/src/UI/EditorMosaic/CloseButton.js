@@ -15,7 +15,7 @@ const styles = {
   },
 };
 
-export default class CloseButton extends Component<Props> {
+export default class CloseButton extends Component {
   render() {
     return (
       <MosaicContext.Consumer>

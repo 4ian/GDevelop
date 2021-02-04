@@ -930,7 +930,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       properties: {
         type: 'secondary',
         title: t`Properties`,
-        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
@@ -954,7 +953,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       'layers-list': {
         type: 'secondary',
         title: t`Layers`,
-        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <LayersList
             project={project}
@@ -975,7 +973,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       'instances-list': {
         type: 'secondary',
         title: t`Instances list`,
-        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}
@@ -1069,7 +1066,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': {
         type: 'secondary',
         title: t`Object Groups`,
-        toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <ObjectGroupsList
             globalObjectGroups={project.getObjectGroups()}

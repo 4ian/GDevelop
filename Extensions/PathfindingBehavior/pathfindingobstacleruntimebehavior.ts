@@ -37,7 +37,9 @@ namespace gdjs {
     /**
      * Add a obstacle to the list of existing obstacles.
      */
-    addObstacle(pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior) {
+    addObstacle(
+      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
+    ) {
       this._obstaclesHSHG.addObject(pathfindingObstacleBehavior);
     }
 
@@ -45,7 +47,9 @@ namespace gdjs {
      * Remove a obstacle from the list of existing obstacles. Be sure that the obstacle was
      * added before.
      */
-    removeObstacle(pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior) {
+    removeObstacle(
+      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
+    ) {
       this._obstaclesHSHG.removeObject(pathfindingObstacleBehavior);
     }
 
@@ -57,7 +61,12 @@ namespace gdjs {
      * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
      * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
      */
-    getAllObstaclesAround(x: float, y: float, radius: float, result: PathfindingObstacleRuntimeBehavior[]): any {
+    getAllObstaclesAround(
+      x: float,
+      y: float,
+      radius: float,
+      result: PathfindingObstacleRuntimeBehavior[]
+    ): any {
       const vertex = new PathfindingObstaclesManager.Vertex(x, y, radius);
       this._obstaclesHSHG.addObject(vertex);
       this._obstaclesHSHG.queryForCollisionWith(vertex, result);
@@ -112,7 +121,11 @@ namespace gdjs {
     _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, behaviorData, owner: gdjs.RuntimeObject) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;

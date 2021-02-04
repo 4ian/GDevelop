@@ -22,7 +22,7 @@ KeyboardExtension::KeyboardExtension() {
       "gdjs.evtTools.input.wasKeyReleased");
   GetAllConditions()["AnyKeyPressed"].SetFunctionName(
       "gdjs.evtTools.input.anyKeyPressed");
-        GetAllConditions()["AnyKeyReleased"].SetFunctionName(
+  GetAllConditions()["AnyKeyReleased"].SetFunctionName(
       "gdjs.evtTools.input.anyKeyReleased");
   GetAllStrExpressions()["LastPressedKey"].SetFunctionName(
       "gdjs.evtTools.input.lastPressedKey");

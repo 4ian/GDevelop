@@ -28,6 +28,7 @@ type Props = {|
     display?: 'inline-block',
   |},
 |};
+// TODO: add support for span when set inline, remove inline-block display
 
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain

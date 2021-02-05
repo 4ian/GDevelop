@@ -20,11 +20,19 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
     .filter(({ tags }) => {
       if (!chosenCategory) return true;
 
-      const hasChosenCategoryTag = tags.some(
-        tag => tag === chosenCategory.node.name
-      );
+      const hasChosenCategoryTag =
+        // If the chosen category is a container of tags, not a real tag, then
+        // skip checking if the item has it.
+        chosenCategory.node.isTagContainerOnly ||
+        tags.some(tag => tag === chosenCategory.node.name);
       if (!hasChosenCategoryTag) return false; // Asset is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
+        if (parentNode.isTagContainerOnly) {
+          // The parent is a container of tags, not a real tag. No need
+          // to check if the item has it.
+          return true;
+        }
+
         const hasParentCategoryTag = tags.some(tag => tag === parentNode.name);
         if (!hasParentCategoryTag) return false; // Asset is not in the the parent(s) of the selected category
       }

@@ -48,6 +48,12 @@ html {
   padding-left: env(safe-area-inset-left);
 }
 
+/* Force a Material UI dialog/modal to use the full height, even on large screens. */
+.full-height-modal > .MuiDialog-container > .MuiPaper-root {
+  /* This follows the material-ui dialog `min-height`. */
+  min-height: calc(100% - 64px);
+}
+
 @keyframes fadein {
   from {
     opacity: 0;

@@ -104,6 +104,7 @@ import {
   game2,
   gameRollingMetrics1,
   gameRollingMetricsWithoutPlayersAndRetention1,
+  showcasedGame1,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
@@ -227,6 +228,9 @@ import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
+import { GamesShowcase } from '../GamesShowcase';
+import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
+import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
 
 configureActions({
   depth: 2,
@@ -4955,4 +4959,23 @@ storiesOf('AssetStore/ExtensionsSearchDialog', module)
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('GamesShowcase', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <GamesShowcaseStateProvider>
+        <GamesShowcase />
+      </GamesShowcaseStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('GamesShowcase/ShowcasedGameListItem', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ShowcasedGameListItem
+      onHeightComputed={() => {}}
+      showcasedGame={showcasedGame1}
+    />
   ));

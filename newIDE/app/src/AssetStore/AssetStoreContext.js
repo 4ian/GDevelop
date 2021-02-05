@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState, useFilters } from './FiltersChooser';
+import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
 import {
   type AssetShortHeader,
   type Filters,
@@ -10,7 +10,7 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from './UseSearchItem';
+import { useSearchItem } from '../UI/Search/UseSearchItem';
 
 const defaultSearchText = '';
 

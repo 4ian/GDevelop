@@ -5,8 +5,8 @@ import { Column, Line } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import { SearchResults } from './SearchResults';
-import { FiltersChooser } from './FiltersChooser';
+import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { FiltersChooser } from '../UI/Search/FiltersChooser';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -77,7 +77,7 @@ export const AssetStore = ({
                 />
               </ScrollView>
             </Background>
-            <SearchResults
+            <BoxSearchResults
               baseSize={128}
               onRetry={fetchAssetsAndFilters}
               error={error}

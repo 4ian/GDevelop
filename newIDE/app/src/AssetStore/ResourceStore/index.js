@@ -5,9 +5,9 @@ import { Column, Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
-import { FiltersChooser } from '../FiltersChooser';
+import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ResourceStoreContext } from './ResourceStoreContext';
-import { SearchResults } from '../SearchResults';
+import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
 import { ResourceCard } from './ResourceCard';
 
 const styles = {
@@ -66,7 +66,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
             />
           </ScrollView>
         </Background>
-        <SearchResults
+        <BoxSearchResults
           baseSize={128}
           onRetry={fetchResourcesAndFilters}
           error={error}

@@ -15,6 +15,9 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
 
 #if defined(GD_IDE_ONLY)
 
+  GetAllExpressions()["normalize"]
+      .SetFunctionName("GDpriv::MathematicalTools::normalize")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MathematicalTools.h");
   GetAllExpressions()["clamp"]
       .SetFunctionName("GDpriv::MathematicalTools::clamp")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MathematicalTools.h");

@@ -1,11 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import PlaceholderError from '../../UI/PlaceholderError';
-import ErrorBoundary from '../../UI/ErrorBoundary';
+import PlaceholderLoader from '../PlaceholderLoader';
+import PlaceholderError from '../PlaceholderError';
+import ErrorBoundary from '../ErrorBoundary';
 import { AutoSizer, Grid } from 'react-virtualized';
-import EmptyMessage from '../../UI/EmptyMessage';
+import EmptyMessage from '../EmptyMessage';
 
 type Props<SearchItem> = {|
   searchItems: ?Array<SearchItem>,

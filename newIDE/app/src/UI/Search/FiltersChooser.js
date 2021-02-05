@@ -4,16 +4,16 @@ import * as React from 'react';
 import {
   type Filters,
   type TagsTreeNode,
-} from '../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Types.flow';
 import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Subheader from '../UI/Subheader';
-import InlineCheckbox from '../UI/InlineCheckbox';
-import { ColumnStackLayout } from '../UI/Layout';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
-import EmptyMessage from '../UI/EmptyMessage';
+import Subheader from '../Subheader';
+import InlineCheckbox from '../InlineCheckbox';
+import { ColumnStackLayout } from '../Layout';
+import PlaceholderLoader from '../PlaceholderLoader';
+import EmptyMessage from '../EmptyMessage';
 
 export type ChosenCategory = {|
   node: TagsTreeNode,

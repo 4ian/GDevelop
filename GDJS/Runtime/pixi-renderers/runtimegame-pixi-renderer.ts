@@ -282,9 +282,9 @@ namespace gdjs {
           //TODO: Do this on a user gesture, otherwise most browsers won't activate fullscreen
           if (this._isFullscreen) {
             // @ts-ignore
-            if (document.documentElement.requestFullScreen) {
+            if (document.documentElement.requestFullscreen) {
               // @ts-ignore
-              document.documentElement.requestFullScreen();
+              document.documentElement.requestFullscreen();
             } else {
               // @ts-ignore
               if (document.documentElement.mozRequestFullScreen) {
@@ -300,9 +300,9 @@ namespace gdjs {
             }
           } else {
             // @ts-ignore
-            if (document.cancelFullScreen) {
+            if (document.cancelFullscreen) {
               // @ts-ignore
-              document.cancelFullScreen();
+              document.cancelFullscreen();
             } else {
               // @ts-ignore
               if (document.mozCancelFullScreen) {

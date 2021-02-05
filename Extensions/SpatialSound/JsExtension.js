@@ -72,7 +72,6 @@ module.exports = {
       .addParameter('expression', _('Z position'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SpatialSound/howler.spatial.min.js')
-      .addIncludeFile('Extensions/SpatialSound/spatialsoundtools.js')
       .setFunctionName('Howler.pos');
 
     return extension;

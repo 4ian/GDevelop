@@ -321,7 +321,12 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('string', _('Provider'), '', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Provider'),
+        '["google", "facebook", "github", "twitter"]',
+        false
+      )
       .addParameter(
         'scenevar',
         _('Callback variable with state (ok or error)'),

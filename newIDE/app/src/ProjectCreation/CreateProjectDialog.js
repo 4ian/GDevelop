@@ -9,6 +9,9 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { GamesShowcase } from '../GamesShowcase';
+import Window from '../Utils/Window';
+import PublishIcon from '@material-ui/icons/Publish';
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials',
@@ -74,10 +77,28 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             onClick={onClose}
           />,
         ]}
+        secondaryActions={
+          this.state.currentTab === 'games-showcase'
+            ? [
+                <FlatButton
+                  key="submit-game-showcase"
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+                    );
+                  }}
+                  primary
+                  icon={<PublishIcon />}
+                  label={<Trans>Submit your game to the showcase</Trans>}
+                />,
+              ]
+            : null
+        }
         cannotBeDismissed={false}
         onRequestClose={onClose}
         open={open}
         noMargin
+        fullHeight
         flexBody
       >
         <Column expand noMargin>
@@ -85,6 +106,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <Tab label={<Trans>Starters</Trans>} value="starters" />
             <Tab label={<Trans>Examples</Trans>} value="examples" />
             <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
+            <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
           </Tabs>
           {this.state.currentTab === 'starters' && (
             <ScrollView>
@@ -113,6 +135,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               <Tutorials />
             </ScrollView>
           )}
+          {this.state.currentTab === 'games-showcase' && <GamesShowcase />}
         </Column>
       </Dialog>
     );

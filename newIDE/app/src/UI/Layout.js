@@ -80,7 +80,10 @@ type ResponsiveLineStackLayoutProps = {|
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
+  /** Prefer `noColumnMargin` if needed. */
   noMargin?: boolean,
+  /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
+  noColumnMargin?: boolean,
   children: React.Node,
 |};
 
@@ -89,6 +92,7 @@ export const ResponsiveLineStackLayout = ({
   justifyContent,
   expand,
   noMargin,
+  noColumnMargin,
   children,
 }: ResponsiveLineStackLayoutProps) => {
   let isFirstChild = true;
@@ -96,7 +100,7 @@ export const ResponsiveLineStackLayout = ({
     <ResponsiveWindowMeasurer>
       {windowWidth =>
         windowWidth === 'small' ? (
-          <ColumnStackLayout noMargin={noMargin} expand>
+          <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
             {children}
           </ColumnStackLayout>
         ) : (

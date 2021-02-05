@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SearchBar from '../UI/SearchBar';
 import { Column, Line } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { type ShowcasedGame } from '../Utils/GDevelopServices/Game';
+import { ListSearchResults } from '../UI/Search/ListSearchResults';
 import { FiltersChooser } from '../UI/Search/FiltersChooser';
-import { AssetStoreContext } from './AssetStoreContext';
-import { AssetCard } from './AssetCard';
+import { GamesShowcaseContext } from './GamesShowcaseContext';
+import { ShowcasedGameListItem } from './ShowcasedGameListItem';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Trans } from '@lingui/macro';
 import Subheader from '../UI/Subheader';
 import { CategoryChooser } from '../UI/Search/CategoryChooser';
 
@@ -21,34 +21,27 @@ const styles = {
   },
 };
 
-type Props = {
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
-  onOpenDetails: AssetShortHeader => void,
-};
+const getShowcasedGameTitle = (showcasedGame: ShowcasedGame) =>
+  showcasedGame.title;
 
-export const AssetStore = ({
-  project,
-  objectsContainer,
-  events,
-  onOpenDetails,
-}: Props) => {
+type Props = {};
+
+export const GamesShowcase = (props: Props) => {
   const {
     filters,
     searchResults,
     error,
-    fetchAssetsAndFilters,
+    fetchShowcasedGamesAndFilters,
     filtersState,
     searchText,
     setSearchText,
-  } = React.useContext(AssetStoreContext);
+  } = React.useContext(GamesShowcaseContext);
 
   React.useEffect(
     () => {
-      fetchAssetsAndFilters();
+      fetchShowcasedGamesAndFilters();
     },
-    [fetchAssetsAndFilters]
+    [fetchShowcasedGamesAndFilters]
   );
 
   return (
@@ -77,31 +70,22 @@ export const AssetStore = ({
                   <Trans>Categories</Trans>
                 </Subheader>
                 <CategoryChooser
-                  allItemsLabel={<Trans>All assets</Trans>}
-                  allFilters={filters}
-                  filtersState={filtersState}
-                  error={error}
-                />
-                <Subheader>
-                  <Trans>Filters</Trans>
-                </Subheader>
-                <FiltersChooser
+                  allItemsLabel={<Trans>All games</Trans>}
                   allFilters={filters}
                   filtersState={filtersState}
                   error={error}
                 />
               </ScrollView>
             </Background>
-            <BoxSearchResults
-              baseSize={128}
-              onRetry={fetchAssetsAndFilters}
+            <ListSearchResults
+              onRetry={fetchShowcasedGamesAndFilters}
               error={error}
               searchItems={searchResults}
-              renderSearchItem={(assetShortHeader, size) => (
-                <AssetCard
-                  size={size}
-                  onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                  assetShortHeader={assetShortHeader}
+              getSearchItemUniqueId={getShowcasedGameTitle}
+              renderSearchItem={(showcasedGame, onHeightComputed) => (
+                <ShowcasedGameListItem
+                  onHeightComputed={onHeightComputed}
+                  showcasedGame={showcasedGame}
                 />
               )}
             />

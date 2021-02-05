@@ -11,7 +11,7 @@ namespace GDpriv {
 namespace MathematicalTools {
 
 double GD_API normalize(double expression, double min, double max) { 
-  return (expression - min) / (max - min);
+  return (min = max ? max : (expression - min) / (max - min));
 }
 
 double GD_API clamp(double expression, double min, double max) { 

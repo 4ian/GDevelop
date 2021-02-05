@@ -143,7 +143,7 @@ namespace gdjs {
         min: float,
         max: float
       ): number {
-        return (val - min) / (max - min);
+        return min === max ? max : (val - min) / (max - min);
       };
 
       /**

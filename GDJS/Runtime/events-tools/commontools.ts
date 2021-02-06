@@ -132,6 +132,21 @@ namespace gdjs {
       };
 
       /**
+       * Normalize a value between `min` and `max` to a value between 0 and 1.
+       * @param {number} val The value to normalize
+       * @param {number} min The minimum
+       * @param {number} max The maximum
+       * @returns The normalized value between 0 and 1
+       */
+      export const normalize = function (
+        val: float,
+        min: float,
+        max: float
+      ): number {
+        return min === max ? max : (val - min) / (max - min);
+      };
+
+      /**
        * Limit a value to a range.
        * @param x Value.
        * @param min The minimum value.

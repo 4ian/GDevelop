@@ -13,6 +13,7 @@ namespace GDpriv {
  */
 namespace MathematicalTools {
 
+double GD_API normalize(double expression, double min, double max);
 double GD_API clamp(double expression, double min, double max);
 double GD_API Minimal(double expression1, double expression2);
 double GD_API Maximal(double expression1, double expression2);

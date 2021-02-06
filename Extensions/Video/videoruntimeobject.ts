@@ -221,7 +221,11 @@ namespace gdjs {
      */
     setVolume(volume: number): void {
       this._volume =
-        gdjs.evtTools.common.clamp(gdjs.evtTools.common.normalize(volume, 0, 100), 0, 1) * 100;
+        gdjs.evtTools.common.clamp(
+          gdjs.evtTools.common.normalize(volume, 0, 100),
+          0,
+          1
+        ) * 100;
       this._renderer.updateVolume();
     }
 
@@ -230,7 +234,9 @@ namespace gdjs {
      * @returns The current video's volume, betwenn 0 and 100.
      */
     getVolume(): number {
-      return gdjs.evtTools.common.normalize(this._renderer.getVolume(), 0, 1) * 100;
+      return (
+        gdjs.evtTools.common.normalize(this._renderer.getVolume(), 0, 1) * 100
+      );
     }
 
     /**

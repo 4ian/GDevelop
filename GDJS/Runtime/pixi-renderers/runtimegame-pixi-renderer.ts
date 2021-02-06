@@ -300,9 +300,9 @@ namespace gdjs {
             }
           } else {
             // @ts-ignore
-            if (document.cancelFullscreen) {
+            if (document.exitFullscreen) {
               // @ts-ignore
-              document.cancelFullscreen();
+              document.exitFullscreen();
             } else {
               // @ts-ignore
               if (document.mozCancelFullScreen) {

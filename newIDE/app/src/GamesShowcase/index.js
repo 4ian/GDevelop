@@ -6,7 +6,6 @@ import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import { type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { ListSearchResults } from '../UI/Search/ListSearchResults';
-import { FiltersChooser } from '../UI/Search/FiltersChooser';
 import { GamesShowcaseContext } from './GamesShowcaseContext';
 import { ShowcasedGameListItem } from './ShowcasedGameListItem';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';

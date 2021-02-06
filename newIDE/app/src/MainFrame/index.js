@@ -294,7 +294,9 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<'starters' | 'games-showcase'>('starters');
+  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
+    'starters' | 'games-showcase'
+  >('starters');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1500,7 +1502,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
-  )
+  );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {

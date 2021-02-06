@@ -8,7 +8,7 @@ import IconButton from '../../../UI/IconButton';
 import Language from '@material-ui/icons/Language';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import Window from '../../../Utils/Window';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -17,7 +17,6 @@ import {
   ColumnStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
-import YouTubeIcon from '@material-ui/icons/YouTube';
 import ForumIcon from '@material-ui/icons/Forum';
 import HelpIcon from '@material-ui/icons/Help';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';

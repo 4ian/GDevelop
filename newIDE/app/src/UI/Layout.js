@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Spacer, Line, Column } from './Grid';
-import {
-  ResponsiveWindowMeasurer,
-  useResponsiveWindowWidth,
-} from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
   renderTextField: () => React.Node,

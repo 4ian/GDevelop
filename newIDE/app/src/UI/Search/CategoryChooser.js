@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
   type Filters,
@@ -9,11 +8,7 @@ import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Subheader from '../Subheader';
-import InlineCheckbox from '../InlineCheckbox';
-import { ColumnStackLayout } from '../Layout';
 import PlaceholderLoader from '../PlaceholderLoader';
-import EmptyMessage from '../EmptyMessage';
 import { type FiltersState, type ChosenCategory } from './FiltersChooser';
 
 const nodeIdSeparator = ';-/>'; // A seemingly random string to ensure no clashes with tag names.

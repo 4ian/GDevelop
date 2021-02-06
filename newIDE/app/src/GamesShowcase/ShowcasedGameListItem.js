@@ -58,9 +58,6 @@ const styles = {
     overflow: 'hidden',
     padding: 8,
   },
-  inlineText: {
-    display: 'inline-block',
-  },
 };
 
 type Props = {|
@@ -191,17 +188,17 @@ export const ShowcasedGameListItem = ({
           <Line expand>
             <Column expand>
               <ResponsiveLineStackLayout noMargin alignItems="baseline" expand>
-                <Text noMargin style={styles.inlineText}>
+                <Text noMargin displayInlineAsSpan>
                   {showcasedGame.title}
                 </Text>
-                <Text noMargin size="body2" style={styles.inlineText}>
+                <Text noMargin size="body2" displayInlineAsSpan>
                   <Trans>by {showcasedGame.author}</Trans>
                 </Text>
               </ResponsiveLineStackLayout>
               {showcasedGame.genres.length ? (
                 <TagChips tags={showcasedGame.genres} />
               ) : null}
-              <Text size="body2">
+              <Text size="body2" displayInlineAsSpan>
                 <MarkdownText
                   source={showcasedGame.description}
                   allowParagraphs

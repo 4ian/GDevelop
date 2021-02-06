@@ -1,6 +1,6 @@
 /*
  * Scale the element and make it jiggle. Useful to
- * draw the user attention on this. Use sparingly.
+ * draw the user attention on the element. Use sparingly.
  */
 @keyframes scale-and-jiggle {
   0% {
@@ -29,5 +29,18 @@
   }
   100% {
     transform: rotate(0deg) scale(1.75);
+  }
+}
+
+/*
+ * Fade in the element. Used for the MainFrame at startup, and
+ * can be used to smoothly show other elements after a loading.
+ */
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

@@ -54,15 +54,6 @@ html {
   min-height: calc(100% - 64px);
 }
 
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 /* Disable selections and web-ish cursors */
 :not(input):not(textarea):not(canvas):not(code),
 :not(input):not(textarea):not(canvas):not(code)::after,

@@ -2658,6 +2658,18 @@ storiesOf('CreateProjectDialog', module)
       onClose={action('onClose')}
       onCreate={action('onCreate')}
       onOpen={action('onOpen')}
+      initialTab="starters"
+    />
+  ))
+  .add('Games showcase as initial tab', () => (
+    <CreateProjectDialog
+      open
+      examplesComponent={Placeholder}
+      startersComponent={Placeholder}
+      onClose={action('onClose')}
+      onCreate={action('onCreate')}
+      onOpen={action('onOpen')}
+      initialTab="games-showcase"
     />
   ));
 

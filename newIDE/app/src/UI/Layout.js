@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { Spacer, Line, Column } from './Grid';
-import { ResponsiveWindowMeasurer } from './Reponsive/ResponsiveWindowMeasurer';
+import {
+  ResponsiveWindowMeasurer,
+  useResponsiveWindowWidth,
+} from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
   renderTextField: () => React.Node,
@@ -95,38 +98,34 @@ export const ResponsiveLineStackLayout = ({
   noColumnMargin,
   children,
 }: ResponsiveLineStackLayoutProps) => {
+  const windowWidth = useResponsiveWindowWidth();
   let isFirstChild = true;
-  return (
-    <ResponsiveWindowMeasurer>
-      {windowWidth =>
-        windowWidth === 'small' ? (
-          <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
-            {children}
-          </ColumnStackLayout>
-        ) : (
-          <Line
-            alignItems={alignItems}
-            justifyContent={justifyContent}
-            expand={expand}
-            noMargin={noMargin}
-          >
-            {React.Children.map(children, (child, index) => {
-              if (!child) return null;
 
-              const addSpacers = !isFirstChild;
-              isFirstChild = false;
+  return windowWidth === 'small' ? (
+    <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
+      {children}
+    </ColumnStackLayout>
+  ) : (
+    <Line
+      alignItems={alignItems}
+      justifyContent={justifyContent}
+      expand={expand}
+      noMargin={noMargin}
+    >
+      {React.Children.map(children, (child, index) => {
+        if (!child) return null;
 
-              return (
-                <React.Fragment>
-                  {addSpacers && <Spacer />}
-                  {child}
-                </React.Fragment>
-              );
-            })}
-          </Line>
-        )
-      }
-    </ResponsiveWindowMeasurer>
+        const addSpacers = !isFirstChild;
+        isFirstChild = false;
+
+        return (
+          <React.Fragment>
+            {addSpacers && <Spacer />}
+            {child}
+          </React.Fragment>
+        );
+      })}
+    </Line>
   );
 };
 

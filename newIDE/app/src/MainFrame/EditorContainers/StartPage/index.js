@@ -8,24 +8,33 @@ import IconButton from '../../../UI/IconButton';
 import Language from '@material-ui/icons/Language';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import Window from '../../../Utils/Window';
-import { Line, Spacer } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
+import YouTubeIcon from '@material-ui/icons/YouTube';
+import ForumIcon from '@material-ui/icons/Forum';
+import HelpIcon from '@material-ui/icons/Help';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 
 const styles = {
   innerContainer: {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    minHeight: 350,
+    minHeight: 400,
   },
   centerContainer: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
+    flexShrink: 0,
     maxWidth: 400,
   },
   logoPaper: {
@@ -51,20 +60,12 @@ type Props = {|
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
-  onOpenAboutDialog: () => void,
+  onOpenGamesShowcase: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
 |};
 
-type State = {|
-  aboutDialogOpen: boolean,
-|};
-
-export class StartPage extends React.Component<Props, State> {
-  state = {
-    aboutDialogOpen: false,
-  };
-
+export class StartPage extends React.Component<Props, {||}> {
   shouldComponentUpdate(nextProps: Props) {
     // Prevent any update to the editor if the editor is not active,
     // and so not visible to the user.
@@ -91,7 +92,7 @@ export class StartPage extends React.Component<Props, State> {
       onCreate,
       onOpenProjectManager,
       onCloseProject,
-      onOpenAboutDialog,
+      onOpenGamesShowcase,
       onOpenHelpFinder,
       onOpenLanguageDialog,
     } = this.props;
@@ -117,41 +118,32 @@ export class StartPage extends React.Component<Props, State> {
                       </Trans>
                     </Text>
                   </Paper>
-                  {!project && canOpen && (
-                    <React.Fragment>
+                  <ColumnStackLayout noMargin>
+                    {!project && canOpen && (
                       <RaisedButton
                         label={<Trans>Open a project</Trans>}
                         fullWidth
                         onClick={onOpen}
                         primary
                       />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
-                  {!project && (
-                    <React.Fragment>
+                    )}
+                    {!project && (
                       <RaisedButton
                         label={<Trans>Create a new project</Trans>}
                         fullWidth
                         onClick={onCreate}
                         primary
                       />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
-                  {!!project && (
-                    <React.Fragment>
+                    )}
+                    {!!project && (
                       <RaisedButton
                         label={<Trans>Open Project Manager</Trans>}
                         fullWidth
                         onClick={onOpenProjectManager}
                         primary
                       />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
-                  {!!project && (
-                    <React.Fragment>
+                    )}
+                    {!!project && (
                       <FlatButton
                         label={<Trans>Close project</Trans>}
                         fullWidth
@@ -159,78 +151,97 @@ export class StartPage extends React.Component<Props, State> {
                           onCloseProject();
                         }}
                       />
-                      <Spacer />
-                    </React.Fragment>
-                  )}
-                  {
-                    <FlatButton
-                      label={<Trans>Search the documentation</Trans>}
-                      fullWidth
-                      onClick={onOpenHelpFinder}
-                    />
-                  }
+                    )}
+                    {
+                      <FlatButton
+                        label={<Trans>Search the documentation</Trans>}
+                        fullWidth
+                        onClick={onOpenHelpFinder}
+                      />
+                    }
+                  </ColumnStackLayout>
                 </div>
               </Line>
-              <Line alignItems="center" justifyContent="space-between">
-                <Line>
-                  <FlatButton
-                    label={<Trans>About GDevelop</Trans>}
-                    onClick={onOpenAboutDialog}
-                  />
-                  <FlatButton
-                    label={<Trans>GDevelop Forums</Trans>}
-                    onClick={() =>
-                      Window.openExternalURL('https://forum.gdevelop-app.com')
-                    }
-                  />
-                  <FlatButton
-                    label={<Trans>Help and tutorials</Trans>}
-                    onClick={() =>
-                      Window.openExternalURL(
-                        'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                      )
-                    }
-                  />
-                </Line>
-                <Line alignItems="center">
-                  <FlatButton
-                    label={i18n.language}
-                    onClick={onOpenLanguageDialog}
-                    icon={<Language />}
-                  />
-                  <IconButton
-                    className="icon-facebook"
-                    onClick={() =>
-                      Window.openExternalURL(
-                        'https://www.facebook.com/GDevelopApp'
-                      )
-                    }
-                    tooltip={t`GDevelop on Facebook`}
-                  />
-                  <IconButton
-                    className="icon-twitter"
-                    onClick={() =>
-                      Window.openExternalURL('https://twitter.com/GDevelopApp')
-                    }
-                    tooltip={t`GDevelop on Twitter`}
-                  />
-                  <IconButton
-                    className="icon-discord"
-                    onClick={() =>
-                      Window.openExternalURL('https://discord.gg/rjdYHvj')
-                    }
-                    tooltip={t`GDevelop on Discord`}
-                  />
-                  <IconButton
-                    className="icon-reddit"
-                    onClick={() =>
-                      Window.openExternalURL(
-                        'https://www.reddit.com/r/gdevelop'
-                      )
-                    }
-                    tooltip={t`GDevelop on Reddit`}
-                  />
-                </Line>
+              <Line noMargin>
+                <ResponsiveLineStackLayout
+                  alignItems="center"
+                  justifyContent="space-between"
+                  expand
+                >
+                  <Line noMargin justifyContent="center">
+                    <FlatButton
+                      icon={<SportsEsportsIcon />}
+                      label={<Trans>GDevelop Games</Trans>}
+                      onClick={onOpenGamesShowcase}
+                    />
+                    <FlatButton
+                      icon={<ForumIcon />}
+                      label={<Trans>Community Forums</Trans>}
+                      onClick={() =>
+                        Window.openExternalURL('https://forum.gdevelop-app.com')
+                      }
+                    />
+                    <FlatButton
+                      icon={<HelpIcon />}
+                      label={<Trans>Help and tutorials</Trans>}
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'http://wiki.compilgames.net/doku.php/gdevelop5/start'
+                        )
+                      }
+                    />
+                  </Line>
+                  <Line noMargin alignItems="center" justifyContent="center">
+                    <IconButton
+                      className="icon-youtube"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://www.youtube.com/c/GDevelopApp'
+                        )
+                      }
+                      tooltip={t`Tutorials on YouTube`}
+                    />
+                    <IconButton
+                      className="icon-discord"
+                      onClick={() =>
+                        Window.openExternalURL('https://discord.gg/rjdYHvj')
+                      }
+                      tooltip={t`GDevelop on Discord`}
+                    />
+                    <IconButton
+                      className="icon-reddit"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://www.reddit.com/r/gdevelop'
+                        )
+                      }
+                      tooltip={t`GDevelop on Reddit`}
+                    />
+                    <IconButton
+                      className="icon-twitter"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://twitter.com/GDevelopApp'
+                        )
+                      }
+                      tooltip={t`GDevelop on Twitter`}
+                    />
+                    <IconButton
+                      className="icon-facebook"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://www.facebook.com/GDevelopApp'
+                        )
+                      }
+                      tooltip={t`GDevelop on Facebook`}
+                    />
+                    <FlatButton
+                      label={i18n.language}
+                      onClick={onOpenLanguageDialog}
+                      icon={<Language />}
+                    />
+                  </Line>
+                </ResponsiveLineStackLayout>
               </Line>
             </div>
           </ScrollBackground>
@@ -254,7 +265,7 @@ export const renderStartPageContainer = (
     onCreate={props.onCreate}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
-    onOpenAboutDialog={props.onOpenAboutDialog}
+    onOpenGamesShowcase={props.onOpenGamesShowcase}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
   />

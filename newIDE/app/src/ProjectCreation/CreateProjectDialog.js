@@ -14,7 +14,7 @@ import Window from '../Utils/Window';
 import PublishIcon from '@material-ui/icons/Publish';
 
 type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials',
+  currentTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase',
   outputPath: string,
 |};
 
@@ -30,6 +30,7 @@ export type CreateProjectDialogWithComponentsProps = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => Promise<void>,
+  initialTab: 'starters' | 'games-showcase',
 |};
 
 type Props = {|
@@ -40,12 +41,12 @@ type Props = {|
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
-    currentTab: 'starters',
+    currentTab: this.props.initialTab,
     outputPath: '',
   };
 
   _onChangeTab = (
-    newTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials'
+    newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
   ) => {
     this.setState({
       currentTab: newTab,

@@ -134,16 +134,21 @@ export const ShowcasedGameListItem = ({
   onHeightComputed,
 }: Props) => {
   // Report the height of the item once it's known.
+  const [isLoaded, setIsLoaded] = React.useState(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const isImageLoadingRef = React.useRef(true);
   const notifyHeightChanged = React.useCallback(
     () => {
+      if (!isLoaded && !isImageLoadingRef.current) {
+        setIsLoaded(true);
+      }
+
       // But don't report the height while the image is loading, as it could
       // make some "jumps" in the scroll when scrolling up.
       if (containerRef.current && !isImageLoadingRef.current)
         onHeightComputed(containerRef.current.getBoundingClientRect().height);
     },
-    [onHeightComputed]
+    [onHeightComputed, isLoaded]
   );
   React.useLayoutEffect(notifyHeightChanged);
 
@@ -154,7 +159,14 @@ export const ShowcasedGameListItem = ({
   const otherLinks = showcasedGame.links.slice(3);
 
   return (
-    <div style={styles.container} ref={containerRef}>
+    <div
+      style={{
+        ...styles.container,
+        visibility: isLoaded ? undefined : 'hidden',
+        animation: isLoaded ? 'fadein 0.5s' : undefined,
+      }}
+      ref={containerRef}
+    >
       <Card style={styles.card}>
         <ResponsiveLineStackLayout noMargin>
           <CorsAwareImage

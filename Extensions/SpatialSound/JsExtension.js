@@ -29,7 +29,7 @@ module.exports = {
       'SpatialSound',
       _('Spatial sound'),
       _(
-        'Allow positioning sounds in 3D space, using a stereo system to make the player know where a sound came from.'
+        'Allow positioning sounds in a 3D space. The stereo system of the device is used to simulate the position of the sound and to give the impression that the sound is located somewhere around the player.'
       ),
       'Arthur Pacaud (arthuro555)',
       'MIT'

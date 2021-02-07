@@ -11,6 +11,9 @@ declare class gdProject extends gdObjectsContainer {
   getPackageName(): string;
   setOrientation(orientation: string): void;
   getOrientation(): string;
+  setProjectUuid(projectUuid: string): void;
+  getProjectUuid(): string;
+  resetProjectUuid(): void;
   setProjectFile(file: string): void;
   getProjectFile(): string;
   setGameResolutionSize(width: number, height: number): void;

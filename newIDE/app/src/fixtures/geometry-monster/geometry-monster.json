@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/geometry-monster/geometry-monster.json",
+    "projectUuid": "6da4964e-189e-45ad-bb3f-6366c4d63633",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -2295,7 +2295,7 @@
               "parameters": [
                 "Shapes",
                 "=",
-                "RandomInRange(0.8, 1.6)"
+                "RandomFloatInRange(0.8, 1.6)"
               ],
               "subInstructions": []
             },
@@ -3434,12 +3434,17 @@
       "description": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
       "extensionNamespace": "",
       "fullName": "Stay On Screen",
+      "helpPath": "",
       "iconUrl": "",
       "name": "StayOnScreen",
       "previewIconUrl": "",
       "shortDescription": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
-      "tags": "positioning, camera, screen",
       "version": "0.0.1",
+      "tags": [
+        "positioning",
+        "camera",
+        "screen"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3560,12 +3565,17 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
       "iconUrl": "",
       "name": "SineMovement",
       "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3825,12 +3835,20 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Flash",
       "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -4435,12 +4453,19 @@
       "description": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
       "extensionNamespace": "",
       "fullName": "Health (life points and damages for objects)",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Health",
       "previewIconUrl": "",
       "shortDescription": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
-      "tags": "health, life, damage, hit, heal",
       "version": "0.0.1",
+      "tags": [
+        "health",
+        "life",
+        "damage",
+        "hit",
+        "heal"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {

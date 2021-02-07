@@ -12,6 +12,7 @@ type Props<SearchItem> = {|
   renderSearchItem: (item: SearchItem, size: number) => React.Node,
   error: ?Error,
   onRetry: () => void,
+  baseSize: number,
 |};
 
 const styles = {
@@ -24,6 +25,7 @@ export const SearchResults = <SearchItem>({
   renderSearchItem,
   error,
   onRetry,
+  baseSize,
 }: Props<SearchItem>) => {
   if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
@@ -55,7 +57,6 @@ export const SearchResults = <SearchItem>({
           {({ width, height }) => {
             if (!width || !height) return null;
 
-            const baseSize = 128;
             const columnCount = Math.max(Math.floor((width - 5) / baseSize), 1);
             const columnWidth = Math.max(Math.floor(width / columnCount), 30);
             const rowCount = Math.max(

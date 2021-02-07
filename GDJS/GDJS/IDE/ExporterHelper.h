@@ -35,7 +35,7 @@ struct PreviewExportOptions {
       : project(project_),
         exportPath(exportPath_),
         projectDataOnlyExport(false),
-        nonRuntimeScriptsCacheBurst(0) {};
+        nonRuntimeScriptsCacheBurst(0){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -173,10 +173,13 @@ class ExporterHelper {
    * directory.
    *
    * \param includesFiles A vector with filenames to be copied.
-   * \param exportDir The directory where the files mus tbe copied.
+   * \param exportDir The directory where the files must be copied.
+   * \param exportSourceMaps Should the source maps be copied? Should be true on
+   * previews only.
    */
   bool ExportIncludesAndLibs(const std::vector<gd::String> &includesFiles,
-                             gd::String exportDir);
+                             gd::String exportDir,
+                             bool exportSourceMaps);
 
   /**
    * \brief Generate the events JS code, and save them to the export directory.

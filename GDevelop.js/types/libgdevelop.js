@@ -9,11 +9,13 @@ declare class libGDevelop {
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
+  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
+  asForEachChildVariableEvent(gdBaseEvent): gdForEachChildVariableEvent;
   asCommentEvent(gdBaseEvent): gdCommentEvent;
   asGroupEvent(gdBaseEvent): gdGroupEvent;
   asLinkEvent(gdBaseEvent): gdLinkEvent;
@@ -115,6 +117,7 @@ declare class libGDevelop {
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
+  ForEachChildVariableEvent: Class<gdForEachChildVariableEvent>;
   CommentEvent: Class<gdCommentEvent>;
   GroupEvent: Class<gdGroupEvent>;
   LinkEvent: Class<gdLinkEvent>;

@@ -1,5 +1,6 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
 #include <GDCore/Events/Builtin/LinkEvent.h>
 #include <GDCore/Events/Builtin/RepeatEvent.h>
@@ -340,6 +341,12 @@ void removeFromVectorVector2f(std::vector<sf::Vector2f> &vec, size_t pos) {
 void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
                                        size_t pos) {
   vec.erase(vec.begin() + pos);
+}
+
+void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec, size_t oldIndex, size_t newIndex) {
+  if (oldIndex > vec.size() || newIndex > vec.size()) return;
+
+  std::swap(vec[oldIndex], vec[newIndex]);
 }
 
 // Implement a conversion from std::set<gd::String> to std::vector<gd::String>

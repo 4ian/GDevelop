@@ -7,7 +7,7 @@ const loaderSize = 50;
 const styles = {
   dialogContent: {
     padding: 10,
-    overflowX: 'hidden',
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'row',
   },

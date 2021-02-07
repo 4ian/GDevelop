@@ -8,6 +8,7 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
+
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
@@ -83,11 +84,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
-  const gd::String& GetTags() const { return tags; };
-  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
-    tags = tags_;
-    return *this;
-  }
+  const std::vector<gd::String>& GetTags() const { return tags; };
+  std::vector<gd::String>& GetTags() { return tags; };
 
   const gd::String& GetAuthor() const { return author; };
   EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
@@ -96,7 +94,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   const gd::String& GetPreviewIconUrl() const { return previewIconUrl; };
-  EventsFunctionsExtension& SetPreviewIconUrl(const gd::String& previewIconUrl_) {
+  EventsFunctionsExtension& SetPreviewIconUrl(
+      const gd::String& previewIconUrl_) {
     previewIconUrl = previewIconUrl_;
     return *this;
   }
@@ -104,6 +103,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   const gd::String& GetIconUrl() const { return iconUrl; };
   EventsFunctionsExtension& SetIconUrl(const gd::String& iconUrl_) {
     iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  const gd::String& GetHelpPath() const { return helpPath; };
+
+  /**
+   * \brief Set the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  EventsFunctionsExtension& SetHelpPath(const gd::String& helpPath_) {
+    helpPath = helpPath_;
     return *this;
   }
 
@@ -140,7 +154,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   /** \name Lifecycle event functions
    */
   ///@{
-  static bool IsExtensionLifecycleEventsFunction(const gd::String& eventsFunctionName);
+  static bool IsExtensionLifecycleEventsFunction(
+      const gd::String& eventsFunctionName);
   ///@}
 
  private:
@@ -156,10 +171,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
-  gd::String tags;
+  std::vector<gd::String> tags;
   gd::String author;
   gd::String previewIconUrl;
   gd::String iconUrl;
+  gd::String helpPath;  ///< The relative path to the help for this extension in
+                        ///< the documentation (or an absolute URL).
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 

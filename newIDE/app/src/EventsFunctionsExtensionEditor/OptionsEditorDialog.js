@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -23,6 +24,11 @@ import axios from 'axios';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  getHelpLink,
+  isRelativePathToDocumentationRoot,
+  isDocumentationAbsoluteUrl,
+} from '../Utils/HelpLink';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -106,6 +112,50 @@ When you're ready, remove this last paragraph and click on "Submit new issue". T
     `https://github.com/4ian/GDevelop-extensions/issues/new?body=${encodeURIComponent(
       body
     )}&title=New%20extension`
+  );
+};
+
+type HelpPathTextFieldProps = {|
+  i18n: I18nType,
+  helpPath: string,
+  onChangeHelpPath: string => void,
+|};
+
+const HelpPathTextField = ({
+  i18n,
+  helpPath,
+  onChangeHelpPath,
+}: HelpPathTextFieldProps) => {
+  const isAbsoluteUrl = isDocumentationAbsoluteUrl(helpPath);
+  const isRelativePath = isRelativePathToDocumentationRoot(helpPath);
+  const helperText = helpPath
+    ? (isRelativePath
+        ? i18n._(
+            t`This is a relative path that will open in the GDevelop wiki.`
+          )
+        : i18n._(t`This is link to a webpage.`)) +
+      ` [${i18n._(t`Click here to test the link.`)}](${getHelpLink(helpPath)})`
+    : i18n._(
+        t`This can either be a URL to a web page, or a path starting with a slash that will be opened in the GDevelop wiki. Leave empty if there is no help page, although it's recommended you eventually write one if you distribute the extension.`
+      );
+
+  return (
+    <TextField
+      floatingLabelText={<Trans>Help page URL</Trans>}
+      value={helpPath}
+      onChange={(e, text) => {
+        onChangeHelpPath(text);
+      }}
+      errorText={
+        !!helpPath && !isAbsoluteUrl && !isRelativePath ? (
+          <Trans>
+            This is not a URL starting with "http://" or "https://".
+          </Trans>
+        ) : null
+      }
+      helperMarkdownText={helperText}
+      fullWidth
+    />
   );
 };
 
@@ -233,14 +283,33 @@ export default function OptionsEditorDialog({
               }}
               fullWidth
             />
-            <TextField
+            <SemiControlledTextField
               floatingLabelText={<Trans>Tags (comma separated)</Trans>}
-              value={eventsFunctionsExtension.getTags()}
-              onChange={(e, text) => {
-                eventsFunctionsExtension.setTags(text);
+              value={eventsFunctionsExtension
+                .getTags()
+                .toJSArray()
+                .join(', ')}
+              onChange={text => {
+                const tags = eventsFunctionsExtension.getTags();
+                tags.clear();
+                text
+                  .split(',')
+                  .map(tag => tag.trim())
+                  .filter(Boolean)
+                  .forEach(tag => {
+                    tags.push_back(tag);
+                  });
                 forceUpdate();
               }}
               fullWidth
+            />
+            <HelpPathTextField
+              i18n={i18n}
+              helpPath={eventsFunctionsExtension.getHelpPath()}
+              onChangeHelpPath={helpPath => {
+                eventsFunctionsExtension.setHelpPath(helpPath);
+                forceUpdate();
+              }}
             />
             <TextField
               floatingLabelText={

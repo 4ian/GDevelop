@@ -58,18 +58,6 @@ std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
   return values;
 };
 
-bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
-                                   const std::set<gd::String> &set) {
-  bool missingKey = false;
-  for (auto &key : set) {
-    if (map.find(key) == map.end()) {
-      missingKey = true;
-    }
-  }
-
-  return missingKey;
-}
-
 }  // namespace
 
 namespace gdjs {
@@ -174,8 +162,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-  // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath);
+  // Copy all the dependencies and their source maps
+  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -268,22 +256,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsIos = [&getIconFilename]() {
-    std::vector<gd::String> sizes = {"180",
-                                     "60",
-                                     "120",
-                                     "76",
-                                     "152",
-                                     "40",
-                                     "80",
-                                     "57",
-                                     "114",
-                                     "72",
-                                     "144",
-                                     "167",
-                                     "29",
-                                     "58",
-                                     "50",
-                                     "100"};
+    std::vector<gd::String> sizes = {
+        "180", "60",  "120", "76", "152", "40", "80", "57",  "114", "72",
+        "144", "167", "29",  "58", "87",  "50", "20", "100", "167", "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -311,7 +286,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   for (std::shared_ptr<gd::PlatformExtension> extension :
        project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
+    for (gd::DependencyMetadata &dependency : extension->GetAllDependencies()) {
       if (dependency.GetDependencyType() == "cordova") {
         gd::String plugin;
         plugin += "<plugin name=\"" + dependency.GetExportName();
@@ -331,14 +306,15 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
         plugin += "\t</plugin>";
 
-        // Don't include the plugin if an extra setting was not fulfilled.
-        bool missingSetting = AreMapKeysMissingElementOfSet(
-            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
-        if (!missingSetting) plugins += plugin;
+        // Don't include the plugin if no extra setting was fulfilled.
+        bool hasExtraSettings = !extraSettingValues.empty();
+        if (!dependency.IsOnlyIfSomeExtraSettingsNonEmpty() || hasExtraSettings)
+          plugins += plugin;
       }
     }
   }
 
+  // TODO: migrate the plugins to the package.json
   str =
       str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 
@@ -823,7 +799,9 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    const std::vector<gd::String> &includesFiles, gd::String exportDir) {
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
+    bool exportSourceMaps) {
   for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
       // By convention, an include file that is relative is relative to
@@ -835,6 +813,12 @@ bool ExporterHelper::ExportIncludesAndLibs(
         if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
+
+        gd::String sourceMap = source + ".map";
+        // Copy source map if present
+        if (exportSourceMaps && fs.FileExists(sourceMap)) {
+          fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
+        }
       } else {
         std::cout << "Could not find GDJS include file " << include
                   << std::endl;

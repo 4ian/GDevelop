@@ -1,5 +1,5 @@
 // @flow
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   type SelectionState,
   getSelectedEvents,
@@ -20,24 +20,39 @@ const gd: libGDevelop = global.gd;
 export const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 export const hasClipboardEvents = () => {
-  return (
-    Clipboard.has(CLIPBOARD_KIND) &&
-    Clipboard.get(CLIPBOARD_KIND).eventsCount > 0
+  if (!Clipboard.has(CLIPBOARD_KIND)) return false;
+  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const eventsCount = SafeExtractor.extractNumberProperty(
+    clipboardContent,
+    'eventsCount'
   );
+  if (eventsCount === null) return false;
+
+  return eventsCount > 0;
 };
 
 export const hasClipboardConditions = () => {
-  return (
-    Clipboard.has(CLIPBOARD_KIND) &&
-    Clipboard.get(CLIPBOARD_KIND).conditionsCount > 0
+  if (!Clipboard.has(CLIPBOARD_KIND)) return false;
+  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const conditionsCount = SafeExtractor.extractNumberProperty(
+    clipboardContent,
+    'conditionsCount'
   );
+  if (conditionsCount === null) return false;
+
+  return conditionsCount > 0;
 };
 
 export const hasClipboardActions = () => {
-  return (
-    Clipboard.has(CLIPBOARD_KIND) &&
-    Clipboard.get(CLIPBOARD_KIND).actionsCount > 0
+  if (!Clipboard.has(CLIPBOARD_KIND)) return false;
+  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const actionsCount = SafeExtractor.extractNumberProperty(
+    clipboardContent,
+    'actionsCount'
   );
+  if (actionsCount === null) return false;
+
+  return actionsCount > 0;
 };
 
 export const copySelectionToClipboard = (selection: SelectionState) => {
@@ -79,10 +94,17 @@ export const pasteEventsFromClipboardInSelection = (
 ): boolean => {
   if (!hasEventSelected(selection) || !hasClipboardEvents()) return false;
 
+  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const eventsListContent = SafeExtractor.extractArrayProperty(
+    clipboardContent,
+    'eventsList'
+  );
+  if (!eventsListContent) return false;
+
   const eventsList = new gd.EventsList();
   unserializeFromJSObject(
     eventsList,
-    Clipboard.get(CLIPBOARD_KIND).eventsList,
+    eventsListContent,
     'unserializeFrom',
     project
   );
@@ -111,17 +133,27 @@ export const pasteInstructionsFromClipboardInSelection = (
     return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const actionsListContent = SafeExtractor.extractArrayProperty(
+    clipboardContent,
+    'actionsList'
+  );
+  const conditionsListContent = SafeExtractor.extractArrayProperty(
+    clipboardContent,
+    'conditionsList'
+  );
+  if (!actionsListContent || !conditionsListContent) return false;
+
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();
   unserializeFromJSObject(
     actionsList,
-    clipboardContent.actionsList,
+    actionsListContent,
     'unserializeFrom',
     project
   );
   unserializeFromJSObject(
     conditionsList,
-    clipboardContent.conditionsList,
+    conditionsListContent,
     'unserializeFrom',
     project
   );
@@ -174,17 +206,27 @@ export const pasteInstructionsFromClipboardInInstructionsList = (
   if (!hasClipboardConditions() && !hasClipboardActions()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const actionsListContent = SafeExtractor.extractArrayProperty(
+    clipboardContent,
+    'actionsList'
+  );
+  const conditionsListContent = SafeExtractor.extractArrayProperty(
+    clipboardContent,
+    'conditionsList'
+  );
+  if (!actionsListContent || !conditionsListContent) return;
+
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();
   unserializeFromJSObject(
     actionsList,
-    clipboardContent.actionsList,
+    actionsListContent,
     'unserializeFrom',
     project
   );
   unserializeFromJSObject(
     conditionsList,
-    clipboardContent.conditionsList,
+    conditionsListContent,
     'unserializeFrom',
     project
   );

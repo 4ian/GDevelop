@@ -116,6 +116,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -252,6 +253,9 @@ const MainFrame = (props: Props) => {
     openPlatformSpecificAssetsDialog,
   ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
+  const [profileDialogInitialTab, setProfileDialogInitialTab] = React.useState<
+    'profile' | 'games-dashboard'
+  >('profile');
   const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
@@ -393,6 +397,13 @@ const MainFrame = (props: Props) => {
     // eslint-disable-next-line
     []
   );
+
+  const openProfileDialogWithTab = (
+    profileDialogInitialTab: 'profile' | 'games-dashboard'
+  ) => {
+    setProfileDialogInitialTab(profileDialogInitialTab);
+    openProfileDialog(true);
+  };
 
   const _showSnackMessage = React.useCallback(
     (snackMessage: string) => {
@@ -801,6 +812,32 @@ const MainFrame = (props: Props) => {
     _onProjectItemModified();
   };
 
+  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    // Close the extension tab before updating/reinstalling the extension.
+    const eventsFunctionsExtensionName = extensionShortHeader.name;
+
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        eventsFunctionsExtensionName
+      );
+
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtension
+        ),
+      }));
+    }
+  };
+
   const deleteLayout = (layout: gdLayout) => {
     const { i18n } = props;
     if (!state.currentProject) return;
@@ -1174,6 +1211,8 @@ const MainFrame = (props: Props) => {
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
+            getIsMenuBarHiddenInPreview:
+              preferences.getIsMenuBarHiddenInPreview,
           })
         )
         .catch(error => {
@@ -1192,6 +1231,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       previewState,
       state.editorTabs,
+      preferences.getIsMenuBarHiddenInPreview,
     ]
   );
 
@@ -1630,6 +1670,11 @@ const MainFrame = (props: Props) => {
                 _showSnackMessage(i18n._(t`Project properly saved`));
 
                 if (fileMetadata) {
+                  preferences.insertRecentProjectFile({
+                    fileMetadata,
+                    storageProviderName: getStorageProvider().internalName,
+                  });
+
                   setState(state => ({
                     ...state,
                     currentFileMetadata: fileMetadata,
@@ -1661,6 +1706,8 @@ const MainFrame = (props: Props) => {
       setState,
       state.editorTabs,
       _showSnackMessage,
+      getStorageProvider,
+      preferences,
     ]
   );
 
@@ -1885,6 +1932,14 @@ const MainFrame = (props: Props) => {
     onOpenCommandPalette: commandPaletteRef.current
       ? commandPaletteRef.current.open
       : () => {},
+    onOpenProfile: React.useCallback(
+      () => openProfileDialogWithTab('profile'),
+      []
+    ),
+    onOpenGamesDashboard: React.useCallback(
+      () => openProfileDialogWithTab('games-dashboard'),
+      []
+    ),
   });
 
   const showLoader = isLoadingProject || previewLoading;
@@ -1909,7 +1964,9 @@ const MainFrame = (props: Props) => {
           onOpenAbout: () => openAboutDialog(true),
           onOpenPreferences: () => openPreferencesDialog(true),
           onOpenLanguage: () => openLanguageDialog(true),
-          onOpenProfile: () => openProfileDialog(true),
+          onOpenProfile: () => openProfileDialogWithTab('profile'),
+          onOpenGamesDashboard: () =>
+            openProfileDialogWithTab('games-dashboard'),
           setUpdateStatus: setUpdateStatus,
           recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
@@ -1943,6 +2000,7 @@ const MainFrame = (props: Props) => {
             onAddExternalLayout={addExternalLayout}
             onAddEventsFunctionsExtension={addEventsFunctionsExtension}
             onAddExternalEvents={addExternalEvents}
+            onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
             onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
@@ -1958,7 +2016,10 @@ const MainFrame = (props: Props) => {
             }}
             onExportProject={() => openExportDialog(true)}
             onOpenPreferences={() => openPreferencesDialog(true)}
-            onOpenProfile={() => openProfileDialog(true)}
+            onOpenProfile={() => openProfileDialogWithTab('profile')}
+            onOpenGamesDashboard={() =>
+              openProfileDialogWithTab('games-dashboard')
+            }
             onOpenResources={() => {
               openResources();
               openProjectManager(false);
@@ -2122,40 +2183,29 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           onClose: () => openCreateDialog(false),
-          onOpen: (storageProvider, fileMetadata) => {
-            setState(state => ({ ...state, createDialogOpen: false })).then(
-              state => {
-                // eslint-disable-next-line
-                getStorageProviderOperations(storageProvider)
-                  .then(storageProviderOperations =>
-                    openFromFileMetadata(fileMetadata)
-                  )
-                  .then(state => {
-                    if (state)
-                      openSceneOrProjectManager({
-                        currentProject: state.currentProject,
-                        editorTabs: state.editorTabs,
-                      });
-                  });
-              }
-            );
+          onOpen: async (storageProvider, fileMetadata) => {
+            await setState(state => ({ ...state, createDialogOpen: false }));
+            await getStorageProviderOperations(storageProvider);
+            const state = await openFromFileMetadata(fileMetadata);
+
+            if (state) {
+              if (state.currentProject) state.currentProject.resetProjectUuid();
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+            }
           },
-          onCreate: (project, storageProvider, fileMetadata) => {
-            setState(state => ({ ...state, createDialogOpen: false })).then(
-              state => {
-                // eslint-disable-next-line
-                getStorageProviderOperations(storageProvider)
-                  .then(storageProviderOperations =>
-                    loadFromProject(project, fileMetadata)
-                  )
-                  .then(state =>
-                    openSceneOrProjectManager({
-                      currentProject: state.currentProject,
-                      editorTabs: state.editorTabs,
-                    })
-                  );
-              }
-            );
+          onCreate: async (project, storageProvider, fileMetadata) => {
+            await setState(state => ({ ...state, createDialogOpen: false }));
+            await getStorageProviderOperations(storageProvider);
+            const state = await loadFromProject(project, fileMetadata);
+
+            if (state.currentProject) state.currentProject.resetProjectUuid();
+            openSceneOrProjectManager({
+              currentProject: state.currentProject,
+              editorTabs: state.editorTabs,
+            });
           },
         })}
       {!!introDialog &&
@@ -2205,6 +2255,8 @@ const MainFrame = (props: Props) => {
       )}
       {profileDialogOpen && (
         <ProfileDialog
+          currentProject={currentProject}
+          initialTab={profileDialogInitialTab}
           open
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}

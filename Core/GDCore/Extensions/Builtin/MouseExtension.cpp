@@ -14,8 +14,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .SetExtensionInformation(
           "BuiltinMouse",
-          _("Mouse features"),
-          _("Built-in extension that enables the use of a mouse"),
+          _("Mouse and touch"),
+          "Conditions and actions to handle either the mouse or touches on "
+          "touchscreen. By default, conditions related to the mouse will also "
+          "handle the touches - so that it's easier to handle both in your "
+          "game. You can disable this behavior if you want to handle them "
+          "separately in different events.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/mouse-touch");
@@ -187,14 +191,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition(
-          "MouseButtonReleased",
-          _("Mouse button released"),
-          _("Check if the specified mouse button was released."),
-          _("_PARAM1_ mouse button was released"),
-          _("Mouse and touch"),
-          "res/conditions/mouse24.png",
-          "res/conditions/mouse.png")
+      .AddCondition("MouseButtonReleased",
+                    _("Mouse button released"),
+                    _("Check if the specified mouse button was released."),
+                    _("_PARAM1_ mouse button was released"),
+                    _("Mouse and touch"),
+                    "res/conditions/mouse24.png",
+                    "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("mouse", _("Button to test"))
       .MarkAsSimple();

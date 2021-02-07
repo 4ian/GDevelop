@@ -39,6 +39,7 @@ import Window from '../Utils/Window';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import ScrollView from '../UI/ScrollView';
 const electron = optionalRequire('electron');
 
 const ObjectListItem = ({
@@ -237,7 +238,7 @@ export default function NewObjectDialog({
           />
         )}
         {currentTab === 'new-object' && (
-          <React.Fragment>
+          <ScrollView>
             <List>
               {objects.map(objectMetadata => (
                 <ObjectListItem
@@ -296,7 +297,7 @@ export default function NewObjectDialog({
                 }}
               />
             </Line>
-          </React.Fragment>
+          </ScrollView>
         )}
       </Column>
       {openedAsset !== null ? (

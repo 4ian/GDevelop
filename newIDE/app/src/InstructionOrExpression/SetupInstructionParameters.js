@@ -66,12 +66,22 @@ export const setupInstructionParameters = (
       });
 
     if (behaviorNames.length > 0) {
-      instruction.setParameter(maybeBehaviorParameterIndex, behaviorNames[0]);
+      const currentParameterValue = instruction.getParameter(
+        maybeBehaviorParameterIndex
+      );
+
+      // Set the behavior to the first matching behavior, in case a matching behavior name
+      // is not already set.
+      if (
+        !behaviorNames.some(
+          behaviorName => currentParameterValue === behaviorName
+        )
+      ) {
+        instruction.setParameter(maybeBehaviorParameterIndex, behaviorNames[0]);
+      }
     } else {
-      // Ignore - this will either be shown as an error in the BehaviorField
-      // or should not happen if the instruction was added using the NewInstructionEditor
-      // (as the editor should only show instructions available for the behaviors
-      // of the object and for the object).
+      // Ignore - this will be shown as an error in the BehaviorField (the required
+      // behavior is not attached to the object).
     }
   }
 };

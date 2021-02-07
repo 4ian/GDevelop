@@ -5,6 +5,7 @@
  */
 #if defined(GD_IDE_ONLY)
 #include "EventsFunctionsExtension.h"
+
 #include "EventsBasedBehavior.h"
 #include "EventsFunction.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -37,6 +38,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   author = other.author;
   previewIconUrl = other.previewIconUrl;
   iconUrl = other.iconUrl;
+  helpPath = other.helpPath;
   EventsFunctionsContainer::Init(other);
   eventsBasedBehaviors = other.eventsBasedBehaviors;
 }
@@ -48,10 +50,15 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
-  element.SetAttribute("tags", tags);
+  auto& tagsElement = element.AddChild("tags");
+  tagsElement.ConsiderAsArray();
+  for (const auto& tag : tags) {
+    tagsElement.AddChild("").SetStringValue(tag);
+  }
   element.SetAttribute("author", author);
   element.SetAttribute("previewIconUrl", previewIconUrl);
   element.SetAttribute("iconUrl", iconUrl);
+  element.SetAttribute("helpPath", helpPath);
 
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
@@ -66,10 +73,27 @@ void EventsFunctionsExtension::UnserializeFrom(
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
-  tags = element.GetStringAttribute("tags");
   author = element.GetStringAttribute("author");
   previewIconUrl = element.GetStringAttribute("previewIconUrl");
   iconUrl = element.GetStringAttribute("iconUrl");
+  helpPath = element.GetStringAttribute("helpPath");
+
+  tags.clear();
+  auto& tagsElement = element.GetChild("tags");
+  if (!tagsElement.IsValueUndefined()) {
+    // Compatibility with GD <= 5.0.0-beta102
+    gd::String tagsAsString = tagsElement.GetStringValue();
+    tags = tagsAsString.Split(',');
+    for (auto& tag : tags) {
+      tag = tag.Trim();
+    }
+    // end of compatibility code
+  } else {
+    tagsElement.ConsiderAsArray();
+    for (std::size_t i = 0; i < tagsElement.GetChildrenCount(); ++i) {
+      tags.push_back(tagsElement.GetChild(i).GetStringValue());
+    }
+  }
 
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(

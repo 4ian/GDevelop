@@ -11,23 +11,23 @@ This project is released under the MIT License.
 
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
-
 #include "TextObject.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation(
-          "TextObject",
-          _("Text object"),
-          _("This Extension enables the use of an object that displays text."),
-          "Florian Rival and Victor Levasseur",
-          "Open source (MIT License)")
+      .SetExtensionInformation("TextObject",
+                               _("Text object"),
+                               _("An object that can be used to display any "
+                                 "text on the screen: remaining life counter, "
+                                 "some indicators, menu buttons, dialogues..."),
+                               "Florian Rival and Victor Levasseur",
+                               "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/text");
 
   gd::ObjectMetadata& obj =
       extension.AddObject<TextObject>("Text",
                                       _("Text"),
-                                      _("Displays a text"),
+                                      _("Displays a text on the screen."),
                                       "CppPlatform/Extensions/texticon.png");
 
 #if defined(GD_IDE_ONLY)

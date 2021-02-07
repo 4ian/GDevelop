@@ -14,6 +14,7 @@ import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -103,10 +104,12 @@ export default class ForEachEvent extends React.Component<
             tabIndex={0}
           >
             {objectName ? (
-              `Repeat for each instance of ${objectName}:`
+              <Trans>Repeat for each instance of {objectName}:</Trans>
             ) : (
               <i>
-                Click to choose for which objects this event will be repeated
+                <Trans>
+                  Click to choose for which objects this event will be repeated
+                </Trans>
               </i>
             )}
           </span>

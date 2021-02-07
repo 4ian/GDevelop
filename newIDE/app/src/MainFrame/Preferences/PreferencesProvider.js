@@ -28,6 +28,7 @@ type Props = {|
 type State = Preferences;
 
 const LocalStorageItem = 'gd-preferences';
+const MAX_RECENT_FILES_COUNT = 20;
 
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
@@ -70,6 +71,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
+    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
   };
 
   componentDidMount() {
@@ -398,7 +401,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }
@@ -409,7 +412,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this._setRecentProjectFiles(
       [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
         0,
-        5
+        MAX_RECENT_FILES_COUNT
       )
     );
   }
@@ -481,6 +484,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, newObjectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getIsMenuBarHiddenInPreview() {
+    return this.state.values.isMenuBarHiddenInPreview;
+  }
+
+  _setIsMenuBarHiddenInPreview(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isMenuBarHiddenInPreview: enabled,
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

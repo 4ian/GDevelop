@@ -41,8 +41,7 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
     const gd::String& icon,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                            nameWithNamespace,
                                                            fullname,
@@ -65,8 +64,7 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
     const gd::String& icon,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                         nameWithNamespace,
                                                         fullname,
@@ -87,8 +85,7 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   expressionsInfos[nameWithNamespace] = ExpressionMetadata(GetNameSpace(),
                                                            nameWithNamespace,
                                                            fullname,
@@ -107,8 +104,7 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   strExpressionsInfos[nameWithNamespace] = ExpressionMetadata(GetNameSpace(),
                                                               nameWithNamespace,
                                                               fullname,
@@ -133,8 +129,7 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& description,
     const gd::String& icon24x24,
     std::shared_ptr<gd::Object> instance) {
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
                                                    nameWithNamespace,
                                                    fullname,
@@ -156,8 +151,7 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
     const gd::String& className,
     std::shared_ptr<gd::Behavior> instance,
     std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance) {
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(),
                                                       nameWithNamespace,
                                                       fullname,
@@ -173,8 +167,7 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
 }
 
 gd::EffectMetadata& PlatformExtension::AddEffect(const gd::String& name) {
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  gd::String nameWithNamespace = GetNameSpace() + name;
   effectsMetadata[nameWithNamespace] = EffectMetadata(nameWithNamespace);
   return effectsMetadata[nameWithNamespace];
 }
@@ -187,8 +180,7 @@ gd::EventMetadata& PlatformExtension::AddEvent(
     const gd::String& smallicon_,
     std::shared_ptr<gd::BaseEvent> instance_) {
 #if defined(GD_IDE_ONLY)
-  gd::String nameWithNamespace =
-      GetNameSpace().empty() ? name_ : GetNameSpace() + name_;
+  gd::String nameWithNamespace = GetNameSpace() + name_;
   eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace,
                                                      fullname_,
                                                      description_,
@@ -272,6 +264,84 @@ std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
 }
 
 #if defined(GD_IDE_ONLY)
+
+gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
+    const gd::String& newActionName, const gd::String& copiedActionName) {
+  gd::String newNameWithNamespace = GetNameSpace() + newActionName;
+  gd::String copiedNameWithNamespace = GetNameSpace() + copiedActionName;
+
+  auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
+  if (copiedAction == actionsInfos.end()) {
+    gd::LogWarning("Could not find an action with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    actionsInfos[newNameWithNamespace] = copiedAction->second;
+  }
+
+  return actionsInfos[newNameWithNamespace];
+}
+
+gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
+    const gd::String& newConditionName, const gd::String& copiedConditionName) {
+  gd::String newNameWithNamespace = GetNameSpace() + newConditionName;
+  gd::String copiedNameWithNamespace = GetNameSpace() + copiedConditionName;
+
+  auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
+  if (copiedCondition == conditionsInfos.end()) {
+    gd::LogWarning("Could not find a condition with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    conditionsInfos[newNameWithNamespace] = copiedCondition->second;
+  }
+
+  return conditionsInfos[newNameWithNamespace];
+}
+/**
+ * \brief Create a new expression which is the duplicate of the specified one.
+ *
+ * Useful for handling a deprecated expression that is just a "copy" of the
+ * new one.
+ */
+gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
+    const gd::String& newExpressionName,
+    const gd::String& copiedExpressionName) {
+  gd::String newNameWithNamespace = GetNameSpace() + newExpressionName;
+  gd::String copiedNameWithNamespace = GetNameSpace() + copiedExpressionName;
+
+  auto copiedExpression = expressionsInfos.find(copiedNameWithNamespace);
+  if (copiedExpression == expressionsInfos.end()) {
+    gd::LogWarning("Could not find an expression with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    expressionsInfos[newNameWithNamespace] = copiedExpression->second;
+  }
+
+  return expressionsInfos[newNameWithNamespace];
+}
+/**
+ * \brief Create a new string expression which is the duplicate of the
+ * specified one.
+ *
+ * Useful for handling a deprecated string expression that is just a "copy" of
+ * the new one.
+ */
+gd::ExpressionMetadata& PlatformExtension::AddDuplicatedStrExpression(
+    const gd::String& newExpressionName,
+    const gd::String& copiedExpressionName) {
+  gd::String newNameWithNamespace = GetNameSpace() + newExpressionName;
+  gd::String copiedNameWithNamespace = GetNameSpace() + copiedExpressionName;
+
+  auto copiedExpression = strExpressionsInfos.find(copiedNameWithNamespace);
+  if (copiedExpression == strExpressionsInfos.end()) {
+    gd::LogWarning("Could not find a string expression with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    strExpressionsInfos[newNameWithNamespace] = copiedExpression->second;
+  }
+
+  return strExpressionsInfos[newNameWithNamespace];
+}
+
 std::map<gd::String, gd::InstructionMetadata>&
 PlatformExtension::GetAllActions() {
   return actionsInfos;

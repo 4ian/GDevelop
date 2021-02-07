@@ -78,6 +78,7 @@ export const AssetStore = ({
               </ScrollView>
             </Background>
             <SearchResults
+              baseSize={128}
               onRetry={fetchAssetsAndFilters}
               error={error}
               searchItems={searchResults}

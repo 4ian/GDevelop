@@ -17,7 +17,7 @@ jobs:
       # System dependencies (for Electron Builder and Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake
 
       - run:
           name: Install Emscripten (for GDevelop.js)

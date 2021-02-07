@@ -11,7 +11,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
       "SystemInfo",
       _("System information"),
-      _("Provides information about the system running the game"),
+      _("Get information about the system and device running the game."),
       "Florian Rival",
       "Open source (MIT License)");
 

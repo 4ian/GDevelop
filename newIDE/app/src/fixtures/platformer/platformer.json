@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
+    "projectUuid": "c82d449a-9975-4c9d-a003-8683951a8a09",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -5572,12 +5572,16 @@
       "description": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
       "extensionNamespace": "",
       "fullName": "Parallax for Tiled Sprite",
+      "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWltYWdlLW1vdmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTUsM0gxOVYwTDI0LDVMMTksMTBWN0gxNVYzTTIxLDExLjk0VjE5QTIsMiAwIDAsMSAxOSwyMUg1QTIsMiAwIDAsMSAzLDE5VjVBMiwyIDAgMCwxIDUsM0gxMi4wNkMxMiwzLjMzIDEyLDMuNjcgMTIsNEE4LDggMCAwLDAgMjAsMTJDMjAuMzMsMTIgMjAuNjcsMTIgMjEsMTEuOTRNMTksMThMMTQuNSwxMkwxMSwxNi41TDguNSwxMy41TDUsMThIMTlaIiAvPjwvc3ZnPg==",
       "name": "Parallax",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/image-move.svg",
       "shortDescription": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
-      "tags": "parallax, tiled",
-      "version": "1.0.0",
+      "version": "1.0.1",
+      "tags": [
+        "parallax",
+        "tiled"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -5631,7 +5635,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "CameraWidth(Object.Behavior::PropertyFollowedLayer(), 0)"
+                        "CameraWidth(Object.Layer(), 0)"
                       ],
                       "subInstructions": []
                     }
@@ -5736,7 +5740,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "CameraHeight(Object.Behavior::PropertyFollowedLayer(), 0)"
+                        "CameraHeight(Object.Layer(), 0)"
                       ],
                       "subInstructions": []
                     }

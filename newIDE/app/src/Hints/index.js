@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
+import { getHelpLink } from '../Utils/HelpLink';
 
 export type Hint = {|
   kind: 'warning' | 'info',
@@ -12,9 +13,10 @@ export type TutorialHint = {|
   kind: 'tutorial' | 'video-tutorial',
   name: string,
   message: MessageDescriptor,
-  iconSrc: string,
+  iconSrc: ?string,
   link: string,
   identifier: string,
+  featuredForGettingStarted?: boolean,
 |};
 
 export const getDeprecatedBehaviorsInformation = (): {
@@ -30,6 +32,7 @@ export const getExperimentalObjects = (): {
 } => ({
   'Video::VideoObject': true,
   'SkeletonObject::Skeleton': true,
+  'TileMap::TileMap': true,
 });
 
 export const getExtraObjectsInformation = (): {
@@ -57,6 +60,12 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
+    },
+  ],
+  'TileMap::TileMap': [
+    {
+      kind: 'info',
+      message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
     },
   ],
 });
@@ -114,11 +123,86 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Be careful with this action, you may have problems exiting the preview if you don't add a way to toggle it back.`,
     };
   }
+  if (type === 'GetArgumentAsBoolean') {
+    return {
+      kind: 'info',
+      message: t`If the parameter is a string or a number, you probably want to use the expressions "GetArgumentAsString" or "GetArgumentAsNumber", along with the conditions "Compare two strings" or "Compare two numbers".`,
+    };
+  }
 
   return null;
 };
 
 const tutorialHints = {
+  'geometry-monster': {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/geometry-monster.png',
+    name: 'Geometry Monster Tutorial',
+    message: t`Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.`,
+    link: getHelpLink('/tutorials/geometry-monster'),
+    identifier: 'geometry-monster',
+    featuredForGettingStarted: true,
+  },
+  platformer: {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/platformer.png',
+    name: 'Platformer Tutorial',
+    message: t`Make a platform game from scratch.`,
+    link: getHelpLink('/tutorials/platformer/start'),
+    identifier: 'platformer',
+    featuredForGettingStarted: true,
+  },
+  'space-shooter': {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/space-shooter.png',
+    name: 'Space Shooter Tutorial',
+    message: t`Make a space shooter game from scratch.`,
+    link: getHelpLink('/tutorials/space-shooter'),
+    identifier: 'space-shooter',
+    featuredForGettingStarted: true,
+  },
+  'simple-game-physics-particles': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/simple-game-physics-particles.jpg',
+    name: 'How to Create a Simple Game with Physics and Particles',
+    message: t`Create a game from scratch using physics and particles.`,
+    link: 'https://www.youtube.com/watch?v=w8B84Dpgkjc',
+    identifier: 'simple-game-physics-particles',
+    featuredForGettingStarted: true,
+  },
+  'tank-shooter': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Tank Shooter Tutorial',
+    message: t`Make a simple tank shooter game from scratch.`,
+    link: getHelpLink('/tutorials/tank-shooter'),
+    identifier: 'tank-shooter',
+  },
+  'endless-runner': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Endless Runner Tutorial',
+    message: t`Make a simple game where the player must jump on platforms for as long as possible.`,
+    link: getHelpLink('/tutorials/endless-runner'),
+    identifier: 'endless-runner',
+  },
+  'endless-car-game': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Endless Car Game Tutorial',
+    message: t`Create a simple game where you must dodge the cars on the road.`,
+    link: getHelpLink('/tutorials/roadrider'),
+    identifier: 'endless-car-game',
+  },
+  'breakout-tutorial': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Breakout Tutorial',
+    message: t`Create a simple breakout game where you must destroy all the bricks on the screen.`,
+    link: getHelpLink('/tutorials/breakout'),
+    identifier: 'breakout-tutorial',
+  },
+
   'screen-shake-timer-variables': {
     kind: 'video-tutorial',
     iconSrc: 'res/tutorial_icons/screen-shake-timer-variables.jpg',

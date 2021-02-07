@@ -67,6 +67,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
           </ScrollView>
         </Background>
         <SearchResults
+          baseSize={128}
           onRetry={fetchResourcesAndFilters}
           error={error}
           searchItems={searchResultsForResourceKind}

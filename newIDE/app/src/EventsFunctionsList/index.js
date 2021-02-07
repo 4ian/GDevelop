@@ -15,7 +15,7 @@ import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
@@ -176,9 +176,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _pasteEventsFunction = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
-    const { eventsFunction: copiedEventsFunction, name } = Clipboard.get(
-      EVENTS_FUNCTION_CLIPBOARD_KIND
+    const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
+    const copiedEventsFunction = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'eventsFunction'
     );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedEventsFunction) return;
+
     const { project, eventsFunctionsContainer } = this.props;
 
     const newName = newNameGenerator(name, name =>

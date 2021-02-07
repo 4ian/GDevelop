@@ -13,13 +13,12 @@ void GD_CORE_API
 BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation(
-          "BuiltinExternalLayouts",
-          _("External layouts"),
-          _("Built-in extension providing actions and conditions related to "
-            "external layouts"),
-          "Florian Rival",
-          "Open source (MIT License)")
+      .SetExtensionInformation("BuiltinExternalLayouts",
+                               _("External layouts"),
+                               "Provides actions and conditions related to "
+                               "external layouts.",
+                               "Florian Rival",
+                               "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/external-layouts");
 
 #if defined(GD_IDE_ONLY)

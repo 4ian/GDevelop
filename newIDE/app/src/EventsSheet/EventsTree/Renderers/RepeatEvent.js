@@ -14,6 +14,7 @@ import DefaultField from '../../ParameterFields/DefaultField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -104,9 +105,11 @@ export default class RepeatEvent extends React.Component<
             tabIndex={0}
           >
             {expression ? (
-              `Repeat ${expression} times:`
+              <Trans>Repeat {expression} times:</Trans>
             ) : (
-              <i>Click to choose how many times will be repeated</i>
+              <i>
+                <Trans>Click to choose how many times will be repeated</Trans>
+              </i>
             )}
           </span>
         </div>

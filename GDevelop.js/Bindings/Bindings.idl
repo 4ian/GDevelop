@@ -300,6 +300,9 @@ interface Project {
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
+    void SetProjectUuid([Const] DOMString projectUuid);
+    [Const, Ref] DOMString GetProjectUuid();
+    void ResetProjectUuid();
     void SetProjectFile([Const] DOMString file);
     [Const, Ref] DOMString GetProjectFile();
     void SetGameResolutionSize(long width, long height);
@@ -1068,7 +1071,7 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
     [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
 
-    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
+    [Ref] DependencyMetadata OnlyIfSomeExtraSettingsNonEmpty();
 };
 
 interface ParameterMetadata {
@@ -1105,6 +1108,7 @@ interface VectorParameterMetadata {
     [Ref] ParameterMetadata at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
     void FREE_removeFromVectorParameterMetadata(unsigned long index);
+    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 
@@ -1313,6 +1317,19 @@ interface PlatformExtension {
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+
     [Value] VectorString GetExtensionObjectsTypes();
     [Value] VectorString GetBehaviorsTypes();
     [Value] VectorString GetExtensionEffectTypes();
@@ -1460,6 +1477,36 @@ interface ForEachEvent {
 
     //Inherited from BaseEvent:
     ForEachEvent Clone();
+    [Const, Ref] DOMString GetType();
+    void SetType([Const] DOMString type);
+    boolean IsExecutable();
+    boolean CanHaveSubEvents();
+    boolean HasSubEvents();
+    [Ref] EventsList GetSubEvents();
+    boolean IsDisabled();
+    void SetDisabled(boolean disable);
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface ForEachChildVariableEvent {
+    void ForEachChildVariableEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+
+    [Const, Ref] DOMString GetIterableVariableName();
+    [Const, Ref] DOMString GetKeyIteratorVariableName();
+    [Const, Ref] DOMString GetValueIteratorVariableName();
+    void SetIterableVariableName([Const] DOMString newName);
+    void SetKeyIteratorVariableName([Const] DOMString newName);
+    void SetValueIteratorVariableName([Const] DOMString newName);
+
+    //Inherited from BaseEvent:
+    ForEachChildVariableEvent Clone();
     [Const, Ref] DOMString GetType();
     void SetType([Const] DOMString type);
     boolean IsExecutable();
@@ -1902,14 +1949,15 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
-    [Ref] EventsFunctionsExtension SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
+    [Ref] VectorString GetTags();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
     [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
     [Const, Ref] DOMString GetPreviewIconUrl();
     [Ref] EventsFunctionsExtension SetIconUrl([Const] DOMString iconUrl);
     [Const, Ref] DOMString GetIconUrl();
+    [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
+    [Const, Ref] DOMString GetHelpPath();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

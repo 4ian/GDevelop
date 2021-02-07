@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.gdevelop.gdblade",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/space-shooter/space-shooter.json",
+    "projectUuid": "40020a93-0979-4af4-8fdd-0c5b53e17d66",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -9872,12 +9872,20 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Flash",
       "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10482,12 +10490,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "FireBullet",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10814,12 +10825,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Health",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11486,12 +11500,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "StayOnScreen",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11612,12 +11629,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "LinearMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11709,12 +11729,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "BackAndForthMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -12116,12 +12139,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "SineMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -12381,12 +12407,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "VibratingCamera",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [
         {
           "description": "Vibrate the camera randomly around a position",
@@ -12580,12 +12609,15 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
       "iconUrl": "",
       "name": "SpaceShooterControls",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [
         {
           "description": "Handle the player object movements, by checking the touch position or the keys pressed",

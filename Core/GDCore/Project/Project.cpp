@@ -38,6 +38,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/PolymorphicClone.h"
+#include "GDCore/Tools/UUID/UUID.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Utf8/utf8.h"
 
@@ -64,6 +65,7 @@ Project::Project()
       scaleMode("linear"),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
@@ -106,6 +108,8 @@ Project::Project()
 }
 
 Project::~Project() {}
+
+void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
@@ -595,6 +599,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
+  SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -621,6 +626,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   } else {
     useDeprecatedZeroAsDefaultZOrder =
         propElement.GetBoolAttribute("useDeprecatedZeroAsDefaultZOrder", false);
+  }
+  // end of compatibility code
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (!propElement.HasAttribute("projectUuid") &&
+      !propElement.HasChild("projectUuid")) {
+    ResetProjectUuid();
   }
   // end of compatibility code
 
@@ -888,6 +900,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
+  propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
@@ -1087,6 +1100,7 @@ void Project::Init(const gd::Project& game) {
   scaleMode = game.scaleMode;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
 #if defined(GD_IDE_ONLY)

@@ -164,8 +164,12 @@
 }
 
 /**
- * Container having an icon next to the associated name
+ * Container having an icon next to the associated name.
+ * No rules to be set, we used to have a nowrap but it creates issues
+ * with overflowing long object/variable names (that can contain expressions).
  */
+/*
 .gd-events-sheet .name-and-icon-container {
     white-space: nowrap;
 }
+*/

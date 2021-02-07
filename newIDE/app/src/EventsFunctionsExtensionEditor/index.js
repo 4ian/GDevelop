@@ -40,6 +40,7 @@ import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { getParametersIndexOffset } from '../EventsFunctionsExtensionsLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -296,6 +297,48 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsBasedBehavior,
       eventsFunction.getName(),
       newName
+    );
+
+    done(true);
+  };
+
+  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: boolean => void
+  ) => {
+    // Don't ask for user confirmation as this change is easy to revert.
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.moveEventsFunctionParameter(
+      project,
+      eventsFunctionsExtension,
+      eventsFunction.getName(),
+      oldIndex + getParametersIndexOffset(false),
+      newIndex + getParametersIndexOffset(false)
+    );
+
+    done(true);
+  };
+
+  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: boolean => void
+  ) => {
+    // Don't ask for user confirmation as this change is easy to revert.
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      eventsFunction.getName(),
+      oldIndex,
+      newIndex
     );
 
     done(true);
@@ -577,36 +620,49 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         title: t`Function Configuration`,
         toolbarControls: [],
         renderEditor: () => (
-          <Background>
-            {selectedEventsFunction &&
-            this._globalObjectsContainer &&
-            this._objectsContainer ? (
-              <EventsFunctionConfigurationEditor
-                project={project}
-                eventsFunction={selectedEventsFunction}
-                eventsBasedBehavior={selectedEventsBasedBehavior}
-                globalObjectsContainer={this._globalObjectsContainer}
-                objectsContainer={this._objectsContainer}
-                helpPagePath={
-                  !!selectedEventsBasedBehavior
-                    ? '/behaviors/events-based-behaviors'
-                    : '/events/functions'
-                }
-                onParametersOrGroupsUpdated={() => {
-                  this._loadEventsFunctionFrom(project, selectedEventsFunction);
-                  this.forceUpdate();
-                }}
-                unsavedChanges={this.props.unsavedChanges}
-              />
-            ) : (
-              <EmptyMessage>
-                <Trans>
-                  Choose a function, or a function of a behavior, to set the
-                  parameters that it accepts.
-                </Trans>
-              </EmptyMessage>
+          <I18n>
+            {({ i18n }) => (
+              <Background>
+                {selectedEventsFunction &&
+                this._globalObjectsContainer &&
+                this._objectsContainer ? (
+                  <EventsFunctionConfigurationEditor
+                    project={project}
+                    eventsFunction={selectedEventsFunction}
+                    eventsBasedBehavior={selectedEventsBasedBehavior}
+                    globalObjectsContainer={this._globalObjectsContainer}
+                    objectsContainer={this._objectsContainer}
+                    helpPagePath={
+                      !!selectedEventsBasedBehavior
+                        ? '/behaviors/events-based-behaviors'
+                        : '/events/functions'
+                    }
+                    onParametersOrGroupsUpdated={() => {
+                      this._loadEventsFunctionFrom(
+                        project,
+                        selectedEventsFunction
+                      );
+                      this.forceUpdate();
+                    }}
+                    onMoveFreeEventsParameter={this._makeMoveFreeEventsParameter(
+                      i18n
+                    )}
+                    onMoveBehaviorEventsParameter={this._makeMoveBehaviorEventsParameter(
+                      i18n
+                    )}
+                    unsavedChanges={this.props.unsavedChanges}
+                  />
+                ) : (
+                  <EmptyMessage>
+                    <Trans>
+                      Choose a function, or a function of a behavior, to set the
+                      parameters that it accepts.
+                    </Trans>
+                  </EmptyMessage>
+                )}
+              </Background>
             )}
-          </Background>
+          </I18n>
         ),
       },
       'events-sheet': {

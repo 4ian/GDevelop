@@ -5,29 +5,32 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
 #include "DraggableBehavior.h"
 #include "DraggableRuntimeBehavior.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 
 void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "DraggableBehavior",
-      _("Draggable Behavior"),
-      _("This Extension enables the movement of objects with a mouse."),
-      "Florian Rival",
-      "Open source (MIT License)")
-      .SetExtensionHelpPath("behaviors/draggable");
+  extension
+      .SetExtensionInformation(
+          "DraggableBehavior",
+          _("Draggable Behavior"),
+          _("Allows objects to be moved using the mouse (or touch). Add the "
+            "behavior to an object to make it draggable. Use events to enable "
+            "or disable the behavior when needed."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/draggable");
 
-  gd::BehaviorMetadata& aut =
-      extension.AddBehavior("Draggable",
-                            _("Draggable object"),
-                            _("Draggable"),
-                            _("Allows objects to be moved using the mouse (or touch)."),
-                            "",
-                            "CppPlatform/Extensions/draggableicon.png",
-                            "DraggableBehavior",
-                            std::make_shared<DraggableBehavior>(),
-                            std::shared_ptr<gd::BehaviorsSharedData>());
+  gd::BehaviorMetadata& aut = extension.AddBehavior(
+      "Draggable",
+      _("Draggable object"),
+      _("Draggable"),
+      _("Allows objects to be moved using the mouse (or touch)."),
+      "",
+      "CppPlatform/Extensions/draggableicon.png",
+      "DraggableBehavior",
+      std::make_shared<DraggableBehavior>(),
+      std::shared_ptr<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
   aut.AddCondition("Dragged",

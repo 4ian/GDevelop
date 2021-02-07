@@ -5,22 +5,25 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-
 #include "Extension.h"
+
 #include "ExtensionSubDeclaration1.h"
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "ParticleEmitterObject.h"
 
 void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "ParticleSystem",
-      _("Particle system"),
-      _("This Extension can display a large number of small particles."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "ParticleSystem",
+          _("Particle system"),
+          "A particle emitter allows to create various effects by showing a "
+          "lot of tiny images called particles. It's ideal for fires, smoke, "
+          "explosions, magical effects, etc...",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/particles_emitter");
 
   // Declaration of all objects available

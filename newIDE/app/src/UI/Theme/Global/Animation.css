@@ -1,0 +1,33 @@
+/*
+ * Scale the element and make it jiggle. Useful to
+ * draw the user attention on this. Use sparingly.
+ */
+@keyframes scale-and-jiggle {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  30% {
+    transform: rotate(0deg) scale(1.75);
+  }
+  40% {
+    transform: rotate(4deg) scale(1.75);
+  }
+  50% {
+    transform: rotate(-4deg) scale(1.75);
+  }
+  60% {
+    transform: rotate(4deg) scale(1.75);
+  }
+  70% {
+    transform: rotate(-4deg) scale(1.75);
+  }
+  80% {
+    transform: rotate(4deg) scale(1.75);
+  }
+  90% {
+    transform: rotate(-4deg) scale(1.75);
+  }
+  100% {
+    transform: rotate(0deg) scale(1.75);
+  }
+}

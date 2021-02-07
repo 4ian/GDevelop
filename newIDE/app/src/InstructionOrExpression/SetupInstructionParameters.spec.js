@@ -168,4 +168,104 @@ describe('setupInstructionParameters', () => {
     expect(instruction.getParameter(0)).toBe(objectName);
     expect(instruction.getParameter(1)).toBe('FirstPlatformerObject');
   });
+
+  it('sets the proper parameters for a behavior, changing it if a wrong behavior name is entered', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const objectName = 'MySpriteObject';
+    const object = layout.insertNewObject(project, 'Sprite', objectName, 0);
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'FirstPlatformerObject'
+    );
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'OtherPlatformerObject'
+    );
+
+    // Simulate that we select an instruction of the object behavior
+    const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
+      false,
+      project,
+      layout,
+      objectName
+    );
+    const jumpSpeedInstruction = enumeratedInstructions.find(
+      enumeratedInstruction =>
+        enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
+    );
+
+    if (!jumpSpeedInstruction) {
+      throw new Error('PlatformBehavior::JumpSpeed action was not found');
+    }
+
+    const instruction = new gd.Instruction();
+    instruction.setParametersCount(4);
+    instruction.setParameter(0, objectName);
+    instruction.setParameter(1, 'WrongName');
+    setupInstructionParameters(
+      project,
+      layout,
+      instruction,
+      jumpSpeedInstruction.metadata,
+      objectName
+    );
+
+    // Check that parameters were created, the object name and behavior set
+    expect(instruction.getParametersCount()).toBe(4);
+    expect(instruction.getParameter(0)).toBe(objectName);
+    expect(instruction.getParameter(1)).toBe('FirstPlatformerObject');
+  });
+
+  it('sets the proper parameters for a behavior, letting an existing behavior name if it is valid', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const objectName = 'MySpriteObject';
+    const object = layout.insertNewObject(project, 'Sprite', objectName, 0);
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'FirstPlatformerObject'
+    );
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'OtherPlatformerObject'
+    );
+
+    // Simulate that we select an instruction of the object behavior
+    const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
+      false,
+      project,
+      layout,
+      objectName
+    );
+    const jumpSpeedInstruction = enumeratedInstructions.find(
+      enumeratedInstruction =>
+        enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
+    );
+
+    if (!jumpSpeedInstruction) {
+      throw new Error('PlatformBehavior::JumpSpeed action was not found');
+    }
+
+    const instruction = new gd.Instruction();
+    instruction.setParametersCount(4);
+    instruction.setParameter(0, objectName);
+    instruction.setParameter(1, 'OtherPlatformerObject');
+    setupInstructionParameters(
+      project,
+      layout,
+      instruction,
+      jumpSpeedInstruction.metadata,
+      objectName
+    );
+
+    // Check that parameters were created, the object name and behavior set
+    expect(instruction.getParametersCount()).toBe(4);
+    expect(instruction.getParameter(0)).toBe(objectName);
+    expect(instruction.getParameter(1)).toBe('OtherPlatformerObject');
+  });
 });

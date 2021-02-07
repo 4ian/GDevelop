@@ -32,6 +32,5 @@
     "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\"",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
-  },
-  "dependencies": {}
+  }
 }

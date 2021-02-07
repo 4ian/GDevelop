@@ -296,12 +296,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
 
   return conditionsInfos[newNameWithNamespace];
 }
-/**
- * \brief Create a new expression which is the duplicate of the specified one.
- *
- * Useful for handling a deprecated expression that is just a "copy" of the
- * new one.
- */
+
 gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
     const gd::String& newExpressionName,
     const gd::String& copiedExpressionName) {
@@ -318,13 +313,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
 
   return expressionsInfos[newNameWithNamespace];
 }
-/**
- * \brief Create a new string expression which is the duplicate of the
- * specified one.
- *
- * Useful for handling a deprecated string expression that is just a "copy" of
- * the new one.
- */
+
 gd::ExpressionMetadata& PlatformExtension::AddDuplicatedStrExpression(
     const gd::String& newExpressionName,
     const gd::String& copiedExpressionName) {

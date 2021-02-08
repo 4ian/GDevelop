@@ -184,7 +184,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
     destroyWhenNoParticles = enable;
   };
 
-  float GetNbParticles() const { return nbParticles; };
   float GetRendererParam1() const { return rendererParam1; };
   float GetRendererParam2() const { return rendererParam2; };
   float GetTank() const { return tank; };
@@ -264,7 +263,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
 
   gd::String textureParticleName;
   RendererType rendererType;
-  std::size_t nbParticles;
   float rendererParam1;
   float rendererParam2;
   bool additive;

@@ -732,7 +732,7 @@ namespace gdjs {
       }
     }
 
-    getNbParticles() {
+    getParticleCount() {
       return this._renderer.getParticleCount();
     }
 

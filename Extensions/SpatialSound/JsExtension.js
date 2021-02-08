@@ -20,7 +20,7 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function (
+  createExtension: function(
     _ /*: (string) => string */,
     gd /*: libGDevelop */
   ) {
@@ -39,7 +39,9 @@ module.exports = {
       .addAction(
         'SetSoundPosition',
         _('Set position of sound'),
-        _('Sets the spatial position of a sound.'),
+        _(
+          "Sets the spatial position of a sound. When a sound is at a distance of 1 to the listener, it's heard at 100% volume. Then, it follows an *inverse distance model*. At a distance of 2, it's heard at 50%, and at a distance of 4 it's heard at 25%."
+        ),
         _(
           'Set position of sound on channel _PARAM1_ to position _PARAM2_, _PARAM3_, _PARAM4_'
         ),
@@ -76,7 +78,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
+  runExtensionSanityTests: function(
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {

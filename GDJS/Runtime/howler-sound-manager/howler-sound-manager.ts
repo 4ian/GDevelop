@@ -1,4 +1,4 @@
-import type { Howl, HowlCallback, Howler } from './howler';
+import type { Howl, HowlCallback, Howler } from '../types/howler';
 /*
  * GDevelop JS Platform
  * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights reserved.

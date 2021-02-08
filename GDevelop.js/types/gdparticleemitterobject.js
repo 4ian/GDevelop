@@ -12,6 +12,7 @@ declare class gdParticleEmitterObject extends gdObject {
   isRenderingAdditive(): boolean;
   setRenderingAdditive(): void;
   setRenderingAlpha(): void;
+  getNbParticles(): number;
   setMaxParticleNb(newValue: number): void;
   getMaxParticleNb(): number;
   setTank(newValue: number): void;

@@ -2394,6 +2394,7 @@ interface ParticleEmitterObject {
     void SetRenderingAdditive();
     void SetRenderingAlpha();
 
+    float GetNbParticles();
     void SetMaxParticleNb(float newValue);
     float GetMaxParticleNb();
     void SetTank(float newValue);

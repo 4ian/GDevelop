@@ -61,7 +61,7 @@ export const getExtraObjectsInformation = (): {
     },
     {
       kind: 'info',
-      message: t`For editing the font size you have to make a new export in an external editor like bmFont, click on help button bellow for more help.`,
+      message: t`The font size is stored directly inside the font. If you want to change it, export again your font using an external editor like bmFont. Click on the help button to learn more.`,
     },
   ],
   'SkeletonObject::Skeleton': [

@@ -6,10 +6,10 @@ import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 const gd: libGDevelop = global.gd;
 
+const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
-const defaultBitmapFontUrl = 'res/fonts/bitmapFont/silver.fnt';
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -226,6 +226,10 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<any> {
+    if (loadedBitmapFonts[resourceName]) {
+      return Promise.resolve(loadedBitmapFonts[resourceName].data);
+    }
+
     if (!project.getResourcesManager().hasResource(resourceName))
       return Promise.reject(
         new Error(`Can't find resource called ${resourceName}.`)
@@ -239,17 +243,21 @@ export default class PixiResourcesLoader {
         )
       );
 
-    let fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+    const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
     if (!fullUrl) {
-      console.warn(
-        `The resource called ${resourceName} was no found.\nThe default bitmap font will be used.`
+      return Promise.reject(
+        new Error(
+          `The resource called ${resourceName} was no found.\nThe default bitmap font will be used.`
+        )
       );
-      return;
     }
 
-    return axios.get(fullUrl).then(response => response.data);
+    return axios.get(fullUrl).then(response => {
+      loadedBitmapFonts[resourceName] = response;
+      return response.data;
+    });
   }
 
   static getInvalidPIXITexture() {

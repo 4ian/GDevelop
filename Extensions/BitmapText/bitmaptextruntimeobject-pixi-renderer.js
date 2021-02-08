@@ -13,12 +13,13 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   this._object = runtimeObject;
 
   // Set up the object to track the font we're using.
-  this._bitmapFontStyle = new PIXI.TextStyle();
-  this._bitmapFontStyle.fontFamily = 'Arial';
-  this._bitmapFontStyle.fontSize = 20;
-  this._bitmapFontStyle.align = runtimeObject._align;
-  this._bitmapFontStyle.wordWrap = runtimeObject._wordWrap;
-  this._bitmapFontStyle.fill = '#000000';
+  this._bitmapFontStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 20,
+    align: runtimeObject._align,
+    fill: '#000000',
+    wordWrap: runtimeObject._wordWrap,
+  });
 
   const defaultSlugFontName =
     this._bitmapFontStyle.fontFamily +
@@ -29,40 +30,32 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     '-bitmapFont';
   this._bitmapFontStyle.fontName = defaultSlugFontName;
 
-  // Load (or reset) the text
-  if (this._pixiObject === undefined) {
-    //Generate default bitmap font
-    PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
-      chars: [
-        [' ', '~'], // All the printable ASCII characters
-      ],
-    });
+  //Generate default bitmap font
+  PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
+    chars: [
+      [' ', '~'], // All the printable ASCII characters
+    ],
+  });
 
-    this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
-      fontName: defaultSlugFontName,
-    });
+  this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
+    fontName: defaultSlugFontName,
+  });
 
-    let bitmapFontResourceName = runtimeObject._bitmapFontFile;
-    let bitmapTextureResourceName = runtimeObject._bitmapTextureFile;
+  let bitmapFontResourceName = runtimeObject._bitmapFontFile;
+  let bitmapAtlasResourceName = runtimeObject._bitmapAtlasFile;
 
-    let texture = runtimeScene
-      .getGame()
-      .getImageManager()
-      .getPIXITexture(bitmapTextureResourceName);
+  let texture = runtimeScene
+    .getGame()
+    .getImageManager()
+    .getPIXITexture(bitmapAtlasResourceName);
 
-    // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
-    const bitmapFont = runtimeScene
-      .getGame()
-      .getBitmapFontManager()
-      .getBitmapFontFromData(bitmapFontResourceName, texture);
-    this._pixiObject.fontName = bitmapFont.font;
-    this._pixiObject.fontSize = bitmapFont.size;
-
-    this.updatePosition();
-  } else {
-    this.updateFont();
-    this.updateScale();
-  }
+  // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
+  const bitmapFont = runtimeScene
+    .getGame()
+    .getBitmapFontManager()
+    .getBitmapFontFromData(bitmapFontResourceName, texture);
+  this._pixiObject.fontName = bitmapFont.font;
+  this._pixiObject.fontSize = bitmapFont.size;
 
   runtimeScene
     .getLayer('')
@@ -74,6 +67,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
 
+  this.updatePosition();
   this.updateAlignment();
   this.updateTextContent();
   this.updatePosition();
@@ -96,23 +90,23 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.onDestroy = function () {
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
-  let bitmapFontResourceName = this._object._bitmapFontFile;
-  let bitmapTextureResourceName = this._object._bitmapTextureFile;
+  const bitmapFontResourceName = this._object._bitmapFontFile;
+  const bitmapAtlasResourceName = this._object._bitmapAtlasFile;
 
   // Get the texture used in the bitmap font
-  let texture = this._object._runtimeScene
+  const texture = this._object._runtimeScene
     .getGame()
     .getImageManager()
-    .getPIXITexture(bitmapTextureResourceName);
+    .getPIXITexture(bitmapAtlasResourceName);
 
   // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
   const bitmapFont = this._object._runtimeScene
     .getGame()
     .getBitmapFontManager()
     .getBitmapFontFromData(bitmapFontResourceName, texture);
+
   this._pixiObject.fontName = bitmapFont.font;
   this._pixiObject.fontSize = bitmapFont.size;
-
   this.updatePosition();
 };
 
@@ -125,16 +119,27 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateTint = function () {
   this._pixiObject.dirty = true;
 };
 
+/**
+ * Get the tint of the bitmap object as a "R;G;B" string.
+ * @returns {string} the tint of bitmap object in "R;G;B" format.
+ */
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getTint = function () {
-  return this._pixiObject.tint;
+  return (
+    this._object._tint[0] +
+    ';' +
+    this._object._tint[1] +
+    ';' +
+    this._object._tint[2]
+  );
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateScale = function () {
   this._pixiObject.scale.set(this._object._scale);
+  this.updatePosition();
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getScale = function () {
-  return this._pixiObject.scale.x && this._pixiObject.scale.y; // both should be equal, return the biggest
+  return Math.max(this._pixiObject.scale.x, this._pixiObject.scale.y);
 };
 
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateWrappingWidth = function () {

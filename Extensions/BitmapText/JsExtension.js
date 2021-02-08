@@ -86,11 +86,11 @@ module.exports = {
         .setLabel(_('Bitmap Font'));
 
       objectProperties
-        .getOrCreate('bitmapTextureFile')
-        .setValue(objectContent.bitmapTextureFile)
+        .getOrCreate('bitmapAtlasFile')
+        .setValue(objectContent.bitmapAtlasFile)
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bitmap texture'));
+        .setLabel(_('Bitmap atlas image'));
 
       objectProperties
         .getOrCreate('scale')
@@ -121,7 +121,7 @@ module.exports = {
         fontSize: 20,
         tint: '#ffffff',
         bitmapFontFile: '',
-        bitmapTextureFile: '',
+        bitmapAtlasFile: '',
         align: 'left',
         wordWrap: true,
       })
@@ -175,7 +175,7 @@ module.exports = {
         'res/conditions/text.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('string')
+      .useStandardRelationalOperatorParameters('string')
       .getCodeExtraInformation()
       .setFunctionName('getText');
 
@@ -192,7 +192,7 @@ module.exports = {
         'res/conditions/opacity.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardRelationalOperatorParameters('number')
       .getCodeExtraInformation()
       .setFunctionName('getOpacity');
 
@@ -357,18 +357,23 @@ module.exports = {
 
     object
       .addAction(
-        'BitmapFontName',
-        _('Font'),
-        _('Change the font used by the Bitmap text object.'),
-        _('Set the font of _PARAM0_ to _PARAM1_'),
+        'BitmapFontAndAtlasFile',
+        _('Bitmap files'),
+        _(
+          'Change the font file and atlas image used by the Bitmap text object.'
+        ),
+        _(
+          'Set the bitmap font of _PARAM0_ with font file:_PARAM1_ and the atlas image:_PARAM2_'
+        ),
         '',
         'res/actions/font24.png',
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .addParameter('font', _('Font resource'), '', false)
+      .addParameter('bitmapFont', _('Bitmap font file'), '', false)
+      .addParameter('string', _('Bitmap atlas texture'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setFont'); // TODO a test mais on change pas de la font mais la resource directement, mettre une nouvelle action pour changer l'atlas en plus.
+      .setFunctionName('setBitmapFontAndAtlasFile');
 
     object
       .addAction(
@@ -397,7 +402,7 @@ module.exports = {
         _(
           "De/activate word wrapping. Note that word wrapping is a graphical option\nyou can't get the number of lines displayed"
         ),
-        _('Set word wrapping style of _PARAM0_: _PARAM1_'),
+        _('Activate wrapping style of _PARAM0_: _PARAM1_'),
         '',
         'res/actions/wordWrap24.png',
         'res/actions/wordWrap.png'
@@ -431,7 +436,6 @@ module.exports = {
         _('Scale'),
         _('Scale'),
         '',
-        'res/actions/scale24.png',
         'res/actions/scale24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
@@ -444,20 +448,18 @@ module.exports = {
         _('Font size'),
         _('Font size'),
         '',
-        'res/actions/characterSize24.png',
         'res/actions/characterSize24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getFontSize');
+      .setFunctionName('getFontSize'); // TODO dans la preview ça retourne undefined c'est pas bon faut prendre la valeur dans la font rendu qui se trouve dans le renderer.
 
     object
-      .addExpression(
+      .addStrExpression(
         'Text',
         _('Text'),
         _('Text'),
         '',
-        'res/actions/text24.png',
         'res/actions/text24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
@@ -465,12 +467,11 @@ module.exports = {
       .setFunctionName('getText');
 
     object
-      .addExpression(
+      .addStrExpression(
         'FontName',
         _('Font name'),
         _('Font name'),
         '',
-        'res/actions/font24.png',
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
@@ -551,7 +552,7 @@ module.exports = {
       // It will then be replaced with the bitmap font setup by the user (see `update` method)
 
       // Define same as  bitmapTextObject.setRawJSONContent() on top of this file
-      const style = new PIXI.TextStyle({
+      this._bitmapFontStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
         fontSize: 20,
         align: 'left',
@@ -559,8 +560,6 @@ module.exports = {
         fill: '#ffffff',
         wordWrap: true,
       });
-
-      this._bitmapFontStyle = style;
 
       // defaultSlugFontName is used as fontName when PixiJS generate the bitmap font.
       const defaultSlugFontName =
@@ -581,7 +580,7 @@ module.exports = {
 
       // We'll track changes of the font to trigger the loading of the new font.
       this._currentBitmapFontFile = '';
-      this._currentBitmapTextureFile = '';
+      this._currentBitmapAtlasFile = '';
 
       this._pixiObject = new PIXI.BitmapText('', {
         fontName: this._bitmapFontStyle.fontName, // Use the bitmap font previously generated.
@@ -630,24 +629,36 @@ module.exports = {
 
       // Track the changes in font to load the new requested font.
       const bitmapFontFile = properties.get('bitmapFontFile').getValue();
-      const bitmapTextureFile = properties.get('bitmapTextureFile').getValue();
+      const bitmapAtlasFile = properties.get('bitmapAtlasFile').getValue();
 
       if (
         this._currentBitmapFontFile !== bitmapFontFile ||
-        this._currentBitmapTextureFile !== bitmapTextureFile
+        this._currentBitmapAtlasFile !== bitmapAtlasFile
       ) {
         this._currentBitmapFontFile = bitmapFontFile;
-        this._currentBitmapTextureFile = bitmapTextureFile;
+        this._currentBitmapAtlasFile = bitmapAtlasFile;
 
-        this._texture = this._pixiResourcesLoader.getPIXITexture(
+        this._bitmapAtlasTexture = this._pixiResourcesLoader.getPIXITexture(
           this._project,
-          bitmapTextureFile
+          this._currentBitmapAtlasFile
         );
 
         this._pixiResourcesLoader
-          .getResourceBitmapFont(this._project, bitmapFontFile)
+          .getResourceBitmapFont(this._project, this._currentBitmapFontFile)
           .then((fontData) => {
-            const bitmapFont = PIXI.BitmapFont.install(fontData, this._texture);
+            const bitmapFont = PIXI.BitmapFont.install(
+              fontData,
+              this._bitmapAtlasTexture
+            );
+            // We patch the installed font to use a more complex name that includes the size of the font,
+            // to avoid conflicts between different font files using the same font name.
+
+            const defaultName = bitmapFont.font;
+            const fullSlugName = bitmapFont.font + '-' + bitmapFont.size;
+            bitmapFont.font = fullSlugName;
+            PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+            delete PIXI.BitmapFont.available[defaultName];
+
             this._pixiObject.fontName = bitmapFont.font;
             this._pixiObject.fontSize = bitmapFont.size;
             this._pixiObject.dirty = true;

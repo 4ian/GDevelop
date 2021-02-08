@@ -4,8 +4,8 @@
  * @property {number} content.opacity The opacity of the BitmapText
  * @property {string} content.text Content of the text
  * @property {string} content.tint The tint of the object
- * @property {string} content.bitmapFontResourceName The bitmap font file used for the text
- * @property {string} content.bitmapTextureResourceName The bitmap texture used with the bitmap font file
+ * @property {string} content.bitmapFontFile The bitmap font file used for the text
+ * @property {string} content.bitmapAtlasFile The bitmap texture used with the bitmap font file
  * @property {number} content.scale The scale of the bitmap text object
  * @property {boolean} content.wordWrap Activate word wrap if set to true
  * @property {('left'|'center'|'right')} content.align Alignment of the text: "left", "center" or "right"
@@ -32,13 +32,11 @@ gdjs.BitmapTextRuntimeObject = function (runtimeScene, objectData) {
   /** @type {string} */
   this._text = objectData.content.text;
   /** @type {number[]} color in format [r, g, b], where each component is in the range [0, 255] */
-  this._tint = gdjs.hexToRGBColor(
-    objectData.content.tint
-  );
+  this._tint = gdjs.hexToRGBColor(objectData.content.tint);
   /** @type {string} */
   this._bitmapFontFile = objectData.content.bitmapFontFile; // fnt/xml files
   /** @type {string} */
-  this._bitmapTextureFile = objectData.content.bitmapTextureFile; // texture file used with fnt/xml (bitmap font file)
+  this._bitmapAtlasFile = objectData.content.bitmapAtlasFile; // texture file used with fnt/xml (bitmap font file)
   /** @type {number} */
   this._scale = objectData.content.scale;
   /** @type {boolean} */
@@ -91,22 +89,20 @@ gdjs.BitmapTextRuntimeObject.prototype.updateFromObjectData = function (
     this.setText(newObjectData.content.text);
   }
   if (oldObjectData.content.tint !== newObjectData.content.tint) {
-    this._tint = gdjs.hexToRGBColor(
-      newObjectData.content.tint
-    );
+    this._tint = gdjs.hexToRGBColor(newObjectData.content.tint);
     this._renderer.updateTint();
   }
   if (
     oldObjectData.content.bitmapFontFile !==
     newObjectData.content.bitmapFontFile
   ) {
-    this.setFont(newObjectData.content.bitmapFontFile);
+    this._setBitmapFontFile(newObjectData.content.bitmapFontFile);
   }
   if (
-    oldObjectData.content.bitmapTextureFile !==
-    newObjectData.content.bitmapTextureFile
+    oldObjectData.content.bitmapAtlasFile !==
+    newObjectData.content.bitmapAtlasFile
   ) {
-    this.setTexture(newObjectData.content.bitmapTextureFile);
+    this._setBitmapAtlasFile(newObjectData.content.bitmapAtlasFile);
   }
   if (oldObjectData.content.scale !== newObjectData.content.scale) {
     this.setScale(newObjectData.content.scale);
@@ -179,11 +175,29 @@ gdjs.BitmapTextRuntimeObject.prototype.getScale = function () {
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.getFontSize = function () {
-  return this._fontSize;
+  return this._fontSize; // TODO pas bon faut prendre la valeur depuis le _renderer
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setFont = function (fontResourceName) {
-  this._bitmapFontFile = fontResourceName;
+gdjs.BitmapTextRuntimeObject.prototype._setBitmapFontFile = function (
+  bitmapFontResourceName
+) {
+  this._bitmapFontFile = bitmapFontResourceName;
+  this._renderer.updateFont();
+};
+
+gdjs.BitmapTextRuntimeObject.prototype._setBitmapAtlasFile = function (
+  bitmapAtlasResourceName
+) {
+  this._bitmapAtlasFile = bitmapAtlasResourceName;
+  this._renderer.updateFont();
+};
+
+gdjs.BitmapTextRuntimeObject.prototype.setBitmapFontAndAtlasFile = function (
+  bitmapFontResourceName,
+  bitmapAtlasResourceName
+) {
+  this._bitmapFontFile = bitmapFontResourceName;
+  this._bitmapAtlasFile = bitmapAtlasResourceName;
   this._renderer.updateFont();
 };
 
@@ -191,14 +205,8 @@ gdjs.BitmapTextRuntimeObject.prototype.getFontName = function () {
   return this._renderer.getRendererObject().fontName;
 };
 
-gdjs.BitmapTextRuntimeObject.prototype.setTexture = function (
-  bitmapTextureResourceName
-) {
-  this._bitmapTextureFile = bitmapTextureResourceName;
-};
-
 gdjs.BitmapTextRuntimeObject.prototype.getTexture = function () {
-  return this._bitmapTextureResourceName;
+  return this._bitmapAtlasResourceName;
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.setAlignment = function (align) {
@@ -239,7 +247,7 @@ gdjs.BitmapTextRuntimeObject.prototype.setAngle = function (angle) {
 
 /**
  * Set object opacity.
- * @param {number} opacity The new opacity of the object (0-255).
+ * @param {number}  opacity The new opacity of the object (0-255).
  */
 gdjs.BitmapTextRuntimeObject.prototype.setOpacity = function (opacity) {
   this._opacity = opacity;

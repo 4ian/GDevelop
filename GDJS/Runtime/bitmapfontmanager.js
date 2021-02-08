@@ -16,8 +16,8 @@ gdjs.BitmapFontManager = function (resources) {
   /** @type Object.<string, Object> */
   this._fontUsed = {};
   /** @type Array.<Object> */
-  this._fontTobeUnloaded = [];
-  this._loadedFontsData = [];
+  this._fontTobeUnloaded = {};
+  this._loadedFontsData = {};
 };
 
 /**
@@ -36,11 +36,11 @@ gdjs.BitmapFontManager.prototype.setFontUsed = function (name) {
   this._fontUsed[name] = this._fontUsed[name] || { objectsUsingTheFont: 0 };
   this._fontUsed[name].objectsUsingTheFont++;
 
-  const fontCachePosition = this._fontTobeUnloaded.indexOf(name);
-  if (fontCachePosition !== -1) {
+  const fontCache = this._fontTobeUnloaded[name];
+  if (fontCache) {
     // The font is in the cache of unloaded font, because it was previously used and then marked as not used anymore.
     // Remove it from the cache to avoid the font getting unloaded.
-    this._fontTobeUnloaded.splice(fontCachePosition, 1);
+    delete this._fontTobeUnloaded.name;
   }
 };
 
@@ -89,7 +89,7 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
   texture
 ) {
   // Reuse an existing bitmapFont that is already in memory and already installed
-  for (var i = 0; i < this._loadedFontsData.length; ++i) {
+  for (let i = 0; i < this._loadedFontsData.length; ++i) {
     let loadedFontData = this._loadedFontsData[i];
     if (
       loadedFontData.fontResourceFileName === bitmapFontResourceName &&
@@ -112,24 +112,18 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
         '" (or is not a bitmapFont file).'
     );
 
-    if (!PIXI.BitmapFont.available['Arial-20-#ffffff-bitmapFont']) {
-      let bitmapFontStyle = new PIXI.TextStyle();
-      bitmapFontStyle.fontFamily = 'Arial';
-      bitmapFontStyle.fontSize = 20;
-      bitmapFontStyle.align = 'left';
-      bitmapFontStyle.wordWrap = true;
-      bitmapFontStyle.fill = '#ffffff';
-
-      const defaultSlugFontName =
-        bitmapFontStyle.fontFamily +
-        '-' +
-        bitmapFontStyle.fontSize +
-        '-' +
-        bitmapFontStyle.fill +
-        '-bitmapFont';
+    const defaultFontName = 'Arial-20-#ffffff-bitmapFont'; // TODO BOUH
+    if (!PIXI.BitmapFont.available[defaultFontName]) {
+      const bitmapFontStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        align: 'left',
+        fill: '#ffffff',
+        wordWrap: true,
+      });
 
       //Generate default bitmap font
-      PIXI.BitmapFont.from(defaultSlugFontName, bitmapFontStyle, {
+      PIXI.BitmapFont.from(defaultFontName, bitmapFontStyle, {
         chars: [
           [' ', '~'], // All the printable ASCII characters
         ],
@@ -140,21 +134,24 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
       console.warn('The default bitmap font Arial will be used.');
     }
 
-    return PIXI.BitmapFont.available['Arial-20-#ffffff-bitmapFont']; // TODO retourné une font par default, le slug Arial par default ou alors une bitmapFont include par default dans GD?
+    return PIXI.BitmapFont.available[defaultFontName];
   }
 
-  for (var i = 0; i < this._loadedFontsData.length; ++i) {
-    if (
-      this._loadedFontsData[i].fontResourceFileName === bitmapFontResourceName
-    ) {
-      let fontData = this._loadedFontsData[i].fontData;
-      let bitmapFont = PIXI.BitmapFont.install(fontData, texture);
+  if (
+    this._loadedFontsData[bitmapFontResourceName].fontResourceFileName ===
+    bitmapFontResourceName
+  ) {
+    const fontData = this._loadedFontsData[bitmapFontResourceName].fontData;
+    const bitmapFont = PIXI.BitmapFont.install(fontData, texture);
 
-      this.setFontUsed(bitmapFont.font);
+    const slug = bitmapFont.font + '-' + bitmapFont.size;
 
-      this._loadedFontsData[i].fontName = bitmapFont.font;
-      return bitmapFont;
-    }
+    this.setFontUsed(slug);
+
+    this._loadedFontsData[bitmapFontResourceName].bitmapFont = bitmapFont;
+    this._loadedFontsData[bitmapFontResourceName].slug = slug;
+    this._loadedFontsData[bitmapFontResourceName].fontName = bitmapFont.font;
+    return this._loadedFontsData[bitmapFontResourceName].bitmapFont;
   }
 };
 
@@ -173,13 +170,13 @@ gdjs.BitmapFontManager.prototype.preloadBitmapFontData = async function (
 ) {
   let resources = this._resources;
 
-  let bitmapFontResources = resources.filter(function (resource) {
+  const bitmapFontResources = resources.filter(function (resource) {
     return resource.kind === 'bitmapFont' && !resource.disablePreload;
   });
   if (bitmapFontResources.length === 0)
     return onComplete(bitmapFontResources.length);
 
-  var loaded = 0;
+  let loaded = 0;
   /** @type BitmapFontManagerRequestCallback */
   var onLoad = function (error) {
     if (error) {
@@ -194,27 +191,30 @@ gdjs.BitmapFontManager.prototype.preloadBitmapFontData = async function (
     }
   };
 
-  for (var i = 0; i < bitmapFontResources.length; ++i) {
-    let response = await fetch(bitmapFontResources[i].file)
+  for (let i = 0; i < bitmapFontResources.length; ++i) {
+    const response = await fetch(bitmapFontResources[i].file)
       .then(function (response) {
         return response;
       })
       .catch(function (error) {
         console.log(
-          "Can't fetch the bitmap font file " + bitmapFontResources[i].file + ", error: "+ error
+          "Can't fetch the bitmap font file " +
+            bitmapFontResources[i].file +
+            ', error: ' +
+            error
         );
       });
 
-      if(!response) return;
-  
+    if (!response) return;
 
-    let fontData = await response.text();
+    const fontData = await response.text();
 
-    this._loadedFontsData.push({
+    this._loadedFontsData[bitmapFontResources[i].name] = {
       fontResourceFileName: bitmapFontResources[i].name,
       fontData: fontData,
       fontName: '',
-    });
+      bitmapFont: '',
+    };
     onLoad();
   }
 };

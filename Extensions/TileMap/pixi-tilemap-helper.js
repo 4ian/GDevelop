@@ -160,8 +160,8 @@
       textureCache: textureCache,
       layers: tiledData.layers,
       tiles: tiles,
-      tilemapHeight: margin + tiledData.height * (tileheight + spacing),
-      tilemapWidth: margin + tiledData.width * (tilewidth + spacing),
+      tilemapHeight: tiledData.height * tileheight,
+      tilemapWidth: tiledData.width * tilewidth,
     };
     return tileMapData;
   };

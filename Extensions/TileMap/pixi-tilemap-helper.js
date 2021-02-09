@@ -160,7 +160,6 @@
       textureCache: textureCache,
       layers: tiledData.layers,
       tiles: tiles,
-      // Workaround for https://github.com/pixijs/pixi-tilemap/issues/108 we need to manually calculate width/height
       tilemapHeight: margin + tiledData.height * (tileheight + spacing),
       tilemapWidth: margin + tiledData.width * (tilewidth + spacing),
     };

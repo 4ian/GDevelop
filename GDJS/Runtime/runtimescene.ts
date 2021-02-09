@@ -556,7 +556,7 @@ namespace gdjs {
     /**
      * Called to update visibility of the renderers of objects
      * rendered on the scene and give a last chance for objects to update before rendering.
-     * 
+     *
      * Visibility is set to false if object is hidden, or if
      * object is too far from the camera of its layer ("culling").
      */
@@ -565,12 +565,12 @@ namespace gdjs {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
           const object = this._allInstancesList[i];
-          // Perform pre-render update.
-          object.updatePreRender(this);
           const rendererObject = object.getRendererObject();
           if (rendererObject) {
             object.getRendererObject().visible = !object.isHidden();
           }
+          // Perform pre-render update.
+          object.updatePreRender(this);
         }
         return;
       } else {
@@ -580,8 +580,6 @@ namespace gdjs {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
           const object = this._allInstancesList[i];
-          // Perform pre-render update.
-          object.updatePreRender(this);
           const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
           const rendererObject = object.getRendererObject();
           if (!cameraCoords || !rendererObject) {
@@ -604,6 +602,8 @@ namespace gdjs {
               rendererObject.visible = true;
             }
           }
+          // Perform pre-render update.
+          object.updatePreRender(this);
         }
       }
     }

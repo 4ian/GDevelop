@@ -4,11 +4,15 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ObjectMetadata.h"
+
 #include <algorithm>
 #include <iostream>
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd {
 
@@ -142,6 +146,70 @@ gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
 
   return strExpressionsInfos[name];
 #endif
+}
+
+gd::MultipleInstructionMetadata ObjectMetadata::AddExpressionAndCondition(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
+                                                                 condition);
+}
+
+gd::MultipleInstructionMetadata
+ObjectMetadata::AddExpressionAndConditionAndAction(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  // TODO: ScopedCondition
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+  // TODO: ScopedAction
+  auto& action = AddAction("Set" + name,
+                           fullname,
+                           // TODO
+                           _("Change ") + description,
+                           sentenceName + ""  // TODO
+                           ,
+                           group,
+                           icon,
+                           icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
+      expression, condition, action);
 }
 
 ObjectMetadata& ObjectMetadata::SetFullName(const gd::String& fullname_) {

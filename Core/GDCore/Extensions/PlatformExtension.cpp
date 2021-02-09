@@ -13,11 +13,13 @@
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd {
 
@@ -114,6 +116,68 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
 #endif
+}
+
+gd::MultipleInstructionMetadata PlatformExtension::AddExpressionAndCondition(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
+                                                                 condition);
+}
+
+gd::MultipleInstructionMetadata
+PlatformExtension::AddExpressionAndConditionAndAction(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+  auto& action = AddAction("Set" + name,
+                           fullname,
+                           // TODO
+                           _("Change ") + description,
+                           sentenceName + ""  // TODO
+                           ,
+                           group,
+                           icon,
+                           icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
+      expression, condition, action);
 }
 
 #if defined(GD_IDE_ONLY)

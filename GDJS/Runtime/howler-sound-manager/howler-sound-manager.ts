@@ -1,12 +1,10 @@
-import type { Howl, HowlCallback, Howler } from '../types/howler';
+///<reference path='../types/howler'>
 /*
  * GDevelop JS Platform
  * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  declare const Howler: Howler;
-  declare const Howl: Howl;
   type HowlerEvent =
     | 'load'
     | 'loaderror'

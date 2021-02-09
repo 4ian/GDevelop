@@ -8,14 +8,14 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Adapted by arthuro555 for the GDevelop project
 
-export type HowlCallback = (soundId: number) => void;
-export type HowlErrorCallback = (soundId: number, error: unknown) => void;
+declare type HowlCallback = (soundId: number) => void;
+declare type HowlErrorCallback = (soundId: number, error?: string) => void;
 
-export interface SoundSpriteDefinitions {
+declare interface SoundSpriteDefinitions {
   [name: string]: [number, number] | [number, number, boolean];
 }
 
-export interface HowlListeners {
+declare interface HowlListeners {
   /**
    * Fires when the sound has been stopped. The first parameter is the ID of the sound.
    */
@@ -83,7 +83,7 @@ export interface HowlListeners {
   onplayerror?: HowlErrorCallback;
 }
 
-export interface HowlOptions extends HowlListeners {
+declare interface HowlOptions extends HowlListeners {
   /**
    * The sources to the track(s) to be loaded for the sound (URLs or base64 data URIs). These should
    * be in order of preference, howler.js will automatically load the first one that is compatible
@@ -189,7 +189,7 @@ export interface HowlOptions extends HowlListeners {
   };
 }
 
-export class Howl {
+declare class Howl {
   constructor(options: HowlOptions);
 
   play(id?: number): number; // .play() is not chainable; the other methods are
@@ -331,7 +331,7 @@ export class Howl {
   ): this;
 }
 
-export interface Howler {
+declare interface Howler {
   stop(): this;
   mute(muted: boolean): this;
   volume(): number;
@@ -358,4 +358,4 @@ export interface Howler {
   ): this | void;
 }
 
-export const Howler: Howler;
+declare const Howler: Howler;

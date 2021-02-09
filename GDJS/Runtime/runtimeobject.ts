@@ -189,6 +189,12 @@ namespace gdjs {
      */
     update(runtimeScene: gdjs.RuntimeScene): void {}
 
+    /**
+     * Called once during the game loop, after events and before rendering.
+     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     */
+    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {}
+
     //Nothing to do.
     /**
      * Called when the object is created from an initial instance at the startup of the scene.<br>

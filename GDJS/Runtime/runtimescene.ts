@@ -485,9 +485,9 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('objects (visibility)');
       }
-      this._updateObjectsVisibility();
+      this._updateObjectsPreRender();
       if (this._profiler) {
-        this._profiler.end('objects (visibility)');
+        this._profiler.end('objects (pre-render)');
       }
       if (this._profiler) {
         this._profiler.begin('layers (effects update)');
@@ -560,12 +560,14 @@ namespace gdjs {
      * Visibility is set to false if object is hidden, or if
      * object is too far from the camera of its layer ("culling").
      */
-    _updateObjectsVisibility() {
+    _updateObjectsPreRender() {
       if (this._timeManager.isFirstFrame()) {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          let object = this._allInstancesList[i];
-          let rendererObject = object.getRendererObject();
+          const object = this._allInstancesList[i];
+          // Perform pre-render update.
+          object.updatePreRender(this);
+          const rendererObject = object.getRendererObject();
           if (rendererObject) {
             object.getRendererObject().visible = !object.isHidden();
           }
@@ -577,9 +579,11 @@ namespace gdjs {
         this._updateLayersCameraCoordinates();
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          let object = this._allInstancesList[i];
+          const object = this._allInstancesList[i];
+          // Perform pre-render update.
+          object.updatePreRender(this);
           const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
-          let rendererObject = object.getRendererObject();
+          const rendererObject = object.getRendererObject();
           if (!cameraCoords || !rendererObject) {
             continue;
           }

@@ -524,9 +524,10 @@ module.exports = {
         this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
         // Check if the point is inside the object bounds
-        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
+        const originalWidth =
+          this._pixiObject._tilemapWidth / this._pixiObject.scale.x;
         const originalHeight =
-          this._pixiObject.height / this._pixiObject.scale.y;
+          this._pixiObject._tilemapHeight / this._pixiObject.scale.y;
 
         return (
           localPosition.x >= 0 &&
@@ -673,14 +674,14 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width / this._pixiObject.scale.x;
+      return this._pixiObject._tilemapWidth / this._pixiObject.scale.x;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height / this._pixiObject.scale.y;
+      return this._pixiObject._tilemapHeight / this._pixiObject.scale.y;
     };
 
     objectsRenderingService.registerInstanceRenderer(

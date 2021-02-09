@@ -160,6 +160,9 @@
       textureCache: textureCache,
       layers: tiledData.layers,
       tiles: tiles,
+      // Workaround for https://github.com/pixijs/pixi-tilemap/issues/108 we need to manually calculate width/height
+      tilemapHeight: margin + tiledData.height * (tileheight + spacing),
+      tilemapWidth: margin + tiledData.width * (tilewidth + spacing),
     };
     return tileMapData;
   };
@@ -241,7 +244,12 @@
         FLIPPED_DIAGONALLY_FLAG
       );
 
-    return [tileUid, !!flippedHorizontally, !!flippedVertically, !!flippedDiagonally];
+    return [
+      tileUid,
+      !!flippedHorizontally,
+      !!flippedVertically,
+      !!flippedDiagonally,
+    ];
   };
 
   /**
@@ -336,6 +344,9 @@
   ) => {
     if (!pixiTileMap || !genericTileMapData) return;
     pixiTileMap.clear();
+
+    pixiTileMap._tilemapWidth = genericTileMapData.tilemapWidth;
+    pixiTileMap._tilemapHeight = genericTileMapData.tilemapHeight;
 
     genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;

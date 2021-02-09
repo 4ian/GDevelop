@@ -146,11 +146,11 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._pixiObject.width;
+      return this._pixiObject._tilemapWidth;
     }
 
     getHeight(): float {
-      return this._pixiObject.height;
+      return this._pixiObject._tilemapHeight;
     }
   }
   export const TileMapRuntimeObjectRenderer =

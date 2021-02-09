@@ -1,7 +1,11 @@
 ---
 name: "\U0001F4A1Feature request"
-about: Suggest an idea for this project AFTER discussing it on Discord or
-    Forum first. We'll create a card for it on the roadmap.
+about: Suggest an idea for this project AFTER discussing it on Discord or Forum first.
+  We'll create a card for it on the roadmap.
+title: ''
+labels: "✨ enhancement"
+assignees: ''
+
 ---
 
 BEFORE opening a new feature request, please make sure that you:

@@ -84,7 +84,7 @@ namespace gdjs {
       return true;
     }
 
-    update(): void {
+    updatePreRender(): void {
       this._renderer.ensureUpToDate();
     }
 

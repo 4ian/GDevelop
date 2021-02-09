@@ -8,7 +8,10 @@ namespace gdjs {
         y: float,
         z: float
       ) =>
-        runtimeScene.getSoundManager().getSoundOnChannel(channel).pos(x, y, z);
+        runtimeScene
+          .getSoundManager()
+          .getSoundOnChannel(channel)
+          .setSpatialPosition(x, y, z);
     }
   }
 }

@@ -209,7 +209,6 @@ namespace gdjs {
 
     /**
      * Get the sound seek.
-     * @returns {number}
      */
     getSeek(): float {
       if (typeof this._id === 'undefined') return 0;
@@ -222,6 +221,23 @@ namespace gdjs {
      */
     setSeek(seek: float): this {
       if (typeof this._id !== 'undefined') this._howl.seek(seek, this._id);
+      return this;
+    }
+
+    /**
+     * Get the sound spatial position.
+     */
+    getSpatialPosition(axis: 'x' | 'y' | 'z'): float {
+      if (typeof this._id === 'undefined') return 0;
+      return this._howl.pos(this._id)[axis === 'x' ? 0 : axis === 'y' ? 1 : 2];
+    }
+
+    /**
+     * Set the sound spatial position.
+     * @returns The current instance for chaining.
+     */
+    setSpatialPosition(x: float, y: float, z: float): this {
+      if (typeof this._id !== 'undefined') this._howl.pos(x, y, z, this._id);
       return this;
     }
 
@@ -275,7 +291,7 @@ namespace gdjs {
      * Returns the raw howl.
      * Be careful with this, you could break something!
      */
-    getRawHowl(): Howl {
+    _getRawHowl(): Howl {
       return this._howl;
     }
   }
@@ -489,7 +505,7 @@ namespace gdjs {
         for (let i in howlerSoundContainer) {
           if (
             howlerSoundContainer[i] &&
-            howlerSoundContainer[i].getRawHowl() === howl
+            howlerSoundContainer[i]._getRawHowl() === howl
           ) {
             howlerSoundContainer[i].stop();
             delete howlerSoundContainer[i];

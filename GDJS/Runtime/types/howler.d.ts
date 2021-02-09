@@ -306,7 +306,8 @@ export class Howl {
   ): this;
 
   stereo(pan: number, id?: number): this | void;
-  pos(x: number, y: number, z: number, id?: number): this | void;
+  pos(x: float, y: float, z: float, id: integer): this;
+  pos(id: integer): [float, float, float];
   orientation(
     x: number,
     y: number,

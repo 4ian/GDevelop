@@ -554,9 +554,9 @@ namespace gdjs {
     }
 
     /**
-     * Called to update visibility of PIXI.DisplayObject of objects
-     * rendered on the scene.
-     *
+     * Called to update visibility of the renderers of objects
+     * rendered on the scene and give a last chance for objects to update before rendering.
+     * 
      * Visibility is set to false if object is hidden, or if
      * object is too far from the camera of its layer ("culling").
      */

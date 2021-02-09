@@ -24,6 +24,7 @@
 namespace gd {
 class Instruction;
 class InstructionMetadata;
+class MultipleInstructionMetadata;
 class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
@@ -160,13 +161,43 @@ class GD_CORE_API PlatformExtension {
                                         const gd::String& group_,
                                         const gd::String& smallicon_);
   /**
-   * \brief Declare a new String expression as being part of the extension.
+   * \brief Declare a new string expression as being part of the extension.
    */
   gd::ExpressionMetadata& AddStrExpression(const gd::String& name_,
                                            const gd::String& fullname_,
                                            const gd::String& description_,
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
+
+  /**
+   * \brief Declare a new expression and condition as being part of the
+   * extension.
+   * \note It's recommended to use this function to avoid declaring twice a similar
+   * expression/condition.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndCondition(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
+
+  /**
+   * \brief Declare a new expression, condition and action as being part of the
+   * extension.
+   * \note It's recommended to use this function to avoid declaring 3 times a similar
+   * expression/condition/action.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
 
   gd::DependencyMetadata& AddDependency();
 
@@ -290,7 +321,6 @@ class GD_CORE_API PlatformExtension {
    */
   void StripUnimplementedInstructionsAndExpressions();
   ///@}
-
 
   /** \name Extension accessors
    * Accessors to read the information and content of the extension.

@@ -4,12 +4,16 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BehaviorMetadata.h"
+
 #include <iostream>
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd {
 
@@ -172,6 +176,70 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
           .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[name];
 #endif
+}
+
+gd::MultipleInstructionMetadata BehaviorMetadata::AddExpressionAndCondition(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  auto& condition = AddScopedCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
+                                                                 condition);
+}
+
+gd::MultipleInstructionMetadata
+BehaviorMetadata::AddExpressionAndConditionAndAction(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  auto& expression =
+      type == "number"
+          ? AddExpression(name, fullname, description, group, icon)
+          : AddStrExpression(name, fullname, description, group, icon);
+  // TODO: ScopedCondition
+  auto& condition = AddScopedCondition(name,
+                                 fullname,
+                                 // TODO
+                                 _("Compare ") + description,
+                                 sentenceName + ""  // TODO
+                                 ,
+                                 group,
+                                 icon,
+                                 icon);
+  // TODO: ScopedAction
+  auto& action = AddScopedAction("Set" + name,
+                           fullname,
+                           // TODO
+                           _("Change ") + description,
+                           sentenceName + ""  // TODO
+                           ,
+                           group,
+                           icon,
+                           icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
+      expression, condition, action);
 }
 
 BehaviorMetadata& BehaviorMetadata::SetFullName(const gd::String& fullname_) {

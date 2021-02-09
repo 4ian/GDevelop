@@ -3063,6 +3063,83 @@ describe('libGD.js', function () {
         .get('TestExtensionName::AnotherCondition');
       expect(copiedCondition.getFullName()).toBe('Banner showing');
       expect(copiedCondition.isHidden()).toBe(true);
+      extension.delete();
+    });
+    it('can have expressions and conditions added at the same time', function () {
+      const extension = makeTestExtension();
+      extension
+        .addExpressionAndCondition(
+          'number',
+          'PlayerHealth',
+          'Health of the player',
+          'The health of the player, from 0 to 100.',
+          'the health of the player',
+          'Health Management',
+          'SomeHealthIcon.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('string', 'Some stuff', '', false)
+        .setParameterLongDescription('Blabla')
+        .setFunctionName('some.method.to.getPlayerHealth')
+        .useStandardParameters('number');
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::PlayerHealth')
+      ).toBe(true);
+      const declaredCondition = extension
+        .getAllConditions()
+        .get('TestExtensionName::PlayerHealth');
+      expect(declaredCondition.getParametersCount()).toBe(4);
+
+      expect(
+        extension.getAllExpressions().has('TestExtensionName::PlayerHealth')
+      ).toBe(true);
+      const declaredExpression = extension
+        .getAllExpressions()
+        .get('TestExtensionName::PlayerHealth');
+      expect(declaredExpression.getParametersCount()).toBe(2);
+    });
+    it('can have expressions, conditions and actions added at the same time', function () {
+      const extension = makeTestExtension();
+      extension
+        .addExpressionAndConditionAndAction(
+          'number',
+          'PlayerHealth',
+          'Health of the player',
+          'The health of the player, from 0 to 100.',
+          'the health of the player',
+          'Health Management',
+          'SomeHealthIcon.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('string', 'Some stuff', '', false)
+        .setParameterLongDescription('Blabla')
+        .setFunctionName('some.method.to.getPlayerHealth')
+        .useStandardParameters('number');
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::PlayerHealth')
+      ).toBe(true);
+      const declaredCondition = extension
+        .getAllConditions()
+        .get('TestExtensionName::PlayerHealth');
+      expect(declaredCondition.getParametersCount()).toBe(4);
+
+      expect(
+        extension.getAllActions().has('TestExtensionName::SetPlayerHealth')
+      ).toBe(true);
+      const declaredAction = extension
+        .getAllActions()
+        .get('TestExtensionName::SetPlayerHealth');
+      expect(declaredAction.getParametersCount()).toBe(4);
+
+      expect(
+        extension.getAllExpressions().has('TestExtensionName::PlayerHealth')
+      ).toBe(true);
+      const declaredExpression = extension
+        .getAllExpressions()
+        .get('TestExtensionName::PlayerHealth');
+      expect(declaredExpression.getParametersCount()).toBe(2);
     });
   });
 

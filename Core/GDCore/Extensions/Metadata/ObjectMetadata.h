@@ -14,6 +14,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class InstructionMetadata;
+class MultipleInstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
 
@@ -94,6 +95,36 @@ class GD_CORE_API ObjectMetadata {
                                            const gd::String& description_,
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
+
+  /**
+   * \brief Declare a new expression and condition as being part of the
+   * object.
+   * \note It's recommended to use this function to avoid declaring twice a similar
+   * expression/condition.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndCondition(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
+
+  /**
+   * \brief Declare a new expression, condition and action as being part of the
+   * object.
+   * \note It's recommended to use this function to avoid declaring 3 times a similar
+   * expression/condition/action.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
 
   /**
    * \brief Set the name shown to the user.

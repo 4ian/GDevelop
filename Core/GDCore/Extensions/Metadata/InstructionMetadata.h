@@ -219,7 +219,7 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is easy for an user to understand.
+   * \brief Consider that the instruction is easy for a user to understand.
    */
   InstructionMetadata &MarkAsSimple() {
     usageComplexity = 2;
@@ -227,7 +227,7 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is harder for an user to understand
+   * \brief Consider that the instruction is harder for a user to understand
    * than a normal instruction.
    */
   InstructionMetadata &MarkAsAdvanced() {
@@ -236,7 +236,7 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is complex for an user to understand.
+   * \brief Consider that the instruction is complex for a user to understand.
    */
   InstructionMetadata &MarkAsComplex() {
     usageComplexity = 9;

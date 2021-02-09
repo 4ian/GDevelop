@@ -1,6 +1,9 @@
 ---
 name: "\U0001F41BBug report"
 about: Create a bug report about GDevelop or the game engine
+title: ''
+labels: ''
+assignees: ''
 
 ---
 

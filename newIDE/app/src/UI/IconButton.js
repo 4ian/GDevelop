@@ -13,6 +13,7 @@ type IconProps =
   // Support a few specific icons from iconmoon-font.css
   | {|
       className:
+        | 'icon-youtube'
         | 'icon-twitter'
         | 'icon-facebook'
         | 'icon-discord'

@@ -1,14 +1,15 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import PlaceholderError from '../../UI/PlaceholderError';
-import ErrorBoundary from '../../UI/ErrorBoundary';
+import PlaceholderLoader from '../PlaceholderLoader';
+import PlaceholderError from '../PlaceholderError';
+import ErrorBoundary from '../ErrorBoundary';
 import { AutoSizer, Grid } from 'react-virtualized';
-import EmptyMessage from '../../UI/EmptyMessage';
+import EmptyMessage from '../EmptyMessage';
 
 type Props<SearchItem> = {|
   searchItems: ?Array<SearchItem>,
+  getSearchItemUniqueId: (item: SearchItem) => string,
   renderSearchItem: (
     item: SearchItem,
     onHeightComputed: (number) => void
@@ -25,8 +26,9 @@ const styles = {
 const ESTIMATED_ROW_HEIGHT = 90;
 
 /** A virtualized list of search results, caching the searched item heights. */
-export const ListSearchResults = <SearchItem: { name: string }>({
+export const ListSearchResults = <SearchItem>({
   searchItems,
+  getSearchItemUniqueId,
   renderSearchItem,
   error,
   onRetry,
@@ -37,20 +39,27 @@ export const ListSearchResults = <SearchItem: { name: string }>({
   // are reporting their heights and we cache these values.
   const cachedHeightsForWidth = React.useRef(0);
   const cachedHeights = React.useRef({});
-  const onItemHeightComputed = React.useCallback((searchItem, height) => {
-    if (cachedHeights.current[searchItem.name] === height) return false;
+  const onItemHeightComputed = React.useCallback(
+    (searchItem, height) => {
+      if (cachedHeights.current[getSearchItemUniqueId(searchItem)] === height)
+        return false;
 
-    cachedHeights.current[searchItem.name] = height;
-    return true;
-  }, []);
+      cachedHeights.current[getSearchItemUniqueId(searchItem)] = height;
+      return true;
+    },
+    [getSearchItemUniqueId]
+  );
   const getRowHeight = React.useCallback(
     ({ index }) => {
       if (!searchItems || !searchItems[index]) return ESTIMATED_ROW_HEIGHT;
 
       const searchItem = searchItems[index];
-      return cachedHeights.current[searchItem.name] || ESTIMATED_ROW_HEIGHT;
+      return (
+        cachedHeights.current[getSearchItemUniqueId(searchItem)] ||
+        ESTIMATED_ROW_HEIGHT
+      );
     },
-    [searchItems]
+    [searchItems, getSearchItemUniqueId]
   );
 
   // Render an item, and update the cached height when it's reported

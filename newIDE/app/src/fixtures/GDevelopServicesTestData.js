@@ -8,7 +8,7 @@ import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type Game } from '../Utils/GDevelopServices/Game';
+import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { type UserProfile } from '../Profile/UserProfileContext';
 import {
@@ -657,4 +657,50 @@ export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
   },
   players: null,
   retention: null,
+};
+
+export const showcasedGame1: ShowcasedGame = {
+  title: "Lil BUB's HELLO EARTH",
+  author: "Lil BUB's Team",
+  description:
+    'BUB is a very special, one of a kind critter. More specifically, she is the [most amazing cat on the planet](http://lilbub.com)... and her game is made with GDevelop!\n\nThe game is a retro 8-bit game, with beautiful arts and soundtrack, which alternates between platformers levels, with hidden secrets, and shooter levels with bosses, multiple enemies and bonuses.',
+  tags: [
+    'Action',
+    'Platform',
+    'Shooter',
+    'Adventure',
+    'Android',
+    'iOS',
+    'Windows',
+    'macOS',
+    'Linux',
+  ],
+  genres: ['Action', 'Platform', 'Shooter', 'Adventure'],
+  platforms: ['Android', 'iOS', 'Windows', 'macOS', 'Linux'],
+  imageUrls: [
+    'https://resources.gdevelop-app.com/games-showcase/images/18JKXDTWljabX3O09SW2VKYOThZkIf1jG',
+  ],
+  links: [
+    {
+      url:
+        'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
+      type: 'app-store',
+    },
+    {
+      url: 'https://play.google.com/store/apps/details?id=com.lilbub.game',
+      type: 'play-store',
+    },
+    {
+      url: 'http://compilgames.net/bub-landing-page',
+      type: 'download-win-mac-linux',
+    },
+    { url: '/games/lil-bub-hello-earth', type: 'learn-more' },
+  ],
+  isFeatured: false,
+  bannerUrl:
+    'https://resources.gdevelop-app.com/games-showcase/images/bub-game-banner.jpg',
+  bannerBackgroundPosition: '',
+  thumbnailUrl:
+    'https://resources.gdevelop-app.com/games-showcase/images/bub-animated-logo.gif',
+  editorDescription: '',
 };

@@ -32,6 +32,7 @@ import {
   type ResourceFetcher,
   ResourceFetcherContext,
 } from '../ProjectsStorage/ResourceFetcher';
+import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -101,11 +102,13 @@ export default class Providers extends React.Component<Props, {||}> {
                                     <AssetStoreStateProvider>
                                       <ResourceStoreStateProvider>
                                         <ExtensionStoreStateProvider>
-                                          <ResourceFetcherContext.Provider
-                                            value={resourceFetcher}
-                                          >
-                                            {children({ i18n })}
-                                          </ResourceFetcherContext.Provider>
+                                          <GamesShowcaseStateProvider>
+                                            <ResourceFetcherContext.Provider
+                                              value={resourceFetcher}
+                                            >
+                                              {children({ i18n })}
+                                            </ResourceFetcherContext.Provider>
+                                          </GamesShowcaseStateProvider>
                                         </ExtensionStoreStateProvider>
                                       </ResourceStoreStateProvider>
                                     </AssetStoreStateProvider>

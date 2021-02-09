@@ -732,6 +732,10 @@ namespace gdjs {
       }
     }
 
+    getParticleCount() {
+      return this._renderer.getParticleCount();
+    }
+
     getTank() {
       return this.tank;
     }

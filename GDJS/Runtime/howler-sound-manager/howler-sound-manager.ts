@@ -73,14 +73,18 @@ namespace gdjs {
       if (this.isLoaded()) {
         const newID = this._howl.play(this._id === null ? undefined : this._id);
         this._id = newID;
-        /*
-         * Manually handle play to avoid problems if trying to set a listener before loading.
-         * Before loading, it cannot work as without an ID we cannot set a listener, but
-         * once we have an ID the sound already started playing and it therefore won't trigger
-         * the first time the sound is played.
-         */
-        this._onPlay.forEach((func) => func(newID));
+
+        // Manually handle the play event before we have an ID.
+        // Before loading, howler won't register events as without an ID we cannot set a listener.
+        // Once we have an ID, we can transfer control of the events to howler.
+        // We also need to call them once as Howler doesn't for the first play event.
+        this._onPlay.forEach((func) => {
+          // Transfer the event to howler now that we have an ID
+          this.on('play', func);
+          func(newID);
+        });
         this._oncePlay.forEach((func) => func(newID));
+        this._onPlay = [];
         this._oncePlay = [];
       } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
 
@@ -235,10 +239,10 @@ namespace gdjs {
      * Adds an event listener to the howl.
      */
     on(event: HowlerEvent, handler: HowlCallback): this {
-      if (event === 'play') this._onPlay.push(handler);
-      else if (!this.isLoaded())
-        this._howl.once('load', () => this.on(event, handler));
-      else if (typeof this._id === 'undefined')
+      if (event === 'play') {
+        if (typeof this._id === 'undefined') this._onPlay.push(handler);
+        else this._howl.on(event, handler, this._id);
+      } else if (typeof this._id === 'undefined')
         this.once('play', () => this.on(event, handler));
       else this._howl.on(event, handler, this._id);
 
@@ -249,10 +253,10 @@ namespace gdjs {
      * Adds an event listener to the howl that removes itself after being called.
      */
     once(event: HowlerEvent, handler: HowlCallback): this {
-      if (event === 'play') this._oncePlay.push(handler);
-      else if (!this.isLoaded())
-        this._howl.once('load', () => this.once(event, handler));
-      else if (typeof this._id === 'undefined')
+      if (event === 'play') {
+        if (typeof this._id === 'undefined') this._oncePlay.push(handler);
+        else this._howl.once(event, handler, this._id);
+      } else if (typeof this._id === 'undefined')
         this.once('play', () => this.once(event, handler));
       else this._howl.once(event, handler, this._id);
 

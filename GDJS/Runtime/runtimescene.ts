@@ -483,7 +483,7 @@ namespace gdjs {
         this._profiler.end('callbacks and extensions (post-events)');
       }
       if (this._profiler) {
-        this._profiler.begin('objects (visibility)');
+        this._profiler.begin('objects (pre-render)');
       }
       this._updateObjectsPreRender();
       if (this._profiler) {

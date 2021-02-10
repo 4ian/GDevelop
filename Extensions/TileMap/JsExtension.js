@@ -526,9 +526,13 @@ module.exports = {
 
         // Check if the point is inside the object bounds
         const originalWidth =
-          this._pixiTileMapData?.tilemapWidth / this._pixiObject.scale.x;
+          (this._pixiTileMapData
+            ? this._pixiTileMapData.tilemapWidth
+            : this._pixiObject.width) / this._pixiObject.scale.x;
         const originalHeight =
-          this._pixiTileMapData?.tilemapHeight / this._pixiObject.scale.y;
+          (this._pixiTileMapData
+            ? this._pixiTileMapData.tilemapHeight
+            : this._pixiObject.height) / this._pixiObject.scale.y;
 
         return (
           localPosition.x >= 0 &&
@@ -675,14 +679,22 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this._pixiTileMapData?.tilemapWidth / this._pixiObject.scale.x;
+      return (
+        (this._pixiTileMapData
+          ? this._pixiTileMapData.tilemapWidth
+          : this._pixiObject.width) / this._pixiObject.scale.x
+      );
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this._pixiTileMapData?.tilemapHeight / this._pixiObject.scale.y;
+      return (
+        (this._pixiTileMapData
+          ? this._pixiTileMapData.tilemapHeight
+          : this._pixiObject.height) / this._pixiObject.scale.y
+      );
     };
 
     objectsRenderingService.registerInstanceRenderer(

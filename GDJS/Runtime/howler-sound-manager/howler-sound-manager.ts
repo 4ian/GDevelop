@@ -20,6 +20,14 @@ namespace gdjs {
     | 'fade'
     | 'unlock';
 
+  const HowlParameters: Partial<HowlOptions> = {
+    preload: true,
+    onplayerror: (_, error) =>
+      console.error("Can't play an audio file: ", error),
+    onloaderror: (_, error) =>
+      console.error('Error while loading an audio file: ', error),
+  };
+
   /**
    * A thin wrapper around a Howl object with:
    * * Extra methods `paused`, `stopped`, `getRate`/`setRate` and `canBeDestroyed` methods.
@@ -34,7 +42,7 @@ namespace gdjs {
     /**
      * The ID of the played sound.
      */
-    private _id?: integer;
+    private _id: integer | null = null;
 
     /**
      * The Howl passed to the constructor.
@@ -94,7 +102,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     pause(): this {
-      if (typeof this._id !== 'undefined') this._howl.pause(this._id);
+      if (this._id !== null) this._howl.pause(this._id);
       return this;
     }
 
@@ -103,7 +111,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     stop(): this {
-      if (typeof this._id !== 'undefined') this._howl.stop(this._id);
+      if (this._id !== null) this._howl.stop(this._id);
       return this;
     }
 
@@ -135,7 +143,7 @@ namespace gdjs {
      * Get the sound playback rate.
      */
     getRate(): float {
-      if (typeof this._id === 'undefined') return 0;
+      if (this._id === null) return 0;
       return this._howl.rate(this._id);
     }
 
@@ -144,7 +152,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setRate(rate: float): this {
-      if (typeof this._id !== 'undefined') {
+      if (this._id !== null) {
         rate = gdjs.HowlerSoundManager.clampRate(rate);
         this._howl.rate(rate, this._id);
       }
@@ -155,7 +163,7 @@ namespace gdjs {
      * Get if the sound is looping.
      */
     getLoop(): boolean {
-      if (this._id === undefined) return false;
+      if (this._id === null) return false;
       return this._howl.loop(this._id);
     }
 
@@ -174,7 +182,7 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      if (typeof this._id === 'undefined') return 100;
+      if (this._id === null) return 100;
       return this._howl.volume(this._id);
     }
 
@@ -184,7 +192,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setVolume(volume: float): this {
-      if (typeof this._id !== 'undefined') this._howl.volume(volume, this._id);
+      if (this._id !== null) this._howl.volume(volume, this._id);
       return this;
     }
 
@@ -192,7 +200,7 @@ namespace gdjs {
      * Get if the sound is muted.
      */
     getMute(): boolean {
-      if (typeof this._id === 'undefined') return false;
+      if (this._id === null) return false;
       return this._howl.mute(this._id);
     }
 
@@ -201,7 +209,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setMute(mute: boolean): this {
-      if (typeof this._id !== 'undefined') this._howl.mute(mute, this._id);
+      if (this._id !== null) this._howl.mute(mute, this._id);
       return this;
     }
 
@@ -209,7 +217,7 @@ namespace gdjs {
      * Get the sound seek.
      */
     getSeek(): float {
-      if (typeof this._id === 'undefined') return 0;
+      if (this._id === null) return 0;
       return this._howl.seek(this._id);
     }
 
@@ -218,7 +226,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setSeek(seek: float): this {
-      if (typeof this._id !== 'undefined') this._howl.seek(seek, this._id);
+      if (this._id !== null) this._howl.seek(seek, this._id);
       return this;
     }
 
@@ -226,7 +234,7 @@ namespace gdjs {
      * Get the sound spatial position.
      */
     getSpatialPosition(axis: 'x' | 'y' | 'z'): float {
-      if (typeof this._id === 'undefined') return 0;
+      if (this._id === null) return 0;
       return this._howl.pos(this._id)[axis === 'x' ? 0 : axis === 'y' ? 1 : 2];
     }
 
@@ -235,7 +243,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setSpatialPosition(x: float, y: float, z: float): this {
-      if (typeof this._id !== 'undefined') this._howl.pos(x, y, z, this._id);
+      if (this._id !== null) this._howl.pos(x, y, z, this._id);
       return this;
     }
 
@@ -244,8 +252,7 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     fade(from: float, to: float, duration: float): this {
-      if (typeof this._id !== 'undefined')
-        this._howl.fade(from, to, duration, this._id);
+      if (this._id !== null) this._howl.fade(from, to, duration, this._id);
       return this;
     }
 
@@ -254,9 +261,9 @@ namespace gdjs {
      */
     on(event: HowlerEvent, handler: HowlCallback): this {
       if (event === 'play') {
-        if (typeof this._id === 'undefined') this._onPlay.push(handler);
+        if (this._id === null) this._onPlay.push(handler);
         else this._howl.on(event, handler, this._id);
-      } else if (typeof this._id === 'undefined')
+      } else if (this._id === null)
         this.once('play', () => this.on(event, handler));
       else this._howl.on(event, handler, this._id);
 
@@ -268,9 +275,9 @@ namespace gdjs {
      */
     once(event: HowlerEvent, handler: HowlCallback): this {
       if (event === 'play') {
-        if (typeof this._id === 'undefined') this._oncePlay.push(handler);
+        if (this._id === null) this._oncePlay.push(handler);
         else this._howl.once(event, handler, this._id);
-      } else if (typeof this._id === 'undefined')
+      } else if (this._id === null)
         this.once('play', () => this.once(event, handler));
       else this._howl.once(event, handler, this._id);
 
@@ -283,14 +290,6 @@ namespace gdjs {
     off(event: HowlerEvent, handler: HowlCallback): this {
       if (this._id !== null) this._howl.off(event, handler, this._id);
       return this;
-    }
-
-    /**
-     * Returns the raw howl.
-     * Be careful with this, you could break something!
-     */
-    _getRawHowl(): Howl {
-      return this._howl;
     }
   }
 
@@ -447,15 +446,10 @@ namespace gdjs {
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
 
       if (!cacheContainer.hasOwnProperty(soundFile)) {
-        //@ts-ignore FIXME Somehow TypeScript does not detect the Howl consturctor
         cacheContainer[soundFile] = new Howl({
+          ...HowlParameters,
           src: [soundFile],
-          preload: true,
           html5: isMusic,
-          onplayerror: (_, error) =>
-            console.error("Can't play a sound. Error is: ", error),
-          onloaderror: (_, error) =>
-            console.error('Error while loading sound file: ', error),
         });
       }
       return new gdjs.HowlerSound(cacheContainer[soundFile]);
@@ -473,15 +467,10 @@ namespace gdjs {
       // Do not reload if it is already loaded.
       if (cacheContainer.hasOwnProperty(soundFile)) return;
 
-      //@ts-ignore FIXME Somehow TypeScript does not detect the Howl consturctor
       cacheContainer[soundFile] = new Howl({
+        ...HowlParameters,
         src: [soundFile],
-        preload: true,
         html5: isMusic,
-        onplayerror: (_, error) =>
-          console.error("Can't play a sound. Error is: ", error),
-        onloaderror: (_, error) =>
-          console.error('Error while loading sound file: ', error),
       });
     }
 
@@ -503,7 +492,8 @@ namespace gdjs {
         for (let i in howlerSoundContainer) {
           if (
             howlerSoundContainer[i] &&
-            howlerSoundContainer[i]._getRawHowl() === howl
+            //@ts-ignore We really need to access the raw howl here.
+            howlerSoundContainer[i]._howl === howl
           ) {
             howlerSoundContainer[i].stop();
             delete howlerSoundContainer[i];
@@ -687,14 +677,11 @@ namespace gdjs {
         isMusic: boolean
       ) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;
-        //@ts-ignore FIXME Somehow TypeScript does not detect the Howl consturctor
         container[file] = new Howl({
+          ...HowlParameters,
           src: [file],
-          preload: true,
           onload: onLoadCallback,
           onloaderror: onLoadCallback,
-          onplayerror: (_, error) =>
-            console.error("Can't play a sound. Error is: ", error),
           html5: isMusic,
         });
       };

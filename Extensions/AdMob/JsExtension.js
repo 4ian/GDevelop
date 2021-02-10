@@ -40,13 +40,13 @@ module.exports = {
     extension
       .registerProperty('AdMobAppIdAndroid')
       .setLabel(_('AdMob Android App ID'))
-      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY')
+      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY')
       .setType('string');
 
     extension
       .registerProperty('AdMobAppIdIos')
       .setLabel(_('AdMob iOS App ID'))
-      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY')
+      .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY')
       .setType('string');
 
     extension

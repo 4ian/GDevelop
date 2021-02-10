@@ -514,6 +514,7 @@ module.exports = {
       );
 
       this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
+      this._pixiTileMapData = null;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -525,9 +526,9 @@ module.exports = {
 
         // Check if the point is inside the object bounds
         const originalWidth =
-          this._pixiObject._tilemapWidth / this._pixiObject.scale.x;
+          this._pixiTileMapData?.tilemapWidth / this._pixiObject.scale.x;
         const originalHeight =
-          this._pixiObject._tilemapHeight / this._pixiObject.scale.y;
+          this._pixiTileMapData?.tilemapHeight / this._pixiObject.scale.y;
 
         return (
           localPosition.x >= 0 &&
@@ -587,7 +588,7 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      const pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
+      this._pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
         (textureName) =>
           this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
         tilesetJsonData
@@ -598,10 +599,10 @@ module.exports = {
         tilesetJsonFile
       );
 
-      if (pixiTileMapData) {
+      if (this._pixiTileMapData) {
         PixiTilemapHelper.updatePixiTileMap(
           this._pixiObject,
-          pixiTileMapData,
+          this._pixiTileMapData,
           displayMode,
           layerIndex,
           pako
@@ -674,14 +675,14 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject._tilemapWidth / this._pixiObject.scale.x;
+      return this._pixiTileMapData?.tilemapWidth / this._pixiObject.scale.x;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject._tilemapHeight / this._pixiObject.scale.y;
+      return this._pixiTileMapData?.tilemapHeight / this._pixiObject.scale.y;
     };
 
     objectsRenderingService.registerInstanceRenderer(

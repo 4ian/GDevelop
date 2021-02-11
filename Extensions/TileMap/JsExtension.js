@@ -525,14 +525,8 @@ module.exports = {
         this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
         // Check if the point is inside the object bounds
-        const originalWidth =
-          (this._pixiTileMapData
-            ? this._pixiTileMapData.tilemapWidth
-            : this._pixiObject.width) / this._pixiObject.scale.x;
-        const originalHeight =
-          (this._pixiTileMapData
-            ? this._pixiTileMapData.tilemapHeight
-            : this._pixiObject.height) / this._pixiObject.scale.y;
+        const originalWidth = this.getDefaultWidth();
+        const originalHeight = this.getDefaultHeight();
 
         return (
           localPosition.x >= 0 &&
@@ -650,6 +644,10 @@ module.exports = {
       if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();
         this._pixiObject.height = this._instance.getCustomHeight();
+        this._pixiObject.scale.x =
+          this._instance.getCustomWidth() / this.getDefaultWidth();
+        this._pixiObject.scale.y =
+          this._instance.getCustomHeight() / this.getDefaultHeight();
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -679,22 +677,14 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return (
-        (this._pixiTileMapData
-          ? this._pixiTileMapData.tilemapWidth
-          : this._pixiObject.width) / this._pixiObject.scale.x
-      );
+      return !!this._pixiTileMapData ? this._pixiTileMapData.tilemapWidth : 0;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return (
-        (this._pixiTileMapData
-          ? this._pixiTileMapData.tilemapHeight
-          : this._pixiObject.height) / this._pixiObject.scale.y
-      );
+      return !!this._pixiTileMapData ? this._pixiTileMapData.tilemapHeight : 0;
     };
 
     objectsRenderingService.registerInstanceRenderer(

@@ -65,6 +65,7 @@ export const localCordovaExportPipeline: ExportPipeline<
           defaultPath={project.getLastCompilationDirectory()}
           onChange={outputDir => {
             updateExportState(() => ({ outputDir }));
+            project.setLastCompilationDirectory(outputDir);
           }}
           fullWidth
         />

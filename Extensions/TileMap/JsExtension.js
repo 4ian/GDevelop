@@ -642,8 +642,6 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
         this._pixiObject.scale.x =
           this._instance.getCustomWidth() / this.getDefaultWidth();
         this._pixiObject.scale.y =

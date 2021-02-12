@@ -148,11 +148,15 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._pixiTileMapData ? this._pixiTileMapData.tilemapWidth : this._pixiObject.width;
+      return this._pixiTileMapData
+        ? this._pixiTileMapData.tilemapWidth * this._pixiObject.scale.x
+        : 0;
     }
 
     getHeight(): float {
-      return this._pixiTileMapData ? this._pixiTileMapData.tilemapHeight: this._pixiObject.height;
+      return this._pixiTileMapData
+        ? this._pixiTileMapData.tilemapHeight * this._pixiObject.scale.y
+        : 0;
     }
   }
   export const TileMapRuntimeObjectRenderer =

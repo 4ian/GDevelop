@@ -446,11 +446,15 @@ namespace gdjs {
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
 
       if (!cacheContainer.hasOwnProperty(soundFile)) {
-        cacheContainer[soundFile] = new Howl({
-          ...HowlParameters,
-          src: [soundFile],
-          html5: isMusic,
-        });
+        cacheContainer[soundFile] = new Howl(
+          Object.assign(
+            {
+              src: [soundFile],
+              html5: isMusic,
+            },
+            HowlParameters
+          )
+        );
       }
       return new gdjs.HowlerSound(cacheContainer[soundFile]);
     }
@@ -467,11 +471,15 @@ namespace gdjs {
       // Do not reload if it is already loaded.
       if (cacheContainer.hasOwnProperty(soundFile)) return;
 
-      cacheContainer[soundFile] = new Howl({
-        ...HowlParameters,
-        src: [soundFile],
-        html5: isMusic,
-      });
+      cacheContainer[soundFile] = new Howl(
+        Object.assign(
+          {
+            src: [soundFile],
+            html5: isMusic,
+          },
+          HowlParameters
+        )
+      );
     }
 
     /**
@@ -677,13 +685,14 @@ namespace gdjs {
         isMusic: boolean
       ) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;
-        container[file] = new Howl({
-          ...HowlParameters,
-          src: [file],
-          onload: onLoadCallback,
-          onloaderror: onLoadCallback,
-          html5: isMusic,
-        });
+        container[file] = new Howl(
+          Object.assign({}, HowlParameters, {
+            src: [file],
+            onload: onLoadCallback,
+            onloaderror: onLoadCallback,
+            html5: isMusic,
+          })
+        );
       };
 
       for (let file in files) {

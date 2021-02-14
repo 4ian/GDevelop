@@ -1857,7 +1857,7 @@ interface EventsFunction {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunction SetSentence([Const] DOMString sentence);
     [Const, Ref] DOMString GetSentence();
-    [Ref] EventsFunction TogglePrivate();
+    [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();

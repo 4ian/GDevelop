@@ -37,10 +37,7 @@ export type EventsFunctionCreationParameters = {|
 |};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.getName();
-
-const getEventsFunctionPrivateness = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.isPrivate();
+  eventsFunction.getName() + (eventsFunction.isPrivate() ? ' (private)' : '');
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -90,7 +87,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _togglePrivate = eventsFunction => {
-    eventsFunction.togglePrivate();
+    eventsFunction.setPrivate(!eventsFunction.isPrivate());
     this.forceUpdate();
   };
 
@@ -337,7 +334,6 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                       i18n
                     )}
                     reactDndType="GD_EVENTS_FUNCTION"
-                    isItemBold={getEventsFunctionPrivateness}
                   />
                 )}
               </I18n>

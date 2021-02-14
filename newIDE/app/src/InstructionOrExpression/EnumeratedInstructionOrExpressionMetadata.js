@@ -43,10 +43,12 @@ export type EnumeratedInstructionOrExpressionMetadata =
   | EnumeratedInstructionMetadata
   | EnumeratedExpressionMetadata;
 
-export const filterEnumeratedInstructionOrExpressionMetadataByScope = (
-  list: Array<EnumeratedInstructionOrExpressionMetadata>,
+export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
+  +T: EnumeratedInstructionOrExpressionMetadata
+>(
+  list: Array<T>,
   scope: EventsScope
-): Array<EnumeratedInstructionOrExpressionMetadata> =>
+): Array<T> =>
   list.filter(enumeratedInstructionOrExpressionMetadata => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 

@@ -14,7 +14,7 @@ declare class gdEventsFunction {
   getFullName(): string;
   setSentence(sentence: string): gdEventsFunction;
   getSentence(): string;
-  togglePrivate(): gdEventsFunction;
+  setPrivate(isPrivate: boolean): gdEventsFunction;
   isPrivate(): boolean;
   setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
   getFunctionType(): EventsFunction_FunctionType;

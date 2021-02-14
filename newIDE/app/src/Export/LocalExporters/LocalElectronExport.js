@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -44,6 +44,7 @@ export const localElectronExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'local-electron',
+  shouldHaveUniquePackageName: t`The package name begins with com.example, make sure you replace it with an unique one, else installing your game might overwrite other games.`,
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),

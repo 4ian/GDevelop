@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -44,6 +44,7 @@ export const localCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'local-cordova',
+  shouldHaveUniquePackageName: t`The package name begins with com.example, make sure you replace it with an unique one to be able to publish your game on app stores.`,
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),

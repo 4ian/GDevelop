@@ -35,7 +35,8 @@ export type AlertMessageIdentifier =
   | 'p2p-broker-recommendation'
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
-  | 'extension-installed-explanation';
+  | 'extension-installed-explanation'
+  | 'project-should-have-unique-package-name';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -144,6 +145,12 @@ export const allAlertMessages: Array<{
     key: 'asset-installed-explanation',
     label: (
       <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
+  {
+    key: 'project-should-have-unique-package-name',
+    label: (
+      <Trans>Project package names should not begin with com.example</Trans>
     ),
   },
 ];

@@ -8,6 +8,7 @@
 #define GDCORE_EVENTSFUNCTION_H
 
 #include <vector>
+
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/String.h"
@@ -117,6 +118,24 @@ class GD_CORE_API EventsFunction {
   FunctionType GetFunctionType() const { return functionType; };
 
   /**
+   * \brief Returns true if the function is private.
+   */
+  bool IsPrivate() {
+    if (isPrivate)
+      return true;
+    else
+      return false;
+  }
+
+  /**
+   * \brief Toggles the privateness of the function.
+   */
+  EventsFunction& TogglePrivate() {
+    isPrivate = !isPrivate;
+    return *this;
+  }
+
+  /**
    * \brief Return the events.
    */
   const gd::EventsList& GetEvents() const { return events; };
@@ -128,7 +147,7 @@ class GD_CORE_API EventsFunction {
 
   /**
    * \brief Return the parameters of the function.
-   * 
+   *
    * \note During code/extension generation, new parameters are added
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".
    * This should be transparent to the user.
@@ -143,12 +162,14 @@ class GD_CORE_API EventsFunction {
   std::vector<gd::ParameterMetadata>& GetParameters() { return parameters; };
 
   /**
-   * \brief Return a reference to the object groups that can be used in the function.
+   * \brief Return a reference to the object groups that can be used in the
+   * function.
    */
   ObjectGroupsContainer& GetObjectGroups() { return objectGroups; }
 
   /**
-   * \brief Return a const reference to the object groups that can be used in the function.
+   * \brief Return a const reference to the object groups that can be used in
+   * the function.
    */
   const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
 
@@ -176,6 +197,7 @@ class GD_CORE_API EventsFunction {
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;
   gd::ObjectGroupsContainer objectGroups;
+  bool isPrivate = false;
 };
 
 }  // namespace gd

@@ -29,6 +29,12 @@ export type EnumeratedExpressionMetadata = {|
   parameters: Array<gdParameterMetadata>,
 |};
 
+const separator = gd.PlatformExtension.getNamespaceSeparator();
+// This is copied from gd::WholeProjectRefactorer (see GetBehaviorFullType)
+// Could be factored into a single C++ function in gd::PlatformExtension?
+const getBehaviorFullType = (extensionName: string, behaviorName: string) =>
+  extensionName + separator + behaviorName;
+
 // An object representing InstructionMetadata or ExpressionMetadata.
 // Allow to use most information without paying the cost to call the
 // InstructionMetadata/ExpressionMetadata methods. In theory,
@@ -37,27 +43,20 @@ export type EnumeratedInstructionOrExpressionMetadata =
   | EnumeratedInstructionMetadata
   | EnumeratedExpressionMetadata;
 
-export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
-  +T: EnumeratedInstructionOrExpressionMetadata
->(
-  list: Array<T>,
+export const filterEnumeratedInstructionOrExpressionMetadataByScope = (
+  list: Array<EnumeratedInstructionOrExpressionMetadata>,
   scope: EventsScope
-): Array<T> => {
-  // This is copied from gd::WholeProjectRefactorer (see GetBehaviorFullType)
-  // Could be factored into a single C++ function in gd::PlatformExtension?
-  const separator = gd.PlatformExtension.getNamespaceSeparator();
-  const getBehaviorFullType = (extensionName: string, behaviorName: string) => {
-    return extensionName + separator + behaviorName;
-  };
-
-  return list.filter(enumeratedInstructionOrExpressionMetadata => {
+): Array<EnumeratedInstructionOrExpressionMetadata> =>
+  list.filter(enumeratedInstructionOrExpressionMetadata => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 
     const {
-      behaviorMetadata,
-    } = enumeratedInstructionOrExpressionMetadata.scope;
+      type,
+      scope: { behaviorMetadata },
+    } = enumeratedInstructionOrExpressionMetadata;
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
+    // Show private behavior functions when editing the behavior
     if (
       behaviorMetadata &&
       eventsBasedBehavior &&
@@ -66,10 +65,16 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
         eventsFunctionsExtension.getName(),
         eventsBasedBehavior.getName()
       ) === behaviorMetadata.getName()
-    ) {
+    )
       return true;
-    }
+
+    // Show private non-behavior functions when editing the extension
+    if (
+      !behaviorMetadata &&
+      eventsFunctionsExtension &&
+      eventsFunctionsExtension.getName() === type.split(separator)[0]
+    )
+      return true;
 
     return false;
   });
-};

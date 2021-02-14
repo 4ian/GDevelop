@@ -13,12 +13,18 @@ namespace gdjs {
 MouseExtension::MouseExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMouseExtension(*this);
 
-  GetAllConditions()["SourisX"].SetFunctionName(
+  GetAllConditions()["MouseX"].SetFunctionName(
       "gdjs.evtTools.input.getMouseX");
-  GetAllConditions()["SourisY"].SetFunctionName(
+  GetAllConditions()["MouseY"].SetFunctionName(
       "gdjs.evtTools.input.getMouseY");
-  GetAllConditions()["SourisBouton"].SetFunctionName(
+  GetAllConditions()["SourisX"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseX"); // Deprecated
+  GetAllConditions()["SourisY"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseY"); // Deprecated
+  GetAllConditions()["MouseButtonPressed"].SetFunctionName(
       "gdjs.evtTools.input.isMouseButtonPressed");
+  GetAllConditions()["SourisBouton"].SetFunctionName(
+      "gdjs.evtTools.input.isMouseButtonPressed"); // Deprecated
   GetAllConditions()["MouseButtonReleased"].SetFunctionName(
       "gdjs.evtTools.input.isMouseButtonReleased");
   GetAllActions()["CacheSouris"].SetFunctionName(
@@ -62,8 +68,7 @@ MouseExtension::MouseExtension() {
   GetAllExpressions()["MouseWheelDelta"].SetFunctionName(
       "gdjs.evtTools.input.getMouseWheelDelta");
 
-  StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
-                                                   // listed here:
+  StripUnimplementedInstructionsAndExpressions();
 }
 
 }  // namespace gdjs

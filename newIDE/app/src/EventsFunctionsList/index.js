@@ -86,7 +86,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
-  _togglePrivate = eventsFunction => {
+  _togglePrivate = (eventsFunction: gdEventsFunction) => {
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
     this.forceUpdate();
   };

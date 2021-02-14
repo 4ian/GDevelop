@@ -25,12 +25,22 @@ CameraExtension::CameraExtension() {
       .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
 
-  GetAllActions()["CameraX"]
+  GetAllActions()["SetCameraX"]
       .SetFunctionName("SetCameraX")
       .SetManipulatedType("number")
       .SetGetter("GetCameraX")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
-  GetAllActions()["CameraY"]
+  GetAllActions()["SetCameraY"]
+      .SetFunctionName("SetCameraY")
+      .SetManipulatedType("number")
+      .SetGetter("GetCameraY")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+  GetAllActions()["CameraX"] // Deprecated
+      .SetFunctionName("SetCameraX")
+      .SetManipulatedType("number")
+      .SetGetter("GetCameraX")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+  GetAllActions()["CameraY"] // Deprecated
       .SetFunctionName("SetCameraY")
       .SetManipulatedType("number")
       .SetGetter("GetCameraY")
@@ -49,7 +59,13 @@ CameraExtension::CameraExtension() {
       .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
 
-  GetAllActions()["RotateCamera"]
+  GetAllActions()["SetCameraAngle"]
+      .SetFunctionName("SetCameraAngle")
+      .SetGetter("GetCameraAngle")
+      .SetManipulatedType("number")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+
+  GetAllActions()["RotateCamera"] // Deprecated
       .SetFunctionName("SetCameraAngle")
       .SetGetter("GetCameraAngle")
       .SetManipulatedType("number")
@@ -135,6 +151,9 @@ CameraExtension::CameraExtension() {
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
   GetAllExpressions()["VueY"]
       .SetFunctionName("GetCameraY")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+  GetAllExpressions()["CameraAngle"]
+      .SetFunctionName("GetCameraRotation")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
   GetAllExpressions()["CameraRotation"]
       .SetFunctionName("GetCameraRotation")

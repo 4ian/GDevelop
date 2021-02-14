@@ -201,6 +201,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddParameter("mouse", _("Button to check"))
       .MarkAsSimple();
 
+  // Support for deprecated names:
   extension.AddDuplicatedCondition("SourisBouton", "MouseButtonPressed")
       .SetHidden();
 

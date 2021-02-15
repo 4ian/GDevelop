@@ -201,7 +201,7 @@ module.exports = {
         'FontSize',
         _('Font size'),
         _(
-          'Check the font size of the text. This value is the font size setup in the external bmFont editor.'
+          'Check the font size, defined in an external editor.'
         ),
         _('the font size'),
         '',
@@ -232,7 +232,7 @@ module.exports = {
       .addCondition(
         'Font',
         _('Font name'),
-        _('Check the font name, define in the external editor bmFont.'),
+        _('Check the font name, defined in an external editor.'),
         _('the font name'),
         '',
         'res/conditions/font24.png',
@@ -360,7 +360,8 @@ module.exports = {
         'BitmapFontAndAtlasFile',
         _('Bitmap files'),
         _(
-          'Change the font file and atlas image used by the Bitmap text object.'
+          'Change the font file and atlas image used by the Bitmap text object.' +
+            'The resource name of files can be found in:`Project Manager > Game settings > Resources`'
         ),
         _(
           'Set the bitmap font of _PARAM0_ with font file:_PARAM1_ and the atlas image:_PARAM2_'
@@ -371,7 +372,13 @@ module.exports = {
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('bitmapFont', _('Bitmap font file'), '', false)
+      .setParameterLongDescription(
+        'This input take the resource name of the font file, without quotes.'
+      )
       .addParameter('string', _('Bitmap atlas texture'), '', false)
+      .setParameterLongDescription(
+        'This input take the resource name of the image exported with the font, with quotes.'
+      )
       .getCodeExtraInformation()
       .setFunctionName('setBitmapFontAndAtlasFile');
 
@@ -446,7 +453,9 @@ module.exports = {
       .addExpression(
         'FontSize',
         _('Font size'),
-        _('Font size'),
+        _(
+          'Font size defined for generate the bitmap font files in an external editor.'
+        ),
         '',
         'res/actions/characterSize24.png'
       )
@@ -470,7 +479,9 @@ module.exports = {
       .addStrExpression(
         'FontName',
         _('Font name'),
-        _('Font name'),
+        _(
+          'Font name defined for generate the bitmap font files in an external editor.'
+        ),
         '',
         'res/actions/font.png'
       )

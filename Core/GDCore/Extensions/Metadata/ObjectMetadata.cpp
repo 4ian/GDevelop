@@ -152,20 +152,33 @@ gd::MultipleInstructionMetadata ObjectMetadata::AddExpressionAndCondition(
     const gd::String& type,
     const gd::String& name,
     const gd::String& fullname,
-    const gd::String& description,
+    const gd::String& descriptionSubject,
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
-          ? AddExpression(name, fullname, description, group, icon)
-          : AddStrExpression(name, fullname, description, group, icon);
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  // TODO: ScopedCondition
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
   auto& condition = AddCondition(name,
                                  fullname,
-                                 // TODO
-                                 _("Compare ") + description,
-                                 sentenceName + ""  // TODO
-                                 ,
+                                 conditionDescriptionTemplate.FindAndReplace(
+                                     "<subject>", descriptionSubject),
+                                 sentenceName,
                                  group,
                                  icon,
                                  icon);
@@ -179,34 +192,47 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
     const gd::String& type,
     const gd::String& name,
     const gd::String& fullname,
-    const gd::String& description,
+    const gd::String& descriptionSubject,
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
-          ? AddExpression(name, fullname, description, group, icon)
-          : AddStrExpression(name, fullname, description, group, icon);
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
   // TODO: ScopedCondition
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
   auto& condition = AddCondition(name,
                                  fullname,
-                                 // TODO
-                                 _("Compare ") + description,
-                                 sentenceName + ""  // TODO
-                                 ,
+                                 conditionDescriptionTemplate.FindAndReplace(
+                                     "<subject>", descriptionSubject),
+                                 sentenceName,
                                  group,
                                  icon,
                                  icon);
+
   // TODO: ScopedAction
-  auto& action = AddAction("Set" + name,
-                           fullname,
-                           // TODO
-                           _("Change ") + description,
-                           sentenceName + ""  // TODO
-                           ,
-                           group,
-                           icon,
-                           icon);
+  gd::String actionDescriptionTemplate = _("Change <subject>.");
+  auto& action = AddAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);

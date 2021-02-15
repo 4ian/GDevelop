@@ -151,8 +151,8 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, behaviors expression do not have namespace ( not necessary as
-  // we refer to the auomatism name in the expression )
+  // Be careful, behaviors expression do not have namespace (not necessary as
+  // we refer to the behavior name in the expression).
   expressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
@@ -168,8 +168,8 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, behaviors expression do not have namespace ( not necessary as
-  // we refer to the auomatism name in the expression )
+  // Be careful, behaviors expression do not have namespace (not necessary as
+  // we refer to the behavior name in the expression).
   strExpressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
@@ -182,23 +182,36 @@ gd::MultipleInstructionMetadata BehaviorMetadata::AddExpressionAndCondition(
     const gd::String& type,
     const gd::String& name,
     const gd::String& fullname,
-    const gd::String& description,
+    const gd::String& descriptionSubject,
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
-          ? AddExpression(name, fullname, description, group, icon)
-          : AddStrExpression(name, fullname, description, group, icon);
-  auto& condition = AddScopedCondition(name,
-                                 fullname,
-                                 // TODO
-                                 _("Compare ") + description,
-                                 sentenceName + ""  // TODO
-                                 ,
-                                 group,
-                                 icon,
-                                 icon);
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
 
   return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
                                                                  condition);
@@ -209,34 +222,46 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
     const gd::String& type,
     const gd::String& name,
     const gd::String& fullname,
-    const gd::String& description,
+    const gd::String& descriptionSubject,
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
-          ? AddExpression(name, fullname, description, group, icon)
-          : AddStrExpression(name, fullname, description, group, icon);
-  // TODO: ScopedCondition
-  auto& condition = AddScopedCondition(name,
-                                 fullname,
-                                 // TODO
-                                 _("Compare ") + description,
-                                 sentenceName + ""  // TODO
-                                 ,
-                                 group,
-                                 icon,
-                                 icon);
-  // TODO: ScopedAction
-  auto& action = AddScopedAction("Set" + name,
-                           fullname,
-                           // TODO
-                           _("Change ") + description,
-                           sentenceName + ""  // TODO
-                           ,
-                           group,
-                           icon,
-                           icon);
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
+
+  gd::String actionDescriptionTemplate = _("Change <subject>.");
+  auto& action = AddScopedAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);

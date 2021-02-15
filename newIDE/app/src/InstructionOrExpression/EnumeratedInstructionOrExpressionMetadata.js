@@ -29,11 +29,12 @@ export type EnumeratedExpressionMetadata = {|
   parameters: Array<gdParameterMetadata>,
 |};
 
-const separator = gd.PlatformExtension.getNamespaceSeparator();
 // This is copied from gd::WholeProjectRefactorer (see GetBehaviorFullType)
 // Could be factored into a single C++ function in gd::PlatformExtension?
-const getBehaviorFullType = (extensionName: string, behaviorName: string) =>
-  extensionName + separator + behaviorName;
+const getBehaviorFullType = (extensionName: string, behaviorName: string) => {
+  const separator = gd.PlatformExtension.getNamespaceSeparator();
+  return extensionName + separator + behaviorName;
+};
 
 // An object representing InstructionMetadata or ExpressionMetadata.
 // Allow to use most information without paying the cost to call the
@@ -48,8 +49,9 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
 >(
   list: Array<T>,
   scope: EventsScope
-): Array<T> =>
-  list.filter(enumeratedInstructionOrExpressionMetadata => {
+): Array<T> => {
+  const separator = gd.PlatformExtension.getNamespaceSeparator();
+  return list.filter(enumeratedInstructionOrExpressionMetadata => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 
     const {
@@ -80,3 +82,4 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
 
     return false;
   });
+};

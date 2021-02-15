@@ -452,7 +452,7 @@ module.exports = {
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getFontSize'); // TODO dans la preview ça retourne undefined c'est pas bon faut prendre la valeur dans la font rendu qui se trouve dans le renderer.
+      .setFunctionName('getFontSize');
 
     object
       .addStrExpression(

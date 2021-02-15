@@ -175,7 +175,7 @@ gdjs.BitmapTextRuntimeObject.prototype.getScale = function () {
 };
 
 gdjs.BitmapTextRuntimeObject.prototype.getFontSize = function () {
-  return this._fontSize; // TODO pas bon faut prendre la valeur depuis le _renderer
+  return this._renderer.getFontSize();
 };
 
 gdjs.BitmapTextRuntimeObject.prototype._setBitmapFontFile = function (

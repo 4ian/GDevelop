@@ -89,6 +89,10 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.onDestroy = function () {
   gdjs.BitmapFontManager.removeFontUsed(this._pixiObject._fontName);
 };
 
+gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.getFontSize = function () {
+  return this._pixiObject.fontSize;
+};
+
 gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
   const bitmapFontResourceName = this._object._bitmapFontFile;
   const bitmapAtlasResourceName = this._object._bitmapAtlasFile;

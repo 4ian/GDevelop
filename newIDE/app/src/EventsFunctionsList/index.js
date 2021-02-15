@@ -37,7 +37,7 @@ export type EventsFunctionCreationParameters = {|
 |};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.getName();
+  eventsFunction.getName() + (eventsFunction.isPrivate() ? ' (private)' : '');
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -84,6 +84,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   state: State = {
     renamedEventsFunction: null,
     searchText: '',
+  };
+
+  _togglePrivate = (eventsFunction: gdEventsFunction) => {
+    eventsFunction.setPrivate(!eventsFunction.isPrivate());
+    this.forceUpdate();
   };
 
   _deleteEventsFunction = (
@@ -222,6 +227,12 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         label: i18n._(t`Rename`),
         click: () => this._editName(eventsFunction),
         enabled: this.props.canRename(eventsFunction),
+      },
+      {
+        label: eventsFunction.isPrivate()
+          ? i18n._(t`Make public`)
+          : i18n._(t`Make private`),
+        click: () => this._togglePrivate(eventsFunction),
       },
       {
         label: i18n._(t`Remove`),

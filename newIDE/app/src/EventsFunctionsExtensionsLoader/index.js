@@ -349,6 +349,8 @@ function generateBehavior(
         instructionOrExpression.setHidden();
       }
 
+      if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
+
       const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
       codeExtraInformation
         .setIncludeFile(includeFile)

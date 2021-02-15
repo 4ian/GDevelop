@@ -16,7 +16,10 @@ import {
   filterInstructionsList,
   deduplicateInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
-import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import {
+  type EnumeratedInstructionMetadata,
+  filterEnumeratedInstructionOrExpressionMetadataByScope,
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
@@ -43,6 +46,7 @@ import {
   getObjectOrObjectGroupListItemValue,
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   searchBar: {
@@ -63,6 +67,7 @@ type Props = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  scope: EventsScope,
   currentTab: TabName,
   onChangeTab: TabName => void,
   isCondition: boolean,
@@ -88,8 +93,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _selectedItem = React.createRef<ListItemRefType>();
 
   // Free instructions, to be displayed in a tab next to the objects.
-  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateFreeInstructions(
-    this.props.isCondition
+  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateFreeInstructions(this.props.isCondition),
+    this.props.scope
   );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.freeInstructionsInfo
@@ -101,8 +107,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
-  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = enumerateAllInstructions(
-    this.props.isCondition
+  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
+    enumerateAllInstructions(this.props.isCondition),
+    this.props.scope
   );
 
   componentDidMount() {

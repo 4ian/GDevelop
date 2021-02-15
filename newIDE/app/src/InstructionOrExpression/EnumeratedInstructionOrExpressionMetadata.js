@@ -3,6 +3,7 @@ import { type EventsScope } from './EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 export type InstructionOrExpressionScope = {|
+  extension: gdPlatformExtension,
   objectMetadata?: ?gdObjectMetadata,
   behaviorMetadata?: ?gdBehaviorMetadata,
 |};
@@ -44,6 +45,10 @@ export type EnumeratedInstructionOrExpressionMetadata =
   | EnumeratedInstructionMetadata
   | EnumeratedExpressionMetadata;
 
+/**
+ * Given a list of expression or instructions that were previously enumerated,
+ * filter the ones that are not usable from the current "scope".
+ */
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   +T: EnumeratedInstructionOrExpressionMetadata
 >(
@@ -54,9 +59,13 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   return list.filter(enumeratedInstructionOrExpressionMetadata => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 
+    // The instruction or expression is marked as "private":
+    // we now compare its scope (where it was declared) and the current scope
+    // (where we are) to see if we should filter it or not.
+
     const {
       type,
-      scope: { behaviorMetadata },
+      scope: { behaviorMetadata, extension },
     } = enumeratedInstructionOrExpressionMetadata;
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
@@ -76,7 +85,7 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
     if (
       !behaviorMetadata &&
       eventsFunctionsExtension &&
-      eventsFunctionsExtension.getName() === type.split(separator)[0]
+      eventsFunctionsExtension.getName() === extension.getName()
     )
       return true;
 

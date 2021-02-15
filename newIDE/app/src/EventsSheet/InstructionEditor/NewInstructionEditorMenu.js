@@ -142,6 +142,7 @@ export default function NewInstructionEditorMenu({
       key="instruction-or-object-selector"
       style={styles.fullHeightSelector}
       project={project}
+      scope={scope}
       currentTab={currentInstructionOrObjectSelectorTab}
       onChangeTab={setCurrentInstructionOrObjectSelectorTab}
       globalObjectsContainer={globalObjectsContainer}

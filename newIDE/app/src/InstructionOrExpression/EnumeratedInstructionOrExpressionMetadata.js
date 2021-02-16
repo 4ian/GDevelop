@@ -55,7 +55,6 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  const separator = gd.PlatformExtension.getNamespaceSeparator();
   return list.filter(enumeratedInstructionOrExpressionMetadata => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 
@@ -64,9 +63,9 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
     // (where we are) to see if we should filter it or not.
 
     const {
-      type,
-      scope: { behaviorMetadata, extension },
-    } = enumeratedInstructionOrExpressionMetadata;
+      behaviorMetadata,
+      extension,
+    } = enumeratedInstructionOrExpressionMetadata.scope;
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
     // Show private behavior functions when editing the behavior

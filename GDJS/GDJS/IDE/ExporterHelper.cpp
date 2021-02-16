@@ -454,6 +454,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir) {
   gd::String jsonName =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
   gd::String jsonAuthor =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
   gd::String jsonVersion =
@@ -468,6 +470,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -55,7 +55,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 > = {
   name: 'browser-online-electron',
   onlineBuildType: 'electron-build',
-  shouldHaveUniquePackageName: t`The package name begins with com.example, make sure you replace it with an unique one, else installing your game might overwrite other games.`,
+  packageNameWarningType: 'desktop',
 
   getInitialExportState: () => ({
     targets: ['winExe'],

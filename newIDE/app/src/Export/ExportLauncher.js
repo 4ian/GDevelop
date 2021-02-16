@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import RaisedButton from '../UI/RaisedButton';
 import { sendExportLaunched } from '../Utils/Analytics/EventSender';
 import {
@@ -247,7 +248,7 @@ export default class ExportLauncher extends Component<Props, State> {
 
     return (
       <Column noMargin>
-        {!!exportPipeline.shouldHaveUniquePackageName &&
+        {!!exportPipeline.packageNameWarningType &&
           project.getPackageName().indexOf('com.example') !== -1 && (
             <Line>
               <DismissableAlertMessage
@@ -256,7 +257,11 @@ export default class ExportLauncher extends Component<Props, State> {
               >
                 <I18n>
                   {({ i18n }) =>
-                    i18n._(exportPipeline.shouldHaveUniquePackageName)
+                    i18n._(
+                      exportPipeline.packageNameWarningType === 'mobile'
+                        ? t`The package name begins with com.example, make sure you replace it with an unique one to be able to publish your game on app stores.`
+                        : t`The package name begins with com.example, make sure you replace it with an unique one, else installing your game might overwrite other games.`
+                    )
                   }
                 </I18n>
               </DismissableAlertMessage>

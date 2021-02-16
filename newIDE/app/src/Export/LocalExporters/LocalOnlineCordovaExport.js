@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -48,7 +48,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 > = {
   name: 'local-online-cordova',
   onlineBuildType: 'cordova-build',
-  shouldHaveUniquePackageName: t`The package name begins with com.example, make sure you replace it with an unique one to be able to publish your game on app stores.`,
+  packageNameWarningType: 'mobile',
 
   getInitialExportState: () => null,
 

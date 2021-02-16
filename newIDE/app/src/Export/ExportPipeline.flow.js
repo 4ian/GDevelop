@@ -22,7 +22,7 @@ export type ExportPipeline<
 > = {|
   name: string,
   onlineBuildType?: string,
-  shouldHaveUniquePackageName?: MessageDescriptor,
+  packageNameWarningType?: 'mobile' | 'desktop',
 
   getInitialExportState: (project: gdProject) => ExportState,
 

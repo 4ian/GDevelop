@@ -44,6 +44,7 @@ export const localElectronExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'local-electron',
+  packageNameWarningType: 'desktop',
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),

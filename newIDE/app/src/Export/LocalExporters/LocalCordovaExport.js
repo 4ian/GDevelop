@@ -44,6 +44,7 @@ export const localCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'local-cordova',
+  packageNameWarningType: 'mobile',
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),

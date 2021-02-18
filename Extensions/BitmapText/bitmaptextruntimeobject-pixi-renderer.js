@@ -38,7 +38,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   const defaultBitmapFont = runtimeScene
     .getGame()
     .getBitmapFontManager()
-    .generateDefaultBitmapFont();
+    .getDefaultBitmapFont();
 
   this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
     fontName: defaultBitmapFont.font,
@@ -48,7 +48,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   let bitmapAtlasResourceName = runtimeObject._bitmapAtlasFile;
 
   // No bitmap font file
-  if (bitmapFontResourceName == '') {
+  if (bitmapFontResourceName === '') {
     console.warn(
       'No bitmap font was setup for "' +
         this._object.name +
@@ -56,7 +56,7 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     );
   }
   // No texture file
-  if (bitmapFontResourceName == '') {
+  if (bitmapFontResourceName === '') {
     console.warn(
       'No atlas image was setup for "' +
         this._object.name +

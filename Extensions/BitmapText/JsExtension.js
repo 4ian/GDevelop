@@ -568,7 +568,6 @@ module.exports = {
       // Set up a and generate a default bitmap font
       // It will then be replaced with the bitmap font setup by the user (see `update` method)
 
-      // Define same as  bitmapTextObject.setRawJSONContent() on top of this file
       this._bitmapFontStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
         fontSize: 20,

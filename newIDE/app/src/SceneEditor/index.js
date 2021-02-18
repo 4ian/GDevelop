@@ -26,7 +26,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -851,14 +851,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
-    if (!clipboardContent || !this.editor) return;
+    if (!this.editor) return;
 
     const position = useLastCursorPosition
       ? this.editor.getLastCursorSceneCoordinates()
       : this.editor.getLastContextMenuSceneCoordinates();
-    const { x, y } = clipboardContent;
-    clipboardContent.instances
+
+    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+    const instancesContent = SafeExtractor.extractArrayProperty(
+      clipboardContent,
+      'instances'
+    );
+    const x = SafeExtractor.extractNumberProperty(clipboardContent, 'x');
+    const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
+    if (x === null || y === null || instancesContent === null) return;
+
+    instancesContent
       .map(serializedInstance => {
         const instance = new gd.InitialInstance();
         unserializeFromJSObject(instance, serializedInstance);

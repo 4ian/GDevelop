@@ -56,12 +56,15 @@ type NewInstructionEditorState = {|
 |};
 
 type NewInstructionEditorSetters = {|
-  chooseFreeInstruction: (
+  /** Select an instruction - which can be a free or an object instruction. */
+  chooseInstruction: (
     type: string
   ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  /** Select an object, so that then this object specific instructions can be searched and selected. */
   chooseObject: (
     objectName: string
   ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  /** Select an instruction for the currently selected object. */
   chooseObjectInstruction: (
     type: string
   ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
@@ -185,7 +188,7 @@ export const useNewInstructionEditor = ({
     };
   };
 
-  const chooseFreeInstruction = (type: string) => {
+  const chooseInstruction = (type: string) => {
     instruction.setType(type);
     const newState = {
       chosenObjectName: null,
@@ -207,7 +210,7 @@ export const useNewInstructionEditor = ({
   return [
     state,
     {
-      chooseFreeInstruction,
+      chooseInstruction,
       chooseObject,
       chooseObjectInstruction,
     },

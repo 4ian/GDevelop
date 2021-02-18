@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Spacer, Line, Column } from './Grid';
-import { ResponsiveWindowMeasurer } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
   renderTextField: () => React.Node,
@@ -80,7 +80,10 @@ type ResponsiveLineStackLayoutProps = {|
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
+  /** Prefer `noColumnMargin` if needed. */
   noMargin?: boolean,
+  /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
+  noColumnMargin?: boolean,
   children: React.Node,
 |};
 
@@ -89,40 +92,37 @@ export const ResponsiveLineStackLayout = ({
   justifyContent,
   expand,
   noMargin,
+  noColumnMargin,
   children,
 }: ResponsiveLineStackLayoutProps) => {
+  const windowWidth = useResponsiveWindowWidth();
   let isFirstChild = true;
-  return (
-    <ResponsiveWindowMeasurer>
-      {windowWidth =>
-        windowWidth === 'small' ? (
-          <ColumnStackLayout noMargin={noMargin} expand>
-            {children}
-          </ColumnStackLayout>
-        ) : (
-          <Line
-            alignItems={alignItems}
-            justifyContent={justifyContent}
-            expand={expand}
-            noMargin={noMargin}
-          >
-            {React.Children.map(children, (child, index) => {
-              if (!child) return null;
 
-              const addSpacers = !isFirstChild;
-              isFirstChild = false;
+  return windowWidth === 'small' ? (
+    <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
+      {children}
+    </ColumnStackLayout>
+  ) : (
+    <Line
+      alignItems={alignItems}
+      justifyContent={justifyContent}
+      expand={expand}
+      noMargin={noMargin}
+    >
+      {React.Children.map(children, (child, index) => {
+        if (!child) return null;
 
-              return (
-                <React.Fragment>
-                  {addSpacers && <Spacer />}
-                  {child}
-                </React.Fragment>
-              );
-            })}
-          </Line>
-        )
-      }
-    </ResponsiveWindowMeasurer>
+        const addSpacers = !isFirstChild;
+        isFirstChild = false;
+
+        return (
+          <React.Fragment>
+            {addSpacers && <Spacer />}
+            {child}
+          </React.Fragment>
+        );
+      })}
+    </Line>
   );
 };
 

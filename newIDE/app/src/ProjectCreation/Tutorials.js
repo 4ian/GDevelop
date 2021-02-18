@@ -1,132 +1,151 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { PureComponent } from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
-import { getHelpLink } from '../Utils/HelpLink';
 import { List, ListItem } from '../UI/List';
+import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import Subheader from '../UI/Subheader';
+import { getAllTutorialHints, type TutorialHint } from '../Hints';
+import { I18n } from '@lingui/react';
+import ListIcon from '../UI/ListIcon';
+import RaisedButton from '../UI/RaisedButton';
+import { getHelpLink } from '../Utils/HelpLink';
 
-export default class Tutorials extends PureComponent {
-  render() {
+const TutorialListItem = ({
+  tutorialHint,
+  i18n,
+}: {|
+  tutorialHint: TutorialHint,
+  i18n: I18nType,
+|}) => {
+  return (
+    <ListItem
+      leftIcon={
+        tutorialHint.iconSrc ? (
+          <ListIcon
+            iconWidth={120}
+            iconHeight={60}
+            src={tutorialHint.iconSrc}
+          />
+        ) : null
+      }
+      primaryText={tutorialHint.name}
+      secondaryText={i18n._(tutorialHint.message)}
+      onClick={() => {
+        sendTutorialOpened(tutorialHint.identifier);
+        Window.openExternalURL(tutorialHint.link);
+      }}
+    />
+  );
+};
+
+export default function Tutorials() {
+  const allTutorials = getAllTutorialHints();
+  const featuredForGettingStartedTutorials = allTutorials.filter(
+    tutorialHint => {
+      return !!tutorialHint.featuredForGettingStarted;
+    }
+  );
+  const videoTutorials = allTutorials.filter(tutorialHint => {
     return (
-      <Column noMargin>
-        <Line>
+      !tutorialHint.featuredForGettingStarted &&
+      tutorialHint.kind === 'video-tutorial'
+    );
+  });
+  const nonVideoTutorials = allTutorials.filter(tutorialHint => {
+    return (
+      !tutorialHint.featuredForGettingStarted &&
+      tutorialHint.kind !== 'video-tutorial'
+    );
+  });
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <ColumnStackLayout noMargin>
           <Column>
             <Text>
               <Trans>
-                Tutorials are available on GDevelop wiki. Choose a tutorial to
-                read:
+                Get started by following a tutorial, the best way to understand
+                how GDevelop works.
               </Trans>
             </Text>
           </Column>
-        </Line>
-        <Line>
           <Column expand noMargin>
+            <Column>
+              <Text size="title" noMargin>
+                <Trans>Getting Started</Trans>
+              </Text>
+            </Column>
             <List>
-              <ListItem
-                primaryText={<Trans>Geometry Monster Tutorial</Trans>}
-                secondaryText={
-                  <Trans>
-                    Make a hyper-casual mobile game where the player must grab
-                    shapes and avoid bombs.
-                  </Trans>
-                }
-                onClick={() => {
-                  sendTutorialOpened('Geometry Monster');
-                  Window.openExternalURL(
-                    getHelpLink('/tutorials/geometry-monster')
-                  );
-                }}
-              />
-              <ListItem
-                primaryText={<Trans>Platformer Tutorial</Trans>}
-                secondaryText={
-                  <Trans>Make a platform game from scratch.</Trans>
-                }
-                onClick={() => {
-                  sendTutorialOpened('Platformer');
-                  Window.openExternalURL(
-                    getHelpLink('/tutorials/platformer/start')
-                  );
-                }}
-              />
-              <ListItem
-                primaryText={<Trans>Space Shooter Tutorial</Trans>}
-                secondaryText={
-                  <Trans>Make a space shooter game from scratch.</Trans>
-                }
-                onClick={() => {
-                  sendTutorialOpened('Space Shooter');
-                  Window.openExternalURL(
-                    getHelpLink('/tutorials/space-shooter/start')
-                  );
-                }}
-              />
-              <ListItem
-                primaryText={<Trans>Tank Shooter Tutorial</Trans>}
-                secondaryText={
-                  <Trans>Make a simple tank shooter game from scratch.</Trans>
-                }
-                onClick={() => {
-                  sendTutorialOpened('Tank Shooter');
-                  Window.openExternalURL(
-                    getHelpLink('/tutorials/tank-shooter')
-                  );
-                }}
-              />
-              <Subheader>
-                <Trans>Community Tutorials</Trans>
-              </Subheader>
-              <ListItem
-                primaryText={<Trans>Endless Runner Tutorial</Trans>}
-                secondaryText={
-                  <Trans>
-                    Make a simple game where the player must jump on platforms
-                    for as long as possible.
-                  </Trans>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendTutorialOpened('Endless Runner');
-                  Window.openExternalURL(
-                    getHelpLink('/tutorials/endless-runner')
-                  );
-                }}
-              />
-              <ListItem
-                primaryText={<Trans>Endless Car Game Tutorial</Trans>}
-                secondaryText={
-                  <Trans>
-                    Create a simple game where you must dodge the cars on the
-                    road.
-                  </Trans>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendTutorialOpened('Endless Car Game');
-                  Window.openExternalURL(getHelpLink('/tutorials/roadrider'));
-                }}
-              />
-              <ListItem
-                primaryText={<Trans>Breakout Tutorial</Trans>}
-                secondaryText={
-                  <Trans>
-                    Create a simple breakout game where you must destroy all the
-                    bricks on the screen.
-                  </Trans>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendTutorialOpened('Breakout');
-                  Window.openExternalURL(getHelpLink('/tutorials/breakout'));
-                }}
-              />
+              <List>
+                {featuredForGettingStartedTutorials.map(tutorialHint => (
+                  <TutorialListItem
+                    key={tutorialHint.identifier}
+                    tutorialHint={tutorialHint}
+                    i18n={i18n}
+                  />
+                ))}
+              </List>
             </List>
           </Column>
-        </Line>
-      </Column>
-    );
-  }
+          <Line justifyContent="center" noMargin>
+            <RaisedButton
+              primary
+              label={<Trans>Open GDevelop documentation</Trans>}
+              onClick={() => {
+                Window.openExternalURL(getHelpLink('/'));
+              }}
+            />
+          </Line>
+          <Column noMargin>
+            <Column>
+              <Text size="title" noMargin>
+                <Trans>Video Tutorials</Trans>
+              </Text>
+            </Column>
+            <List>
+              {videoTutorials.map(tutorialHint => (
+                <TutorialListItem
+                  key={tutorialHint.identifier}
+                  tutorialHint={tutorialHint}
+                  i18n={i18n}
+                />
+              ))}
+            </List>
+          </Column>
+          <Line justifyContent="center" noMargin>
+            <RaisedButton
+              primary
+              label={<Trans>Find more on GDevelop Youtube channel</Trans>}
+              onClick={() => {
+                Window.openExternalURL('https://www.youtube.com/c/GDevelopApp');
+              }}
+            />
+          </Line>
+          <Column noMargin>
+            <Column>
+              <Text size="title" noMargin>
+                <Trans>Other Community Tutorials</Trans>
+              </Text>
+            </Column>
+            <List>
+              <List>
+                {nonVideoTutorials.map(tutorialHint => (
+                  <TutorialListItem
+                    key={tutorialHint.identifier}
+                    tutorialHint={tutorialHint}
+                    i18n={i18n}
+                  />
+                ))}
+              </List>
+            </List>
+          </Column>
+        </ColumnStackLayout>
+      )}
+    </I18n>
+  );
 }

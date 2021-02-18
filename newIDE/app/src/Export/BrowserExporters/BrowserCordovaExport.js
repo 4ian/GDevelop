@@ -52,6 +52,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'browser-cordova',
+  packageNameWarningType: 'mobile',
 
   getInitialExportState: () => null,
 

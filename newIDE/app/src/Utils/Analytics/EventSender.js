@@ -244,6 +244,12 @@ export const sendNewObjectCreated = (name: string) => {
   client.recordEvent('new-object-created', { name });
 };
 
+export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('showcase-open-game-link', { title, linkType });
+};
+
 export const sendChoosePlanClicked = (planId: string | null) => {
   if (isDev || !client) return;
 

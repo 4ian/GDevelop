@@ -4,14 +4,17 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import ScrollView from '../UI/ScrollView';
 import { Tabs, Tab } from '../UI/Tabs';
 import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
-import { VideoTutorials } from './VideoTutorials';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { GamesShowcase } from '../GamesShowcase';
+import Window from '../Utils/Window';
+import PublishIcon from '@material-ui/icons/Publish';
 
 type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials',
+  currentTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase',
   outputPath: string,
 |};
 
@@ -27,6 +30,7 @@ export type CreateProjectDialogWithComponentsProps = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => Promise<void>,
+  initialTab: 'starters' | 'games-showcase',
 |};
 
 type Props = {|
@@ -37,12 +41,12 @@ type Props = {|
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
-    currentTab: 'starters',
+    currentTab: this.props.initialTab,
     outputPath: '',
   };
 
   _onChangeTab = (
-    newTab: 'starters' | 'examples' | 'tutorials' | 'video-tutorials'
+    newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
   ) => {
     this.setState({
       currentTab: newTab,
@@ -74,38 +78,65 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             onClick={onClose}
           />,
         ]}
+        secondaryActions={
+          this.state.currentTab === 'games-showcase'
+            ? [
+                <FlatButton
+                  key="submit-game-showcase"
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+                    );
+                  }}
+                  primary
+                  icon={<PublishIcon />}
+                  label={<Trans>Submit your game to the showcase</Trans>}
+                />,
+              ]
+            : null
+        }
         cannotBeDismissed={false}
         onRequestClose={onClose}
         open={open}
         noMargin
+        fullHeight
+        flexBody
       >
-        <Column noMargin>
+        <Column expand noMargin>
           <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
             <Tab label={<Trans>Starters</Trans>} value="starters" />
             <Tab label={<Trans>Examples</Trans>} value="examples" />
             <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
-            <Tab label={<Trans>Videos</Trans>} value="video-tutorials" />
+            <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
           </Tabs>
           {this.state.currentTab === 'starters' && (
-            <StartersComponent
-              onOpen={onOpen}
-              onCreate={onCreate}
-              onChangeOutputPath={outputPath => this.setState({ outputPath })}
-              onShowExamples={this._showExamples}
-              outputPath={this.state.outputPath}
-            />
+            <ScrollView>
+              <StartersComponent
+                onOpen={onOpen}
+                onCreate={onCreate}
+                onChangeOutputPath={outputPath => this.setState({ outputPath })}
+                onShowExamples={this._showExamples}
+                outputPath={this.state.outputPath}
+              />
+            </ScrollView>
           )}
           {this.state.currentTab === 'examples' && (
-            <ExamplesComponent
-              onOpen={onOpen}
-              onCreate={onCreate}
-              onChangeOutputPath={outputPath => this.setState({ outputPath })}
-              onExamplesLoaded={this._onExamplesLoaded}
-              outputPath={this.state.outputPath}
-            />
+            <ScrollView>
+              <ExamplesComponent
+                onOpen={onOpen}
+                onCreate={onCreate}
+                onChangeOutputPath={outputPath => this.setState({ outputPath })}
+                onExamplesLoaded={this._onExamplesLoaded}
+                outputPath={this.state.outputPath}
+              />
+            </ScrollView>
           )}
-          {this.state.currentTab === 'tutorials' && <Tutorials />}
-          {this.state.currentTab === 'video-tutorials' && <VideoTutorials />}
+          {this.state.currentTab === 'tutorials' && (
+            <ScrollView>
+              <Tutorials />
+            </ScrollView>
+          )}
+          {this.state.currentTab === 'games-showcase' && <GamesShowcase />}
         </Column>
       </Dialog>
     );

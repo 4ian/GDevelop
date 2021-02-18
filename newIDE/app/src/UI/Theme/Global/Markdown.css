@@ -5,6 +5,7 @@
   /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
   font-family: var(--gdevelop-font-family);
 }
+
 .gd-markdown.standalone-text-container {
   font-size: 16px;
   line-height: 1.3;

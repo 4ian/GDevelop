@@ -61,6 +61,28 @@ const freeInstructionsToRemove = {
   ],
 };
 
+/**
+ * When all instructions are searched, some can be duplicated
+ * (on purpose, so that it's easier to find them for users)
+ * in both the object instructions and in the free instructions.
+ *
+ * This removes the duplication, useful for showing results in a list.
+ */
+export const deduplicateInstructionsList = (
+  list: Array<EnumeratedInstructionMetadata>
+): Array<EnumeratedInstructionMetadata> => {
+  let createFound = false;
+  return list.filter(enumerateInstruction => {
+    if (enumerateInstruction.type === 'Create') {
+      if (createFound) return false;
+
+      createFound = true;
+    }
+
+    return true;
+  });
+};
+
 const filterInstructionsToRemove = (
   list: Array<EnumeratedInstructionMetadata>,
   typesToRemove: ?$ReadOnlyArray<string>
@@ -209,6 +231,7 @@ export const enumerateAllInstructions = (
       prefix,
       isCondition ? extension.getAllConditions() : extension.getAllActions(),
       {
+        extension,
         objectMetadata: undefined,
         behaviorMetadata: undefined,
       }
@@ -225,7 +248,7 @@ export const enumerateAllInstructions = (
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.at(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = { objectMetadata };
+      const scope = { extension, objectMetadata };
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -249,7 +272,7 @@ export const enumerateAllInstructions = (
     for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
       const behaviorType = allBehaviorsTypes.at(j);
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = { behaviorMetadata };
+      const scope = { extension, behaviorMetadata };
 
       allInstructions = [
         ...allInstructions,
@@ -355,7 +378,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     //Objects instructions:
     if (objectType !== baseObjectType && hasObjectType) {
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = { objectMetadata };
+      const scope = { extension, objectMetadata };
 
       allInstructions = [
         ...allInstructions,
@@ -378,7 +401,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
 
     if (hasBaseObjectType) {
       const objectMetadata = extension.getObjectMetadata(baseObjectType);
-      const scope = { objectMetadata };
+      const scope = { extension, objectMetadata };
 
       allInstructions = [
         ...allInstructions,
@@ -403,7 +426,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = { behaviorMetadata };
+      const scope = { extension, behaviorMetadata };
 
       allInstructions = [
         ...enumerateExtensionInstructions(
@@ -457,6 +480,7 @@ export const enumerateFreeInstructions = (
       prefix,
       isCondition ? extension.getAllConditions() : extension.getAllActions(),
       {
+        extension,
         objectMetadata: undefined,
         behaviorMetadata: undefined,
       }

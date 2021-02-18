@@ -52,6 +52,7 @@ export const browserElectronExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: 'browser-electron',
+  packageNameWarningType: 'desktop',
 
   getInitialExportState: () => null,
 

@@ -1062,6 +1062,31 @@ interface ExpressionMetadata {
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
 
+interface MultipleInstructionMetadata {
+    [Ref] MultipleInstructionMetadata AddParameter([Const] DOMString type,
+                                        [Const] DOMString description,
+                                        [Const] DOMString optionalObjectType,
+                                        boolean parameterIsOptional);
+    [Ref] MultipleInstructionMetadata AddCodeOnlyParameter(
+        [Const] DOMString type, [Const] DOMString supplementaryInformation);
+    [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+
+    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type);
+
+    [Ref] MultipleInstructionMetadata SetHidden();
+
+    [Ref] MultipleInstructionMetadata SetFunctionName([Const] DOMString functionName);
+    [Ref] MultipleInstructionMetadata SetGetter([Const] DOMString getter);
+
+    [Ref] MultipleInstructionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] MultipleInstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+
+    [Ref] MultipleInstructionMetadata MarkAsSimple();
+    [Ref] MultipleInstructionMetadata MarkAsAdvanced();
+    [Ref] MultipleInstructionMetadata MarkAsComplex();
+};
+
 interface DependencyMetadata {
     void DependencyMetadata();
 
@@ -1076,7 +1101,7 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
     [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
 
-    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
+    [Ref] DependencyMetadata OnlyIfSomeExtraSettingsNonEmpty();
 };
 
 interface ParameterMetadata {
@@ -1113,6 +1138,7 @@ interface VectorParameterMetadata {
     [Ref] ParameterMetadata at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
     void FREE_removeFromVectorParameterMetadata(unsigned long index);
+    void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 
@@ -1132,6 +1158,23 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
 
+    [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentence,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon,
+                                        [Const] DOMString smallicon);
+
+    [Const, Ref] InstructionMetadata AddScopedAction([Const] DOMString name,
+                                     [Const] DOMString fullname,
+                                     [Const] DOMString description,
+                                     [Const] DOMString sentence,
+                                     [Const] DOMString group,
+                                     [Const] DOMString icon,
+                                     [Const] DOMString smallicon);
+
+    // Prefer using AddScopedCondition, or even better: AddExpressionAndCondition.
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
                                         [Const] DOMString description,
@@ -1140,6 +1183,7 @@ interface ObjectMetadata {
                                         [Const] DOMString icon,
                                         [Const] DOMString smallicon);
 
+    // Prefer using AddScopedAction, or even better: AddExpressionAndConditionAndAction.
     [Const, Ref] InstructionMetadata AddAction([Const] DOMString name,
                                      [Const] DOMString fullname,
                                      [Const] DOMString description,
@@ -1159,6 +1203,24 @@ interface ObjectMetadata {
                                            [Const] DOMString description,
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
+
+    [Value] MultipleInstructionMetadata AddExpressionAndCondition(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
+
+    [Value] MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
 
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -1189,7 +1251,7 @@ interface BehaviorMetadata {
                                      [Const] DOMString icon,
                                      [Const] DOMString smallicon);
 
-    // Prefer using AddScopedCondition
+    // Prefer using AddScopedCondition, or even better: AddExpressionAndCondition.
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
                                         [Const] DOMString description,
@@ -1198,7 +1260,7 @@ interface BehaviorMetadata {
                                         [Const] DOMString icon,
                                         [Const] DOMString smallicon);
 
-    // Prefer using AddScopedAction
+    // Prefer using AddScopedAction, or even better: AddExpressionAndConditionAndAction.
     [Const, Ref] InstructionMetadata AddAction([Const] DOMString name,
                                      [Const] DOMString fullname,
                                      [Const] DOMString description,
@@ -1218,6 +1280,24 @@ interface BehaviorMetadata {
                                            [Const] DOMString description,
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
+
+    [Value] MultipleInstructionMetadata AddExpressionAndCondition(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
+
+    [Value] MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -1260,6 +1340,24 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     void MarkAsDeprecated();
+
+    [Value] MultipleInstructionMetadata AddExpressionAndCondition(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
+
+    [Value] MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+                                        [Const] DOMString type,
+                                        [Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentenceName,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon);
 
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -1320,6 +1418,19 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
+
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
 
     [Value] VectorString GetExtensionObjectsTypes();
     [Value] VectorString GetBehaviorsTypes();
@@ -1848,6 +1959,8 @@ interface EventsFunction {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunction SetSentence([Const] DOMString sentence);
     [Const, Ref] DOMString GetSentence();
+    [Ref] EventsFunction SetPrivate(boolean isPrivate);
+    boolean IsPrivate();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();
 

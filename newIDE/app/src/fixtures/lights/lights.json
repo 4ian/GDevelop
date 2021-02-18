@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.lights",
-    "projectUuid": "e1c47342-74f3-4937-bfa9-5a7a1b991ccb",
+    "projectUuid": "df6bdd0e-6a25-4e5e-89fe-7c29a1dc928b",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -729,8 +729,12 @@
       "name": "SineMovement",
       "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {

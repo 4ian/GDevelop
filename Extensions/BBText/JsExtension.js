@@ -29,9 +29,7 @@ module.exports = {
       .setExtensionInformation(
         'BBText',
         _('BBCode Text Object'),
-        _(
-          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
-        ),
+        'A BBText is an object displaying on the screen a rich text formatted using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).',
         'Todor Imreorov',
         'Open source (MIT License)'
       )

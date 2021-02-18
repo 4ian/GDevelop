@@ -35,7 +35,8 @@ export type AlertMessageIdentifier =
   | 'p2p-broker-recommendation'
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
-  | 'extension-installed-explanation';
+  | 'extension-installed-explanation'
+  | 'project-should-have-unique-package-name';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -146,6 +147,12 @@ export const allAlertMessages: Array<{
       <Trans>Explanation after an object is installed from the store</Trans>
     ),
   },
+  {
+    key: 'project-should-have-unique-package-name',
+    label: (
+      <Trans>Project package names should not begin with com.example</Trans>
+    ),
+  },
 ];
 
 /**
@@ -175,6 +182,7 @@ export type PreferencesValues = {|
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  isMenuBarHiddenInPreview: boolean,
 |};
 
 /**
@@ -223,6 +231,8 @@ export type Preferences = {|
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
   getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getIsMenuBarHiddenInPreview: () => boolean,
+  setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -252,6 +262,7 @@ export const initialPreferences = {
     hasProjectOpened: false,
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    isMenuBarHiddenInPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -290,6 +301,8 @@ export const initialPreferences = {
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
   getNewObjectDialogDefaultTab: () => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
+  getIsMenuBarHiddenInPreview: () => true,
+  setIsMenuBarHiddenInPreview: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

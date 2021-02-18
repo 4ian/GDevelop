@@ -75,6 +75,7 @@ export const enumerateFreeExpressions = (
           ? extension.getAllStrExpressions()
           : extension.getAllExpressions(),
         {
+          extension,
           objectMetadata: undefined,
           behaviorMetadata: undefined,
         }
@@ -94,7 +95,7 @@ export const enumerateObjectExpressions = (
   );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
-  const scope = { objectMetadata };
+  const scope = { extension, objectMetadata };
 
   let objectsExpressions = enumerateExpressionMetadataMap(
     '',
@@ -138,7 +139,7 @@ export const enumerateBehaviorExpressions = (
   );
   const extension = extensionAndBehaviorMetadata.getExtension();
   const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
-  const scope = { behaviorMetadata };
+  const scope = { extension, behaviorMetadata };
 
   return enumerateExpressionMetadataMap(
     '',
@@ -173,7 +174,7 @@ export const enumerateAllExpressions = (
           type === 'string'
             ? extension.getAllStrExpressionsForObject(objectType)
             : extension.getAllExpressionsForObject(objectType),
-          { objectMetadata }
+          { extension, objectMetadata }
         )
       );
     });
@@ -188,7 +189,7 @@ export const enumerateAllExpressions = (
           type === 'string'
             ? extension.getAllStrExpressionsForBehavior(behaviorType)
             : extension.getAllExpressionsForBehavior(behaviorType),
-          { behaviorMetadata }
+          { extension, behaviorMetadata }
         )
       );
     });

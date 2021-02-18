@@ -24,7 +24,7 @@ import {
   filterProjectItemsList,
 } from './EnumerateProjectItems';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -50,6 +50,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -289,6 +290,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onInstallExtension: ExtensionShortHeader => void,
 |};
 
 type State = {|
@@ -380,7 +382,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   _pasteLayout = (index: number) => {
     if (!Clipboard.has(LAYOUT_CLIPBOARD_KIND)) return;
 
-    const { layout: copiedLayout, name } = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
+    const clipboardContent = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
+    const copiedLayout = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'layout'
+    );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedLayout) return;
+
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
@@ -489,9 +498,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   _pasteExternalEvents = (index: number) => {
     if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
 
-    const { externalEvents: copiedExternalEvents, name } = Clipboard.get(
-      EXTERNAL_EVENTS_CLIPBOARD_KIND
+    const clipboardContent = Clipboard.get(EXTERNAL_EVENTS_CLIPBOARD_KIND);
+    const copiedExternalEvents = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'externalEvents'
     );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedExternalEvents) return;
+
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
@@ -550,9 +564,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   _pasteExternalLayout = (index: number) => {
     if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
 
-    const { externalLayout: copiedExternalLayout, name } = Clipboard.get(
-      EXTERNAL_LAYOUT_CLIPBOARD_KIND
+    const clipboardContent = Clipboard.get(EXTERNAL_LAYOUT_CLIPBOARD_KIND);
+    const copiedExternalLayout = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'externalLayout'
     );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedExternalLayout) return;
+
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
@@ -617,10 +636,16 @@ export default class ProjectManager extends React.Component<Props, State> {
   _pasteEventsFunctionsExtension = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
 
-    const {
-      eventsFunctionsExtension: copiedEventsFunctionsExtension,
-      name,
-    } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
+    const clipboardContent = Clipboard.get(
+      EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND
+    );
+    const copiedEventsFunctionsExtension = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'eventsFunctionsExtension'
+    );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedEventsFunctionsExtension) return;
+
     const { project } = this.props;
 
     const newName = newNameGenerator(name, name =>
@@ -733,6 +758,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project,
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
+      onInstallExtension,
     } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
@@ -1173,6 +1199,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ExtensionsSearchDialog
             project={project}
             onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
+            onInstallExtension={onInstallExtension}
           />
         )}
       </div>

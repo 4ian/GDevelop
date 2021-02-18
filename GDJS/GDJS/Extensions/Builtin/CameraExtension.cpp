@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "CameraExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
@@ -13,10 +14,16 @@ namespace gdjs {
 CameraExtension::CameraExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCameraExtension(*this);
 
-  GetAllActions()["CameraX"]
+  GetAllActions()["CameraX"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraX")
       .SetGetter("gdjs.evtTools.camera.getCameraX");
-  GetAllActions()["CameraY"]
+  GetAllActions()["CameraY"]  // Deprecated
+      .SetFunctionName("gdjs.evtTools.camera.setCameraY")
+      .SetGetter("gdjs.evtTools.camera.getCameraY");
+  GetAllActions()["SetCameraX"]
+      .SetFunctionName("gdjs.evtTools.camera.setCameraX")
+      .SetGetter("gdjs.evtTools.camera.getCameraX");
+  GetAllActions()["SetCameraY"]
       .SetFunctionName("gdjs.evtTools.camera.setCameraY")
       .SetGetter("gdjs.evtTools.camera.getCameraY");
   GetAllConditions()["CameraX"].SetFunctionName(
@@ -35,7 +42,10 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.layerIsVisible");
   GetAllConditions()["CameraAngle"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
-  GetAllActions()["RotateCamera"]
+  GetAllActions()["SetCameraAngle"]
+      .SetFunctionName("gdjs.evtTools.camera.setCameraRotation")
+      .SetGetter("gdjs.evtTools.camera.getCameraRotation");
+  GetAllActions()["RotateCamera"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraRotation")
       .SetGetter("gdjs.evtTools.camera.getCameraRotation");
   GetAllActions()["ZoomCamera"].SetFunctionName(
@@ -49,12 +59,14 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.getCameraY");
   GetAllExpressions()["VueY"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraY");
+  GetAllExpressions()["CameraAngle"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraRotation"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraRotation");
+  GetAllExpressions()["VueRotation"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraZoom"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraZoom");
-  GetAllExpressions()["VueRotation"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraWidth"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraWidth");
   GetAllExpressions()["CameraHeight"].SetFunctionName(
@@ -89,6 +101,9 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.setLayerDefaultZOrder");
   GetAllExpressions()["LayerDefaultZOrder"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerDefaultZOrder");
+
+  GetAllActions()["SetLayerAmbientLightColor"].SetFunctionName(
+      "gdjs.evtTools.camera.setLayerAmbientLightColor");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

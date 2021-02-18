@@ -39,6 +39,19 @@ type Props = {|
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
+  onMoveFreeEventsParameter?: (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: () => void
+  ) => void,
+  onMoveBehaviorEventsParameter?: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
 |};
 
 type State = {|
@@ -190,6 +203,40 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }));
   };
 
+  _moveParameters = (oldIndex: number, newIndex: number) => {
+    const { eventsFunction, eventsBasedBehavior } = this.props;
+    const parameters = eventsFunction.getParameters();
+
+    if (eventsBasedBehavior) {
+      if (this.props.onMoveBehaviorEventsParameter)
+        this.props.onMoveBehaviorEventsParameter(
+          eventsBasedBehavior,
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
+    } else {
+      if (this.props.onMoveFreeEventsParameter)
+        this.props.onMoveFreeEventsParameter(
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
+    }
+  };
+
   render() {
     const {
       project,
@@ -325,6 +372,22 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               ),
                               click: () => this._removeLongDescription(i),
                             },
+                            {
+                              label: i18n._(t`Move up`),
+                              click: () => this._moveParameters(i, i - 1),
+                              enabled:
+                                !isParameterDisabled(i) &&
+                                i - 1 >= 0 &&
+                                !isParameterDisabled(i - 1),
+                            },
+                            {
+                              label: i18n._(t`Move down`),
+                              click: () => this._moveParameters(i, i + 1),
+                              enabled:
+                                !isParameterDisabled(i) &&
+                                i + 1 < parameters.size() &&
+                                !isParameterDisabled(i + 1),
+                            },
                           ]}
                         />
                       </MiniToolbar>
@@ -385,11 +448,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 />
                                 <SelectOption
                                   value="yesorno"
-                                  primaryText={t`Yes or no (boolean)`}
+                                  primaryText={t`Yes or No (boolean)`}
                                 />
                                 <SelectOption
                                   value="trueorfalse"
-                                  primaryText={t`True or false (boolean)`}
+                                  primaryText={t`True or False (boolean)`}
                                 />
                               </SelectField>
                             )}

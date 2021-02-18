@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.gdevelop.gdblade",
-    "projectUuid": "95a5aab8-451f-4d49-990f-f0dca85216f7",
+    "projectUuid": "40020a93-0979-4af4-8fdd-0c5b53e17d66",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -9877,8 +9877,15 @@
       "name": "Flash",
       "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10488,8 +10495,10 @@
       "name": "FireBullet",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10821,8 +10830,10 @@
       "name": "Health",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11494,8 +11505,10 @@
       "name": "StayOnScreen",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11621,8 +11634,10 @@
       "name": "LinearMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11719,8 +11734,10 @@
       "name": "BackAndForthMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -12127,8 +12144,10 @@
       "name": "SineMovement",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -12393,8 +12412,10 @@
       "name": "VibratingCamera",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [
         {
           "description": "Vibrate the camera randomly around a position",
@@ -12593,8 +12614,10 @@
       "name": "SpaceShooterControls",
       "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
       "eventsFunctions": [
         {
           "description": "Handle the player object movements, by checking the touch position or the keys pressed",

@@ -6,18 +6,19 @@ import Chip from '@material-ui/core/Chip';
 const styles = {
   chipContainer: {
     display: 'flex',
+    flexWrap: 'wrap',
     overflowX: 'auto',
-    margin: 4,
+    marginTop: 4,
   },
   chip: {
-    marginLeft: 2,
-    marginRight: 2,
+    marginRight: 4,
+    marginBottom: 4,
   },
 };
 
 type Props = {|
   tags: Tags,
-  onChange: Tags => void,
+  onChange?: Tags => void,
 |};
 
 export default ({ tags, onChange }: Props) => {
@@ -30,7 +31,7 @@ export default ({ tags, onChange }: Props) => {
           key={tag}
           size="small"
           style={styles.chip}
-          onDelete={() => onChange(removeTag(tags, tag))}
+          onDelete={onChange ? () => onChange(removeTag(tags, tag)) : undefined}
           label={tag}
         />
       ))}

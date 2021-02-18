@@ -17,6 +17,7 @@ import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -32,7 +33,7 @@ const styles = {
   },
   wrappingText: {
     fontFamily,
-    fontSize: '12px',
+    fontSize: '13px',
     paddingLeft: 5,
     paddingRight: 5,
     paddingTop: 2,
@@ -186,9 +187,16 @@ export default class JsCodeEvent extends React.Component<
         tabIndex={0}
         style={textStyle}
       >
-        {parameterObjects
-          ? `, objects /*${parameterObjects}*/`
-          : ' /* Click here to choose objects to pass to JavaScript */'}
+        {parameterObjects ? (
+          <Trans>, objects /*{parameterObjects}*/</Trans>
+        ) : (
+          <>
+            {' '}
+            <Trans>
+              {'/* Click here to choose objects to pass to JavaScript */'}
+            </Trans>
+          </>
+        )}
       </span>
     );
 

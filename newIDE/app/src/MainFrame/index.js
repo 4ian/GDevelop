@@ -116,6 +116,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -293,6 +294,9 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
+    'starters' | 'games-showcase'
+  >('starters');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -811,6 +815,32 @@ const MainFrame = (props: Props) => {
     _onProjectItemModified();
   };
 
+  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    // Close the extension tab before updating/reinstalling the extension.
+    const eventsFunctionsExtensionName = extensionShortHeader.name;
+
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        eventsFunctionsExtensionName
+      );
+
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtension
+        ),
+      }));
+    }
+  };
+
   const deleteLayout = (layout: gdLayout) => {
     const { i18n } = props;
     if (!state.currentProject) return;
@@ -1184,6 +1214,8 @@ const MainFrame = (props: Props) => {
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
+            getIsMenuBarHiddenInPreview:
+              preferences.getIsMenuBarHiddenInPreview,
           })
         )
         .catch(error => {
@@ -1202,6 +1234,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       previewState,
       state.editorTabs,
+      preferences.getIsMenuBarHiddenInPreview,
     ]
   );
 
@@ -1457,6 +1490,15 @@ const MainFrame = (props: Props) => {
 
   const openCreateDialog = React.useCallback(
     (open: boolean = true) => {
+      setCreateDialogInitialTab('starters');
+      setState(state => ({ ...state, createDialogOpen: open }));
+    },
+    [setState]
+  );
+
+  const onOpenGamesShowcase = React.useCallback(
+    (open: boolean = true) => {
+      setCreateDialogInitialTab('games-showcase');
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
@@ -1640,6 +1682,11 @@ const MainFrame = (props: Props) => {
                 _showSnackMessage(i18n._(t`Project properly saved`));
 
                 if (fileMetadata) {
+                  preferences.insertRecentProjectFile({
+                    fileMetadata,
+                    storageProviderName: getStorageProvider().internalName,
+                  });
+
                   setState(state => ({
                     ...state,
                     currentFileMetadata: fileMetadata,
@@ -1671,6 +1718,8 @@ const MainFrame = (props: Props) => {
       setState,
       state.editorTabs,
       _showSnackMessage,
+      getStorageProvider,
+      preferences,
     ]
   );
 
@@ -1963,6 +2012,7 @@ const MainFrame = (props: Props) => {
             onAddExternalLayout={addExternalLayout}
             onAddEventsFunctionsExtension={addEventsFunctionsExtension}
             onAddExternalEvents={addExternalEvents}
+            onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
             onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
@@ -2086,7 +2136,7 @@ const MainFrame = (props: Props) => {
                   onCreate: () => openCreateDialog(),
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
-                  onOpenAboutDialog: () => openAboutDialog(true),
+                  onOpenGamesShowcase: () => onOpenGamesShowcase(),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () => {
@@ -2144,6 +2194,7 @@ const MainFrame = (props: Props) => {
         state.createDialogOpen &&
         renderCreateDialog({
           open: state.createDialogOpen,
+          initialTab: createDialogInitialTab,
           onClose: () => openCreateDialog(false),
           onOpen: async (storageProvider, fileMetadata) => {
             await setState(state => ({ ...state, createDialogOpen: false }));

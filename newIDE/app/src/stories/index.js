@@ -104,6 +104,7 @@ import {
   game2,
   gameRollingMetrics1,
   gameRollingMetricsWithoutPlayersAndRetention1,
+  showcasedGame1,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
@@ -227,6 +228,9 @@ import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
+import { GamesShowcase } from '../GamesShowcase';
+import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
+import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
 
 configureActions({
   depth: 2,
@@ -2514,7 +2518,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
-      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
     />
@@ -2530,7 +2534,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
-      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
     />
@@ -2654,6 +2658,18 @@ storiesOf('CreateProjectDialog', module)
       onClose={action('onClose')}
       onCreate={action('onCreate')}
       onOpen={action('onOpen')}
+      initialTab="starters"
+    />
+  ))
+  .add('Games showcase as initial tab', () => (
+    <CreateProjectDialog
+      open
+      examplesComponent={Placeholder}
+      startersComponent={Placeholder}
+      onClose={action('onClose')}
+      onCreate={action('onCreate')}
+      onOpen={action('onOpen')}
+      initialTab="games-showcase"
     />
   ));
 
@@ -3020,7 +3036,7 @@ storiesOf('InstructionSelector', module)
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('"KeyPressed" condition chosen, ', () => (
+  .add('"KeyPressed" condition chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'free-instructions'}
       render={(value, onChange) => (
@@ -3028,6 +3044,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}
@@ -3043,7 +3060,7 @@ storiesOf('InstructionOrObjectSelector', module)
       )}
     />
   ))
-  .add('"MySpriteObject" object chosen, ', () => (
+  .add('"MySpriteObject" object chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'objects'}
       render={(value, onChange) => (
@@ -3051,6 +3068,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}
@@ -3159,59 +3177,77 @@ storiesOf('NewInstructionEditorDialog', module)
     />
   ))
   .add('New condition (scope: without layout)', () => (
-    <NewInstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ layout: null }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={true}
-      instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <NewInstructionEditorDialog
+        open
+        project={testProject.project}
+        scope={{ layout: null }}
+        globalObjectsContainer={testProject.project}
+        objectsContainer={testProject.testLayout}
+        isCondition
+        isNewInstruction={true}
+        instruction={testProject.testInstruction}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+        canPasteInstructions={true}
+        onPasteInstructions={action('paste instructions')}
+      />
+    </Column>
   ));
 
 storiesOf('NewInstructionEditorMenu', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <PopoverButton>
-      {({ buttonElement, onClose }) => (
-        <NewInstructionEditorMenu
-          open
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          isCondition
-          isNewInstruction={false}
-          instruction={testProject.testInstruction}
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onChooseResource={() => {
-            action('onChooseResource');
-            return Promise.reject();
-          }}
-          resourceSources={[]}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCancel={onClose}
-          onSubmit={onClose}
-          anchorEl={buttonElement}
-          canPasteInstructions={true}
-          onPasteInstructions={action('paste instructions')}
-        />
-      )}
-    </PopoverButton>
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <PopoverButton>
+        {({ buttonElement, onClose }) => (
+          <NewInstructionEditorMenu
+            open
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            isCondition
+            isNewInstruction={false}
+            instruction={testProject.testInstruction}
+            resourceExternalEditors={fakeResourceExternalEditors}
+            onChooseResource={() => {
+              action('onChooseResource');
+              return Promise.reject();
+            }}
+            resourceSources={[]}
+            openInstructionOrExpression={action(
+              'open instruction or expression'
+            )}
+            onCancel={onClose}
+            onSubmit={onClose}
+            anchorEl={buttonElement}
+            canPasteInstructions={true}
+            onPasteInstructions={action('paste instructions')}
+          />
+        )}
+      </PopoverButton>
+    </Column>
   ));
 
 storiesOf('TextEditor', module)
@@ -4196,6 +4232,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4237,6 +4274,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4929,9 +4967,29 @@ storiesOf('AssetStore/ExtensionsSearchDialog', module)
             <ExtensionsSearchDialog
               project={testProject.project}
               onClose={action('on close')}
+              onInstallExtension={action('onInstallExtension')}
             />
           </ExtensionStoreStateProvider>
         </EventsFunctionsExtensionsProvider>
       )}
     </I18n>
+  ));
+
+storiesOf('GamesShowcase', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <GamesShowcaseStateProvider>
+        <GamesShowcase />
+      </GamesShowcaseStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('GamesShowcase/ShowcasedGameListItem', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ShowcasedGameListItem
+      onHeightComputed={() => {}}
+      showcasedGame={showcasedGame1}
+    />
   ));

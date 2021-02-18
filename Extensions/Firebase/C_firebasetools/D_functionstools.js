@@ -1,3 +1,4 @@
+// @ts-nocheck - TODO: convert this file to use TypeScript namespaces
 /**
  * Firebase Tools Collection.
  * @fileoverview

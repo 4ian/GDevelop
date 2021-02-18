@@ -15,11 +15,21 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension.SetExtensionInformation(
       "BuiltinMathematicalTools",
       _("Mathematical tools"),
-      _("Built-in extension providing mathematical tools"),
+      "A set of mathematical functions that can be used in expressions.",
       "Florian Rival",
       "Open source (MIT License)");
 
 #if defined(GD_IDE_ONLY)
+
+  extension
+      .AddExpression("normalize",
+                     _("Normalize a value between `min` and `max` to a value between 0 and 1."),
+                     _("Remap a value between 0 and 1."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Value"))
+      .AddParameter("expression", _("Min"))
+      .AddParameter("expression", _("Max"));
 
   extension
       .AddExpression("clamp",

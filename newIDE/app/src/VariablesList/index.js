@@ -15,7 +15,7 @@ import {
   getSelection,
 } from '../Utils/SelectionHandler';
 import { CLIPBOARD_KIND } from './ClipboardKind';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -83,8 +83,18 @@ export default class VariablesList extends React.Component<Props, State> {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
-    const variables = Clipboard.get(CLIPBOARD_KIND);
-    variables.forEach(({ name, serializedVariable }) => {
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    const variablesContent = SafeExtractor.extractArray(clipboardContent);
+    if (!variablesContent) return;
+
+    variablesContent.forEach(variableContent => {
+      const name = SafeExtractor.extractStringProperty(variableContent, 'name');
+      const serializedVariable = SafeExtractor.extractObjectProperty(
+        variableContent,
+        'serializedVariable'
+      );
+      if (!name || !serializedVariable) return;
+
       const newName = newNameGenerator(
         name,
         name =>

@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
+import { type Filters } from './Types.flow';
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -59,18 +60,6 @@ export type Asset = {|
   authors: Array<string>,
   license: string,
   objectAssets: Array<ObjectAsset>,
-|};
-
-export type TagsTreeNode = {|
-  name: string,
-  children: Array<TagsTreeNode>,
-  allChildrenTags: Array<string>,
-|};
-
-export type Filters = {|
-  allTags: Array<string>,
-  defaultTags: Array<string>,
-  tagsTree: Array<TagsTreeNode>,
 |};
 
 export type AllAssets = {|

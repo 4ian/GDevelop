@@ -77,7 +77,7 @@ install:
   - cd newIDE/app && npm install
   - cd ../..
 #Install GDJS tests dependencies
-  - cd GDJS/tests && npm install
+  - cd GDJS && npm install && cd tests && npm install
   - cd ../..
 
 script:
@@ -98,6 +98,10 @@ script:
   - npm run flow
   - npm run check-format
   - cd ../..
+# GDJS tests:
+  - cd GDJS
+  - npm run check-format
+  - cd ..
 # GDJS game engine tests, disabled on Travis CI because ChromeHeadless can't be started.
 # See them running on Semaphore-CI instead: https://semaphoreci.com/4ian/gd
 #  - cd GDJS/tests && npm test

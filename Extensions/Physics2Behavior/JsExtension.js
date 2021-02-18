@@ -25,13 +25,15 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'Physics2',
-      'Physics Engine 2.0',
-      'Simulate physics',
-      'Florian Rival, Franco Maciel',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'Physics2',
+        'Physics Engine 2.0',
+        "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
+        'Florian Rival, Franco Maciel',
+        'MIT'
+      )
+      .setExtensionHelpPath('/behaviors/physics2');
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior

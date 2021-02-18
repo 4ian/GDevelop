@@ -20,15 +20,16 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'DialogueTree',
         _('Dialogue Tree (Experimental)'),
-        _(
-          'Start dialogue trees, made using Yarn, powered by Bondage.js. Experimental extension that can change in the future.'
-        ),
+        'Handle dialogue trees, made using Yarn Spinner. Useful to make complex dialogues with multiple choices. The Yarn Spinner editor is embedded in GDevelop so you can edit your dialogues without leaving GDevelop.',
         'Todor Imreorov',
         'Open source (MIT License)'
       )
@@ -431,8 +432,12 @@ module.exports = {
     extension
       .addStrExpression(
         'BranchTag',
-        _('Get a tag of the current branch of the running dialogue via its index'),
-        _('Get a tag of the current branch of the running dialogue via its index'),
+        _(
+          'Get a tag of the current branch of the running dialogue via its index'
+        ),
+        _(
+          'Get a tag of the current branch of the running dialogue via its index'
+        ),
         _('Dialogue Tree (experimental)'),
         'JsPlatform/Extensions/yarn32.png'
       )
@@ -712,7 +717,10 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
 };

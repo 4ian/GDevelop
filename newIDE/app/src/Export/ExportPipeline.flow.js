@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow.js';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type UserProfile } from '../Profile/UserProfileContext';
 
@@ -21,6 +22,7 @@ export type ExportPipeline<
 > = {|
   name: string,
   onlineBuildType?: string,
+  packageNameWarningType?: 'mobile' | 'desktop',
 
   getInitialExportState: (project: gdProject) => ExportState,
 

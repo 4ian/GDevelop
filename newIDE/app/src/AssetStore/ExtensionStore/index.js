@@ -1,16 +1,18 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
-import { FiltersChooser } from '../FiltersChooser';
+import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
-import { ListSearchResults } from './ListSearchResults';
+import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
+import Subheader from '../../UI/Subheader';
 
 const styles = {
   searchBar: {
@@ -25,6 +27,9 @@ type Props = {|
   onInstall: ExtensionShortHeader => Promise<void>,
   showOnlyWithBehaviors: boolean,
 |};
+
+const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
+  extensionShortHeader.name;
 
 export const ExtensionStore = ({
   isInstalling,
@@ -83,6 +88,9 @@ export const ExtensionStore = ({
                 width={windowWidth === 'small' ? 150 : 250}
               >
                 <ScrollView>
+                  <Subheader>
+                    <Trans>Filters</Trans>
+                  </Subheader>
                   <FiltersChooser
                     allFilters={filters}
                     filtersState={filtersState}
@@ -94,6 +102,7 @@ export const ExtensionStore = ({
                 onRetry={fetchExtensionsAndFilters}
                 error={error}
                 searchItems={filteredSearchResults}
+                getSearchItemUniqueId={getExtensionName}
                 renderSearchItem={(extensionShortHeader, onHeightComputed) => (
                   <ExtensionListItem
                     project={project}

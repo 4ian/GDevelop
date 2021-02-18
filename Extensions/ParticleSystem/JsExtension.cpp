@@ -173,7 +173,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
     conditions["ParticleSystem::Texture"].SetFunctionName("getTexture");
 
     strExpressions["Texture"].SetFunctionName("getTexture");
-    expressions["NbParticles"].SetFunctionName("getNbParticles");
+    expressions["NbParticles"].SetFunctionName("getParticleCount");
     expressions["RendererParam1"].SetFunctionName("getRendererParam1");
     expressions["RendererParam2"].SetFunctionName("getRendererParam2");
     expressions["Tank"].SetFunctionName("getTank");

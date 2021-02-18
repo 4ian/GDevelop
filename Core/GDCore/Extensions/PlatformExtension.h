@@ -24,6 +24,7 @@
 namespace gd {
 class Instruction;
 class InstructionMetadata;
+class MultipleInstructionMetadata;
 class ExpressionMetadata;
 class ObjectMetadata;
 class BehaviorMetadata;
@@ -82,6 +83,11 @@ class GD_CORE_API PlatformExtension {
   PlatformExtension();
   virtual ~PlatformExtension();
 
+  /** \name Extension setup
+   * Common setup for all extensions
+   */
+  ///@{
+
   /**
    * \brief Must be called to declare the main information about the extension.
    */
@@ -100,8 +106,8 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
-   * \brief Set the path to the help, relative to the GDevelop documentation root.
-   * For example, "/all-features/collisions" for
+   * \brief Set the path to the help, relative to the GDevelop documentation
+   * root. For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
    *
    * The instructions, objects and behaviors will have this help path set by
@@ -118,9 +124,15 @@ class GD_CORE_API PlatformExtension {
    */
   void MarkAsDeprecated() { deprecated = true; }
 
+  ///@}
+
+  /** \name Features declaration
+   * Declare features provided by the extension
+   */
+  ///@{
+
   /**
    * \brief Declare a new condition as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -132,7 +144,6 @@ class GD_CORE_API PlatformExtension {
 
   /**
    * \brief Declare a new action as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
                                      const gd::String& fullname_,
@@ -143,7 +154,6 @@ class GD_CORE_API PlatformExtension {
                                      const gd::String& smallicon_);
   /**
    * \brief Declare a new expression as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::ExpressionMetadata& AddExpression(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -151,8 +161,7 @@ class GD_CORE_API PlatformExtension {
                                         const gd::String& group_,
                                         const gd::String& smallicon_);
   /**
-   * \brief Declare a new String expression as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
+   * \brief Declare a new string expression as being part of the extension.
    */
   gd::ExpressionMetadata& AddStrExpression(const gd::String& name_,
                                            const gd::String& fullname_,
@@ -160,55 +169,79 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
 
+  /**
+   * \brief Declare a new expression and condition as being part of the
+   * extension.
+   * \note It's recommended to use this function to avoid declaring twice a
+   * similar expression/condition.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndCondition(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
+
+  /**
+   * \brief Declare a new expression, condition and action as being part of the
+   * extension.
+   * \note The action name is prefixed by "Set" (and the namespace, as the
+   * condition and the expression).
+   * \note It's recommended to use this function to avoid declaring 3 times a
+   * similar expression/condition/action.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
+
   gd::DependencyMetadata& AddDependency();
 
   /**
    * \brief Declare a new object as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    * \tparam T the declared class inherited from *gd::Object*
-   * \param name The name of the object
-   * \param fullname The user friendly name of the object
-   * \param description The user friendly description of the object
-   * \param icon The 24x24 icon of the object:
-   res/icons_[SkinName]/[iconName]24.png will be first tried,
-   * and then if it does not exists, the full entered name will be tried.
+   * \param name The name of the object.
+   * \param fullname The user friendly name of the object.
+   * \param description The user friendly description of the object.
+   * \param icon The icon of the object.
    */
   template <class T>
   gd::ObjectMetadata& AddObject(const gd::String& name_,
                                 const gd::String& fullname_,
                                 const gd::String& description_,
-                                const gd::String& icon24x24_);
+                                const gd::String& icon_);
 
   /**
    * \brief Declare a new object as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    * \param name The name of the object
    * \param fullname The user friendly name of the object
    * \param description The user friendly description of the object
-   * \param icon The 24x24 icon of the object:
-   res/icons_[SkinName]/[iconName]24.png will be first tried,
-   * and then if it does not exists, the full entered name will be tried.
+   * \param icon The icon of the object.
    * \param instance The "blueprint" object to be copied when a new object is
    asked for.
    */
   gd::ObjectMetadata& AddObject(const gd::String& name_,
                                 const gd::String& fullname_,
                                 const gd::String& description_,
-                                const gd::String& icon24x24_,
+                                const gd::String& icon_,
                                 std::shared_ptr<gd::Object> instance);
 
   /**
    * \brief Declare a new behavior as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    *
    * \param name The name of the behavior
    * \param fullname The user friendly name of the behavior
    * \param description The user friendly description of the behavior
-   * \param icon The 24x24 icon of the behavior:
-   * res/icons_[SkinName]/[iconName]24.png will be first tried, and then if it
-   * does not exists, it is assumed that the icon name is the filename that must
-   * be used to open the icon. \param instance An instance of the behavior that
-   * will be used to create the behavior \param sharedDatasInstance Optional
+   * \param icon The icon of the behavior.
+   * \param instance An instance of the behavior that
+   * will be used to create the behavior
+   * \param sharedDatasInstance Optional
    * instance of the data shared by the behaviors having the same name.
    */
   gd::BehaviorMetadata& AddBehavior(
@@ -217,7 +250,7 @@ class GD_CORE_API PlatformExtension {
       const gd::String& defaultName_,
       const gd::String& description_,
       const gd::String& group_,
-      const gd::String& icon24x24_,
+      const gd::String& icon_,
       const gd::String& className_,
       std::shared_ptr<gd::Behavior> instance,
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
@@ -230,7 +263,6 @@ class GD_CORE_API PlatformExtension {
 
   /**
    * \brief Declare a new event as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::EventMetadata& AddEvent(const gd::String& name_,
                               const gd::String& fullname_,
@@ -241,12 +273,61 @@ class GD_CORE_API PlatformExtension {
 
 #if defined(GD_IDE_ONLY)
   /**
+   * \brief Create a new action which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated action that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedAction(
+      const gd::String& newActionName, const gd::String& copiedActionName);
+  /**
+   * \brief Create a new condition which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated condition that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedCondition(
+      const gd::String& newConditionName,
+      const gd::String& copiedConditionName);
+  /**
+   * \brief Create a new expression which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated expression that is just a "copy" of the
+   * new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+  /**
+   * \brief Create a new string expression which is the duplicate of the
+   * specified one.
+   *
+   * Useful for handling a deprecated string expression that is just a "copy" of
+   * the new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedStrExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+
+  /**
    * \brief Adds a property to the extension.
    */
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionPropertiesMetadata[name];
   };
 #endif
+
+  /**
+   * \brief Delete all instructions having no function name or custom code
+   * generator.
+   */
+  void StripUnimplementedInstructionsAndExpressions();
+  ///@}
+
+  /** \name Extension accessors
+   * Accessors to read the information and content of the extension.
+   */
+  ///@{
 
   /**
    * \brief Return the name extension user friendly name.
@@ -373,9 +454,8 @@ class GD_CORE_API PlatformExtension {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Return a reference to a map containing the names of the actions (in
-   * the first members) and the metadata associated with (in the second
-   * members).
+   * \brief Return a reference to a map containing the names of the actions
+   * (as keys) and the metadata associated with (as values).
    */
   std::map<gd::String, gd::InstructionMetadata>& GetAllActions();
 
@@ -450,8 +530,8 @@ class GD_CORE_API PlatformExtension {
       gd::String autoType);
 
   /**
-   * Called ( e.g. during compilation ) so as to inventory resources used by
-   * conditions and update their filename
+   * Called to inventory resources used by conditions
+   * (and possibly do work on them, like renaming, etc...)
    *
    * \see gd::PlatformExtension::ExposeActionsResources
    */
@@ -459,8 +539,8 @@ class GD_CORE_API PlatformExtension {
                                          gd::ArbitraryResourceWorker& worker){};
 
   /**
-   * Called ( e.g. during compilation ) so as to inventory resources used by
-   * actions and update their filename
+   * Called to inventory resources used by actions
+   * (and possibly do work on them, like renaming, etc...)
    *
    * \see ArbitraryResourceWorker
    */
@@ -468,17 +548,14 @@ class GD_CORE_API PlatformExtension {
                                       gd::ArbitraryResourceWorker& worker){};
 
   /**
-   * \brief Delete all instructions having no functions name or custom code
-   * generator.
-   */
-  void StripUnimplementedInstructionsAndExpressions();
-
-  /**
-   * \brief Get all the properties of the extension
+   * \brief Get all the properties of the extension. Properties
+   * are shown in the game properties in the editor, and are exported in the
+   * project data.
    */
   std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
     return extensionPropertiesMetadata;
   }
+  ///@}
 #endif
 
   /**
@@ -495,8 +572,8 @@ class GD_CORE_API PlatformExtension {
 
  private:
   /**
-   * Set the namespace ( the String each actions/conditions/expressions start
-   * with )
+   * Set the namespace (the string all actions/conditions/expressions start
+   * with).
    */
   void SetNameSpace(gd::String nameSpace_);
 

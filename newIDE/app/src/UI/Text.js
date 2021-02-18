@@ -48,6 +48,7 @@ export default ({
 }: Props) => (
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
+    component={displayInlineAsSpan ? 'span' : undefined}
     style={{
       width: fullWidth ? '100%' : undefined,
       ...style,

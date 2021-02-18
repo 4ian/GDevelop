@@ -482,11 +482,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         
         // If variables are defined, store the value in them
         if(keyIteratorExists) outputCode += 
-            "    $ITERABLE_REFERENCE.getType() === \"structure\"\n"
-            "      ? $KEY_ITERATOR_REFERENCE.setString($ITERATOR_KEY)\n"
-            "      : $ITERABLE_REFERENCE.getType() === \"array\"\n"
-            "        ? $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY)\n"
-            "        : gdjs.VariablesContainer.badVariable;\n";
+            "    if($ITERABLE_REFERENCE.getType() === \"structure\")\n"
+            "        $KEY_ITERATOR_REFERENCE.setString($ITERATOR_KEY);\n"
+            "    else if($ITERABLE_REFERENCE.getType() === \"array\")\n"
+            "        $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY);\n";
 
         if(valueIteratorExists) outputCode += 
             "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
@@ -513,7 +512,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           outputCode += "} //Subevents end.\n";
         }
         outputCode += "}\n";
-        // End of normal code generation
+        // End of standard code generation
 
         // End the for loop
         outputCode += "}\n";

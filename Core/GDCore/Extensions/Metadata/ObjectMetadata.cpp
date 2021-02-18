@@ -11,6 +11,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -112,6 +113,56 @@ gd::InstructionMetadata& ObjectMetadata::AddAction(
 #endif
 }
 
+gd::InstructionMetadata& ObjectMetadata::AddScopedCondition(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace =
+      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+  conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                           nameWithNamespace,
+                                                           fullname,
+                                                           description,
+                                                           sentence,
+                                                           group,
+                                                           icon,
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath())
+                                           .SetIsObjectInstruction();
+  return conditionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::InstructionMetadata& ObjectMetadata::AddScopedAction(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace =
+      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+  actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                        nameWithNamespace,
+                                                        fullname,
+                                                        description,
+                                                        sentence,
+                                                        group,
+                                                        icon,
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath())
+                                        .SetIsObjectInstruction();
+  return actionsInfos[nameWithNamespace];
+#endif
+}
+
 gd::ExpressionMetadata& ObjectMetadata::AddExpression(
     const gd::String& name,
     const gd::String& fullname,
@@ -119,8 +170,8 @@ gd::ExpressionMetadata& ObjectMetadata::AddExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, objects expression do not have namespace ( not necessary as
-  // objects inherits from only one derived object )
+  // Be careful, objects expression do not have namespace (not necessary as
+  // objects inherits from only one derived object).
   expressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
@@ -137,8 +188,8 @@ gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, objects expression do not have namespace ( not necessary as
-  // objects inherits from only one derived object )
+  // Be careful, objects expression do not have namespace (not necessary as
+  // objects inherits from only one derived object).
   strExpressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
@@ -172,16 +223,16 @@ gd::MultipleInstructionMetadata ObjectMetadata::AddExpressionAndCondition(
                              group,
                              icon);
 
-  // TODO: ScopedCondition
   gd::String conditionDescriptionTemplate = _("Compare <subject>.");
-  auto& condition = AddCondition(name,
-                                 fullname,
-                                 conditionDescriptionTemplate.FindAndReplace(
-                                     "<subject>", descriptionSubject),
-                                 sentenceName,
-                                 group,
-                                 icon,
-                                 icon);
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
 
   return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
                                                                  condition);
@@ -212,20 +263,19 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
                              group,
                              icon);
 
-  // TODO: ScopedCondition
   gd::String conditionDescriptionTemplate = _("Compare <subject>.");
-  auto& condition = AddCondition(name,
-                                 fullname,
-                                 conditionDescriptionTemplate.FindAndReplace(
-                                     "<subject>", descriptionSubject),
-                                 sentenceName,
-                                 group,
-                                 icon,
-                                 icon);
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
 
-  // TODO: ScopedAction
   gd::String actionDescriptionTemplate = _("Change <subject>.");
-  auto& action = AddAction(
+  auto& action = AddScopedAction(
       "Set" + name,
       fullname,
       actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),

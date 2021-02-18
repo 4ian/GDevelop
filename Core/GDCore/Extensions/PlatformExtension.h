@@ -172,8 +172,8 @@ class GD_CORE_API PlatformExtension {
   /**
    * \brief Declare a new expression and condition as being part of the
    * extension.
-   * \note It's recommended to use this function to avoid declaring twice a similar
-   * expression/condition.
+   * \note It's recommended to use this function to avoid declaring twice a
+   * similar expression/condition.
    */
   gd::MultipleInstructionMetadata AddExpressionAndCondition(
       const gd::String& type,
@@ -187,8 +187,10 @@ class GD_CORE_API PlatformExtension {
   /**
    * \brief Declare a new expression, condition and action as being part of the
    * extension.
-   * \note It's recommended to use this function to avoid declaring 3 times a similar
-   * expression/condition/action.
+   * \note The action name is prefixed by "Set" (and the namespace, as the
+   * condition and the expression).
+   * \note It's recommended to use this function to avoid declaring 3 times a
+   * similar expression/condition/action.
    */
   gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
       const gd::String& type,

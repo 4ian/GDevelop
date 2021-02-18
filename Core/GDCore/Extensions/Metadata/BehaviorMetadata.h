@@ -43,7 +43,8 @@ class GD_CORE_API BehaviorMetadata {
 
   /**
    * Declare a new condition as being part of the behavior.
-   * \deprecated Prefer using `AddScopedCondition`.
+   * \deprecated Prefer using `AddScopedCondition`, to properly namespace
+   * the condition.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -55,7 +56,8 @@ class GD_CORE_API BehaviorMetadata {
 
   /**
    * Declare a new action as being part of the behavior.
-   * \deprecated Prefer using `AddScopedAction`.
+   * \deprecated Prefer using `AddScopedAction`, to properly namespace
+   * the action.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
                                      const gd::String& fullname_,
@@ -122,6 +124,8 @@ class GD_CORE_API BehaviorMetadata {
   /**
    * \brief Declare a new expression, condition and action as being part of the
    * behavior.
+   * \note The action name is prefixed by "Set" (and the namespace, as the
+   * condition).
    * \note It's recommended to use this function to avoid declaring 3 times a
    * similar expression/condition/action.
    */

@@ -4,11 +4,17 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  type FloatPoint = [float, float];
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
+    static TOP_DOWN = 0;
+    static PIXEL_ISOMETRY = 1;
+    static TRUE_ISOMETRY = 2;
+    static CUSTOM_ISOMETRY = 2;
+
     //Behavior configuration:
     _allowDiagonals: any;
     _acceleration: any;
@@ -23,13 +29,19 @@ namespace gdjs {
     _angle: float = 0;
 
     //Attributes used when moving
+    _x: float = 0;
+    _y: float = 0;
     _xVelocity: float = 0;
     _yVelocity: float = 0;
-    _angularSpeed: number = 0;
+    _angularSpeed: float = 0;
     _leftKey: boolean = false;
     _rightKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
+
+    // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
+    _basisTransformation: BasisTransformation | null;
+    _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
@@ -41,6 +53,10 @@ namespace gdjs {
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
+      this.setViewpoint(
+        behaviorData.viewpoint,
+        behaviorData.customIsometryAngle
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -71,7 +87,31 @@ namespace gdjs {
       ) {
         this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
       }
+      if (
+        oldBehaviorData.platformType !== newBehaviorData.platformType ||
+        oldBehaviorData.customIsometryAngle !==
+          newBehaviorData.customIsometryAngle
+      ) {
+        this.setViewpoint(
+          newBehaviorData.platformType,
+          newBehaviorData.customIsometryAngle
+        );
+      }
       return true;
+    }
+
+    setViewpoint(viewpoint: string, customIsometryAngle: float): void {
+      if (viewpoint == 'PixelIsometry') {
+        this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
+      } else if (viewpoint == 'TrueIsometry') {
+        this._basisTransformation = new IsometryTransformation(Math.PI / 6);
+      } else if (viewpoint == 'CustomIsometry') {
+        this._basisTransformation = new IsometryTransformation(
+          (customIsometryAngle * Math.PI) / 180
+        );
+      } else {
+        this._basisTransformation = null;
+      }
     }
 
     setAcceleration(acceleration): void {
@@ -270,8 +310,19 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      object.setX(object.getX() + this._xVelocity * timeDelta);
-      object.setY(object.getY() + this._yVelocity * timeDelta);
+      if (this._basisTransformation == null) {
+        // Top-down pointview
+        object.setX(object.getX() + this._xVelocity * timeDelta);
+        object.setY(object.getY() + this._yVelocity * timeDelta);
+      } else {
+        // Isometry pointview
+        const point = this._temporaryPointForTransformations;
+        point[0] = this._xVelocity * timeDelta;
+        point[1] = this._yVelocity * timeDelta;
+        this._basisTransformation.toScreen(point, point);
+        object.setX(object.getX() + point[0]);
+        object.setY(object.getY() + point[1]);
+      }
 
       //Also update angle if needed
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
@@ -284,6 +335,7 @@ namespace gdjs {
           );
         }
       }
+
       this._leftKey = false;
       this._rightKey = false;
       this._upKey = false;
@@ -322,6 +374,49 @@ namespace gdjs {
       this._downKey = true;
     }
   }
+
+  export interface BasisTransformation {
+    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
+  }
+
+  export class IsometryTransformation implements BasisTransformation {
+    _screen: float[][];
+
+    /**
+     * @param angle between the x axis and the projected isometric x axis.
+     * @throws if the angle is not in ]0; pi/4[. Note that 0 is a front viewpoint and pi/4 a top-down viewpoint.
+     */
+    constructor(angle: float) {
+      if (angle <= 0 || angle >= Math.PI / 4)
+        throw new RangeError(
+          'An isometry angle must be in ]0; pi/4] but was: ' + angle
+        );
+
+      const alpha = Math.asin(Math.tan(angle));
+      const sinA = Math.sin(alpha);
+      const cosB = Math.cos(Math.PI / 4);
+      const sinB = cosB;
+      // https://en.wikipedia.org/wiki/Isometric_projection
+      //
+      //   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
+      //   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
+      //   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
+      this._screen = [
+        [cosB, -sinB],
+        [sinA * sinB, sinA * cosB],
+      ];
+    }
+
+    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
+      const x =
+        this._screen[0][0] * worldPoint[0] + this._screen[0][1] * worldPoint[1];
+      const y =
+        this._screen[1][0] * worldPoint[0] + this._screen[1][1] * worldPoint[1];
+      screenPoint[0] = x;
+      screenPoint[1] = y;
+    }
+  }
+
   gdjs.registerBehavior(
     'TopDownMovementBehavior::TopDownMovementBehavior',
     gdjs.TopDownMovementRuntimeBehavior

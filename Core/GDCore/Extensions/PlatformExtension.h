@@ -100,8 +100,8 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
-   * \brief Set the path to the help, relative to the GDevelop documentation root.
-   * For example, "/all-features/collisions" for
+   * \brief Set the path to the help, relative to the GDevelop documentation
+   * root. For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
    *
    * The instructions, objects and behaviors will have this help path set by
@@ -372,6 +372,43 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::EventMetadata>& GetAllEvents();
 
 #if defined(GD_IDE_ONLY)
+  /**
+   * \brief Create a new action which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated action that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedAction(
+      const gd::String& newActionName, const gd::String& copiedActionName);
+  /**
+   * \brief Create a new condition which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated condition that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedCondition(
+      const gd::String& newConditionName,
+      const gd::String& copiedConditionName);
+  /**
+   * \brief Create a new expression which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated expression that is just a "copy" of the
+   * new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+  /**
+   * \brief Create a new string expression which is the duplicate of the
+   * specified one.
+   *
+   * Useful for handling a deprecated string expression that is just a "copy" of
+   * the new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedStrExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+
   /**
    * \brief Return a reference to a map containing the names of the actions (in
    * the first members) and the metadata associated with (in the second

@@ -82,6 +82,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
 
+ extension
+      .AddCondition("AnyKeyReleased",
+                    _("Any key released"),
+                    _("Test if any key is released"),
+                    _("Any key is released"),
+                    _("Keyboard"),
+                    "res/conditions/keyboard24.png",
+                    "res/conditions/keyboard.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
   extension
       .AddStrExpression(
           "LastPressedKey",

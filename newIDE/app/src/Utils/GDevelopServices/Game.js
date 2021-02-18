@@ -1,12 +1,64 @@
 // @flow
 import axios from 'axios';
 import { GDevelopGameApi } from './ApiConfigs';
+import { type Filters } from './Types.flow';
 
 export type Game = {
   id: string,
   gameName: string,
   authorName: string,
   createdAt: number,
+};
+
+export type ShowcasedGameLink = {
+  url: string,
+  type:
+    | 'app-store'
+    | 'play-store'
+    | 'play'
+    | 'download'
+    | 'download-win-mac-linux'
+    | 'learn-more',
+};
+
+export type ShowcasedGame = {
+  title: string,
+  author: string,
+  description: string,
+  genres: Array<string>,
+  platforms: Array<string>,
+  /** Represents the union of genres+platforms. */
+  tags: Array<string>,
+  imageUrls: Array<string>,
+  links: Array<ShowcasedGameLink>,
+  isFeatured: boolean,
+  bannerUrl: string,
+  bannerBackgroundPosition: string,
+  thumbnailUrl: string,
+  editorDescription: string,
+};
+
+export type AllShowcasedGames = {
+  showcasedGames: Array<ShowcasedGame>,
+  filters: Filters,
+};
+
+export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
+  return axios
+    .get(`${GDevelopGameApi.baseUrl}/showcased-game`)
+    .then(response => response.data)
+    .then(({ gamesShowcaseUrl, filtersUrl }) => {
+      if (!gamesShowcaseUrl || !filtersUrl) {
+        throw new Error('Unexpected response from the resource endpoint.');
+      }
+      return Promise.all([
+        axios.get(gamesShowcaseUrl).then(response => response.data),
+        axios.get(filtersUrl).then(response => response.data),
+      ]).then(([showcasedGames, filters]) => ({
+        showcasedGames,
+        filters,
+      }));
+    });
 };
 
 export const registerGame = (

@@ -430,7 +430,9 @@
     tilesetResourceName
   ) => {
     const requestedTileMapDataId =
-      (tilesetResourceName || tilemapResourceName) +
+      tilemapResourceName +
+      '@' +
+      tilesetResourceName +
       '@' +
       atlasImageResourceName;
 

@@ -58,18 +58,6 @@ std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
   return values;
 };
 
-bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
-                                   const std::set<gd::String> &set) {
-  bool missingKey = false;
-  for (auto &key : set) {
-    if (map.find(key) == map.end()) {
-      missingKey = true;
-    }
-  }
-
-  return missingKey;
-}
-
 }  // namespace
 
 namespace gdjs {
@@ -298,7 +286,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   for (std::shared_ptr<gd::PlatformExtension> extension :
        project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
+    for (gd::DependencyMetadata &dependency : extension->GetAllDependencies()) {
       if (dependency.GetDependencyType() == "cordova") {
         gd::String plugin;
         plugin += "<plugin name=\"" + dependency.GetExportName();
@@ -318,10 +306,10 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
         plugin += "\t</plugin>";
 
-        // Don't include the plugin if an extra setting was not fulfilled.
-        bool missingSetting = AreMapKeysMissingElementOfSet(
-            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
-        if (!missingSetting) plugins += plugin;
+        // Don't include the plugin if no extra setting was fulfilled.
+        bool hasExtraSettings = !extraSettingValues.empty();
+        if (!dependency.IsOnlyIfSomeExtraSettingsNonEmpty() || hasExtraSettings)
+          plugins += plugin;
       }
     }
   }
@@ -466,6 +454,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir) {
   gd::String jsonName =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
   gd::String jsonAuthor =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
   gd::String jsonVersion =
@@ -480,6 +470,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);

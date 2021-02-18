@@ -42,10 +42,32 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName in objectContent) {
-        if (typeof objectContent[propertyName] === 'boolean')
-          objectContent[propertyName] = newValue === '1';
-        else objectContent[propertyName] = newValue;
+      if (propertyName === 'tilemapJsonFile') {
+        objectContent.tilemapJsonFile = newValue;
+        return true;
+      }
+      if (propertyName === 'tilesetJsonFile') {
+        objectContent.tilesetJsonFile = newValue;
+        return true;
+      }
+      if (propertyName === 'tilemapAtlasImage') {
+        objectContent.tilemapAtlasImage = newValue;
+        return true;
+      }
+      if (propertyName === 'displayMode') {
+        objectContent.displayMode = newValue;
+        return true;
+      }
+      if (propertyName === 'layerIndex') {
+        objectContent.layerIndex = parseFloat(newValue);
+        return true;
+      }
+      if (propertyName === 'animationSpeedScale') {
+        objectContent.animationSpeedScale = parseFloat(newValue);
+        return true;
+      }
+      if (propertyName === 'animationFps') {
+        objectContent.animationFps = parseFloat(newValue);
         return true;
       }
 

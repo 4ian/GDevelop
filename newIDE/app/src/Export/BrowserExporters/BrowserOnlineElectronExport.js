@@ -55,6 +55,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 > = {
   name: 'browser-online-electron',
   onlineBuildType: 'electron-build',
+  packageNameWarningType: 'desktop',
 
   getInitialExportState: () => ({
     targets: ['winExe'],

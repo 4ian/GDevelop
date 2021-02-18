@@ -483,11 +483,11 @@ namespace gdjs {
         this._profiler.end('callbacks and extensions (post-events)');
       }
       if (this._profiler) {
-        this._profiler.begin('objects (visibility)');
+        this._profiler.begin('objects (pre-render)');
       }
-      this._updateObjectsVisibility();
+      this._updateObjectsPreRender();
       if (this._profiler) {
-        this._profiler.end('objects (visibility)');
+        this._profiler.end('objects (pre-render)');
       }
       if (this._profiler) {
         this._profiler.begin('layers (effects update)');
@@ -554,21 +554,23 @@ namespace gdjs {
     }
 
     /**
-     * Called to update visibility of PIXI.DisplayObject of objects
-     * rendered on the scene.
+     * Called to update visibility of the renderers of objects
+     * rendered on the scene and give a last chance for objects to update before rendering.
      *
      * Visibility is set to false if object is hidden, or if
      * object is too far from the camera of its layer ("culling").
      */
-    _updateObjectsVisibility() {
+    _updateObjectsPreRender() {
       if (this._timeManager.isFirstFrame()) {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          let object = this._allInstancesList[i];
-          let rendererObject = object.getRendererObject();
+          const object = this._allInstancesList[i];
+          const rendererObject = object.getRendererObject();
           if (rendererObject) {
             object.getRendererObject().visible = !object.isHidden();
           }
+          // Perform pre-render update.
+          object.updatePreRender(this);
         }
         return;
       } else {
@@ -577,9 +579,9 @@ namespace gdjs {
         this._updateLayersCameraCoordinates();
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          let object = this._allInstancesList[i];
+          const object = this._allInstancesList[i];
           const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
-          let rendererObject = object.getRendererObject();
+          const rendererObject = object.getRendererObject();
           if (!cameraCoords || !rendererObject) {
             continue;
           }
@@ -600,6 +602,8 @@ namespace gdjs {
               rendererObject.visible = true;
             }
           }
+          // Perform pre-render update.
+          object.updatePreRender(this);
         }
       }
     }

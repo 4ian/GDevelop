@@ -3,18 +3,24 @@ import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
 type Props = {|
+  /** The text to display. */
   children: ?React.Node,
+  /** Size of the text. `body` if not specified. */
   size?: 'body' | 'body2' | 'title',
+  /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
+  /** Don't shrink the text if there is not enough place in a flex container. */
   noShrink?: boolean,
+  /** Remove the margin around the text. */
   noMargin?: boolean,
   fullWidth?: boolean,
+  /** By default the text is a paragraph (`p`). It can be shown inline  */
+  displayInlineAsSpan?: boolean,
+  /** A limited set of styling is supported. */
   style?: {|
     // Margins
     marginLeft?: number,
     marginRight?: number,
-    // marginTop?: number,
-    // marginBottom?: number,
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
@@ -24,9 +30,6 @@ type Props = {|
 
     // Allow to expand the text
     flex?: 1,
-
-    // Allow to show the text inline
-    display?: 'inline-block',
   |},
 |};
 
@@ -40,6 +43,7 @@ export default ({
   align,
   noShrink,
   noMargin,
+  displayInlineAsSpan,
   fullWidth,
 }: Props) => (
   <Typography
@@ -47,6 +51,7 @@ export default ({
     style={{
       width: fullWidth ? '100%' : undefined,
       ...style,
+      display: displayInlineAsSpan ? 'inline-block' : undefined,
       flexShrink: noShrink ? 0 : undefined,
       marginTop: noMargin ? 0 : 6,
       marginBottom: noMargin ? 0 : 6,

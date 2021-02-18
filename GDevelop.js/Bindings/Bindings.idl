@@ -1095,7 +1095,7 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata SetExtraSetting([Const] DOMString settingName, [Const, Ref] PropertyDescriptor settingValue);
     [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
 
-    [Ref] DependencyMetadata OnlyIfExtraSettingIsNonEmpty([Const] DOMString settingName);
+    [Ref] DependencyMetadata OnlyIfSomeExtraSettingsNonEmpty();
 };
 
 interface ParameterMetadata {
@@ -1340,6 +1340,19 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetIconUrl();
     boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
+
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
 
     [Value] VectorString GetExtensionObjectsTypes();
     [Value] VectorString GetBehaviorsTypes();
@@ -1868,6 +1881,8 @@ interface EventsFunction {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunction SetSentence([Const] DOMString sentence);
     [Const, Ref] DOMString GetSentence();
+    [Ref] EventsFunction SetPrivate(boolean isPrivate);
+    boolean IsPrivate();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();
 

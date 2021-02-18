@@ -12,9 +12,9 @@ namespace gdjs {
    */
   export class PathfindingObstaclesManager {
     _obstaclesHSHG: any;
-    x: any;
-    y: any;
-    radius: any;
+    x: float = 0;
+    y: float = 0;
+    radius: float = 0;
 
     constructor(runtimeScene) {
       // @ts-ignore
@@ -37,7 +37,9 @@ namespace gdjs {
     /**
      * Add a obstacle to the list of existing obstacles.
      */
-    addObstacle(pathfindingObstacleBehavior) {
+    addObstacle(
+      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
+    ) {
       this._obstaclesHSHG.addObject(pathfindingObstacleBehavior);
     }
 
@@ -45,7 +47,9 @@ namespace gdjs {
      * Remove a obstacle from the list of existing obstacles. Be sure that the obstacle was
      * added before.
      */
-    removeObstacle(pathfindingObstacleBehavior) {
+    removeObstacle(
+      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
+    ) {
       this._obstaclesHSHG.removeObject(pathfindingObstacleBehavior);
     }
 
@@ -57,7 +61,12 @@ namespace gdjs {
      * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
      * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
      */
-    getAllObstaclesAround(x, y, radius, result): any {
+    getAllObstaclesAround(
+      x: float,
+      y: float,
+      radius: float,
+      result: PathfindingObstacleRuntimeBehavior[]
+    ): any {
       const vertex = new PathfindingObstaclesManager.Vertex(x, y, radius);
       this._obstaclesHSHG.addObject(vertex);
       this._obstaclesHSHG.queryForCollisionWith(vertex, result);
@@ -109,10 +118,14 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    _manager: any;
+    _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;
@@ -138,7 +151,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //No need for update as we take care of this below.
       /*if ( this._hshgNeedUpdate ) {
           this._manager._obstaclesHSHG.update();
@@ -174,7 +187,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     getAABB() {
       return this.owner.getAABB();
@@ -200,7 +213,7 @@ namespace gdjs {
       return this._cost;
     }
 
-    setCost(cost): void {
+    setCost(cost: float): void {
       this._cost = cost;
     }
 
@@ -208,7 +221,7 @@ namespace gdjs {
       return this._impassable;
     }
 
-    setImpassable(impassable): void {
+    setImpassable(impassable: boolean): void {
       this._impassable = impassable;
     }
   }

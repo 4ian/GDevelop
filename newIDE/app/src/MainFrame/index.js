@@ -294,6 +294,9 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
+    'starters' | 'games-showcase'
+  >('starters');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1487,6 +1490,15 @@ const MainFrame = (props: Props) => {
 
   const openCreateDialog = React.useCallback(
     (open: boolean = true) => {
+      setCreateDialogInitialTab('starters');
+      setState(state => ({ ...state, createDialogOpen: open }));
+    },
+    [setState]
+  );
+
+  const onOpenGamesShowcase = React.useCallback(
+    (open: boolean = true) => {
+      setCreateDialogInitialTab('games-showcase');
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
@@ -2124,7 +2136,7 @@ const MainFrame = (props: Props) => {
                   onCreate: () => openCreateDialog(),
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
-                  onOpenAboutDialog: () => openAboutDialog(true),
+                  onOpenGamesShowcase: () => onOpenGamesShowcase(),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () => {
@@ -2182,6 +2194,7 @@ const MainFrame = (props: Props) => {
         state.createDialogOpen &&
         renderCreateDialog({
           open: state.createDialogOpen,
+          initialTab: createDialogInitialTab,
           onClose: () => openCreateDialog(false),
           onOpen: async (storageProvider, fileMetadata) => {
             await setState(state => ({ ...state, createDialogOpen: false }));

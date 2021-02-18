@@ -10,41 +10,61 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
   runtimeObject,
   runtimeScene
 ) {
+  /*
+    Bitmap Text initialization:
+      Get the styes from the object properties, initalize the styles in this._bitmapFontStyle.
+      Generate a default bitmap font with styles.
+      Create the Bitmap Text and use the bitmap font generated.
+      Get if the object properties have bitmap font file and atlas image file and use it on the Bitmap Text object.
+  */
+
   this._object = runtimeObject;
 
-  // Set up the object to track the font we're using.
   this._bitmapFontStyle = new PIXI.TextStyle({
     fontFamily: 'Arial',
     fontSize: 20,
+    padding: 5,
     align: runtimeObject._align,
-    fill: '#000000',
+    fill: gdjs.rgbToHexNumber(
+      this._object._tint[0],
+      this._object._tint[1],
+      this._object._tint[2]
+    ),
     wordWrap: runtimeObject._wordWrap,
+    lineHeight: 20,
   });
 
-  const defaultSlugFontName =
-    this._bitmapFontStyle.fontFamily +
-    '-' +
-    this._bitmapFontStyle.fontSize +
-    '-' +
-    this._bitmapFontStyle.fill +
-    '-bitmapFont';
-  this._bitmapFontStyle.fontName = defaultSlugFontName;
-
-  //Generate default bitmap font
-  PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
-    chars: [
-      [' ', '~'], // All the printable ASCII characters
-    ],
-  });
+  // Generate default bitmap font Arial, used if files are not found.
+  const defaultBitmapFont = runtimeScene
+    .getGame()
+    .getBitmapFontManager()
+    .generateDefaultBitmapFont();
 
   this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
-    fontName: defaultSlugFontName,
+    fontName: defaultBitmapFont.font,
   });
 
   let bitmapFontResourceName = runtimeObject._bitmapFontFile;
   let bitmapAtlasResourceName = runtimeObject._bitmapAtlasFile;
 
-  let texture = runtimeScene
+  // No bitmap font file
+  if (bitmapFontResourceName == '') {
+    console.warn(
+      'No bitmap font was setup for "' +
+        this._object.name +
+        '" Bitmap Text object.'
+    );
+  }
+  // No texture file
+  if (bitmapFontResourceName == '') {
+    console.warn(
+      'No atlas image was setup for "' +
+        this._object.name +
+        '" Bitmap Text object.'
+    );
+  }
+
+  const texture = runtimeScene
     .getGame()
     .getImageManager()
     .getPIXITexture(bitmapAtlasResourceName);
@@ -56,6 +76,8 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     .getBitmapFontFromData(bitmapFontResourceName, texture);
   this._pixiObject.fontName = bitmapFont.font;
   this._pixiObject.fontSize = bitmapFont.size;
+
+  runtimeScene.getGame().getBitmapFontManager().setFontUsed(bitmapFont.font);
 
   runtimeScene
     .getLayer('')
@@ -109,8 +131,21 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer.prototype.updateFont = function () {
     .getBitmapFontManager()
     .getBitmapFontFromData(bitmapFontResourceName, texture);
 
+  // Mark the old font unused for the manager
+  this._object._runtimeScene
+    .getGame()
+    .getBitmapFontManager()
+    .removeFontUsed(this._pixiObject.fontName);
+
+  // Update the font used for Pixi
   this._pixiObject.fontName = bitmapFont.font;
   this._pixiObject.fontSize = bitmapFont.size;
+  // Mark the new font used for the manager
+  this._object._runtimeScene
+    .getGame()
+    .getBitmapFontManager()
+    .setFontUsed(this._pixiObject.fontName);
+
   this.updatePosition();
 };
 

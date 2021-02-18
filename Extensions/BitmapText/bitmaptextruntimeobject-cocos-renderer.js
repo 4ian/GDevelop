@@ -20,13 +20,13 @@ gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.getRendererObject = function
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.onDestroy = function () {};
 
-gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.getTint = function () {};
-
-gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateTint = function () {};
+gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.getFontSize = function () {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateFont = function () {};
 
-gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateFontSize = function () {};
+gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateTint = function () {};
+
+gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.getTint = function () {};
 
 gdjs.BitmapTextRuntimeObjectCocosRenderer.prototype.updateScale = function () {};
 

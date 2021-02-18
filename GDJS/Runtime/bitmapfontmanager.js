@@ -16,8 +16,63 @@ gdjs.BitmapFontManager = function (resources) {
   /** @type Object.<string, Object> */
   this._fontUsed = {};
   /** @type Array.<Object> */
-  this._fontTobeUnloaded = {};
+  this._fontTobeUnloaded = [];
   this._loadedFontsData = {};
+  this._defaultSlugFontName = 'Arial-20-20';
+};
+
+gdjs.BitmapFontManager.prototype.getDefaultSlugFontName = function () {
+  return this._defaultSlugFontName;
+};
+
+// Use element from PIXI.BitmapFont for generate a unique name and replace the original by the new one in PIXI.BitmapFont
+gdjs.BitmapFontManager.prototype.generateSlugName = function (bitmapFont) {
+  return bitmapFont.font + '-' + bitmapFont.size + '-' + bitmapFont.lineHeight;
+};
+
+// We patch the installed font to use a more complex name that includes the size of the font and line height,
+// to avoid conflicts between different font files using the same font name.
+gdjs.BitmapFontManager.prototype.patchBitmapFont = function (bitmapFont) {
+  const defaultName = bitmapFont.font;
+  const fullSlugName = this.generateSlugName(bitmapFont);
+  bitmapFont.font = fullSlugName;
+  PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+
+  delete PIXI.BitmapFont.available[defaultName];
+  return PIXI.BitmapFont.available[fullSlugName];
+};
+
+gdjs.BitmapFontManager.prototype.generateDefaultBitmapFont = function (
+  arg_bitmapFontStyle
+) {
+  // arg_bitmapFontStyle is used for use the properties setup in the object, otherwise we
+  const bitmapFontStyle =
+    arg_bitmapFontStyle ||
+    new PIXI.TextStyle({
+      fontFamily: 'Arial',
+      fontSize: 20,
+      padding: 5,
+      align: 'left',
+      fill: '#ffffff',
+      wordWrap: true,
+      lineHeight: 20,
+    });
+
+  // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
+  const bitmapFont = this.patchBitmapFont(
+    PIXI.BitmapFont.from(bitmapFontStyle.fontFamily, bitmapFontStyle, {
+      chars: [
+        [' ', '~'], // All the printable ASCII characters
+      ],
+    })
+  );
+
+  // If we there is no argument this mean we use the default font Arial
+  if (!arg_bitmapFontStyle) {
+    this._defaultSlugFontName = this.generateSlugName(bitmapFont);
+  }
+
+  return bitmapFont;
 };
 
 /**
@@ -105,36 +160,23 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
     );
   });
 
-  if (!bitmapFontResource) {
+  //A file was given, but the resource doesn't exist
+  if (bitmapFontResourceName !== '' && !bitmapFontResource) {
     console.warn(
-      'Can\'t find resource with name: "' +
+      'Unable to find bitmap font for resource "' +
         bitmapFontResourceName +
         '" (or is not a bitmapFont file).'
     );
+  }
 
-    const defaultFontName = 'Arial-20-#ffffff-bitmapFont'; // TODO BOUH
-    if (!PIXI.BitmapFont.available[defaultFontName]) {
-      const bitmapFontStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 20,
-        align: 'left',
-        fill: '#ffffff',
-        wordWrap: true,
-      });
-
-      //Generate default bitmap font
-      PIXI.BitmapFont.from(defaultFontName, bitmapFontStyle, {
-        chars: [
-          [' ', '~'], // All the printable ASCII characters
-        ],
-      });
-      PIXI.BitmapFont.available['Arial-20-#ffffff-bitmapFont'].font =
-        'Arial-20-#ffffff-bitmapFont';
-
-      console.warn('The default bitmap font Arial will be used.');
+  // There is no bitmap font file or resource
+  if (!bitmapFontResource || bitmapFontResourceName == '') {
+    // If the default Arial bitmap font doesn't exist, generate it and use it.
+    if (!PIXI.BitmapFont.available[this.getDefaultSlugFontName()]) {
+      return this.generateDefaultBitmapFont();
     }
 
-    return PIXI.BitmapFont.available[defaultFontName];
+    return PIXI.BitmapFont.available[this.getDefaultSlugFontName()];
   }
 
   if (
@@ -142,14 +184,11 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
     bitmapFontResourceName
   ) {
     const fontData = this._loadedFontsData[bitmapFontResourceName].fontData;
-    const bitmapFont = PIXI.BitmapFont.install(fontData, texture);
-
-    const slug = bitmapFont.font + '-' + bitmapFont.size;
-
-    this.setFontUsed(slug);
+    const bitmapFont = this.patchBitmapFont(
+      PIXI.BitmapFont.install(fontData, texture)
+    );
 
     this._loadedFontsData[bitmapFontResourceName].bitmapFont = bitmapFont;
-    this._loadedFontsData[bitmapFontResourceName].slug = slug;
     this._loadedFontsData[bitmapFontResourceName].fontName = bitmapFont.font;
     return this._loadedFontsData[bitmapFontResourceName].bitmapFont;
   }
@@ -197,7 +236,7 @@ gdjs.BitmapFontManager.prototype.preloadBitmapFontData = async function (
         return response;
       })
       .catch(function (error) {
-        console.log(
+        console.error(
           "Can't fetch the bitmap font file " +
             bitmapFontResources[i].file +
             ', error: ' +

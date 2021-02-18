@@ -1,3 +1,11 @@
+/*
+- Delete one bitmap text object on scene and refresh hotreload delete all the bitmap text objects
+- During a preview is open, when we change files in bitmap text object and use hotreload bitmap object is broken in preview.
+- CRASH: when atlas texture is updated but wrong 
+Pixi.js: Error: Texture Error: frame does not fit inside the base Texture dimensions: X: 168 + 3 = 171 > 256 or Y: 260 + 64 = 324 > 256
+
+*/
+
 // @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
@@ -200,9 +208,7 @@ module.exports = {
       .addCondition(
         'FontSize',
         _('Font size'),
-        _(
-          'Check the font size, defined in an external editor.'
-        ),
+        _('Check the font size, defined in an external editor.'),
         _('the font size'),
         '',
         'res/conditions/characterSize24.png',
@@ -566,35 +572,35 @@ module.exports = {
       this._bitmapFontStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
         fontSize: 20,
-        align: 'left',
         padding: 5,
+        align: 'left',
         fill: '#ffffff',
         wordWrap: true,
+        lineHegiht: 20,
       });
 
-      // defaultSlugFontName is used as fontName when PixiJS generate the bitmap font.
-      const defaultSlugFontName =
-        this._bitmapFontStyle.fontFamily +
-        '-' +
-        this._bitmapFontStyle.fontSize +
-        '-' +
-        this._bitmapFontStyle.fill +
-        '-bitmapFont';
-      this._bitmapFontStyle.fontName = defaultSlugFontName;
+      // defaultFullSlugName is used as fontName when PixiJS generate the bitmap font.
+      //const defaultFullSlugName = this._generateSlugName(this._bitmapFontStyle);
 
-      //Generate a bitmap font, defaultSlugFontName is used as fontName.
-      PIXI.BitmapFont.from(defaultSlugFontName, this._bitmapFontStyle, {
-        chars: [
-          [' ', '~'], // All the printable ASCII characters
-        ],
-      });
+      // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
+      const bitmapFont = this.patchBitmapFont(
+        PIXI.BitmapFont.from(
+          this._bitmapFontStyle.fontFamily,
+          this._bitmapFontStyle,
+          {
+            chars: [
+              [' ', '~'], // All the printable ASCII characters
+            ],
+          }
+        )
+      );
 
       // We'll track changes of the font to trigger the loading of the new font.
       this._currentBitmapFontFile = '';
       this._currentBitmapAtlasFile = '';
 
       this._pixiObject = new PIXI.BitmapText('', {
-        fontName: this._bitmapFontStyle.fontName, // Use the bitmap font previously generated.
+        fontName: bitmapFont.font,
       });
 
       this._pixiObject.anchor.x = 0.5;
@@ -661,11 +667,16 @@ module.exports = {
               fontData,
               this._bitmapAtlasTexture
             );
-            // We patch the installed font to use a more complex name that includes the size of the font,
-            // to avoid conflicts between different font files using the same font name.
 
+            // We patch the installed font to use a more complex name that includes the size of the font and line height,
+            // to avoid conflicts between different font files using the same font name.
             const defaultName = bitmapFont.font;
-            const fullSlugName = bitmapFont.font + '-' + bitmapFont.size;
+            const fullSlugName =
+              bitmapFont.font +
+              '-' +
+              bitmapFont.size +
+              '-' +
+              bitmapFont.lineHeight;
             bitmapFont.font = fullSlugName;
             PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
             delete PIXI.BitmapFont.available[defaultName];
@@ -697,6 +708,33 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
+    };
+
+    // Generate a slug name for patch PIXI.BitmapFont, same thing is done in the renderer.
+    // Generate a unique name from elements in PIXI.BitmapFont for get and use a unique name in PIXI.BitmapFont,
+    // and replace the original name by the new one in PIXI.BitmapFont
+    // Original name "Arial", the font name.
+    // New name "Arial-20-20", the font name, font size, line height
+    RenderedBitmapTextInstance.prototype.generateSlugName = function (
+      bitmapFontStyle
+    ) {
+      return (
+        bitmapFontStyle.font + '-' + bitmapFontStyle.size + '-' + bitmapFontStyle.lineHeight
+      );
+    };
+
+    // We patch the installed font to use a more complex name that includes the size of the font and line height,
+    // to avoid conflicts between different font files using the same font name.
+    RenderedBitmapTextInstance.prototype.patchBitmapFont = function (
+      bitmapFont
+    ) {
+      const defaultName = bitmapFont.font;
+      const fullSlugName = this.generateSlugName(bitmapFont);
+      bitmapFont.font = fullSlugName;
+      PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+
+      delete PIXI.BitmapFont.available[defaultName];
+      return PIXI.BitmapFont.available[fullSlugName];
     };
 
     /**

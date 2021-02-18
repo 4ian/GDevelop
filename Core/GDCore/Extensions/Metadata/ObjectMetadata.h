@@ -5,9 +5,10 @@
  */
 #ifndef OBJECTMETADATA_H
 #define OBJECTMETADATA_H
+#include <functional>
 #include <map>
 #include <memory>
-#include <functional>
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Object.h"
@@ -18,7 +19,8 @@ class MultipleInstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+    CreateFunPtr;
 
 namespace gd {
 
@@ -32,7 +34,7 @@ class GD_CORE_API ObjectMetadata {
  public:
   /**
    * \brief Construct an object metadata, using a "blueprint" object that will
-   * be copied when a new object is asked.
+   * be copied when a new object is requested.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
@@ -56,7 +58,8 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Declare a new condition as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
+   * \deprecated Prefer using `AddScopedCondition`, to properly namespace the
+   * condition.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -68,7 +71,8 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Declare a new action as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
+   * \deprecated Prefer using `AddScopedAction`, to properly namespace the
+   * action.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
                                      const gd::String& fullname_,
@@ -77,9 +81,31 @@ class GD_CORE_API ObjectMetadata {
                                      const gd::String& group_,
                                      const gd::String& icon_,
                                      const gd::String& smallicon_);
+
+  /**
+   * Declare a new condition as being part of the object.
+   */
+  gd::InstructionMetadata& AddScopedCondition(const gd::String& name_,
+                                              const gd::String& fullname_,
+                                              const gd::String& description_,
+                                              const gd::String& sentence_,
+                                              const gd::String& group_,
+                                              const gd::String& icon_,
+                                              const gd::String& smallicon_);
+
+  /**
+   * Declare a new action as being part of the object.
+   */
+  gd::InstructionMetadata& AddScopedAction(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& sentence_,
+                                           const gd::String& group_,
+                                           const gd::String& icon_,
+                                           const gd::String& smallicon_);
+
   /**
    * \brief Declare a new expression as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::ExpressionMetadata& AddExpression(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -88,7 +114,6 @@ class GD_CORE_API ObjectMetadata {
                                         const gd::String& smallicon_);
   /**
    * \brief Declare a new string expression as being part of the extension.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   gd::ExpressionMetadata& AddStrExpression(const gd::String& name_,
                                            const gd::String& fullname_,
@@ -99,8 +124,8 @@ class GD_CORE_API ObjectMetadata {
   /**
    * \brief Declare a new expression and condition as being part of the
    * object.
-   * \note It's recommended to use this function to avoid declaring twice a similar
-   * expression/condition.
+   * \note It's recommended to use this function to avoid declaring twice a
+   * similar expression/condition.
    */
   gd::MultipleInstructionMetadata AddExpressionAndCondition(
       const gd::String& type,
@@ -114,8 +139,10 @@ class GD_CORE_API ObjectMetadata {
   /**
    * \brief Declare a new expression, condition and action as being part of the
    * object.
-   * \note It's recommended to use this function to avoid declaring 3 times a similar
-   * expression/condition/action.
+   * \note The action name is prefixed by "Set" (and the namespace, as the
+   * condition).
+   * \note It's recommended to use this function to avoid declaring
+   * 3 times a similar expression/condition/action.
    */
   gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
       const gd::String& type,
@@ -128,28 +155,28 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Set the name shown to the user.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   ObjectMetadata& SetFullName(const gd::String& fullname_);
 
   /**
    * \brief Set the description shown to the user.
-   * \note This method does nothing when used for GD C++ runtime.
    */
   ObjectMetadata& SetDescription(const gd::String& description_);
 
   /**
-   * Get the help path of the object, relative to the GDevelop documentation root.
+   * \brief Get the help path of the object, relative to the GDevelop
+   * documentation root.
    */
-  const gd::String &GetHelpPath() const { return helpPath; }
+  const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the object, relative to the GDevelop documentation root.
+   * \brief Set the help path of the object, relative to the GDevelop
+   * documentation root.
    *
    * The object instructions will have this help path set by
    * default, unless you call SetHelpPath on them.
    */
-  ObjectMetadata &SetHelpPath(const gd::String &path) {
+  ObjectMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
     return *this;
   }
@@ -197,7 +224,7 @@ class GD_CORE_API ObjectMetadata {
   gd::String name;
   gd::String helpPath;
 #if defined(GD_IDE_ONLY)
-  gd::String helpUrl; ///< Deprecated. Use helpPath instead.
+  gd::String helpUrl;  ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;

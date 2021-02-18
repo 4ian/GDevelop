@@ -1153,6 +1153,23 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
 
+    [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
+                                        [Const] DOMString fullname,
+                                        [Const] DOMString description,
+                                        [Const] DOMString sentence,
+                                        [Const] DOMString group,
+                                        [Const] DOMString icon,
+                                        [Const] DOMString smallicon);
+
+    [Const, Ref] InstructionMetadata AddScopedAction([Const] DOMString name,
+                                     [Const] DOMString fullname,
+                                     [Const] DOMString description,
+                                     [Const] DOMString sentence,
+                                     [Const] DOMString group,
+                                     [Const] DOMString icon,
+                                     [Const] DOMString smallicon);
+
+    // Prefer using AddScopedCondition, or even better: AddExpressionAndCondition.
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
                                         [Const] DOMString description,
@@ -1161,6 +1178,7 @@ interface ObjectMetadata {
                                         [Const] DOMString icon,
                                         [Const] DOMString smallicon);
 
+    // Prefer using AddScopedAction, or even better: AddExpressionAndConditionAndAction.
     [Const, Ref] InstructionMetadata AddAction([Const] DOMString name,
                                      [Const] DOMString fullname,
                                      [Const] DOMString description,
@@ -1228,7 +1246,7 @@ interface BehaviorMetadata {
                                      [Const] DOMString icon,
                                      [Const] DOMString smallicon);
 
-    // Prefer using AddScopedCondition
+    // Prefer using AddScopedCondition, or even better: AddExpressionAndCondition.
     [Const, Ref] InstructionMetadata AddCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
                                         [Const] DOMString description,
@@ -1237,7 +1255,7 @@ interface BehaviorMetadata {
                                         [Const] DOMString icon,
                                         [Const] DOMString smallicon);
 
-    // Prefer using AddScopedAction
+    // Prefer using AddScopedAction, or even better: AddExpressionAndConditionAndAction.
     [Const, Ref] InstructionMetadata AddAction([Const] DOMString name,
                                      [Const] DOMString fullname,
                                      [Const] DOMString description,

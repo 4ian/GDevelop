@@ -34,15 +34,26 @@ MouseExtension::MouseExtension() {
       .SetFunctionName("CenterCursor")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
 
-  GetAllConditions()["SourisX"]
+  GetAllConditions()["MouseX"]
       .SetFunctionName("GetCursorXPosition")
       .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-  GetAllConditions()["SourisY"]
+  GetAllConditions()["MouseY"]
       .SetFunctionName("GetCursorYPosition")
       .SetManipulatedType("number")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-  GetAllConditions()["SourisBouton"]
+  GetAllConditions()["SourisX"] // Deprecated
+      .SetFunctionName("GetCursorXPosition")
+      .SetManipulatedType("number")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
+  GetAllConditions()["SourisY"] // Deprecated
+      .SetFunctionName("GetCursorYPosition")
+      .SetManipulatedType("number")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
+  GetAllConditions()["MouseButtonPressed"]
+      .SetFunctionName("MouseButtonPressed")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
+  GetAllConditions()["SourisBouton"] // Deprecated
       .SetFunctionName("MouseButtonPressed")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
   GetAllConditions()["MouseButtonReleased"]
@@ -58,13 +69,13 @@ MouseExtension::MouseExtension() {
   GetAllExpressions()["MouseX"]
       .SetFunctionName("GetCursorXPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-  GetAllExpressions()["SourisX"]
+  GetAllExpressions()["SourisX"] // Deprecated
       .SetFunctionName("GetCursorXPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
   GetAllExpressions()["MouseY"]
       .SetFunctionName("GetCursorYPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
-  GetAllExpressions()["SourisY"]
+  GetAllExpressions()["SourisY"] // Deprecated
       .SetFunctionName("GetCursorYPosition")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MouseTools.h");
   GetAllExpressions()["MouseWheelDelta"]

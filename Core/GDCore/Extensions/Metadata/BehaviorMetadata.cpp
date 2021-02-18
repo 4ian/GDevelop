@@ -4,12 +4,16 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BehaviorMetadata.h"
+
 #include <iostream>
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd {
 
@@ -147,8 +151,8 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, behaviors expression do not have namespace ( not necessary as
-  // we refer to the auomatism name in the expression )
+  // Be careful, behaviors expression do not have namespace (not necessary as
+  // we refer to the behavior name in the expression).
   expressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
@@ -164,14 +168,103 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
     const gd::String& group,
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
-  // Be careful, behaviors expression do not have namespace ( not necessary as
-  // we refer to the auomatism name in the expression )
+  // Be careful, behaviors expression do not have namespace (not necessary as
+  // we refer to the behavior name in the expression).
   strExpressionsInfos[name] =
       ExpressionMetadata(
           extensionNamespace, name, fullname, description, group, smallicon)
           .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[name];
 #endif
+}
+
+gd::MultipleInstructionMetadata BehaviorMetadata::AddExpressionAndCondition(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& descriptionSubject,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
+  auto& expression =
+      type == "number"
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
+                                                                 condition);
+}
+
+gd::MultipleInstructionMetadata
+BehaviorMetadata::AddExpressionAndConditionAndAction(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& descriptionSubject,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
+  auto& expression =
+      type == "number"
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
+
+  gd::String actionDescriptionTemplate = _("Change <subject>.");
+  auto& action = AddScopedAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
+      expression, condition, action);
 }
 
 BehaviorMetadata& BehaviorMetadata::SetFullName(const gd::String& fullname_) {

@@ -13,11 +13,13 @@
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 namespace gd {
 
@@ -114,6 +116,94 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
 #endif
+}
+
+gd::MultipleInstructionMetadata PlatformExtension::AddExpressionAndCondition(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& descriptionSubject,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
+  auto& expression =
+      type == "number"
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 conditionDescriptionTemplate.FindAndReplace(
+                                     "<subject>", descriptionSubject),
+                                 sentenceName,
+                                 group,
+                                 icon,
+                                 icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndCondition(expression,
+                                                                 condition);
+}
+
+gd::MultipleInstructionMetadata
+PlatformExtension::AddExpressionAndConditionAndAction(
+    const gd::String& type,
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& descriptionSubject,
+    const gd::String& sentenceName,
+    const gd::String& group,
+    const gd::String& icon) {
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
+  auto& expression =
+      type == "number"
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
+
+  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 conditionDescriptionTemplate.FindAndReplace(
+                                     "<subject>", descriptionSubject),
+                                 sentenceName,
+                                 group,
+                                 icon,
+                                 icon);
+
+  // TODO: update the checks
+  gd::String actionDescriptionTemplate = _("Change <subject>.");
+  auto& action = AddAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
+
+  return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
+      expression, condition, action);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -296,12 +386,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
 
   return conditionsInfos[newNameWithNamespace];
 }
-/**
- * \brief Create a new expression which is the duplicate of the specified one.
- *
- * Useful for handling a deprecated expression that is just a "copy" of the
- * new one.
- */
+
 gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
     const gd::String& newExpressionName,
     const gd::String& copiedExpressionName) {
@@ -318,13 +403,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
 
   return expressionsInfos[newNameWithNamespace];
 }
-/**
- * \brief Create a new string expression which is the duplicate of the
- * specified one.
- *
- * Useful for handling a deprecated string expression that is just a "copy" of
- * the new one.
- */
+
 gd::ExpressionMetadata& PlatformExtension::AddDuplicatedStrExpression(
     const gd::String& newExpressionName,
     const gd::String& copiedExpressionName) {

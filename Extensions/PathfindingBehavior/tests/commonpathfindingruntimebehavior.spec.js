@@ -58,7 +58,7 @@ const doTestsCommonpathfindingruntimebehavior = (
         angleOffset: 0,
         cellWidth: 20,
         cellHeight: 20,
-        extraBorder: 0
+        extraBorder: 0,
       },
     ],
   });

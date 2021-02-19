@@ -108,7 +108,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         angleOffset: 0,
         cellWidth: cellSize,
         cellHeight: cellSize,
-        extraBorder: 0
+        extraBorder: 0,
       },
     ],
   });

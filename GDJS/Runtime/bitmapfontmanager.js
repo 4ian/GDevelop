@@ -69,6 +69,7 @@ gdjs.BitmapFontManager.prototype.getDefaultBitmapFont = function () {
     })
   );
 
+  // Define the default name used for the default bitmap font.
   this._defaultSlugFontName = this.bitmapFont.font;
   return this.bitmapFont;
 };
@@ -141,24 +142,21 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
   bitmapFontResourceName,
   texture
 ) {
-  // Reuse an existing bitmapFont that is already in memory and already installed
-  for (let i = 0; i < this._loadedFontsData.length; ++i) {
-    let loadedFontData = this._loadedFontsData[i];
-    if (
-      loadedFontData.fontResourceFileName === bitmapFontResourceName &&
-      PIXI.BitmapFont.available[loadedFontData.fontName]
-    ) {
-      return PIXI.BitmapFont.available[loadedFontData.fontName];
-    }
+  // Reuse an existing bitmapFont that is already in memory and already installed.
+  if (this._loadedFontsData[bitmapFontResourceName]) {
+    const fontName = this._loadedFontsData[bitmapFontResourceName].bitmapFont
+      .font;
+    return PIXI.BitmapFont.available[fontName];
   }
 
+  // Otherwise check in resources if the resource exist and is a bitmap font file.
   let bitmapFontResource = this._resources.find(function (resource) {
     return (
       resource.kind === 'bitmapFont' && resource.name === bitmapFontResourceName
     );
   });
 
-  //A file was given, but the resource doesn't exist
+  //A resource file was given, but the resource doesn't exist or isn't a bitmap font file.
   if (bitmapFontResourceName !== '' && !bitmapFontResource) {
     console.warn(
       'Unable to find bitmap font for resource "' +
@@ -167,27 +165,25 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
     );
   }
 
-  // There is no bitmap font file or resource
+  // There is no bitmap font file or resource related to this resource name.
   if (!bitmapFontResource || bitmapFontResourceName === '') {
-    // If the default Arial bitmap font doesn't exist, generate it and use it.
-    if (!PIXI.BitmapFont.available[this.getDefaultSlugFontName()]) {
-      return this.getDefaultBitmapFont();
-    }
-
-    return PIXI.BitmapFont.available[this.getDefaultSlugFontName()];
+    // We the default Arial bitmap font
+    return this.getDefaultBitmapFont();
   }
 
+  // Is case of a resource file is found and is a bitmap font file and this file was preloaded
   if (
     this._loadedFontsData[bitmapFontResourceName].fontResourceFileName ===
     bitmapFontResourceName
   ) {
+    // Get the fontData of this resource, install the bitmap font and patch the fontName.
     const fontData = this._loadedFontsData[bitmapFontResourceName].fontData;
     const bitmapFont = this.patchInstalledBitmapFont(
       PIXI.BitmapFont.install(fontData, texture)
     );
 
+    // Finally save the bitmap font previously patched and return it.
     this._loadedFontsData[bitmapFontResourceName].bitmapFont = bitmapFont;
-    this._loadedFontsData[bitmapFontResourceName].fontName = bitmapFont.font;
     return this._loadedFontsData[bitmapFontResourceName].bitmapFont;
   }
 };
@@ -249,8 +245,7 @@ gdjs.BitmapFontManager.prototype.preloadBitmapFontData = async function (
     this._loadedFontsData[bitmapFontResources[i].name] = {
       fontResourceFileName: bitmapFontResources[i].name,
       fontData: fontData,
-      fontName: '',
-      bitmapFont: '',
+      bitmapFont: {},
     };
     onLoad();
   }

@@ -177,7 +177,6 @@ const doTestsLegacypathfindingruntimebehavior = (
   const playerX = 480;
   const playerY = 320;
 
-  // This one is not on limit
   it('can find a path with an obstacle near the start', function () {
     let obstacleX;
     let obstacleY;
@@ -218,7 +217,6 @@ const doTestsLegacypathfindingruntimebehavior = (
     // move away from the obstacle
     player.setPosition(playerX, playerY);
     player.getBehavior(pathFindingName).moveTo(runtimeScene, targetX, targetY);
-    //expect(player._animationFrame).to.be(null);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(3);
   });
@@ -230,7 +228,8 @@ const doTestsLegacypathfindingruntimebehavior = (
     let targetY;
     switch (direction) {
       case 'right':
-        // right on the player right
+        // The obstacle will be right on the player right after the first step.
+        // So, it's overlaping the player by one cell lengt at start.
         obstacleX =
           playerX +
           playerRightBorder +
@@ -283,7 +282,6 @@ const doTestsLegacypathfindingruntimebehavior = (
     // move away from the obstacle
     player.setPosition(playerX, playerY);
     player.getBehavior(pathFindingName).moveTo(runtimeScene, targetX, targetY);
-    //expect(player._animationFrame).to.be(null);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(3);
   });
@@ -295,7 +293,8 @@ const doTestsLegacypathfindingruntimebehavior = (
     let targetY;
     switch (direction) {
       case 'right':
-        // right on the player right
+        // The obstacle will be right on the player right after the first step.
+        // So, it's overlaping the player by one cell lengt at start.
         obstacleX =
           playerX +
           playerRightBorder +
@@ -360,7 +359,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     }
   });
 
-  it('can find a path with an obstacle adjascent to the target', function () {
+  it('can find a path with an obstacle adjacent to the target', function () {
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -476,14 +475,14 @@ const doTestsLegacypathfindingruntimebehavior = (
     objectCenteredOnCells
   );
 
-  it('can find a path between 2 ajusted obstacles', function () {
+  it('can find a path between 2 obstacles making a path perfectly ajusted to the object', function () {
     let topObstacleX;
     let bottomObstacleX;
     let topObstacleY;
     let bottomObstacleY;
     let targetX;
     let targetY;
-    let straitLineCells;
+    let straightLineCellCount;
     switch (direction) {
       case 'right': {
         const obstacleX =
@@ -497,7 +496,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetX =
           obstacleX + obstacleRightBorder + playerLeftBorder + 2 * cellSize;
         targetY = playerY;
-        straitLineCells = (targetX - playerX) / cellSize + 1;
+        straightLineCellCount = (targetX - playerX) / cellSize + 1;
         break;
       }
       case 'left': {
@@ -512,11 +511,11 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetX =
           obstacleX - obstacleLeftBorder - playerRightBorder - 2 * cellSize;
         targetY = playerY;
-        straitLineCells = (playerX - targetX) / cellSize + 1;
+        straightLineCellCount = (playerX - targetX) / cellSize + 1;
         break;
       }
       case 'up': {
-        // topObstacle and bottomObstacle are actually left and right but for convegnance...
+        // topObstacle and bottomObstacle are actually left and right but for convenience...
         const obstacleY =
           playerY - playerTopBorder - 2 * cellSize - obstacleBottomBorder;
         topObstacleY = obstacleY;
@@ -528,11 +527,11 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetY =
           obstacleY - obstacleTopBorder - playerBottomBorder - 2 * cellSize;
         targetX = playerX;
-        straitLineCells = (playerY - targetY) / cellSize + 1;
+        straightLineCellCount = (playerY - targetY) / cellSize + 1;
         break;
       }
       case 'down': {
-        // topObstacle and bottomObstacle are actually left and right but for convegnance...
+        // topObstacle and bottomObstacle are actually left and right but for convenience...
         const obstacleY =
           playerY + playerBottomBorder + 2 * cellSize + obstacleTopBorder;
         topObstacleY = obstacleY;
@@ -544,7 +543,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetY =
           obstacleY + obstacleBottomBorder + playerTopBorder + 2 * cellSize;
         targetX = playerX;
-        straitLineCells = (targetY - playerY) / cellSize + 1;
+        straightLineCellCount = (targetY - playerY) / cellSize + 1;
         break;
       }
     }
@@ -558,18 +557,18 @@ const doTestsLegacypathfindingruntimebehavior = (
     player.getBehavior(pathFindingName).moveTo(runtimeScene, targetX, targetY);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(
-      straitLineCells
+      straightLineCellCount
     );
   });
 
-  it("mustn't find a direct path between 2 slightly too much tighten obstacles", function () {
+  it("mustn't find a direct path between 2 obstacles making a path slightly too narrow.", function () {
     let topObstacleX;
     let bottomObstacleX;
     let topObstacleY;
     let bottomObstacleY;
     let targetX;
     let targetY;
-    let straitLineCells;
+    let straightLineCellCount;
     switch (direction) {
       case 'right': {
         const obstacleX =
@@ -587,7 +586,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetX =
           obstacleX + obstacleRightBorder + playerLeftBorder + 2 * cellSize;
         targetY = playerY;
-        straitLineCells = (targetX - playerX) / cellSize + 1;
+        straightLineCellCount = (targetX - playerX) / cellSize + 1;
         break;
       }
       case 'left': {
@@ -606,7 +605,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetX =
           obstacleX - obstacleLeftBorder - playerRightBorder - 2 * cellSize;
         targetY = playerY;
-        straitLineCells = (playerX - targetX) / cellSize + 1;
+        straightLineCellCount = (playerX - targetX) / cellSize + 1;
         break;
       }
       case 'up': {
@@ -625,7 +624,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetY =
           obstacleY - obstacleTopBorder - playerBottomBorder - 2 * cellSize;
         targetX = playerX;
-        straitLineCells = (playerY - targetY) / cellSize + 1;
+        straightLineCellCount = (playerY - targetY) / cellSize + 1;
         break;
       }
       case 'down': {
@@ -644,7 +643,7 @@ const doTestsLegacypathfindingruntimebehavior = (
         targetY =
           obstacleY + obstacleBottomBorder + playerTopBorder + 2 * cellSize;
         targetX = playerX;
-        straitLineCells = (targetY - playerY) / cellSize + 1;
+        straightLineCellCount = (targetY - playerY) / cellSize + 1;
         break;
       }
     }
@@ -659,7 +658,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     // had to do a little detour
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be.above(
-      straitLineCells
+      straightLineCellCount
     );
   });
 };

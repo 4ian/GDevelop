@@ -343,6 +343,8 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
+      // This is not a real hook
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       if (useShouldAutofocusSearchbar() && this._searchBar)
         this._searchBar.focus();
     }

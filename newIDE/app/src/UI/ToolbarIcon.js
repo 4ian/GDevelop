@@ -45,7 +45,7 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
             height={32}
             style={{
               filter: disabled
-                ? 'grayscale(100%)'
+                ? 'grayscale(50%)'
                 : muiTheme.gdevelopIconsCSSFilter,
             }}
           />

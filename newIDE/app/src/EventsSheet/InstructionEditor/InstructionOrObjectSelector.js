@@ -115,6 +115,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // This is not a real hook
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar.current
     ) {

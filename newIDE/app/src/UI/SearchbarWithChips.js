@@ -36,6 +36,8 @@ export default class SearchbarWithChips extends Component<Props> {
   _searchBar: ?SearchBar;
 
   componentDidMount() {
+    // This is not a real hook
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     if (useShouldAutofocusSearchbar() && this._searchBar)
       this._searchBar.focus();
   }

@@ -192,7 +192,7 @@ declare interface HowlOptions extends HowlListeners {
 declare class Howl {
   constructor(options: HowlOptions);
 
-  play(id?: number): number; // .play() is not chainable; the other methods are
+  play(id?: number | "__default"): number; // .play() is not chainable; the other methods are
   pause(id?: number): this;
   stop(id?: number): this;
 

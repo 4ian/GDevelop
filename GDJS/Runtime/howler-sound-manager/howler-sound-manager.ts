@@ -77,7 +77,9 @@ namespace gdjs {
      */
     play(): this {
       if (this.isLoaded()) {
-        const newID = this._howl.play(this._id === null ? undefined : this._id);
+        const newID = this._howl.play(
+          this._id === null ? '__default' : this._id
+        );
         this._id = newID;
 
         // Manually handle the play event before we have an ID.

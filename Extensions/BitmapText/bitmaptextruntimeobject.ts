@@ -4,7 +4,7 @@ namespace gdjs {
     /** The base parameters of the Bitmap Text */
     content: {
       /** The opacity of the Bitmap Text */
-      opacity: number;
+      opacity: float;
       /** Content of the text */
       text: string;
       /** The tint of the text */
@@ -14,16 +14,16 @@ namespace gdjs {
       /** The atlas image file for the text */
       bitmapAtlasFile: string;
       /** The scale of the text */
-      scale: number;
+      scale: float;
       /** Activate word wrap if set to true */
       wordWrap: boolean;
       /** Wrapping with from custom size properties */
-      wrappingWidth: number;
+      wrappingWidth: float;
       /** Alignment of the text: "left", "center" or "right" */
       align: 'left' | 'center' | 'right';
     };
   };
-  export type BBTextObjectData = ObjectData & BitmapTextObjectDataType;
+  export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
 
   /**
    * Displays a bitmap text without losing in quality on edges
@@ -157,7 +157,7 @@ namespace gdjs {
       return this._tint[0] + ';' + this._tint[1] + ';' + this._tint[2];
     }
 
-    setScale(scale. float): void {
+    setScale(scale: float): void {
       this._scale = scale;
       this._renderer.updateScale();
     }

@@ -32,7 +32,9 @@ gdjs.BitmapFontManager.prototype.generateSlugName = function (bitmapFont) {
 
 // We patch the installed font to use a more complex name that includes the size of the font and line height,
 // to avoid conflicts between different font files using the same font name.
-gdjs.BitmapFontManager.prototype.patchBitmapFont = function (bitmapFont) {
+gdjs.BitmapFontManager.prototype.patchInstalledBitmapFont = function (
+  bitmapFont
+) {
   const defaultName = bitmapFont.font;
   const fullSlugName = this.generateSlugName(bitmapFont);
   bitmapFont.font = fullSlugName;
@@ -59,7 +61,7 @@ gdjs.BitmapFontManager.prototype.getDefaultBitmapFont = function () {
   });
 
   // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
-  this.bitmapFont = this.patchBitmapFont(
+  this.bitmapFont = this.patchInstalledBitmapFont(
     PIXI.BitmapFont.from(bitmapFontStyle.fontFamily, bitmapFontStyle, {
       chars: [
         [' ', '~'], // All the printable ASCII characters
@@ -180,7 +182,7 @@ gdjs.BitmapFontManager.prototype.getBitmapFontFromData = function (
     bitmapFontResourceName
   ) {
     const fontData = this._loadedFontsData[bitmapFontResourceName].fontData;
-    const bitmapFont = this.patchBitmapFont(
+    const bitmapFont = this.patchInstalledBitmapFont(
       PIXI.BitmapFont.install(fontData, texture)
     );
 

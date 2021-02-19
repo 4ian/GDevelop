@@ -44,8 +44,8 @@ gdjs.BitmapTextRuntimeObjectPixiRenderer = function (
     fontName: defaultBitmapFont.font,
   });
 
-  let bitmapFontResourceName = runtimeObject._bitmapFontFile;
-  let bitmapAtlasResourceName = runtimeObject._bitmapAtlasFile;
+  const bitmapFontResourceName = runtimeObject._bitmapFontFile;
+  const bitmapAtlasResourceName = runtimeObject._bitmapAtlasFile;
 
   // No bitmap font file
   if (bitmapFontResourceName === '') {

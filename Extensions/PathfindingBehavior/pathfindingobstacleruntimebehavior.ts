@@ -4,6 +4,8 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  declare var rbush: any;
+
   /**
    * PathfindingObstaclesManager manages the common objects shared by objects having a
    * pathfinding behavior: In particular, the obstacles behaviors are required to declare
@@ -11,14 +13,18 @@ namespace gdjs {
    * (see `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
    */
   export class PathfindingObstaclesManager {
-    _obstaclesHSHG: any;
-    x: float = 0;
-    y: float = 0;
-    radius: float = 0;
+    _obstaclesRBush: any;
 
-    constructor(runtimeScene) {
-      // @ts-ignore
-      this._obstaclesHSHG = new gdjs.HSHG.HSHG();
+    /**
+     * @param object The object
+     */
+    constructor(runtimeScene: gdjs.RuntimeScene) {
+      this._obstaclesRBush = new rbush(9, [
+        '.owner.getAABB().min[0]',
+        '.owner.getAABB().min[1]',
+        '.owner.getAABB().max[0]',
+        '.owner.getAABB().max[1]',
+      ]);
     }
 
     /**
@@ -40,7 +46,7 @@ namespace gdjs {
     addObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesHSHG.addObject(pathfindingObstacleBehavior);
+      this._obstaclesRBush.insert(pathfindingObstacleBehavior);
     }
 
     /**
@@ -50,60 +56,33 @@ namespace gdjs {
     removeObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesHSHG.removeObject(pathfindingObstacleBehavior);
+      this._obstaclesRBush.remove(pathfindingObstacleBehavior);
     }
 
     /**
-     * Returns all the obstacles around the specified position.
-     * @param x X position
-     * @param y Y position
-     * @param radius The radius of the search
-     * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
-     * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
+     * Returns all the platforms around the specified object.
+     * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
+     * @return An array with all platforms near the object.
      */
     getAllObstaclesAround(
       x: float,
       y: float,
       radius: float,
-      result: PathfindingObstacleRuntimeBehavior[]
-    ): any {
-      const vertex = new PathfindingObstaclesManager.Vertex(x, y, radius);
-      this._obstaclesHSHG.addObject(vertex);
-      this._obstaclesHSHG.queryForCollisionWith(vertex, result);
-      this._obstaclesHSHG.removeObject(vertex);
-    }
-  }
-
-  export namespace PathfindingObstaclesManager {
-    /**
-     * Tool class which represents a simple point with a radius and a getAABB method.
-     * @ignore
-     */
-    export class Vertex {
-      x: float;
-      y: float;
-      radius: float;
-      aabb: AABB | null;
-
-      constructor(x: float, y: float, radius: float) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.aabb = null;
-      }
-
-      /**
-       * Return an axis aligned bouding box for the vertex.
-       */
-      getAABB(): AABB {
-        const rad = this.radius,
-          x = this.x,
-          y = this.y;
-        return (this.aabb = {
-          min: [x - rad, y - rad],
-          max: [x + rad, y + rad],
-        });
-      }
+      result: gdjs.PathfindingObstacleRuntimeBehavior[]): any {
+      const searchArea = gdjs.staticObject(
+        PathfindingObstaclesManager.prototype.getAllObstaclesAround
+      );
+      // @ts-ignore
+      searchArea.minX = x - radius;
+      // @ts-ignore
+      searchArea.minY = y - radius;
+      // @ts-ignore
+      searchArea.maxX = x + radius;
+      // @ts-ignore
+      searchArea.maxY = y + radius;
+      const nearbyPlatforms = this._obstaclesRBush.search(searchArea);
+      result.length = 0;
+      result.push.apply(result, nearbyPlatforms);
     }
   }
 

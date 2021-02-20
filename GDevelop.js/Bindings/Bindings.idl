@@ -1855,18 +1855,6 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetObjectStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
-    boolean STATIC_HasCondition([Const, Ref] Platform p, [Const] DOMString type);
-    boolean STATIC_HasAction([Const, Ref] Platform p, [Const] DOMString type);
-    boolean STATIC_HasObjectAction([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
-    boolean STATIC_HasObjectCondition([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
-    boolean STATIC_HasBehaviorAction([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
-    boolean STATIC_HasBehaviorCondition([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
-    boolean STATIC_HasExpression([Const, Ref] Platform p, [Const] DOMString type);
-    boolean STATIC_HasObjectExpression([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
-    boolean STATIC_HasBehaviorExpression([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
-    boolean STATIC_HasStrExpression([Const, Ref] Platform p, [Const] DOMString type);
-    boolean STATIC_HasObjectStrExpression([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
-    boolean STATIC_HasBehaviorStrExpression([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
 };
 
 interface ExpressionParserDiagnostic {

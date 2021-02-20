@@ -219,6 +219,20 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
+   * \brief Check if the instruction is an object instruction.
+   */
+  bool IsObjectInstruction() {
+    return isObjectInstruction;
+  }
+
+  /**
+   * \brief Check if the instruction is a behavior instruction.
+   */
+  bool IsBehaviorInstruction() {
+    return isBehaviorInstruction;
+  }
+
+  /**
    * \brief Consider that the instruction is easy for a user to understand.
    */
   InstructionMetadata &MarkAsSimple() {

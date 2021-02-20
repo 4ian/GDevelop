@@ -2249,12 +2249,6 @@ describe('libGD.js', function () {
   describe('gd.MetadataProvider', function () {
     it('can return metadata about expressions (even if they do not exist)', function () {
       expect(
-        gd.MetadataProvider.hasExpression(
-          gd.JsPlatform.get(),
-          'NotExistingExpression'
-        )
-      ).toBe(false);
-      expect(
         gd.MetadataProvider.getExpressionMetadata(
           gd.JsPlatform.get(),
           'NotExistingExpression'

@@ -30,8 +30,6 @@ std::map<gd::String, gd::InstructionMetadata>
     PlatformExtension::badActionsMetadata;
 std::map<gd::String, gd::ExpressionMetadata>
     PlatformExtension::badExpressionsMetadata;
-std::map<gd::String, gd::ExpressionMetadata>
-    PlatformExtension::badStrExpressionsMetadata;
 #endif
 
 gd::InstructionMetadata& PlatformExtension::AddCondition(
@@ -88,7 +86,8 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
-  expressionsInfos[nameWithNamespace] = ExpressionMetadata(GetNameSpace(),
+  expressionsInfos[nameWithNamespace] = ExpressionMetadata("number",
+                                                           GetNameSpace(),
                                                            nameWithNamespace,
                                                            fullname,
                                                            description,
@@ -107,7 +106,8 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
-  strExpressionsInfos[nameWithNamespace] = ExpressionMetadata(GetNameSpace(),
+  strExpressionsInfos[nameWithNamespace] = ExpressionMetadata("string",
+                                                              GetNameSpace(),
                                                               nameWithNamespace,
                                                               fullname,
                                                               description,
@@ -477,7 +477,7 @@ PlatformExtension::GetAllStrExpressionsForObject(gd::String objectType) {
   if (objectsInfos.find(objectType) != objectsInfos.end())
     return objectsInfos.find(objectType)->second.strExpressionsInfos;
 
-  return badStrExpressionsMetadata;
+  return badExpressionsMetadata;
 }
 
 std::map<gd::String, gd::InstructionMetadata>&
@@ -509,7 +509,7 @@ PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType) {
   if (behaviorsInfo.find(autoType) != behaviorsInfo.end())
     return behaviorsInfo.find(autoType)->second.strExpressionsInfos;
 
-  return badStrExpressionsMetadata;
+  return badExpressionsMetadata;
 }
 
 gd::BaseEventSPtr PlatformExtension::CreateEvent(gd::String eventType) const {

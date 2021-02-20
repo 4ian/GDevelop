@@ -2711,7 +2711,7 @@ describe('libGD.js', function () {
       parser.delete();
     }
 
-    it('can parse valid expressions', function () {
+    it('can parse valid expressions (number)', function () {
       testExpression('number', '1+1');
       testExpression('number', '2-3');
       testExpression('number', '4/5');
@@ -2722,6 +2722,20 @@ describe('libGD.js', function () {
       testExpression('number', '  15 +    16 - 17   ');
       testExpression('number', '.14');
       testExpression('number', '3.');
+    });
+
+    it('can parse valid expressions (string)', function () {
+      testExpression('string', '"Hello"');
+      testExpression('string', '"Hello" + " " + "World"');
+    });
+
+    it('can parse valid expressions ("number|string" type)', function () {
+      testExpression('number|string', '1+1');
+      testExpression('number|string', '2-3');
+      testExpression('number|string', '4/5');
+      testExpression('number|string', '6*7');
+      testExpression('number|string', '"Hello"');
+      testExpression('number|string', '"Hello" + " " + "World"');
     });
 
     it('report errors in invalid expressions', function () {
@@ -2749,6 +2763,32 @@ describe('libGD.js', function () {
         '="Mynewscene"',
         'You must enter a text (between quotes) or a valid expression call.',
         0
+      );
+    });
+    it('report errors in invalid expressions ("number|string" type)', function () {
+      testExpression(
+        'number|string',
+        '123 + "World"',
+        'You entered a text, but a number was expected.',
+        6
+      );
+      testExpression(
+        'number|string',
+        '"World" + 123',
+        'You entered a number, but a text was expected (in quotes).',
+        10
+      );
+      testExpression(
+        'number|string',
+        '"World" + ToNumber("123")',
+        'You tried to use an expression that returns a number, but a string is expected. Use `ToString` if you need to convert a number to a string.',
+        10
+      );
+      testExpression(
+        'number|string',
+        '123 + ToString(456)',
+        'You tried to use an expression that returns a string, but a number is expected. Use `ToNumber` if you need to convert a string to a number.',
+        6
       );
     });
 
@@ -3490,6 +3530,7 @@ describe('libGD.js', function () {
   describe('gd.ExpressionMetadata', () => {
     it('can have parameters', () => {
       const expressionMetadata = new gd.ExpressionMetadata(
+        'number',
         'extensionNamespace',
         'name',
         'fullname',
@@ -3498,6 +3539,7 @@ describe('libGD.js', function () {
         'smallicon'
       );
 
+      expect(expressionMetadata.getReturnType()).toBe('number');
       expect(expressionMetadata.getFullName()).toBe('fullname');
       expect(expressionMetadata.getDescription()).toBe('description');
       expect(expressionMetadata.getGroup()).toBe('group');

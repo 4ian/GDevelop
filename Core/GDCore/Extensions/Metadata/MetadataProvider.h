@@ -96,7 +96,7 @@ class GD_CORE_API MetadataProvider {
 
   /**
    * Get information about an expression, and its associated extension.
-   * Works for static expressions.
+   * Works for free expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
   GetExtensionAndExpressionMetadata(const gd::Platform& platform,
@@ -122,7 +122,7 @@ class GD_CORE_API MetadataProvider {
 
   /**
    * Get information about a string expression, and its associated extension.
-   * Works for static expressions.
+   * Works for free expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
   GetExtensionAndStrExpressionMetadata(const gd::Platform& platform,
@@ -180,7 +180,7 @@ class GD_CORE_API MetadataProvider {
 
   /**
    * Get information about an expression from its type
-   * Works for static expressions.
+   * Works for free expressions.
    */
   static const gd::ExpressionMetadata& GetExpressionMetadata(
       const gd::Platform& platform, gd::String exprType);
@@ -201,7 +201,7 @@ class GD_CORE_API MetadataProvider {
 
   /**
    * Get information about a string expression from its type
-   * Works for static expressions.
+   * Works for free expressions.
    */
   static const gd::ExpressionMetadata& GetStrExpressionMetadata(
       const gd::Platform& platform, gd::String exprType);
@@ -220,9 +220,29 @@ class GD_CORE_API MetadataProvider {
   static const gd::ExpressionMetadata& GetBehaviorStrExpressionMetadata(
       const gd::Platform& platform, gd::String autoType, gd::String exprType);
 
+  /**
+   * Get information about an expression from its type.
+   * Works for free expressions.
+   */
+  static const gd::ExpressionMetadata& GetAnyExpressionMetadata(
+      const gd::Platform& platform, gd::String exprType);
+
+  /**
+   * Get information about an expression from its type.
+   * Works for object expressions.
+   */
+  static const gd::ExpressionMetadata& GetObjectAnyExpressionMetadata(
+      const gd::Platform& platform, gd::String objectType, gd::String exprType);
+
+  /**
+   * Get information about an expression from its type.
+   * Works for behavior expressions.
+   */
+  static const gd::ExpressionMetadata& GetBehaviorAnyExpressionMetadata(
+      const gd::Platform& platform, gd::String autoType, gd::String exprType);
+
   static bool IsBadExpressionMetadata(const gd::ExpressionMetadata& metadata) {
-    return &metadata == &badExpressionMetadata ||
-           &metadata == &badStrExpressionMetadata;
+    return &metadata == &badExpressionMetadata;
   }
 
   virtual ~MetadataProvider();
@@ -236,7 +256,6 @@ class GD_CORE_API MetadataProvider {
   static EffectMetadata badEffectMetadata;
   static gd::InstructionMetadata badInstructionMetadata;
   static gd::ExpressionMetadata badExpressionMetadata;
-  static gd::ExpressionMetadata badStrExpressionMetadata;
   int useless;  // Useless member to avoid emscripten "must have a positive
                 // integer typeid pointer" runtime error.
 };

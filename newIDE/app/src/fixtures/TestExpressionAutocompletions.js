@@ -37,6 +37,7 @@ const makeFakeEnumeratedExpressionMetadata = (
 export const makeFakeExactExpressionAutocompletion = () => {
   const gd: libGDevelop = global.gd;
   const expressionMetadata = new gd.ExpressionMetadata(
+    'number',
     'SomeExtension',
     'MyFunction',
     'My function',
@@ -70,6 +71,7 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
   const gd: libGDevelop = global.gd;
 
   const expressionMetadata = new gd.ExpressionMetadata(
+    'number',
     'SomeExtension',
     'MyFunction',
     'My function',
@@ -83,6 +85,7 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
   expressionMetadata.addParameter('string', 'Some string', '', false);
 
   const expressionWithoutParamsMetadata = new gd.ExpressionMetadata(
+    'number',
     'SomeExtension',
     'MyFunctionWithoutParams',
     'My function without params',

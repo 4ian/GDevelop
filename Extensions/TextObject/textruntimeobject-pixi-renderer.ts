@@ -147,14 +147,14 @@ namespace gdjs {
     }
 
     /**
-     * Get y-scale of the text.
+     * Get x-scale of the text.
      */
     getScaleX(): float {
       return this._text.scale.x;
     }
 
     /**
-     * Get x-scale of the text.
+     * Get y-scale of the text.
      */
     getScaleY(): float {
       return this._text.scale.y;

@@ -108,14 +108,14 @@ namespace gdjs {
     }
 
     /**
-     * Get y-scale of the tiled sprite object.
+     * Get x-scale of the tiled sprite object.
      */
     getScaleX(): float {
       return this._tiledSprite.scale.x;
     }
 
     /**
-     * Get x-scale of the tiled sprite object.
+     * Get y-scale of the tiled sprite object.
      */
     getScaleY(): float {
       return this._tiledSprite.scale.y;

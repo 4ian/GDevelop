@@ -33,6 +33,7 @@ type Props = {|
   onChange: string => void,
   onChoose?: string => void,
   dataSource: DataSource,
+  clearOnChoose: boolean,
 
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
@@ -243,6 +244,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               if (option === null || !input.current) return;
 
               handleChange(input.current, option, props);
+              setInputValue(null);
               setIsMenuOpen(false);
             }}
             open={isMenuOpen}

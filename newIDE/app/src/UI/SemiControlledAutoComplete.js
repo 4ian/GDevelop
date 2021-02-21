@@ -33,7 +33,6 @@ type Props = {|
   onChange: string => void,
   onChoose?: string => void,
   dataSource: DataSource,
-  clearOnChoose: boolean,
 
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,

@@ -19,6 +19,8 @@ namespace gdjs {
   export class TiledSpriteRuntimeObject extends gdjs.RuntimeObject {
     _xOffset: float = 0;
     _yOffset: float = 0;
+    _scaleX: float = 1;
+    _scaleY: float = 1;
     opacity: float = 255;
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 

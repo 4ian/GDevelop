@@ -164,7 +164,7 @@ namespace gdjs {
      * Set the text object scale.
      * @param newScale The new scale for the text object.
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       this._text.scale.x = newScale;
       this._text.scale.y = newScale;
     }
@@ -173,7 +173,7 @@ namespace gdjs {
      * Set the text object x-scale.
      * @param newScale The new x-scale for the text object.
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       this._text.scale.x = newScale;
     }
 
@@ -181,7 +181,7 @@ namespace gdjs {
      * Set the text object y-scale.
      * @param newScale The new y-scale for the text object.
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       this._text.scale.y = newScale;
     }
   }

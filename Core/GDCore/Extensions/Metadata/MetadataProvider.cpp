@@ -4,11 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+
 #include <algorithm>
+
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
-#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/String.h"
@@ -22,7 +24,6 @@ gd::ObjectMetadata MetadataProvider::badObjectInfo;
 gd::EffectMetadata MetadataProvider::badEffectMetadata;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
-gd::ExpressionMetadata MetadataProvider::badStrExpressionMetadata;
 gd::PlatformExtension MetadataProvider::badExtension;
 
 ExtensionAndMetadata<BehaviorMetadata>
@@ -276,7 +277,7 @@ MetadataProvider::GetExtensionAndObjectStrExpressionMetadata(
   }
 
   return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badStrExpressionMetadata);
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectStrExpressionMetadata(
@@ -313,7 +314,7 @@ MetadataProvider::GetExtensionAndBehaviorStrExpressionMetadata(
   }
 
   return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badStrExpressionMetadata);
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata&
@@ -337,12 +338,56 @@ MetadataProvider::GetExtensionAndStrExpressionMetadata(
   }
 
   return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badStrExpressionMetadata);
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetStrExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
   return GetExtensionAndStrExpressionMetadata(platform, exprType).GetMetadata();
+}
+
+const gd::ExpressionMetadata& MetadataProvider::GetAnyExpressionMetadata(
+    const gd::Platform& platform, gd::String exprType) {
+  const auto& numberExpressionMetadata =
+      GetExpressionMetadata(platform, exprType);
+  const auto& stringExpressionMetadata =
+      GetStrExpressionMetadata(platform, exprType);
+
+  return &numberExpressionMetadata != &badExpressionMetadata
+             ? numberExpressionMetadata
+             : &stringExpressionMetadata != &badExpressionMetadata
+                   ? stringExpressionMetadata
+                   : badExpressionMetadata;
+}
+
+const gd::ExpressionMetadata& MetadataProvider::GetObjectAnyExpressionMetadata(
+    const gd::Platform& platform, gd::String objectType, gd::String exprType) {
+  const auto& numberExpressionMetadata =
+      GetObjectExpressionMetadata(platform, objectType, exprType);
+  const auto& stringExpressionMetadata =
+      GetObjectStrExpressionMetadata(platform, objectType, exprType);
+
+  return &numberExpressionMetadata != &badExpressionMetadata
+             ? numberExpressionMetadata
+             : &stringExpressionMetadata != &badExpressionMetadata
+                   ? stringExpressionMetadata
+                   : badExpressionMetadata;
+}
+
+const gd::ExpressionMetadata&
+MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
+                                                   gd::String autoType,
+                                                   gd::String exprType) {
+  const auto& numberExpressionMetadata =
+      GetBehaviorExpressionMetadata(platform, autoType, exprType);
+  const auto& stringExpressionMetadata =
+      GetBehaviorStrExpressionMetadata(platform, autoType, exprType);
+
+  return &numberExpressionMetadata != &badExpressionMetadata
+             ? numberExpressionMetadata
+             : &stringExpressionMetadata != &badExpressionMetadata
+                   ? stringExpressionMetadata
+                   : badExpressionMetadata;
 }
 
 MetadataProvider::~MetadataProvider() {}

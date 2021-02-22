@@ -4,8 +4,10 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ExpressionCodeGenerator.h"
+
 #include <memory>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -35,11 +37,18 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   gd::ExpressionParser2 parser(codeGenerator.GetPlatform(),
                                codeGenerator.GetGlobalObjectsAndGroups(),
                                codeGenerator.GetObjectsAndGroups());
+  ExpressionCodeGenerator generator(codeGenerator, context);
+
   auto node = parser.ParseExpression(type, expression, objectName);
+  if (!node) {
+    std::cout << "Error: error while parsing: \"" << expression << "\" ("
+              << type << ")" << std::endl;
+
+    return generator.GenerateDefaultValue(type);
+  }
+
   gd::ExpressionValidator validator;
   node->Visit(validator);
-
-  ExpressionCodeGenerator generator(codeGenerator, context);
   if (!validator.GetErrors().empty()) {
     std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
               << "\" in: \"" << expression << "\" (" << type << ")"
@@ -130,8 +139,8 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(node.expressionMetadata)) {
     output += "/* Error during generation, function not found: " +
-              codeGenerator.ConvertToString(node.functionName) + " for type " +
-              node.type + " */ " + GenerateDefaultValue(node.type);
+              codeGenerator.ConvertToString(node.functionName) + " */ " +
+              GenerateDefaultValue(node.type);
     return;
   }
 
@@ -359,7 +368,8 @@ void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
   output += GenerateDefaultValue(node.type);
 }
 
-void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) {
+void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(
+    ObjectFunctionNameNode& node) {
   output += GenerateDefaultValue(node.type);
 }
 

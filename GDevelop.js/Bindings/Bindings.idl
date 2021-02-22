@@ -1025,6 +1025,7 @@ interface InstructionMetadata {
 
 interface ExpressionMetadata {
     void ExpressionMetadata(
+        [Const] DOMString returnType,
         [Const] DOMString extensionNamespace,
         [Const] DOMString name,
         [Const] DOMString fullname,
@@ -1032,6 +1033,7 @@ interface ExpressionMetadata {
         [Const] DOMString group,
         [Const] DOMString smallicon);
 
+    [Const, Ref] DOMString GetReturnType();
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetGroup();

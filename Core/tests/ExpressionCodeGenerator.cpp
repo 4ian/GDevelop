@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
+
 #include "DummyPlatform.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -35,6 +36,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello world\"");
     }
@@ -43,6 +45,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + \"world\"");
     }
@@ -52,6 +55,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
@@ -64,6 +68,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45");
     }
@@ -76,6 +81,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 + 0");
     }
@@ -84,6 +90,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 * 0");
     }
@@ -94,7 +101,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       auto node = parser.ParseExpression("number", "-12.45");
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
-
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "-(12.45)");
     }
@@ -102,7 +109,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       auto node = parser.ParseExpression("number", "12.5 + -2.  /   (.3)");
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
-
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -(2.) / (0.3)");
     }
@@ -115,6 +122,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "1 / getNumber()");
     }
@@ -124,6 +132,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(12, \"hello world\")");
@@ -136,6 +145,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(getNumber(), \"hello world\")");
@@ -146,6 +156,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "MySpriteObject.getObjectNumber() ?? 0");
@@ -157,6 +168,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "MySpriteObject.getObjectStringWith1Param(getNumber()) ?? \"\"");
@@ -169,6 +181,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getMouseX(\"\", \"layer1\", 0)");
@@ -180,6 +193,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getMouseX(\"\", \"layer1\", 2 + 2)");
@@ -194,6 +208,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getMouseX(\"\", \"\", 0)");
@@ -211,6 +226,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "MySpriteObject.getObjectStringWith3Param(MySpriteObject."
@@ -226,6 +242,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(getNumber(), /* Error during generation, "
@@ -247,10 +264,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "/* Error during generation, function not found: "
-              "MyExtension::Idontexist for type number */ 0");
+              "MyExtension::Idontexist */ 0");
     }
     {
       auto node = parser.ParseExpression("number",
@@ -259,6 +277,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(1, \"2\")");
@@ -311,6 +330,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                             context);
 
+        REQUIRE(node);
         node->Visit(expressionCodeGenerator);
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getLayoutVariable(myVariable))");
@@ -322,6 +342,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                             context);
 
+        REQUIRE(node);
         node->Visit(expressionCodeGenerator);
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getProjectVariable(myGlobalVariable))");
@@ -335,6 +356,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                             context);
 
+        REQUIRE(node);
         node->Visit(expressionCodeGenerator);
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getLayoutVariable(myVariable).getChild("
@@ -348,6 +370,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                             context);
 
+        REQUIRE(node);
         node->Visit(expressionCodeGenerator);
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getLayoutVariable(myVariable).getChild("
@@ -362,6 +385,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                             context);
 
+        REQUIRE(node);
         node->Visit(expressionCodeGenerator);
         REQUIRE(
             expressionCodeGenerator.GetOutput() ==
@@ -389,6 +413,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
+      REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "-(+(-(getMouseX(\"\", \"\", 0))))");

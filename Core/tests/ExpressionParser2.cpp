@@ -356,6 +356,35 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("valid operators ('number|string' type)") {
+    {
+      auto node = parser.ParseExpression("number|string", "123 + 456");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "number");
+      auto &leftNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftNumberNode.number == "123");
+      auto &rightNumberNode =
+          dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightNumberNode.number == "456");
+    }
+    {
+      auto node = parser.ParseExpression("number|string", "\"abc\" + \"def\"");
+      REQUIRE(node != nullptr);
+      auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
+      REQUIRE(operatorNode.op == '+');
+      REQUIRE(operatorNode.type == "string");
+      auto &leftTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.leftHandSide);
+      REQUIRE(leftTextNode.text == "abc");
+      auto &rightTextNode =
+          dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
+      REQUIRE(rightTextNode.text == "def");
+    }
+  }
+
   SECTION("valid unary operators") {
     {
       auto node = parser.ParseExpression("number", "-123");
@@ -379,6 +408,38 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression("number", "-123.2");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123.2");
+    }
+  }
+  SECTION("valid unary operators ('number|string' type)") {
+    {
+      auto node = parser.ParseExpression("number|string", "-123");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      REQUIRE(unaryOperatorNode.type == "number");
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123");
+    }
+    {
+      auto node = parser.ParseExpression("number|string", "+123");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '+');
+      REQUIRE(unaryOperatorNode.type == "number");
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123");
+    }
+    {
+      auto node = parser.ParseExpression("number|string", "-123.2");
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       REQUIRE(unaryOperatorNode.op == '-');
@@ -547,6 +608,34 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression("string", "\"hello world\" + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 16);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+    }
+  }
+  SECTION("Numbers and texts mismatchs ('number|string' type)") {
+    {
+      auto node =
+          parser.ParseExpression("number|string", "123 + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 6);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+    }
+    {
+      auto node =
+          parser.ParseExpression("number|string", "\"hello world\" + 123");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator;
@@ -747,6 +836,37 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid function calls ('number|string' type)") {
+    {
+      auto node =
+          parser.ParseExpression("number|string", "MyExtension::GetNumber()");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
+      REQUIRE(functionNode.type == "number");
+      REQUIRE(functionNode.objectName == "");
+      REQUIRE(functionNode.behaviorName == "");
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("number|string", "MyExtension::ToString(23)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "MyExtension::ToString");
+      REQUIRE(functionNode.type == "string");
+      REQUIRE(functionNode.objectName == "");
+      REQUIRE(functionNode.behaviorName == "");
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+  }
+
   SECTION("Valid function calls (whitespaces)") {
     {
       auto node =
@@ -934,6 +1054,36 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
     }
   }
+  SECTION("Invalid function calls, because of a wrong return type") {
+    {
+      auto node = parser.ParseExpression("string", "MyExtension::GetNumber()");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You tried to use an expression that returns a number, but a "
+              "string is expected. Use `ToString` if you need to convert a "
+              "number to a string.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 24);
+    }
+    {
+      auto node = parser.ParseExpression("number", "MyExtension::ToString()");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You tried to use an expression that returns a string, but a "
+              "number is expected. Use `ToNumber` if you need to convert a "
+              "string to a number.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 23);
+    }
+  }
   SECTION("Invalid free function call, finishing with namespace separator") {
     {
       auto node = parser.ParseExpression("number", "MyExtension::(12)");
@@ -1034,6 +1184,31 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &grandChildNode =
           dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
       REQUIRE(grandChildNode.name == "grandChild");
+    }
+  }
+
+  SECTION("Valid type inferred from expressions with type 'number|string'") {
+    {
+      auto node = parser.ParseExpression("number|string", "123");
+      REQUIRE(node != nullptr);
+      REQUIRE(node->type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("number|string",
+                                         "123 + MyExtension::GetNumber()");
+      REQUIRE(node != nullptr);
+      REQUIRE(node->type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("number|string", "\"Hello\"");
+      REQUIRE(node != nullptr);
+      REQUIRE(node->type == "string");
+    }
+    {
+      auto node = parser.ParseExpression(
+          "number|string", "\"Hello\" + MyExtension::ToString(3)");
+      REQUIRE(node != nullptr);
+      REQUIRE(node->type == "string");
     }
   }
 

@@ -294,10 +294,8 @@ namespace gdjs {
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
     _musics: Record<integer, HowlerSound> = {};
-    _freeSounds: HowlerSound[] = [];
-
-    //Sounds without an assigned channel.
-    _freeMusics: HowlerSound[] = [];
+    _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
+    _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
     _checkForPause: () => void;
@@ -523,6 +521,8 @@ namespace gdjs {
       this._sounds = {};
       this._musics = {};
       this._pausedSounds.length = 0;
+      this._loadedMusics = {};
+      this._loadedSounds = {};
     }
 
     playSound(soundName: string, loop: boolean, volume: float, pitch: float) {

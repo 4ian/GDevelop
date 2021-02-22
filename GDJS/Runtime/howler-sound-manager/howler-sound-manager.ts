@@ -15,7 +15,7 @@ namespace gdjs {
 
   /**
    * A thin wrapper around a Howl object with:
-   * * Extra methods `paused`, `stopped`, `getRate`/`setRate` and `canBeDestroyed` methods.
+   * * Handling of callbacks when the sound is not yet loaded.
    * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
    *
    * See https://github.com/goldfire/howler.js#methods for the full documentation.
@@ -296,23 +296,15 @@ namespace gdjs {
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
+
+    /** Paused sounds or musics that should be played once the game is resumed.  */
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
-    _checkForPause: () => void;
 
     constructor(resources: ResourceData[]) {
       this._resources = resources;
 
-      //Map storing "audio" resources for faster access.
-
-      //Musics without an assigned channel.
       const that = this;
-      this._checkForPause = function () {
-        if (that._paused) {
-          this.pause();
-          that._pausedSounds.push(this);
-        }
-      };
       document.addEventListener('deviceready', function () {
         // pause/resume sounds in Cordova when the app is being paused/resumed
         document.addEventListener(
@@ -412,7 +404,7 @@ namespace gdjs {
       arr: Array<HowlerSound>,
       sound: HowlerSound
     ): HowlerSound {
-      //Try to recycle an old sound.
+      // Try to recycle an old sound.
       for (var i = 0, len = arr.length; i < len; ++i) {
         if (arr[i] !== null && arr[i].stopped()) {
           arr[i] = sound;
@@ -481,7 +473,8 @@ namespace gdjs {
 
       if (!cacheContainer[soundFile]) return;
 
-      // Make sure any sound using the howl is deleted so that the howl can be garbage collected
+      // Make sure any sound using the howl is deleted so
+      // that the howl can be garbage collected
       // and no weird "zombies" using the unloaded howl can exist.
       const howl = cacheContainer[soundFile];
       function clearContainer(howlerSoundContainer: HowlerSound[]) {

@@ -289,20 +289,20 @@ namespace gdjs {
   export class HowlerSoundManager {
     _loadedMusics: Record<string, Howl> = {};
     _loadedSounds: Record<string, Howl> = {};
-    _resources: any;
+    _resources: ResourceData[];
     _availableResources: any = {};
-    _globalVolume: number = 100;
-    _sounds: Record<string, HowlerSound> = {};
-    _musics: Record<string, HowlerSound> = {};
+    _globalVolume: float = 100;
+    _sounds: Record<integer, HowlerSound> = {};
+    _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = [];
 
     //Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = [];
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
-    _checkForPause: any;
+    _checkForPause: () => void;
 
-    constructor(resources) {
+    constructor(resources: ResourceData[]) {
       this._resources = resources;
 
       //Map storing "audio" resources for faster access.
@@ -372,7 +372,7 @@ namespace gdjs {
      * Ensure rate is in a range valid for Howler.js
      * @return The clamped rate
      */
-    static clampRate(rate): any {
+    static clampRate(rate: float): float {
       if (rate > 4.0) {
         return 4.0;
       }
@@ -410,7 +410,10 @@ namespace gdjs {
      * @param arr The gdjs.HowlerSound to add.
      * @return The gdjs.HowlerSound that have been added (i.e: the second parameter).
      */
-    private _storeSoundInArray(arr: Array<HowlerSound>, sound): any {
+    private _storeSoundInArray(
+      arr: Array<HowlerSound>,
+      sound: HowlerSound
+    ): HowlerSound {
       //Try to recycle an old sound.
       for (var i = 0, len = arr.length; i < len; ++i) {
         if (arr[i] !== null && arr[i].stopped()) {
@@ -522,7 +525,7 @@ namespace gdjs {
       this._pausedSounds.length = 0;
     }
 
-    playSound(soundName, loop, volume, pitch) {
+    playSound(soundName: string, loop: boolean, volume: float, pitch: float) {
       var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
       this._storeSoundInArray(this._freeSounds, sound).play();
 
@@ -538,7 +541,13 @@ namespace gdjs {
       });
     }
 
-    playSoundOnChannel(soundName, channel, loop, volume, pitch) {
+    playSoundOnChannel(
+      soundName: string,
+      channel: integer,
+      loop: boolean,
+      volume: float,
+      pitch: float
+    ) {
       if (this._sounds[channel]) this._sounds[channel].stop();
 
       var sound = this.createHowlerSound(
@@ -559,11 +568,11 @@ namespace gdjs {
       });
     }
 
-    getSoundOnChannel(channel) {
+    getSoundOnChannel(channel: integer): HowlerSound {
       return this._sounds[channel];
     }
 
-    playMusic(soundName, loop, volume, pitch) {
+    playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
       var music = this.createHowlerSound(soundName, /* isMusic= */ true);
       this._storeSoundInArray(this._freeMusics, music).play();
 
@@ -579,7 +588,13 @@ namespace gdjs {
       });
     }
 
-    playMusicOnChannel(soundName, channel, loop, volume, pitch) {
+    playMusicOnChannel(
+      soundName: string,
+      channel: integer,
+      loop: boolean,
+      volume: float,
+      pitch: float
+    ) {
       if (this._musics[channel]) this._musics[channel].stop();
 
       const music = this.createHowlerSound(
@@ -600,11 +615,11 @@ namespace gdjs {
       });
     }
 
-    getMusicOnChannel(channel) {
+    getMusicOnChannel(channel: integer): HowlerSound {
       return this._musics[channel];
     }
 
-    setGlobalVolume(volume): void {
+    setGlobalVolume(volume: float): void {
       this._globalVolume = volume;
       if (this._globalVolume > 100) {
         this._globalVolume = 100;
@@ -615,7 +630,7 @@ namespace gdjs {
       Howler.volume(this._globalVolume / 100);
     }
 
-    getGlobalVolume() {
+    getGlobalVolume(): float {
       return this._globalVolume;
     }
 
@@ -629,7 +644,11 @@ namespace gdjs {
       this._pausedSounds.length = 0;
     }
 
-    preloadAudio(onProgress, onComplete, resources) {
+    preloadAudio(
+      onProgress: (loadedCount: integer, totalCount: integer) => void,
+      onComplete: (totalCount: integer) => void,
+      resources: ResourceData[]
+    ) {
       resources = resources || this._resources;
 
       // Construct the list of files to be loaded.
@@ -652,7 +671,7 @@ namespace gdjs {
       const totalCount = Object.keys(files).length;
       if (totalCount === 0) return onComplete(totalCount); // Nothing to load.
 
-      let loadedCount = 0;
+      let loadedCount: integer = 0;
       const onLoad = (_?: any, error?: string) => {
         if (error)
           console.error(
@@ -668,7 +687,7 @@ namespace gdjs {
 
       const preloadAudioFile = (
         file: string,
-        onLoadCallback: (_?: any, error?: string) => void,
+        onLoadCallback: HowlCallback,
         isMusic: boolean
       ) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;

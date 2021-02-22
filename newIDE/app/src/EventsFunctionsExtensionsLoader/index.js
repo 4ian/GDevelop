@@ -222,9 +222,10 @@ const generateFreeFunction = (
 
   // Hide "lifecycle" functions as they are called automatically by
   // the game engine.
-  if (isExtensionLifecycleEventsFunction(eventsFunction.getName())) {
+  if (isExtensionLifecycleEventsFunction(eventsFunction.getName()))
     instructionOrExpression.setHidden();
-  }
+
+  if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
   const codeNamespace = getFreeFunctionCodeNamespace(
     eventsFunction,
@@ -347,6 +348,8 @@ function generateBehavior(
       if (isBehaviorLifecycleEventsFunction(eventsFunction.getName())) {
         instructionOrExpression.setHidden();
       }
+
+      if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
       const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
       codeExtraInformation

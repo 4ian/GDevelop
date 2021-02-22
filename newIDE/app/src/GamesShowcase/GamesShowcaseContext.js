@@ -68,7 +68,7 @@ export const GamesShowcaseStateProvider = ({
 
   const fetchShowcasedGamesAndFilters = React.useCallback(
     () => {
-      // Don't attempt to load again resources and filters if they
+      // Don't attempt to load again games and filters if they
       // were loaded already.
       if (showcasedGamesByName || isLoading.current) return;
 

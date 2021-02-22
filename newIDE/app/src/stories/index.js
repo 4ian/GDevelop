@@ -3036,7 +3036,7 @@ storiesOf('InstructionSelector', module)
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('"KeyPressed" condition chosen, ', () => (
+  .add('"KeyPressed" condition chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'free-instructions'}
       render={(value, onChange) => (
@@ -3044,6 +3044,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}
@@ -3059,7 +3060,7 @@ storiesOf('InstructionOrObjectSelector', module)
       )}
     />
   ))
-  .add('"MySpriteObject" object chosen, ', () => (
+  .add('"MySpriteObject" object chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'objects'}
       render={(value, onChange) => (
@@ -3067,6 +3068,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}

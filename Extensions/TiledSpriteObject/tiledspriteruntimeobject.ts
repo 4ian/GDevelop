@@ -19,6 +19,8 @@ namespace gdjs {
   export class TiledSpriteRuntimeObject extends gdjs.RuntimeObject {
     _xOffset: float = 0;
     _yOffset: float = 0;
+    _scaleX: float = 1;
+    _scaleY: float = 1;
     opacity: float = 255;
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
@@ -218,6 +220,55 @@ namespace gdjs {
      */
     getColor(): string {
       return this._renderer.getColor();
+    }
+
+    /**
+     * Get scale of the tiled sprite object.
+     */
+    getScale(): float {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get x-scale of the tiled sprite object.
+     */
+    getScaleX(): float {
+      return this._renderer.getScaleX();
+    }
+
+    /**
+     * Get y-scale of the tiled sprite object.
+     */
+    getScaleY(): float {
+      return this._renderer.getScaleY();
+    }
+
+    /**
+     * Set the tiled sprite object scale.
+     * @param newScale The new scale for the tiled sprite object.
+     */
+    setScale(newScale: float): void {
+      this._scaleX = newScale;
+      this._scaleY = newScale;
+      this._renderer.setScale(newScale);
+    }
+
+    /**
+     * Set the tiled sprite object x-scale.
+     * @param newScale The new x-scale for the tiled sprite object.
+     */
+    setScaleX(newScale: float): void {
+      this._scaleX = newScale;
+      this._renderer.setScaleX(newScale);
+    }
+
+    /**
+     * Set the tiled sprite object y-scale.
+     * @param newScale The new y-scale for the tiled sprite object.
+     */
+    setScaleY(newScale: float): void {
+      this._scaleY = newScale;
+      this._renderer.setScaleY(newScale);
     }
   }
   gdjs.registerObject(

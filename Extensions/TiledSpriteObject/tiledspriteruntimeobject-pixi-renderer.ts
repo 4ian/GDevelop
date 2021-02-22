@@ -106,6 +106,45 @@ namespace gdjs {
         Math.floor(rgb[2] * 255)
       );
     }
+
+    /**
+     * Get x-scale of the tiled sprite object.
+     */
+    getScaleX(): float {
+      return this._tiledSprite.scale.x;
+    }
+
+    /**
+     * Get y-scale of the tiled sprite object.
+     */
+    getScaleY(): float {
+      return this._tiledSprite.scale.y;
+    }
+
+    /**
+     * Set the tiled sprite object scale.
+     * @param newScale The new scale for the object.
+     */
+    setScale(newScale: float): void {
+      this._tiledSprite.scale.x = newScale;
+      this._tiledSprite.scale.y = newScale;
+    }
+
+    /**
+     * Set the tiled sprite object x-scale.
+     * @param newScale The new x-scale for the object.
+     */
+    setScaleX(newScale: float): void {
+      this._tiledSprite.scale.x = newScale;
+    }
+
+    /**
+     * Set the tiled sprite object y-scale.
+     * @param newScale The new y-scale for the object.
+     */
+    setScaleY(newScale: float): void {
+      this._tiledSprite.scale.y = newScale;
+    }
   }
 
   export const TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;

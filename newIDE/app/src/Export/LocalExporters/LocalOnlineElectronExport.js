@@ -49,6 +49,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 > = {
   name: 'local-online-electron',
   onlineBuildType: 'electron-build',
+  packageNameWarningType: 'desktop',
 
   getInitialExportState: () => ({
     targets: ['winExe'],

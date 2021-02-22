@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Tools/Localization.h"
 
 using namespace std;
@@ -148,37 +149,47 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("SourisX",
-                    _("Cursor X position"),
-                    _("Compare the X position of the cursor or of a touch."),
-                    _("the cursor X position"),
-                    _("Mouse and touch"),
-                    "res/conditions/mouse24.png",
-                    "res/conditions/mouse.png")
+      .AddExpressionAndCondition(
+          "number",
+          "MouseX",
+          _("Cursor X position"),
+          _("the X position of the cursor or of a touch"),
+          _("the cursor (or touch) X position"),
+          _("Mouse and touch"),
+          "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
+  // Support for deprecated names:
+  extension.AddDuplicatedCondition("SourisX", "MouseX").SetHidden();
+  extension.AddDuplicatedExpression("SourisX", "MouseX").SetHidden();
+
   extension
-      .AddCondition("SourisY",
-                    _("Cursor Y position"),
-                    _("Compare the Y position of the cursor or of a touch."),
-                    _("the cursor Y position"),
-                    _("Mouse and touch"),
-                    "res/conditions/mouse24.png",
-                    "res/conditions/mouse.png")
+      .AddExpressionAndCondition(
+          "number",
+          "MouseY",
+          _("Cursor Y position"),
+          _("the Y position of the cursor or of a touch"),
+          _("the cursor (or touch) Y position"),
+          _("Mouse and touch"),
+          "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
+  // Support for deprecated names:
+  extension.AddDuplicatedCondition("SourisY", "MouseY").SetHidden();
+  extension.AddDuplicatedExpression("SourisY", "MouseY").SetHidden();
+
   extension
-      .AddCondition("SourisBouton",
+      .AddCondition("MouseButtonPressed",
                     _("Mouse button pressed or touch held"),
                     _("Check if the specified mouse button is pressed or "
                       "if a touch is in contact with the screen."),
@@ -187,8 +198,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("mouse", _("Button to test"))
+      .AddParameter("mouse", _("Button to check"))
       .MarkAsSimple();
+
+  // Support for deprecated names:
+  extension.AddDuplicatedCondition("SourisBouton", "MouseButtonPressed")
+      .SetHidden();
 
   extension
       .AddCondition("MouseButtonReleased",
@@ -199,36 +214,36 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("mouse", _("Button to test"))
+      .AddParameter("mouse", _("Button to check"))
       .MarkAsSimple();
 
   extension
-      .AddCondition("TouchX",
-                    _("Touch X position"),
-                    _("Compare the X position of a specific touch."),
-                    _("the touch #_PARAM1_ X position"),
-                    _("Mouse and touch/Multitouch"),
-                    "res/conditions/touch24.png",
-                    "res/conditions/touch.png")
+      .AddExpressionAndCondition("number",
+                                 "TouchX",
+                                 _("Touch X position"),
+                                 _("the X position of a specific touch"),
+                                 _("the touch #_PARAM1_ X position"),
+                                 _("Mouse and touch/Multitouch"),
+                                 "res/conditions/touch24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
   extension
-      .AddCondition("TouchY",
-                    _("Touch Y position"),
-                    _("Compare the Y position of a specific touch."),
-                    _("the touch #_PARAM1_ Y position"),
-                    _("Mouse and touch/Multitouch"),
-                    "res/conditions/touch24.png",
-                    "res/conditions/touch.png")
+      .AddExpressionAndCondition("number",
+                                 "TouchY",
+                                 _("Touch Y position"),
+                                 _("the Y position of a specific touch"),
+                                 _("the touch #_PARAM1_ Y position"),
+                                 _("Mouse and touch/Multitouch"),
+                                 "res/conditions/touch24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
@@ -265,94 +280,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddExpression("MouseX",
-                     _("Cursor X position"),
-                     _("Cursor X position"),
-                     _("Mouse cursor"),
-                     "res/actions/mouse.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("SourisX",
-                     _("Cursor X position"),
-                     _("Cursor X position"),
-                     _("Mouse cursor"),
-                     "res/actions/mouse.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0")
-      .SetHidden();
-
-  extension
-      .AddExpression("MouseY",
-                     _("Cursor Y position"),
-                     _("Cursor Y position"),
-                     _("Mouse cursor"),
-                     "res/actions/mouse.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("SourisY",
-                     _("Cursor Y position"),
-                     _("Cursor Y position"),
-                     _("Mouse cursor"),
-                     "res/actions/mouse.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0")
-      .SetHidden();
-
-  extension
       .AddExpression("MouseWheelDelta",
                      _("Mouse wheel: Displacement"),
                      _("Mouse wheel displacement"),
-                     _("Mouse cursor"),
+                     _("Mouse and touch"),
                      "res/actions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "");
-
-  extension
-      .AddExpression("TouchX",
-                     _("Touch X position"),
-                     _("Touch X position"),
-                     _("Multitouch"),
-                     "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("expression", _("Touch identifier"))
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("TouchY",
-                     _("Touch Y position"),
-                     _("Touch Y position"),
-                     _("Multitouch"),
-                     "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("expression", _("Touch identifier"))
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("camera", _("Camera"), "", true)
-      .SetDefaultValue("0");
 
   extension
       .AddExpression("LastTouchId",
                      _("Identifier of the last touch"),
                      _("Identifier of the last touch"),
-                     _("Multitouch"),
+                     _("Mouse and touch/Multitouch"),
                      "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -360,7 +299,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddExpression("LastEndedTouchId",
                      _("Identifier of the last ended touch"),
                      _("Identifier of the last ended touch"),
-                     _("Multitouch"),
+                     _("Mouse and touch/Multitouch"),
                      "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "");
 

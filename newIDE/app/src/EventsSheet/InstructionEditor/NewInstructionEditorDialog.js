@@ -176,6 +176,7 @@ export default function NewInstructionEditorDialog({
       <InstructionOrObjectSelector
         style={styles.fullHeightSelector}
         project={project}
+        scope={scope}
         currentTab={currentInstructionOrObjectSelectorTab}
         onChangeTab={setCurrentInstructionOrObjectSelectorTab}
         globalObjectsContainer={globalObjectsContainer}

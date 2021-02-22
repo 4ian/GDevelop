@@ -54,6 +54,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 > = {
   name: 'browser-online-cordova',
   onlineBuildType: 'cordova-build',
+  packageNameWarningType: 'mobile',
 
   getInitialExportState: () => null,
 

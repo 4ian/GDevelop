@@ -499,18 +499,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetExtensionAndObjectStrExpressionMetadata
 #define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
   GetExtensionAndBehaviorStrExpressionMetadata
-#define STATIC_HasCondition HasCondition
-#define STATIC_HasAction HasAction
-#define STATIC_HasObjectAction HasObjectAction
-#define STATIC_HasObjectCondition HasObjectCondition
-#define STATIC_HasBehaviorAction HasBehaviorAction
-#define STATIC_HasBehaviorCondition HasBehaviorCondition
-#define STATIC_HasExpression HasExpression
-#define STATIC_HasObjectExpression HasObjectExpression
-#define STATIC_HasBehaviorExpression HasBehaviorExpression
-#define STATIC_HasStrExpression HasStrExpression
-#define STATIC_HasObjectStrExpression HasObjectStrExpression
-#define STATIC_HasBehaviorStrExpression HasBehaviorStrExpression
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents

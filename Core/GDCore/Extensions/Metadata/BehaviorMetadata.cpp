@@ -153,10 +153,14 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace (not necessary as
   // we refer to the behavior name in the expression).
-  expressionsInfos[name] =
-      ExpressionMetadata(
-          extensionNamespace, name, fullname, description, group, smallicon)
-          .SetHelpPath(GetHelpPath());
+  expressionsInfos[name] = ExpressionMetadata("number",
+                                              extensionNamespace,
+                                              name,
+                                              fullname,
+                                              description,
+                                              group,
+                                              smallicon)
+                               .SetHelpPath(GetHelpPath());
   return expressionsInfos[name];
 #endif
 }
@@ -170,10 +174,14 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
 #if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace (not necessary as
   // we refer to the behavior name in the expression).
-  strExpressionsInfos[name] =
-      ExpressionMetadata(
-          extensionNamespace, name, fullname, description, group, smallicon)
-          .SetHelpPath(GetHelpPath());
+  strExpressionsInfos[name] = ExpressionMetadata("string",
+                                                 extensionNamespace,
+                                                 name,
+                                                 fullname,
+                                                 description,
+                                                 group,
+                                                 smallicon)
+                                  .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[name];
 #endif
 }

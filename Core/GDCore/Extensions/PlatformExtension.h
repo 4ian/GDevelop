@@ -618,9 +618,6 @@ class GD_CORE_API PlatformExtension {
   static std::map<gd::String, gd::ExpressionMetadata>
       badExpressionsMetadata;  ///< Used when an expression is not found in the
                                ///< extension
-  static std::map<gd::String, gd::ExpressionMetadata>
-      badStrExpressionsMetadata;  ///< Used when an expression is not found in
-                                  ///< the extension
 #endif
 };
 

@@ -847,10 +847,6 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
               "condition" + gd::String::From(cId - 1) + "IsTrue", context) +
           ".val ) {\n";
 
-    gd::InstructionMetadata instrInfos =
-        gd::MetadataProvider::GetConditionMetadata(platform,
-                                                   conditions[cId].GetType());
-
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId],
                               "condition" + gd::String::From(cId) + "IsTrue",

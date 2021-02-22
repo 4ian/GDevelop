@@ -239,11 +239,11 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: electron
-      ? electron.remote.nativeTheme.shouldUseDarkColors
+    themeName:
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'Nord'
-        : 'GDevelop default'
-      : 'GDevelop default',
+        : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

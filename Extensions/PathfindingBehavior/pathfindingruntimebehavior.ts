@@ -574,38 +574,28 @@ namespace gdjs {
   export namespace PathfindingRuntimeBehavior {
 
     /**
-     * Internal tool class containing the structures used by A* and members functions related
-     * to them.
-     * @ignore
+     * A-Star path finding algorithm
      */
     export class AStarPathFinder {
       _graph: GridGraph;
       _nodeEvaluator: NodeEvaluator;
-      _finalNode: Node | null = null;
-      _destination: FloatPoint = [0, 0];
-      _start: FloatPoint = [0, 0];
       _startX: float = 0;
       _startY: float = 0;
+      _startIndex: FloatPoint = [0, 0];
+      _destinationIndex: FloatPoint = [0, 0];
+      _finalNode: Node | null = null;
       _maxComplexityFactor: integer = 50;
-
-      _neighbors: Node[] = [];
-      
       _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
-
-      //An array of array. Nodes are indexed by their x position, and then by their y position.
+      /** Temporary variable that contains the neighbors to be evaluated */
+      _neighbors: Node[] = [];
+      /** An array of nodes sorted by their estimate cost (First node = Lower estimate cost). */
       _openNodes: Node[] = [];
-      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
 
       constructor(graph: GridGraph, nodeEvaluator: NodeEvaluator) {
         this._graph = graph;
         this._nodeEvaluator = nodeEvaluator;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
-
-        //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       }
-
-      //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
-      
 
       getFinalNode() {
         return this._finalNode;
@@ -628,19 +618,20 @@ namespace gdjs {
       }
 
       computePathTo(targetX: float, targetY: float) {
-        this._destination[0] = targetX;
-        this._destination[1] = targetY;
-        this._graph.getCellIndex(this._destination);
-        this._start[0] = this._startX;
-        this._start[1] = this._startY;
-        this._graph.getCellIndex(this._start);
+        this._destinationIndex[0] = targetX;
+        this._destinationIndex[1] = targetY;
+        this._graph.getCellIndex(this._destinationIndex);
+        this._startIndex[0] = this._startX;
+        this._startIndex[1] = this._startY;
+        this._graph.getCellIndex(this._startIndex);
 
         //Initialize the algorithm
-        this._graph._freeAllNodes();
-        const startNode = this._graph._getNode(this._start[0], this._start[1]);
+        this._graph.freeAllNodes();
+        const startNode = this._graph.getNode(this._startIndex[0], this._startIndex[1]);
+        startNode.cost = this._nodeEvaluator.evaluateNode(startNode);
         startNode.smallestCost = 0;
         startNode.estimateCost =
-          0 + this._distanceFunction(this._start, this._destination);
+          0 + this._distanceFunction(this._startIndex, this._destinationIndex);
         this._openNodes.length = 0;
         this._openNodes.push(startNode);
 
@@ -663,10 +654,11 @@ namespace gdjs {
 
           //Check if we reached destination?
           if (
-            n.pos[0] == this._destination[0] &&
-            n.pos[1] == this._destination[1]
+            n.index[0] == this._destinationIndex[0] &&
+            n.index[1] == this._destinationIndex[1]
           ) {
             this._finalNode = n;
+            //TODO build the path to an out parameter
             return true;
           }
 
@@ -706,8 +698,8 @@ namespace gdjs {
               //The node is already in the open list..
               for (let i = 0; i < this._openNodes.length; ++i) {
                 if (
-                  this._openNodes[i].pos[0] == neighbor.pos[0] &&
-                  this._openNodes[i].pos[1] == neighbor.pos[1]
+                  this._openNodes[i].index[0] == neighbor.index[0] &&
+                  this._openNodes[i].index[1] == neighbor.index[1]
                 ) {
                   //..so remove it as its estimate cost will be updated.
                   this._openNodes.splice(i, 1);
@@ -721,7 +713,7 @@ namespace gdjs {
             neighbor.parent = currentNode;
             neighbor.estimateCost =
               neighbor.smallestCost +
-              this._distanceFunction(neighbor.pos, this._destination);
+              this._distanceFunction(neighbor.index, this._destinationIndex);
   
             //Add the neighbor to open nodes, which are sorted by their estimate cost:
             if (
@@ -743,31 +735,49 @@ namespace gdjs {
       }
     }
     
+    /**
+     * Decide which node is passable and it's cost
+     */
     export interface NodeEvaluator {
       evaluateNode(node: Node): float;
     }
     
+    /**
+     * Decide which node is passable and it's cost according to obstacles defined in {@link PathfindingObstaclesManager}
+     */
     export class CollisionNodeEvaluator implements NodeEvaluator {
       _graph: GridGraph;
       _obstacles: PathfindingObstaclesManager;
       _collisionMethod: integer = PathfindingRuntimeBehavior.AABB_COLLISION;
-      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
-      // for rectangular collision methods
+      
+      // used for legacy and AABB collision methods
       _leftBorder: integer = 0;
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
       _bottomBorder: integer = 0;
-      _aabb: AABB = { min: [0, 0], max: [0, 0] };
+      /**
+       * Translation image of the borders
+       * moved from cell to cell to evaluate them
+       */
+      _stampAABB: AABB = { min: [0, 0], max: [0, 0] };
       
-      // for hitbox collision method
+      /**
+       * Hitboxes relative to the object origin
+       * used for hitbox collision method
+       */
       _objectHitboxes: Polygon[] = [];
+      /**
+       * Translation image of _objectHitboxes
+       * moved from cell to cell to evaluate them
+       */
       _stampHitboxes: Polygon[] = [];
+      
+      /** Used by evaluateNode to temporarily store obstacles near a position. */
+      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
       
       constructor(graph: GridGraph, obstacles: PathfindingObstaclesManager) {
         this._graph = graph;
         this._obstacles = obstacles;
-
-        //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       }
 
       setObjectSize(
@@ -794,12 +804,10 @@ namespace gdjs {
       }
 
       evaluateNode(node: Node): float {
-        const xPos = node.pos[0];
-        const yPos = node.pos[1];
+        const indexX = node.index[0];
+        const indexY = node.index[1];
         const nodeCenter = node.center;
         
-
-        //...and update its cost according to obstacles
         let objectsOnCell = false;
         
         if (this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION) {
@@ -822,11 +830,11 @@ namespace gdjs {
           );
         }
         else {
-            this._aabb.min[0] = nodeCenter[0] - this._leftBorder;
-            this._aabb.min[1] = nodeCenter[1] - this._topBorder;
-            this._aabb.max[0] = nodeCenter[0] + this._rightBorder;
-            this._aabb.max[1] = nodeCenter[1] + this._bottomBorder;
-            this._obstacles.getAllObstaclesAroundAABB(this._aabb, this._closeObstacles);
+            this._stampAABB.min[0] = nodeCenter[0] - this._leftBorder;
+            this._stampAABB.min[1] = nodeCenter[1] - this._topBorder;
+            this._stampAABB.max[0] = nodeCenter[0] + this._rightBorder;
+            this._stampAABB.max[1] = nodeCenter[1] + this._bottomBorder;
+            this._obstacles.getAllObstaclesAroundAABB(this._stampAABB, this._closeObstacles);
         }
         //console.debug(`Evaluate (${xPos}, ${yPos}) center:${node.center} ${this._closeObstacles.length} obstacles`);
         
@@ -857,10 +865,10 @@ namespace gdjs {
               cellHeight
           );
 
-          objectsOnCell = topLeftCellX < xPos &&
-            xPos < bottomRightCellX &&
-            topLeftCellY < yPos &&
-            yPos < bottomRightCellY;
+          objectsOnCell = topLeftCellX < indexX &&
+            indexX < bottomRightCellX &&
+            topLeftCellY < indexY &&
+            indexY < bottomRightCellY;
           }
           else {
             if (this._collisionMethod == PathfindingRuntimeBehavior.HITBOX_COLLISION) {
@@ -871,11 +879,11 @@ namespace gdjs {
             else if (this._collisionMethod == PathfindingRuntimeBehavior.AABB_COLLISION) {
               // this is needed to exclude touching edges
               const obstacleAABB = obj.getAABB();
-              objectsOnCell =
-                obstacleAABB.min[0] < this._aabb.max[0] &&
-                obstacleAABB.max[0] > this._aabb.min[0] &&
-                obstacleAABB.min[1] < this._aabb.max[1] &&
-                obstacleAABB.max[1] > this._aabb.min[1];
+              objectsOnCell = 
+              obstacleAABB.min[0] < this._stampAABB.max[0]
+            && obstacleAABB.max[0] > this._stampAABB.min[0]
+            && obstacleAABB.min[1] < this._stampAABB.max[1]
+            && obstacleAABB.max[1] > this._stampAABB.min[1];
             }
           }
           if (objectsOnCell) {
@@ -930,7 +938,7 @@ namespace gdjs {
      * Internal tool class representing a node when looking for a path
      */
     export class Node {
-      pos: FloatPoint;
+      index: FloatPoint;
       center: FloatPoint = [0, 0];
       cost: integer = 0;
       smallestCost: integer = -1;
@@ -940,12 +948,12 @@ namespace gdjs {
       factor: float = 1;
 
       constructor(xPos: integer, yPos: integer) {
-        this.pos = [xPos, yPos];
+        this.index = [xPos, yPos];
       }
 
       reinitialize(xPos: integer, yPos: integer) {
-        this.pos[0] = xPos;
-        this.pos[1] = yPos;
+        this.index[0] = xPos;
+        this.index[1] = yPos;
         this.cost = 0;
         this.smallestCost = -1;
         this.estimateCost = -1;
@@ -953,10 +961,15 @@ namespace gdjs {
         this.open = true;
       }
     }
-
+    
+    /**
+     * Data structure of a graph with nodes organized into a grid.
+     * The grid logic is delegated to a {@link Grid}.
+     */
     export class GridGraph {
+      /** An array of array. Nodes are indexed by their x position, and then by their y position. */
       _allNodes: Node[][] = [];
-      //Used by getNodes to temporarily store obstacles near a position.
+      /** Old nodes constructed in a previous search are stored here to avoid temporary objects (see freeAllNodes method). */
       _nodeCache: Node[] = [];
       
       _grid: Grid;
@@ -969,10 +982,9 @@ namespace gdjs {
       /**
        * Get (or dynamically construct) a node.
        *
-       * *All* nodes should be created using this method: The cost of the node is computed thanks
-       * to the objects flagged as obstacles.
+       * *All* nodes should be created using this method
        */
-      _getNode(xPos: integer, yPos: integer): Node {
+      getNode(xPos: integer, yPos: integer): Node {
         //First check if their is a node a the specified position.
         if (this._allNodes.hasOwnProperty(xPos)) {
           if (this._allNodes[xPos].hasOwnProperty(yPos)) {
@@ -1008,7 +1020,7 @@ namespace gdjs {
         this._grid.getCellCenter(index, position);
       }
       
-      _freeAllNodes() {
+      freeAllNodes() {
         if (this._nodeCache.length <= 32000) {
           for (const i in this._allNodes) {
             if (this._allNodes.hasOwnProperty(i)) {
@@ -1025,14 +1037,23 @@ namespace gdjs {
       }
     }
 
-    
+    /**
+     * The grid logic of the graph.
+     * Define how nodes are linked to one another
+     * and the mapping between coordinates and node indexes.
+     */
     export interface Grid {
       getCellIndex(position: FloatPoint, index?: FloatPoint): void;
       getCellCenter(index: FloatPoint, position?: FloatPoint): void;
       getNeighbors(currentNode: Node, result: Node[]): void;
       setGraph(graph: GridGraph): void;
     }
-
+    
+    /**
+     * A rectangular grid logic.
+     * Define how nodes are linked to one another
+     * and the mapping between coordinates and node indexes.
+     */
     export class RectangularGrid implements Grid {
       static _withoutDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
       static _withDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, -1], [-1, 1]];
@@ -1095,12 +1116,12 @@ namespace gdjs {
         const deltas: FloatPoint[] = this._allowDiagonals ? RectangularGrid._withDiagonalsDeltas
                                                           : RectangularGrid._withoutDiagonalsDeltas;
         for (const delta of deltas) {
-          let node = this._graph!._getNode(
-            currentNode.pos[0] + delta[0],
-            currentNode.pos[1] + delta[1]
+          let node = this._graph!.getNode(
+            currentNode.index[0] + delta[0],
+            currentNode.index[1] + delta[1]
           );
           node.factor = 1;
-          this.getCellCenter(node.pos, node.center);
+          this.getCellCenter(node.index, node.center);
           result.push(node);
         }
       }

@@ -5,22 +5,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  type HowlerEvent =
-    | 'load'
-    | 'loaderror'
-    | 'playerror'
-    | 'play'
-    | 'end'
-    | 'pause'
-    | 'stop'
-    | 'mute'
-    | 'volume'
-    | 'rate'
-    | 'seek'
-    | 'fade'
-    | 'unlock';
-
-  const HowlParameters: Partial<HowlOptions> = {
+  const HowlParameters: HowlOptions = {
     preload: true,
     onplayerror: (_, error) =>
       console.error("Can't play an audio file: ", error),
@@ -261,7 +246,7 @@ namespace gdjs {
     /**
      * Adds an event listener to the howl.
      */
-    on(event: HowlerEvent, handler: HowlCallback): this {
+    on(event: HowlEvent, handler: HowlCallback): this {
       if (event === 'play') {
         if (this._id === null) this._onPlay.push(handler);
         else this._howl.on(event, handler, this._id);
@@ -275,7 +260,7 @@ namespace gdjs {
     /**
      * Adds an event listener to the howl that removes itself after being called.
      */
-    once(event: HowlerEvent, handler: HowlCallback): this {
+    once(event: HowlEvent, handler: HowlCallback): this {
       if (event === 'play') {
         if (this._id === null) this._oncePlay.push(handler);
         else this._howl.once(event, handler, this._id);
@@ -289,7 +274,7 @@ namespace gdjs {
     /**
      * Removes an event listener to the howl.
      */
-    off(event: HowlerEvent, handler: HowlCallback): this {
+    off(event: HowlEvent, handler: HowlCallback): this {
       if (this._id !== null) this._howl.off(event, handler, this._id);
       return this;
     }

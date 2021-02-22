@@ -8,69 +8,87 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Adapted by arthuro555 for the GDevelop project
 
-declare type HowlCallback = (soundId: number) => void;
+declare type HowlBaseCallback = (soundId: number) => void;
 declare type HowlErrorCallback = (soundId: number, error?: string) => void;
+type HowlCallback = HowlBaseCallback | HowlErrorCallback;
 
 declare interface SoundSpriteDefinitions {
   [name: string]: [number, number] | [number, number, boolean];
 }
 
+type HowlErrorEvent = 'playerror' | 'loaderror';
+
+type HowlBaseEvent =
+  | 'load'
+  | 'play'
+  | 'end'
+  | 'pause'
+  | 'stop'
+  | 'mute'
+  | 'volume'
+  | 'rate'
+  | 'seek'
+  | 'fade'
+  | 'unlock';
+
+type HowlEvent = HowlBaseEvent | HowlErrorEvent;
+
 declare interface HowlListeners {
   /**
    * Fires when the sound has been stopped. The first parameter is the ID of the sound.
    */
-  onstop?: HowlCallback;
+  onstop?: HowlBaseCallback;
 
   /**
    * Fires when the sound has been paused. The first parameter is the ID of the sound.
    */
-  onpause?: HowlCallback;
+  onpause?: HowlBaseCallback;
 
   /**
    * Fires when the sound is loaded.
    */
-  onload?: HowlCallback;
+  onload?: HowlBaseCallback;
 
   /**
    * Fires when the sound has been muted/unmuted. The first parameter is the ID of the sound.
    */
-  onmute?: HowlCallback;
+  onmute?: HowlBaseCallback;
 
   /**
    * Fires when the sound's volume has changed. The first parameter is the ID of the sound.
    */
-  onvolume?: HowlCallback;
+  onvolume?: HowlBaseCallback;
 
   /**
    * Fires when the sound's playback rate has changed. The first parameter is the ID of the sound.
    */
-  onrate?: HowlCallback;
+  onrate?: HowlBaseCallback;
 
   /**
    * Fires when the sound has been seeked. The first parameter is the ID of the sound.
    */
-  onseek?: HowlCallback;
+  onseek?: HowlBaseCallback;
 
   /**
    * Fires when the current sound finishes fading in/out. The first parameter is the ID of the sound.
    */
-  onfade?: HowlCallback;
+  onfade?: HowlBaseCallback;
 
   /**
    * Fires when audio has been automatically unlocked through a touch/click event.
    */
-  onunlock?: HowlCallback;
+  onunlock?: HowlBaseCallback;
 
   /**
    * Fires when the sound finishes playing (if it is looping, it'll fire at the end of each loop).
    * The first parameter is the ID of the sound.
    */
-  onend?: HowlCallback;
+  onend?: HowlBaseCallback;
 
   /**
    * Fires when the sound begins playing. The first parameter is the ID of the sound.
    */
-  onplay?: HowlCallback;
+  onplay?: HowlBaseCallback;
 
   /**
    * Fires when the sound is unable to load. The first parameter is the ID of the sound (if it exists) and the second is the error message/code.
@@ -225,85 +243,19 @@ declare class Howl {
   unload(): void;
 
   on(event: 'load', callback: () => void, id?: number): this;
-  on(
-    event: 'loaderror' | 'playerror',
-    callback: HowlErrorCallback,
-    id?: number
-  ): this;
-  on(
-    event:
-      | 'play'
-      | 'end'
-      | 'pause'
-      | 'stop'
-      | 'mute'
-      | 'volume'
-      | 'rate'
-      | 'seek'
-      | 'fade'
-      | 'unlock',
-    callback: HowlCallback,
-    id?: number
-  ): this;
-  on(
-    event: string,
-    callback: HowlCallback | HowlErrorCallback,
-    id?: number
-  ): this;
+  on(event: HowlErrorEvent, callback: HowlErrorCallback, id?: number): this;
+  on(event: HowlBaseEvent, callback: HowlBaseCallback, id?: number): this;
+  on(event: string, callback: HowlCallback, id?: number): this;
 
   once(event: 'load', callback: () => void, id?: number): this;
-  once(
-    event: 'loaderror' | 'playerror',
-    callback: HowlErrorCallback,
-    id?: number
-  ): this;
-  once(
-    event:
-      | 'play'
-      | 'end'
-      | 'pause'
-      | 'stop'
-      | 'mute'
-      | 'volume'
-      | 'rate'
-      | 'seek'
-      | 'fade'
-      | 'unlock',
-    callback: HowlCallback,
-    id?: number
-  ): this;
-  once(
-    event: string,
-    callback: HowlCallback | HowlErrorCallback,
-    id?: number
-  ): this;
+  once(event: HowlErrorEvent, callback: HowlErrorCallback, id?: number): this;
+  once(event: HowlBaseEvent, callback: HowlBaseCallback, id?: number): this;
+  once(event: string, callback: HowlCallback, id?: number): this;
 
   off(event: 'load', callback?: () => void, id?: number): this;
-  off(
-    event: 'loaderror' | 'playerror',
-    callback?: HowlErrorCallback,
-    id?: number
-  ): this;
-  off(
-    event:
-      | 'play'
-      | 'end'
-      | 'pause'
-      | 'stop'
-      | 'mute'
-      | 'volume'
-      | 'rate'
-      | 'seek'
-      | 'fade'
-      | 'unlock',
-    callback?: HowlCallback,
-    id?: number
-  ): this;
-  off(
-    event?: string,
-    callback?: HowlCallback | HowlErrorCallback,
-    id?: number
-  ): this;
+  off(event: HowlErrorEvent, callback?: HowlErrorCallback, id?: number): this;
+  off(event: HowlBaseEvent, callback?: HowlBaseCallback, id?: number): this;
+  off(event?: string, callback?: HowlCallback, id?: number): this;
 
   stereo(pan: number, id?: number): this | void;
   pos(x: float, y: float, z: float, id: integer): this;

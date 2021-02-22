@@ -348,7 +348,7 @@ export const insertAutocompletionInExpression = (
     return separatorChars.indexOf(char) !== -1;
   };
 
-  const isExpression = (word: String) => {
+  const isExpression = (word: string) => {
     return word.includes('::');
   };
 

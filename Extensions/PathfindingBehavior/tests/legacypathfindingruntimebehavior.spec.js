@@ -1,5 +1,80 @@
-// I don't know how to share utility methods
-const addObstacleSprite3 = (runtimeScene, objectCenteredOnCells) => {
+var legacypathfindingruntimebehavior = {
+
+createScene: () => {
+  const runtimeGame = new gdjs.RuntimeGame({
+    variables: [],
+    properties: { windowWidth: 800, windowHeight: 600 },
+    resources: { resources: [] },
+  });
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
+  runtimeScene._timeManager.getElapsedTime = function () {
+    return (1 / 60) * 1000;
+  };
+  return runtimeScene;
+},
+
+addPlayer: (runtimeScene, cellSize, objectCenteredOnCells) => {
+  const player = new gdjs.SpriteRuntimeObject(runtimeScene, {
+    name: 'player',
+    type: '',
+    animations: [
+      {
+        name: 'animation',
+        directions: [
+          {
+            sprites: [
+              {
+                originPoint: objectCenteredOnCells
+                  ? { x: 80, y: 80 }
+                  : { x: 87, y: 87 },
+                centerPoint: { x: 80, y: 80 },
+                points: [
+                  { name: 'Center', x: 80, y: 80 },
+                  objectCenteredOnCells
+                    ? { name: 'Origin', x: 80, y: 80 }
+                    : { name: 'Origin', x: 87, y: 87 },
+                ],
+                hasCustomCollisionMask: false,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    behaviors: [
+      {
+        type: 'PathfindingBehavior::PathfindingBehavior',
+        name: 'auto1',
+        allowDiagonals: false,
+        acceleration: 400,
+        maxSpeed: 200,
+        angularMaxSpeed: 180,
+        rotateObject: false,
+        angleOffset: 0,
+        cellWidth: cellSize,
+        cellHeight: cellSize,
+        extraBorder: 0,
+      },
+    ],
+  });
+  player.getWidth = function () {
+    return 160;
+  };
+  player.getHeight = function () {
+    return 160;
+  };
+  runtimeScene.addObject(player);
+  return player;
+},
+
+addObstacle: (runtimeScene, objectCenteredOnCells) => {
   var obstacle = new gdjs.SpriteRuntimeObject(runtimeScene, {
     name: 'obstacle',
     type: '',
@@ -44,83 +119,14 @@ const addObstacleSprite3 = (runtimeScene, objectCenteredOnCells) => {
   runtimeScene.addObject(obstacle);
 
   return obstacle;
-};
+},
 
-const doTestsLegacypathfindingruntimebehavior = (
+doTests: (
   cellSize,
   objectCenteredOnCells,
   direction
 ) => {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] },
-  });
-  var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({
-    layers: [{ name: '', visibility: true, effects: [] }],
-    variables: [],
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-  });
-  runtimeScene._timeManager.getElapsedTime = function () {
-    return (1 / 60) * 1000;
-  };
-
   const pathFindingName = 'auto1';
-  const player = new gdjs.SpriteRuntimeObject(runtimeScene, {
-    name: 'player',
-    type: '',
-    animations: [
-      {
-        name: 'animation',
-        directions: [
-          {
-            sprites: [
-              {
-                originPoint: objectCenteredOnCells
-                  ? { x: 80, y: 80 }
-                  : { x: 87, y: 87 },
-                centerPoint: { x: 80, y: 80 },
-                points: [
-                  { name: 'Center', x: 80, y: 80 },
-                  objectCenteredOnCells
-                    ? { name: 'Origin', x: 80, y: 80 }
-                    : { name: 'Origin', x: 87, y: 87 },
-                ],
-                hasCustomCollisionMask: false,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    behaviors: [
-      {
-        type: 'PathfindingBehavior::PathfindingBehavior',
-        name: pathFindingName,
-        allowDiagonals: false,
-        acceleration: 400,
-        maxSpeed: 200,
-        angularMaxSpeed: 180,
-        rotateObject: false,
-        angleOffset: 0,
-        cellWidth: cellSize,
-        cellHeight: cellSize,
-        extraBorder: 0,
-      },
-    ],
-  });
-  player.getWidth = function () {
-    return 160;
-  };
-  player.getHeight = function () {
-    return 160;
-  };
-  runtimeScene.addObject(player);
-
-  const obstacle = addObstacleSprite3(runtimeScene, objectCenteredOnCells);
 
   let playerLeftBorder;
   let playerRightBorder;
@@ -178,6 +184,10 @@ const doTestsLegacypathfindingruntimebehavior = (
   const playerY = 320;
 
   it('can find a path with an obstacle near the start', function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacle = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -222,6 +232,10 @@ const doTestsLegacypathfindingruntimebehavior = (
   });
 
   it('can find a path when an obstacle is overlapping only at the start', function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacle = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -287,6 +301,10 @@ const doTestsLegacypathfindingruntimebehavior = (
   });
 
   it("mustn't find a path when an obstacle is slightly overlapping the only first cell to go", function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacle = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -360,6 +378,10 @@ const doTestsLegacypathfindingruntimebehavior = (
   });
 
   it('can find a path with an obstacle adjacent to the target', function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacle = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -408,6 +430,10 @@ const doTestsLegacypathfindingruntimebehavior = (
   });
 
   it("mustn't find a path with an obstacle slightly overlapping to the target", function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacle = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -469,13 +495,12 @@ const doTestsLegacypathfindingruntimebehavior = (
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(false);
   });
 
-  const obstacleTop = obstacle;
-  const obstacleBottom = addObstacleSprite3(
-    runtimeScene,
-    objectCenteredOnCells
-  );
-
   it('can find a path between 2 obstacles making a path perfectly adjusted to the object', function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacleTop = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+    const obstacleBottom = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let topObstacleX;
     let bottomObstacleX;
     let topObstacleY;
@@ -562,6 +587,11 @@ const doTestsLegacypathfindingruntimebehavior = (
   });
 
   it("mustn't find a direct path between 2 obstacles making a path slightly too narrow.", function () {
+    const runtimeScene = legacypathfindingruntimebehavior.createScene();
+    const player = legacypathfindingruntimebehavior.addPlayer(runtimeScene, cellSize, objectCenteredOnCells);
+    const obstacleTop = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+    const obstacleBottom = legacypathfindingruntimebehavior.addObstacle(runtimeScene, objectCenteredOnCells);
+
     let topObstacleX;
     let bottomObstacleX;
     let topObstacleY;
@@ -661,7 +691,8 @@ const doTestsLegacypathfindingruntimebehavior = (
       straightLineCellCount
     );
   });
-};
+},
+}
 
 // limit tests cases on the legacy collision methods.
 describe('gdjs.PathfindingRuntimeBehavior', function () {
@@ -673,7 +704,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           describe(`centered: ${objectCenteredOnCells},`, function () {
             ['left', 'right', 'down', 'up'].forEach((direction) => {
               describe(`direction: ${direction})`, function () {
-                doTestsLegacypathfindingruntimebehavior(
+                legacypathfindingruntimebehavior.doTests(
                   cellSize,
                   objectCenteredOnCells,
                   direction

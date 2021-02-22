@@ -239,9 +239,11 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'Nord'
-      : 'GDevelop default',
+    themeName:
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'Nord'
+        : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

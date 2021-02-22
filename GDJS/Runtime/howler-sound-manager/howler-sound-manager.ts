@@ -290,7 +290,7 @@ namespace gdjs {
     _loadedMusics: Record<string, Howl> = {};
     _loadedSounds: Record<string, Howl> = {};
     _resources: ResourceData[];
-    _availableResources: any = {};
+    _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
     _musics: Record<integer, HowlerSound> = {};

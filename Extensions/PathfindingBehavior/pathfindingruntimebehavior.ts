@@ -425,37 +425,10 @@ namespace gdjs {
           aabb.max[1] - owner.getY() + this._extraBorder
         );
       }
-      
-      if (this._nodeEvaluator._obstacles === null) {
-        console.log(
-          'You tried to compute a path without specifying the obstacles'
-        );
-        return;
-      }
-      if (this._pathFinder.computePathTo(x, y)) {
-        //Path found: memorize it
-        let node = this._pathFinder.getFinalNode();
-        let finalPathLength = 0;
-        while (node) {
-          if (finalPathLength === this._path.length) {
-            this._path.push([0, 0]);
-          }
-          this._path[finalPathLength][0] = node.center[0];
-          this._path[finalPathLength][1] = node.center[1];
-          node = node.parent;
-          finalPathLength++;
-        }
-        this._path.length = finalPathLength;
-        this._path.reverse();
-        this._path[0][0] = owner.getX();
-        this._path[0][1] = owner.getY();
+      this._pathFound = this._pathFinder.computePathTo(x, y, this._path);
+      if (this._pathFound) {
         this._enterSegment(0);
-        this._pathFound = true;
-        return;
       }
-
-      //Not path found
-      this._pathFound = false;
     }
 
     static deepCloneHitboxes(hitboxes: Polygon[]): Polygon[] {
@@ -617,7 +590,7 @@ namespace gdjs {
         return this;
       }
 
-      computePathTo(targetX: float, targetY: float) {
+      computePathTo(targetX: float, targetY: float, path: FloatPoint[]) {
         this._destinationIndex[0] = targetX;
         this._destinationIndex[1] = targetY;
         this._graph.getCellIndex(this._destinationIndex);
@@ -658,7 +631,22 @@ namespace gdjs {
             n.index[1] == this._destinationIndex[1]
           ) {
             this._finalNode = n;
-            //TODO build the path to an out parameter
+            //Path found: memorize it
+            let node = this._finalNode!;
+            let finalPathLength = 0;
+            while (node) {
+              if (finalPathLength === path.length) {
+                path.push([0, 0]);
+              }
+              path[finalPathLength][0] = node.center[0];
+              path[finalPathLength][1] = node.center[1];
+              node = node.parent!;
+              finalPathLength++;
+            }
+            path.length = finalPathLength;
+            path.reverse();
+            path[0][0] = this._startX;
+            path[0][1] = this._startY;
             return true;
           }
 

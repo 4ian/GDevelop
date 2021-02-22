@@ -221,7 +221,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(3);
   });
 
-  it('can find a path when an obstacle is overlaping only at the start', function () {
+  it('can find a path when an obstacle is overlapping only at the start', function () {
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -229,7 +229,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     switch (direction) {
       case 'right':
         // The obstacle will be right on the player right after the first step.
-        // So, it's overlaping the player by one cell lengt at start.
+        // So, it's overlapping the player by one cell length at start.
         obstacleX =
           playerX +
           playerRightBorder +
@@ -286,7 +286,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(3);
   });
 
-  it("mustn't find a path when an obstacle is slightly overlaping the only first cell to go", function () {
+  it("mustn't find a path when an obstacle is slightly overlapping the only first cell to go", function () {
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -294,7 +294,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     switch (direction) {
       case 'right':
         // The obstacle will be right on the player right after the first step.
-        // So, it's overlaping the player by one cell lengt at start.
+        // So, it's overlapping the player by one cell length at start.
         obstacleX =
           playerX +
           playerRightBorder +
@@ -407,7 +407,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(3);
   });
 
-  it("mustn't find a path with an obstacle slightly overlaping to the target", function () {
+  it("mustn't find a path with an obstacle slightly overlapping to the target", function () {
     let obstacleX;
     let obstacleY;
     let targetX;
@@ -475,7 +475,7 @@ const doTestsLegacypathfindingruntimebehavior = (
     objectCenteredOnCells
   );
 
-  it('can find a path between 2 obstacles making a path perfectly ajusted to the object', function () {
+  it('can find a path between 2 obstacles making a path perfectly adjusted to the object', function () {
     let topObstacleX;
     let bottomObstacleX;
     let topObstacleY;

@@ -80,7 +80,7 @@ const doTestsCommonpathfindingruntimebehavior = (
   it('can find a path without any obstacle in the way', function () {
     const obstacle = addObstacle(runtimeScene);
     obstacle.setPosition(100, 100);
-    // so obstacles register
+    // To ensure obstacles are registered.
     runtimeScene.renderAndStep(1000 / 60);
 
     object.setPosition(480, 300);
@@ -93,7 +93,7 @@ const doTestsCommonpathfindingruntimebehavior = (
 
   it("mustn't find a path to the obstacle inside", function () {
     obstacle.setPosition(600, 300);
-    // so obstacles register
+    // To ensure obstacles are registered.
     runtimeScene.renderAndStep(1000 / 60);
 
     object.setPosition(480, 300);
@@ -103,7 +103,7 @@ const doTestsCommonpathfindingruntimebehavior = (
 
   it('can find a path with an obstacle in the way', function () {
     obstacle.setPosition(600, 300);
-    // so obstacles register
+    // To ensure obstacles are registered.
     runtimeScene.renderAndStep(1000 / 60);
 
     object.setPosition(480, 300);
@@ -118,7 +118,7 @@ const doTestsCommonpathfindingruntimebehavior = (
   it('can find a path between 2 obstacles', function () {
     obstacleTop.setPosition(600, 180);
     obstacleBottom.setPosition(600, 420);
-    // so obstacles register
+    // To ensure obstacles are registered.
     runtimeScene.renderAndStep(1000 / 60);
 
     object.setPosition(480, 300);
@@ -135,7 +135,7 @@ const doTestsCommonpathfindingruntimebehavior = (
     obstacleBottom.setPosition(600, 420);
     obstacleLeft.setPosition(480, 300);
     obstacleRight.setPosition(720, 300);
-    // so obstacles register
+    // To ensure obstacles are registered.
     runtimeScene.renderAndStep(1000 / 60);
 
     object.setPosition(360, 300);

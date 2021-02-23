@@ -30,7 +30,6 @@ export const getDeprecatedBehaviorsInformation = (): {
 export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
-  'Video::VideoObject': true,
   'SkeletonObject::Skeleton': true,
   'TileMap::TileMap': true,
 });

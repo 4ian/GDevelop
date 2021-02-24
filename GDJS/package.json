@@ -29,7 +29,7 @@
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm test",
-    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\"",
+    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\"",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
   }

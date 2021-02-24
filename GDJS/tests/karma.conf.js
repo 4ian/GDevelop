@@ -56,6 +56,8 @@ module.exports = function(config) {
       '../Runtime-dist/Extensions/Lighting/lightruntimeobject.js',
       '../Runtime-dist/Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
       '../Runtime-dist/Extensions/Lighting/lightobstacleruntimebehavior.js',
+      '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
+      '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
 
       // Test extensions:
       './tests/Extensions/**.js',

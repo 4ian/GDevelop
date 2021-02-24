@@ -566,7 +566,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/people/\" + ToString(Variable(num)) + \"/\"",
                 "\"person\"",
                 "\"GET\"",
@@ -581,7 +581,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/planets/\" + ToString(Variable(num)) + \"/\"",
                 "\"planet\"",
                 "\"GET\"",

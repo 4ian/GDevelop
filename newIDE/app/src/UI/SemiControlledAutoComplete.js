@@ -243,6 +243,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               if (option === null || !input.current) return;
 
               handleChange(input.current, option, props);
+              setInputValue(null);
               setIsMenuOpen(false);
             }}
             open={isMenuOpen}

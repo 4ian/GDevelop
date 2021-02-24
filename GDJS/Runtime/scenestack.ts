@@ -37,16 +37,16 @@ namespace gdjs {
         const request = currentScene.getRequestedChange();
 
         //Something special was requested by the current scene.
-        if (request === gdjs.RuntimeScene.STOP_GAME) {
+        if (request === gdjs.SceneChangeRequest.STOP_GAME) {
           this._runtimeGame.getRenderer().stopGame();
           return true;
-        } else if (request === gdjs.RuntimeScene.POP_SCENE) {
+        } else if (request === gdjs.SceneChangeRequest.POP_SCENE) {
           this.pop();
-        } else if (request === gdjs.RuntimeScene.PUSH_SCENE) {
+        } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.RuntimeScene.REPLACE_SCENE) {
+        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
           this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.RuntimeScene.CLEAR_SCENES) {
+        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
           console.error('Unrecognized change in scene stack.');

@@ -8,43 +8,43 @@ namespace gdjs {
    * A scene being played, containing instances of objects rendered on screen.
    */
   export class RuntimeScene {
-    _eventsFunction: any = null;
-    _instances: any;
+    _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
+    _instances: Hashtable<RuntimeObject[]>;
 
     //Contains the instances living on the scene
-    _instancesCache: any;
+    _instancesCache: Hashtable<RuntimeObject[]>;
 
     //Used to recycle destroyed instance instead of creating new ones.
-    _objects: any;
+    _objects: Hashtable<ObjectData>;
 
     //Contains the objects data stored in the project
-    _objectsCtor: any;
-    _layers: any;
-    _initialBehaviorSharedData: any;
-    _renderer: any;
-    _variables: any;
+    _objectsCtor: Hashtable<typeof RuntimeObject>;
+    _layers: Hashtable<Layer>;
+    _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
+    _renderer: RuntimeSceneRenderer;
+    _variables: gdjs.VariablesContainer;
     _runtimeGame: gdjs.RuntimeGame;
-    _lastId: number = 0;
+    _lastId: integer = 0;
     _name: string = '';
-    _timeManager: any;
+    _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
-    _requestedScene: any = '';
+    _requestedScene: string = '';
     _isLoaded: boolean = false;
 
     // True if loadFromScene was called and the scene is being played.
     _isJustResumed: boolean = false;
 
     // True in the first frame after resuming the paused scene
-    _requestedChange: any;
+    _requestedChange: SceneChangeRequest;
     _backgroundColor: integer = 0;
     _allInstancesList: gdjs.RuntimeObject[] = [];
-    _onceTriggers: any;
+    _onceTriggers: OnceTriggers;
     _layersCameraCoordinates: any = {};
     _instancesRemoved: gdjs.RuntimeObject[] = [];
     _profiler: gdjs.Profiler | null = null;
 
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
-    _onProfilerStopped: any = null;
+    _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
 
     /**
      * @param runtimeGame The game associated to this scene.
@@ -63,7 +63,7 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer();
       this._runtimeGame = runtimeGame;
       this._timeManager = new gdjs.TimeManager();
-      this._requestedChange = RuntimeScene.CONTINUE;
+      this._requestedChange = SceneChangeRequest.CONTINUE;
 
       // What to do after the frame is rendered.
 
@@ -183,7 +183,7 @@ namespace gdjs {
      * Check if an object is registered, meaning that instances of it can be created and lives in the scene.
      * @see gdjs.RuntimeScene#registerObject
      */
-    isObjectRegistered(objectName): boolean {
+    isObjectRegistered(objectName: string): boolean {
       return (
         this._objects.containsKey(objectName) &&
         this._instances.containsKey(objectName) &&
@@ -320,6 +320,7 @@ namespace gdjs {
       this._instancesRemoved = [];
       this._lastId = 0;
 
+      //@ts-ignore We are deleting the object
       this._onceTriggers = null;
       this._isLoaded = false;
       this.onGameResolutionResized();
@@ -337,8 +338,8 @@ namespace gdjs {
      */
     createObjectsFrom(
       data: InstanceData[],
-      xPos: number,
-      yPos: number,
+      xPos: float,
+      yPos: float,
       trackByPersistentUuid: boolean
     ) {
       for (let i = 0, len = data.length; i < len; ++i) {
@@ -377,7 +378,7 @@ namespace gdjs {
         // default Z order for all layers.
         return;
       }
-      const layerHighestZOrders: { [key: string]: number } = {};
+      const layerHighestZOrders: Record<string, number> = {};
       const allInstances = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstances.length; i < len; ++i) {
         const object = allInstances[i];
@@ -425,7 +426,7 @@ namespace gdjs {
      *
      * @param func The function to be called.
      */
-    setEventsFunction(func: Function): void {
+    setEventsFunction(func: () => void): void {
       this._eventsFunction = func;
     }
 
@@ -438,7 +439,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.beginFrame();
       }
-      this._requestedChange = RuntimeScene.CONTINUE;
+      this._requestedChange = SceneChangeRequest.CONTINUE;
       this._timeManager.update(
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
@@ -462,7 +463,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('events');
       }
-      this._eventsFunction(this);
+      if (this._eventsFunction !== null) this._eventsFunction(this);
       if (this._profiler) {
         this._profiler.end('events');
       }
@@ -752,7 +753,7 @@ namespace gdjs {
      * Add an object to the instances living on the scene.
      * @param obj The object to be added.
      */
-    addObject(obj) {
+    addObject(obj: RuntimeObject) {
       if (!this._instances.containsKey(obj.name)) {
         console.log(
           'RuntimeScene.addObject: No objects called "' +
@@ -801,14 +802,13 @@ namespace gdjs {
       // and the stored object's data:
       const cache = this._instancesCache.get(objectName);
       const ctor = this._objectsCtor.get(objectName);
-      let obj = null;
+      let obj;
       if (!cache || cache.length === 0) {
         obj = new ctor(this, this._objects.get(objectName));
       } else {
         // Reuse an objet destroyed before. If there is an object in the cache,
         // then it means it does support reinitialization.
         obj = cache.pop();
-        // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
         obj.reinitialize(this._objects.get(objectName));
       }
       this.addObject(obj);
@@ -851,7 +851,7 @@ namespace gdjs {
     /**
      * Create an identifier for a new object of the scene.
      */
-    createNewUniqueId() {
+    createNewUniqueId(): integer {
       this._lastId++;
       return this._lastId;
     }
@@ -874,7 +874,7 @@ namespace gdjs {
      * Get the variables of the runtimeScene.
      * @return The container holding the variables of the scene.
      */
-    getVariables(): any {
+    getVariables() {
       return this._variables;
     }
 
@@ -954,7 +954,7 @@ namespace gdjs {
      * @param layerName The name of the layer to reorder
      * @param index The new position in the list of layers
      */
-    setLayerIndex(layerName: string, index: float): void {
+    setLayerIndex(layerName: string, index: integer): void {
       const layer: gdjs.Layer = this._layers.get(layerName);
       if (!layer) {
         return;
@@ -989,7 +989,7 @@ namespace gdjs {
     /**
      * Return the value of the scene change that is requested.
      */
-    getRequestedChange() {
+    getRequestedChange(): SceneChangeRequest {
       return this._requestedChange;
     }
 
@@ -998,7 +998,7 @@ namespace gdjs {
      *
      * See requestChange.
      */
-    getRequestedScene() {
+    getRequestedScene(): string {
       return this._requestedScene;
     }
 
@@ -1008,9 +1008,9 @@ namespace gdjs {
      * @param change One of RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
      * @param sceneName The name of the new scene to launch, if applicable.
      */
-    requestChange(change: number, sceneName: string) {
+    requestChange(change: SceneChangeRequest, sceneName?: string) {
       this._requestedChange = change;
-      this._requestedScene = sceneName;
+      if (sceneName) this._requestedScene = sceneName;
     }
 
     /**
@@ -1025,7 +1025,7 @@ namespace gdjs {
      * in the scene.
      * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
      */
-    startProfiler(onProfilerStopped: Function) {
+    startProfiler(onProfilerStopped: (oldProfiler: gdjs.Profiler) => void) {
       if (this._profiler) {
         return;
       }
@@ -1078,13 +1078,15 @@ namespace gdjs {
     sceneJustResumed(): boolean {
       return this._isJustResumed;
     }
+  }
 
-    //The flags to describe the change request by a scene:
-    static CONTINUE = 0;
-    static PUSH_SCENE = 1;
-    static POP_SCENE = 2;
-    static REPLACE_SCENE = 3;
-    static CLEAR_SCENES = 4;
-    static STOP_GAME = 5;
+  //The flags to describe the change request by a scene:
+  export enum SceneChangeRequest {
+    CONTINUE,
+    PUSH_SCENE,
+    POP_SCENE,
+    REPLACE_SCENE,
+    CLEAR_SCENES,
+    STOP_GAME,
   }
 }

@@ -200,6 +200,8 @@ declare interface ResourceData {
   smoothed?: boolean;
   userAdded: boolean;
   disablePreload?: boolean;
+  preloadAsSound?: boolean;
+  preloadAsMusic?: boolean;
 }
 
 declare enum ResourceKind {

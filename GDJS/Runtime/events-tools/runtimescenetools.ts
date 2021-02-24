@@ -133,8 +133,8 @@ namespace gdjs {
         }
         runtimeScene.requestChange(
           clearOthers
-            ? gdjs.RuntimeScene.CLEAR_SCENES
-            : gdjs.RuntimeScene.REPLACE_SCENE,
+            ? SceneChangeRequest.CLEAR_SCENES
+            : SceneChangeRequest.REPLACE_SCENE,
           newSceneName
         );
       };
@@ -142,13 +142,13 @@ namespace gdjs {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
-        runtimeScene.requestChange(gdjs.RuntimeScene.PUSH_SCENE, newSceneName);
+        runtimeScene.requestChange(SceneChangeRequest.PUSH_SCENE, newSceneName);
       };
       export const popScene = function (runtimeScene) {
-        runtimeScene.requestChange(gdjs.RuntimeScene.POP_SCENE);
+        runtimeScene.requestChange(SceneChangeRequest.POP_SCENE);
       };
       export const stopGame = function (runtimeScene) {
-        runtimeScene.requestChange(gdjs.RuntimeScene.STOP_GAME);
+        runtimeScene.requestChange(SceneChangeRequest.STOP_GAME);
       };
       export const createObjectsFromExternalLayout = function (
         scene,

@@ -1,3 +1,5 @@
+describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
+
 const makeTestRuntimeScene = () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
@@ -21,7 +23,7 @@ const makeTestRuntimeScene = () => {
 };
 
 const addPlatformObject = runtimeScene => {
-  var platform = new gdjs.RuntimeObject(runtimeScene, {
+  const platform = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj2',
     type: '',
     behaviors: [
@@ -43,7 +45,7 @@ const addPlatformObject = runtimeScene => {
 };
 
 const addLadderObject = runtimeScene => {
-  var platform = new gdjs.RuntimeObject(runtimeScene, {
+  const platform = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj3',
     type: '',
     behaviors: [
@@ -65,11 +67,10 @@ const addLadderObject = runtimeScene => {
   return platform;
 };
 
-describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 describe('falling', function() {
-  var runtimeScene;
-  var object;
-  var platform;
+  let runtimeScene;
+  let object;
+  let platform;
 
   beforeEach(function() {
     runtimeScene = makeTestRuntimeScene();
@@ -110,7 +111,7 @@ describe('falling', function() {
   });
 
   it('can fall when in the air', function() {
-    for (var i = 0; i < 30; ++i) {
+    for (let i = 0; i < 30; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
       if (i < 10) expect(object.getBehavior('auto1').isFalling()).to.be(true);
     }
@@ -120,7 +121,7 @@ describe('falling', function() {
     expect(object.getBehavior('auto1').isFalling()).to.be(false);
     expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
-    for (var i = 0; i < 35; ++i) {
+    for (let i = 0; i < 35; ++i) {
       //Check that the platformer object can fall.
       object.getBehavior('auto1').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
@@ -129,7 +130,7 @@ describe('falling', function() {
     expect(object.getY()).to.be(-24.75);
     expect(object.getBehavior('auto1').isFalling()).to.be(true);
 
-    for (var i = 0; i < 100; ++i) {
+    for (let i = 0; i < 100; ++i) {
       //Let the speed on X axis go back to 0.
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -142,7 +143,7 @@ describe('falling', function() {
       platform.getY() - 10
     );
 
-    for (var i = 0; i < 35; ++i) {
+    for (let i = 0; i < 35; ++i) {
       object.getBehavior('auto1').simulateLeftKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -155,7 +156,7 @@ describe('falling', function() {
     expect(object.getY()).to.be(platform.getY());
 
     object.getBehavior('auto1').simulateReleaseKey();
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -170,7 +171,7 @@ describe('falling', function() {
       platform.getY() - 10
     );
 
-    for (var i = 0; i < 35; ++i) {
+    for (let i = 0; i < 35; ++i) {
       object.getBehavior('auto1').simulateLeftKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -183,7 +184,7 @@ describe('falling', function() {
     expect(object.getY()).to.be(platform.getY());
 
     object.getBehavior('auto1').simulateJumpKey();
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -198,7 +199,7 @@ describe('falling', function() {
       platform.getY() - object.getHeight() + 1
     );
 
-    for (var i = 0; i < 15; ++i) {
+    for (let i = 0; i < 15; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -213,7 +214,7 @@ describe('falling', function() {
     expect(object.getBehavior('auto1').isFalling()).to.be(false);
     expect(object.getY()).to.be(-19); // -19 = -10 (platform y) + -9 (object height)
 
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       object.getBehavior('auto1').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
@@ -230,9 +231,9 @@ describe('falling', function() {
 });
 
 describe('jump and jump sustain (round coordinates on)', function() {
-  var runtimeScene;
-  var object;
-  var platform;
+  let runtimeScene;
+  let object;
+  let platform;
 
   beforeEach(function() {
     runtimeScene = makeTestRuntimeScene();
@@ -275,7 +276,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 
   it('can jump', function() {
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -286,7 +287,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 
     // Jump without sustaining
     object.getBehavior('auto1').simulateJumpKey();
-    for (var i = 0; i < 18; ++i) {
+    for (let i = 0; i < 18; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
 	}
 
@@ -298,7 +299,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
     expect(object.getY()).to.be.within(-180, -179);
 
     // Then let the object fall
-    for (var i = 0; i < 60; ++i) {
+    for (let i = 0; i < 60; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
@@ -306,7 +307,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 
   it('can jump, sustaining the jump', function() {
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -317,7 +318,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 
 	// Jump with sustaining as much as possible, and
 	// even more (18 frames at 60fps is greater than 0.2s)
-    for (var i = 0; i < 18; ++i) {
+    for (let i = 0; i < 18; ++i) {
       object.getBehavior('auto1').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -326,7 +327,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
     expect(object.getY()).to.be(-230);
     runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-235);
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       // Verify that pressing the jump key does not change anything
       object.getBehavior('auto1').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
@@ -340,7 +341,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
     expect(object.getY()).to.be.within(-247, -246);
 
     // Then let the object fall
-    for (var i = 0; i < 60; ++i) {
+    for (let i = 0; i < 60; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
@@ -348,7 +349,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 
   it('can jump, and only sustain the jump while key held', function() {
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -358,7 +359,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
     expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
 	// Jump with sustaining a bit (5 frames at 60fps = 0.08s), then stop
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       object.getBehavior('auto1').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -367,7 +368,7 @@ describe('jump and jump sustain (round coordinates on)', function() {
 	// Stop holding the jump key
 	runtimeScene.renderAndStep(1000 / 60);
 
-    for (var i = 0; i < 13; ++i) {
+    for (let i = 0; i < 13; ++i) {
 	  // then hold it again (but it's too late, jump sustain is gone for this jump)
       object.getBehavior('auto1').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
@@ -386,18 +387,57 @@ describe('jump and jump sustain (round coordinates on)', function() {
     runtimeScene.renderAndStep(1000 / 60);
 
     // Then let the object fall
-    for (var i = 0; i < 60; ++i) {
+    for (let i = 0; i < 60; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30);
   });
+  
+  it('should not grab a platform while jumping', function() {
+    const topPlatform = addPlatformObject(runtimeScene);
+    topPlatform.setPosition(12, -80);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // Ensure the object falls on the platform
+    for (let i = 0; i < 10; ++i) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+
+    // Check the object is on the platform
+    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+    expect(object.getBehavior('auto1').isFalling()).to.be(false);
+    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+    // Jump without sustaining
+    object.getBehavior('auto1').simulateJumpKey();
+    for (let i = 0; i < 3; ++i) {
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+    }
+    // the object is against the platform side 
+    expect(object.getY()).to.be.within(
+      topPlatform.getY(),
+      topPlatform.getY() + object.getHeight()
+    );
+
+    // try to grab the platform
+    for (let i = 0; i < 30; ++i) {
+      object.getBehavior('auto1').simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    // Check that the object didn't grabbed the platform
+    expect(object.getX()).to.be.above(
+      topPlatform.getX() - object.getWidth() + 20,
+    );
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
+  });
 });
 
 describe('jumpthru', function() {
-  var runtimeScene;
-  var object;
-  var platform;
-  var jumpthru;
+  let runtimeScene;
+  let object;
+  let platform;
+  let jumpthru;
 
   beforeEach(function() {
     runtimeScene = makeTestRuntimeScene();
@@ -461,7 +501,7 @@ describe('jumpthru', function() {
 
   it('can jump through the jumpthru', function() {
     //Check the platform stopped the platformer object.
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
@@ -485,13 +525,13 @@ describe('jumpthru', function() {
     expect(object.getBehavior('auto1').isJumping()).to.be(true);
 
     // Continue the simulation and check that position is correct in the middle of the jump
-    for (var i = 0; i < 20; ++i) {
+    for (let i = 0; i < 20; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be.within(-89, -88);
 
     // Continue simulation and check that we arrive on the jumpthru
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 10; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be.within(
@@ -503,9 +543,9 @@ describe('jumpthru', function() {
 });
 
 describe('rounded coordinates (moving platforms)', function() {
-  var runtimeScene;
-  var object;
-  var platform;
+  let runtimeScene;
+  let object;
+  let platform;
 
   beforeEach(function() {
     runtimeScene = makeTestRuntimeScene();
@@ -546,7 +586,7 @@ describe('rounded coordinates (moving platforms)', function() {
   });
 
   it('follows the platform', function() {
-    for (var i = 0; i < 30; ++i) {
+    for (let i = 0; i < 30; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
 
@@ -572,9 +612,9 @@ describe('rounded coordinates (moving platforms)', function() {
 
 
 describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
-  var runtimeScene;
-  var object;
-  var platform;
+  let runtimeScene;
+  let object;
+  let platform;
   var object2;
 
   beforeEach(function() {
@@ -670,7 +710,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
     expect(object.getY()).to.be(-30);
 
     // Simulate more frames. Check that trying to jump won't do anything.
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       object2.getBehavior('PlatformerObject').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -686,7 +726,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
     expect(object.getY()).to.be(-30);
 
     // Simulate more frames so that the object reaches the floor
-    for (var i = 0; i < 20; ++i) {
+    for (let i = 0; i < 20; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object2.getX()).to.be(9);
@@ -697,7 +737,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
     // Start a jump for both objects
     object.getBehavior('PlatformerObject').simulateJumpKey();
     object2.getBehavior('PlatformerObject').simulateJumpKey();
-    for (var i = 0; i < 6; ++i) {
+    for (let i = 0; i < 6; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object2.getX()).to.be(9);
@@ -707,7 +747,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
 
     // Try to go right for the first object: won't work because the other
     // object is a platform.
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       object.getBehavior('PlatformerObject').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -717,7 +757,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
     expect(object.getY()).to.be.within(-94.2, -94.1);
 
     // Try to go right for the first and second object: can do.
-    for (var i = 0; i < 3; ++i) {
+    for (let i = 0; i < 3; ++i) {
       object.getBehavior('PlatformerObject').simulateRightKey();
       object2.getBehavior('PlatformerObject').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
@@ -728,7 +768,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
     expect(object.getY()).to.be.within(-101.2, -101.1);
 
     // Let the object fall back on the floor.
-    for (var i = 0; i < 30; ++i) {
+    for (let i = 0; i < 30; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object2.getX()).to.be.within(9.83, 9.84);
@@ -739,8 +779,8 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
 });
 
 describe('ladder', function() {
-  var runtimeScene;
-  var object;
+  let runtimeScene;
+  let object;
   var scale;
 
   beforeEach(function() {
@@ -784,64 +824,79 @@ describe('ladder', function() {
     ladder.setPosition(30, -10 - ladder.getHeight());
   });
 
+  const fall = (frameCount) => {
+    for (let i = 0; i < frameCount; ++i) {
+      const lastY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getY()).to.be.above(lastY);
+    }
+  }
+
+  const climbLadder = (frameCount) => {
+    for (let i = 0; i < frameCount; ++i) {
+      const lastY = object.getY();
+      object.getBehavior('auto1').simulateUpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+      expect(object.getY()).to.be.below(lastY);
+    }
+  }
+
+  const stayOnLadder = (frameCount) => {
+    for (let i = 0; i < frameCount; ++i) {
+      const lastY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+      expect(object.getY()).to.be(lastY);
+    }
+  }
+
+  const fallOnPlatform = (maxFrameCount) => {
+    // Ensure the object falls on the platform
+    for (let i = 0; i < maxFrameCount; ++i) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    //Check the object is on the platform
+    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+    expect(object.getBehavior('auto1').isFalling()).to.be(false);
+    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+  }
+
   it('can climb a ladder', function() {
     object.setPosition(30, -32);
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-
-    //Check the object is on the platform
-    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
-    expect(object.getBehavior('auto1').isFalling()).to.be(false);
-    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    fallOnPlatform(10);
 
     // Climb the ladder
     object.getBehavior('auto1').simulateLadderKey();
-    runtimeScene.renderAndStep(1000 / 60);
-    for (var i = 0; i < 10; ++i) {
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be.below(-30);
-
-    // Stay on the ladder
-    const stayY = object.getY();
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be(stayY);
-    expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-
-    // Climb the ladder
-    for (var i = 0; i < 14; ++i) {
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
-    }
+    climbLadder(10);
+    stayOnLadder(10);
+    climbLadder(14);
     // Check that we reached the maximum height
+    // The player goes a little over the ladder...
+    object.getBehavior('auto1').simulateUpKey();
+    runtimeScene.renderAndStep(1000 / 60);
     const playerAtLadderTop = ladder.getY() - object.getHeight();
-    expect(object.getY()).to.be.within(playerAtLadderTop, playerAtLadderTop + 2);
+    expect(object.getY()).to.be.within(playerAtLadderTop - 3, playerAtLadderTop);
+    expect(object.getBehavior('auto1').isFalling()).to.be(true);
 
-    //TODO it fall at the end but that may not be expected.
+    // ...and it falls even if up is pressed
+    for (let i = 0; i < 12; ++i) {
+      object.getBehavior('auto1').simulateUpKey();
+      fall(1);
+    }
   });
 
-  // TODO
-  it.skip('can jump and grab a ladder', function() {
+  it.only('can jump and grab a ladder', function() {
     object.setPosition(30, -32);
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-
-    //Check the object is on the platform
-    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
-    expect(object.getBehavior('auto1').isFalling()).to.be(false);
-    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    fallOnPlatform(10);
 
     // Jump
     object.getBehavior('auto1').simulateJumpKey();
     runtimeScene.renderAndStep(1000 / 60);
-    for (var i = 0; i < 10; ++i) {
+    for (let i = 0; i < 2; ++i) {
       object.getBehavior('auto1').simulateUpKey();
       runtimeScene.renderAndStep(1000 / 60);
     }
@@ -851,97 +906,95 @@ describe('ladder', function() {
     // Grab the ladder
     object.getBehavior('auto1').simulateLadderKey();
     runtimeScene.renderAndStep(1000 / 60);
-    // Stay on the ladder
-    const stayY = object.getY();
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be(stayY);
-    expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
 
-    // Climb the ladder
-    for (var i = 0; i < 10; ++i) {
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be.below(stayY);
+    stayOnLadder(10);
+    climbLadder(2);
   });
 
-  it('can fall from a ladder', function() {
+  it('can fall from a ladder right side', function() {
     object.setPosition(30, -32);
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-
-    //Check the object is on the platform
-    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
-    expect(object.getBehavior('auto1').isFalling()).to.be(false);
-    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    fallOnPlatform(10);
 
     // Climb the ladder
     object.getBehavior('auto1').simulateLadderKey();
-    runtimeScene.renderAndStep(1000 / 60);
-    for (var i = 0; i < 10; ++i) {
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be.below(-30);
-
-    // Stay on the ladder
-    const stayY = object.getY();
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be(stayY);
-    expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+    climbLadder(10);
+    stayOnLadder(10);
 
     // Fall to the ladder right
     runtimeScene.renderAndStep(1000 / 60);
-    for (var i = 0; i < 20; ++i) {
+    for (let i = 0; i < 16; ++i) {
       object.getBehavior('auto1').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
     }
-    expect(object.getY()).to.be.above(stayY);
+    fall(5);
+  });
+
+  it('can walk from a ladder', function() {
+    object.setPosition(30, -32);
+    // Ensure the object falls on the platform
+    fallOnPlatform(10);
+
+    // Climb the ladder
+    object.getBehavior('auto1').simulateLadderKey();
+    stayOnLadder(10);
+    
+    // Going from the ladder to the right
+    runtimeScene.renderAndStep(1000 / 60);
+    for (let i = 0; i < 16; ++i) {
+      object.getBehavior('auto1').simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+    }
+    // Falling 1 frame
+    object.getBehavior('auto1').simulateRightKey();
+    runtimeScene.renderAndStep(1000 / 60);
     expect(object.getBehavior('auto1').isFalling()).to.be(true);
+    // and directly on the floor
+    object.getBehavior('auto1').simulateRightKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
   });
 
   it('can jump from a ladder', function() {
     object.setPosition(30, -32);
     // Ensure the object falls on the platform
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-
-    //Check the object is on the platform
-    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
-    expect(object.getBehavior('auto1').isFalling()).to.be(false);
-    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    fallOnPlatform(10);
 
     // Climb the ladder
     object.getBehavior('auto1').simulateLadderKey();
-    runtimeScene.renderAndStep(1000 / 60);
-    for (var i = 0; i < 10; ++i) {
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be.below(-30);
+    climbLadder(10);
+    stayOnLadder(10);
 
-    // Stay on the ladder
+    // Jump from the ladder
     const stayY = object.getY();
-    for (var i = 0; i < 10; ++i) {
-      runtimeScene.renderAndStep(1000 / 60);
-    }
-    expect(object.getY()).to.be(stayY);
-    expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-
-    // Fall to the ladder right
     object.getBehavior('auto1').simulateJumpKey();
-    for (var i = 0; i < 20; ++i) {
+    for (let i = 0; i < 20; ++i) {
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(object.getY()).to.be.below(stayY);
     expect(object.getBehavior('auto1').isJumping()).to.be(true);
+  });
+
+  it('can grab a ladder when falling', function() {
+    object.setPosition(30, -32);
+    // Ensure the object falls on the platform
+    fallOnPlatform(10);
+
+    // Climb the ladder
+    object.getBehavior('auto1').simulateLadderKey();
+    climbLadder(24);
+    // Check that we reached the maximum height
+    // The player goes a little over the ladder...
+    object.getBehavior('auto1').simulateUpKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getBehavior('auto1').isFalling()).to.be(true);
+    fall(10);
+    
+    object.getBehavior('auto1').simulateLadderKey();
+    stayOnLadder(10);
+    climbLadder(5);
   });
 });
 });

@@ -67,7 +67,7 @@ const addLadderObject = runtimeScene => {
   return platform;
 };
 
-describe('falling', function() {
+describe('(falling)', function() {
   let runtimeScene;
   let object;
   let platform;
@@ -228,9 +228,26 @@ describe('falling', function() {
     runtimeScene.renderAndStep(1000 / 60);
     expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
   });
+
+  it('falls when a platform is moved away', function() {
+    object.setPosition(0, -32);
+    // Ensure the object falls on the platform
+    for (let i = 0; i < 10; ++i) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    //Check the object is on the platform
+    expect(object.getY()).to.be.within(-31, -30); // -30 = -10 (platform y) + -20 (object height)
+    expect(object.getBehavior('auto1').isFalling()).to.be(false);
+    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+    // move the platform away
+    platform.setPosition(-100, -100);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getBehavior('auto1').isFalling()).to.be(true);
+  });
 });
 
-describe('jump and jump sustain (round coordinates on)', function() {
+describe('(jump and jump sustain, round coordinates on)', function() {
   let runtimeScene;
   let object;
   let platform;
@@ -431,9 +448,41 @@ describe('jump and jump sustain (round coordinates on)', function() {
     );
     expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
   });
+
+  it('should not grab a platform while walking', function() {
+    const topPlatform = addPlatformObject(runtimeScene);
+    topPlatform.setPosition(20, platform.getY() - object.getHeight());
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // Ensure the object falls on the platform
+    for (let i = 0; i < 10; ++i) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+
+    // Check the object is on the platform
+    expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+    expect(object.getBehavior('auto1').isFalling()).to.be(false);
+    expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+    // try to grab the platform
+    for (let i = 0; i < 30; ++i) {
+      object.getBehavior('auto1').simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+    }
+
+    // The object is where it could grab the top platform if it where falling.
+    expect(object.getX()).to.be.within(
+      topPlatform.getX() - object.getWidth(),
+      topPlatform.getX() - object.getWidth() + 2
+    );
+    expect(object.getY()).to.be(topPlatform.getY());
+    // Check that the object didn't grabbed the platform
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
+  });
 });
 
-describe('jumpthru', function() {
+describe('(jumpthru)', function() {
   let runtimeScene;
   let object;
   let platform;
@@ -542,7 +591,7 @@ describe('jumpthru', function() {
   });
 });
 
-describe('rounded coordinates (moving platforms)', function() {
+describe('(rounded coordinates, moving platforms)', function() {
   let runtimeScene;
   let object;
   let platform;
@@ -607,6 +656,38 @@ describe('rounded coordinates (moving platforms)', function() {
     runtimeScene.renderAndStep(1000 / 60);
 
     expect(object.getX()).to.be(0.36);
+  });
+
+  it('follows a moving platform when was grabbed to another', function() {
+    const topPlatform = addPlatformObject(runtimeScene);
+    topPlatform.setPosition(platform.getX() + 30, -50);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // Fall and Grab the platform
+    object.setPosition(topPlatform.getX() - object.getWidth(), topPlatform.getY() - 10);
+    for (let i = 0; i < 7; ++i) {
+      object.getBehavior('auto1').simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+    }
+    object.getBehavior('auto1').simulateRightKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+
+    // move the bottom platform to the object
+    for (let i = 0; i < 20; ++i) {
+      platform.setY(platform.getY() - 1);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    // the platform reach the object
+    expect(platform.getY()).to.be(object.getY() + object.getHeight());
+    for (let i = 0; i < 5; ++i) {
+      platform.setY(platform.getY() - 1);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    // the object follows it and no longer grab the other platform
+    expect(object.getY()).to.be(platform.getY() - object.getHeight());
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
   });
 });
 
@@ -778,7 +859,7 @@ describe('and gdjs.PlatformRuntimeBehavior at same time', function() {
   });
 });
 
-describe('ladder', function() {
+describe('(ladder)', function() {
   let runtimeScene;
   let object;
   var scale;
@@ -888,7 +969,7 @@ describe('ladder', function() {
     }
   });
 
-  it.only('can jump and grab a ladder', function() {
+  it('can jump and grab a ladder', function() {
     object.setPosition(30, -32);
     // Ensure the object falls on the platform
     fallOnPlatform(10);
@@ -995,6 +1076,53 @@ describe('ladder', function() {
     object.getBehavior('auto1').simulateLadderKey();
     stayOnLadder(10);
     climbLadder(5);
+  });
+
+  it('should not grab a platform when grabbed to a ladder', function() {
+    const topPlatform = addPlatformObject(runtimeScene);
+    topPlatform.setPosition(ladder.getX() + ladder.getWidth(), -50);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    object.setPosition(topPlatform.getX() - object.getWidth(), topPlatform.getY());
+    // Grab the ladder
+    object.getBehavior('auto1').simulateLadderKey();
+    stayOnLadder(10);
+
+    object.getBehavior('auto1').simulateRightKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    // The object is where it could grab the top platform if it where falling.
+    expect(object.getX()).to.be.within(
+      topPlatform.getX() - object.getWidth(),
+      topPlatform.getX() - object.getWidth() + 2
+    );
+    expect(object.getY()).to.be(topPlatform.getY());
+    // Check that the object didn't grabbed the platform
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
+
+    stayOnLadder(10);
+  });
+
+  it('can grab a ladder when grabbed to a platform', function() {
+    const topPlatform = addPlatformObject(runtimeScene);
+    topPlatform.setPosition(ladder.getX() + ladder.getWidth(), -50);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // Fall and Grab the platform
+    object.setPosition(topPlatform.getX() - object.getWidth(), topPlatform.getY() - 10);
+    for (let i = 0; i < 5; ++i) {
+      object.getBehavior('auto1').simulateRightKey();
+      fall(1);
+    }
+    object.getBehavior('auto1').simulateRightKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+
+    // try to grab the ladder
+    object.getBehavior('auto1').simulateLadderKey();
+    runtimeScene.renderAndStep(1000 / 60);
+    // panic mode! (probably a bug)
+    expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+    expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
   });
 });
 });

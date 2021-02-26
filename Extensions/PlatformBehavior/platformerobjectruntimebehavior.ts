@@ -44,7 +44,8 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
-    _state: PlatformerObjectRuntimeBehavior.State = PlatformerObjectRuntimeBehavior.State.Falling;
+    _state: PlatformerObjectRuntimeBehavior.State =
+      PlatformerObjectRuntimeBehavior.State.Falling;
 
     /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
     _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
@@ -185,7 +186,10 @@ namespace gdjs {
       //0.2) Track changes in object size
 
       //Stick the object to the floor if its height has changed.
-      if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor && this._oldHeight !== object.getHeight()) {
+      if (
+        this._state == PlatformerObjectRuntimeBehavior.State.OnFloor &&
+        this._oldHeight !== object.getHeight()
+      ) {
         object.setY(
           this._floorLastY -
             object.getHeight() +
@@ -235,7 +239,9 @@ namespace gdjs {
       }
 
       //Shift the object according to the grabbed platform movement.
-      if (this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
+      if (
+        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
+      ) {
         // This erases any other movement
         requestedDeltaX =
           this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
@@ -347,9 +353,11 @@ namespace gdjs {
       }
 
       //Fall
-      if (this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
-          this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
-          this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
+      if (
+        this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
+        this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
+        this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
+      ) {
         this._currentFallSpeed += this._gravity * timeDelta;
         if (this._currentFallSpeed > this._maxFallingSpeed) {
           this._currentFallSpeed = this._maxFallingSpeed;
@@ -403,7 +411,8 @@ namespace gdjs {
               true
             )
           ) {
-            this._state = PlatformerObjectRuntimeBehavior.State.GrabbingPlatform;
+            this._state =
+              PlatformerObjectRuntimeBehavior.State.GrabbingPlatform;
             this._grabbedPlatform = collidingPlatform;
             requestedDeltaY = 0;
           } else {
@@ -414,7 +423,10 @@ namespace gdjs {
       this._releaseKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
-      if (this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform && !this._releaseKey) {
+      if (
+        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
+        !this._releaseKey
+      ) {
         this._canJump = true;
         this._currentJumpSpeed = 0;
         this._currentFallSpeed = 0;
@@ -637,12 +649,12 @@ namespace gdjs {
             this._canJump = true;
             this._currentJumpSpeed = 0;
             this._currentFallSpeed = 0;
-            
+
             //Register the colliding platform as the floor.
             this._floorPlatform = collidingPlatform;
             this._floorLastX = this._floorPlatform.owner.getX();
             this._floorLastY = this._floorPlatform.owner.getY();
-            
+
             //Ensure nothing is grabbed.
             this._releaseGrabbedPlatform();
             this._state = PlatformerObjectRuntimeBehavior.State.OnFloor;
@@ -703,7 +715,9 @@ namespace gdjs {
      * Mark the platformer object has not being grabbing any platform.
      */
     _releaseGrabbedPlatform() {
-      if (this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
+      if (
+        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
+      ) {
         this._state = PlatformerObjectRuntimeBehavior.State.Falling;
       }
 
@@ -1230,7 +1244,9 @@ namespace gdjs {
      * @returns Returns true if a platform is grabbed and false if not.
      */
     isGrabbingPlatform(): boolean {
-      return this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform;
+      return (
+        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
+      );
     }
 
     /**
@@ -1260,7 +1276,7 @@ namespace gdjs {
       OnFloor,
       Jumping,
       OnLadder,
-      GrabbingPlatform
+      GrabbingPlatform,
     }
   }
 

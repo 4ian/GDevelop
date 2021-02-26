@@ -15,7 +15,7 @@ namespace gdjs {
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: any;
-    _pixiRenderer: PIXI.Renderer;
+    _pixiRenderer: PIXI.Renderer | null;
 
     // Width and height are tracked when a render texture is used.
     _oldWidth: float | null = null;

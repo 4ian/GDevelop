@@ -3,17 +3,16 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer {
-    _pixiRenderer: PIXI.Renderer;
+    _pixiRenderer: PIXI.Renderer | null;
     _runtimeScene: gdjs.RuntimeScene;
-    _pixiContainer: any;
+    _pixiContainer: PIXI.Container;
     _debugDraw: PIXI.Graphics | null = null;
     _profilerText: PIXI.Text | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer
+      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null
     ) {
-      // @ts-expect-error ts-migrate(2322) FIXME: Type 'Renderer | null' is not assignable to type '... Remove this comment to see the full error message
       this._pixiRenderer = runtimeGameRenderer
         ? runtimeGameRenderer.getPIXIRenderer()
         : null;
@@ -35,9 +34,9 @@ namespace gdjs {
         this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
     }
 
+    // Nothing to do.
     onSceneUnloaded() {}
 
-    // Nothing to do.
     render() {
       if (!this._pixiRenderer) {
         return;

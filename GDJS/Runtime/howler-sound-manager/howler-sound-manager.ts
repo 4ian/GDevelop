@@ -640,7 +640,7 @@ namespace gdjs {
     preloadAudio(
       onProgress: (loadedCount: integer, totalCount: integer) => void,
       onComplete: (totalCount: integer) => void,
-      resources: ResourceData[]
+      resources?: ResourceData[]
     ) {
       resources = resources || this._resources;
 

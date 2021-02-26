@@ -604,5 +604,6 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  export type RuntimeGameRenderer = RuntimeGamePixiRenderer;
   export const RuntimeGameRenderer = RuntimeGamePixiRenderer;
 }

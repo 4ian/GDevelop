@@ -384,10 +384,8 @@ namespace gdjs {
       this._searchContext.setObstacles(this._manager);
       this._searchContext.setCellSize(this._cellWidth, this._cellHeight);
       this._searchContext.setStartPosition(owner.getX(), owner.getY());
-      if (
-        this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
-      ) {
-        this._searchContext.setObjectSize(
+      if (this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION) {
+        this._searchContext._nodeEvaluator.setObjectSize(
           owner.getX() - owner.getDrawableX() + this._extraBorder,
           owner.getY() - owner.getDrawableY() + this._extraBorder,
           owner.getWidth() -
@@ -404,10 +402,10 @@ namespace gdjs {
         for (let pi = 0; pi < copyHitboxes.length; ++pi) {
           copyHitboxes[pi].move(-owner.getX(), -owner.getY());
         }
-        this._searchContext.setObjectHitBoxes(copyHitboxes);
-
+        this._searchContext._nodeEvaluator.setObjectHitBoxes(copyHitboxes);
+        
         const aabb = owner.getAABB();
-        this._searchContext.setObjectSize(
+        this._searchContext._nodeEvaluator.setObjectSize(
           owner.getX() - aabb.min[0] + this._extraBorder,
           owner.getY() - aabb.min[1] + this._extraBorder,
           aabb.max[0] - owner.getX() + this._extraBorder,
@@ -562,6 +560,7 @@ namespace gdjs {
      */
     export class Node {
       pos: FloatPoint;
+      center: FloatPoint;
       cost: integer = 0;
       smallestCost: integer = -1;
       estimateCost: integer = -1;
@@ -570,6 +569,8 @@ namespace gdjs {
 
       constructor(xPos: integer, yPos: integer) {
         this.pos = [xPos, yPos];
+        // TODO
+        this.center = [0, 0];
       }
 
       reinitialize(xPos: integer, yPos: integer) {
@@ -599,18 +600,10 @@ namespace gdjs {
       _maxComplexityFactor: integer = 50;
       _cellWidth: float = 20;
       _cellHeight: float = 20;
-
+      
+      _nodeEvaluator: NodeEvaluator;
+      
       _behavior: gdjs.PathfindingRuntimeBehavior;
-      // for rectangular collision methods
-      _leftBorder: integer = 0;
-      _rightBorder: integer = 0;
-      _topBorder: integer = 0;
-      _bottomBorder: integer = 0;
-      _aabb: AABB = { min: [0, 0], max: [0, 0] };
-
-      // for hitbox collision method
-      _objectHitboxes: Polygon[] = [];
-      _stampHitboxes: Polygon[] = [];
 
       _temporaryPointForTransformations: FloatPoint = [0, 0];
 
@@ -624,10 +617,8 @@ namespace gdjs {
       //Used by getNodes to temporarily store obstacles near a position.
       _nodeCache: Node[] = [];
 
-      constructor(
-        behavior: gdjs.PathfindingRuntimeBehavior,
-        obstacles: PathfindingObstaclesManager
-      ) {
+      constructor(behavior: gdjs.PathfindingRuntimeBehavior, obstacles: PathfindingObstaclesManager) {
+        this._nodeEvaluator = new NodeEvaluator(behavior, obstacles);
         this._obstacles = obstacles;
         this._behavior = behavior;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
@@ -662,26 +653,6 @@ namespace gdjs {
         this._startX = x;
         this._startY = y;
         return this;
-      }
-
-      setObjectSize(
-        leftBorder: integer,
-        topBorder: integer,
-        rightBorder: integer,
-        bottomBorder: integer
-      ): PathfindingRuntimeBehavior.SearchContext {
-        this._leftBorder = leftBorder;
-        this._rightBorder = rightBorder;
-        this._topBorder = topBorder;
-        this._bottomBorder = bottomBorder;
-        return this;
-      }
-
-      setObjectHitBoxes(objectHitboxes: Polygon[]) {
-        this._objectHitboxes = objectHitboxes;
-        this._stampHitboxes = PathfindingRuntimeBehavior.deepCloneHitboxes(
-          this._objectHitboxes
-        );
       }
 
       setCellSize(
@@ -851,136 +822,19 @@ namespace gdjs {
         } else {
           newNode = new Node(xPos, yPos);
         }
-
-        const nodeCenter = this._temporaryPointForTransformations;
+        const nodeCenter = newNode.center;
         nodeCenter[0] = xPos * this._cellWidth;
         nodeCenter[1] = yPos * this._cellHeight;
         this._behavior._basisTransformation.toScreen(nodeCenter);
         nodeCenter[0] += this._behavior._gridOffsetX;
         nodeCenter[1] += this._behavior._gridOffsetY;
-
-        //...and update its cost according to obstacles
-        let objectsOnCell = false;
-
-        if (
-          this._behavior._collisionMethod ==
-          PathfindingRuntimeBehavior.LEGACY_COLLISION
-        ) {
-          const radius =
-            this._cellHeight > this._cellWidth
-              ? this._cellHeight * 2
-              : this._cellWidth * 2;
-          this._obstacles.getAllObstaclesAround(
-            nodeCenter[0],
-            nodeCenter[1],
-            radius,
-            this._closeObstacles
-          );
-        } else {
-          this._aabb.min[0] = nodeCenter[0] - this._leftBorder;
-          this._aabb.min[1] = nodeCenter[1] - this._topBorder;
-          this._aabb.max[0] = nodeCenter[0] + this._rightBorder;
-          this._aabb.max[1] = nodeCenter[1] + this._bottomBorder;
-          this._obstacles.getAllObstaclesAroundAABB(
-            this._aabb,
-            this._closeObstacles
-          );
-        }
-
-        for (let k = 0; k < this._closeObstacles.length; ++k) {
-          const obj = this._closeObstacles[k].owner;
-
-          if (
-            this._behavior._collisionMethod ==
-            PathfindingRuntimeBehavior.LEGACY_COLLISION
-          ) {
-            const topLeftCellX = Math.floor(
-              (obj.getDrawableX() - this._rightBorder) / this._cellWidth
-            );
-            const topLeftCellY = Math.floor(
-              (obj.getDrawableY() - this._bottomBorder) / this._cellHeight
-            );
-            const bottomRightCellX = Math.ceil(
-              (obj.getDrawableX() + obj.getWidth() + this._leftBorder) /
-                this._cellWidth
-            );
-            const bottomRightCellY = Math.ceil(
-              (obj.getDrawableY() + obj.getHeight() + this._topBorder) /
-                this._cellHeight
-            );
-
-            objectsOnCell =
-              topLeftCellX < xPos &&
-              xPos < bottomRightCellX &&
-              topLeftCellY < yPos &&
-              yPos < bottomRightCellY;
-          } else {
-            if (
-              this._behavior._collisionMethod ==
-              PathfindingRuntimeBehavior.HITBOX_COLLISION
-            ) {
-              this._moveStampHitBoxesTo(nodeCenter[0], nodeCenter[1]);
-              objectsOnCell = this._checkCollisionWithStamp(obj.getHitBoxes());
-            } else if (
-              this._behavior._collisionMethod ==
-              PathfindingRuntimeBehavior.AABB_COLLISION
-            ) {
-              // this is needed to exclude touching edges
-              const obstacleAABB = obj.getAABB();
-              objectsOnCell =
-                obstacleAABB.min[0] < this._aabb.max[0] &&
-                obstacleAABB.max[0] > this._aabb.min[0] &&
-                obstacleAABB.min[1] < this._aabb.max[1] &&
-                obstacleAABB.max[1] > this._aabb.min[1];
-            }
-          }
-          if (objectsOnCell) {
-            if (this._closeObstacles[k].isImpassable()) {
-              //The cell is impassable, stop here.
-              newNode.cost = -1;
-              break;
-            } else {
-              //Superimpose obstacles
-              newNode.cost += this._closeObstacles[k].getCost();
-            }
-          }
-        }
-        if (!objectsOnCell) {
-          newNode.cost = 1;
-        }
+        newNode.center = nodeCenter;
+        
+        newNode.cost = this._nodeEvaluator.evaluateNode(newNode);
 
         //Default cost when no objects put on the cell.
         this._allNodes[xPos][yPos] = newNode;
         return newNode;
-      }
-
-      _moveStampHitBoxesTo(x: float, y: float) {
-        for (let pi = 0; pi < this._objectHitboxes.length; ++pi) {
-          const objectPolygon = this._objectHitboxes[pi];
-          const stampPolygon = this._stampHitboxes[pi];
-          for (let vi = 0; vi < objectPolygon.vertices.length; ++vi) {
-            const objectPoint = objectPolygon.vertices[vi];
-            const stampPoint = stampPolygon.vertices[vi];
-            stampPoint[0] = objectPoint[0] + x;
-            stampPoint[1] = objectPoint[1] + y;
-          }
-        }
-      }
-
-      _checkCollisionWithStamp(hitboxes: Polygon[]): boolean {
-        const hitBoxes1 = this._stampHitboxes;
-        const hitBoxes2 = hitboxes;
-        for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
-          for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
-            if (
-              gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], true)
-                .collision
-            ) {
-              return true;
-            }
-          }
-        }
-        return false;
       }
 
       /**
@@ -1046,6 +900,178 @@ namespace gdjs {
             }
           }
         }
+      }
+    }
+    
+    export class NodeEvaluator {
+      _behavior: gdjs.PathfindingRuntimeBehavior;
+      _obstacles: PathfindingObstaclesManager;
+      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
+      // for rectangular collision methods
+      _leftBorder: integer = 0;
+      _rightBorder: integer = 0;
+      _topBorder: integer = 0;
+      _bottomBorder: integer = 0;
+      _aabb: AABB = { min: [0, 0], max: [0, 0] };
+      
+      // for hitbox collision method
+      _objectHitboxes: Polygon[] = [];
+      _stampHitboxes: Polygon[] = [];
+      
+      _cellWidth: float = 20;
+      _cellHeight: float = 20;
+      
+      constructor(behavior: gdjs.PathfindingRuntimeBehavior, obstacles: PathfindingObstaclesManager) {
+        this._obstacles = obstacles;
+        this._behavior = behavior;
+
+        //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
+      }
+
+      setObjectSize(
+        leftBorder: integer,
+        topBorder: integer,
+        rightBorder: integer,
+        bottomBorder: integer
+      ) {
+        this._leftBorder = leftBorder;
+        this._rightBorder = rightBorder;
+        this._topBorder = topBorder;
+        this._bottomBorder = bottomBorder;
+      }
+
+      setObjectHitBoxes(objectHitboxes: Polygon[]) {
+        this._objectHitboxes = objectHitboxes;
+        this._stampHitboxes = PathfindingRuntimeBehavior.deepCloneHitboxes(this._objectHitboxes);
+        // FIXME just for tests
+        //console.debug("setObjectHitBoxes: %s", objectHitboxes[0].vertices);
+      }
+
+      evaluateNode(node: Node): float {
+        const xPos = node.pos[0];
+        const yPos = node.pos[1];
+        const nodeCenter = node.center;
+
+        //...and update its cost according to obstacles
+        let objectsOnCell = false;
+
+        if (
+          this._behavior._collisionMethod ==
+          PathfindingRuntimeBehavior.LEGACY_COLLISION
+        ) {
+          const radius =
+            this._cellHeight > this._cellWidth
+              ? this._cellHeight * 2
+              : this._cellWidth * 2;
+          this._obstacles.getAllObstaclesAround(
+            nodeCenter[0],
+            nodeCenter[1],
+            radius,
+            this._closeObstacles
+          );
+        }
+        else {
+            this._aabb.min[0] = nodeCenter[0] - this._leftBorder;
+            this._aabb.min[1] = nodeCenter[1] - this._topBorder;
+            this._aabb.max[0] = nodeCenter[0] + this._rightBorder;
+            this._aabb.max[1] = nodeCenter[1] + this._bottomBorder;
+            this._obstacles.getAllObstaclesAroundAABB(this._aabb, this._closeObstacles);
+        }
+        //console.debug("Evaluate (%s, %s) %s obstacles", xPos, yPos, this._closeObstacles.length);
+        
+        let cost: float = 0;
+        for (let k = 0; k < this._closeObstacles.length; ++k) {
+          const obj = this._closeObstacles[k].owner;
+
+          if (
+            this._behavior._collisionMethod ==
+            PathfindingRuntimeBehavior.LEGACY_COLLISION
+          ) {
+            const topLeftCellX = Math.floor(
+              (obj.getDrawableX() - this._rightBorder) / this._cellWidth
+            );
+            const topLeftCellY = Math.floor(
+              (obj.getDrawableY() - this._bottomBorder) / this._cellHeight
+            );
+            const bottomRightCellX = Math.ceil(
+              (obj.getDrawableX() + obj.getWidth() + this._leftBorder) /
+                this._cellWidth
+            );
+            const bottomRightCellY = Math.ceil(
+              (obj.getDrawableY() + obj.getHeight() + this._topBorder) /
+                this._cellHeight
+            );
+
+            objectsOnCell =
+              topLeftCellX < xPos &&
+              xPos < bottomRightCellX &&
+              topLeftCellY < yPos &&
+              yPos < bottomRightCellY;
+          } else {
+            if (
+              this._behavior._collisionMethod ==
+              PathfindingRuntimeBehavior.HITBOX_COLLISION
+            ) {
+              this._moveStampHitBoxesTo(nodeCenter[0], nodeCenter[1]);
+              objectsOnCell = this._checkCollisionWithStamp(obj.getHitBoxes());
+            } else if (
+              this._behavior._collisionMethod ==
+              PathfindingRuntimeBehavior.AABB_COLLISION
+            ) {
+              // this is needed to exclude touching edges
+              const obstacleAABB = obj.getAABB();
+              objectsOnCell =
+                obstacleAABB.min[0] < this._aabb.max[0] &&
+                obstacleAABB.max[0] > this._aabb.min[0] &&
+                obstacleAABB.min[1] < this._aabb.max[1] &&
+                obstacleAABB.max[1] > this._aabb.min[1];
+            }
+          }
+          if (objectsOnCell) {
+            if (this._closeObstacles[k].isImpassable()) {
+              //The cell is impassable, stop here.
+              cost = -1;
+              break;
+            } else {
+              //Superimpose obstacles
+              cost += this._closeObstacles[k].getCost();
+            }
+          }
+        }
+        if (!objectsOnCell) {
+          cost = 1;
+        }
+
+        return cost;
+      }
+      
+      _moveStampHitBoxesTo(x: float, y: float) {
+        for (let pi = 0; pi < this._objectHitboxes.length; ++pi) {
+          const objectPolygon = this._objectHitboxes[pi];
+          const stampPolygon = this._stampHitboxes[pi];
+          for (let vi = 0; vi < objectPolygon.vertices.length; ++vi) {
+            const objectPoint = objectPolygon.vertices[vi];
+            const stampPoint = stampPolygon.vertices[vi];
+            stampPoint[0] = objectPoint[0] + x;
+            stampPoint[1] = objectPoint[1] + y;
+          }
+        }
+      }
+
+      _checkCollisionWithStamp(hitboxes: Polygon[]): boolean {
+        const hitBoxes1 = this._stampHitboxes;
+        const hitBoxes2 = hitboxes;
+        for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
+          for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+            if (
+              gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], true)
+                .collision
+            ) {
+              return true;
+            }
+          }
+        }
+        return false;
       }
     }
 

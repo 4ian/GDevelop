@@ -158,7 +158,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.pixiRenderer.view.onwheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomBy(event.deltaY / 5000);
+        this.zoomBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         this.viewPosition.scrollBy(-event.deltaY / 10, 0);
       } else {

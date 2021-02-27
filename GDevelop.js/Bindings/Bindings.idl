@@ -1099,6 +1099,7 @@ interface DependencyMetadata {
     [Const, Ref] MapStringPropertyDescriptor GetAllExtraSettings();
 
     [Ref] DependencyMetadata OnlyIfSomeExtraSettingsNonEmpty();
+    [Ref] DependencyMetadata OnlyIfOtherDependencyIsExported([Const] DOMString otherDependency);
 };
 
 interface ParameterMetadata {

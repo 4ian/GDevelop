@@ -106,26 +106,34 @@ export const ResourcesWatcher = (props: Props) => {
               watcher.on('change', filename => {
                 console.log(`File Changed: ${filename}`);
 
-                //Recharge la resource en supprimant le fichier du cache
+                // Reload the resource by cleaning the cache
                 resourcesLoader.burstUrl(project, filename);
+                
                 //Lancer un refresh de la thumbnail pour refresh l'image qui a encore l'image du cache ou du moin pas aux bonnes dimensions.
-
 
                 //lance la verification de la taille de l'image
                 let warningSize = false;
 
                 const img = new Image();
-                img.src = resourcesLoader.getResourceFullUrl(project, filename, {});
+                img.src = resourcesLoader.getResourceFullUrl(
+                  project,
+                  filename,
+                  {}
+                );
 
                 if (img.width > 2048 || img.height > 2048) {
                   warningSize = true;
-                  console.warn("watcher warning size");
-                  resourcesLoader.setStatusCode(project, filename, 'WARNING_IMAGE_EXCEEDED_2048_PIXELS');
+                  console.warn('watcher warning size');
+                  resourcesLoader.setStatusCode(
+                    project,
+                    filename,
+                    'WARNING_IMAGE_EXCEEDED_2048_PIXELS'
+                  );
                 }
               });
 
               /*
-              chokidar.watch(pathResourceFound).on('all', (event, path) => {
+              watcher.on('all', (event, path) => {
                 console.log(event, path);
               });
               */

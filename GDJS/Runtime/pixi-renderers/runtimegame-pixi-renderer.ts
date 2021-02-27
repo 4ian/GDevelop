@@ -460,7 +460,7 @@ namespace gdjs {
       };
       // @ts-ignore
       renderer.view.onwheel = function (event) {
-        manager.onMouseWheel(event.deltaY);
+        manager.onMouseWheel(-event.deltaY);
       };
 
       //Touches

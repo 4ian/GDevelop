@@ -176,6 +176,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
 
       //Check that the object grabbed the platform
+      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
       expect(object.getX()).to.be.within(
         platform.getX() + platform.getWidth() + 0,
         platform.getX() + platform.getWidth() + 1
@@ -183,11 +184,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(platform.getY());
 
       object.getBehavior('auto1').simulateJumpKey();
+      //Check that the object is jumping
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
       }
-
-      //Check that the object is jumping
       expect(object.getY()).to.be.below(platform.getY());
     });
 

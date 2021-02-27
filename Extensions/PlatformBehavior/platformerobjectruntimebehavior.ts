@@ -384,7 +384,7 @@ namespace gdjs {
           //Ensure nothing is grabbed.
           this._releaseGrabbedPlatform();
           this._state = PlatformerObjectRuntimeBehavior.State.OnFloor;
-        } else {
+        } else if (this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
           //In the air
           this._canJump = false;
           if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
@@ -497,16 +497,6 @@ namespace gdjs {
       ) {
         this.checkGrabPlatform();
       }
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
-        !this._releaseKey
-      ) {
-        this._canJump = true;
-        this._currentJumpSpeed = 0;
-        this._currentFallSpeed = 0;
-        this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
-        this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
-      }
       if (this._releaseKey) {
         this._releaseGrabbedPlatform();
       }
@@ -517,6 +507,17 @@ namespace gdjs {
 
     beforeMovingY(timeDelta: float, oldX: float) {
       const object = this.owner;
+      
+      if (
+        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
+        !this._releaseKey
+      ) {
+        this._canJump = true;
+        this._currentJumpSpeed = 0;
+        this._currentFallSpeed = 0;
+        this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
+        this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
+      }
 
       if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
         if (this._upKey) {

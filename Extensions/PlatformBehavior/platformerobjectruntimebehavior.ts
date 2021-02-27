@@ -483,6 +483,10 @@ namespace gdjs {
         }
       }
 
+      if (this._releaseKey) {
+        this._releaseGrabbedPlatform();
+      }
+
       //Fall
       if (
         this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
@@ -500,9 +504,6 @@ namespace gdjs {
         this._state != PlatformerObjectRuntimeBehavior.State.OnFloor
       ) {
         this.checkGrabPlatform();
-      }
-      if (this._releaseKey) {
-        this._releaseGrabbedPlatform();
       }
 
       //Jumping

@@ -157,10 +157,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.getBehavior('auto1').simulateReleaseKey();
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
       }
 
       //Check that the object is falling
-      expect(object.getY()).to.be(1.25);
+      expect(object.getY()).to.be(3.75);
     });
 
     it('can grab a platform and jump', function () {

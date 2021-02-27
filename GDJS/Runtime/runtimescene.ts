@@ -39,7 +39,7 @@ namespace gdjs {
     _backgroundColor: integer = 0;
     _allInstancesList: gdjs.RuntimeObject[] = [];
     _onceTriggers: OnceTriggers;
-    _layersCameraCoordinates: any = {};
+    _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
     _instancesRemoved: gdjs.RuntimeObject[] = [];
     _profiler: gdjs.Profiler | null = null;
 
@@ -501,11 +501,15 @@ namespace gdjs {
         this._profiler.begin('render');
       }
 
-      // Uncomment to enable debug rendering (look for the implementation in the renderer
-      // to see what is rendered)
-      // if (this._layersCameraCoordinates) {
-      //  this.getRenderer().renderDebugDraw(this._allInstancesList, this._layersCameraCoordinates); //TODO
-      // }
+      // Set to true to enable debug rendering (look for the implementation in the renderer
+      // to see what is rendered).
+      const renderDebugDraw = false;
+      if (renderDebugDraw && this._layersCameraCoordinates) {
+        this.getRenderer().renderDebugDraw(
+          this._allInstancesList,
+          this._layersCameraCoordinates
+        );
+      }
       this._isJustResumed = false;
       this.render();
       if (this._profiler) {
@@ -755,11 +759,6 @@ namespace gdjs {
      */
     addObject(obj: RuntimeObject) {
       if (!this._instances.containsKey(obj.name)) {
-        console.log(
-          'RuntimeScene.addObject: No objects called "' +
-            obj.name +
-            '"! Adding it.'
-        );
         this._instances.put(obj.name, []);
       }
       this._instances.get(obj.name).push(obj);

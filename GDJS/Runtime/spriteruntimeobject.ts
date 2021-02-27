@@ -543,11 +543,11 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
+      //Beware, `this._animationFrame` can still be null.
       if (this._animationFrame === null) {
         return;
       }
 
-      //Beware, `this._animationFrame` can still be null.
       if (!this._animationFrame.hasCustomHitBoxes) {
         return super.updateHitBoxes();
       }

@@ -227,6 +227,11 @@ namespace gdjs {
       }
     }
 
+    setState(state: PlatformerObjectRuntimeBehavior.State) {
+      console.debug(`${PlatformerObjectRuntimeBehavior.getStateName(this._state)} --> ${PlatformerObjectRuntimeBehavior.getStateName(state)}`);
+      this._state = state;
+    }
+
     moveY() {
       const object = this.owner;
       //Move the object on Y axis
@@ -252,7 +257,7 @@ namespace gdjs {
         ) {
           //Jumpthru = obstacle <=> Only if not already overlapped when going down
           if (PlatformerObjectRuntimeBehavior.State.Jumping) {
-            this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+            this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
           }
           this._currentJumpSpeed = 0;
           if (
@@ -278,13 +283,13 @@ namespace gdjs {
         this._floorPlatform = null;
         this._currentJumpSpeed = 0;
         this._currentFallSpeed = 0;
-        this._state = PlatformerObjectRuntimeBehavior.State.OnLadder;
+        this.setState(PlatformerObjectRuntimeBehavior.State.OnLadder);
       }
     }
 
     checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
-        this._state = PlatformerObjectRuntimeBehavior.State.Jumping;
+        this.setState(PlatformerObjectRuntimeBehavior.State.Jumping);
         this._canJump = false;
         this._timeSinceCurrentJumpStart = 0;
         this._jumpKeyHeldSinceJumpStart = true;
@@ -333,8 +338,7 @@ namespace gdjs {
             true
           )
         ) {
-          this._state =
-            PlatformerObjectRuntimeBehavior.State.GrabbingPlatform;
+          this.setState(PlatformerObjectRuntimeBehavior.State.GrabbingPlatform);
           this._grabbedPlatform = collidingPlatform;
           this._requestedDeltaY = 0;
         } else {
@@ -383,12 +387,12 @@ namespace gdjs {
 
           //Ensure nothing is grabbed.
           this._releaseGrabbedPlatform();
-          this._state = PlatformerObjectRuntimeBehavior.State.OnFloor;
+          this.setState(PlatformerObjectRuntimeBehavior.State.OnFloor);
         } else if (this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
           //In the air
           this._canJump = false;
           if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
-            this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+            this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
             this._floorPlatform = null;
           }
         }
@@ -434,7 +438,7 @@ namespace gdjs {
           this._floorPlatform.owner.id
         )
       ) {
-        this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+        this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
         this._floorPlatform = null;
       }
 
@@ -475,7 +479,7 @@ namespace gdjs {
       if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
         //Coming to an extremity of a ladder
         if (!this._isOverlappingLadder()) {
-          this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+          this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
         }
       }
 
@@ -546,7 +550,7 @@ namespace gdjs {
         }
         if (this._currentJumpSpeed < 0) {
           this._currentJumpSpeed = 0;
-          this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+          this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
         }
       }
 
@@ -782,7 +786,7 @@ namespace gdjs {
       if (
         this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
       ) {
-        this._state = PlatformerObjectRuntimeBehavior.State.Falling;
+        this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
       }
 
       //Ensure nothing is grabbed.
@@ -1335,12 +1339,17 @@ namespace gdjs {
   }
 
   export namespace PlatformerObjectRuntimeBehavior {
-    export enum State {
-      Falling,
+    export const enum State {
+      Falling = 0,
       OnFloor,
       Jumping,
       OnLadder,
       GrabbingPlatform,
+    }
+
+    const stateNames = ["Falling", "OnFloor", "Jumping", "OnLadder", "GrabbingPlatform"];
+    export function getStateName(state: PlatformerObjectRuntimeBehavior.State): String {
+      return stateNames[state];
     }
   }
 

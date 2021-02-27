@@ -44,6 +44,7 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
+    _jumpingFirstDelta:boolean = false;
     _state: PlatformerObjectRuntimeBehavior.State =
       PlatformerObjectRuntimeBehavior.State.Falling;
 
@@ -289,6 +290,9 @@ namespace gdjs {
 
     checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
+        if (this._state != PlatformerObjectRuntimeBehavior.State.Jumping) {
+          this._jumpingFirstDelta = true;
+        }
         this.setState(PlatformerObjectRuntimeBehavior.State.Jumping);
         this._canJump = false;
         this._timeSinceCurrentJumpStart = 0;
@@ -487,8 +491,12 @@ namespace gdjs {
         this._releaseGrabbedPlatform();
       }
 
+      //Jumping
+      this.checkTransitionJumping();
+
       //Fall
       if (
+        !this._jumpingFirstDelta &&
         this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
         this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
         this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
@@ -505,9 +513,6 @@ namespace gdjs {
       ) {
         this.checkGrabPlatform();
       }
-
-      //Jumping
-      this.checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
@@ -660,6 +665,8 @@ namespace gdjs {
       const SPACEKEY = 32;
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+
+      this._jumpingFirstDelta = false;
 
       //0.1) Get the player input:
       this._requestedDeltaX = 0;

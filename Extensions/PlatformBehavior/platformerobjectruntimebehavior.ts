@@ -473,13 +473,6 @@ namespace gdjs {
       //Go on a ladder
       this.checkTransitionOnLadder();
       if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
-        if (this._upKey) {
-          this._requestedDeltaY -= this._ladderClimbingSpeed * timeDelta;
-        }
-        if (this._downKey) {
-          this._requestedDeltaY += this._ladderClimbingSpeed * timeDelta;
-        }
-
         //Coming to an extremity of a ladder
         if (!this._isOverlappingLadder()) {
           this._state = PlatformerObjectRuntimeBehavior.State.Falling;
@@ -524,6 +517,16 @@ namespace gdjs {
 
     beforeMovingY(timeDelta: float, oldX: float) {
       const object = this.owner;
+
+      if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
+        if (this._upKey) {
+          this._requestedDeltaY -= this._ladderClimbingSpeed * timeDelta;
+        }
+        if (this._downKey) {
+          this._requestedDeltaY += this._ladderClimbingSpeed * timeDelta;
+        }
+      }
+
       // Check if the jump key is continuously held since
       // the beginning of the jump.
       if (!this._jumpKey) {

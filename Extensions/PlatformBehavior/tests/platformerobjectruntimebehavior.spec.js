@@ -1060,18 +1060,16 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       stayOnLadder(10);
       climbLadder(14);
       // Check that we reached the maximum height
-      // The player goes a little over the ladder...
-      object.getBehavior('auto1').simulateUpKey();
-      runtimeScene.renderAndStep(1000 / 60);
       const playerAtLadderTop = ladder.getY() - object.getHeight();
       expect(object.getY()).to.be.within(
         playerAtLadderTop - 3,
         playerAtLadderTop
       );
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
 
+      // The player goes a little over the ladder...
+      object.getBehavior('auto1').simulateUpKey();
       // ...and it falls even if up is pressed
-      for (let i = 0; i < 12; ++i) {
+      for (let i = 0; i < 13; ++i) {
         object.getBehavior('auto1').simulateUpKey();
         fall(1);
       }

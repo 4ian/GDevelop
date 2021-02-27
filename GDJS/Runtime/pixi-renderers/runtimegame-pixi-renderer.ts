@@ -459,8 +459,8 @@ namespace gdjs {
         return false;
       };
       // @ts-ignore
-      renderer.view.onmousewheel = function (event) {
-        manager.onMouseWheel(event.wheelDelta);
+      renderer.view.onwheel = function (event) {
+        manager.onMouseWheel(event.deltaY);
       };
 
       //Touches

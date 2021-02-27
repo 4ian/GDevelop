@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
   extension.SetExtensionInformation(
       "BuiltinAdvanced",
       _("Advanced control features"),
-      _("Built-in extension providing advanced control features."),
+      _("Advanced control features to be used in events."),
       "Florian Rival",
       "Open source (MIT License)");
 
@@ -71,6 +71,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function16.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("trueorfalse", "Should the condition be true or false?")
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("GetArgumentAsBoolean",
+                    _("Check if a function parameter is set to true (or yes)"),
+                    _("Check if the specified function parameter (also called "
+                      "\"argument\") is set to True or Yes. If the argument is "
+                      "a string, an empty string is considered as \"false\". "
+                      "If it's a number, 0 is considered as \"false\"."),
+                    _("Parameter _PARAM0_ is true"),
+                    _("Functions"),
+                    "res/function24.png",
+                    "res/function16.png")
+      .AddParameter("string", "Parameter name")
       .MarkAsAdvanced();
 
   extension

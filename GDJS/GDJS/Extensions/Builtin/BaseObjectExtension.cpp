@@ -189,6 +189,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
   objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
+  objectExpressions["DistanceToPosition"].SetFunctionName("getDistanceToPosition");
+  objectExpressions["SqDistanceToPosition"].SetFunctionName("getSqDistanceToPosition");
+  objectExpressions["AngleToObject"].SetFunctionName("getAngleToObject");
+  objectExpressions["AngleToPosition"].SetFunctionName("getAngleToPosition");
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");

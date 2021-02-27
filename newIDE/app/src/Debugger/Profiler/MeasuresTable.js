@@ -136,7 +136,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
               <Table
                 headerHeight={30}
                 height={height}
-                className={muiTheme.tableRootClassName}
+                className={`gd-table ${muiTheme.tableRootClassName}`}
                 headerClassName={'tableHeaderColumn'}
                 rowCount={dataRows.length}
                 rowGetter={({ index }) => dataRows[index]}

@@ -5,6 +5,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
+import classNames from 'classnames';
 
 const styles = {
   defaultBody: {
@@ -49,6 +50,7 @@ type Props = {|
 
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
+  fullHeight?: boolean,
 
   // Style:
   noMargin?: boolean,
@@ -79,6 +81,7 @@ export default (props: Props) => {
     children,
     flexRowBody,
     flexBody,
+    fullHeight,
     noTitleMargin,
   } = props;
   const dialogActions = secondaryActions ? (
@@ -103,7 +106,10 @@ export default (props: Props) => {
           onClose={onRequestClose}
           fullWidth
           fullScreen={size === 'small'}
-          className={size === 'small' ? 'safe-area-aware-container' : undefined}
+          className={classNames({
+            'safe-area-aware-container': size === 'small',
+            'full-height-modal': fullHeight,
+          })}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
           disableBackdropClick={false}
           disableEscapeKeyDown={false}

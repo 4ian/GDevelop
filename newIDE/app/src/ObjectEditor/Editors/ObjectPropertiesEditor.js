@@ -8,8 +8,13 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type EditorProps } from './EditorProps.flow';
 import { Column, Line } from '../../UI/Grid';
-import { getExtraObjectsInformation } from '../../Hints';
+import {
+  getExtraObjectsInformation,
+  getObjectTutorialHints,
+} from '../../Hints';
 import AlertMessage from '../../UI/AlertMessage';
+import { ColumnStackLayout } from '../../UI/Layout';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -43,10 +48,18 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
       objectAsGdObject.getType()
     ];
 
+    const tutorialHints = getObjectTutorialHints(objectAsGdObject.getType());
+
     return (
       <I18n>
         {({ i18n }) => (
-          <Column>
+          <ColumnStackLayout>
+            {tutorialHints.map(tutorialHint => (
+              <DismissableTutorialMessage
+                key={tutorialHint.identifier}
+                tutorialHint={tutorialHint}
+              />
+            ))}
             {propertiesSchema.length ? (
               <React.Fragment>
                 {extraInformation ? (
@@ -78,7 +91,7 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
                 </Trans>
               </EmptyMessage>
             )}
-          </Column>
+          </ColumnStackLayout>
         )}
       </I18n>
     );

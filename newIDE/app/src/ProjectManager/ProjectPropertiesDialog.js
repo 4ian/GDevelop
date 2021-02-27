@@ -21,6 +21,11 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import ExtensionsProperties from './ExtensionsProperties';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
+import RaisedButton from '../UI/RaisedButton';
+import Window from '../Utils/Window';
+import { I18n } from '@lingui/react';
+import AlertMessage from '../UI/AlertMessage';
+import { GameRegistration } from '../GameDashboard/GameRegistration';
 
 type Props = {|
   project: gdProject,
@@ -45,6 +50,7 @@ type ProjectProperties = {|
   minFPS: number,
   maxFPS: number,
   isFolderProject: boolean,
+  useDeprecatedZeroAsDefaultZOrder: boolean,
 |};
 
 function loadPropertiesFromProject(project: gdProject): ProjectProperties {
@@ -63,6 +69,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
+    useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
 }
 
@@ -86,6 +93,7 @@ function applyPropertiesToProject(
     minFPS,
     maxFPS,
     isFolderProject,
+    useDeprecatedZeroAsDefaultZOrder,
   } = newProperties;
   project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
   project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
@@ -100,6 +108,7 @@ function applyPropertiesToProject(
   project.setMaximumFPS(maxFPS);
   project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
   project.setFolderProject(isFolderProject);
+  project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
   return displayProjectErrorsBox(t, getErrors(t, project));
 }
@@ -144,6 +153,10 @@ function ProjectPropertiesDialog(props: Props) {
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
   );
+  let [
+    useDeprecatedZeroAsDefaultZOrder,
+    setUseDeprecatedZeroAsDefaultZOrder,
+  ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
 
   const defaultPackageName = 'com.example.mygame';
   const defaultVersion = '1.0.0';
@@ -183,6 +196,7 @@ function ProjectPropertiesDialog(props: Props) {
                   minFPS,
                   maxFPS,
                   isFolderProject,
+                  useDeprecatedZeroAsDefaultZOrder,
                 })
               )
                 props.onApply();
@@ -266,6 +280,51 @@ function ProjectPropertiesDialog(props: Props) {
             value={author}
             onChange={setAuthor}
           />
+          {useDeprecatedZeroAsDefaultZOrder ? (
+            <React.Fragment>
+              <Text size="title">
+                <Trans>Z Order of objects created from events</Trans>
+              </Text>
+              <AlertMessage kind="info">
+                <Trans>
+                  When you create an object using an action, GDevelop now sets
+                  the Z order of the object to the maximum value that was found
+                  when starting the scene for each layer. This allow to make
+                  sure that objects that you create are in front of others. This
+                  game was created before this change, so GDevelop maintains the
+                  old behavior: newly created objects Z order is set to 0. It's
+                  recommended that you switch to the new behavior by clicking
+                  the following button.
+                </Trans>
+              </AlertMessage>
+              <I18n>
+                {({ i18n }) => (
+                  <RaisedButton
+                    onClick={() => {
+                      const answer = Window.showConfirmDialog(
+                        i18n._(
+                          t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommened)?`
+                        )
+                      );
+                      if (!answer) return;
+
+                      setUseDeprecatedZeroAsDefaultZOrder(false);
+                    }}
+                    label={
+                      <Trans>
+                        Switch to create objects with the highest Z order of the
+                        layer
+                      </Trans>
+                    }
+                  />
+                )}
+              </I18n>
+            </React.Fragment>
+          ) : null}
+          <Text size="title">
+            <Trans>Analytics</Trans>
+          </Text>
+          <GameRegistration project={project} />
           <Text size="title">
             <Trans>Resolution and rendering</Trans>
           </Text>

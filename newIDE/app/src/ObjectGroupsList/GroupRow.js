@@ -8,6 +8,7 @@ import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 type Props = {|
   group: gdObjectGroup,
@@ -53,8 +54,7 @@ export default class GroupRow extends React.Component<Props, {||}> {
         defaultValue={groupName}
         onBlur={e => this.props.onRename(e.target.value)}
         onKeyPress={event => {
-          if (event.charCode === 13) {
-            // enter key pressed
+          if (shouldValidate(event)) {
             this.textField.blur();
           }
         }}

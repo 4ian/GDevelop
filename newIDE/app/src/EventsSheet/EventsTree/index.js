@@ -30,6 +30,7 @@ import './style.css';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 const gd: libGDevelop = global.gd;
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
@@ -89,6 +90,7 @@ type EventsContainerProps = {|
 
   screenType: ScreenType,
   windowWidth: WidthType,
+  eventsSheetHeight: number,
 |};
 
 /**
@@ -156,6 +158,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
             renderObjectThumbnail={this.props.renderObjectThumbnail}
             screenType={this.props.screenType}
             windowWidth={this.props.windowWidth}
+            eventsSheetHeight={this.props.eventsSheetHeight}
           />
         )}
       </div>
@@ -221,6 +224,7 @@ type EventsTreeProps = {|
 
   screenType: ScreenType,
   windowWidth: WidthType,
+  eventsSheetHeight: number,
 |};
 
 // A node displayed by the SortableTree. Almost always represents an
@@ -468,7 +472,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     if (!object) return null;
 
     return (
-      <img
+      <CorsAwareImage
         className={classNames({
           [icon]: true,
         })}
@@ -524,6 +528,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         renderObjectThumbnail={this._renderObjectThumbnail}
         screenType={this.props.screenType}
         windowWidth={this.props.windowWidth}
+        eventsSheetHeight={this.props.eventsSheetHeight}
       />
     );
   };

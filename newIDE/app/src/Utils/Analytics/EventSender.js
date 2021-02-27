@@ -164,16 +164,18 @@ export const sendHelpSearch = (searchText: string) => {
 };
 
 export const sendErrorMessage = (
-  errorMessage: string,
-  type: string,
-  rawError: any
+  message: string,
+  type: 'error' | 'error-boundary',
+  rawError: any,
+  errorId: string
 ) => {
   if (isDev || !client) return;
 
   client.recordEvent('error_message', {
-    message: errorMessage,
+    message,
     type,
     rawError,
+    errorId,
   });
 };
 
@@ -210,6 +212,42 @@ export const sendSubscriptionDialogShown = () => {
   if (isDev || !client) return;
 
   client.recordEvent('subscription-dialog-shown', {});
+};
+
+export const sendAssetOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-opened', { id, name });
+};
+
+export const sendAssetAddedToProject = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-added-to-project', { id, name });
+};
+
+export const sendNewObjectCreated = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('new-object-created', { name });
+};
+
+export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('showcase-open-game-link', { title, linkType });
 };
 
 export const sendChoosePlanClicked = (planId: string | null) => {

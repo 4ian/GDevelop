@@ -29,9 +29,7 @@ module.exports = {
       .setExtensionInformation(
         'P2P',
         _('Peer-to-Peer communication (experimental)'),
-        _(
-          'Allow game instances to communicate remotely using messages sent via WebRTC (P2P)'
-        ),
+        'Allow game instances to communicate remotely using messages sent via WebRTC (P2P).',
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
@@ -297,6 +295,22 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.getEventData');
+
+    extension
+      .addStrExpression(
+        'GetEventSender',
+        _('Get event sender'),
+        _(
+          'Returns the id of the peer that triggered the event'
+        ),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('Event name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.getEventSender');
 
     extension
       .addStrExpression(

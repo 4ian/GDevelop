@@ -47,7 +47,7 @@ if (isWin) {
   );
   shell.exit(0);
 } else {
-  msgcat = shell.exec('type msgcat 2>/dev/null', { silent: true }).stdout;
+  msgcat = shell.exec('which msgcat 2>/dev/null', { silent: true }).stdout;
   if (!msgcat) {
     msgcat = shell.exec('find /usr -name "msgcat" -print -quit 2>/dev/null', {
       silent: true,

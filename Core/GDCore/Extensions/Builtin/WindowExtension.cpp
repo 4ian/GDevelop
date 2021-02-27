@@ -12,12 +12,14 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinWindow",
-                               _("Window features"),
-                               _("Built-in extension allowing to manipulate "
-                                 "the game window and canvas"),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinWindow",
+          _("Window features"),
+          "Provides actions and conditions to manipulate the game window. "
+          "Depending on the platform on which the game is running, not all of "
+          "these features can be applied.",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/window");
 
 #if defined(GD_IDE_ONLY)
@@ -39,14 +41,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       .SetDefaultValue("yes");
 
   extension
-      .AddCondition(
-          "IsFullScreen",
-          _("Fullscreen activated?"),
-          _("Check if the game is currently in fullscreen."),
-          _("The game is in fullscreen"),
-          _("Game's window and resolution"),
-          "res/actions/fullscreen24.png",
-          "res/actions/fullscreen.png")
+      .AddCondition("IsFullScreen",
+                    _("Fullscreen activated?"),
+                    _("Check if the game is currently in fullscreen."),
+                    _("The game is in fullscreen"),
+                    _("Game's window and resolution"),
+                    "res/actions/fullscreen24.png",
+                    "res/actions/fullscreen.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension

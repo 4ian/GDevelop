@@ -13,6 +13,8 @@ import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -63,6 +65,11 @@ export default class ForEachEvent extends React.Component<
   };
 
   endEditing = () => {
+    const { anchorEl } = this.state;
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editing: false,
       anchorEl: null,
@@ -89,12 +96,20 @@ export default class ForEachEvent extends React.Component<
               [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
+            onKeyPress={event => {
+              if (shouldActivate(event)) {
+                this.edit(event);
+              }
+            }}
+            tabIndex={0}
           >
             {objectName ? (
-              `Repeat for each instance of ${objectName}:`
+              <Trans>Repeat for each instance of {objectName}:</Trans>
             ) : (
               <i>
-                Click to choose for which objects this event will be repeated
+                <Trans>
+                  Click to choose for which objects this event will be repeated
+                </Trans>
               </i>
             )}
           </span>
@@ -171,6 +186,7 @@ export default class ForEachEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
+            onRequestClose={this.endEditing}
             ref={objectField => (this._objectField = objectField)}
           />
         </InlinePopover>

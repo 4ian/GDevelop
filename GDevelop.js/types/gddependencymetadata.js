@@ -11,7 +11,8 @@ declare class gdDependencyMetadata {
   setDependencyType(dependencyType_: string): gdDependencyMetadata;
   setExtraSetting(settingName: string, settingValue: gdPropertyDescriptor): gdDependencyMetadata;
   getAllExtraSettings(): gdMapStringPropertyDescriptor;
-  onlyIfExtraSettingIsNonEmpty(settingName: string): gdDependencyMetadata;
+  onlyIfSomeExtraSettingsNonEmpty(): gdDependencyMetadata;
+  onlyIfOtherDependencyIsExported(otherDependency: string): gdDependencyMetadata;
   delete(): void;
   ptr: number;
 };

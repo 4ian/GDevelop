@@ -19,6 +19,7 @@ type Props = {|
 
 export type ScrollViewInterface = {|
   scrollTo: (target: ?React$Component<any, any>) => void,
+  scrollToBottom: () => void,
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
@@ -29,21 +30,30 @@ export default React.forwardRef<Props, ScrollViewInterface>(
        * Scroll the view to the target component.
        */
       scrollTo: (target: ?React$Component<any, any>) => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return;
+
         const targetElement = ReactDOM.findDOMNode(target);
         if (targetElement instanceof HTMLElement) {
           const yPosition = targetElement.getBoundingClientRect().top;
-          const scrollViewElement = scrollView.current;
 
-          if (scrollViewElement) {
-            const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-              .top;
-            scrollViewElement.scrollTop += yPosition - scrollViewYPosition;
-          }
+          const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
+            .top;
+          scrollViewElement.scrollTop += yPosition - scrollViewYPosition;
         } else {
           console.error(
             'Tried to scroll to something that is not a HTMLElement'
           );
         }
+      },
+      /**
+       * Scroll the view to the bottom.
+       */
+      scrollToBottom: () => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return;
+
+        scrollViewElement.scrollTop = scrollViewElement.scrollHeight;
       },
     }));
 

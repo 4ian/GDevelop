@@ -5,7 +5,6 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
   type LoginForm,
@@ -13,6 +12,7 @@ import {
 } from '../Utils/GDevelopServices/Authentification';
 import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
+import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {|
   onClose: () => void,
@@ -100,7 +100,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
         cannotBeDismissed={true}
         open
       >
-        <Column noMargin>
+        <ColumnStackLayout noMargin>
           <BackgroundText>
             <Trans>
               By creating an account and using GDevelop, you agree to the Terms
@@ -110,6 +110,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             </Trans>
           </BackgroundText>
           <TextField
+            autoFocus
             value={this.state.form.email}
             floatingLabelText={<Trans>Email</Trans>}
             errorText={getEmailErrorText(error)}
@@ -138,7 +139,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
               });
             }}
           />
-        </Column>
+        </ColumnStackLayout>
       </Dialog>
     );
   }

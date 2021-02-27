@@ -1,5 +1,6 @@
 import React from 'react';
 import Checkbox from '../../UI/Checkbox';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import {
   checkImageElementSize,
@@ -118,7 +119,7 @@ const ImageThumbnail = ({
           }}
           {...longTouchForContextMenuProps}
         >
-          <img
+          <CorsAwareImage
             style={styles.spriteThumbnailImage}
             alt={hasThumbnailMissing ? '' : resourceName}
             src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}

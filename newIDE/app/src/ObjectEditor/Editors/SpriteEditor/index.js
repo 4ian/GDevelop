@@ -277,7 +277,8 @@ class AnimationsListContainer extends React.Component<
 
     if (newName !== '' && otherNames.filter(name => name === newName).length) {
       showWarningBox(
-        'Another animation with this name already exists. Please use another name.'
+        'Another animation with this name already exists. Please use another name.',
+        { delayToNextTick: true }
       );
       return;
     }

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\splash-screen\\game.json",
+    "projectUuid": "eae9abe7-bdc9-4be4-982a-e90b8d606efe",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -158,7 +155,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "5d61158c-df0a-49a3-8b2d-80b59385a7ff",
+          "persistentUuid": "1eeb7c61-9154-47eb-9639-57c774a221d1",
           "width": 0,
           "x": 383.5,
           "y": 270,

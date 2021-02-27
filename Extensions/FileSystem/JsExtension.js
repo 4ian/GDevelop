@@ -20,7 +20,10 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -305,7 +308,9 @@ module.exports = {
       .addAction(
         'DeleteFileAsync',
         _('Delete a file (Async)'),
-        _('Delete a file from the filesystem asynchronously. The option result variable will be updated once the file is deleted.'),
+        _(
+          'Delete a file from the filesystem asynchronously. The option result variable will be updated once the file is deleted.'
+        ),
         _('Delete the file _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_delete_file24.png',
@@ -366,8 +371,8 @@ module.exports = {
     extension
       .addStrExpression(
         'ExecutablePath',
-        _('This games executable folder'),
-        _('Get the path to this games executable folder.'),
+        _('Game executable file'),
+        _('Get the path to this game executable file.'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -378,9 +383,22 @@ module.exports = {
 
     extension
       .addStrExpression(
+        'ExecutableFolderPath',
+        _('Game executable folder'),
+        _('Get the path to this game executable folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
+        'JsPlatform/Extensions/filesystem_folder32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.getExecutableFolderPath');
+
+    extension
+      .addStrExpression(
         'UserdataPath',
-        _('Userdata folder (For application settings)'),
-        _('Get the path to userdata folder. (For application settings)'),
+        _('Userdata folder (for application settings)'),
+        _('Get the path to userdata folder (for application settings).'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -392,7 +410,7 @@ module.exports = {
     extension
       .addStrExpression(
         'UserHomePath',
-        _('User\'s Home folder'),
+        _("User's Home folder"),
         _('Get the path to the user home folder.'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder32.png'
@@ -418,7 +436,7 @@ module.exports = {
       .addStrExpression(
         'PathDelimiter',
         _('Path delimiter'),
-        _('Get the operating system agnostic path delimiter.'),
+        _('Get the operating system path delimiter.'),
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -426,9 +444,55 @@ module.exports = {
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.getPathDelimiter');
 
+    extension
+      .addStrExpression(
+        'DirectoryName',
+        _('Get directory name from a path'),
+        _(
+          'Returns the portion of the path that represents the directories, without the ending file name.'
+        ),
+        _('Filesystem/Windows, Linux, MacOS'),
+        'JsPlatform/Extensions/filesystem_folder32.png'
+      )
+      .addParameter('string', _('File or folder path'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.getDirectoryName');
+
+    extension
+      .addStrExpression(
+        'FileName',
+        _('Get file name from a path'),
+        _('Returns the name of the file with its extension, if any.'),
+        _('Filesystem/Windows, Linux, MacOS'),
+        'JsPlatform/Extensions/filesystem_folder32.png'
+      )
+      .addParameter('string', _('File path'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.getFileName');
+
+    extension
+      .addStrExpression(
+        'ExtensionName',
+        _('Get the extension from a file path'),
+        _(
+          'Returns the extension of the file designated by the given path, including the extension period. For example: ".txt".'
+        ),
+        _('Filesystem/Windows, Linux, MacOS'),
+        'JsPlatform/Extensions/filesystem_folder32.png'
+      )
+      .addParameter('string', _('File path'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
+      .setFunctionName('gdjs.fileSystem.getExtensionName');
+
     return extension;
   },
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
 };

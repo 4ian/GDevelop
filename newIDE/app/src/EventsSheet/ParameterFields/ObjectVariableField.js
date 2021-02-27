@@ -61,6 +61,7 @@ export default class ObjectVariableField extends React.Component<
           value={this.props.value}
           onChange={this.props.onChange}
           isInline={this.props.isInline}
+          onRequestClose={this.props.onRequestClose}
           ref={field => (this._field = field)}
           onOpenDialog={() => this.setState({ editorOpen: true })}
           globalObjectsContainer={this.props.globalObjectsContainer}

@@ -137,14 +137,15 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     }
   };
 
-  handleUpdatedSubscriptionFailure = (i18n: I18nType, err: Error) => {
+  handleUpdatedSubscriptionFailure = (i18n: I18nType, rawError: Error) => {
     this.setState({ isLoading: false });
-    showErrorBox(
-      i18n._(
+    showErrorBox({
+      message: i18n._(
         t`Your subscription could not be updated. Please try again later!`
       ),
-      err
-    );
+      rawError,
+      errorId: 'subscription-update-error',
+    });
   };
 
   _renderPrice(plan: PlanDetails): React.Node {

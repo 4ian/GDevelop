@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,13 @@
   "properties": {
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
+    "projectUuid": "c82d449a-9975-4c9d-a003-8683951a8a09",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Platformer",
     "author": "",
     "windowWidth": 800,
@@ -197,33 +193,6 @@
         "kind": "image",
         "metadata": "",
         "name": "p1_walk08.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk09.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk09.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk10.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk10.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
-        "file": "https://resources.gdevelop-app.com/examples/platformer/p1_walk11.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "p1_walk11.png",
         "smoothed": true,
         "userAdded": false
       },
@@ -469,6 +438,49 @@
         "name": "shadedDark09.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/platformer/tiled_Forest Background.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "tiled_Forest Background.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/platformer/D-pad top.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "D-pad top.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/platformer/D-pad bottom.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "D-pad bottom.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "https://resources.gdevelop-app.com/examples/platformer/life lost sound.wav",
+        "kind": "audio",
+        "metadata": "",
+        "name": "life lost sound.wav",
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://resources.gdevelop-app.com/examples/platformer/NewFile-1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "NewFile-1.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -501,7 +513,7 @@
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
-        "zoomFactor": 0.5306
+        "zoomFactor": 0.4606
       },
       "objectsGroups": [
         {
@@ -529,6 +541,12 @@
             },
             {
               "name": "ArrowButtonsBg"
+            },
+            {
+              "name": "TopButton"
+            },
+            {
+              "name": "BottomButton"
             }
           ]
         }
@@ -537,6 +555,18 @@
         {
           "name": "Score",
           "value": "0"
+        },
+        {
+          "name": "CheckpointX",
+          "value": "0"
+        },
+        {
+          "name": "CheckpointY",
+          "value": "0"
+        },
+        {
+          "name": "PlayerJustDead",
+          "value": ""
         }
       ],
       "instances": [
@@ -547,9 +577,9 @@
           "layer": "",
           "locked": false,
           "name": "Player",
-          "persistentUuid": "2684dbba-d064-4b1f-9c54-e64855171408",
+          "persistentUuid": "788c041d-1b63-42b6-a22a-e95262a08f83",
           "width": 0,
-          "x": 37.1229,
+          "x": -35,
           "y": 290.508,
           "zOrder": 20,
           "numberProperties": [],
@@ -563,7 +593,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "89a0d758-ad72-4263-889d-6040d310f713",
+          "persistentUuid": "22e46c09-0b92-474b-b139-ee7a28fac131",
           "width": 0,
           "x": 742.246,
           "y": 500.569,
@@ -584,7 +614,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "2275e08f-47a4-4a0d-b259-41b5ab973833",
+          "persistentUuid": "0ae5867c-f6bb-4458-b8bc-c5f8bb3a5338",
           "width": 0,
           "x": 933.139,
           "y": 300.692,
@@ -600,7 +630,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "d8e5ac0b-1bc1-4b1b-88a7-c51283192f91",
+          "persistentUuid": "bbdb0455-667f-422d-9dcd-21ba15f60a40",
           "width": 0,
           "x": 755.6,
           "y": 418,
@@ -616,7 +646,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
-          "persistentUuid": "a246ebb8-1f4c-498b-93ff-dc759d566bd5",
+          "persistentUuid": "7b55098b-4ff4-4609-89df-197bd1a0de3b",
           "width": 0,
           "x": 847.908,
           "y": 359.923,
@@ -632,7 +662,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "717a9e44-0167-4a0f-bc25-4d5517004fe4",
+          "persistentUuid": "cfb83ad3-a943-4e6e-aeb7-d35ccdf7f90f",
           "width": 0,
           "x": 1045,
           "y": 268,
@@ -648,7 +678,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "dfb16514-1a11-423a-bd75-fd1d30414280",
+          "persistentUuid": "a62a7ebb-d296-4348-bcdf-c8469ac6769b",
           "width": 0,
           "x": 1115,
           "y": 268,
@@ -664,7 +694,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
-          "persistentUuid": "056a9557-c890-45b7-8813-17d3d0eea781",
+          "persistentUuid": "b3af049c-dacf-48fe-8973-5734e0eb6ce1",
           "width": 4222.89,
           "x": -583.046,
           "y": 570,
@@ -680,7 +710,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
-          "persistentUuid": "ab4d588a-bb77-4526-bc79-b0bbb96d798e",
+          "persistentUuid": "05e616a8-abe0-4998-b72d-cbe45c41b146",
           "width": 502.923,
           "x": -572.923,
           "y": 83,
@@ -696,7 +726,7 @@
           "layer": "",
           "locked": false,
           "name": "MovingPlatform",
-          "persistentUuid": "31d7b76a-1288-4eae-ad95-b03f932de05f",
+          "persistentUuid": "562e4641-884e-46ca-845b-482c9cb5962a",
           "width": 0,
           "x": 1195.45,
           "y": 297.615,
@@ -712,7 +742,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "7e8ae617-3198-4de0-85ee-d11830583fe4",
+          "persistentUuid": "ed416599-13ff-475d-b91a-3e759a9bf8a9",
           "width": 0,
           "x": 1890.68,
           "y": 499.692,
@@ -733,7 +763,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "97f3812c-108d-4658-8e81-b19ae2d0afde",
+          "persistentUuid": "9543dedc-5f1a-40de-954b-3f0ab5760631",
           "width": 0,
           "x": 1673.6,
           "y": 289.692,
@@ -754,7 +784,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "a88fffe3-46fb-4597-8bc5-f195fd327a81",
+          "persistentUuid": "31016c6a-b199-4ec3-aa20-666d68110687",
           "width": 0,
           "x": 1673.6,
           "y": 359.692,
@@ -770,7 +800,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "466ebcc8-f6d4-4fd9-8d2a-540d2b7c59e1",
+          "persistentUuid": "5c1bd76b-d542-4fef-87ec-3494350c1668",
           "width": 0,
           "x": 1673.6,
           "y": 499.692,
@@ -786,7 +816,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "b1e59d50-8326-4d18-9dac-f581916b70de",
+          "persistentUuid": "b1019fc6-fd11-44eb-9441-6d26b59a5cc6",
           "width": 0,
           "x": 1673.6,
           "y": 429.692,
@@ -802,7 +832,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "b01e146f-f0bc-4ebc-b9d5-8bef05b45e83",
+          "persistentUuid": "0f8e94bf-6a6e-4cf0-afe2-12c6a51205f1",
           "width": 0,
           "x": 1745.52,
           "y": 499.385,
@@ -818,7 +848,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "ae32c9d3-9fb3-4b86-878a-99d68e8fd4f4",
+          "persistentUuid": "d7d3655a-8a0d-4aa1-8a5f-73a19e21187d",
           "width": 0,
           "x": 1745.52,
           "y": 429.385,
@@ -834,7 +864,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "cb1f7132-1609-4996-bb2f-29b84e2da687",
+          "persistentUuid": "ce10a257-6627-4480-9806-b3e14061004e",
           "width": 0,
           "x": 1818.75,
           "y": 499.692,
@@ -850,7 +880,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "0b5e9be3-da70-4788-8ff7-fedcdf339308",
+          "persistentUuid": "724c9654-aa90-4e34-85bb-174ed5c1e511",
           "width": 0,
           "x": 1817.75,
           "y": 429.692,
@@ -871,7 +901,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
-          "persistentUuid": "dc23eeb2-486b-4df4-81e5-82b92a6ff0ce",
+          "persistentUuid": "b32fbc8d-e909-4433-8366-fbce162d67af",
           "width": 0,
           "x": 1667.37,
           "y": 291.246,
@@ -887,7 +917,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "90464d15-9c80-48a1-8356-37e9fee97e18",
+          "persistentUuid": "e34ebc68-d8d9-4c46-a87e-8227a7e47ef6",
           "width": 0,
           "x": 1176.98,
           "y": 295.169,
@@ -903,7 +933,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "56a88068-e1e9-45b9-8a45-ec8586f8da7a",
+          "persistentUuid": "f1fb91c2-d269-47ab-95ba-ffb98b2e48a3",
           "width": 0,
           "x": 2974.06,
           "y": 247,
@@ -919,7 +949,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "288b4eaf-c925-436b-9d32-1d3c85e6a993",
+          "persistentUuid": "ff87eff8-6ab2-45fd-b6d7-635380a6bf1f",
           "width": 0,
           "x": 2593.6,
           "y": 500.231,
@@ -940,7 +970,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "12cb8dae-8b2a-45f8-943b-c0a2e69651f5",
+          "persistentUuid": "6bde59af-9825-4bb2-9a54-cf2aae33c031",
           "width": 0,
           "x": 2665.83,
           "y": 430.231,
@@ -961,7 +991,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "93f3d35b-9156-4d3d-b534-87a42be240fb",
+          "persistentUuid": "dfd6b4d4-0877-4e63-9fd4-1fa3bdc70447",
           "width": 0,
           "x": 2665.6,
           "y": 499.769,
@@ -977,7 +1007,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "19d76909-dd42-45fc-acb1-dc461331df96",
+          "persistentUuid": "98ba0687-173c-415b-9a2f-a1f190a3eb69",
           "width": 0,
           "x": 1745.52,
           "y": 359.385,
@@ -998,9 +1028,9 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
-          "persistentUuid": "3eba7501-56a6-4df2-84a5-7ce83d880562",
+          "persistentUuid": "7baa1486-2886-496d-a791-357f80f4212d",
           "width": 0,
-          "x": 49.2766,
+          "x": -23.7234,
           "y": 291.738,
           "zOrder": 1,
           "numberProperties": [],
@@ -1014,7 +1044,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "f232e86e-0868-40f0-82e9-f8caee948386",
+          "persistentUuid": "b43ba0cf-8ac2-4e46-ad12-6215b493f50e",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -1035,7 +1065,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
-          "persistentUuid": "b2f44cff-56cd-400c-bee9-22252cc3c41d",
+          "persistentUuid": "d49b599a-8275-4e32-83c7-fbd2787fcd1a",
           "width": 0,
           "x": 687.677,
           "y": 527.461,
@@ -1051,7 +1081,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
-          "persistentUuid": "66f539ec-b14e-49ad-bf35-5801f4f1cf3d",
+          "persistentUuid": "a58ea2fd-c543-494f-b3da-3283646c5041",
           "width": 0,
           "x": 286.2,
           "y": 528.461,
@@ -1067,7 +1097,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "b7c544f9-1d33-42a7-b5b0-539f98092cb7",
+          "persistentUuid": "ffd47f18-783e-41c3-837e-c724eb6f0f30",
           "width": 0,
           "x": 1971.78,
           "y": 539.016,
@@ -1083,7 +1113,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
-          "persistentUuid": "6cd88316-799b-447d-a811-57e9eaa4da67",
+          "persistentUuid": "49fcae37-ac51-4e71-b0dd-1508e45655c8",
           "width": 0,
           "x": 2553.78,
           "y": 538.016,
@@ -1094,186 +1124,12 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "abbd2db3-ee92-4632-893d-edd0ebefbb5a",
-          "width": 0,
-          "x": 2181.78,
-          "y": 59.0157,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 2
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "fa065c2b-0baa-49c3-a1f6-422aebcaf2b5",
-          "width": 0,
-          "x": 151.785,
-          "y": 182.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "c789d72b-d903-4334-ad6c-61025f9dc64b",
-          "width": 0,
-          "x": 530.784,
-          "y": 312.015,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "ce3daf52-f07a-45a8-88f4-ca3b27836a43",
-          "width": 0,
-          "x": 1480.78,
-          "y": 134.016,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 2
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "d8d548b4-55c9-435f-a494-b02029d1d133",
-          "width": 0,
-          "x": 2078.78,
-          "y": 385.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "3edb59c5-da2b-4783-ab7f-83654cfde718",
-          "width": 0,
-          "x": 1847.78,
-          "y": 164.016,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "a256220f-a57c-4ff0-8bbf-6d3cc9f145a7",
-          "width": 0,
-          "x": 1258.78,
-          "y": 357.015,
-          "zOrder": -2,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Cloud",
-          "persistentUuid": "3e8f3d91-1ecf-4e19-8041-6878c55097b7",
-          "width": 0,
-          "x": 664.784,
-          "y": 170.016,
-          "zOrder": -2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "BackgroundObjects",
-          "persistentUuid": "f15e9805-a800-4211-b447-93410df67af4",
-          "width": 0,
-          "x": 2078.57,
-          "y": 503.108,
-          "zOrder": -1,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
           "customSize": true,
           "height": 61,
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "94d3d1d2-c0e4-4f29-b881-271d29703754",
+          "persistentUuid": "08f1eeb1-a457-496e-b161-8c80b98c070c",
           "width": 66,
           "x": 1736.78,
           "y": 298.016,
@@ -1294,7 +1150,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "0cb4440c-cdce-4609-a0b3-cd14c4616fcf",
+          "persistentUuid": "cad94cea-07f3-4cdd-a94e-51c1f42e2e97",
           "width": 0,
           "x": 611.785,
           "y": 505.015,
@@ -1310,7 +1166,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "fd073970-64db-4607-b148-acae1926fbbf",
+          "persistentUuid": "673c517d-68b1-40a5-ae02-f1c39951ccbf",
           "width": 94,
           "x": 1249.78,
           "y": 500.015,
@@ -1326,7 +1182,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "500b797a-582b-4eec-8683-cc0b8fdaf481",
+          "persistentUuid": "7b621bcd-4f9e-4bf4-9c40-c5812ec18dbf",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -1342,7 +1198,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "ad1bdb1a-5552-4f66-99fb-05ed4f81a296",
+          "persistentUuid": "e71d046e-d5bb-45b8-8578-33c2d4df9b14",
           "width": 0,
           "x": 925.784,
           "y": 505.015,
@@ -1358,7 +1214,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "bcd5df15-4e41-4962-9dd2-f1d6afa59c53",
+          "persistentUuid": "b5d7941d-f5aa-4305-b09e-d4ed742ba7c1",
           "width": 0,
           "x": 1413.78,
           "y": 502.015,
@@ -1379,7 +1235,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "6a1e1139-0b9f-482a-9e4f-0b7285096d07",
+          "persistentUuid": "3bac2217-2edf-4c1c-b65f-cbea17de2268",
           "width": 58,
           "x": 1371.78,
           "y": 524.016,
@@ -1400,7 +1256,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "87f04fe9-10e3-4466-85bb-8750b98071c2",
+          "persistentUuid": "dafde3c5-0d13-40e6-b6d8-43a6771c424b",
           "width": 58,
           "x": 1435.78,
           "y": 525.016,
@@ -1421,7 +1277,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
-          "persistentUuid": "5b1c48c9-a972-493e-80fc-df582b803e51",
+          "persistentUuid": "3b2ac003-fd90-4e46-8d62-78053ad4f39b",
           "width": 58,
           "x": 1756.78,
           "y": 314.016,
@@ -1439,31 +1295,10 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "BackgroundObjects",
-          "persistentUuid": "dc26d0d2-c8c6-4a8c-9cda-9074f240b601",
-          "width": 0,
-          "x": -43,
-          "y": 501,
-          "zOrder": 1,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
           "layer": "GUI",
           "locked": false,
           "name": "Score",
-          "persistentUuid": "1efd042f-d9f9-45a1-ad6d-ac7a41e88b5f",
+          "persistentUuid": "c0f16068-baf3-420b-b882-a2b2e9ce2803",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -1479,7 +1314,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
-          "persistentUuid": "125b9dd7-56c5-40c0-b9b7-0d3b6a231f97",
+          "persistentUuid": "9d011d94-ad83-4863-ad44-a4be700ea105",
           "width": 0,
           "x": 21,
           "y": 11,
@@ -1495,7 +1330,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "2a2a5197-eed1-4500-86fb-94b63cb92d9a",
+          "persistentUuid": "5e5f93cf-b133-4f0b-8064-6d623c3a861b",
           "width": 0,
           "x": 1960,
           "y": 420,
@@ -1511,7 +1346,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "bc460e2b-d1ef-4c6b-bf7a-25c72f7eb8bb",
+          "persistentUuid": "a7c89362-1c5a-44fd-b0f9-c6c68a83f3e0",
           "width": 0,
           "x": 210,
           "y": 420,
@@ -1527,7 +1362,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "20a6242e-0ba9-4636-9f5e-47491d929c26",
+          "persistentUuid": "4640d7c2-6ffd-46cd-893e-c78991728d61",
           "width": 0,
           "x": 490,
           "y": 490,
@@ -1543,7 +1378,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "56b72b9b-372a-4acc-89c6-10cccf17cc89",
+          "persistentUuid": "a59a964e-1922-49ad-9ba4-61e82105d76b",
           "width": 0,
           "x": 420,
           "y": 490,
@@ -1559,7 +1394,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "d273e06b-8faa-4bdd-b630-b34aca34825d",
+          "persistentUuid": "c8bd9849-e414-43df-9af1-3a4620aff6b7",
           "width": 0,
           "x": 773.846,
           "y": 359.816,
@@ -1575,7 +1410,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "98867585-d529-4496-a6ac-555456621f23",
+          "persistentUuid": "03e16798-a16f-4fe2-93b5-a64e846f5c9b",
           "width": 0,
           "x": 859.831,
           "y": 296.262,
@@ -1591,7 +1426,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "1c623ce3-a30a-40e9-9a77-b6f0acbb44af",
+          "persistentUuid": "1018e19d-fec3-47a8-8ea3-c6c1084eac59",
           "width": 0,
           "x": 953.292,
           "y": 241.431,
@@ -1607,7 +1442,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "26255130-0110-428d-a8bf-bcbf2f07709d",
+          "persistentUuid": "5f2845bb-d1a0-429c-a952-5b0519ce0cfb",
           "width": 0,
           "x": 350,
           "y": 490,
@@ -1623,7 +1458,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "89c12fd5-07b9-4a3b-b499-310da8f4bc94",
+          "persistentUuid": "53d6a3e4-bc3e-4ce5-a030-50c951a4eecd",
           "width": 0,
           "x": 1145.78,
           "y": 205.016,
@@ -1639,7 +1474,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
-          "persistentUuid": "9d553998-ef8c-4b3e-8b95-52f5ebce0b16",
+          "persistentUuid": "b433127f-65f4-444c-94ff-cbc782239881",
           "width": 0,
           "x": 1704.78,
           "y": 206.016,
@@ -1655,10 +1490,10 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "7a6620e8-1e3d-4c4e-9d4c-1976d5c61a81",
+          "persistentUuid": "74234a7b-3bfe-47c1-a7c8-a2eacf71d5c7",
           "width": 0,
-          "x": 2593.78,
-          "y": 369.016,
+          "x": 2808,
+          "y": 168,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1671,10 +1506,10 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
-          "persistentUuid": "90e4c196-e2dc-4525-88a4-dba7be70c718",
+          "persistentUuid": "844861ff-98ba-4895-a26b-9127c1f01b33",
           "width": 0,
-          "x": 3152.78,
-          "y": 370.016,
+          "x": 3173,
+          "y": 172,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1687,10 +1522,10 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
-          "persistentUuid": "1b22776c-c1cf-4032-b95b-78442c84da35",
+          "persistentUuid": "8a04113d-cf76-4c66-ad33-832adfea0ddc",
           "width": 0,
-          "x": 3103.78,
-          "y": 354.016,
+          "x": 3124,
+          "y": 156,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1703,7 +1538,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "bac74d6a-2ac7-46d2-923c-415a61fe3299",
+          "persistentUuid": "a3e28934-cf65-412b-ae65-a970ce88531d",
           "width": 0,
           "x": 2834.06,
           "y": 247,
@@ -1719,7 +1554,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "49b1c7b8-672e-4e19-b4c3-a75964939088",
+          "persistentUuid": "2ebb125c-99c4-4c34-9fb4-93346da7bd2d",
           "width": 0,
           "x": 2904.06,
           "y": 247,
@@ -1735,7 +1570,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "59421c04-8fa4-4dcc-a2e0-cd7c32667a8f",
+          "persistentUuid": "723aeebf-13df-4659-b400-89e55803067e",
           "width": 0,
           "x": 2992,
           "y": 192,
@@ -1751,7 +1586,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "275eadcc-5904-4fa7-a6d7-68df3b7a6916",
+          "persistentUuid": "3ff87891-d9c7-4103-a4f9-95141514f845",
           "width": 0,
           "x": 2849,
           "y": 194,
@@ -1767,7 +1602,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "585dc17b-7d8f-4373-932d-fd59847e019c",
+          "persistentUuid": "f621464b-01b6-4d12-8dfa-ac8707d6f4c5",
           "width": 0,
           "x": 2921,
           "y": 193,
@@ -1783,7 +1618,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
-          "persistentUuid": "ec368404-217a-4af9-a3e8-82e8142abacc",
+          "persistentUuid": "1fb07204-66af-4481-87d9-af83a2380e2d",
           "width": 0,
           "x": 2526,
           "y": 530,
@@ -1799,7 +1634,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
-          "persistentUuid": "4b46ca1d-1c28-4876-b4ac-70a4ab7efb61",
+          "persistentUuid": "6bb52b07-e9c8-4d23-a97e-bdfd3bef73fa",
           "width": 0,
           "x": 1983,
           "y": 525,
@@ -1815,7 +1650,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
-          "persistentUuid": "b2ade97b-85f6-43d5-a170-72c617fef897",
+          "persistentUuid": "35291db3-5afb-452a-b9de-b1c8a28c924f",
           "width": 0,
           "x": 1655.78,
           "y": 190.016,
@@ -1831,7 +1666,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
-          "persistentUuid": "c7b59290-1401-4f08-8c56-e693cd9c013f",
+          "persistentUuid": "dc439743-08c3-46e2-8a46-f42ac9041d0f",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1847,7 +1682,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
-          "persistentUuid": "b0e57f1e-5181-4396-99fa-ad7b0d956e2f",
+          "persistentUuid": "eb5479e9-b562-4420-8c6b-5cc67b88afd1",
           "width": 0,
           "x": 732.6,
           "y": 544.185,
@@ -1863,7 +1698,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
-          "persistentUuid": "e2fdfaad-9e2d-440c-be94-3bcf413fae9e",
+          "persistentUuid": "3cf709c1-47c7-499b-b49c-1f94cc33a9b0",
           "width": 97.5489,
           "x": 39,
           "y": 448,
@@ -1879,7 +1714,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
-          "persistentUuid": "f24641e3-1559-4c70-a9be-ac66de672015",
+          "persistentUuid": "609475cc-8a0e-4a97-8200-56e3ff8451f6",
           "width": 94.1152,
           "x": 147,
           "y": 448,
@@ -1895,7 +1730,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ArrowButtonsBg",
-          "persistentUuid": "926d12c8-161c-4b9d-b0d8-d638298dc863",
+          "persistentUuid": "90ce50f9-249d-4bee-a8a9-b1042d48750b",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -1911,7 +1746,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
-          "persistentUuid": "3775df52-5a7b-498e-bae6-0627bb71b7c0",
+          "persistentUuid": "67cb62f2-5f86-4787-a534-5b8f5a2abc35",
           "width": 107.992,
           "x": 659,
           "y": 457,
@@ -1927,7 +1762,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "7d344285-6da3-4344-a5df-05e02cbea398",
+          "persistentUuid": "ec3bfa6b-76a8-4c1d-8474-7b2e323a5a05",
           "width": 0,
           "x": 1820,
           "y": 280,
@@ -1943,10 +1778,154 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
-          "persistentUuid": "23695d1d-fec9-45b6-a98c-0a4211f13b80",
+          "persistentUuid": "9ec884c2-d959-4975-b3c3-283ae6db1bb5",
           "width": 0,
           "x": 1890,
           "y": 350,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 724,
+          "layer": "Background",
+          "locked": true,
+          "name": "TiledForestBackground",
+          "persistentUuid": "2e89b9b9-58d2-4ffc-bb04-973935cb322a",
+          "width": 744,
+          "x": 0,
+          "y": -110,
+          "zOrder": 24,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 322,
+          "layer": "",
+          "locked": false,
+          "name": "Ladder",
+          "persistentUuid": "7ac25505-19d2-4f57-b652-23b84f8c174b",
+          "width": 70,
+          "x": 1599,
+          "y": 248,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Checkpoint",
+          "persistentUuid": "10a2b255-a0f3-459d-855b-7af98673c068",
+          "width": 0,
+          "x": 8,
+          "y": 500,
+          "zOrder": 26,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Checkpoint",
+          "persistentUuid": "3763e8c5-3f1f-4231-8b42-808ee4237d38",
+          "width": 0,
+          "x": 2667,
+          "y": 360,
+          "zOrder": 27,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 95,
+          "layer": "GUI",
+          "locked": false,
+          "name": "TopButton",
+          "persistentUuid": "4d0d1d8a-a4fb-40d1-a51f-83e795c2d8c3",
+          "width": 76,
+          "x": 103,
+          "y": 385,
+          "zOrder": 28,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 97,
+          "layer": "GUI",
+          "locked": false,
+          "name": "BottomButton",
+          "persistentUuid": "3e876fc1-c96f-45ac-acc0-a922cf9e8839",
+          "width": 79,
+          "x": 101,
+          "y": 488,
+          "zOrder": 29,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "GoRight",
+          "persistentUuid": "5fcd4111-d503-4f5c-b3f6-1e80c21b7d4a",
+          "width": 0,
+          "x": 2788,
+          "y": 366,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "GoLeft",
+          "persistentUuid": "6e55343a-aa3a-485f-bedb-064c8f42cb01",
+          "width": 0,
+          "x": 3152.78,
+          "y": 370.016,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Fly",
+          "persistentUuid": "235f6615-086e-4ebf-bdcf-22ea2a8fd28c",
+          "width": 0,
+          "x": 3103.78,
+          "y": 354.016,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1963,7 +1942,7 @@
           "behaviors": [],
           "animations": [
             {
-              "name": "",
+              "name": "Idle",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2011,7 +1990,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Jumping",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2059,7 +2038,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Running",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2771,11 +2750,15 @@
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
             {
-              "name": "",
+              "name": "Walking",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2859,7 +2842,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Dead",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -2930,6 +2913,10 @@
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -3018,7 +3005,7 @@
               ]
             },
             {
-              "name": "",
+              "name": "Dead",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -3028,160 +3015,6 @@
                     {
                       "hasCustomCollisionMask": false,
                       "image": "flyDead.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Cloud",
-          "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": true,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud1.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud2.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cloud3.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -3284,44 +3117,7 @@
                 {
                   "looping": false,
                   "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "cactus.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 0,
-                            "y": 0
-                          }
-                        ]
-                      ]
-                    }
-                  ]
+                  "sprites": []
                 }
               ]
             },
@@ -3400,7 +3196,12 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -3751,6 +3552,153 @@
               ]
             }
           ]
+        },
+        {
+          "height": 128,
+          "name": "TiledForestBackground",
+          "tags": "",
+          "texture": "tiled_Forest Background.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 128,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "HorizontalTiledSpriteParallax",
+              "type": "Parallax::HorizontalTiledSpriteParallax"
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "cactus.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "TopButton",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "D-pad top.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "BottomButton",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "D-pad bottom.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "height": 32,
+          "name": "FadeIn",
+          "tags": "",
+          "texture": "NewFile-1.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 32,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ]
         }
       ],
       "events": [
@@ -3830,74 +3778,6 @@
             {
               "type": {
                 "inverted": false,
-                "value": "KeyPressed"
-              },
-              "parameters": [
-                "",
-                "RShift"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "BuiltinCommonInstructions::Or"
-              },
-              "parameters": [],
-              "subInstructions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Animation"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Animation"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "2"
-                  ],
-                  "subInstructions": []
-                }
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlaySound"
-              },
-              "parameters": [
-                "",
-                "https://resources.gdevelop-app.com/examples/platformer/jump.wav",
-                "",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
                 "value": "PlatformBehavior::IsJumping"
               },
               "parameters": [
@@ -3911,17 +3791,49 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ChangeAnimation"
+                "value": "SetAnimationName"
               },
               "parameters": [
                 "Player",
-                "=",
-                "1"
+                "\"Jumping\""
               ],
               "subInstructions": []
             }
           ],
-          "events": []
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlaySound"
+                  },
+                  "parameters": [
+                    "",
+                    "https://resources.gdevelop-app.com/examples/platformer/jump.wav",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
         },
         {
           "disabled": false,
@@ -3944,12 +3856,11 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ChangeAnimation"
+                "value": "SetAnimationName"
               },
               "parameters": [
                 "Player",
-                "=",
-                "1"
+                "\"Jumping\""
               ],
               "subInstructions": []
             }
@@ -3996,12 +3907,11 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ChangeAnimation"
+                    "value": "SetAnimationName"
                   },
                   "parameters": [
                     "Player",
-                    "=",
-                    "0"
+                    "\"Idle\""
                   ],
                   "subInstructions": []
                 }
@@ -4029,12 +3939,11 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ChangeAnimation"
+                    "value": "SetAnimationName"
                   },
                   "parameters": [
                     "Player",
-                    "=",
-                    "2"
+                    "\"Running\""
                   ],
                   "subInstructions": []
                 }
@@ -4042,6 +3951,38 @@
               "events": []
             }
           ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "PlatformBehavior::IsOnLadder"
+              },
+              "parameters": [
+                "PlayerHitBox",
+                "PlatformerObject"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAnimationName"
+              },
+              "parameters": [
+                "Player",
+                "\"Jumping\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
         },
         {
           "disabled": false,
@@ -4119,7 +4060,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Make sure the camera follows the player.",
+          "comment": "Make sure the camera follows the player. Note that the parallax for the background is handled thanks to a behavior.",
           "comment2": "On s'assure que la caméra suit le joueur."
         },
         {
@@ -4157,7 +4098,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Management of the moving platform:",
+          "comment": "Management of the moving platform (very simple left/right movement - check also the behaviors for other way of moving objects)",
           "comment2": "Gestion de la plateforme bougeante:"
         },
         {
@@ -4302,7 +4243,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Enemies:",
+          "comment": "Enemies events are in another events sheet (allowing for better organization of the events):",
           "comment2": "Enemis :"
         },
         {
@@ -4326,109 +4267,106 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Objects:",
+          "comment": "Objects to collect",
           "comment2": "Objets:"
         },
         {
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Link",
-          "include": {
-            "includeConfig": 0
-          },
-          "target": "ObjectsManagement"
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "GUI:",
-          "comment2": "Elements de l'interface:"
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Link",
-          "include": {
-            "includeConfig": 0
-          },
-          "target": "GUIManagement"
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Virtual controls",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": true,
-                "value": "SystemInfo::IsMobile"
-              },
-              "parameters": [],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Cache"
-              },
-              "parameters": [
-                "VirtualControls"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
                 "inverted": false,
-                "value": "DepartScene"
+                "value": "CollisionNP"
               },
               "parameters": [
+                "PlayerHitBox",
+                "Coin",
                 ""
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "Coin",
+                "=",
+                "255"
+              ],
+              "subInstructions": []
             }
           ],
           "actions": [
             {
               "type": {
                 "inverted": false,
-                "value": "TouchSimulateMouse"
+                "value": "Opacity"
+              },
+              "parameters": [
+                "Coin",
+                "=",
+                "254"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "PlaySound"
               },
               "parameters": [
                 "",
+                "https://resources.gdevelop-app.com/examples/platformer/coin.wav",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "Score",
+                "+",
+                "100"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectOpacityTween"
+              },
+              "parameters": [
+                "Coin",
+                "Tween",
+                "\"FadeOut\"",
+                "0",
+                "\"easeInQuad\"",
+                "700",
+                "yes"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Tween::AddObjectPositionYTween"
+              },
+              "parameters": [
+                "Coin",
+                "Tween",
+                "\"MoveUp\"",
+                "Coin.Y()-50",
+                "\"easeOutQuad\"",
+                "700",
                 "no"
               ],
               "subInstructions": []
@@ -4437,109 +4375,599 @@
           "events": []
         },
         {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
+          "name": "Interface",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "SourisSurObjet"
-              },
-              "parameters": [
-                "LeftButton",
-                "",
-                "",
-                ""
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "Score",
+                    "=",
+                    "\"x \"+ToString(Variable(Score))"
+                  ],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "events": []
             }
           ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::SimulateLeftKey"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "PlatformerObject"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
+          "parameters": []
         },
         {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
+          "name": "Virtual controls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "SourisSurObjet"
-              },
-              "parameters": [
-                "RightButton",
-                "",
-                "",
-                ""
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "SystemInfo::HasTouchScreen"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "VirtualControls"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TouchSimulateMouse"
+                  },
+                  "parameters": [
+                    "",
+                    "no"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "LeftButton",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateLeftKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "RightButton",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateRightKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "TopButton",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateUpKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateLadderKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "BottomButton",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateDownKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "JumpButton",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::SimulateJumpKey"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::SimulateRightKey"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "PlatformerObject"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
+          "parameters": []
         },
         {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
+          "name": "Checkpoint and player death",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "SourisSurObjet"
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
               },
-              "parameters": [
-                "JumpButton",
-                "",
-                "",
-                ""
+              "comment": "Save the player progress in two variables, that are the position of the last checkpoint that is touched",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "Checkpoint",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "CheckpointX",
+                    "=",
+                    "Checkpoint.X()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "CheckpointY",
+                    "=",
+                    "Checkpoint.Y()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "If the player was declared as dead (by falling or colliding with an enemy), go back to the last checkpoint",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "PlayerJustDead",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    "=",
+                    "Variable(CheckpointX)",
+                    "=",
+                    "Variable(CheckpointY)-PlayerHitBox.Height()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "PlayerJustDead",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlaySound"
+                  },
+                  "parameters": [
+                    "",
+                    "life lost sound.wav",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Make a fade in effect",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "FadeIn",
+                        "0",
+                        "0",
+                        "\"GUI\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "FadeIn",
+                        "=",
+                        "SceneWindowWidth()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Height"
+                      },
+                      "parameters": [
+                        "FadeIn",
+                        "=",
+                        "SceneWindowHeight()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectOpacityTween"
+                      },
+                      "parameters": [
+                        "FadeIn",
+                        "Tween",
+                        "\"FadeIn\"",
+                        "0",
+                        "\"easeInQuad\"",
+                        "1500",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PosY"
+                  },
+                  "parameters": [
+                    "PlayerHitBox",
+                    ">",
+                    "1000"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "PlayerJustDead",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Note: see the events about the enemies to find out how the player is declared dead after touching an enemy",
+              "comment2": ""
             }
           ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::SimulateJumpKey"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "PlatformerObject"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
+          "parameters": []
         }
       ],
       "layers": [
+        {
+          "ambientLightColorB": 1702453632,
+          "ambientLightColorG": 0,
+          "ambientLightColorR": 0,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "Background",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
         {
           "ambientLightColorB": 200,
           "ambientLightColorG": 200,
@@ -4591,12 +5019,20 @@
           "type": "AnchorBehavior::AnchorBehavior"
         },
         {
+          "name": "HorizontalTiledSpriteParallax",
+          "type": "Parallax::HorizontalTiledSpriteParallax"
+        },
+        {
           "name": "Platform",
           "type": "PlatformBehavior::PlatformBehavior"
         },
         {
           "name": "PlatformerObject",
           "type": "PlatformBehavior::PlatformerObjectBehavior"
+        },
+        {
+          "name": "Tween",
+          "type": "Tween::TweenBehavior"
         }
       ]
     }
@@ -4651,7 +5087,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Enemy movement:",
+          "comment": "Handling living enemies:",
           "comment2": ""
         },
         {
@@ -4661,89 +5097,103 @@
           "conditions": [
             {
               "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "GoLeft",
-                "Enemy",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarObjet"
+                "inverted": true,
+                "value": "AnimationName"
               },
               "parameters": [
                 "Enemy",
-                "GoingLeft",
-                "=",
-                "1"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "GoRight",
-                "Enemy",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Enemy",
-                "GoingLeft",
-                "=",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Animation"
-              },
-              "parameters": [
-                "Enemy",
-                "=",
-                "0"
+                "\"Dead\""
               ],
               "subInstructions": []
             }
           ],
           "actions": [],
           "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Enemies movement. Note that we made a very simple movement here, that could be put in a separate behavior. You may want to explore behaviors available for objects and combine them with events to do more complex logic for the enemies.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "GoLeft",
+                    "Enemy",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Enemy",
+                    "GoingLeft",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "GoRight",
+                    "Enemy",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Enemy",
+                    "GoingLeft",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
             {
               "disabled": false,
               "folded": false,
@@ -5019,18 +5469,30 @@
                   "conditions": [
                     {
                       "type": {
-                        "inverted": false,
-                        "value": "PosY"
+                        "inverted": true,
+                        "value": "PlatformBehavior::IsFalling"
                       },
                       "parameters": [
                         "PlayerHitBox",
-                        ">=",
-                        "Enemy.Y()-PlayerHitBox.Height()+Enemy.Height()/2"
+                        "PlatformerObject"
                       ],
                       "subInstructions": []
                     }
                   ],
-                  "actions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "PlayerJustDead",
+                        "=",
+                        "1"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
                   "events": []
                 }
               ]
@@ -5049,7 +5511,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Fading out:",
+          "comment": "Dead enemies: make them fade out (and remove them when they have disappeared!)",
           "comment2": "Disparition des ennemis:"
         },
         {
@@ -5060,34 +5522,23 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Animation"
+                "value": "AnimationName"
               },
               "parameters": [
                 "Enemy",
-                "=",
-                "1"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::IsOnFloor"
-              },
-              "parameters": [
-                "Enemy",
-                "PlatformerObject"
+                "\"Dead\""
               ],
               "subInstructions": []
             },
             {
               "type": {
                 "inverted": true,
-                "value": "PlatformBehavior::IsMoving"
+                "value": "Tween::IsPlaying"
               },
               "parameters": [
                 "Enemy",
-                "PlatformerObject"
+                "Tween",
+                "\"FadeOut\""
               ],
               "subInstructions": []
             }
@@ -5096,245 +5547,16 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ActivateBehavior"
+                "value": "Tween::AddObjectOpacityTween"
               },
               "parameters": [
                 "Enemy",
-                "PlatformerObject",
-                "false"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Enemy",
-                "-",
-                "50*TimeDelta()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Opacity"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383152000,
-      "name": "ObjectsManagement",
-      "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "PlayerHitBox",
-                "Coin",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "255"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "254"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlaySound"
-              },
-              "parameters": [
-                "",
-                "https://resources.gdevelop-app.com/examples/platformer/coin.wav",
-                "",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Score",
-                "+",
-                "100"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "<",
-                "255"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "-",
-                "255*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "AddForceXY"
-              },
-              "parameters": [
-                "Coin",
+                "Tween",
+                "\"FadeOut\"",
                 "0",
-                "-30",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Opacity"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Delete"
-              },
-              "parameters": [
-                "Coin",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        }
-      ]
-    },
-    {
-      "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1383152000,
-      "name": "GUIManagement",
-      "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "TextObject::String"
-              },
-              "parameters": [
-                "Score",
-                "=",
-                "\"x \"+ToString(Variable(Score))"
+                "\"easeOutQuad\"",
+                "1500",
+                "yes"
               ],
               "subInstructions": []
             }
@@ -5344,7 +5566,237 @@
       ]
     }
   ],
-  "eventsFunctionsExtensions": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "4ian",
+      "description": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
+      "extensionNamespace": "",
+      "fullName": "Parallax for Tiled Sprite",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWltYWdlLW1vdmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTUsM0gxOVYwTDI0LDVMMTksMTBWN0gxNVYzTTIxLDExLjk0VjE5QTIsMiAwIDAsMSAxOSwyMUg1QTIsMiAwIDAsMSAzLDE5VjVBMiwyIDAgMCwxIDUsM0gxMi4wNkMxMiwzLjMzIDEyLDMuNjcgMTIsNEE4LDggMCAwLDAgMjAsMTJDMjAuMzMsMTIgMjAuNjcsMTIgMjEsMTEuOTRNMTksMThMMTQuNSwxMkwxMSwxNi41TDguNSwxMy41TDUsMThIMTlaIiAvPjwvc3ZnPg==",
+      "name": "Parallax",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/image-move.svg",
+      "shortDescription": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
+      "version": "1.0.1",
+      "tags": [
+        "parallax",
+        "tiled"
+      ],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Move the image of a Tiled Sprite to follow the camera horizontally with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+          "fullName": "Horizontal Parallax for a Tiled Sprite",
+          "name": "HorizontalTiledSpriteParallax",
+          "objectType": "TiledSpriteObject::TiledSprite",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::XOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraX(Object.Behavior::PropertyFollowedLayer(), 0) * Object.Behavior::PropertyParallaxFactor()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraWidth(Object.Layer(), 0)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "Parallax::HorizontalTiledSpriteParallax",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "0.5",
+              "type": "Number",
+              "label": "Parallax factor (speed for the parallax, usually between 0 and 1)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ParallaxFactor"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Layer to be followed (leave empty for the base layer)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "FollowedLayer"
+            }
+          ]
+        },
+        {
+          "description": "Move the image of a Tiled Sprite to follow the camera vertically with a parallax effect. After adding this to an object, put the object on a layer that is not moving, behind the layer that is followed (for example, a layer called \"Background\").",
+          "fullName": "Vertical Parallax for a Tiled Sprite",
+          "name": "VerticalTiledSpriteParallax",
+          "objectType": "TiledSpriteObject::TiledSprite",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::YOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraY(Object.Behavior::PropertyFollowedLayer(), 0) * Object.Behavior::PropertyParallaxFactor()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TiledSpriteObject::Height"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "CameraHeight(Object.Layer(), 0)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "Parallax::VerticalTiledSpriteParallax",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "0.5",
+              "type": "Number",
+              "label": "Parallax factor (speed for the parallax, usually between 0 and 1)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ParallaxFactor"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Layer to be followed (leave empty for the base layer)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "FollowedLayer"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -114,7 +114,7 @@ bool Exporter::ExportWholePixiProject(
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
-    helper.ExportIncludesAndLibs(includesFiles, exportDir);
+    helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
@@ -122,8 +122,12 @@ bool Exporter::ExportWholePixiProject(
     else if (exportForFacebookInstantGames)
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
-    if (!helper.ExportPixiIndexFile(
-            exportedProject, source, exportDir, includesFiles, "")) {
+    if (!helper.ExportPixiIndexFile(exportedProject,
+                                    source,
+                                    exportDir,
+                                    includesFiles,
+                                    /*nonRuntimeScriptsCacheBurst=*/0,
+                                    "")) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }
@@ -211,14 +215,14 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   gd::ProjectStripper::StripProjectForExport(exportedProject);
 
   //...and export it
-    gd::SerializerElement noRuntimeGameOptions;
+  gd::SerializerElement noRuntimeGameOptions;
   helper.ExportProjectData(
       fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src");
+  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
 
   if (!helper.ExportCocos2dFiles(
           project, exportDir, debugMode, includesFiles)) {

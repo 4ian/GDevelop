@@ -337,6 +337,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
+         // Allow to get a layer directly from the context for convenience:
+         "  getLayer: function(layerName) {\n"
+         "    return runtimeScene.getLayer(layerName);\n"
+         "  },\n"
          // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
          argumentsGetters + "    return \"\";\n" + "  },\n" +
@@ -842,10 +846,6 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
           GenerateBooleanFullName(
               "condition" + gd::String::From(cId - 1) + "IsTrue", context) +
           ".val ) {\n";
-
-    gd::InstructionMetadata instrInfos =
-        gd::MetadataProvider::GetConditionMetadata(platform,
-                                                   conditions[cId].GetType());
 
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId],

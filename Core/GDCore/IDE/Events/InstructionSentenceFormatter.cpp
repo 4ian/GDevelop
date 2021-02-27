@@ -136,7 +136,7 @@ gd::String InstructionSentenceFormatter::LabelFromType(const gd::String &type) {
   else if (type == "mouse")
     return _("Mouse button");
   else if (type == "yesorno")
-    return _("Yes or no");
+    return _("Yes or No");
   else if (type == "police")
     return _("Font");
   else if (type == "color")

@@ -99,7 +99,17 @@ import {
   completeCordovaBuild,
   completeElectronBuild,
   completeWebBuild,
+  fakeAssetShortHeader1,
+  game1,
+  game2,
+  gameRollingMetrics1,
+  gameRollingMetricsWithoutPlayersAndRetention1,
+  showcasedGame1,
 } from '../fixtures/GDevelopServicesTestData';
+import {
+  GDevelopAnalyticsApi,
+  GDevelopGameApi,
+} from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
@@ -138,7 +148,7 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
-import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -152,7 +162,7 @@ import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../ObjectsList/NewObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -165,7 +175,7 @@ import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStoragePro
 import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
-import OpenConfirmDialog from '../ProjectsStorage/OpenConfirmDialog';
+import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
@@ -176,6 +186,7 @@ import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -200,6 +211,26 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
+import { AssetStore } from '../AssetStore';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import ScrollView from '../UI/ScrollView';
+import '../UI/Theme/Global/Scrollbar.css';
+import '../UI/Theme/Global/Animation.css';
+import { AssetCard } from '../AssetStore/AssetCard';
+import { AssetDetails } from '../AssetStore/AssetDetails';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { ExtensionStore } from '../AssetStore/ExtensionStore';
+import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
+import { GameCard } from '../GameDashboard/GameCard';
+import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
+import { GamesList } from '../GameDashboard/GamesList';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { GamesShowcase } from '../GamesShowcase';
+import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
+import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
 
 configureActions({
   depth: 2,
@@ -257,6 +288,39 @@ storiesOf('UI Building Blocks/Buttons', module)
         />
       </Line>
       <Line>
+        <Text>Buttons with split menus:</Text>
+      </Line>
+      <Line>
+        <RaisedButton
+          label="Traditional Raised button"
+          onClick={action('onClick')}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Button with split menu"
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="Primary button with split menu"
+          primary
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and with icon"
+          icon={<Brush />}
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithSplitMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
+          onClick={action('onClick')}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+      </Line>
+      <Line>
         <Text>Buttons with menus:</Text>
       </Line>
       <Line>
@@ -271,6 +335,12 @@ storiesOf('UI Building Blocks/Buttons', module)
         <RaisedButtonWithMenu
           label="... and with icon"
           icon={<Brush />}
+          buildMenuTemplate={buildFakeMenuTemplate}
+        />
+        <RaisedButtonWithMenu
+          label="... and disabled"
+          icon={<Brush />}
+          disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
       </Line>
@@ -733,6 +803,33 @@ storiesOf('UI Building Blocks/SearchBar', module)
         },
       ]}
     />
+  ));
+
+storiesOf('UI Building Blocks/Layout/Grid', module)
+  .addDecorator(muiDecorator)
+  .add('Line and ScrollView in a fixed height container', () => (
+    <FixedHeightFlexContainer height={100}>
+      <Column expand>
+        <Line overflow="hidden">
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+          <ScrollView>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+            <Text>123</Text>
+            <Text>456</Text>
+            <Text>789</Text>
+          </ScrollView>
+        </Line>
+      </Column>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
@@ -1585,6 +1682,11 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     getThumbnail={() => 'res/unknown32.png'}
                     project={testProject.project}
                     objectsContainer={testProject.testLayout}
+                    layout={testProject.testLayout}
+                    events={testProject.testLayout.getEvents()}
+                    resourceSources={[]}
+                    onChooseResource={() => Promise.reject('unimplemented')}
+                    resourceExternalEditors={fakeResourceExternalEditors}
                     onEditObject={action('On edit object')}
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
@@ -2416,7 +2518,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
-      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
     />
@@ -2432,7 +2534,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
-      onOpenAboutDialog={() => action('onOpenAboutDialog')()}
+      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
     />
@@ -2556,6 +2658,18 @@ storiesOf('CreateProjectDialog', module)
       onClose={action('onClose')}
       onCreate={action('onCreate')}
       onOpen={action('onOpen')}
+      initialTab="starters"
+    />
+  ))
+  .add('Games showcase as initial tab', () => (
+    <CreateProjectDialog
+      open
+      examplesComponent={Placeholder}
+      startersComponent={Placeholder}
+      onClose={action('onClose')}
+      onCreate={action('onCreate')}
+      onOpen={action('onOpen')}
+      initialTab="games-showcase"
     />
   ));
 
@@ -2674,6 +2788,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'medium'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2712,6 +2827,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2750,6 +2866,7 @@ storiesOf('EventsTree', module)
             showObjectThumbnails={true}
             screenType={'normal'}
             windowWidth={'small'}
+            eventsSheetHeight={500}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2919,7 +3036,7 @@ storiesOf('InstructionSelector', module)
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('"KeyPressed" condition chosen, ', () => (
+  .add('"KeyPressed" condition chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'free-instructions'}
       render={(value, onChange) => (
@@ -2927,6 +3044,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}
@@ -2942,7 +3060,7 @@ storiesOf('InstructionOrObjectSelector', module)
       )}
     />
   ))
-  .add('"MySpriteObject" object chosen, ', () => (
+  .add('"MySpriteObject" object chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'objects'}
       render={(value, onChange) => (
@@ -2950,6 +3068,7 @@ storiesOf('InstructionOrObjectSelector', module)
           <InstructionOrObjectSelector
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
             project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
             currentTab={value}
             onChangeTab={onChange}
             globalObjectsContainer={testProject.project}
@@ -3030,6 +3149,8 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('Existing condition (scope: without layout)', () => (
@@ -3051,58 +3172,82 @@ storiesOf('NewInstructionEditorDialog', module)
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
+      canPasteInstructions={true}
+      onPasteInstructions={action('paste instructions')}
     />
   ))
   .add('New condition (scope: without layout)', () => (
-    <NewInstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ layout: null }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={true}
-      instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-    />
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <NewInstructionEditorDialog
+        open
+        project={testProject.project}
+        scope={{ layout: null }}
+        globalObjectsContainer={testProject.project}
+        objectsContainer={testProject.testLayout}
+        isCondition
+        isNewInstruction={true}
+        instruction={testProject.testInstruction}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+        openInstructionOrExpression={action('open instruction or expression')}
+        onCancel={action('cancel')}
+        onSubmit={action('submit')}
+        canPasteInstructions={true}
+        onPasteInstructions={action('paste instructions')}
+      />
+    </Column>
   ));
 
 storiesOf('NewInstructionEditorMenu', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <PopoverButton>
-      {({ buttonElement, onClose }) => (
-        <NewInstructionEditorMenu
-          open
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          isCondition
-          isNewInstruction={false}
-          instruction={testProject.testInstruction}
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onChooseResource={() => {
-            action('onChooseResource');
-            return Promise.reject();
-          }}
-          resourceSources={[]}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCancel={onClose}
-          onSubmit={onClose}
-          anchorEl={buttonElement}
-        />
-      )}
-    </PopoverButton>
+    <Column>
+      <Text>
+        Remember to test the search, which search across objects and all
+        instructions - including object instructions (so that object
+        instructions can be created either by selecting an object first or by
+        searching for it).
+      </Text>
+      <PopoverButton>
+        {({ buttonElement, onClose }) => (
+          <NewInstructionEditorMenu
+            open
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            isCondition
+            isNewInstruction={false}
+            instruction={testProject.testInstruction}
+            resourceExternalEditors={fakeResourceExternalEditors}
+            onChooseResource={() => {
+              action('onChooseResource');
+              return Promise.reject();
+            }}
+            resourceSources={[]}
+            openInstructionOrExpression={action(
+              'open instruction or expression'
+            )}
+            onCancel={onClose}
+            onSubmit={onClose}
+            anchorEl={buttonElement}
+            canPasteInstructions={true}
+            onPasteInstructions={action('paste instructions')}
+          />
+        )}
+      </PopoverButton>
+    </Column>
   ));
 
 storiesOf('TextEditor', module)
@@ -3238,6 +3383,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -3262,6 +3412,11 @@ storiesOf('ObjectsList', module)
             getThumbnail={() => 'res/unknown32.png'}
             project={testProject.project}
             objectsContainer={testProject.testLayout}
+            layout={testProject.testLayout}
+            events={testProject.testLayout.getEvents()}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -4077,6 +4232,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4095,6 +4251,7 @@ storiesOf('ProjectManager', module)
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
       onOpenProfile={action('onOpenProfile')}
+      onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -4117,6 +4274,7 @@ storiesOf('ProjectManager', module)
       onAddExternalLayout={action('onAddExternalLayout')}
       onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
       onAddExternalEvents={action('onAddExternalEvents')}
+      onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
       onDeleteEventsFunctionsExtension={action(
@@ -4135,6 +4293,7 @@ storiesOf('ProjectManager', module)
       onExportProject={action('onExportProject')}
       onOpenPreferences={action('onOpenPreferences')}
       onOpenProfile={action('onOpenProfile')}
+      onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -4199,33 +4358,15 @@ storiesOf('ObjectTypeSelector', module)
 storiesOf('NewBehaviorDialog', module)
   .addDecorator(muiDecorator)
   .add('default, for a Sprite object', () => (
-    <NewBehaviorDialog
-      open
-      project={testProject.project}
-      objectType={'Sprite'}
-      onClose={action('on close')}
-      onChoose={action('on choose')}
-    />
-  ));
-
-storiesOf('ExtensionsSearchDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <I18n>
-      {({ i18n }) => (
-        <EventsFunctionsExtensionsProvider
-          i18n={i18n}
-          makeEventsFunctionCodeWriter={() => null}
-          eventsFunctionsExtensionWriter={null}
-          eventsFunctionsExtensionOpener={null}
-        >
-          <ExtensionsSearchDialog
-            project={testProject.project}
-            onClose={action('on close')}
-          />
-        </EventsFunctionsExtensionsProvider>
-      )}
-    </I18n>
+    <ExtensionStoreStateProvider>
+      <NewBehaviorDialog
+        open
+        project={testProject.project}
+        objectType={'Sprite'}
+        onClose={action('on close')}
+        onChoose={action('on choose')}
+      />
+    </ExtensionStoreStateProvider>
   ));
 
 storiesOf('LayersList', module)
@@ -4239,8 +4380,8 @@ storiesOf('LayersList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      onEditLayerEffects={layer => {}}
-      onEditLightingLayer={layer => {}}
+      onEditLayerEffects={action('onEditLayerEffects')}
+      onEditLayer={action('onEditLayer')}
       onRemoveLayer={(layerName, cb) => {
         cb(true);
       }}
@@ -4261,8 +4402,8 @@ storiesOf('LayersList', module)
           return Promise.reject();
         }}
         resourceSources={[]}
-        onEditLayerEffects={layer => {}}
-        onEditLightingLayer={layer => {}}
+        onEditLayerEffects={action('onEditLayerEffects')}
+        onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
@@ -4321,12 +4462,23 @@ storiesOf('EffectsList', module)
 storiesOf('NewObjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <NewObjectDialog
-      open
-      project={testProject.project}
-      onClose={action('close')}
-      onChoose={action('choose')}
-    />
+    <AssetStoreStateProvider>
+      <NewObjectDialog
+        project={testProject.project}
+        layout={testProject.testLayout}
+        onClose={action('onClose')}
+        onCreateNewObject={action('onCreateNewObject')}
+        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        events={testProject.testLayout.getEvents()}
+        objectsContainer={testProject.testLayout}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onChooseResource={() => {
+          action('onChooseResource');
+          return Promise.reject();
+        }}
+        resourceSources={[]}
+      />
+    </AssetStoreStateProvider>
   ));
 
 storiesOf('CommandPalette', module)
@@ -4430,5 +4582,414 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
+    />
+  ));
+
+storiesOf('AssetStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <AssetStoreStateProvider>
+        <AssetStore
+          onOpenDetails={action('onOpenDetails')}
+          events={testProject.testLayout.getEvents()}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+        />
+      </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ResourceStore', module)
+  .addDecorator(muiDecorator)
+  .add('resourceKind: image', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: audio', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: font', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('resourceKind: svg (for icons)', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ResourceStoreStateProvider>
+        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
+      </ResourceStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/AssetCard', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetCard
+      size={128}
+      onOpenDetails={action('onOpenDetails')}
+      assetShortHeader={fakeAssetShortHeader1}
+    />
+  ));
+
+storiesOf('AssetStore/AssetDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AssetDetails
+      canInstall={true}
+      isBeingInstalled={false}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('being installed', () => (
+    <AssetDetails
+      canInstall={false}
+      isBeingInstalled={true}
+      onAdd={action('onAdd')}
+      onClose={action('onClose')}
+      assetShortHeader={fakeAssetShortHeader1}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      layout={testProject.testLayout}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ));
+
+storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
+  .addDecorator(muiDecorator)
+  .add('in progress', () => (
+    <ResourceFetcherDialog
+      progress={40}
+      fetchedResources={null}
+      onAbandon={null}
+      onRetry={null}
+    />
+  ))
+  .add('with errors', () => (
+    <ResourceFetcherDialog
+      progress={100}
+      fetchedResources={{
+        fetchedResources: [],
+        erroredResources: [
+          {
+            resourceName: 'Player.png',
+            error: new Error('Fake download error'),
+          },
+          {
+            resourceName: 'Spaceship.png',
+            error: new Error('Another fake error'),
+          },
+        ],
+      }}
+      onAbandon={action('abandon')}
+      onRetry={action('retry')}
+    />
+  ));
+
+storiesOf('GameDashboard/GamesList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('without a project opened', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(200, [game1, game2])
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('without a project opened, long loading', () => {
+    const mock = new MockAdapter(axios, { delayResponse: 2500 });
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(200, [game1, game2])
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('with an error', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopGameApi.baseUrl}/game`)
+      .reply(500)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GamesList project={null} />
+      </UserProfileContext.Provider>
+    );
+  });
+
+storiesOf('GameDashboard/GameCard', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <GameCard
+      game={game1}
+      isCurrentGame={false}
+      onOpenDetails={action('onOpenDetails')}
+      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenMonetization={action('onOpenMonetization')}
+    />
+  ))
+  .add('current game', () => (
+    <GameCard
+      game={game1}
+      isCurrentGame={true}
+      onOpenDetails={action('onOpenDetails')}
+      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenMonetization={action('onOpenMonetization')}
+    />
+  ));
+
+storiesOf('GameDashboard/GameDetailsDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('Error loading analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(500)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('Missing analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(404)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With partial analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With analytics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetrics1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  })
+  .add('With analytics, long loading', () => {
+    const mock = new MockAdapter(axios, { delayResponse: 2000 });
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetrics1)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </UserProfileContext.Provider>
+    );
+  });
+
+storiesOf('AssetStore/ExtensionStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={false}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={false}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('is installing', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={true}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={false}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ))
+  .add('showOnlyWithBehaviors', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExtensionStoreStateProvider>
+        <ExtensionStore
+          project={testProject.project}
+          isInstalling={false}
+          onInstall={action('onInstall')}
+          showOnlyWithBehaviors={true}
+        />
+      </ExtensionStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ExtensionsSearchDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          makeEventsFunctionCodeWriter={() => null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionStoreStateProvider>
+            <ExtensionsSearchDialog
+              project={testProject.project}
+              onClose={action('on close')}
+              onInstallExtension={action('onInstallExtension')}
+            />
+          </ExtensionStoreStateProvider>
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
+  ));
+
+storiesOf('GamesShowcase', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <GamesShowcaseStateProvider>
+        <GamesShowcase />
+      </GamesShowcaseStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('GamesShowcase/ShowcasedGameListItem', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ShowcasedGameListItem
+      onHeightComputed={() => {}}
+      showcasedGame={showcasedGame1}
     />
   ));

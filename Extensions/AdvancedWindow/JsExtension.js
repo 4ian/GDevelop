@@ -83,7 +83,7 @@ module.exports = {
     extension
       .addCondition(
         'IsVisible',
-        _('Window visibile'),
+        _('Window visible'),
         _('Checks if the window is visible.'),
         _('The window is visible'),
         _('Advanced window management/Windows, Linux, macOS'),
@@ -426,6 +426,17 @@ module.exports = {
       .addParameter('yesorno', _('Enable always on top?'), '', false)
       .setDefaultValue('true')
       .addParameter('stringWithSelector', _('Level'), levelChoices, false)
+      .setDefaultValue('floating')
+      .setParameterLongDescription(
+        'The level is like a layer in GDevelop but for the OS. ' +
+          'The further down the list, the higher it will be. ' +
+          'When disabling always on top, the level will be set to normal. ' +
+          'From "floating" to "status" included, ' +
+          'the window is placed below the Dock on macOS and below the taskbar on Windows. ' +
+          'Starting from "pop-up-menu", it is shown above the Dock on macOS and ' +
+          'above the taskbar on Windows. ' +
+          'This parameter is ignored on linux.'
+      )
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -578,16 +589,14 @@ module.exports = {
       .addAction(
         'SetOpacity',
         _('Set window opacity'),
-        _(
-          'Changes the window opacity. The new opacity should be between 0 and 1.'
-        ),
+        _('Changes the window opacity.'),
         _('Set the window opacity to _PARAM0_'),
         _('Advanced window management/Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
-      .addParameter('number', _('New opacity'), '', false)
-      .setDefaultValue('true')
+      .addParameter('expression', _('New opacity'), '', false)
+      .setParameterLongDescription('A number between 0 (fully transparent) and 1 (fully opaque).')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -604,9 +613,8 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
-      .addParameter('number', _('X position'), '', false)
-      .addParameter('number', _('Y position'), '', false)
-      .setDefaultValue('true')
+      .addParameter('expression', _('X position'), '', false)
+      .addParameter('expression', _('Y position'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'

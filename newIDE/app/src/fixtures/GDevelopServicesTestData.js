@@ -7,7 +7,14 @@ import {
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
+import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { type UserProfile } from '../Profile/UserProfileContext';
+import {
+  type AssetShortHeader,
+  type Asset,
+} from '../Utils/GDevelopServices/Asset';
 
 export const profileForIndieUser: Profile = {
   uid: 'indie-user',
@@ -79,8 +86,7 @@ export const fakeIndieUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNoSubscriptionUserProfile: UserProfile = {
@@ -95,8 +101,7 @@ export const fakeNoSubscriptionUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
@@ -111,8 +116,7 @@ export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNotAuthenticatedUserProfile: UserProfile = {
@@ -127,8 +131,7 @@ export const fakeNotAuthenticatedUserProfile: UserProfile = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
-  getAuthorizationHeader: () =>
-    Promise.reject(new Error('Not implemented in test data')),
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const release: Release = {
@@ -216,4 +219,488 @@ export const completeWebBuild: Build = {
   logsKey: '/fake-error.log',
   s3Key: 'game-12345',
   updatedAt: Date.now(),
+};
+
+const spaceshipSerializedObject = {
+  name: 'PlayerSpaceship',
+  tags: '',
+  type: 'Sprite',
+  updateIfNotVisible: false,
+  variables: [
+    {
+      name: 'State',
+      value: 'Spaceship',
+    },
+  ],
+  behaviors: [],
+  animations: [
+    {
+      name: 'SpaceshipIdle',
+      useMultipleDirections: false,
+      directions: [
+        {
+          looping: true,
+          timeBetweenFrames: 0.08,
+          sprites: [
+            {
+              hasCustomCollisionMask: false,
+              image: 'player-ship1.png',
+              points: [],
+              originPoint: {
+                name: 'origine',
+                x: 0,
+                y: 0,
+              },
+              centerPoint: {
+                automatic: true,
+                name: 'centre',
+                x: 0,
+                y: 0,
+              },
+              customCollisionMask: [],
+            },
+            {
+              hasCustomCollisionMask: false,
+              image: 'player-ship2.png',
+              points: [],
+              originPoint: {
+                name: 'origine',
+                x: 0,
+                y: 0,
+              },
+              centerPoint: {
+                automatic: true,
+                name: 'centre',
+                x: 0,
+                y: 0,
+              },
+              customCollisionMask: [],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+const spaceshipSerializedResources = [
+  {
+    alwaysLoaded: false,
+    file: 'https://example.com/player-ship1.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship1.png',
+    },
+    kind: 'image',
+    metadata: '',
+    name: 'player-ship1.png',
+    smoothed: false,
+    userAdded: false,
+  },
+  {
+    alwaysLoaded: false,
+    file: 'https://example.com/player-ship2.png',
+    origin: {
+      name: 'gdevelop-asset-store',
+      identifier: 'https://example.com/player-ship2.png',
+    },
+    kind: 'image',
+    metadata: '',
+    name: 'player-ship2.png',
+    smoothed: false,
+    userAdded: false,
+  },
+];
+
+export const fakeAsset1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  license: 'MIT',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [],
+    },
+  ],
+};
+
+export const fakeAssetWithBehaviorCustomizations1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  license: 'MIT',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [
+        {
+          behaviorName: 'MyBehavior',
+          behaviorType: 'FakeBehavior::FakeBehavior',
+          required: true,
+          extensionName: 'FakeBehavior',
+          extensionVersion: '1.0.0',
+          properties: [
+            {
+              codeOnly: false,
+              description: 'Example of a parameter',
+              longDescription: '',
+              supplementaryInformation: '',
+              optional: false,
+              type: 'string',
+              name: 'property1',
+              defaultValue: 'Overriden value',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  license: 'MIT',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [
+        {
+          behaviorName: 'MyUnknownBehavior',
+          behaviorType: 'UnknownBehavior::UnknownBehavior',
+          required: true,
+          extensionName: 'UnknownBehavior',
+          extensionVersion: '1.0.0',
+          properties: [],
+        },
+      ],
+    },
+  ],
+};
+
+export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  license: 'MIT',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [
+        {
+          behaviorName: 'MyFlashBehavior',
+          behaviorType: 'Flash::Flash',
+          required: true,
+          extensionName: 'Flash',
+          extensionVersion: '1.0.0',
+          properties: [],
+        },
+      ],
+    },
+  ],
+};
+
+export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  authors: ['test author'],
+  license: 'MIT',
+  version: '1.0.0',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [
+        {
+          required: true,
+          extensions: [
+            {
+              extensionName: 'Flash', // Not really used in events, just for tests.
+              extensionVersion: '1.0.0',
+            },
+          ],
+          events: [
+            {
+              disabled: false,
+              folded: false,
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [
+                {
+                  type: { inverted: false, value: 'VarScene' },
+                  parameters: [
+                    'Counter',
+                    '<',
+                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test)',
+                  ],
+                  subInstructions: [],
+                },
+              ],
+              actions: [
+                {
+                  type: { inverted: false, value: 'ModVarScene' },
+                  parameters: [
+                    'Counter',
+                    '=',
+                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test2)',
+                  ],
+                  subInstructions: [],
+                },
+              ],
+              events: [],
+            },
+          ],
+          parameters: [
+            {
+              codeOnly: false,
+              description: 'Example of a parameter',
+              longDescription: '',
+              supplementaryInformation: '',
+              optional: false,
+              type: 'string',
+              name: 'TEXT_TO_REPLACE',
+              defaultValue: '3',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  description: "A very nice way to start a shoot'em up.",
+  previewImageUrls: ['res/GD-logo.png'],
+  gdevelopVersion: '5.0.0-beta100',
+  authors: ['test author'],
+  license: 'MIT',
+  version: '1.0.0',
+  tags: ['space shooter', 'tag2'],
+  objectAssets: [
+    {
+      object: spaceshipSerializedObject,
+      resources: spaceshipSerializedResources,
+      customization: [
+        {
+          required: true,
+          extensions: [
+            {
+              extensionName: 'UnknownExtension', // Not really used in events, just for tests.
+              extensionVersion: '1.0.0',
+            },
+          ],
+          events: [
+            {
+              disabled: false,
+              folded: false,
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [],
+              events: [],
+            },
+          ],
+          parameters: [
+            {
+              codeOnly: false,
+              description: 'Example of a parameter',
+              longDescription: '',
+              supplementaryInformation: '',
+              optional: false,
+              type: 'string',
+              name: 'EXAMPLE_PARAMETER',
+              defaultValue: 'Hello World',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const fakeAssetShortHeader1: AssetShortHeader = {
+  id: '123',
+  name: 'My spaceship',
+  shortDescription:
+    'A spaceship that can be moved with the keyboard or by touching the screen',
+  previewImageUrls: ['res/GD-logo.png'],
+  tags: ['space shooter', 'tag2'],
+};
+
+export const fakeAssetShortHeader2: AssetShortHeader = {
+  id: '456',
+  name: 'Zombie',
+  shortDescription: 'A zombie attacking the player and wandering around.',
+  previewImageUrls: ['res/GD-logo.png'],
+  tags: ['survival', 'tag2'],
+};
+
+export const fakeAssetShortHeader3: AssetShortHeader = {
+  id: '789',
+  name: 'Sword',
+  shortDescription: 'A small sword.',
+  previewImageUrls: ['res/GD-logo.png'],
+  tags: ['medieval', 'tag2'],
+};
+
+export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
+  shortDescription:
+    'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
+  extensionNamespace: '',
+  fullName: 'Fire bullets',
+  name: 'FireBullet',
+  version: '0.0.2',
+  url: 'Extensions/FireBullet.json',
+  headerUrl: 'Extensions/FireBullet-header.json',
+  tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  previewIconUrl: 'http://example.com/icon.svg',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const flashExtensionShortHeader: ExtensionShortHeader = {
+  shortDescription:
+    'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
+  extensionNamespace: '',
+  fullName: 'Flash (blink)',
+  name: 'Flash',
+  version: '1.0.0',
+  url: 'Extensions/Flash.json',
+  headerUrl: 'Extensions/Flash-header.json',
+  tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
+  previewIconUrl: 'http://example.com/icon.svg',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const game1: Game = {
+  id: 'fake-game1-id',
+  authorName: 'My company',
+  gameName: 'My Great Game',
+  createdAt: 1606065498,
+};
+
+export const game2: Game = {
+  id: 'fake-game2-id',
+  authorName: 'My company',
+  gameName: 'My Other Game',
+  createdAt: 1607065498,
+};
+
+export const gameRollingMetrics1: GameMetrics = {
+  date: '2020-10-01',
+
+  sessions: {
+    d0Sessions: 350,
+  },
+  players: {
+    d0Players: 200,
+    d0NewPlayers: 220,
+  },
+  retention: {
+    d1RetainedPlayers: 193,
+    d2RetainedPlayers: 153,
+    d3RetainedPlayers: 121,
+    d4RetainedPlayers: 83,
+    d5RetainedPlayers: 74,
+    d6RetainedPlayers: 73,
+    d7RetainedPlayers: 67,
+  },
+};
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
+  date: '2020-10-01',
+
+  sessions: {
+    d0Sessions: 350,
+  },
+  players: null,
+  retention: null,
+};
+
+export const showcasedGame1: ShowcasedGame = {
+  title: "Lil BUB's HELLO EARTH",
+  author: "Lil BUB's Team",
+  description:
+    'BUB is a very special, one of a kind critter. More specifically, she is the [most amazing cat on the planet](http://lilbub.com)... and her game is made with GDevelop!\n\nThe game is a retro 8-bit game, with beautiful arts and soundtrack, which alternates between platformers levels, with hidden secrets, and shooter levels with bosses, multiple enemies and bonuses.',
+  tags: [
+    'Action',
+    'Platform',
+    'Shooter',
+    'Adventure',
+    'Android',
+    'iOS',
+    'Windows',
+    'macOS',
+    'Linux',
+  ],
+  genres: ['Action', 'Platform', 'Shooter', 'Adventure'],
+  platforms: ['Android', 'iOS', 'Windows', 'macOS', 'Linux'],
+  imageUrls: [
+    'https://resources.gdevelop-app.com/games-showcase/images/18JKXDTWljabX3O09SW2VKYOThZkIf1jG',
+  ],
+  links: [
+    {
+      url:
+        'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
+      type: 'app-store',
+    },
+    {
+      url: 'https://play.google.com/store/apps/details?id=com.lilbub.game',
+      type: 'play-store',
+    },
+    {
+      url: 'http://compilgames.net/bub-landing-page',
+      type: 'download-win-mac-linux',
+    },
+    { url: '/games/lil-bub-hello-earth', type: 'learn-more' },
+  ],
+  isFeatured: false,
+  bannerUrl:
+    'https://resources.gdevelop-app.com/games-showcase/images/bub-game-banner.jpg',
+  bannerBackgroundPosition: '',
+  thumbnailUrl:
+    'https://resources.gdevelop-app.com/games-showcase/images/bub-animated-logo.gif',
+  editorDescription: '',
 };

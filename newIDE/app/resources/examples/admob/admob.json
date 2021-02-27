@@ -1,24 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "test",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\AdMobTest\\game.json",
+    "projectUuid": "27cc16a0-00ca-4864-9430-ee4d98ee4533",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -55,6 +53,33 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [
+      {
+        "extension": "AdMob",
+        "property": "AdMobAppId",
+        "value": "test"
+      },
+      {
+        "extension": "AdMob",
+        "property": "AdMobAppIdAndroid",
+        "value": "ca-app-pub-3940256099942544~3347511713"
+      },
+      {
+        "extension": "AdMob",
+        "property": "AdMobAppIdIos",
+        "value": "ca-app-pub-3940256099942544~3347511713"
+      },
+      {
+        "extension": "AdMob2",
+        "property": "AdMobAppIdAndroid",
+        "value": "ca-app-pub-3940256099942544~3347511713"
+      },
+      {
+        "extension": "AdMob2",
+        "property": "AdMobAppIdIos",
+        "value": "ca-app-pub-3940256099942544~3347511713"
+      }
+    ],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -379,7 +404,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.699
       },
       "objectsGroups": [],
       "variables": [],
@@ -391,6 +416,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "079d1d5b-9a5e-4323-af17-ba4f91ff0fca",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -406,6 +432,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "3e3f2cc0-d9c0-43ca-9b2f-d2b785a205a2",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -420,25 +447,11 @@
           "height": 60,
           "layer": "",
           "locked": false,
-          "name": "LoadAtTop",
-          "width": 100,
-          "x": 500,
-          "y": 80,
-          "zOrder": 0,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": true,
-          "height": 60,
-          "layer": "",
-          "locked": false,
           "name": "Show",
+          "persistentUuid": "2ba10250-66e0-4ff5-80e3-c687a0a41332",
           "width": 100,
           "x": 500,
-          "y": 160,
+          "y": 292,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -450,25 +463,11 @@
           "height": 60,
           "layer": "",
           "locked": false,
-          "name": "LoadAtTopAndDisplay",
+          "name": "SetupAtTop",
+          "persistentUuid": "de79beb1-9ddf-41a7-97a6-a5f5577f52a9",
           "width": 220,
           "x": 500,
-          "y": 240,
-          "zOrder": 0,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": true,
-          "height": 60,
-          "layer": "",
-          "locked": false,
-          "name": "Remove",
-          "width": 220,
-          "x": 500,
-          "y": 400,
+          "y": 132,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -481,24 +480,10 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
-          "width": 0,
-          "x": 580,
-          "y": 420,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "ButtonText",
+          "persistentUuid": "01430782-046b-41a6-bc21-18ce699a2229",
           "width": 0,
           "x": 520,
-          "y": 100,
+          "y": 312,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -511,24 +496,10 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
-          "width": 0,
-          "x": 520,
-          "y": 180,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "ButtonText",
+          "persistentUuid": "b024a0d5-42b7-4f09-8081-2c2e7c550b50",
           "width": 0,
           "x": 580,
-          "y": 260,
+          "y": 152,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -541,6 +512,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToInterstitials",
+          "persistentUuid": "86c90ccf-a171-4425-a0bc-ff00ea25fa63",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -556,6 +528,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToRewardVideos",
+          "persistentUuid": "78775204-1c5e-46e6-a568-b15aa1469dc3",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -571,6 +544,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "dd8ef5d5-abe6-4656-a1c6-a58705ed8af3",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -586,6 +560,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "4f42ece1-b60d-4a83-acdb-cbbf7e60adaf",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -600,40 +575,11 @@
           "height": 60,
           "layer": "",
           "locked": false,
-          "name": "LoadAtBottom",
-          "width": 100,
-          "x": 620,
-          "y": 80,
-          "zOrder": 0,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "ButtonText",
-          "width": 0,
-          "x": 640,
-          "y": 100,
-          "zOrder": 1,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": true,
-          "height": 60,
-          "layer": "",
-          "locked": false,
           "name": "Hide",
+          "persistentUuid": "64c24f45-beb4-4bb5-a944-dd23b178fe16",
           "width": 100,
           "x": 620,
-          "y": 160,
+          "y": 292,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -646,9 +592,10 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "d9183bd2-0451-4cba-a334-31872e96b70c",
           "width": 0,
           "x": 640,
-          "y": 180,
+          "y": 312,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -660,10 +607,11 @@
           "height": 60,
           "layer": "",
           "locked": false,
-          "name": "LoadAtBottomAndDisplay",
+          "name": "SetupAtBottom",
+          "persistentUuid": "1b7ff83a-7f1b-446e-bd49-89ab9e2eee38",
           "width": 220,
           "x": 500,
-          "y": 320,
+          "y": 212,
           "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
@@ -676,9 +624,10 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "b53b313e-d22b-4c35-a510-91f6e36cd53d",
           "width": 0,
           "x": 580,
-          "y": 340,
+          "y": 232,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -691,6 +640,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "7738b93c-df44-4abc-bb12-d46adea2af04",
           "width": 0,
           "x": 300,
           "y": 20,
@@ -703,6 +653,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -744,6 +695,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -758,83 +710,8 @@
           }
         },
         {
-          "name": "LoadAtTop",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "Button.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "LoadAtBottom",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "Button.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
           "name": "Show",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -873,6 +750,7 @@
         },
         {
           "name": "Hide",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -910,7 +788,8 @@
           ]
         },
         {
-          "name": "LoadAtTopAndDisplay",
+          "name": "SetupAtTop",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -948,45 +827,8 @@
           ]
         },
         {
-          "name": "LoadAtBottomAndDisplay",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "Button.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Remove",
+          "name": "SetupAtBottom",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1028,6 +870,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1046,6 +889,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1061,6 +905,7 @@
         },
         {
           "name": "GoToInterstitials",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1099,6 +944,7 @@
         },
         {
           "name": "GoToRewardVideos",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1160,7 +1006,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -1201,104 +1047,6 @@
                   },
                   "parameters": [
                     "ButtonText",
-                    "LoadAtTop",
-                    "",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\" Load\nat top\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "MettreXY"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "LoadAtTop.PointX(Centre) - ButtonText.Width()/2",
-                    "=",
-                    "LoadAtTop.PointY(Centre) - ButtonText.Height()/2"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAtBottom",
-                    "",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"   Load\nat bottom\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "MettreXY"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "LoadAtBottom.PointX(Centre) - ButtonText.Width()/2",
-                    "=",
-                    "LoadAtBottom.PointY(Centre) - ButtonText.Height()/2"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "ButtonText",
                     "Show",
                     "",
                     ""
@@ -1327,9 +1075,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Show.PointX(Centre) - ButtonText.Width()/2",
+                    "Show.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Show.PointY(Centre) - ButtonText.Height()/2"
+                    "Show.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1376,9 +1124,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Hide.PointX(Centre) - ButtonText.Width()/2",
+                    "Hide.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Hide.PointY(Centre) - ButtonText.Height()/2"
+                    "Hide.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1397,7 +1145,7 @@
                   },
                   "parameters": [
                     "ButtonText",
-                    "LoadAtTopAndDisplay",
+                    "SetupAtTop",
                     "",
                     ""
                   ],
@@ -1413,7 +1161,7 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "\"Load at top\n & Display\""
+                    "\"Set at top \n(before display)\""
                   ],
                   "subInstructions": []
                 },
@@ -1425,9 +1173,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtTopAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "SetupAtTop.PointX(\"Centre\") - ButtonText.Width() / 2",
                     "=",
-                    "LoadAtTopAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "SetupAtTop.PointY(\"Centre\") - ButtonText.Height() / 2"
                   ],
                   "subInstructions": []
                 }
@@ -1446,7 +1194,7 @@
                   },
                   "parameters": [
                     "ButtonText",
-                    "LoadAtBottomAndDisplay",
+                    "SetupAtBottom",
                     "",
                     ""
                   ],
@@ -1462,7 +1210,7 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "\"Load at bottom\n    & Display\""
+                    "\"Set at bottom \n(before display)\""
                   ],
                   "subInstructions": []
                 },
@@ -1474,58 +1222,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtBottomAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "SetupAtBottom.PointX(\"Centre\") - ButtonText.Width() / 2",
                     "=",
-                    "LoadAtBottomAndDisplay.PointY(Centre) - ButtonText.Height()/2"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "Remove",
-                    "",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Remove\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "MettreXY"
-                  },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "Remove.PointX(Centre) - ButtonText.Width()/2",
-                    "=",
-                    "Remove.PointY(Centre) - ButtonText.Height()/2"
+                    "SetupAtBottom.PointY(\"Centre\") - ButtonText.Height() / 2"
                   ],
                   "subInstructions": []
                 }
@@ -1572,9 +1271,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToInterstitials.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToInterstitials.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToInterstitials.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToInterstitials.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1621,9 +1320,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToRewardVideos.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToRewardVideos.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToRewardVideos.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToRewardVideos.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1680,82 +1379,6 @@
           ],
           "actions": [],
           "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "LoadAtTop",
-                    "",
-                    "no",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AdMob::LoadBanner"
-                  },
-                  "parameters": [
-                    "\"ca-app-pub-3940256099942544/6300978111\"",
-                    "\"test\"",
-                    "yes",
-                    "yes",
-                    "no",
-                    "no"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "LoadAtBottom",
-                    "",
-                    "no",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AdMob::LoadBanner"
-                  },
-                  "parameters": [
-                    "\"ca-app-pub-3940256099942544/6300978111\"",
-                    "\"test\"",
-                    "no",
-                    "yes",
-                    "no",
-                    "no"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
             {
               "disabled": false,
               "folded": false,
@@ -1829,7 +1452,7 @@
                     "value": "SourisSurObjet"
                   },
                   "parameters": [
-                    "LoadAtTopAndDisplay",
+                    "SetupAtTop",
                     "",
                     "no",
                     ""
@@ -1845,7 +1468,7 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/6300978111\"",
-                    "\"test\"",
+                    "\"ca-app-pub-3940256099942544/6300978111\"",
                     "yes",
                     "yes",
                     "yes",
@@ -1867,7 +1490,7 @@
                     "value": "SourisSurObjet"
                   },
                   "parameters": [
-                    "LoadAtBottomAndDisplay",
+                    "SetupAtBottom",
                     "",
                     "no",
                     ""
@@ -1883,43 +1506,12 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/6300978111\"",
-                    "\"test\"",
+                    "\"ca-app-pub-3940256099942544/6300978111\"",
                     "no",
                     "yes",
                     "yes",
                     "no"
                   ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "Remove",
-                    "",
-                    "no",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AdMob::RemoveBanner"
-                  },
-                  "parameters": [],
                   "subInstructions": []
                 }
               ],
@@ -2023,7 +1615,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
           "actions": [
@@ -2034,18 +1626,6 @@
               },
               "parameters": [
                 "loading",
-                "=",
-                "\"false\""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarSceneTxt"
-              },
-              "parameters": [
-                "ready",
                 "=",
                 "\"false\""
               ],
@@ -2069,7 +1649,7 @@
                 "value": "ModVarSceneTxt"
               },
               "parameters": [
-                "exists",
+                "errored",
                 "=",
                 "\"false\""
               ],
@@ -2099,36 +1679,6 @@
                   },
                   "parameters": [
                     "loading",
-                    "=",
-                    "\"true\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AdMob::BannerReady"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "ready",
                     "=",
                     "\"true\""
                   ],
@@ -2175,7 +1725,7 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "AdMob::BannerExists"
+                    "value": "AdMob::BannerErrored"
                   },
                   "parameters": [],
                   "subInstructions": []
@@ -2188,7 +1738,7 @@
                     "value": "ModVarSceneTxt"
                   },
                   "parameters": [
-                    "exists",
+                    "errored",
                     "=",
                     "\"true\""
                   ],
@@ -2211,7 +1761,7 @@
                   "parameters": [
                     "DebugText",
                     "=",
-                    "\"Loading: \" + VariableString(loading) + NewLine() + \"Ready: \" + VariableString(ready) + NewLine() + \"Showing: \" + VariableString(showing) + NewLine() + \"Exists: \" + VariableString(exists)"
+                    "\"Loading: \" + VariableString(loading) +  NewLine() + \"Showing: \" + VariableString(showing) + NewLine() + \"Errored: \" + VariableString(errored)"
                   ],
                   "subInstructions": []
                 }
@@ -2223,6 +1773,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2278,6 +1833,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "37936327-98a7-4dad-89da-2c79e2a38544",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -2293,6 +1849,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "ea33063b-f801-47b9-8389-18c9e3349160",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -2308,6 +1865,7 @@
           "layer": "",
           "locked": false,
           "name": "Load",
+          "persistentUuid": "1e4a94b2-f6be-497c-9e38-726fbe253dd2",
           "width": 100,
           "x": 500,
           "y": 80,
@@ -2323,6 +1881,7 @@
           "layer": "",
           "locked": false,
           "name": "Display",
+          "persistentUuid": "109f1dfa-b071-4a6d-9285-e0ef513c0743",
           "width": 100,
           "x": 620,
           "y": 80,
@@ -2338,6 +1897,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAndDisplay",
+          "persistentUuid": "39e42d64-a0a0-45fb-bab4-4bbbe9d3b7b7",
           "width": 220,
           "x": 500,
           "y": 200,
@@ -2353,6 +1913,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "0999cfe6-f2ee-4706-8dab-935ea3e1f596",
           "width": 0,
           "x": 520,
           "y": 100,
@@ -2368,6 +1929,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "74965162-2737-47fd-8ed7-d0b9c3d342be",
           "width": 0,
           "x": 640,
           "y": 100,
@@ -2383,6 +1945,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "61356dcc-5b78-4bc9-b13c-eb2635a7e64a",
           "width": 0,
           "x": 580,
           "y": 220,
@@ -2398,6 +1961,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToBanners",
+          "persistentUuid": "1d6687d6-349f-4ad5-b828-76bcfe3a20bc",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -2413,6 +1977,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToRewardVideos",
+          "persistentUuid": "89464411-a92b-4d92-9bca-c20e435680e3",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -2428,6 +1993,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "0d3c8199-8af4-4302-9b99-600c1b97c21a",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -2443,6 +2009,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "3ebf8a73-8af7-43fc-a044-d2d820ac2c67",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -2458,6 +2025,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "eab0b000-d156-4f2d-b060-c7c3ac62da6d",
           "width": 0,
           "x": 240,
           "y": 20,
@@ -2470,6 +2038,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2511,6 +2080,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2526,6 +2096,7 @@
         },
         {
           "name": "Load",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2564,6 +2135,7 @@
         },
         {
           "name": "Display",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2602,6 +2174,7 @@
         },
         {
           "name": "LoadAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2643,6 +2216,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2661,6 +2235,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2676,6 +2251,7 @@
         },
         {
           "name": "GoToBanners",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2714,6 +2290,7 @@
         },
         {
           "name": "GoToRewardVideos",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2775,7 +2352,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -2844,9 +2421,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Load.PointX(Centre) - ButtonText.Width()/2",
+                    "Load.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Load.PointY(Centre) - ButtonText.Height()/2"
+                    "Load.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2893,9 +2470,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Display.PointX(Centre) - ButtonText.Width()/2",
+                    "Display.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Display.PointY(Centre) - ButtonText.Height()/2"
+                    "Display.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2942,9 +2519,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2991,9 +2568,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToRewardVideos.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToRewardVideos.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToRewardVideos.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToRewardVideos.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -3040,9 +2617,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToBanners.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToBanners.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToBanners.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToBanners.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -3126,8 +2703,7 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/1033173712\"",
-                    "\"test\"",
-                    "no",
+                    "\"ca-app-pub-3940256099942544/1033173712\"",
                     "no"
                   ],
                   "subInstructions": []
@@ -3193,9 +2769,8 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/1033173712\"",
-                    "\"test\"",
-                    "yes",
-                    "no"
+                    "\"ca-app-pub-3940256099942544/1033173712\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -3300,7 +2875,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
           "actions": [
@@ -3335,6 +2910,18 @@
               },
               "parameters": [
                 "showing",
+                "=",
+                "\"false\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "errored",
                 "=",
                 "\"false\""
               ],
@@ -3436,6 +3023,36 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AdMob::InterstitialErrored"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "errored",
+                    "=",
+                    "\"true\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
                 {
@@ -3446,7 +3063,7 @@
                   "parameters": [
                     "DebugText",
                     "=",
-                    "\"Loading: \" + VariableString(loading) + NewLine() + \"Ready: \" + VariableString(ready) + NewLine() + \"Showing: \" + VariableString(showing)"
+                    "\"Loading: \" + VariableString(loading) + NewLine() + \"Ready: \" + VariableString(ready) + NewLine() + \"Showing: \" + VariableString(showing) + NewLine() + \"Errored: \" + VariableString(errored) + NewLine() "
                   ],
                   "subInstructions": []
                 }
@@ -3458,6 +3075,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3513,6 +3135,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "8c79c632-b859-4904-afab-126a7dcda17a",
           "width": 0,
           "x": 341,
           "y": 238,
@@ -3528,6 +3151,7 @@
           "layer": "",
           "locked": false,
           "name": "DebugText",
+          "persistentUuid": "e4fdd33b-6204-4884-8d91-f17b6e3af4b4",
           "width": 0,
           "x": 80,
           "y": 80,
@@ -3543,6 +3167,7 @@
           "layer": "",
           "locked": false,
           "name": "Load",
+          "persistentUuid": "14c5ace8-6f5a-4e60-b3c1-2957fb808d08",
           "width": 100,
           "x": 500,
           "y": 80,
@@ -3558,6 +3183,7 @@
           "layer": "",
           "locked": false,
           "name": "Display",
+          "persistentUuid": "3a11022c-c351-4764-af79-b605d4723d9a",
           "width": 100,
           "x": 620,
           "y": 80,
@@ -3573,6 +3199,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadAndDisplay",
+          "persistentUuid": "88ab0386-725e-4bdf-973c-15e730654f91",
           "width": 220,
           "x": 500,
           "y": 200,
@@ -3588,6 +3215,7 @@
           "layer": "",
           "locked": false,
           "name": "ClaimReward",
+          "persistentUuid": "619a28a1-77fa-4ae4-b518-c4d931c35cec",
           "width": 220,
           "x": 500,
           "y": 320,
@@ -3603,6 +3231,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "b20d9965-9381-4dc8-9803-6ab88b211d18",
           "width": 0,
           "x": 580,
           "y": 340,
@@ -3618,6 +3247,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "9ed000a5-b968-49a9-8776-679507cac2e7",
           "width": 0,
           "x": 520,
           "y": 100,
@@ -3633,6 +3263,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "6e3206b1-c2d6-428f-8970-820cf47f3af9",
           "width": 0,
           "x": 640,
           "y": 100,
@@ -3648,6 +3279,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "af1cd66d-684d-49b6-ac63-a7f56082e01c",
           "width": 0,
           "x": 580,
           "y": 220,
@@ -3663,6 +3295,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToBanners",
+          "persistentUuid": "165cca07-0b99-494f-a371-dff51e67b2a9",
           "width": 220,
           "x": 560,
           "y": 520,
@@ -3678,6 +3311,7 @@
           "layer": "",
           "locked": false,
           "name": "GoToInterstitials",
+          "persistentUuid": "fb9d8029-4fc4-47a6-8dfa-9923d6c17fb1",
           "width": 220,
           "x": 20,
           "y": 520,
@@ -3693,6 +3327,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "c9cdfcbf-8b40-41a5-9d2f-4b471ac3c0bc",
           "width": 0,
           "x": 100,
           "y": 540,
@@ -3708,6 +3343,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonText",
+          "persistentUuid": "bf548de1-5531-412d-8dba-c7267f0c18b7",
           "width": 0,
           "x": 640,
           "y": 540,
@@ -3723,6 +3359,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "c09198f7-b501-40a0-bd50-f8c58c747175",
           "width": 0,
           "x": 220,
           "y": 20,
@@ -3735,6 +3372,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3776,6 +3414,7 @@
           "italic": false,
           "name": "DebugText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3791,6 +3430,7 @@
         },
         {
           "name": "Load",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3829,6 +3469,7 @@
         },
         {
           "name": "Display",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3867,6 +3508,7 @@
         },
         {
           "name": "LoadAndDisplay",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3905,6 +3547,7 @@
         },
         {
           "name": "ClaimReward",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3946,6 +3589,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3964,6 +3608,7 @@
           "italic": false,
           "name": "ButtonText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3979,6 +3624,7 @@
         },
         {
           "name": "GoToBanners",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4017,6 +3663,7 @@
         },
         {
           "name": "GoToInterstitials",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -4078,7 +3725,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -4147,9 +3794,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Load.PointX(Centre) - ButtonText.Width()/2",
+                    "Load.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Load.PointY(Centre) - ButtonText.Height()/2"
+                    "Load.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4196,9 +3843,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Display.PointX(Centre) - ButtonText.Width()/2",
+                    "Display.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Display.PointY(Centre) - ButtonText.Height()/2"
+                    "Display.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4245,9 +3892,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4282,7 +3929,7 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "\"Claim Reward!\""
+                    "\"Get the reward\""
                   ],
                   "subInstructions": []
                 },
@@ -4294,9 +3941,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "ClaimReward.PointX(Centre) - ButtonText.Width()/2",
+                    "ClaimReward.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "ClaimReward.PointY(Centre) - ButtonText.Height()/2"
+                    "ClaimReward.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4343,9 +3990,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToBanners.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToBanners.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToBanners.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToBanners.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4392,9 +4039,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToInterstitials.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToInterstitials.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToInterstitials.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToInterstitials.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4478,7 +4125,7 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/5224354917\"",
-                    "\"test\"",
+                    "\"ca-app-pub-3940256099942544/5224354917\"",
                     "no",
                     "no"
                   ],
@@ -4545,7 +4192,7 @@
                   },
                   "parameters": [
                     "\"ca-app-pub-3940256099942544/5224354917\"",
-                    "\"test\"",
+                    "\"ca-app-pub-3940256099942544/5224354917\"",
                     "yes",
                     "no"
                   ],
@@ -4696,7 +4343,7 @@
         },
         {
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
           "actions": [
@@ -4743,6 +4390,18 @@
               },
               "parameters": [
                 "reward",
+                "=",
+                "\"false\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "errored",
                 "=",
                 "\"false\""
               ],
@@ -4876,6 +4535,36 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AdMob::VideoErrored"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "errored",
+                    "=",
+                    "\"true\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
                 {
@@ -4886,7 +4575,7 @@
                   "parameters": [
                     "DebugText",
                     "=",
-                    "\"Loading: \" + VariableString(loading) + NewLine() + \"Ready: \" + VariableString(ready) + NewLine() + \"Showing: \" + VariableString(showing) + NewLine() + \"Reward: \" + VariableString(reward)"
+                    "\"Loading: \" + VariableString(loading) + NewLine() + \"Ready: \" + VariableString(ready) + NewLine() + \"Showing: \" + VariableString(showing) + NewLine() + \"Errored: \" + VariableString(errored) + NewLine() + \"Reward: \" + VariableString(reward)"
                   ],
                   "subInstructions": []
                 }
@@ -4898,6 +4587,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

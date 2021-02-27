@@ -87,6 +87,10 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           previewExportOptions.setExternalLayoutName(externalLayout.getName());
         }
 
+        // Scripts generated from extensions keep the same URL even after being modified.
+        // Use a cache bursting parameter to force the browser to reload them.
+        previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+
         exporter.exportProjectForPixiPreview(previewExportOptions);
         previewExportOptions.delete();
         exporter.delete();

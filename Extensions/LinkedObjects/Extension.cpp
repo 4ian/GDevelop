@@ -5,17 +5,22 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include <iostream>
+
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "ObjectsLinksManager.h"
-
-#include <iostream>
 
 void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation(
           "LinkedObjects",
           _("Linked objects"),
-          _("This Extension can virtually link two objects."),
+          "These actions and conditions allow to virtually link two objects. "
+          "It's then useful in the events to quickly retrieve one or more "
+          "objects attached to another. For example, this can be used to link "
+          "some equipment objects with the character holding them. More "
+          "generally, this can be used to store and retrieve objects in a way "
+          "that is more efficient than using variables.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/linked-objects");

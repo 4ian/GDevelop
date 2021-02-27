@@ -13,10 +13,15 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   getName(): string;
   setFullName(fullName: string): gdEventsFunctionsExtension;
   getFullName(): string;
-  setTags(tags: string): gdEventsFunctionsExtension;
-  getTags(): string;
+  getTags(): gdVectorString;
   setAuthor(author: string): gdEventsFunctionsExtension;
   getAuthor(): string;
+  setPreviewIconUrl(previewIconUrl: string): gdEventsFunctionsExtension;
+  getPreviewIconUrl(): string;
+  setIconUrl(iconUrl: string): gdEventsFunctionsExtension;
+  getIconUrl(): string;
+  setHelpPath(helpPath: string): gdEventsFunctionsExtension;
+  getHelpPath(): string;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

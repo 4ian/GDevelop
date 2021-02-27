@@ -4,6 +4,8 @@ declare class gdResourcesManager {
   getAllResourceNames(): gdVectorString;
   hasResource(name: string): boolean;
   getResource(name: string): gdResource;
+  getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
+  getResourceNameWithFile(file: string): string;
   addResource(res: gdResource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;

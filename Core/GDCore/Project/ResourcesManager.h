@@ -80,6 +80,17 @@ class GD_CORE_API Resource {
   virtual void SetFile(const gd::String& newFile){};
 
   /**
+   * TODO: make a ResourceOrigin object?
+   */
+  virtual void SetOrigin(const gd::String& originName_, const gd::String& originIdentifier_) {
+    originName = originName_;
+    originIdentifier = originIdentifier_;
+  }
+
+  virtual const gd::String& GetOriginName() const { return originName; }
+  virtual const gd::String& GetOriginIdentifier() const { return originIdentifier; }
+
+  /**
    * \brief Set the metadata (any string) associated to the resource.
    * \note Can be used by external editors to store extra information, for
    * example the configuration used to produce a sound.
@@ -121,8 +132,7 @@ class GD_CORE_API Resource {
    *
    * \return false if the new value cannot be set
    */
-  virtual bool UpdateProperty(const gd::String& name,
-                              const gd::String& value) {
+  virtual bool UpdateProperty(const gd::String& name, const gd::String& value) {
     return false;
   };
 ///@}
@@ -142,6 +152,8 @@ class GD_CORE_API Resource {
   gd::String kind;
   gd::String name;
   gd::String metadata;
+  gd::String originName;
+  gd::String originIdentifier;
   bool userAdded;  ///< True if the resource was added by the user, and not
                    ///< automatically by GDevelop.
 
@@ -178,8 +190,7 @@ class GD_CORE_API ImageResource : public Resource {
   virtual bool UseFile() override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
-  bool UpdateProperty(const gd::String& name,
-                      const gd::String& value) override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   /**
    * \brief Serialize the object
@@ -216,7 +227,9 @@ class GD_CORE_API ImageResource : public Resource {
  */
 class GD_CORE_API AudioResource : public Resource {
  public:
-  AudioResource() : Resource() { SetKind("audio"); };
+  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false) {
+    SetKind("audio");
+  };
   virtual ~AudioResource(){};
   virtual AudioResource* Clone() const override {
     return new AudioResource(*this);
@@ -227,13 +240,39 @@ class GD_CORE_API AudioResource : public Resource {
 
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
+
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
+  
   void SerializeTo(SerializerElement& element) const override;
 #endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
+  /**
+   * \brief Return true if the audio resource should be preloaded as music.
+   */
+  bool PreloadAsMusic() const { return preloadAsMusic; }
+
+  /**
+   * \brief Set if the audio resource should be preloaded as music.
+   */
+  void SetPreloadAsMusic(bool enable = true) { preloadAsMusic = enable; }
+
+  /**
+   * \brief Return true if the audio resource should be preloaded as music.
+   */
+  bool PreloadAsSound() const { return preloadAsSound; }
+
+  /**
+   * \brief Set if the audio resource should be preloaded as music.
+   */
+  void SetPreloadAsSound(bool enable = true) { preloadAsSound = enable; }
+
  private:
   gd::String file;
+  bool preloadAsSound;
+  bool preloadAsMusic;
 };
 
 /**
@@ -313,8 +352,7 @@ class GD_CORE_API JsonResource : public Resource {
   virtual bool UseFile() override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
-  bool UpdateProperty(const gd::String& name,
-                      const gd::String& value) override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   void SerializeTo(SerializerElement& element) const override;
 #endif
@@ -353,6 +391,18 @@ class GD_CORE_API ResourcesManager {
    * \brief Return true if a resource exists.
    */
   bool HasResource(const gd::String& name) const;
+
+  /**
+   * \brief Return the name of the resource with the given origin, if any.
+   * If not found, an empty string is returned.
+   */
+  const gd::String& GetResourceNameWithOrigin(const gd::String& originName, const gd::String& originIdentifier) const;
+
+  /**
+   * \brief Return the name of the first resource with the given file, if any.
+   * If not found, an empty string is returned.
+   */
+  const gd::String& GetResourceNameWithFile(const gd::String& file) const;
 
   /**
    * \brief Return a reference to a resource.
@@ -487,6 +537,7 @@ class GD_CORE_API ResourcesManager {
   static ResourceFolder badFolder;
 #endif
   static Resource badResource;
+  static gd::String badResourceName;
 };
 
 #if defined(GD_IDE_ONLY)

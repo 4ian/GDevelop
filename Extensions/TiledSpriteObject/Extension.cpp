@@ -6,24 +6,28 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-
 #include <iostream>
+
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "TiledSpriteObject.h"
 
 void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "TiledSpriteObject",
-      _("Tiled Sprite Object"),
-      _("This Extension enables the use of Tiled Sprite Objects."),
-      "Victor Levasseur and Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "TiledSpriteObject",
+          _("Tiled Sprite Object"),
+          "Displays an image in a repeating pattern over an area. Useful for "
+          "making backgrounds, including background that are scrolling when "
+          "the camera moves. This is more performant than using multiple "
+          "Sprite objects.",
+          "Victor Levasseur and Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/tiled_sprite");
 
   gd::ObjectMetadata& obj = extension.AddObject<TiledSpriteObject>(
       "TiledSprite",
       _("Tiled Sprite"),
-      _("Displays an image repeated over an area"),
+      _("Displays an image repeated over an area."),
       "CppPlatform/Extensions/TiledSpriteIcon.png");
 
 #if defined(GD_IDE_ONLY)
@@ -41,14 +45,15 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddAction("SetOpacity",
-                _("Change Tiled Sprite opacity"),
-                _("Change the opacity of a Tiled Sprite. 0 is fully transparent, 255 "
-                  "is opaque (default)."),
-                _("the opacity"),
-                _("Visibility"),
-                "res/actions/opacity24.png",
-                "res/actions/opacity.png")
+  obj.AddAction(
+         "SetOpacity",
+         _("Change Tiled Sprite opacity"),
+         _("Change the opacity of a Tiled Sprite. 0 is fully transparent, 255 "
+           "is opaque (default)."),
+         _("the opacity"),
+         _("Visibility"),
+         "res/actions/opacity24.png",
+         "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number");
@@ -62,15 +67,15 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction(
          "SetColor",
-         _("Global color"),
-         _("Change the global color of a Tiled Sprite. The default color is white."),
-         _("Change color of _PARAM0_ to _PARAM1_"),
+         _("Tint color"),
+         _("Change the tint of a Tiled Sprite. The default color is white."),
+         _("Change tint of _PARAM0_ to _PARAM1_"),
          _("Effects"),
          "res/actions/color24.png",
          "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .AddParameter("color", _("Color"));
+      .AddParameter("color", _("Tint"));
 
   obj.AddAction("Width",
                 _("Width"),

@@ -15,7 +15,7 @@ import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
@@ -37,7 +37,7 @@ export type EventsFunctionCreationParameters = {|
 |};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.getName();
+  eventsFunction.getName() + (eventsFunction.isPrivate() ? ' (private)' : '');
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -86,6 +86,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
+  _togglePrivate = (eventsFunction: gdEventsFunction) => {
+    eventsFunction.setPrivate(!eventsFunction.isPrivate());
+    this.forceUpdate();
+  };
+
   _deleteEventsFunction = (
     eventsFunction: gdEventsFunction,
     { askForConfirmation }: {| askForConfirmation: boolean |}
@@ -127,7 +132,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     if (eventsFunction.getName() === newName) return;
 
     if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
-      showWarningBox('Another function with this name already exists.');
+      showWarningBox('Another function with this name already exists.', {
+        delayToNextTick: true,
+      });
       return;
     }
 
@@ -174,9 +181,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _pasteEventsFunction = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
-    const { eventsFunction: copiedEventsFunction, name } = Clipboard.get(
-      EVENTS_FUNCTION_CLIPBOARD_KIND
+    const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
+    const copiedEventsFunction = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'eventsFunction'
     );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    if (!name || !copiedEventsFunction) return;
+
     const { project, eventsFunctionsContainer } = this.props;
 
     const newName = newNameGenerator(name, name =>
@@ -212,9 +224,15 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   ) => {
     return [
       {
-        label: i18n._(t`Renames`),
+        label: i18n._(t`Rename`),
         click: () => this._editName(eventsFunction),
         enabled: this.props.canRename(eventsFunction),
+      },
+      {
+        label: eventsFunction.isPrivate()
+          ? i18n._(t`Make public`)
+          : i18n._(t`Make private`),
+        click: () => this._togglePrivate(eventsFunction),
       },
       {
         label: i18n._(t`Remove`),

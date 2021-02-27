@@ -15,7 +15,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
       .SetExtensionInformation(
           "BuiltinKeyboard",
           _("Keyboard features"),
-          _("Built-in extension that enables the use of a keyboard"),
+          _("Allows your game to respond to keyboard input. Note that this "
+            "does not work with on-screen keyboard on touch devices: use "
+            "instead conditions related to touch when making a game for "
+            "mobile/touchscreen devices."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/keyboard");
@@ -74,6 +77,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Any key pressed"),
                     _("Test if any key is pressed"),
                     _("Any key is pressed"),
+                    _("Keyboard"),
+                    "res/conditions/keyboard24.png",
+                    "res/conditions/keyboard.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+ extension
+      .AddCondition("AnyKeyReleased",
+                    _("Any key released"),
+                    _("Test if any key is released"),
+                    _("Any key is released"),
                     _("Keyboard"),
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")

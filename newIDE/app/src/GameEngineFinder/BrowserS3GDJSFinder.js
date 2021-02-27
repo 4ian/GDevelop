@@ -43,7 +43,7 @@ export const findGDJS = (
   filesContent: Array<TextFileDescriptor>,
 |}> => {
   // Get GDJS for this version. If you updated the version,
-  // run `newIDE/web0app/scripts/deploy-GDJS-Runtime` script.
+  // run `newIDE/web-app/scripts/deploy-GDJS-Runtime` script.
   const gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
 
   return Promise.all(

@@ -525,6 +525,37 @@ public:
     String FindAndReplace(String search, String replacement, bool all = true) const;
 
     /**
+     * \brief Removes the specified characters (by default all the "whitespaces" and line breaks) from the beginning of the string,
+     * and return the new string.
+     */
+    String LeftTrim(const gd::String& chars = " \t\n\v\f\r")
+    {
+        String trimmedString(*this);
+        trimmedString.erase(0, trimmedString.find_first_not_of(chars));
+        return trimmedString;
+    }
+
+    /**
+     * \brief Removes the specified characters (by default all the "whitespaces" and line breaks) from the end of the string,
+     * and return the new string.
+     */
+    String RightTrim(const gd::String& chars = " \t\n\v\f\r")
+    {
+        String trimmedString(*this);
+        trimmedString.erase(trimmedString.find_last_not_of(chars) + 1);
+        return trimmedString;
+    }
+
+    /**
+     * \brief Removes the specified characters (by default all the "whitespaces" and line breaks) from the
+     * beginning and the end of the string and return the new string.
+     */
+    String Trim(const gd::String& chars = " \t\n\v\f\r")
+    {
+        return LeftTrim(chars).RightTrim(chars);
+    }
+
+    /**
      * Normalization form
      */
     enum NormForm

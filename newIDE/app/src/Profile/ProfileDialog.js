@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
 import ProfileDetails from './ProfileDetails';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -13,11 +13,15 @@ import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
+import { GamesList } from '../GameDashboard/GamesList';
+import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {|
+  currentProject: ?gdProject,
   open: boolean,
   onClose: Function,
   onChangeSubscription: Function,
+  initialTab: 'profile' | 'games-dashboard',
 |};
 
 type State = {|
@@ -26,7 +30,7 @@ type State = {|
 
 export default class ProfileDialog extends Component<Props, State> {
   state = {
-    currentTab: 'profile',
+    currentTab: this.props.initialTab,
   };
 
   _onChangeTab = (newTab: string) =>
@@ -51,7 +55,14 @@ export default class ProfileDialog extends Component<Props, State> {
           <Dialog
             actions={actions}
             secondaryActions={[
-              <HelpButton key="help" helpPagePath="/interface/profile" />,
+              <HelpButton
+                key="help"
+                helpPagePath={
+                  this.state.currentTab === 'games-dashboard'
+                    ? '/interface/games-dashboard'
+                    : '/interface/profile'
+                }
+              />,
               userProfile.authenticated && (
                 <FlatButton
                   label={<Trans>Refresh</Trans>}
@@ -74,7 +85,11 @@ export default class ProfileDialog extends Component<Props, State> {
           >
             <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
               <Tab label={<Trans>My Profile</Trans>} value="profile" />
-              <Tab label={<Trans>Online services usage</Trans>} value="usage" />
+              <Tab
+                label={<Trans>Games Dashboard</Trans>}
+                value="games-dashboard"
+              />
+              <Tab label={<Trans>Services Usage</Trans>} value="usage" />
             </Tabs>
             {this.state.currentTab === 'profile' &&
               (userProfile.authenticated ? (
@@ -90,6 +105,29 @@ export default class ProfileDialog extends Component<Props, State> {
                   <CreateProfile
                     onLogin={userProfile.onLogin}
                     onCreateAccount={userProfile.onCreateAccount}
+                  />
+                </Column>
+              ))}
+            {this.state.currentTab === 'games-dashboard' &&
+              (userProfile.authenticated ? (
+                <Line>
+                  <ColumnStackLayout expand>
+                    <GamesList project={this.props.currentProject} />
+                  </ColumnStackLayout>
+                </Line>
+              ) : (
+                <Column>
+                  <CreateProfile
+                    onLogin={userProfile.onLogin}
+                    onCreateAccount={userProfile.onCreateAccount}
+                    message={
+                      <Trans>
+                        Create an account to register your games and to get
+                        access to metrics collected anonymously, like the number
+                        of daily players and retention of the players after a
+                        few days.
+                      </Trans>
+                    }
                   />
                 </Column>
               ))}

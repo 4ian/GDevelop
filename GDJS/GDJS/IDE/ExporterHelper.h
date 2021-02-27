@@ -32,13 +32,17 @@ struct PreviewExportOptions {
    * \param exportPath_ The path in the filesystem where to export the files
    */
   PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
-      : project(project_), exportPath(exportPath_), projectDataOnlyExport(false) {};
+      : project(project_),
+        exportPath(exportPath_),
+        projectDataOnlyExport(false),
+        nonRuntimeScriptsCacheBurst(0){};
 
   /**
-   * \brief Set the address of the debugger server that the game should reach out to,
-   * using WebSockets.
+   * \brief Set the address of the debugger server that the game should reach
+   * out to, using WebSockets.
    */
-  PreviewExportOptions &SetDebuggerServerAddress(const gd::String& address, const gd::String& port) {
+  PreviewExportOptions &SetDebuggerServerAddress(const gd::String &address,
+                                                 const gd::String &port) {
     debuggerServerAddress = address;
     debuggerServerPort = port;
     return *this;
@@ -76,8 +80,18 @@ struct PreviewExportOptions {
    * \brief Set if the export should only export the project data, not
    * exporting events code.
    */
-  PreviewExportOptions& SetProjectDataOnlyExport(bool enable) {
+  PreviewExportOptions &SetProjectDataOnlyExport(bool enable) {
     projectDataOnlyExport = enable;
+    return *this;
+  }
+
+  /**
+   * \brief If set to a non zero value, the exported script URLs will have an
+   * extra search parameter added (with the given value) to ensure browser cache
+   * is bypassed when they are loaded.
+   */
+  PreviewExportOptions &SetNonRuntimeScriptsCacheBurst(unsigned int value) {
+    nonRuntimeScriptsCacheBurst = value;
     return *this;
   }
 
@@ -89,6 +103,7 @@ struct PreviewExportOptions {
   gd::String externalLayoutName;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
+  unsigned int nonRuntimeScriptsCacheBurst;
 };
 
 /**
@@ -154,13 +169,17 @@ class ExporterHelper {
 
   /**
    * \brief Copy all the specified files to the
-   * export directory. Relative files are copied from "<GDJS root>/Runtime" directory.
+   * export directory. Relative files are copied from "<GDJS root>/Runtime"
+   * directory.
    *
    * \param includesFiles A vector with filenames to be copied.
-   * \param exportDir The directory where the files mus tbe copied.
+   * \param exportDir The directory where the files must be copied.
+   * \param exportSourceMaps Should the source maps be copied? Should be true on
+   * previews only.
    */
   bool ExportIncludesAndLibs(const std::vector<gd::String> &includesFiles,
-                             gd::String exportDir);
+                             gd::String exportDir,
+                             bool exportSourceMaps);
 
   /**
    * \brief Generate the events JS code, and save them to the export directory.
@@ -186,8 +205,8 @@ class ExporterHelper {
    * \brief Add the include files for all the objects of the project
    * and their behaviors.
    */
-  void ExportObjectAndBehaviorsIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles);
+  void ExportObjectAndBehaviorsIncludes(gd::Project &project,
+                                        std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export
@@ -214,13 +233,18 @@ class ExporterHelper {
    * \param source The file to be used as a template for the final file.
    * \param exportDir The directory where the preview must be created.
    * \param includesFiles The JS files to be included in the HTML file. Order is
-   * important. \param additionalSpec JSON string that will be passed to the
+   * important.
+   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
+   * bursting parameter to scripts, that are not part of the runtime/extensions,
+   * to force the browser to reload them.
+   * \param additionalSpec JSON string that will be passed to the
    * gdjs.RuntimeGame object.
    */
   bool ExportPixiIndexFile(const gd::Project &project,
                            gd::String source,
                            gd::String exportDir,
                            const std::vector<gd::String> &includesFiles,
+                           unsigned int nonRuntimeScriptsCacheBurst,
                            gd::String additionalSpec = "");
 
   /**
@@ -232,6 +256,9 @@ class ExporterHelper {
    * \param includesFiles "<!--GDJS_CODE_FILES -->" will be
    * replaced by HTML tags to include the filenames
    * contained inside the vector.
+   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
+   * bursting parameter to scripts, that are not part of the runtime/extensions,
+   * to force the browser to reload them.
    * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC"
    * surrounded by comments marks will be replaced by the
    * content of this string.
@@ -239,6 +266,7 @@ class ExporterHelper {
   bool CompleteIndexFile(gd::String &indexFileContent,
                          gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
+                         unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
 
   /**
@@ -290,7 +318,8 @@ class ExporterHelper {
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
    */
-  gd::String GetExportedIncludeFilename(const gd::String& include);
+  gd::String GetExportedIncludeFilename(
+      const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**
    * \brief Change the directory where code files are generated.
@@ -302,10 +331,10 @@ class ExporterHelper {
   }
 
   static void AddDeprecatedFontFilesToFontResources(
-    gd::AbstractFileSystem &fs,
-    gd::ResourcesManager &resourcesManager,
-    const gd::String &exportDir,
-    gd::String urlPrefix = "");
+      gd::AbstractFileSystem &fs,
+      gd::ResourcesManager &resourcesManager,
+      const gd::String &exportDir,
+      gd::String urlPrefix = "");
 
   gd::AbstractFileSystem
       &fs;  ///< The abstract file system to be used for exportation.

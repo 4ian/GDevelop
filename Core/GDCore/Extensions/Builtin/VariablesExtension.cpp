@@ -15,7 +15,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetExtensionInformation(
           "BuiltinVariables",
           _("Variable features"),
-          _("Built-in extension allowing to manipulate variables"),
+          "Actions, conditions and expressions to handle variables, from "
+          "simple variables like the player score, the number of remaining "
+          "lives to complex variables containing arbitrary data like an "
+          "inventory or the result of a web request.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/variables");
@@ -47,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCondition(
           "VariableChildExists",
           _("Child existence"),
-          _("Return true if the specified child of the scene variable exists."),
+          _("Check if the specified child of the scene variable exists."),
           _("Child _PARAM1_ of scene variable _PARAM0_ exists"),
           _("Variables/Structures"),
           "res/conditions/var24.png",
@@ -59,7 +62,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("GlobalVariableChildExists",
                     _("Child existence"),
-                    _("Return true if the specified child of the global "
+                    _("Check if the specified child of the global "
                       "variable exists."),
                     _("Child _PARAM1_ of global variable _PARAM0_ exists"),
                     _("Variables/Global variables/Structures"),
@@ -94,14 +97,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition(
-          "VarGlobalTxt",
-          _("Text of a global variable"),
-          _("Compare the text of a global variable."),
-          _("the text of the global variable _PARAM0_"),
-          _("Variables/Global variables"),
-          "res/conditions/var24.png",
-          "res/conditions/var.png")
+      .AddCondition("VarGlobalTxt",
+                    _("Text of a global variable"),
+                    _("Compare the text of a global variable."),
+                    _("the text of the global variable _PARAM0_"),
+                    _("Variables/Global variables"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .UseStandardRelationalOperatorParameters("string")
       .MarkAsAdvanced();
@@ -154,14 +156,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "ModVarGlobalTxt",
-          _("String of a global variable"),
-          _("Modify the text of a global variable."),
-          _("the text of global variable _PARAM0_"),
-          _("Variables/Global variables"),
-          "res/actions/var24.png",
-          "res/actions/var.png")
+      .AddAction("ModVarGlobalTxt",
+                 _("String of a global variable"),
+                 _("Modify the text of a global variable."),
+                 _("the text of global variable _PARAM0_"),
+                 _("Variables/Global variables"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .UseStandardOperatorParameters("string")
       .MarkAsAdvanced();

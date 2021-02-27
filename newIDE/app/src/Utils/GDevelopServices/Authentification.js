@@ -1,5 +1,5 @@
 // @flow
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/auth';
 import { GDevelopFirebaseConfig } from './ApiConfigs';
 

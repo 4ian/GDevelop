@@ -12,6 +12,7 @@ import ZoomOut from '@material-ui/icons/ZoomOut';
 import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -208,7 +209,7 @@ export default class ImagePreview extends React.Component<Props, State> {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts
                   if (event.metaKey || event.ctrlKey) {
-                    this._zoomBy(deltaY / 500);
+                    this._zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();
                   } else {
@@ -224,7 +225,7 @@ export default class ImagePreview extends React.Component<Props, State> {
                   </PlaceholderMessage>
                 )}
                 {!this.state.errored && (
-                  <img
+                  <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
                     src={imageSource}

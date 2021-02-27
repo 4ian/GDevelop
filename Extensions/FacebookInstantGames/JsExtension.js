@@ -27,7 +27,7 @@ module.exports = {
         "FacebookInstantGames",
         _("Facebook Instant Games"),
         _(
-          "Allow your game to send scores and interact with Facebook Instant Games"
+          "Allow your game to send scores and interact with the Facebook Instant Games platform."
         ),
         "Florian Rival",
         "Open source (MIT License)"

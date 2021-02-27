@@ -34,6 +34,8 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("rotateObject", true);
   behaviorContent.SetAttribute("angleOffset", 0);
   behaviorContent.SetAttribute("ignoreDefaultControls", false);
+  behaviorContent.SetAttribute("viewpoint", "TopDown");
+  behaviorContent.SetAttribute("customIsometryAngle", 30);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -66,6 +68,26 @@ TopDownMovementBehavior::GetProperties(
                     : "true")
       .SetType("Boolean");
 
+  gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
+  gd::String viewpointStr = _("Viewpoint");
+  if (viewpoint == "TopDown")
+    viewpointStr = _("Top-Down");
+  else if (viewpoint == "PixelIsometry")
+    viewpointStr = _("Isometry 2:1 (26.565°)");
+  else if (viewpoint == "TrueIsometry")
+    viewpointStr = _("True Isometry (30°)");
+  else if (viewpoint == "CustomIsometry")
+    viewpointStr = _("Custom Isometry");
+  properties[_("Viewpoint")]
+      .SetValue(viewpointStr)
+      .SetType("Choice")
+      .AddExtraInfo(_("Top-Down"))
+      .AddExtraInfo(_("Isometry 2:1 (26.565°)"))
+      .AddExtraInfo(_("True Isometry (30°)"))
+      .AddExtraInfo(_("Custom Isometry"));
+  properties[_("Custom isometry angle")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("customIsometryAngle")));
+
   return properties;
 }
 
@@ -85,6 +107,17 @@ bool TopDownMovementBehavior::UpdateProperty(
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
   }
+  if (name == _("Viewpoint")) {
+    if (value == _("Isometry 2:1 (26.565°)"))
+      behaviorContent.SetAttribute("viewpoint", "PixelIsometry");
+    else if (value == _("True Isometry (30°)"))
+      behaviorContent.SetAttribute("viewpoint", "TrueIsometry");
+    else if (value == _("Custom Isometry"))
+      behaviorContent.SetAttribute("viewpoint", "CustomIsometry");
+    else
+      behaviorContent.SetAttribute("viewpoint", "TopDown");
+    return true;
+  }
 
   if (value.To<float>() < 0) return false;
 
@@ -98,6 +131,10 @@ bool TopDownMovementBehavior::UpdateProperty(
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());
+  else if (name == _("Custom isometry angle")) {
+    if (value.To<float>() < 1 || value.To<float>() > 44) return false;
+    behaviorContent.SetAttribute("customIsometryAngle", value.To<float>());
+  }
   else
     return false;
 

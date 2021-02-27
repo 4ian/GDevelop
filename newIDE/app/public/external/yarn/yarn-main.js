@@ -25,6 +25,7 @@ window.addEventListener('yarnReady', e => {
   yarn = e;
   yarn.app.fs = fs;
   yarn.app.electron = electron;
+  yarn.data.restoreFromLocalStorage(false);
   ipcRenderer.send('yarn-ready');
 });
 editorFrameEl.src = 'yarn-editor/index.html';
@@ -42,16 +43,20 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
     initialResourcePath: receivedData.resourcePath,
     extension: '.json',
   });
-  
+
   // Inject custom Apply button.
   const saveToGdButton = yarn.document
-    .getElementsByClassName('menu')[0]
+    .getElementsByClassName('search-tags')[0]
     .cloneNode(true);
   saveToGdButton.onclick = () => saveAndClose(pathEditorHeader);
   yarn.document
-    .getElementsByClassName('app-menu')[0]
-    .appendChild(saveToGdButton);
-  saveToGdButton.childNodes[0].firstChild.data = 'Apply';
+    .getElementsByClassName('search-tags')[0]
+    .parentElement.appendChild(saveToGdButton);
+  saveToGdButton.childNodes[0].checked = 'checked';
+  saveToGdButton.childNodes[2].innerHTML = 'Apply';
+  saveToGdButton.childNodes[2].style = 'background-color: white;';
+  yarn.document.getElementsByClassName('app-search')[0].style = 'right: 45px';
+  saveToGdButton.style = 'padding-left: 30px;';
 
   // Process the json file to open, if any.
   if (fileExists(receivedData.resourcePath)) {

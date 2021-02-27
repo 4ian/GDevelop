@@ -48,6 +48,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 > = {
   name: 'local-online-cordova',
   onlineBuildType: 'cordova-build',
+  packageNameWarningType: 'mobile',
 
   getInitialExportState: () => null,
 

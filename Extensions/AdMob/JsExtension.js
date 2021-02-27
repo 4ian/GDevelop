@@ -71,7 +71,8 @@ module.exports = {
       .addDependency()
       .setName('Consent Cordova plugin')
       .setDependencyType('cordova')
-      .setExportName('cordova-plugin-consent');
+      .setExportName('cordova-plugin-consent')
+      .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
 
     extension
       .addAction(

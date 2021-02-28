@@ -79,6 +79,27 @@ namespace gdjs {
     }
 
     /**
+     * Activate or deactivate the debug visualization for collisions and points.
+     * @memberof gdjs.RuntimeScene
+     */
+    renderCollisionsAndPoints(
+      enabled: boolean,
+      viewInsivibleInstance: boolean,
+      viewPointsNames: boolean,
+      viewCustomPoints: boolean
+    ): void {
+      if (enabled && this._layersCameraCoordinates) {
+        this.getRenderer().renderDebugDraw(
+          this._allInstancesList,
+          this._layersCameraCoordinates,
+          viewInsivibleInstance,
+          viewCustomPoints,
+          viewPointsNames
+        );
+      }
+    }
+
+    /**
      * Should be called when the canvas where the scene is rendered has been resized.
      * See gdjs.RuntimeGame.startGameLoop in particular.
      * @memberof gdjs.RuntimeScene
@@ -507,7 +528,10 @@ namespace gdjs {
       if (renderDebugDraw && this._layersCameraCoordinates) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
-          this._layersCameraCoordinates
+          this._layersCameraCoordinates,
+          true,
+          true,
+          true
         );
       }
       this._isJustResumed = false;

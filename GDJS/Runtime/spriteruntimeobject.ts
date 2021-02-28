@@ -802,6 +802,23 @@ namespace gdjs {
       this._transformToGlobal(pt.x, pt.y, pos);
       return pos[1];
     }
+    /**
+     * Get the positions on X and Y axis on the scene of the given point.
+     * @param name The point name
+     * @return An array of the position on X and Y axis on the scene of the given point.
+     */
+    getPointPosition(name: string): [x: float, y: float] {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
+      if (name.length === 0 || this._animationFrame === null) {
+        return [this.getX(), this.getY()];
+      }
+      const pt = this._animationFrame.getPoint(name);
+      const pos = gdjs.staticArray(SpriteRuntimeObject.prototype.getPointX);
+      this._transformToGlobal(pt.x, pt.y, pos);
+      return { x: pos[0], y: pos[1] };
+    }
 
     /**
      * Return an array containing the coordinates of the point passed as parameter

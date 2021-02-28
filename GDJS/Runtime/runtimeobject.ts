@@ -13,6 +13,21 @@ namespace gdjs {
   };
 
   /**
+   * Return the squared bounding radius of an object given its width/height and its center of rotation
+   * (relative to the top-left of the object). The radius is relative to the center of rotation.
+   */
+  const computeSqBoundingRadius = (
+    width: float,
+    height: float,
+    centerX: float,
+    centerY: float
+  ) => {
+    const radiusX = Math.max(centerX, width - centerX);
+    const radiusY = Math.max(centerY, height - centerY);
+    return Math.pow(radiusX, 2) + Math.pow(radiusY, 2);
+  };
+
+  /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
@@ -1549,28 +1564,41 @@ namespace gdjs {
       obj2: gdjs.RuntimeObject,
       ignoreTouchingEdges: boolean
     ): boolean {
-      // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
-      // is not necessarily in the middle of the object (for sprites for example).
       //First check if bounding circle are too far.
-      const o1w = obj1.getWidth();
-      const o1h = obj1.getHeight();
-      const o2w = obj2.getWidth();
-      const o2h = obj2.getHeight();
-      const x =
-        obj1.getDrawableX() +
-        obj1.getCenterX() -
-        (obj2.getDrawableX() + obj2.getCenterX());
-      const y =
-        obj1.getDrawableY() +
-        obj1.getCenterY() -
-        (obj2.getDrawableY() + obj2.getCenterY());
-      const obj1BoundingRadius = Math.sqrt(o1w * o1w + o1h * o1h) / 2.0;
-      const obj2BoundingRadius = Math.sqrt(o2w * o2w + o2h * o2h) / 2.0;
-      if (Math.sqrt(x * x + y * y) > obj1BoundingRadius + obj2BoundingRadius) {
+      const o1centerX = obj1.getCenterX();
+      const o1centerY = obj1.getCenterY();
+      const obj1BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj1.getWidth(),
+          obj1.getHeight(),
+          o1centerX,
+          o1centerY
+        )
+      );
+
+      const o2centerX = obj2.getCenterX();
+      const o2centerY = obj2.getCenterY();
+      const obj2BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj2.getWidth(),
+          obj2.getHeight(),
+          o2centerX,
+          o2centerY
+        )
+      );
+
+      const diffX =
+        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
+      const diffY =
+        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      if (
+        Math.sqrt(diffX * diffX + diffY * diffY) >
+        obj1BoundingRadius + obj2BoundingRadius
+      ) {
         return false;
       }
 
-      //Do a real check if necessary.
+      // Do a real check if necessary.
       const hitBoxes1 = obj1.getHitBoxes();
       const hitBoxes2 = obj2.getHitBoxes();
       for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
@@ -1598,24 +1626,40 @@ namespace gdjs {
      * @return A raycast result with the contact points and distances
      */
     raycastTest(x: float, y: float, endX: number, endY: number, closest): any {
-      // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
-      // is not necessarily in the middle of the object (for sprites for example).
-      const objW = this.getWidth();
-      const objH = this.getHeight();
-      const diffX = this.getDrawableX() + this.getCenterX() - x;
-      const diffY = this.getDrawableY() + this.getCenterY() - y;
-      const sqBoundingR = (objW * objW + objH * objH) / 4.0;
-      const sqDist = (endX - x) * (endX - x) + (endY - y) * (endY - y);
+      // First check if bounding circles are too far
+      const objCenterX = this.getCenterX();
+      const objCenterY = this.getCenterY();
+      const objSqBoundingRadius = computeSqBoundingRadius(
+        this.getWidth(),
+        this.getHeight(),
+        objCenterX,
+        objCenterY
+      );
+
+      const rayCenterWorldX = (x + endX) / 2;
+      const rayCenterWorldY = (x + endX) / 2;
+      const raySqBoundingRadius =
+        (endX - x) * (endX - x) + (endY - y) * (endY - y);
+
+      const diffX = this.getDrawableX() + objCenterX - rayCenterWorldX;
+      const diffY = this.getDrawableY() + objCenterY - rayCenterWorldY;
+
       // @ts-ignore
       let result = gdjs.Polygon.raycastTestStatics.result;
       result.collision = false;
       if (
+        // As an optimization, avoid computing the square root of the two boundings radius
+        // and the distance by comparing the squared values instead.
         diffX * diffX + diffY * diffY >
-        sqBoundingR + sqDist + 2 * Math.sqrt(sqDist * sqBoundingR)
+        objSqBoundingRadius +
+          raySqBoundingRadius +
+          2 * Math.sqrt(raySqBoundingRadius * objSqBoundingRadius)
       ) {
         return result;
       }
-      let testSqDist = closest ? sqDist : 0;
+
+      // Do a real check if necessary.
+      let testSqDist = closest ? raySqBoundingRadius : 0;
       const hitBoxes = this.getHitBoxes();
       for (let i = 0; i < hitBoxes.length; i++) {
         const res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
@@ -1627,7 +1671,7 @@ namespace gdjs {
             if (
               !closest &&
               res.farSqDist > testSqDist &&
-              res.farSqDist <= sqDist
+              res.farSqDist <= raySqBoundingRadius
             ) {
               testSqDist = res.farSqDist;
               result = res;

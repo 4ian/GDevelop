@@ -881,8 +881,26 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.VideoResource', function () {
-    it('should have name and file', function () {
+  describe('gd.BitmapFontResource', function() {
+    it('should have name and file', function() {
+      const resource = new gd.BitmapFontResource();
+      resource.setName('MyBitmapFontResource');
+      resource.setFile('MyBitmapFontFile');
+      expect(resource.getName()).toBe('MyBitmapFontResource');
+      expect(resource.getFile()).toBe('MyBitmapFontFile');
+      resource.delete();
+    });
+    it('can have metadata', function() {
+      const resource = new gd.BitmapFontResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
+  describe('gd.VideoResource', function() {
+    it('should have name and file', function() {
       const resource = new gd.VideoResource();
       resource.setName('MyVideoResource');
       resource.setFile('MyVideoFile');

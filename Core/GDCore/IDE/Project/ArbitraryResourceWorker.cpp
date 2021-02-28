@@ -55,6 +55,21 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
   ExposeFile(fontName);
 };
 
+void ArbitraryResourceWorker::ExposeBitmapFont(gd::String& bitmapFontName) {
+  for (auto resources : GetResources()) {
+    if (!resources) continue;
+
+    if (resources->HasResource(bitmapFontName) &&
+        resources->GetResource(bitmapFontName).GetKind() == "bitmapFont") {
+      // Nothing to do, the font is a reference to a resource that
+      // is already exposed.
+      return;
+    }
+  }
+
+  ExposeFile(bitmapFontName);
+};
+
 void ArbitraryResourceWorker::ExposeResources(
     gd::ResourcesManager* resourcesManager) {
   if (!resourcesManager) return;

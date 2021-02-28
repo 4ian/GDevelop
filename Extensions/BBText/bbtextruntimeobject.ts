@@ -56,7 +56,7 @@ namespace gdjs {
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._opacity = parseFloat(objectData.content.opacity);
       this._text = objectData.content.text;
-      this._color = BBTextRuntimeObject.hexToRGBColor(objectData.content.color);
+      this._color = gdjs.hexToRGBColor(objectData.content.color);
       this._fontFamily = objectData.content.fontFamily;
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._fontSize = parseFloat(objectData.content.fontSize);
@@ -67,11 +67,6 @@ namespace gdjs {
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
-    }
-
-    static hexToRGBColor(hex) {
-      const hexNumber = parseInt(hex.replace('#', ''), 16);
-      return [(hexNumber >> 16) & 255, (hexNumber >> 8) & 255, hexNumber & 255];
     }
 
     getRendererObject() {
@@ -93,7 +88,7 @@ namespace gdjs {
         this.setBBText(newObjectData.content.text);
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
-        this._color = BBTextRuntimeObject.hexToRGBColor(
+        this._color = gdjs.hexToRGBColor(
           newObjectData.content.color
         );
         this._renderer.updateColor();

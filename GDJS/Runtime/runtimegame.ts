@@ -89,6 +89,9 @@ namespace gdjs {
       );
       this._fontManager = new gdjs.FontManager(this._data.resources.resources);
       this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
+      this._bitmapFontManager = new gdjs.BitmapFontManager(
+        this._data.resources.resources
+      );
       this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
       this._minFPS = this._data ? this._data.properties.minFPS : 15;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -122,6 +125,7 @@ namespace gdjs {
       this._soundManager.setResources(this._data.resources.resources);
       this._fontManager.setResources(this._data.resources.resources);
       this._jsonManager.setResources(this._data.resources.resources);
+      this._bitmapFontManager.setResources(this._data.resources.resources);
     }
 
     /**
@@ -169,6 +173,15 @@ namespace gdjs {
     getFontManager(): gdjs.FontFaceObserverFontManager {
       // @ts-ignore
       return this._fontManager;
+    }
+
+    /**
+     * Get the gdjs.BitmapFontManager of the RuntimeGame.
+     * @return The bitmap font manager.
+     */
+    getBitmapFontManager(): gdjs.BitmapFontManager {
+      // @ts-ignore
+      return this._bitmapFontManager;
     }
 
     /**
@@ -471,9 +484,30 @@ namespace gdjs {
                         progressCallback(percent);
                       }
                     },
-                    function () {
-                      loadingScreen.unload();
-                      callback();
+                    //
+
+                    function (jsonTotalCount) {
+                      that._bitmapFontManager.preloadBitmapFontData(
+                        function (count, total) {
+                          var percent = Math.floor(
+                            ((texturesTotalCount +
+                              audioTotalCount +
+                              fontTotalCount +
+                              jsonTotalCount +
+                              count) /
+                              allAssetsTotal) *
+                              100
+                          );
+                          loadingScreen.render(percent);
+                          if (progressCallback) progressCallback(percent);
+                        },
+                        function () {
+                          loadingScreen.unload();
+                          callback();
+                        }
+                      );
+
+                      //
                     }
                   );
                 }

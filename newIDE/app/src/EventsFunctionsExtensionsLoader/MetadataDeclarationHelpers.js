@@ -31,7 +31,28 @@ export const declareExtension = (
     )
     .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
     .setIconUrl(eventsFunctionsExtension.getIconUrl());
+
+  declareExtensionDependencies(extension, eventsFunctionsExtension);
 };
+
+/**
+ * Declare the dependencies of an extension from an events based extension.
+ */
+export const declareExtensionDependencies = (
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+) =>
+  mapVector<gdDependencyMetadata, void>(
+    eventsFunctionsExtension.getAllDependencies(),
+    dependency => {
+      extension
+        .addDependency()
+        .setDependencyType(dependency.getDependencyType())
+        .setName(dependency.getName())
+        .setExportName(dependency.getExportName())
+        .setVersion(dependency.getVersion());
+    }
+  );
 
 const getExtensionIconUrl = (extension: gdPlatformExtension) => {
   return extension.getIconUrl() || 'res/function24.png';

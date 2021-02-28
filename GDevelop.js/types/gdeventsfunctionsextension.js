@@ -22,6 +22,9 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   getIconUrl(): string;
   setHelpPath(helpPath: string): gdEventsFunctionsExtension;
   getHelpPath(): string;
+  addDependency(): gdDependencyMetadata;
+  removeDependencyAt(index: number): void;
+  getAllDependencies(): gdVectorDependencyMetadata;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

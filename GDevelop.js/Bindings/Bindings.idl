@@ -2048,6 +2048,10 @@ interface EventsFunctionsExtension {
     [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
     [Const, Ref] DOMString GetHelpPath();
 
+    [Ref] DependencyMetadata AddDependency();
+    void RemoveDependencyAt(unsigned long index);
+    [Ref] VectorDependencyMetadata GetAllDependencies();
+
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 
     void SerializeTo([Ref] SerializerElement element);

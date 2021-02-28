@@ -34,7 +34,9 @@ const checkNameExists = (
 
 type Props = {| eventsFunctionsExtension: gdEventsFunctionsExtension |};
 
-export const ExtensionDependenciesEditor = ({ eventsFunctionsExtension }: Props) => {
+export const ExtensionDependenciesEditor = ({
+  eventsFunctionsExtension,
+}: Props) => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 

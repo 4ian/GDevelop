@@ -28,7 +28,9 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    console.log('forceUpdateEditor resource editor container');
+    const { resources } = this.props;
+    if (this.editor && resources) this.editor.updateResources(resources);
   }
 
   render() {

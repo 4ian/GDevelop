@@ -48,7 +48,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   forceUpdateEditor() {
-    if (this.editor) this.editor.forceUpdateObjectsList();
+    console.log('forceUpdateEditor scene editor container');
+    const { resources } = this.props;
+    if (this.editor && resources) this.editor.updateResources(resources);
   }
 
   getLayout(): ?gdLayout {
@@ -93,6 +95,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         ref={editor => (this.editor = editor)}
         project={project}
         layout={layout}
+        resources={this.props.resources}
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         isActive={isActive}

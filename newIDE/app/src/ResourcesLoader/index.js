@@ -15,10 +15,10 @@ class UrlsCache {
     return cache;
   }
 
-  getCachedUrl(project: gdProject, url: string): ?string {
+  getCachedUrl(project: gdProject, filename: string): ?string {
     const cache = this._getProjectCache(project);
-    if(!cache[url]) return;
-    return cache[url]["systemFilename"];
+    if (!cache[filename]) return;
+    return cache[filename]['systemFilename'];
   }
 
   cacheUrl(project: gdProject, url: string): string {
@@ -43,22 +43,24 @@ class UrlsCache {
       // The URL is cached with an extra "cache-bursting" parameter.
       // If the cache is emptied or changed, local files will have another
       // value for this parameter, forcing the browser to reload the images.
-      return (cache[filename]["systemFilename"] = `${systemFilename}?cache=${Date.now()}`);
+      return (cache[filename][
+        'systemFilename'
+      ] = `${systemFilename}?cache=${Date.now()}`);
     } else {
-      return (cache[filename]["systemFilename"] = systemFilename);
+      return (cache[filename]['systemFilename'] = systemFilename);
     }
   }
 
   getStatusCode(project: gdProject, filename: string) {
     const cache = this._getProjectCache(project);
-    if(!cache[filename]) return;
-    return (cache[filename]["statusCode"] || "");
+    if (!cache[filename]) return;
+    return cache[filename]['statusCode'] || '';
   }
 
   setStatusCode(project: gdProject, filename: string, statusCode: string) {
     const cache = this._getProjectCache(project);
-    if(!cache[filename]) return;
-    return (cache[filename]["statusCode"] = statusCode);
+    if (!cache[filename]) return;
+    return (cache[filename]['statusCode'] = statusCode);
   }
 }
 
@@ -101,6 +103,7 @@ export default class ResourcesLoader {
     resourcesNames: Array<string>
   ) {
     const resourcesManager = project.getResourcesManager();
+    if (!resourcesNames) return;
     resourcesNames.forEach(resourceName => {
       if (resourcesManager.hasResource(resourceName)) {
         ResourcesLoader._cache.burstUrl(
@@ -142,6 +145,12 @@ export default class ResourcesLoader {
         .replace(/\\/g, '/');
 
       console.info('Caching resolved local filename:', resourceAbsolutePath);
+
+      /*
+      TODO here add an trigger for check the resource and give him a status if needed,
+      depending of their dimension for example.
+      Wrap the trigger in an condition driven by the preferences option of this features.
+      */
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,

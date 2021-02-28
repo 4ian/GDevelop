@@ -25,6 +25,9 @@ export default class PixiResourcesLoader {
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
   }
+  static deleteResourcesCache(project: gdProject, resources: Array<string>) {
+    ResourcesLoader.burstUrlsCacheForResources(project, resources);
+  }
 
   /**
    * (Re)load the PIXI texture represented by the given resources.
@@ -69,7 +72,6 @@ export default class PixiResourcesLoader {
 
     loader.load((loader, loadedResources) => {
       loader.onProgress.detach(progressCallbackId);
-
       //Store the loaded textures so that they are ready to use.
       for (const resourceName in loadedResources) {
         if (loadedResources.hasOwnProperty(resourceName)) {
@@ -82,12 +84,12 @@ export default class PixiResourcesLoader {
             loadedResources[resourceName].texture.baseTexture.realHeight > 2048
           ) {
             statusCode = 'WARNING_IMAGE_EXCEEDED_2048_PIXELS';
+            console.log('TROP GRAND 2');
           }
           loadedTextures[resourceName] = {
             pixi: loadedResources[resourceName].texture,
             statusCode: statusCode,
           };
-          console.debug(loadedTextures);
           ResourcesLoader.setStatusCode(project, resourceName, statusCode);
           PixiResourcesLoader._initializeTexture(
             resource,

@@ -4,6 +4,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import debounce from 'lodash/debounce';
 import { RESOURCE_EXTENSIONS } from '../ResourcesList/ResourceUtils.js';
+
 import resourcesLoader from './index';
 
 const fs = optionalRequire('fs');
@@ -21,10 +22,6 @@ const onWatchEvent = debounce((event: ?string, filename: ?string) => {
   console.warn(
     `Resources watchers found a "${eventName}" in ${resolvedFilename}, updating state Warning or Error for this resource...`
   );
-  /*
-  un truc du style:
-  createOrUpdateResource(project, createResource(), resolvedFilename);
-   */
 }, 100 /* Avoid running the script too much in case multiple changes are fired at the same time. */);
 
 const genericWatcherErrorMessage =
@@ -37,12 +34,13 @@ const genericWatcherErrorMessage =
 
 export type Props = {|
   project?: any,
+  updateResource?: any,
 |};
 
 export const ResourcesWatcher = (props: Props) => {
-  const { project } = props;
+  const { project, updateResource } = props;
 
-  //const resourcesManager = project.getResourcesManager();
+  const resourcesManager = project.getResourcesManager();
   const projectPath = path.dirname(project.getProjectFile());
 
   const preferences = React.useContext(PreferencesContext);
@@ -54,99 +52,94 @@ export const ResourcesWatcher = (props: Props) => {
     }
   };
 
-  let watchers = [];
-
   React.useEffect(
     () => {
-      if (!shouldWatch) {
-        // inverse la ligne ici
-        // Nothing to set up in the effect if watch is deactivated.
-        return;
-      }
+      // Preference disable resource watcher.
+      if (!shouldWatch) return;
 
-      let stopWatchers = false;
       let watchers = [];
 
       //faire de getAllResourcesPaths une fonction externe au composant ?
       getAllResourcesPaths(projectPath, (err, res) => {
         if (err) {
           console.error('Error parse resources', err);
-        } else {
-          //mettre tout les path dans un array.
-          // utilisé l'array et bouclé dessus dans le useEffect plus bas.
+          return;
+        }
 
-          if (!fs || !chokidar) {
-            console.error(
-              "Unable to use 'fs' or 'chokidar' from Node.js to watch changes in resources."
+        if (!fs || !chokidar) {
+          console.error(
+            "Unable to use 'fs' or 'chokidar' from Node.js to watch changes in resources."
+          );
+          return;
+        }
+
+        res.forEach(pathResourceFound => {
+          let watcher = null;
+          try {
+            watcher = chokidar.watch(pathResourceFound, {}, onWatchEvent);
+            //console.warn(`Watcher started on: ${pathResourceFound}`);
+          } catch (error) {
+            //pathsWithErrors[pathResourceFound] = error;
+            console.warn(
+              `Watcher error on: ${pathResourceFound}, error: ${error}`
             );
-            return;
+            return null;
           }
 
-          res.forEach(pathResourceFound => {
-            // if (!resourcesManager.hasResource(fileName)) {
-            //createOrUpdateResource(project, createResource(), fileName);
-            //console.log(`${pathResourceFound}`);
+          if (watcher) {
+            watcher.on('error', error => {
+              console.warn(genericWatcherErrorMessage, error);
+            });
+            watcher.on('change', resourceFullPath => {
+              const resourceName = path.basename(resourceFullPath);
+              if (!resourcesManager.hasResource(resourceName)) {
+                console.log('Resource not found:' + resourceFullPath);
+                return;
+              }
 
-            let watcher = null;
-            try {
-              watcher = chokidar.watch(pathResourceFound, {}, onWatchEvent);
-              //console.warn(`Watcher started on: ${pathResourceFound}`);
-            } catch (error) {
-              //pathsWithErrors[pathResourceFound] = error;
-              console.warn(
-                `Watcher error on: ${pathResourceFound}, error: ${error}`
-              );
-              return null;
-            }
+              console.log(`Resource changed: ${resourceName}`);
 
-            if (watcher) {
-              watcher.on('error', error => {
-                console.warn(genericWatcherErrorMessage, error);
-              });
-              watcher.on('change', filename => {
-                console.log(`File Changed: ${filename}`);
+              // Avertir l'onglet resource que le fichier X a changer et relancé un diagnostique de dimensions.
+              updateResource([resourceName]);
 
-                // Reload the resource by cleaning the cache
-                resourcesLoader.burstUrl(project, filename);
-                
-                //Lancer un refresh de la thumbnail pour refresh l'image qui a encore l'image du cache ou du moin pas aux bonnes dimensions.
+              // Reload the resource by cleaning the PIXI cache used in IDE (scene editor, not resource editor?)
+              resourcesLoader.burstUrl(project, resourceFullPath);
 
-                //lance la verification de la taille de l'image
-                let warningSize = false;
-
-                const img = new Image();
+              let statusCode = '';
+              if (
+                resourcesManager.getResource(resourceName).getKind() === 'image'
+              ) {
+                // Load the image in cache
+                let img = new Image();
                 img.src = resourcesLoader.getResourceFullUrl(
                   project,
-                  filename,
+                  resourceFullPath,
                   {}
                 );
-
+                // Check if the size of the image is below 2048
                 if (img.width > 2048 || img.height > 2048) {
-                  warningSize = true;
                   console.warn('watcher warning size');
-                  resourcesLoader.setStatusCode(
-                    project,
-                    filename,
-                    'WARNING_IMAGE_EXCEEDED_2048_PIXELS'
-                  );
+                  statusCode = 'WARNING_IMAGE_EXCEEDED_2048_PIXELS';
+                  console.log('TROP GRAND 1');
                 }
-              });
+                resourcesLoader.setStatusCode(
+                  project,
+                  resourceFullPath,
+                  statusCode
+                );
 
-              /*
-              watcher.on('all', (event, path) => {
-                console.log(event, path);
-              });
-              */
+                // No need image anymore, deletion.
+                img = null;
+              }
+            });
 
-              watchers.push(watcher);
-            }
-          });
-        }
+            watchers.push(watcher);
+          }
+        });
       });
 
       // Close all the watchers when the React effect is unregistered
       return () => {
-        stopWatchers = true;
         if (!watchers.length) return;
 
         watchers.forEach(watcher => {
@@ -155,7 +148,7 @@ export const ResourcesWatcher = (props: Props) => {
         console.info('Watchers for resources closed.');
       };
     },
-    [shouldWatch]
+    [shouldWatch, project, projectPath, resourcesManager]
   );
 
   return null;

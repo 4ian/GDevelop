@@ -17,7 +17,11 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
+import {
+  createOrUpdateResource,
+  getResourceFilePathStatus,
+} from '../ResourcesList/ResourceUtils.js';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -49,6 +53,7 @@ type Props = {|
   ) => void,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resources: Array<string>,
 |};
 
 const initialMosaicEditorNodes = {
@@ -72,6 +77,39 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     selectedResource: null,
   };
 
+  updateResources(resources: any) {
+    const { project } = this.props;
+
+    console.log('updateResources scene editor');
+
+    if (!resources) return;
+
+    /*
+    resources.forEach(resource => {
+      createOrUpdateResource(project, new gd.ImageResource(), resource);
+    });
+    */
+
+    //PixiResourcesLoader.deleteResourcesCache(project, resources);
+
+    PixiResourcesLoader.loadTextures(
+      project,
+      resources,
+      () => {},
+      () => {
+        if (this.editor) {
+          // TODO nothing works, the images in resources editor are not refresh, until we click again on the resource in list or we reopen the resource tab.
+          //this.editor.forceRemount();
+          //this.forceUpdateObjectsList();
+          //this._propertiesEditor.forceRemount();
+          //this._resourcesList.forceRemount();
+          //this.updateProperties();
+          //this.updateList();
+        }
+      }
+    );
+  }
+
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
@@ -83,6 +121,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         }
       />
     );
+  }
+
+  updateList() {
+    if (this._resourcesList) {
+      this._resourcesList.forceUpdateList();
+    }
   }
 
   deleteResource = (resource: ?gdResource) => {
@@ -105,7 +149,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         () => {
           // Force update of the resources list as otherwise it could render
           // resource that was just deleted.
-          if (this._resourcesList) this._resourcesList.forceUpdateList();
+          this.updateList();
           this.updateToolbar();
         }
       );
@@ -139,9 +183,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
-    if (this._resourcesList) {
-      this._resourcesList.forceUpdateList();
-    }
+    this.updateList();
   };
 
   _removeAllResourcesWithInvalidPath = () => {
@@ -171,9 +213,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
-    if (this._resourcesList) {
-      this._resourcesList.forceUpdateList();
-    }
+    this.updateList();
   };
 
   openProjectFolder = () => {
@@ -190,13 +230,17 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     }
   };
 
+  updateProperties = () => {
+    if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+  };
+
   _onResourceSelected = (selectedResource: ?gdResource) => {
     this.setState(
       {
         selectedResource,
       },
       () => {
-        if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+        this.updateProperties();
         this.updateToolbar();
       }
     );

@@ -914,33 +914,6 @@ namespace gdjs {
       }
     }
 
-    //This is the naive implementation when the platforms manager is simply containing a list
-    //of all existing platforms:
-    /*var o1w = this.owner.getWidth();
-        var o1h = this.owner.getHeight();
-        var obj1BoundingRadius = Math.sqrt(o1w*o1w+o1h*o1h)/2.0 + maxMovementLength;
-        //Get all platforms and keep only
-        var allPlatforms = this._manager.getAllPlatforms();
-        for (var k in allPlatforms.items) {
-            if (allPlatforms.items.hasOwnProperty(k)) {
-                var obj2 = allPlatforms.items[k].owner;
-                var o2w = obj2.getWidth();
-                var o2h = obj2.getHeight();
-                // This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
-                // is not necessarily in the middle of the object (for sprites for example).
-                var x = this.owner.getDrawableX()+this.owner.getCenterX()-(obj2.getDrawableX()+obj2.getCenterX());
-                var y = this.owner.getDrawableY()+this.owner.getCenterY()-(obj2.getDrawableY()+obj2.getCenterY());
-                var obj2BoundingRadius = Math.sqrt(o2w*o2w+o2h*o2h)/2.0;
-                if ( Math.sqrt(x*x+y*y) <= obj1BoundingRadius + obj2BoundingRadius ) {
-                    if ( !this._potentialCollidingObjects.hasOwnProperty(k) )
-                        this._potentialCollidingObjects[k] = allPlatforms.items[k];
-                }
-                else {
-                    if ( this._potentialCollidingObjects.hasOwnProperty(k) )
-                        delete this._potentialCollidingObjects[k];
-                }
-            }
-        }*/
     /**
      * Simulate a control action in the Platformer Object by specifying an input.
      * @param input The string expression of the control action [Left,Right,Up,Down,Ladder,Jump,Release].

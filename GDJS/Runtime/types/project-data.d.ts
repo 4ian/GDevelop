@@ -195,10 +195,4 @@ declare interface ResourceData {
   preloadAsMusic?: boolean;
 }
 
-declare enum ResourceKind {
-  Audio = 'audio',
-  Image = 'image',
-  Font = 'font',
-  Video = 'video',
-  Json = 'json',
-}
+declare type ResourceKind = 'audio' | 'image' | 'font' | 'video' | 'json';

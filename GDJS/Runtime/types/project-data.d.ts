@@ -149,7 +149,7 @@ declare interface ProjectPropertiesData {
   orientation: string;
   packageName: string;
   projectFile: string;
-  scaleMode: string;
+  scaleMode: 'linear' | 'nearest';
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;

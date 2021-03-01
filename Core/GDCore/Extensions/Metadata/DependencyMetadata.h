@@ -101,6 +101,23 @@ class GD_CORE_API DependencyMetadata {
     return onlyIfSomeExtraSettingsNonEmpty;
   };
 
+  /**
+   * \brief Mark the dependency to be included in the export only if one other
+   * dependency is included in the export.
+   */
+  DependencyMetadata& OnlyIfOtherDependencyIsExported(const gd::String& otherDependency) {
+    onlyIfOtherDependencyIsExported = otherDependency;
+    return *this;
+  };
+
+  /**
+   * \brief Get the name of another dependency that must be exported to have this
+   * one also exported.
+   */
+  const gd::String& GetOtherDependencyThatMustBeExported() const {
+    return onlyIfOtherDependencyIsExported;
+  };
+
   const gd::String& GetName() const { return name; };
   const gd::String& GetExportName() const { return exportName; };
   const gd::String& GetVersion() const { return version; };
@@ -127,6 +144,7 @@ class GD_CORE_API DependencyMetadata {
   bool onlyIfSomeExtraSettingsNonEmpty;  ///< If true, only use this dependency
                                          ///< if at least one of the extra
                                          ///< settings is set.
+gd::String onlyIfOtherDependencyIsExported;
 };
 }  // namespace gd
 #endif  // DEPENDENCYMETADATA_H

@@ -134,15 +134,7 @@ class GD_CORE_API DependencyMetadata {
   }
 
   void CopyFrom(const DependencyMetadata& dependencyMetadata) {
-    name = dependencyMetadata.name;
-    exportName = dependencyMetadata.exportName;
-    version = dependencyMetadata.version;
-    dependencyType = dependencyMetadata.dependencyType;
-    extraData = dependencyMetadata.extraData;
-    onlyIfSomeExtraSettingsNonEmpty =
-        dependencyMetadata.onlyIfSomeExtraSettingsNonEmpty;
-    onlyIfOtherDependencyIsExported =
-        dependencyMetadata.onlyIfOtherDependencyIsExported;
+    *this = dependencyMetadata;
   }
 
  private:

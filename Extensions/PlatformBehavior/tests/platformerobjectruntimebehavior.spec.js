@@ -1130,9 +1130,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // try to grab the ladder
       object.getBehavior('auto1').simulateLadderKey();
       runtimeScene.renderAndStep(1000 / 60);
-      // panic mode! (probably a bug)
       expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
     });
   });
 });

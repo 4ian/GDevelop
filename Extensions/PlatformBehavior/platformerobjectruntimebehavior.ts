@@ -461,9 +461,8 @@ namespace gdjs {
       );
       this._updateOverlappedJumpThru();
 
-      this._state.checkTransitionBeforeX();
-
       //1) X axis:
+      this._state.checkTransitionBeforeX();
       this._state.beforeMovingX();
 
       //Ensure the object is not stuck
@@ -475,13 +474,8 @@ namespace gdjs {
       const oldX = object.getX();
       this.moveX();
 
-      //Collided with a wall
-
       //2) Y axis:
       this._state.checkTransitionBeforeY(timeDelta);
-
-      //object.setY(object.getY()-1); //Useless and dangerous
-
       this._state.beforeMovingY(timeDelta, oldX);
 
       const oldY = object.getY();
@@ -504,7 +498,6 @@ namespace gdjs {
 
       //5) Track the movement
       this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
-
       this._lastDeltaY = object.getY() - oldY;
     }
 
@@ -1385,7 +1378,6 @@ namespace gdjs {
   
       beforeMovingY(timeDelta: float, oldX: float) {
         const behavior = this._behavior;
-        const object = behavior.owner;
         
         //Fall
         if (
@@ -1478,29 +1470,15 @@ namespace gdjs {
   
         //Jumping
         behavior.checkTransitionJumping();
-  
-        //Grabbing a platform
-        if (
-          behavior._canGrabPlatforms &&
-          behavior._requestedDeltaX !== 0
-        ) {
-          //TODO useless?
-          behavior.checkGrabPlatform();
-        }
       }
   
       beforeMovingY(timeDelta: float, oldX: float) {
         const behavior = this._behavior;
-        const object = behavior.owner;
         //TODO useless condition?
-        if (
-          !behavior._releaseKey
-        ) {
-          behavior._canJump = true;
-          behavior._currentFallSpeed = 0;
-          this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
-          this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
-        }
+        behavior._canJump = true;
+        behavior._currentFallSpeed = 0;
+        this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
+        this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
       }
 
       toString(): String {

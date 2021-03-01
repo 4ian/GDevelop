@@ -1,11 +1,3 @@
-/*
-- Delete one bitmap text object on scene and refresh hotreload delete all the bitmap text objects
-- During a preview is open, when we change files in bitmap text object and use hotreload bitmap object is broken in preview.
-- CRASH: when atlas texture is updated but wrong 
-Pixi.js: Error: Texture Error: frame does not fit inside the base Texture dimensions: X: 168 + 3 = 171 > 256 or Y: 260 + 64 = 324 > 256
-
-*/
-
 // @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
@@ -87,15 +79,15 @@ module.exports = {
         .setLabel(_('Alignment, when multiple lines are displayed'));
 
       objectProperties
-        .getOrCreate('bitmapFontFile')
-        .setValue(objectContent.bitmapFontFile)
+        .getOrCreate('bitmapFontResourceName')
+        .setValue(objectContent.bitmapFontResourceName)
         .setType('resource')
         .addExtraInfo('bitmapFont') //fnt or xml files
         .setLabel(_('Bitmap Font'));
 
       objectProperties
-        .getOrCreate('bitmapAtlasFile')
-        .setValue(objectContent.bitmapAtlasFile)
+        .getOrCreate('textureAtlasResourceName')
+        .setValue(objectContent.textureAtlasResourceName)
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Bitmap atlas image'));
@@ -123,13 +115,13 @@ module.exports = {
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
         text:
-          'This text use the default bitmap font,\nadd your files in the object properties.',
+          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
         tint: '#ffffff',
-        bitmapFontFile: '',
-        bitmapAtlasFile: '',
+        bitmapFontResourceName: '',
+        textureAtlasResourceName: '',
         align: 'left',
         wordWrap: true,
       })
@@ -173,227 +165,163 @@ module.exports = {
       );
 
     object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'string',
         'Text',
-        _('Compare the text'),
-        _('Compare the text of a Bitmap text object.'),
+        _('Text'),
+        _('the text'),
         _('the text'),
         '',
         'res/conditions/text24.png',
         'res/conditions/text.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('string')
-      .getCodeExtraInformation()
-      .setFunctionName('getText');
+      .useStandardParameters('string')
+      .setFunctionName('setText')
+      .setGetter('getText');
 
     object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'number',
         'Opacity',
         _('Opacity'),
-        _(
-          'Check the opacity of a Bitmap text object, between 0 (fully transparent) to 255 (opaque).'
-        ),
+        _('the opacity, between 0 (fully transparent) and 255 (opaque)'),
         _('the opacity'),
         '',
         'res/conditions/opacity24.png',
         'res/conditions/opacity.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .useStandardParameters('number')
+      .setFunctionName('setOpacity')
+      .setGetter('getOpacity');
 
     object
-      .addCondition(
+      .addExpressionAndCondition(
+        'number',
         'FontSize',
         _('Font size'),
-        _('Check the font size, defined in an external editor.'),
+        _('the font size, defined in the Bitmap Font'),
         _('the font size'),
         '',
         'res/conditions/characterSize24.png',
         'res/conditions/characterSize.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
+      .useStandardParameters('number')
       .setFunctionName('getFontSize');
 
     object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'number',
         'Scale',
         _('Scale'),
-        _('Check the scale of the Bitmap text object, 1 by default.'),
+        _('the scale (1 by default)'),
         _('the scale'),
         '',
         'res/actions/scale24.png',
         'res/actions/scale.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getScale');
+      .useStandardParameters('number')
+      .setFunctionName('setScale')
+      .setGetter('getScale');
 
     object
-      .addCondition(
-        'Font',
+      .addExpressionAndCondition(
+        'string',
+        'FontName',
         _('Font name'),
-        _('Check the font name, defined in an external editor.'),
+        _('the font name (defined in the Bitmap font)'),
         _('the font name'),
         '',
         'res/conditions/font24.png',
         'res/conditions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('string')
-      .getCodeExtraInformation()
+      .useStandardParameters('string')
       .setFunctionName('getFontName');
 
     object
-      .addCondition(
-        'Alignment',
-        _('Alignment'),
-        _('Check the current text alignment.'),
-        _('the alignment'),
-        '',
-        'res/actions/textAlign24.png',
-        'res/actions/textAlign.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('string')
-      .getCodeExtraInformation()
-      .setFunctionName('getAlignment');
-
-    object
-      .addCondition(
-        'WordWrap',
-        _('Wrapping'),
-        _('Check if word wrap is enabled.'),
-        _('_PARAM0_ word wrap is enabled'),
-        '',
-        'res/conditions/wordWrap24.png',
-        'res/conditions/wordWrap.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getWordWrap');
-
-    object
-      .addCondition(
-        'WrappingWidth',
-        _('Wrapping width'),
-        _(
-          'Compare the width, in pixels, after which the text is wrapped on next line.'
-        ),
-        _('the wrapping width'),
-        '',
-        'res/actions/scaleWidth24.png',
-        'res/actions/scaleWidth.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getWrappingWidth');
-
-    object
       .addAction(
-        'Text',
-        _('Modify the text'),
-        _('Modify the text of a Bitmap text object.'),
-        _('the Bitmap text'),
-        '',
-        'res/actions/text24.png',
-        'res/actions/text.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('string')
-      .getCodeExtraInformation()
-      .setFunctionName('setText')
-      .setGetter('getText');
-
-    object
-      .addAction(
-        'Tint',
+        'SetTint',
         _('Tint'),
-        _('Change the tint of an object. The default color is white.'),
-        _('Change tint of _PARAM0_ to _PARAM1_'),
+        _('Set the tint of the Bitmap Text object.'),
+        _('Set tint of _PARAM0_ to _PARAM1_'),
         '',
         'res/actions/color24.png',
         'res/actions/color.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('color', _('Color'), '', false)
-      .setDefaultValue('255;255;255')
       .getCodeExtraInformation()
       .setFunctionName('setTint');
 
     object
       .addAction(
-        'Opacity',
-        _('Change text opacity'),
-        _(
-          'Change the opacity of a Bitmap text object. 0 is fully transparent, 255 is opaque (default).'
-        ),
-        _('the opacity'),
-        '',
-        'res/actions/opacity24.png',
-        'res/actions/opacity.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
-
-    object
-      .addAction(
-        'Scale',
-        _('Scale'),
-        _('Change the scale of a Bitmap text object, 1 by default.'),
-        _('the scale'),
-        '',
-        'res/actions/scale24.png',
-        'res/actions/scale.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('setScale')
-      .setGetter('getScale');
-
-    object
-      .addAction(
-        'BitmapFontAndAtlasFile',
-        _('Bitmap files'),
-        _(
-          'Change the font file and atlas image used by the Bitmap text object.' +
-            'The resource name of files can be found in:`Project Manager > Game settings > Resources`'
-        ),
-        _(
-          'Set the bitmap font of _PARAM0_ with font file:_PARAM1_ and the atlas image:_PARAM2_'
-        ),
+        'SetBitmapFontResourceName',
+        _('Bitmap Font'),
+        _('Change the Bitmap Font of the object.') +
+          ' ' +
+          _(
+            'The resource name can be found in: `Project Manager > Game settings > Resources`.'
+          ),
+        _('Set the bitmap font of _PARAM0_ to _PARAM2_'),
         '',
         'res/actions/font24.png',
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .addParameter('bitmapFont', _('Bitmap font file'), '', false)
+      .addParameter('bitmapFont', _('Bitmap font resource name'), '', false)
       .setParameterLongDescription(
-        'This input take the resource name of the font file, without quotes.'
-      )
-      .addParameter('string', _('Bitmap atlas texture'), '', false)
-      .setParameterLongDescription(
-        'This input take the resource name of the image exported with the font, with quotes.'
+        'The resource name of the font file, without quotes.'
       )
       .getCodeExtraInformation()
-      .setFunctionName('setBitmapFontAndAtlasFile');
+      .setFunctionName('setBitmapFontResourceName');
 
     object
       .addAction(
+        'SetTextureAtlasResourceName',
+        _('Bitmap Font Atlas'),
+        _('Change the atlas image used by the object.') +
+          ' ' +
+          _(
+            'The resource name can be found in: `Project Manager > Game settings > Resources`.'
+          ),
+        _('Set the atlas of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter('string', _('Texture atlas resource name'), '', false)
+      .setParameterLongDescription(
+        'The resource name of the image exported with the font, with quotes.'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setTextureAtlasResourceName');
+
+    object
+      .addExpressionAndCondition(
+        'string',
         'Alignment',
         _('Alignment'),
+        _('the text alignment'),
+        _('the text alignment'),
+        '',
+        'res/actions/textAlign24.png',
+        'res/actions/textAlign.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardParameters('string')
+      .setFunctionName('getAlignment');
+
+    object
+      .addAction(
+        'SetAlignment',
+        _('Alignment'),
         _('Change the alignment of a Bitmap text object.'),
-        _('Change the alignment of _PARAM0_ to _PARAM1_'),
+        _('Set the alignment of _PARAM0_ to _PARAM1_'),
         '',
         'res/actions/textAlign24.png',
         'res/actions/textAlign.png'
@@ -409,13 +337,25 @@ module.exports = {
       .setFunctionName('setAlignment');
 
     object
-      .addAction(
+      .addCondition(
         'WordWrap',
         _('Word wrap'),
-        _(
-          "De/activate word wrapping. Note that word wrapping is a graphical option\nyou can't get the number of lines displayed"
-        ),
-        _('Activate wrapping style of _PARAM0_: _PARAM1_'),
+        _('Check if word wrap is enabled.'),
+        _('_PARAM0_ word wrap is enabled'),
+        '',
+        'res/conditions/wordWrap24.png',
+        'res/conditions/wordWrap.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getWordWrap');
+
+    object
+      .addAction(
+        'SetWordWrap',
+        _('Word wrap'),
+        _('De/activate word wrapping.'),
+        _('Activate word wrap of _PARAM0_: _PARAM1_'),
         '',
         'res/actions/wordWrap24.png',
         'res/actions/wordWrap.png'
@@ -426,74 +366,20 @@ module.exports = {
       .setFunctionName('setWordWrap');
 
     object
-      .addAction(
+      .addExpressionAndConditionAndAction(
+        'number',
         'WrappingWidth',
         _('Wrapping width'),
-        _(
-          'Change the width, in pixels, after which the text is wrapped on next line.'
-        ),
+        _('the width, in pixels, after which the text is wrapped on next line'),
         _('the wrapping width'),
         '',
         'res/actions/scaleWidth24.png',
         'res/actions/scaleWidth.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
+      .useStandardParameters('number')
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
-
-    object
-      .addExpression(
-        'Scale',
-        _('Scale'),
-        _('Scale'),
-        '',
-        'res/actions/scale24.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getScale');
-
-    object
-      .addExpression(
-        'FontSize',
-        _('Font size'),
-        _(
-          'Font size defined for generate the bitmap font files in an external editor.'
-        ),
-        '',
-        'res/actions/characterSize24.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getFontSize');
-
-    object
-      .addStrExpression(
-        'Text',
-        _('Text'),
-        _('Text'),
-        '',
-        'res/actions/text24.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getText');
-
-    object
-      .addStrExpression(
-        'FontName',
-        _('Font name'),
-        _(
-          'Font name defined for generate the bitmap font files in an external editor.'
-        ),
-        '',
-        'res/actions/font.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getFontName');
 
     return extension;
   },
@@ -540,6 +426,63 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
+    /** The bitmap font used in case another font can't be loaded */
+    let defaultBitmapFont = null;
+
+    /**
+     * Patch the specified installed font to use a slug name that includes the size of the font and line height,
+     * to avoid conflicts between different font files using the same font name.
+     */
+    const patchBitmapFont = (bitmapFont) => {
+      const generateSlugName = (bitmapFontStyle) => {
+        return (
+          bitmapFontStyle.font +
+          '-' +
+          bitmapFontStyle.size +
+          '-' +
+          bitmapFontStyle.lineHeight
+        );
+      };
+
+      const defaultName = bitmapFont.font;
+      const fullSlugName = generateSlugName(bitmapFont);
+      bitmapFont.font = fullSlugName;
+      PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+
+      delete PIXI.BitmapFont.available[defaultName];
+      return PIXI.BitmapFont.available[fullSlugName];
+    };
+
+    /**
+     * Return a default bitmap font to be used in case another font can't be loaded.
+     */
+    const getDefaultBitmapFont = () => {
+      if (defaultBitmapFont) return defaultBitmapFont;
+
+      const defaultBitmapFontStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        padding: 5,
+        align: 'left',
+        fill: '#ffffff',
+        wordWrap: true,
+        lineHeight: 20,
+      });
+
+      defaultBitmapFont = patchBitmapFont(
+        PIXI.BitmapFont.from(
+          defaultBitmapFontStyle.fontFamily,
+          defaultBitmapFontStyle,
+          {
+            chars: [
+              [' ', '~'], // All the printable ASCII characters
+            ],
+          }
+        )
+      );
+      return defaultBitmapFont;
+    };
+
     /**
      * Renderer for instances of BitmapText inside the IDE.
      *
@@ -565,41 +508,13 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      // Set up a and generate a default bitmap font
-      // It will then be replaced with the bitmap font setup by the user (see `update` method)
-
-      this._bitmapFontStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 20,
-        padding: 5,
-        align: 'left',
-        fill: '#ffffff',
-        wordWrap: true,
-        lineHegiht: 20,
-      });
-
-      // defaultFullSlugName is used as fontName when PixiJS generate the bitmap font.
-      //const defaultFullSlugName = this._generateSlugName(this._bitmapFontStyle);
-
-      // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
-      const bitmapFont = this.patchBitmapFont(
-        PIXI.BitmapFont.from(
-          this._bitmapFontStyle.fontFamily,
-          this._bitmapFontStyle,
-          {
-            chars: [
-              [' ', '~'], // All the printable ASCII characters
-            ],
-          }
-        )
-      );
-
       // We'll track changes of the font to trigger the loading of the new font.
-      this._currentBitmapFontFile = '';
-      this._currentBitmapAtlasFile = '';
+      this._currentBitmapFontResourceName = '';
+      this._currentTextureAtlasResourceName = '';
 
       this._pixiObject = new PIXI.BitmapText('', {
-        fontName: bitmapFont.font,
+        // Use a default font. The proper font will be loaded in `update` method.
+        fontName: getDefaultBitmapFont().font,
       });
 
       this._pixiObject.anchor.x = 0.5;
@@ -644,48 +559,48 @@ module.exports = {
       this._pixiObject.scale.set(scale);
 
       // Track the changes in font to load the new requested font.
-      const bitmapFontFile = properties.get('bitmapFontFile').getValue();
-      const bitmapAtlasFile = properties.get('bitmapAtlasFile').getValue();
+      const bitmapFontResourceName = properties
+        .get('bitmapFontResourceName')
+        .getValue();
+      const textureAtlasResourceName = properties
+        .get('textureAtlasResourceName')
+        .getValue();
 
       if (
-        this._currentBitmapFontFile !== bitmapFontFile ||
-        this._currentBitmapAtlasFile !== bitmapAtlasFile
+        this._currentBitmapFontResourceName !== bitmapFontResourceName ||
+        this._currentTextureAtlasResourceName !== textureAtlasResourceName
       ) {
-        this._currentBitmapFontFile = bitmapFontFile;
-        this._currentBitmapAtlasFile = bitmapAtlasFile;
+        this._currentBitmapFontResourceName = bitmapFontResourceName;
+        this._currentTextureAtlasResourceName = textureAtlasResourceName;
 
-        this._bitmapAtlasTexture = this._pixiResourcesLoader.getPIXITexture(
+        const texture = this._pixiResourcesLoader.getPIXITexture(
           this._project,
-          this._currentBitmapAtlasFile
+          this._currentTextureAtlasResourceName
         );
 
         this._pixiResourcesLoader
-          .getResourceBitmapFont(this._project, this._currentBitmapFontFile)
+          .getResourceBitmapFont(
+            this._project,
+            this._currentBitmapFontResourceName
+          )
           .then((fontData) => {
-            const bitmapFont = PIXI.BitmapFont.install(
-              fontData,
-              this._bitmapAtlasTexture
+            const bitmapFont = patchBitmapFont(
+              PIXI.BitmapFont.install(fontData, texture)
             );
-
-            // We patch the installed font to use a more complex name that includes the size of the font and line height,
-            // to avoid conflicts between different font files using the same font name.
-            const defaultName = bitmapFont.font;
-            const fullSlugName =
-              bitmapFont.font +
-              '-' +
-              bitmapFont.size +
-              '-' +
-              bitmapFont.lineHeight;
-            bitmapFont.font = fullSlugName;
-            PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
-            delete PIXI.BitmapFont.available[defaultName];
-
             this._pixiObject.fontName = bitmapFont.font;
             this._pixiObject.fontSize = bitmapFont.size;
             this._pixiObject.dirty = true;
           })
           .catch((err) => {
-            console.warn('Unable to load font data', err);
+            console.warn('Unable to load font data:', err);
+            console.info(
+              'Is the texture atlas properly set for the Bitmap Text object? The default font will be used instead.'
+            );
+
+            const bitmapFont = getDefaultBitmapFont();
+            this._pixiObject.fontName = bitmapFont.font;
+            this._pixiObject.fontSize = bitmapFont.size;
+            this._pixiObject.dirty = true;
           });
       }
 
@@ -707,33 +622,6 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-    };
-
-    // Generate a slug name for patch PIXI.BitmapFont, same thing is done in the renderer.
-    // Generate a unique name from elements in PIXI.BitmapFont for get and use a unique name in PIXI.BitmapFont,
-    // and replace the original name by the new one in PIXI.BitmapFont
-    // Original name "Arial", the font name.
-    // New name "Arial-20-20", the font name, font size, line height
-    RenderedBitmapTextInstance.prototype.generateSlugName = function (
-      bitmapFontStyle
-    ) {
-      return (
-        bitmapFontStyle.font + '-' + bitmapFontStyle.size + '-' + bitmapFontStyle.lineHeight
-      );
-    };
-
-    // We patch the installed font to use a more complex name that includes the size of the font and line height,
-    // to avoid conflicts between different font files using the same font name.
-    RenderedBitmapTextInstance.prototype.patchBitmapFont = function (
-      bitmapFont
-    ) {
-      const defaultName = bitmapFont.font;
-      const fullSlugName = this.generateSlugName(bitmapFont);
-      bitmapFont.font = fullSlugName;
-      PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
-
-      delete PIXI.BitmapFont.available[defaultName];
-      return PIXI.BitmapFont.available[fullSlugName];
     };
 
     /**

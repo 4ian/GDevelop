@@ -88,9 +88,7 @@ namespace gdjs {
         this.setBBText(newObjectData.content.text);
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
-        this._color = gdjs.hexToRGBColor(
-          newObjectData.content.color
-        );
+        this._color = gdjs.hexToRGBColor(newObjectData.content.color);
         this._renderer.updateColor();
       }
       if (

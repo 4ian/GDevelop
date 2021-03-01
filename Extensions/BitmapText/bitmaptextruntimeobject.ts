@@ -3,63 +3,80 @@ namespace gdjs {
   export type BitmapTextObjectDataType = {
     /** The base parameters of the Bitmap Text */
     content: {
-      /** The opacity of the Bitmap Text */
+      /** The opacity of the text. */
       opacity: float;
-      /** Content of the text */
+      /** Content of the text. */
       text: string;
-      /** The tint of the text */
-      tint: Array<number>;
-      /** The bitmap font file for the text */
-      bitmapFontFile: string;
-      /** The atlas image file for the text */
-      bitmapAtlasFile: string;
-      /** The scale of the text */
+      /** The tint of the text. */
+      tint: string;
+      /** The name of the resource containing the bitmap font for the text. */
+      bitmapFontResourceName: string;
+      /** The name of the resource containing the atlas image file for the text. */
+      textureAtlasResourceName: string;
+      /** The scale of the text. */
       scale: float;
-      /** Activate word wrap if set to true */
+      /** Activate word wrap if set to true. */
       wordWrap: boolean;
-      /** Wrapping with from custom size properties */
+      /** Wrapping with from custom size properties. */
       wrappingWidth: float;
-      /** Alignment of the text: "left", "center" or "right" */
+      /** Alignment of the text. */
       align: 'left' | 'center' | 'right';
     };
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
 
   /**
-   * Displays a bitmap text without losing in quality on edges
-   * The object use files generated in a external editor like bmFont.
+   * Displays a text using a "Bitmap Font", generated in a external editor like bmFont.
+   * This is more efficient/faster to render than a traditional text (which needs
+   * to have its whole texture re-rendered anytime it changes).
+   *
+   * Bitmap Font can be created with softwares like:
+   * * BMFont (Windows, free): http://www.angelcode.com/products/bmfont/|http://www.angelcode.com/products/bmfont/
+   * * Glyph Designer (OS X, commercial): http://www.71squared.com/en/glyphdesigner|http://www.71squared.com/en/glyphdesigner
+   * * Littera (Web-based, free): http://kvazars.com/littera/|http://kvazars.com/littera/
    */
   export class BitmapTextRuntimeObject extends gdjs.RuntimeObject {
     _opacity: float;
     _text: string;
     /** color in format [r, g, b], where each component is in the range [0, 255] */
     _tint: integer[];
-    _fontFamily: string;
-    _bitmapFontFile: string;
-    _bitmapAtlasFile: string;
+    _bitmapFontResourceName: string;
+    _textureAtlasResourceName: string;
     _scale: number;
     _wordWrap: boolean;
     _wrappingWidth: float;
     _align: string;
 
-    _renderer: gdjs.BitmapTextRuntimeObjectRenderer;
+    _renderer:
+      | gdjs.BitmapTextRuntimeObjectPixiRenderer
+      | gdjs.BitmapTextRuntimeObjectCocosRenderer;
 
     /**
      * @param runtimeScene The scene the object belongs to.
      * @param objectData The object data used to initialize the object
      */
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData: BBTextObjectData) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      objectData: BitmapTextObjectData
+    ) {
       super(runtimeScene, objectData);
 
       this._opacity = objectData.content.opacity;
       this._text = objectData.content.text;
       this._tint = gdjs.hexToRGBColor(objectData.content.tint);
-      this._bitmapFontFile = objectData.content.bitmapFontFile; // fnt/xml files
-      this._bitmapAtlasFile = objectData.content.bitmapAtlasFile; // texture file used with fnt/xml (bitmap font file)
+
+      this._bitmapFontResourceName = objectData.content.bitmapFontResourceName; // fnt/xml files
+      this._textureAtlasResourceName =
+        objectData.content.textureAtlasResourceName; // texture file used with fnt/xml (bitmap font file)
       this._scale = objectData.content.scale;
       this._wordWrap = objectData.content.wordWrap;
       this._wrappingWidth = 0;
       this._align = objectData.content.align;
+
+      this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
+        this,
+        runtimeScene
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -85,16 +102,20 @@ namespace gdjs {
         this._renderer.updateTint();
       }
       if (
-        oldObjectData.content.bitmapFontFile !==
-        newObjectData.content.bitmapFontFile
+        oldObjectData.content.bitmapFontResourceName !==
+        newObjectData.content.bitmapFontResourceName
       ) {
-        this._setBitmapFontFile(newObjectData.content.bitmapFontFile);
+        this.setBitmapFontResourceName(
+          newObjectData.content.bitmapFontResourceName
+        );
       }
       if (
-        oldObjectData.content.bitmapAtlasFile !==
-        newObjectData.content.bitmapAtlasFile
+        oldObjectData.content.textureAtlasResourceName !==
+        newObjectData.content.textureAtlasResourceName
       ) {
-        this._setBitmapAtlasFile(newObjectData.content.bitmapAtlasFile);
+        this.setTextureAtlasResourceName(
+          newObjectData.content.textureAtlasResourceName
+        );
       }
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
         this.setScale(newObjectData.content.scale);
@@ -115,11 +136,6 @@ namespace gdjs {
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
-      } else {
-        this.setWrappingWidth(
-          // This value is the default wrapping width of the runtime object.
-          250
-        );
       }
     }
 
@@ -170,31 +186,22 @@ namespace gdjs {
       return this._renderer.getFontSize();
     }
 
-    _setBitmapFontFile(bitmapFontResourceName: string): void {
-      this._bitmapFontFile = bitmapFontResourceName;
+    setBitmapFontResourceName(bitmapFontResourceName: string): void {
+      this._bitmapFontResourceName = bitmapFontResourceName;
       this._renderer.updateFont();
     }
 
-    _setBitmapAtlasFile(bitmapAtlasResourceName: string): void {
-      this._bitmapAtlasFile = bitmapAtlasResourceName;
-      this._renderer.updateFont();
-    }
-
-    setBitmapFontAndAtlasFile(
-      bitmapFontResourceName: string,
-      bitmapAtlasResourceName: string
-    ): void {
-      this._bitmapFontFile = bitmapFontResourceName;
-      this._bitmapAtlasFile = bitmapAtlasResourceName;
-      this._renderer.updateFont();
-    }
-
-    getFontName(): string {
+    getBitmapFontResourceName(): string {
       return this._renderer.getRendererObject().fontName;
     }
 
-    getTexture(): string {
-      return this._bitmapAtlasResourceName;
+    setTextureAtlasResourceName(textureAtlasResourceName: string): void {
+      this._textureAtlasResourceName = textureAtlasResourceName;
+      this._renderer.updateFont();
+    }
+
+    getTextureAtlasResourceName(): string {
+      return this._textureAtlasResourceName;
     }
 
     setAlignment(align: string): void {
@@ -250,7 +257,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the width.
+     * Set the wrapping width.
      * @param width The new width in pixels.
      */
     setWrappingWidth(width: float): void {
@@ -288,9 +295,9 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
   }
-  // @ts-ignore
   gdjs.registerObject(
     'BitmapText::BitmapTextObject',
+    // @ts-ignore
     gdjs.BitmapTextRuntimeObject
   );
 }

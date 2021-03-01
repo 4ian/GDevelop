@@ -195,4 +195,10 @@ declare interface ResourceData {
   preloadAsMusic?: boolean;
 }
 
-declare type ResourceKind = 'audio' | 'image' | 'font' | 'video' | 'json' | 'bitmapFont';
+declare type ResourceKind =
+  | 'audio'
+  | 'image'
+  | 'font'
+  | 'video'
+  | 'json'
+  | 'bitmapFont';

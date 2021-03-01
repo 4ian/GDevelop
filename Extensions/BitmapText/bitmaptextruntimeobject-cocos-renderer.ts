@@ -1,15 +1,9 @@
-/**
- * The Cocos2D-JS renderer for the BitmapTextRuntimeObject.
- *
- * The implementation is empty as the object is not supported in Cocos2D-JS for now.
- *
- * @class BitmapTextRuntimeObjectCocosRenderer
- * @constructor
-
- * @param {gdjs.RuntimeScene} runtimeScene The gdjs.RuntimeScene in which the object is
- */
-
 namespace gdjs {
+  /**
+   * The Cocos2D-JS renderer for the BitmapTextRuntimeObject.
+   *
+   * The implementation is empty as the object is not supported in Cocos2D-JS for now.
+   */
   export class BitmapTextRuntimeObjectCocosRenderer {
     getRendererObject() {}
     onDestroy() {}
@@ -35,6 +29,5 @@ namespace gdjs {
     }
   }
 
-  gdjs.BitmapTextRuntimeObjectRenderer =
-    gdjs.BitmapTextRuntimeObjectCocosRenderer;
+  export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectCocosRenderer;
 }

@@ -1100,6 +1100,8 @@ interface DependencyMetadata {
 
     [Ref] DependencyMetadata OnlyIfSomeExtraSettingsNonEmpty();
     [Ref] DependencyMetadata OnlyIfOtherDependencyIsExported([Const] DOMString otherDependency);
+
+    void CopyFrom([Const, Ref] DependencyMetadata dependencyMetadata);
 };
 
 interface ParameterMetadata {

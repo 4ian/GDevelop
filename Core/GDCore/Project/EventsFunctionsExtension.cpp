@@ -100,7 +100,7 @@ void EventsFunctionsExtension::UnserializeFrom(
   }
 
   dependencies.clear();
-  auto& dependenciesElement = element.GetChild("dependencies");
+  const auto& dependenciesElement = element.GetChild("dependencies");
   dependenciesElement.ConsiderAsArray();
   for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
     dependencies.push_back(

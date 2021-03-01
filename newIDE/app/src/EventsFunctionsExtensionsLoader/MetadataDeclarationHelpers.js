@@ -44,14 +44,7 @@ export const declareExtensionDependencies = (
 ) =>
   mapVector<gdDependencyMetadata, void>(
     eventsFunctionsExtension.getAllDependencies(),
-    dependency => {
-      extension
-        .addDependency()
-        .setDependencyType(dependency.getDependencyType())
-        .setName(dependency.getName())
-        .setExportName(dependency.getExportName())
-        .setVersion(dependency.getVersion());
-    }
+    dependency => extension.addDependency().copyFrom(dependency)
   );
 
 const getExtensionIconUrl = (extension: gdPlatformExtension) => {

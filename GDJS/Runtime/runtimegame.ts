@@ -46,9 +46,9 @@ namespace gdjs {
     _gameResolutionHeight: integer;
     _originalWidth: float;
     _originalHeight: float;
-    _resizeMode: 'adaptWidth' | 'adaptHeigth' | string;
+    _resizeMode: 'adaptWidth' | 'adaptHeight' | string;
     _adaptGameResolutionAtRuntime: boolean;
-    _scaleMode: "linaer" | "nearest";
+    _scaleMode: 'linear' | 'nearest';
     _renderer: RuntimeGameRenderer;
 
     //Game loop management (see startGameLoop method)
@@ -397,7 +397,7 @@ namespace gdjs {
     /**
      * Return the scale mode of the game ("linear" or "nearest").
      */
-    getScaleMode(): "linaer" | "nearest" {
+    getScaleMode(): 'linear' | 'nearest' {
       return this._scaleMode;
     }
 

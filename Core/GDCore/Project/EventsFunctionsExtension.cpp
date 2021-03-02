@@ -59,6 +59,10 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("previewIconUrl", previewIconUrl);
   element.SetAttribute("iconUrl", iconUrl);
   element.SetAttribute("helpPath", helpPath);
+  auto& dependenciesElement = element.AddChild("dependencies");
+  dependenciesElement.ConsiderAsArray();
+  for (auto& dependency : dependencies)
+    SerializeDependencyTo(dependency, dependenciesElement.AddChild(""));
 
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
@@ -94,6 +98,13 @@ void EventsFunctionsExtension::UnserializeFrom(
       tags.push_back(tagsElement.GetChild(i).GetStringValue());
     }
   }
+
+  dependencies.clear();
+  const auto& dependenciesElement = element.GetChild("dependencies");
+  dependenciesElement.ConsiderAsArray();
+  for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
+    dependencies.push_back(
+        UnserializeDependencyFrom(dependenciesElement.GetChild(i)));
 
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(

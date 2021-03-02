@@ -657,34 +657,34 @@ namespace gdjs {
       this._requestedDeltaY = 0;
 
       const inputManager = runtimeScene.getGame().getInputManager();
-      this._leftKey ||=
+      this._leftKey || (this._leftKey =
         !this._ignoreDefaultControls &&
-        inputManager.isKeyPressed(LEFTKEY);
+        inputManager.isKeyPressed(LEFTKEY));
       // @ts-ignore
-      this._rightKey ||=
+      this._rightKey || (this._rightKey =
         !this._ignoreDefaultControls &&
-        inputManager.isKeyPressed(RIGHTKEY);
+        inputManager.isKeyPressed(RIGHTKEY));
       
-      this._jumpKey ||=
+      this._jumpKey || (this._jumpKey =
       !this._ignoreDefaultControls &&
       (inputManager.isKeyPressed(LSHIFTKEY) ||
       inputManager.isKeyPressed(RSHIFTKEY) ||
-      inputManager.isKeyPressed(SPACEKEY));
+      inputManager.isKeyPressed(SPACEKEY)));
       
-      this._ladderKey ||=
+      this._ladderKey || (this._ladderKey =
       !this._ignoreDefaultControls &&
-      inputManager.isKeyPressed(UPKEY);
+      inputManager.isKeyPressed(UPKEY));
       
-      this._upKey ||=
+      this._upKey || (this._upKey =
         !this._ignoreDefaultControls &&
-        inputManager.isKeyPressed(UPKEY);
-      this._downKey ||=
+        inputManager.isKeyPressed(UPKEY));
+      this._downKey || (this._downKey =
         !this._ignoreDefaultControls &&
-        inputManager.isKeyPressed(DOWNKEY);
+        inputManager.isKeyPressed(DOWNKEY));
       
-      this._releaseKey ||=
+      this._releaseKey || (this._releaseKey =
         !this._ignoreDefaultControls &&
-        inputManager.isKeyPressed(DOWNKEY);
+        inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this.updateSpeed(timeDelta);
 

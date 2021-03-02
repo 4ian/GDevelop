@@ -1,18 +1,40 @@
+// @ts-check
 describe('gdjs.PathfindingRuntimeBehavior', function () {
   // tests cases where every collisionMethod has the same behavior.
   let doCommonPathFindingTests = (collisionMethod, allowDiagonals) => {
     const pathFindingName = 'auto1';
 
-    let createScene = () => {
+    const createScene = () => {
       const runtimeGame = new gdjs.RuntimeGame({
         variables: [],
+        // @ts-ignore - missing properties.
         properties: { windowWidth: 800, windowHeight: 600 },
         resources: { resources: [] },
       });
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
-        layers: [{ name: '', visibility: true, effects: [] }],
+        layers: [
+          {
+            name: '',
+            visibility: true,
+            effects: [],
+            cameras: [],
+
+            ambientLightColorR: 0,
+            ambientLightColorG: 0,
+            ambientLightColorB: 0,
+            isLightingLayer: false,
+            followBaseLayerCamera: true,
+          },
+        ],
         variables: [],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
         behaviorsSharedData: [],
         objects: [],
         instances: [],
@@ -23,7 +45,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       return runtimeScene;
     };
 
-    let addPlayer = (runtimeScene) => {
+    const addPlayer = (runtimeScene) => {
       const player = new gdjs.RuntimeObject(runtimeScene, {
         name: 'player',
         type: '',
@@ -31,6 +53,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           {
             type: 'PathfindingBehavior::PathfindingBehavior',
             name: 'auto1',
+            // @ts-ignore - properties are not typed
             allowDiagonals: allowDiagonals,
             acceleration: 400,
             maxSpeed: 200,
@@ -54,13 +77,14 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       return player;
     };
 
-    let addObstacle = (runtimeScene) => {
+    const addObstacle = (runtimeScene) => {
       const obstacle = new gdjs.RuntimeObject(runtimeScene, {
         name: 'obstacle',
         type: '',
         behaviors: [
           {
             type: 'PathfindingBehavior::PathfindingObstacleBehavior',
+            // @ts-ignore - properties are not typed
             impassable: true,
             cost: 2,
           },

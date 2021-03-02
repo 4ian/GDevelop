@@ -1,3 +1,4 @@
+// @ts-check
 describe('gdjs.PathfindingRuntimeBehavior', function () {
   // limit tests cases on the legacy collision methods.
   let doLegacyPathFindingTests = (
@@ -10,13 +11,34 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     let createScene = () => {
       const runtimeGame = new gdjs.RuntimeGame({
         variables: [],
+        // @ts-ignore - missing properties.
         properties: { windowWidth: 800, windowHeight: 600 },
         resources: { resources: [] },
       });
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
-        layers: [{ name: '', visibility: true, effects: [] }],
+        layers: [
+          {
+            name: '',
+            visibility: true,
+            effects: [],
+            cameras: [],
+
+            ambientLightColorR: 0,
+            ambientLightColorG: 0,
+            ambientLightColorB: 0,
+            isLightingLayer: false,
+            followBaseLayerCamera: true,
+          },
+        ],
         variables: [],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
         behaviorsSharedData: [],
         objects: [],
         instances: [],
@@ -365,6 +387,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           targetX = playerX;
           targetY = playerY - 2 * cellSize;
           break;
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacle.setPosition(obstacleX, obstacleY);
@@ -490,6 +514,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             inclusiveMargin -
             1;
           break;
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacle.setPosition(obstacleX, obstacleY);
@@ -685,6 +711,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           straightLineCellCount = (targetY - playerY) / cellSize + 1;
           break;
         }
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacleTop.setPosition(topObstacleX, topObstacleY);

@@ -45,7 +45,7 @@ export const ExtensionDependenciesEditor = ({
     eventsFunctionsExtension
       .addDependency()
       .setName(
-        newNameGenerator('New Dependency', newName =>
+        newNameGenerator('New Dependency', (newName) =>
           checkNameExists(newName, deps)
         )
       )
@@ -94,7 +94,7 @@ export const ExtensionDependenciesEditor = ({
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getName()}
-                        onChange={newName => {
+                        onChange={(newName) => {
                           if (checkNameExists(newName, deps))
                             showWarningBox(
                               `This name is already in use! Please use a unique name.`,
@@ -114,7 +114,7 @@ export const ExtensionDependenciesEditor = ({
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getExportName()}
-                        onChange={newExportName => {
+                        onChange={(newExportName) => {
                           dependency.setExportName(newExportName);
                           forceUpdate();
                         }}
@@ -124,7 +124,7 @@ export const ExtensionDependenciesEditor = ({
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getVersion()}
-                        onChange={newVersion => {
+                        onChange={(newVersion) => {
                           dependency.setVersion(newVersion);
                           forceUpdate();
                         }}
@@ -171,11 +171,12 @@ export const ExtensionDependenciesEditor = ({
       <Line>
         <BackgroundText>
           <Trans>
-            Dependencies allow to require javascript libraries to be present on
-            the built game. NPM dependencies will be included on electron build
-            and cordova dependencies will be included on cordova builds. Note
-            that this is intended for usage in javascript events, if you are
-            using standard events, you should not worry about this.
+            Dependencies allow to add additional libraries in the exported
+            games. NPM dependencies will be included for Electron builds
+            (Windows, macOS, Linux) and Cordova dependencies will be included
+            for Cordova builds (Android, iOS). Note that this is intended for
+            usage in JavaScript events only. If you are only using standard
+            events, you should not worry about this.
           </Trans>
         </BackgroundText>
       </Line>

@@ -1,15 +1,17 @@
 //@flow
 import React from 'react';
 import { Trans, t } from '@lingui/macro';
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import {
+  Table,
+  TableRow,
+  TableBody,
+  TableRowColumn,
+  TableHeader,
+  TableHeaderColumn,
+} from '../../UI/Table';
 import Paper from '@material-ui/core/Paper';
-import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
 import Add from '@material-ui/icons/Add';
 import Delete from '@material-ui/icons/Delete';
@@ -45,7 +47,7 @@ export const ExtensionDependenciesEditor = ({
     eventsFunctionsExtension
       .addDependency()
       .setName(
-        newNameGenerator('New Dependency', (newName) =>
+        newNameGenerator('New Dependency', newName =>
           checkNameExists(newName, deps)
         )
       )
@@ -66,77 +68,89 @@ export const ExtensionDependenciesEditor = ({
           )}
         >
           <Table>
-            <TableHead>
+            <TableHeader>
               <TableRow>
-                <TableCell>
+                <TableHeaderColumn>
                   <Trans>Name</Trans>
-                </TableCell>
-                <TableCell>
+                </TableHeaderColumn>
+                <TableHeaderColumn>
                   <Trans>Export name</Trans>
-                </TableCell>
-                <TableCell>
+                </TableHeaderColumn>
+                <TableHeaderColumn>
                   <Trans>Version</Trans>
-                </TableCell>
-                <TableCell>
+                </TableHeaderColumn>
+                <TableHeaderColumn>
                   <Trans>Dependency type</Trans>
-                </TableCell>
-                <TableCell>
+                </TableHeaderColumn>
+                <TableHeaderColumn>
                   <Trans>Action</Trans>
-                </TableCell>
+                </TableHeaderColumn>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
-              {mapVector<gdDependencyMetadata, TableRow>(
+              {// $FlowFixMe - unsure why Flow complains about TableRow.
+              mapVector<gdDependencyMetadata, TableRow>(
                 eventsFunctionsExtension.getAllDependencies(),
                 (dependency, index) => (
                   <TableRow key={dependency.getName()}>
-                    <TableCell>
+                    <TableRowColumn>
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getName()}
-                        onChange={(newName) => {
-                          if (checkNameExists(newName, deps))
+                        onChange={newName => {
+                          if (newName === dependency.getName()) return;
+
+                          if (checkNameExists(newName, deps)) {
                             showWarningBox(
                               `This name is already in use! Please use a unique name.`,
                               { delayToNextTick: true }
                             );
-                          else {
-                            eventsFunctionsExtension
-                              .getAllDependencies()
-                              .at(index)
-                              .setName(newName);
+                          } else {
+                            dependency.setName(newName);
                             forceUpdate();
                           }
                         }}
+                        margin="none"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </TableRowColumn>
+                    <TableRowColumn>
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getExportName()}
-                        onChange={(newExportName) => {
+                        onChange={newExportName => {
+                          if (newExportName === dependency.getExportName())
+                            return;
+
                           dependency.setExportName(newExportName);
                           forceUpdate();
                         }}
+                        margin="none"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </TableRowColumn>
+                    <TableRowColumn>
                       <SemiControlledTextField
                         commitOnBlur
                         value={dependency.getVersion()}
-                        onChange={(newVersion) => {
+                        onChange={newVersion => {
+                          if (newVersion === dependency.getVersion()) return;
+
                           dependency.setVersion(newVersion);
                           forceUpdate();
                         }}
+                        margin="none"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </TableRowColumn>
+                    <TableRowColumn>
                       <SelectField
                         value={dependency.getDependencyType()}
                         onChange={(_, __, newType) => {
+                          if (newType === dependency.getDependencyType())
+                            return;
+
                           dependency.setDependencyType(newType);
                           forceUpdate();
                         }}
+                        margin="none"
                       >
                         <SelectOption value="npm" primaryText={t`NPM`} />
                         <SelectOption
@@ -144,28 +158,34 @@ export const ExtensionDependenciesEditor = ({
                           primaryText={t`Cordova`}
                         />
                       </SelectField>
-                    </TableCell>
-                    <TableCell>
+                    </TableRowColumn>
+                    <TableRowColumn>
                       <IconButton
                         tooltip={t`Remove`}
                         onClick={() => {
                           eventsFunctionsExtension.removeDependencyAt(index);
                           forceUpdate();
                         }}
+                        size="small"
                       >
                         <Delete />
                       </IconButton>
-                    </TableCell>
+                    </TableRowColumn>
                   </TableRow>
                 )
               )}
             </TableBody>
           </Table>
-          <FlatButton
-            icon={<Add />}
-            label={<Trans>Add</Trans>}
-            onClick={addDependency}
-          />
+          <Column expand>
+            <Line justifyContent="flex-end">
+              <RaisedButton
+                primary
+                icon={<Add />}
+                label={<Trans>Add</Trans>}
+                onClick={addDependency}
+              />
+            </Line>
+          </Column>
         </TableContainer>
       </Line>
       <Line>

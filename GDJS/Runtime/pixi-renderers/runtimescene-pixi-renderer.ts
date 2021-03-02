@@ -8,7 +8,6 @@ namespace gdjs {
     _pixiContainer: any;
     _debugDraw: PIXI.Graphics | null = null;
     _profilerText: PIXI.Text | null = null;
-    _pointsText: PIXI.Text | null = null;
     _renderedObjectsPoints: Array<{
       wasRendered: boolean;
       points: { x: float; y: float };
@@ -94,7 +93,6 @@ namespace gdjs {
         // Add on top of all layers:
         this._pixiContainer.addChild(this._debugDraw);
       }
-      const _pointsText = [];
 
       // Activate here what you want to be displayed:
       const displayAABB = true;
@@ -211,7 +209,7 @@ namespace gdjs {
               compensationCameraMovementY,
           };
 
-          // Draw Center points
+          // Draw Center point
           debugDraw.fill.alpha = 0.3;
           debugDraw.line.color = 0xffff00;
           debugDraw.fill.color = 0xffff00;
@@ -238,7 +236,7 @@ namespace gdjs {
             );
           }
 
-          // Draw Origin points
+          // Draw Origin point
           // Origin point of the object, with camera movement
           // For Sprite objects get the position of the origin point.
           // For others objects that doesn't have origin point the position of the rendered object is used.

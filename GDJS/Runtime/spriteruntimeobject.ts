@@ -817,7 +817,7 @@ namespace gdjs {
       const pt = this._animationFrame.getPoint(name);
       const pos = gdjs.staticArray(SpriteRuntimeObject.prototype.getPointX);
       this._transformToGlobal(pt.x, pt.y, pos);
-      return { x: pos[0], y: pos[1] };
+      return [pos[0], pos[1]];
     }
 
     /**

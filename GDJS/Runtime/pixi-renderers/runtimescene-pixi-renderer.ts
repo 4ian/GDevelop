@@ -168,7 +168,7 @@ namespace gdjs {
           if (!this._renderedObjectsPoints[id]) {
             this._renderedObjectsPoints[id] = {
               wasRendered: true,
-              points: {},
+              points: { x: 0, y: 0 },
             };
           }
 
@@ -240,20 +240,19 @@ namespace gdjs {
           // Origin point of the object, with camera movement
           // For Sprite objects get the position of the origin point.
           // For others objects that doesn't have origin point the position of the rendered object is used.
-          let originPoint = {
-            x: object.getDrawableX() - compensationCameraMovementX,
-            y: object.getDrawableY() - compensationCameraMovementY,
-          };
-
+          let originPoint = [
+            object.getDrawableX() - compensationCameraMovementX,
+            object.getDrawableY() - compensationCameraMovementY,
+          ];
           if (object instanceof gdjs.SpriteRuntimeObject) {
             originPoint = object.getPointPosition('origin');
-            originPoint.x = originPoint.x - compensationCameraMovementX;
-            originPoint.y = originPoint.y - compensationCameraMovementY;
+            originPoint[0] = originPoint[0] - compensationCameraMovementX;
+            originPoint[1] = originPoint[1] - compensationCameraMovementY;
           }
 
           debugDraw.line.color = 0xff0000;
           debugDraw.fill.color = 0xff0000;
-          debugDraw.drawCircle(originPoint.x, originPoint.y, 3);
+          debugDraw.drawCircle(originPoint[0], originPoint[1], 3);
 
           if (viewPointsNames) {
             if (!renderedObjectTextPoints.points['origin']) {
@@ -266,8 +265,8 @@ namespace gdjs {
               );
             }
             renderedObjectTextPoints.points['origin'].position.set(
-              originPoint.x,
-              originPoint.y
+              originPoint[0],
+              originPoint[1]
             );
 
             // Mark the text points as rendered
@@ -279,11 +278,13 @@ namespace gdjs {
 
           // Draw custom point
           if (viewCustomPoints) {
+            // @ts-ignore '_animationFrame' does not exist on type 'RuntimeObject | SpriteRuntimeObject'.
             if (!object?._animationFrame?.points) continue;
+            // @ts-ignore '_animationFrame' does not exist on type 'RuntimeObject | SpriteRuntimeObject'.
             for (const customPointName in object._animationFrame.points[
               'items'
             ]) {
-              let customPoint: { x: float; y: float };
+              let customPoint: [float, float];
 
               if (object instanceof gdjs.SpriteRuntimeObject) {
                 customPoint = object.getPointPosition(customPointName);
@@ -303,8 +304,8 @@ namespace gdjs {
                 }
 
                 renderedObjectTextPoints.points[customPointName].position.set(
-                  customPoint.x - compensationCameraMovementX,
-                  customPoint.y - compensationCameraMovementY
+                  customPoint[0] - compensationCameraMovementX,
+                  customPoint[1] - compensationCameraMovementY
                 );
 
                 // Mark the text points as rendered
@@ -319,8 +320,8 @@ namespace gdjs {
               debugDraw.line.color = 0x0000ff;
               debugDraw.fill.color = 0x0000ff;
               debugDraw.drawCircle(
-                customPoint.x - compensationCameraMovementX,
-                customPoint.y - compensationCameraMovementY,
+                customPoint[0] - compensationCameraMovementX,
+                customPoint[1] - compensationCameraMovementY,
                 3
               );
             }

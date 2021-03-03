@@ -74,7 +74,7 @@ describe('gdjs.LightRuntimeObject', function () {
 
   it('check object properties', function () {
     expect(lightObj.getRadius()).to.be(100);
-    expect(lightObj.getColor()).to.eql("180;180;180");
+    expect(lightObj.getColor()).to.eql('180;180;180');
     expect(lightObj.getDebugMode()).to.be(false);
     expect(lightObj.getDrawableX()).to.be(100);
     expect(lightObj.getDrawableY()).to.be(100);

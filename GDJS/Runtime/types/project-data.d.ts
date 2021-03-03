@@ -158,7 +158,7 @@ declare interface ProjectPropertiesData {
   orientation: string;
   packageName: string;
   projectFile: string;
-  scaleMode: string;
+  scaleMode: 'linear' | 'nearest';
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;
@@ -204,10 +204,4 @@ declare interface ResourceData {
   preloadAsMusic?: boolean;
 }
 
-declare enum ResourceKind {
-  Audio = 'audio',
-  Image = 'image',
-  Font = 'font',
-  Video = 'video',
-  Json = 'json',
-}
+declare type ResourceKind = 'audio' | 'image' | 'font' | 'video' | 'json';

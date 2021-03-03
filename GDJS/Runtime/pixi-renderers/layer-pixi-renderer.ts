@@ -10,12 +10,12 @@ namespace gdjs {
   export class LayerPixiRenderer {
     _pixiContainer: any;
 
-    _filters: { [key: string]: gdjs.PixiFiltersTools.Filter } = {};
+    _filters: Record<string, gdjs.PixiFiltersTools.Filter> = {};
     _layer: any;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: any;
-    _pixiRenderer: PIXI.Renderer;
+    _pixiRenderer: PIXI.Renderer | null;
 
     // Width and height are tracked when a render texture is used.
     _oldWidth: float | null = null;
@@ -44,11 +44,11 @@ namespace gdjs {
       }
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Container {
       return this._pixiContainer;
     }
 
-    getLightingSprite() {
+    getLightingSprite(): PIXI.Sprite | null {
       return this._lightingSprite;
     }
 
@@ -56,7 +56,7 @@ namespace gdjs {
      * Update the position of the PIXI container. To be called after each change
      * made to position, zoom or rotation of the camera.
      */
-    private updatePosition() {
+    updatePosition(): void {
       const angle = -gdjs.toRad(this._layer.getCameraRotation());
       const zoomFactor = this._layer.getCameraZoom();
       this._pixiContainer.rotation = angle;
@@ -76,7 +76,7 @@ namespace gdjs {
       this._pixiContainer.position.y += this._layer.getHeight() / 2;
     }
 
-    updateVisibility(visible): void {
+    updateVisibility(visible: boolean): void {
       this._pixiContainer.visible = !!visible;
     }
 
@@ -94,7 +94,7 @@ namespace gdjs {
      * Add a new effect, or replace the one with the same name.
      * @param effectData The data of the effect to add.
      */
-    addEffect(effectData: EffectData) {
+    addEffect(effectData: EffectData): void {
       const filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
         effectData.effectType
       );
@@ -129,7 +129,7 @@ namespace gdjs {
      * Remove the effect with the specified name
      * @param effectName The name of the effect.
      */
-    removeEffect(effectName: string) {
+    removeEffect(effectName: string): void {
       const filter = this._filters[effectName];
       if (!filter) {
         return;
@@ -149,7 +149,7 @@ namespace gdjs {
      * @param child The child (PIXI object) to be added.
      * @param zOrder The z order of the associated object.
      */
-    addRendererObject(child, zOrder) {
+    addRendererObject(child, zOrder: integer): void {
       child.zOrder = zOrder;
 
       //Extend the pixi object with a z order.
@@ -169,7 +169,7 @@ namespace gdjs {
      * @param child The child (PIXI object) to be modified.
      * @param newZOrder The z order of the associated object.
      */
-    changeRendererObjectZOrder(child, newZOrder) {
+    changeRendererObjectZOrder(child, newZOrder: integer): void {
       this._pixiContainer.removeChild(child);
       this.addRendererObject(child, newZOrder);
     }
@@ -180,7 +180,7 @@ namespace gdjs {
      *
      * @param child The child (PIXI object) to be removed.
      */
-    removeRendererObject(child) {
+    removeRendererObject(child): void {
       this._pixiContainer.removeChild(child);
     }
 
@@ -282,7 +282,7 @@ namespace gdjs {
      * Updates the render texture, if it exists.
      * Also, render texture is cleared with a specified clear color.
      */
-    _updateRenderTexture() {
+    _updateRenderTexture(): void {
       if (
         !this._pixiRenderer ||
         this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
@@ -335,7 +335,7 @@ namespace gdjs {
      * of the layer by a sprite showing this texture.
      * used only in lighting for now as the sprite could have MULTIPLY blend mode.
      */
-    private _replaceContainerWithSprite() {
+    private _replaceContainerWithSprite(): void {
       if (
         !this._pixiRenderer ||
         this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
@@ -356,5 +356,6 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  export type LayerRenderer = gdjs.LayerPixiRenderer;
   export const LayerRenderer = gdjs.LayerPixiRenderer;
 }

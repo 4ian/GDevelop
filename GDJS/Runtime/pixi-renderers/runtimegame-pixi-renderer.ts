@@ -459,8 +459,8 @@ namespace gdjs {
         return false;
       };
       // @ts-ignore
-      renderer.view.onmousewheel = function (event) {
-        manager.onMouseWheel(event.wheelDelta);
+      renderer.view.onwheel = function (event) {
+        manager.onMouseWheel(-event.deltaY);
       };
 
       //Touches
@@ -604,5 +604,6 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  export type RuntimeGameRenderer = RuntimeGamePixiRenderer;
   export const RuntimeGameRenderer = RuntimeGamePixiRenderer;
 }

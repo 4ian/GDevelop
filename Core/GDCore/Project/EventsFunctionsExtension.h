@@ -9,6 +9,7 @@
 
 #include <vector>
 
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
@@ -136,6 +137,35 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return eventsBasedBehaviors;
   }
 
+  /** \name Dependencies
+   */
+  ///@{
+
+  /**
+   * \brief Adds a new dependency.
+   */
+  gd::DependencyMetadata& AddDependency() {
+    gd::DependencyMetadata dependency;
+    dependencies.push_back(dependency);
+    return dependencies.back();
+  };
+
+  /**
+   * \brief Adds a new dependency.
+   */
+  void RemoveDependencyAt(size_t index) {
+    dependencies.erase(dependencies.begin() + index);
+  };
+
+  /**
+   * \brief Returns the list of dependencies.
+   */
+  std::vector<gd::DependencyMetadata>& GetAllDependencies() {
+    return dependencies;
+  };
+
+  ///@}
+
   /** \name Serialization
    */
   ///@{
@@ -165,6 +195,24 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
    */
   void Init(const gd::EventsFunctionsExtension& other);
 
+  void SerializeDependencyTo(const gd::DependencyMetadata& dependency,
+                             gd::SerializerElement& serializer) const {
+    serializer.SetStringAttribute("type", dependency.GetDependencyType());
+    serializer.SetStringAttribute("exportName", dependency.GetExportName());
+    serializer.SetStringAttribute("name", dependency.GetName());
+    serializer.SetStringAttribute("version", dependency.GetVersion());
+  }
+
+  gd::DependencyMetadata UnserializeDependencyFrom(
+      gd::SerializerElement& serializer) {
+    gd::DependencyMetadata dependency;
+    dependency.SetDependencyType(serializer.GetStringAttribute("type"));
+    dependency.SetExportName(serializer.GetStringAttribute("exportName"));
+    dependency.SetName(serializer.GetStringAttribute("name"));
+    dependency.SetVersion(serializer.GetStringAttribute("version"));
+    return dependency;
+  }
+
   gd::String version;
   gd::String extensionNamespace;
   gd::String shortDescription;
@@ -178,6 +226,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  std::vector<gd::DependencyMetadata> dependencies;
 };
 
 }  // namespace gd

@@ -132,12 +132,6 @@ namespace gdjs {
     }
 
     doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
-      //No need for update as we take care of this below.
-      /*if ( this._hshgNeedUpdate ) {
-          this._manager._obstaclesHSHG.update();
-          this._manager._hshgNeedUpdate = false;
-      }*/
-
       //Make sure the obstacle is or is not in the obstacles manager.
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);

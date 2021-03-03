@@ -7,9 +7,24 @@ namespace gdjs {
   /** An axis-aligned bounding box. Used to represents a box around an object for example. */
   export type AABB = {
     /** The [x,y] coordinates of the top left point */
-    min: Array<number>;
+    min: FloatPoint;
     /** The [x,y] coordinates of the bottom right point */
-    max: Array<number>;
+    max: FloatPoint;
+  };
+
+  /**
+   * Return the squared bounding radius of an object given its width/height and its center of rotation
+   * (relative to the top-left of the object). The radius is relative to the center of rotation.
+   */
+  const computeSqBoundingRadius = (
+    width: float,
+    height: float,
+    centerX: float,
+    centerY: float
+  ) => {
+    const radiusX = Math.max(centerX, width - centerX);
+    const radiusY = Math.max(centerY, height - centerY);
+    return Math.pow(radiusX, 2) + Math.pow(radiusY, 2);
   };
 
   /**
@@ -27,13 +42,10 @@ namespace gdjs {
     zOrder: integer = 0;
     hidden: boolean = false;
     layer: string = '';
-    protected _nameId: number;
+    protected _nameId: integer;
     protected _livingOnScene: boolean = true;
 
-    /**
-     * @readonly
-     */
-    id: number;
+    readonly id: integer;
     _runtimeScene: gdjs.RuntimeScene;
 
     /**
@@ -107,7 +119,7 @@ namespace gdjs {
      * If you redefine this function, **make sure to call the original method**
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
-    onCreated() {
+    onCreated(): void {
       for (let i = 0; i < this._behaviors.length; ++i) {
         this._behaviors[i].onCreated();
       }
@@ -129,7 +141,7 @@ namespace gdjs {
      * need to be set again.
      *
      */
-    reinitialize(objectData: ObjectData) {
+    reinitialize(objectData: ObjectData): void {
       const runtimeScene = this._runtimeScene;
       this.x = 0;
       this.y = 0;
@@ -138,6 +150,7 @@ namespace gdjs {
       this.hidden = false;
       this.layer = '';
       this._livingOnScene = true;
+      //@ts-ignore Reinitialize is like a constructor, it can overwrite the readonly property.
       this.id = runtimeScene.createNewUniqueId();
       this.persistentUuid = null;
       this.pick = false;
@@ -202,7 +215,9 @@ namespace gdjs {
      *
      * @param initialInstanceData The data of the initial instance.
      */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {}
+    extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ): void {}
 
     //Nothing to do.
     /**
@@ -373,7 +388,12 @@ namespace gdjs {
       return this.getY();
     }
 
-    rotateTowardPosition(x, y, speed, scene) {
+    rotateTowardPosition(
+      x: float,
+      y: float,
+      speed: float,
+      scene: gdjs.RuntimeScene
+    ): void {
       this.rotateTowardAngle(
         (Math.atan2(
           y - (this.getDrawableY() + this.getCenterY()),
@@ -386,7 +406,11 @@ namespace gdjs {
       );
     }
 
-    rotateTowardAngle(angle, speed, runtimeScene) {
+    rotateTowardAngle(
+      angle: float,
+      speed: float,
+      runtimeScene: gdjs.RuntimeScene
+    ): void {
       if (speed === 0) {
         this.setAngle(angle);
         return;
@@ -428,7 +452,7 @@ namespace gdjs {
      * @param speed The speed, in degrees per second.
      * @param runtimeScene The scene where the object is displayed.
      */
-    rotate(speed: number, runtimeScene: gdjs.RuntimeScene) {
+    rotate(speed: float, runtimeScene: gdjs.RuntimeScene): void {
       this.setAngle(
         this.getAngle() + (speed * this.getElapsedTime(runtimeScene)) / 1000
       );
@@ -499,7 +523,7 @@ namespace gdjs {
      *
      * @param z The new Z order position of the object
      */
-    setZOrder(z: number): void {
+    setZOrder(z: integer): void {
       if (z === this.zOrder) {
         return;
       }
@@ -547,7 +571,7 @@ namespace gdjs {
      * @return The specified variable
      * @static
      */
-    static returnVariable(variable: gdjs.Variable): any {
+    static returnVariable(variable: gdjs.Variable): gdjs.Variable {
       return variable;
     }
 
@@ -610,7 +634,7 @@ namespace gdjs {
      * @return The number of children
      * @static
      */
-    static getVariableChildCount(variable): any {
+    static getVariableChildCount(variable: gdjs.Variable): integer {
       if (variable.isStructure() == false) {
         return 0;
       }
@@ -622,7 +646,7 @@ namespace gdjs {
      * @param variable The variable to be changed
      * @param newValue The value to be set
      */
-    static setVariableNumber(variable, newValue: float) {
+    static setVariableNumber(variable: gdjs.Variable, newValue: float): void {
       variable.setNumber(newValue);
     }
 
@@ -631,7 +655,7 @@ namespace gdjs {
      * @param variable The variable to be changed
      * @param newValue {String} The value to be set
      */
-    static setVariableString(variable, newValue) {
+    static setVariableString(variable: gdjs.Variable, newValue: string) {
       variable.setString(newValue);
     }
 
@@ -643,7 +667,7 @@ namespace gdjs {
     private static variableChildExists(
       variable: gdjs.Variable,
       childName: string
-    ) {
+    ): boolean {
       return variable.hasChild(childName);
     }
 
@@ -655,15 +679,15 @@ namespace gdjs {
     private static variableRemoveChild(
       variable: gdjs.Variable,
       childName: string
-    ) {
-      return variable.removeChild(childName);
+    ): void {
+      variable.removeChild(childName);
     }
 
     /**
      * @static
      * @param variable The variable to be cleared
      */
-    private static variableClearChildren(variable: gdjs.Variable) {
+    private static variableClearChildren(variable: gdjs.Variable): void {
       variable.clearChildren();
     }
 
@@ -813,7 +837,7 @@ namespace gdjs {
      * @param y The y coordinates of the force
      * @param multiplier Set the force multiplier
      */
-    addForce(x: float, y: float, multiplier: integer) {
+    addForce(x: float, y: float, multiplier: integer): void {
       this._forces.push(this._getRecycledForce(x, y, multiplier));
     }
 
@@ -823,7 +847,7 @@ namespace gdjs {
      * @param len The length of the force, in pixels.
      * @param multiplier Set the force multiplier
      */
-    addPolarForce(angle: float, len: number, multiplier: integer) {
+    addPolarForce(angle: float, len: float, multiplier: integer): void {
       const angleInRadians = (angle / 180) * 3.14159;
 
       //TODO: Benchmark with Math.PI
@@ -842,9 +866,9 @@ namespace gdjs {
     addForceTowardPosition(
       x: float,
       y: float,
-      len: number,
+      len: float,
       multiplier: integer
-    ) {
+    ): void {
       const angle = Math.atan2(
         y - (this.getDrawableY() + this.getCenterY()),
         x - (this.getDrawableX() + this.getCenterX())
@@ -863,9 +887,9 @@ namespace gdjs {
      */
     addForceTowardObject(
       object: gdjs.RuntimeObject,
-      len: number,
+      len: float,
       multiplier: integer
-    ) {
+    ): void {
       if (object == null) {
         return;
       }
@@ -880,7 +904,7 @@ namespace gdjs {
     /**
      * Deletes all forces applied on the object
      */
-    clearForces() {
+    clearForces(): void {
       RuntimeObject.forcesGarbage.push.apply(
         RuntimeObject.forcesGarbage,
         this._forces
@@ -900,7 +924,7 @@ namespace gdjs {
      * Called once a step by runtimeScene to update forces magnitudes and
      * remove null ones.
      */
-    updateForces(elapsedTime): void {
+    updateForces(elapsedTime: float): void {
       for (let i = 0; i < this._forces.length; ) {
         const force = this._forces[i];
         const multiplier = force.getMultiplier();
@@ -953,7 +977,7 @@ namespace gdjs {
      * @return true if the difference between the average angle of the forces
      * and the angle parameter is inferior to toleranceInDegrees parameter.
      */
-    averageForceAngleIs(angle: float, toleranceInDegrees: number): boolean {
+    averageForceAngleIs(angle: float, toleranceInDegrees: float): boolean {
       let averageAngle = this.getAverageForce().getAngle();
       if (averageAngle < 0) {
         averageAngle += 360;
@@ -1108,7 +1132,7 @@ namespace gdjs {
     /**
      * Call each behavior stepPreEvents method.
      */
-    stepBehaviorsPreEvents(runtimeScene) {
+    stepBehaviorsPreEvents(runtimeScene): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].stepPreEvents(runtimeScene);
       }
@@ -1117,7 +1141,7 @@ namespace gdjs {
     /**
      * Call each behavior stepPostEvents method.
      */
-    stepBehaviorsPostEvents(runtimeScene) {
+    stepBehaviorsPostEvents(runtimeScene): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].stepPostEvents(runtimeScene);
       }
@@ -1127,7 +1151,7 @@ namespace gdjs {
      * Called when the object was hot reloaded, to notify behaviors
      * that the object was modified. Useful for behaviors that
      */
-    notifyBehaviorsObjectHotReloaded() {
+    notifyBehaviorsObjectHotReloaded(): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].onObjectHotReloaded();
       }
@@ -1143,7 +1167,7 @@ namespace gdjs {
      * @param name {String} The behavior name.
      * @return The behavior with the given name, or undefined.
      */
-    getBehavior(name): gdjs.RuntimeBehavior | null {
+    getBehavior(name: string): gdjs.RuntimeBehavior | null {
       return this._behaviorsTable.get(name);
     }
 
@@ -1152,7 +1176,7 @@ namespace gdjs {
      *
      * @param name {String} The behavior name.
      */
-    hasBehavior(name): boolean {
+    hasBehavior(name: string): boolean {
       return this._behaviorsTable.containsKey(name);
     }
 
@@ -1162,7 +1186,7 @@ namespace gdjs {
      * @param name {String} The behavior name.
      * @param enable {boolean} true to activate the behavior
      */
-    activateBehavior(name, enable) {
+    activateBehavior(name: string, enable: boolean): void {
       if (this._behaviorsTable.containsKey(name)) {
         this._behaviorsTable.get(name).activate(enable);
       }
@@ -1174,7 +1198,7 @@ namespace gdjs {
      * @param name The behavior name.
      * @return true if the behavior is activated.
      */
-    behaviorActivated(name: string): any {
+    behaviorActivated(name: string): boolean {
       if (this._behaviorsTable.containsKey(name)) {
         return this._behaviorsTable.get(name).activated();
       }
@@ -1244,7 +1268,7 @@ namespace gdjs {
      * @param timeInSeconds The time value to check in seconds
      * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
      */
-    timerElapsedTime(timerName: string, timeInSeconds: number): boolean {
+    timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
         return false;
@@ -1279,7 +1303,7 @@ namespace gdjs {
      * Pause a timer, if the timer doesn't exist it is created
      * @param timerName The timer name
      */
-    pauseTimer(timerName: string) {
+    pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
       }
@@ -1290,7 +1314,7 @@ namespace gdjs {
      * Unpause a timer, if the timer doesn't exist it is created
      * @param timerName The timer name
      */
-    unpauseTimer(timerName: string) {
+    unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
       }
@@ -1301,7 +1325,7 @@ namespace gdjs {
      * Remove a timer
      * @param timerName The timer name
      */
-    removeTimer(timerName: string) {
+    removeTimer(timerName: string): void {
       if (this._timers.containsKey(timerName)) {
         this._timers.remove(timerName);
       }
@@ -1312,7 +1336,7 @@ namespace gdjs {
      * @param timerName The timer name
      * @return The timer elapsed time in seconds, 0 if the timer doesn't exist
      */
-    getTimerElapsedTimeInSeconds(timerName: string): number {
+    getTimerElapsedTimeInSeconds(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {
         return 0;
       }
@@ -1326,7 +1350,10 @@ namespace gdjs {
      * @param ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
      * @return true if the object was moved
      */
-    separateFromObjects(objects, ignoreTouchingEdges: boolean): any {
+    separateFromObjects(
+      objects: RuntimeObject[],
+      ignoreTouchingEdges: boolean
+    ): boolean {
       let moved = false;
       let xMove = 0;
       let yMove = 0;
@@ -1364,7 +1391,10 @@ namespace gdjs {
      * @param ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
      * @return true if the object was moved
      */
-    separateFromObjectsList(objectsLists, ignoreTouchingEdges: boolean): any {
+    separateFromObjectsList(
+      objectsLists: ObjectsLists,
+      ignoreTouchingEdges: boolean
+    ): boolean {
       let moved = false;
       let xMove = 0;
       let yMove = 0;
@@ -1405,7 +1435,7 @@ namespace gdjs {
      * Get the distance, in pixels, between *the center* of this object and another object.
      * @param otherObject The other object
      */
-    getDistanceToObject(otherObject: gdjs.RuntimeObject) {
+    getDistanceToObject(otherObject: gdjs.RuntimeObject): float {
       return Math.sqrt(this.getSqDistanceToObject(otherObject));
     }
 
@@ -1413,7 +1443,7 @@ namespace gdjs {
      * Get the squared distance, in pixels, between *the center* of this object and another object.
      * @param otherObject The other object
      */
-    getSqDistanceToObject(otherObject: gdjs.RuntimeObject) {
+    getSqDistanceToObject(otherObject: gdjs.RuntimeObject): float {
       if (otherObject === null) {
         return 0;
       }
@@ -1433,7 +1463,7 @@ namespace gdjs {
      * @param targetX Target X position
      * @param targetY Target Y position
      */
-    getDistanceToPosition(targetX: number, targetY: number) {
+    getDistanceToPosition(targetX: float, targetY: float): float {
       return Math.sqrt(this.getSqDistanceToPosition(targetX, targetY));
     }
 
@@ -1442,7 +1472,7 @@ namespace gdjs {
      * @param targetX Target X position
      * @param targetY Target Y position
      */
-    getSqDistanceToPosition(targetX: number, targetY: number) {
+    getSqDistanceToPosition(targetX: float, targetY: float): float {
       const x = this.getDrawableX() + this.getCenterX() - targetX;
       const y = this.getDrawableY() + this.getCenterY() - targetY;
       return x * x + y * y;
@@ -1452,7 +1482,7 @@ namespace gdjs {
      * Get the angle, in degrees, from the *object center* to another object.
      * @param otherObject The other object
      */
-    getAngleToObject(otherObject: gdjs.RuntimeObject) {
+    getAngleToObject(otherObject: gdjs.RuntimeObject): float {
       if (otherObject === null) {
         return 0;
       }
@@ -1472,7 +1502,7 @@ namespace gdjs {
      * @param targetX Target X position
      * @param targetY Target Y position
      */
-    getAngleToPosition(targetX: number, targetY: number) {
+    getAngleToPosition(targetX: float, targetY: float): float {
       const x = this.getDrawableX() + this.getCenterX() - targetX;
       const y = this.getDrawableY() + this.getCenterY() - targetY;
       return (Math.atan2(-y, -x) * 180) / Math.PI;
@@ -1487,7 +1517,12 @@ namespace gdjs {
      * @param distance The distance between the object and the target, in pixels.
      * @param angleInDegrees The angle between the object and the target, in degrees.
      */
-    putAround(x: float, y: float, distance: number, angleInDegrees: number) {
+    putAround(
+      x: float,
+      y: float,
+      distance: float,
+      angleInDegrees: float
+    ): void {
       const angle = (angleInDegrees / 180) * 3.14159;
 
       // Offset the position by the center, as PutAround* methods should position the center
@@ -1514,7 +1549,11 @@ namespace gdjs {
      * @param distance The distance between the object and the target
      * @param angleInDegrees The angle between the object and the target, in degrees.
      */
-    putAroundObject(obj, distance: number, angleInDegrees: number) {
+    putAroundObject(
+      obj: gdjs.RuntimeObject,
+      distance: float,
+      angleInDegrees: float
+    ): void {
       this.putAround(
         obj.getDrawableX() + obj.getCenterX(),
         obj.getDrawableY() + obj.getCenterY(),
@@ -1527,7 +1566,7 @@ namespace gdjs {
      * @deprecated
      * @param objectsLists Tables of objects
      */
-    separateObjectsWithoutForces(objectsLists) {
+    separateObjectsWithoutForces(objectsLists: ObjectsLists): void {
       //Prepare the list of objects to iterate over.
       const objects = gdjs.staticArray(
         RuntimeObject.prototype.separateObjectsWithoutForces
@@ -1570,7 +1609,7 @@ namespace gdjs {
      * @deprecated
      * @param objectsLists Tables of objects
      */
-    separateObjectsWithForces(objectsLists) {
+    separateObjectsWithForces(objectsLists: ObjectsLists): void {
       //Prepare the list of objects to iterate over.
       const objects = gdjs.staticArray(
         RuntimeObject.prototype.separateObjectsWithForces
@@ -1622,28 +1661,41 @@ namespace gdjs {
       obj2: gdjs.RuntimeObject,
       ignoreTouchingEdges: boolean
     ): boolean {
-      // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
-      // is not necessarily in the middle of the object (for sprites for example).
       //First check if bounding circle are too far.
-      const o1w = obj1.getWidth();
-      const o1h = obj1.getHeight();
-      const o2w = obj2.getWidth();
-      const o2h = obj2.getHeight();
-      const x =
-        obj1.getDrawableX() +
-        obj1.getCenterX() -
-        (obj2.getDrawableX() + obj2.getCenterX());
-      const y =
-        obj1.getDrawableY() +
-        obj1.getCenterY() -
-        (obj2.getDrawableY() + obj2.getCenterY());
-      const obj1BoundingRadius = Math.sqrt(o1w * o1w + o1h * o1h) / 2.0;
-      const obj2BoundingRadius = Math.sqrt(o2w * o2w + o2h * o2h) / 2.0;
-      if (Math.sqrt(x * x + y * y) > obj1BoundingRadius + obj2BoundingRadius) {
+      const o1centerX = obj1.getCenterX();
+      const o1centerY = obj1.getCenterY();
+      const obj1BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj1.getWidth(),
+          obj1.getHeight(),
+          o1centerX,
+          o1centerY
+        )
+      );
+
+      const o2centerX = obj2.getCenterX();
+      const o2centerY = obj2.getCenterY();
+      const obj2BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj2.getWidth(),
+          obj2.getHeight(),
+          o2centerX,
+          o2centerY
+        )
+      );
+
+      const diffX =
+        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
+      const diffY =
+        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      if (
+        Math.sqrt(diffX * diffX + diffY * diffY) >
+        obj1BoundingRadius + obj2BoundingRadius
+      ) {
         return false;
       }
 
-      //Do a real check if necessary.
+      // Do a real check if necessary.
       const hitBoxes1 = obj1.getHitBoxes();
       const hitBoxes2 = obj2.getHitBoxes();
       for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
@@ -1667,28 +1719,50 @@ namespace gdjs {
      * @param y The raycast source Y
      * @param endX The raycast end position X
      * @param endY The raycast end position Y
-     * @param closest {boolean} Get the closest or farthest collision mask result?
+     * @param closest Get the closest or farthest collision mask result?
      * @return A raycast result with the contact points and distances
      */
-    raycastTest(x: float, y: float, endX: number, endY: number, closest): any {
-      // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
-      // is not necessarily in the middle of the object (for sprites for example).
-      const objW = this.getWidth();
-      const objH = this.getHeight();
-      const diffX = this.getDrawableX() + this.getCenterX() - x;
-      const diffY = this.getDrawableY() + this.getCenterY() - y;
-      const sqBoundingR = (objW * objW + objH * objH) / 4.0;
-      const sqDist = (endX - x) * (endX - x) + (endY - y) * (endY - y);
+    raycastTest(
+      x: float,
+      y: float,
+      endX: float,
+      endY: float,
+      closest: boolean
+    ): RaycastTestResult {
+      // First check if bounding circles are too far
+      const objCenterX = this.getCenterX();
+      const objCenterY = this.getCenterY();
+      const objSqBoundingRadius = computeSqBoundingRadius(
+        this.getWidth(),
+        this.getHeight(),
+        objCenterX,
+        objCenterY
+      );
+
+      const rayCenterWorldX = (x + endX) / 2;
+      const rayCenterWorldY = (x + endX) / 2;
+      const raySqBoundingRadius =
+        (endX - x) * (endX - x) + (endY - y) * (endY - y);
+
+      const diffX = this.getDrawableX() + objCenterX - rayCenterWorldX;
+      const diffY = this.getDrawableY() + objCenterY - rayCenterWorldY;
+
       // @ts-ignore
       let result = gdjs.Polygon.raycastTestStatics.result;
       result.collision = false;
       if (
+        // As an optimization, avoid computing the square root of the two boundings radius
+        // and the distance by comparing the squared values instead.
         diffX * diffX + diffY * diffY >
-        sqBoundingR + sqDist + 2 * Math.sqrt(sqDist * sqBoundingR)
+        objSqBoundingRadius +
+          raySqBoundingRadius +
+          2 * Math.sqrt(raySqBoundingRadius * objSqBoundingRadius)
       ) {
         return result;
       }
-      let testSqDist = closest ? sqDist : 0;
+
+      // Do a real check if necessary.
+      let testSqDist = closest ? raySqBoundingRadius : 0;
       const hitBoxes = this.getHitBoxes();
       for (let i = 0; i < hitBoxes.length; i++) {
         const res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
@@ -1700,7 +1774,7 @@ namespace gdjs {
             if (
               !closest &&
               res.farSqDist > testSqDist &&
-              res.farSqDist <= sqDist
+              res.farSqDist <= raySqBoundingRadius
             ) {
               testSqDist = res.farSqDist;
               result = res;
@@ -1718,7 +1792,7 @@ namespace gdjs {
      * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
      *
      */
-    insideObject(x, y) {
+    insideObject(x: float, y: float): boolean {
       if (this.hitBoxesDirty) {
         this.updateHitBoxes();
         this.updateAABB();
@@ -1736,7 +1810,11 @@ namespace gdjs {
      * Check the distance between two objects.
      * @static
      */
-    static distanceTest(obj1, obj2, distance) {
+    static distanceTest(
+      obj1: RuntimeObject,
+      obj2: RuntimeObject,
+      distance: float
+    ): boolean {
       return obj1.getSqDistanceToObject(obj2) <= distance;
     }
 
@@ -1745,7 +1823,7 @@ namespace gdjs {
      *
      * @return true if the cursor, or any touch, is on the object.
      */
-    cursorOnObject(runtimeScene): any {
+    cursorOnObject(runtimeScene: RuntimeScene): boolean {
       const inputManager = runtimeScene.getGame().getInputManager();
       const layer = runtimeScene.getLayer(this.layer);
       const mousePos = layer.convertCoords(
@@ -1774,7 +1852,7 @@ namespace gdjs {
      * @param pointY The point y coordinate.
      * @return true if the point is inside the object collision hitboxes.
      */
-    isCollidingWithPoint(pointX, pointY): boolean {
+    isCollidingWithPoint(pointX: float, pointY: float): boolean {
       const hitBoxes = this.getHitBoxes();
       for (let i = 0; i < this.hitBoxes.length; ++i) {
         if (gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY)) {
@@ -1791,7 +1869,7 @@ namespace gdjs {
      *
      * @static
      */
-    static getNameIdentifier(name) {
+    static getNameIdentifier(name: string): integer {
       if (RuntimeObject._identifiers.containsKey(name)) {
         return RuntimeObject._identifiers.get(name);
       }

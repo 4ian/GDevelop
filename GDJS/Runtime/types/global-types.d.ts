@@ -10,6 +10,12 @@ declare type integer = number;
 /** A floating point number. Use this instead of `number` to ease future optimizations. */
 declare type float = number;
 
+/** A point in cartesian space. */
+declare type FloatPoint = [number, number];
+
+/** A Hastable with the picked objects lists. */
+declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
+
 /**
  * Represents the context of the events function (or the behavior method),
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).
@@ -23,9 +29,7 @@ declare type EventsFunctionContext = {
    * You can alter the list and this will alter the objects picked for the next conditions/actions/events.
    * If you don't need this, prefer using `getObjects`.
    */
-  getObjectsLists: (
-    objectName: string
-  ) => Hashtable<Array<gdjs.RuntimeObject>> | null;
+  getObjectsLists: (objectName: string) => ObjectsLists | null;
 
   /**  Get the "real" behavior name, that can be used with `getBehavior`. For example: `object.getBehavior(eventsFunctionContext.getBehaviorName("MyBehavior"))` */
   getBehaviorName: (behaviorName: string) => string;
@@ -44,6 +48,7 @@ declare type EventsFunctionContext = {
 };
 
 declare namespace gdjs {
+  var projectData: ProjectData;
   var runtimeGameOptions: gdjs.RuntimeGameOptions;
 }
 

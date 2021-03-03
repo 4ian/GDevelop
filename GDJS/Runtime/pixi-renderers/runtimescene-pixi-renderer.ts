@@ -3,17 +3,16 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer {
-    _pixiRenderer: PIXI.Renderer;
+    _pixiRenderer: PIXI.Renderer | null;
     _runtimeScene: gdjs.RuntimeScene;
-    _pixiContainer: any;
+    _pixiContainer: PIXI.Container;
     _debugDraw: PIXI.Graphics | null = null;
     _profilerText: PIXI.Text | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer
+      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null
     ) {
-      // @ts-expect-error ts-migrate(2322) FIXME: Type 'Renderer | null' is not assignable to type '... Remove this comment to see the full error message
       this._pixiRenderer = runtimeGameRenderer
         ? runtimeGameRenderer.getPIXIRenderer()
         : null;
@@ -35,9 +34,9 @@ namespace gdjs {
         this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
     }
 
+    // Nothing to do.
     onSceneUnloaded() {}
 
-    // Nothing to do.
     render() {
       if (!this._pixiRenderer) {
         return;
@@ -71,7 +70,14 @@ namespace gdjs {
       this._profilerText.text = outputs.join('\n');
     }
 
-    renderDebugDraw(instances: gdjs.RuntimeObject[], layersCameraCoordinates) {
+    /**
+     * Render graphics for debugging purpose. Activate this in `gdjs.RuntimeScene`,
+     * in the `renderAndStep` method.
+     */
+    renderDebugDraw(
+      instances: gdjs.RuntimeObject[],
+      layersCameraCoordinates: Record<string, [float, float, float, float]>
+    ) {
       if (!this._debugDraw) {
         this._debugDraw = new PIXI.Graphics();
 
@@ -79,27 +85,77 @@ namespace gdjs {
         this._pixiContainer.addChild(this._debugDraw);
       }
 
-      /** @type PIXI.Graphics */
+      // Activate here what you want to be displayed:
+      const displayAABB = true;
+      const displayHitboxesAndSomePoints = true;
+
       const debugDraw: PIXI.Graphics = this._debugDraw;
       debugDraw.clear();
-      debugDraw.beginFill(6842600);
-      debugDraw.lineStyle(1, 6842600, 1);
-      debugDraw.fill.alpha = 0.1;
+      debugDraw.beginFill();
       debugDraw.alpha = 0.8;
-      for (let i = 0; i < instances.length; i++) {
-        const object = instances[i];
-        const cameraCoords = layersCameraCoordinates[object.getLayer()];
-        const rendererObject = object.getRendererObject();
-        if (!cameraCoords || !rendererObject) {
-          continue;
+      debugDraw.lineStyle(2, 0x0000ff, 1);
+
+      if (displayAABB) {
+        for (let i = 0; i < instances.length; i++) {
+          const object = instances[i];
+          const cameraCoords = layersCameraCoordinates[object.getLayer()];
+          const rendererObject = object.getRendererObject();
+          if (!cameraCoords || !rendererObject) {
+            continue;
+          }
+          const aabb = object.getAABB();
+          debugDraw.fill.alpha = 0.2;
+          debugDraw.line.color = 0x778ee8;
+          debugDraw.fill.color = 0x778ee8;
+          debugDraw.drawRect(
+            aabb.min[0],
+            aabb.min[1],
+            aabb.max[0] - aabb.min[0],
+            aabb.max[1] - aabb.min[1]
+          );
         }
-        const aabb = object.getAABB();
-        debugDraw.drawRect(
-          aabb.min[0],
-          aabb.min[1],
-          aabb.max[0] - aabb.min[0],
-          aabb.max[1] - aabb.min[1]
-        );
+      }
+
+      if (displayHitboxesAndSomePoints) {
+        for (let i = 0; i < instances.length; i++) {
+          const object = instances[i];
+          const cameraCoords = layersCameraCoordinates[object.getLayer()];
+          const rendererObject = object.getRendererObject();
+          if (!cameraCoords || !rendererObject) {
+            continue;
+          }
+
+          // Draw hitboxes (sub-optimal performance)
+          const hitboxes = object.getHitBoxes();
+          for (let j = 0; j < hitboxes.length; j++) {
+            // Note that this conversion is sub-optimal, but we don't care
+            // as this is for debug draw.
+            const polygon: float[] = [];
+            hitboxes[j].vertices.forEach((point) => {
+              polygon.push(point[0]);
+              polygon.push(point[1]);
+            });
+            debugDraw.fill.alpha = 0;
+            debugDraw.line.color = 0xe86868;
+            debugDraw.drawPolygon(polygon);
+          }
+
+          // Draw circle point
+          debugDraw.fill.alpha = 0.8;
+          debugDraw.line.color = 0x68e868;
+          debugDraw.fill.color = 0x68e868;
+          debugDraw.drawCircle(object.getDrawableX(), object.getDrawableY(), 3);
+
+          // Draw center point
+          debugDraw.fill.alpha = 0.8;
+          debugDraw.line.color = 0xe8e868;
+          debugDraw.fill.color = 0xe8e868;
+          debugDraw.drawCircle(
+            object.getDrawableX() + object.getCenterX(),
+            object.getDrawableY() + object.getCenterY(),
+            3
+          );
+        }
       }
       debugDraw.endFill();
     }

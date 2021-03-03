@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <streambuf>
 #include <string>
@@ -18,6 +19,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
@@ -34,31 +36,6 @@
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
-
-namespace {
-
-std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
-    const gd::Project &project,
-    const gd::String &extensionName,
-    const gd::DependencyMetadata &dependency) {
-  std::map<gd::String, gd::String> values;
-
-  for (const auto &extraSetting : dependency.GetAllExtraSettings()) {
-    const gd::String &type = extraSetting.second.GetType();
-    const gd::String extraSettingValue =
-        type == "ExtensionProperty"
-            ? project.GetExtensionProperties().GetValue(
-                  extensionName, extraSetting.second.GetValue())
-            : extraSetting.second.GetValue();
-
-    if (!extraSettingValue.empty())
-      values[extraSetting.first] = extraSettingValue;
-  }
-
-  return values;
-};
-
-}  // namespace
 
 namespace gdjs {
 
@@ -283,35 +260,31 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
   gd::String plugins = "";
+  auto dependenciesAndExtensions =
+      gd::ExportedDependencyResolver::GetDependenciesFor(project, "cordova");
+  for (auto &dependencyAndExtension : dependenciesAndExtensions) {
+    const auto &dependency = dependencyAndExtension.GetDependency();
 
-  for (std::shared_ptr<gd::PlatformExtension> extension :
-       project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-    for (gd::DependencyMetadata &dependency : extension->GetAllDependencies()) {
-      if (dependency.GetDependencyType() == "cordova") {
-        gd::String plugin;
-        plugin += "<plugin name=\"" + dependency.GetExportName();
-        if (dependency.GetVersion() != "") {
-          plugin += "\" spec=\"" + dependency.GetVersion();
-        }
-        plugin += "\">\n";
-
-        auto extraSettingValues = GetExtensionDependencyExtraSettingValues(
-            project, extension->GetName(), dependency);
-
-        // For Cordova, all settings are considered a plugin variable.
-        for (auto &extraSetting : extraSettingValues) {
-          plugin += "\t\t<variable name=\"" + extraSetting.first +
-                    "\" value=\"" + extraSetting.second + "\" />\n";
-        }
-
-        plugin += "\t</plugin>";
-
-        // Don't include the plugin if no extra setting was fulfilled.
-        bool hasExtraSettings = !extraSettingValues.empty();
-        if (!dependency.IsOnlyIfSomeExtraSettingsNonEmpty() || hasExtraSettings)
-          plugins += plugin;
-      }
+    gd::String plugin;
+    plugin += "<plugin name=\"" + dependency.GetExportName();
+    if (dependency.GetVersion() != "") {
+      plugin += "\" spec=\"" + dependency.GetVersion();
     }
+    plugin += "\">\n";
+
+    auto extraSettingValues = gd::ExportedDependencyResolver::
+        GetExtensionDependencyExtraSettingValues(project,
+                                                 dependencyAndExtension);
+
+    // For Cordova, all settings are considered a plugin variable.
+    for (auto &extraSetting : extraSettingValues) {
+      plugin += "\t\t<variable name=\"" + extraSetting.first + "\" value=\"" +
+                extraSetting.second + "\" />\n";
+    }
+
+    plugin += "\t</plugin>";
+
+    plugins += plugin;
   }
 
   // TODO: migrate the plugins to the package.json
@@ -477,27 +450,23 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
     gd::String packages = "";
 
-    for (std::shared_ptr<gd::PlatformExtension> extension :
-         project.GetCurrentPlatform()
-             .GetAllPlatformExtensions()) {  // TODO Add a way to select only
-                                             // used Extensions
-      for (gd::DependencyMetadata dependency :
-           extension->GetAllDependencies()) {
-        if (dependency.GetDependencyType() == "npm") {
-          if (dependency.GetVersion() == "") {
-            gd::LogError(
-                "Latest Version not available for NPM dependencies, "
-                "dependency " +
-                dependency.GetName() +
-                " is not exported. Please specify a version when calling "
-                "addDependency.");
-            continue;
-          }
-          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
-                      dependency.GetVersion() + "\",";
-          // For node extra settings are ignored
-        }
+    auto dependenciesAndExtensions =
+        gd::ExportedDependencyResolver::GetDependenciesFor(project, "npm");
+    for (auto &dependencyAndExtension : dependenciesAndExtensions) {
+      const auto &dependency = dependencyAndExtension.GetDependency();
+      if (dependency.GetVersion() == "") {
+        gd::LogError(
+            "Latest Version not available for NPM dependencies, "
+            "dependency " +
+            dependency.GetName() +
+            " is not exported. Please specify a version when calling "
+            "addDependency.");
+        continue;
       }
+
+      // For Electron, extra settings of dependencies are ignored.
+      packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
+                  dependency.GetVersion() + "\",";
     }
 
     if (!packages.empty()) {
@@ -593,7 +562,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "libs/jshashtable.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "gd-splash-image.js");
-  InsertUnique(includesFiles, "libs/hshg.js");
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");

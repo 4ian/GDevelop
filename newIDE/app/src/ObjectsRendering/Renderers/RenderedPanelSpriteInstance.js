@@ -211,13 +211,8 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   );
 
   if (!texture.baseTexture.valid) {
-    //Post pone texture update if texture is not loaded
-    const renderer = this;
-    texture.on('update', function() {
-      renderer.updateTexture();
-      texture.off('update', this);
-    });
-
+    // Post pone texture update if texture is not loaded.
+    texture.once('update', () => this.updateTexture());
     return;
   }
 

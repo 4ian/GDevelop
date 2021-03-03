@@ -13,7 +13,7 @@ declare interface ProjectData {
   properties: ProjectPropertiesData;
   resources: ResourcesData;
   objects: ObjectData[];
-  variables: VariableData[];
+  variables: RootVariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
 }
@@ -25,7 +25,7 @@ declare type ObjectData = {
   /** The object type. */
   type: string;
   /** The list of default variables. */
-  variables: Array<VariableData>;
+  variables: Array<RootVariableData>;
   /** The list of default behaviors. */
   behaviors: Array<BehaviorData>;
 };
@@ -39,7 +39,7 @@ declare type VariableType =
 
 /** Data representation of a GDevelop variable */
 declare type VariableData = Readonly<{
-  /** The name of the variable. Used if a child variable. Leave blank for arrays. */
+  /** The name of the variable. Leave blank for array children. */
   name?: string;
   /** The value of the variable. Leave blank for structures. */
   value?: string | float | boolean;
@@ -48,6 +48,9 @@ declare type VariableData = Readonly<{
   /** The type of the variable. Defaults to number. */
   type?: VariableType;
 }>;
+
+/** A variable child of a container. Those always have a name. */
+declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
 
 /** Properties to set up a behavior. */
 declare type BehaviorData = {
@@ -72,7 +75,7 @@ declare interface LayoutData {
   name: string;
   stopSoundsOnStartup: boolean;
   title: string;
-  variables: VariableData[];
+  variables: RootVariableData[];
   instances: InstanceData[];
   objects: ObjectData[];
   layers: LayerData[];
@@ -103,7 +106,7 @@ declare interface InstanceData {
   zOrder: number;
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
-  initialVariables: VariableData[];
+  initialVariables: RootVariableData[];
 }
 
 declare interface InstanceNumberProperty {

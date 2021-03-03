@@ -320,8 +320,8 @@ namespace gdjs {
         runtimeGame.setProjectData(newProjectData);
         runtimeGame.loadAllAssets(() => {
           this._hotReloadVariablesContainer(
-            oldProjectData.variables as Required<VariableData>[],
-            newProjectData.variables as Required<VariableData>[],
+            oldProjectData.variables,
+            newProjectData.variables,
             runtimeGame.getVariables()
           );
 
@@ -383,8 +383,8 @@ namespace gdjs {
     }
 
     _hotReloadVariablesContainer(
-      oldVariablesData: Required<VariableData>[],
-      newVariablesData: Required<VariableData>[],
+      oldVariablesData: RootVariableData[],
+      newVariablesData: RootVariableData[],
       variablesContainer: gdjs.VariablesContainer
     ): void {
       newVariablesData.forEach((newVariableData) => {
@@ -401,9 +401,9 @@ namespace gdjs {
             new gdjs.Variable(newVariableData)
           );
         } else if (
-          gdjs.Variable.isPrimitive(newVariableData.type) &&
+          gdjs.Variable.isPrimitive(newVariableData.type || 'number') &&
           (oldVariableData.value !== newVariableData.value ||
-            !gdjs.Variable.isPrimitive(oldVariableData.type))
+            !gdjs.Variable.isPrimitive(oldVariableData.type || 'number'))
         ) {
           // Variable value was changed or was converted from
           // a structure to a variable with value.
@@ -412,13 +412,16 @@ namespace gdjs {
             variableName,
             new gdjs.Variable(newVariableData)
           );
-        } else if (!gdjs.Variable.isPrimitive(newVariableData.type)) {
+        } else if (
+          !gdjs.Variable.isPrimitive(newVariableData.type || 'number')
+        ) {
           // Variable is a structure or array (or was converted from a primitive
           // to one of those).
           if (newVariableData.type === 'structure')
             this._hotReloadStructureVariable(
+              //@ts-ignore If the type is structure, it is assured that the children have a name
               oldVariableData.children,
-              newVariableData.children as Required<VariableData>[],
+              newVariableData.children,
               variable
             );
           else {
@@ -449,8 +452,8 @@ namespace gdjs {
     }
 
     _hotReloadStructureVariable(
-      oldChildren: Required<VariableData>[],
-      newChildren: Required<VariableData>[],
+      oldChildren: RootVariableData[],
+      newChildren: RootVariableData[],
       variable: gdjs.Variable
     ): void {
       if (oldChildren) {
@@ -464,9 +467,9 @@ namespace gdjs {
             // Child variable was removed.
             variable.removeChild(oldChildVariableData.name);
           } else if (
-            gdjs.Variable.isPrimitive(newChildVariableData.type) &&
+            gdjs.Variable.isPrimitive(newChildVariableData.type || 'number') &&
             (oldChildVariableData.value !== newChildVariableData.value ||
-              !gdjs.Variable.isPrimitive(oldChildVariableData.type))
+              !gdjs.Variable.isPrimitive(oldChildVariableData.type || 'number'))
           ) {
             // The child variable value was changed or was converted from
             // structure to a variable with value.
@@ -474,11 +477,14 @@ namespace gdjs {
               newChildVariableData.name,
               new gdjs.Variable(newChildVariableData)
             );
-          } else if (!gdjs.Variable.isPrimitive(newChildVariableData.type)) {
+          } else if (
+            !gdjs.Variable.isPrimitive(newChildVariableData.type || 'number')
+          ) {
             // Variable is a structure or array (or was converted from a primitive
             // to one of those).
             if (newChildVariableData.type === 'structure')
               this._hotReloadStructureVariable(
+                //@ts-ignore If the type is structure, it is assured that the children have a name
                 oldChildVariableData.children,
                 newChildVariableData.children as Required<VariableData>[],
                 variable.getChild(newChildVariableData.name)

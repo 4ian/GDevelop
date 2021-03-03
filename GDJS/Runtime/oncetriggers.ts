@@ -9,8 +9,8 @@ namespace gdjs {
    * that are used in events to have conditions that are only valid for one frame in a row.
    */
   export class OnceTriggers {
-    _onceTriggers: Record<number, boolean> = {};
-    _lastFrameOnceTrigger: Record<number, boolean> = {};
+    _onceTriggers: Record<integer, boolean> = {};
+    _lastFrameOnceTrigger: Record<integer, boolean> = {};
 
     /**
      * To be called when events begin so that "Trigger once" conditions
@@ -36,7 +36,7 @@ namespace gdjs {
      * this method was not called with the same identifier during the last frame.
      * @param triggerId The identifier of the "Trigger once" condition.
      */
-    triggerOnce(triggerId: number): boolean {
+    triggerOnce(triggerId: integer): boolean {
       this._onceTriggers[triggerId] = true;
       return !this._lastFrameOnceTrigger.hasOwnProperty(triggerId);
     }

@@ -35,7 +35,7 @@ namespace gdjs {
     /** The number of frames that have been measured */
     _framesCount: number = 0;
 
-    /** A function to get the current time. If avialable, corresponds to performance.now(). */
+    /** A function to get the current time. If available, corresponds to performance.now(). */
     _getTimeNow: () => float;
 
     constructor() {

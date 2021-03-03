@@ -144,7 +144,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       behaviorContent.setBoolAttribute('property2', true);
     };
 
-    extension.addBehavior(
+    const behavior = extension.addBehavior(
       'FakeBehavior',
       'Fake behavior with two properties',
       'FakeBehavior', // Default name is the name
@@ -155,6 +155,24 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       fakeBehavior,
       new gd.BehaviorsSharedData()
     );
+    behavior
+      .addExpression(
+        'SomethingReturningNumberWith1NumberParam',
+        'Some expression returning a number',
+        'Some expression returning a number',
+        '',
+        'fake-icon.png'
+      )
+      .addParameter('expression', 'First parameter (number)', '', false);
+    behavior
+      .addStrExpression(
+        'SomethingReturningStringWith1NumberParam',
+        'Some expression returning a string',
+        'Some expression returning a string',
+        '',
+        'fake-icon.png'
+      )
+      .addParameter('expression', 'First parameter (number)', '', false);
 
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

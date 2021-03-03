@@ -50,6 +50,14 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       REQUIRE(getCompletionsFor("number", "My", 1) == expectedCompletions);
       REQUIRE(getCompletionsFor("number", "My", 2) == expectedEmptyCompletions);
     }
+    SECTION("Object or expression completions when type is number|string") {
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForObject("number|string", "My"),
+          gd::ExpressionCompletionDescription::ForExpression("number|string", "My")};
+      REQUIRE(getCompletionsFor("number|string", "My", 0) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number|string", "My", 1) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number|string", "My", 2) == expectedEmptyCompletions);
+    }
     SECTION("Object when type is an object") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
           gd::ExpressionCompletionDescription::ForObject("object", "My")};
@@ -131,7 +139,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   }
 
   SECTION("Partial object or behavior function") {
-    SECTION("Test 1") {
+    SECTION("Test with string type") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
               gd::ExpressionCompletionDescription::ForObject("string",
@@ -153,6 +161,30 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 12) ==
               expectedBehaviorOrFunctionCompletions);
       REQUIRE(getCompletionsFor("string", "MyObject.Func", 13) ==
+              expectedEmptyCompletions);
+    }
+    SECTION("Test with 'number|string' type") {
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForObject("number|string",
+                                                             "MyObject")};
+      std::vector<gd::ExpressionCompletionDescription>
+          expectedBehaviorOrFunctionCompletions{
+              gd::ExpressionCompletionDescription::ForBehavior("Func",
+                                                               "MyObject"),
+              gd::ExpressionCompletionDescription::ForExpression(
+                  "number|string", "Func", "MyObject")};
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 0) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 7) ==
+              expectedObjectCompletions);
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 8) ==
+              expectedBehaviorOrFunctionCompletions);
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 9) ==
+              expectedBehaviorOrFunctionCompletions);
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 12) ==
+              expectedBehaviorOrFunctionCompletions);
+      REQUIRE(getCompletionsFor("number|string", "MyObject.Func", 13) ==
               expectedEmptyCompletions);
     }
   }

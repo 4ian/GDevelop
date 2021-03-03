@@ -28,7 +28,7 @@ namespace gdjs {
     _followBaseLayerCamera: boolean;
     _clearColor: Array<integer>;
 
-    _renderer: any;
+    _renderer: LayerRenderer;
 
     /**
      * @param layerData The data used to initialize the layer
@@ -62,7 +62,7 @@ namespace gdjs {
       }
     }
 
-    getRenderer() {
+    getRenderer(): gdjs.LayerRenderer {
       return this._renderer;
     }
 
@@ -86,7 +86,7 @@ namespace gdjs {
      * Called by the RuntimeScene whenever the game resolution size is changed.
      * Updates the layer width/height and position.
      */
-    onGameResolutionResized() {
+    onGameResolutionResized(): void {
       const oldGameResolutionWidth = this._cachedGameResolutionWidth;
       const oldGameResolutionHeight = this._cachedGameResolutionHeight;
       this._cachedGameResolutionWidth = this._runtimeScene
@@ -120,9 +120,9 @@ namespace gdjs {
 
     /**
      * Called at each frame, after events are run and before rendering.
-     * @param runtimeScene The scene the layer belongs to.
+     * @param [runtimeScene] The scene the layer belongs to.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene?: gdjs.RuntimeScene): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
@@ -272,7 +272,7 @@ namespace gdjs {
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
-    convertCoords(x: float, y: float, cameraId?: integer) {
+    convertCoords(x: float, y: float, cameraId?: integer): FloatPoint {
       x -= this._cachedGameResolutionWidth / 2;
       y -= this._cachedGameResolutionHeight / 2;
       x /= Math.abs(this._zoomFactor);
@@ -288,7 +288,7 @@ namespace gdjs {
       return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
     }
 
-    convertInverseCoords(x, y, cameraId) {
+    convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 
@@ -319,7 +319,7 @@ namespace gdjs {
      * Return the initial effects data for the layer. Only to
      * be used by renderers.
      */
-    getInitialEffectsData() {
+    getInitialEffectsData(): EffectData[] {
       return this._initialEffectsData;
     }
 
@@ -327,7 +327,7 @@ namespace gdjs {
      * Add a new effect, or replace the one with the same name.
      * @param effectData The data of the effect to add.
      */
-    addEffect(effectData: EffectData) {
+    addEffect(effectData: EffectData): void {
       this._renderer.addEffect(effectData);
       for (let name in effectData.doubleParameters) {
         this.setEffectDoubleParameter(
@@ -356,7 +356,7 @@ namespace gdjs {
      * Remove the effect with the specified name
      * @param effectName The name of the effect.
      */
-    removeEffect(effectName: string) {
+    removeEffect(effectName: string): void {
       this._renderer.removeEffect(effectName);
     }
 
@@ -472,7 +472,7 @@ namespace gdjs {
     /**
      * Change the position, rotation and scale (zoom) of the layer camera to be the same as the base layer camera.
      */
-    followBaseLayer() {
+    followBaseLayer(): void {
       const baseLayer = this._runtimeScene.getLayer('');
       this.setCameraX(baseLayer.getCameraX());
       this.setCameraY(baseLayer.getCameraY());

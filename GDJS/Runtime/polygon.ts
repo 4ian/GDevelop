@@ -4,12 +4,11 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  type FloatPoint = Array<float>;
-
   export type CollisionTestResult = {
     collision: boolean;
     move_axis: FloatPoint;
   };
+
   export type RaycastTestResult = {
     collision: boolean;
     closeX: float;
@@ -104,7 +103,7 @@ namespace gdjs {
       return true;
     }
 
-    computeCenter() {
+    computeCenter(): FloatPoint {
       this.center[0] = 0;
       this.center[1] = 0;
       const len = this.vertices.length;
@@ -212,7 +211,10 @@ namespace gdjs {
       //Ensure move axis is correctly oriented.
       const p1Center = p1.computeCenter();
       const p2Center = p2.computeCenter();
-      const d = [p1Center[0] - p2Center[0], p1Center[1] - p2Center[1]];
+      const d: FloatPoint = [
+        p1Center[0] - p2Center[0],
+        p1Center[1] - p2Center[1],
+      ];
       if (Polygon.dotProduct(d, move_axis) < 0) {
         move_axis[0] = -move_axis[0];
         move_axis[1] = -move_axis[1];
@@ -431,7 +433,14 @@ namespace gdjs {
 
     // Arrays and data structure that are (re)used by Polygon.collisionTest to
     // avoid any allocation.
-    private static collisionTestStatics = {
+    private static collisionTestStatics: {
+      minMaxA: FloatPoint;
+      minMaxB: FloatPoint;
+      edge: FloatPoint;
+      axis: FloatPoint;
+      move_axis: FloatPoint;
+      result: CollisionTestResult;
+    } = {
       minMaxA: [0, 0],
       minMaxB: [0, 0],
       edge: [0, 0],
@@ -442,7 +451,15 @@ namespace gdjs {
 
     // Arrays and data structure that are (re)used by Polygon.raycastTest to
     // avoid any allocation.
-    private static raycastTestStatics = {
+    private static raycastTestStatics: {
+      p: FloatPoint;
+      q: FloatPoint;
+      r: FloatPoint;
+      s: FloatPoint;
+      deltaQP: FloatPoint;
+      axis: FloatPoint;
+      result: RaycastTestResult;
+    } = {
       p: [0, 0],
       q: [0, 0],
       r: [0, 0],

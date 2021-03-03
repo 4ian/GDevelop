@@ -1,26 +1,51 @@
 namespace gdjs {
+  export type ProfilerStats = {
+    framesCount: integer;
+  };
+
+  export type FrameMeasure = {
+    parent: FrameMeasure | null;
+    time: float;
+    lastStartTime: float;
+    subsections: Record<string, FrameMeasure>;
+  };
+
   /**
    * A basic profiling tool that can be used to measure time spent in sections of the engine.
    */
   export class Profiler {
-    _framesMeasures: any = [];
+    /** All the measures for the last frames */
+    _framesMeasures: Array<FrameMeasure> = [];
 
-    // All the measures for the last frames
     _currentFrameIndex: float = 0;
-    _currentFrameMeasure: any = null;
 
-    // The measures being done
-    _currentSection: any = null;
+    /** The measures being done */
+    _currentFrameMeasure: FrameMeasure = {
+      parent: null,
+      time: 0,
+      lastStartTime: 0,
+      subsections: {},
+    };
+
+    /** The section being measured */
+    _currentSection: FrameMeasure | null = null;
+
     _maxFramesCount: number = 600;
+
+    /** The number of frames that have been measured */
     _framesCount: number = 0;
-    _getTimeNow: any;
+
+    /** A function to get the current time. If avialable, corresponds to performance.now(). */
+    _getTimeNow: () => float;
 
     constructor() {
-      // The section being measured
-
-      // The number of frames that have been measured
       while (this._framesMeasures.length < this._maxFramesCount) {
-        this._framesMeasures.push({ parent: null, time: 0, subsections: {} });
+        this._framesMeasures.push({
+          parent: null,
+          time: 0,
+          lastStartTime: 0,
+          subsections: {},
+        });
       }
       this._getTimeNow =
         window.performance && typeof window.performance.now === 'function'
@@ -28,7 +53,7 @@ namespace gdjs {
           : Date.now;
     }
 
-    beginFrame() {
+    beginFrame(): void {
       this._currentFrameMeasure = {
         parent: null,
         time: 0,
@@ -38,7 +63,12 @@ namespace gdjs {
       this._currentSection = this._currentFrameMeasure;
     }
 
-    begin(sectionName) {
+    begin(sectionName: string): void {
+      if (this._currentSection === null)
+        throw new Error(
+          'Impossible to call Profiler.begin() when not profiling a frame!'
+        );
+
       // Push the new section
       const subsections = this._currentSection.subsections;
       const subsection = (subsections[sectionName] = subsections[
@@ -55,7 +85,12 @@ namespace gdjs {
       this._currentSection.lastStartTime = this._getTimeNow();
     }
 
-    end(sectionName?: string) {
+    end(sectionName?: string): void {
+      if (this._currentSection === null)
+        throw new Error(
+          'Impossible to call Profiler.end() when not profiling a frame!'
+        );
+
       // Stop the timer
       const sectionTime =
         this._getTimeNow() - this._currentSection.lastStartTime;
@@ -63,10 +98,15 @@ namespace gdjs {
         (this._currentSection.time || 0) + sectionTime;
 
       // Pop the section
-      this._currentSection = this._currentSection.parent;
+      if (this._currentSection.parent !== null)
+        this._currentSection = this._currentSection.parent;
     }
 
-    endFrame() {
+    endFrame(): void {
+      if (this._currentSection === null)
+        throw new Error(
+          'Impossible to end profiling a frame when profiling has not started a frame!'
+        );
       if (this._currentSection.parent !== null) {
         throw new Error(
           'Mismatch in profiler, endFrame should be called on root section'
@@ -77,14 +117,20 @@ namespace gdjs {
       if (this._framesCount > this._maxFramesCount) {
         this._framesCount = this._maxFramesCount;
       }
-      this._framesMeasures[this._currentFrameIndex] = this._currentFrameMeasure;
+      this._framesMeasures[this._currentFrameIndex] = this
+        ._currentFrameMeasure as FrameMeasure;
       this._currentFrameIndex++;
       if (this._currentFrameIndex >= this._maxFramesCount) {
         this._currentFrameIndex = 0;
       }
     }
 
-    static _addAverageSectionTimes(section, destinationSection, totalCount, i) {
+    static _addAverageSectionTimes(
+      section: FrameMeasure,
+      destinationSection: FrameMeasure,
+      totalCount: integer,
+      i: integer
+    ): void {
       destinationSection.time =
         (destinationSection.time || 0) + section.time / totalCount;
       for (const sectionName in section.subsections) {
@@ -111,8 +157,13 @@ namespace gdjs {
      * Return the measures for all the section of the game during the frames
      * captured.
      */
-    getFramesAverageMeasures() {
-      const framesAverageMeasures = { parent: null, time: 0, subsections: {} };
+    getFramesAverageMeasures(): FrameMeasure {
+      const framesAverageMeasures = {
+        parent: null,
+        time: 0,
+        lastStartTime: 0,
+        subsections: {},
+      };
       for (let i = 0; i < this._framesCount; ++i) {
         Profiler._addAverageSectionTimes(
           this._framesMeasures[i],
@@ -127,7 +178,7 @@ namespace gdjs {
     /**
      * Get stats measured during the frames captured.
      */
-    getStats() {
+    getStats(): ProfilerStats {
       return { framesCount: this._framesCount };
     }
 
@@ -143,7 +194,7 @@ namespace gdjs {
       sectionName: string,
       profilerSection: any,
       outputs: any
-    ) {
+    ): void {
       const percent =
         profilerSection.parent && profilerSection.parent.time !== 0
           ? (

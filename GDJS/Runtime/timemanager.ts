@@ -11,10 +11,10 @@ namespace gdjs {
   export class TimeManager {
     _elapsedTime: float = 0;
     _timeScale: float = 1;
-    _timeFromStart: any;
-    _firstFrame: any;
-    _timers: any;
-    _firstUpdateDone: any;
+    _timeFromStart: float = 0;
+    _firstFrame: boolean = true;
+    _timers: Hashtable<gdjs.Timer> = new Hashtable();
+    _firstUpdateDone: boolean = false;
 
     constructor() {
       this.reset();
@@ -28,7 +28,7 @@ namespace gdjs {
       this._timers = new Hashtable();
     }
 
-    update(elapsedTime, minimumFPS): void {
+    update(elapsedTime: float, minimumFPS: integer): void {
       if (this._firstUpdateDone) {
         this._firstFrame = false;
       }
@@ -70,7 +70,7 @@ namespace gdjs {
      * Get the time since the instanciation of the manager (i.e: since
      * the beginning of the scene most of the time), in milliseconds.
      */
-    getTimeFromStart() {
+    getTimeFromStart(): float {
       return this._timeFromStart;
     }
 
@@ -90,19 +90,19 @@ namespace gdjs {
       return this._elapsedTime;
     }
 
-    addTimer(name) {
+    addTimer(name: string): void {
       this._timers.put(name, new gdjs.Timer(name));
     }
 
-    hasTimer(name): boolean {
+    hasTimer(name: string): boolean {
       return this._timers.containsKey(name);
     }
 
-    getTimer(name) {
+    getTimer(name: string): gdjs.Timer {
       return this._timers.get(name);
     }
 
-    removeTimer(name) {
+    removeTimer(name: string): void {
       if (this._timers.containsKey(name)) {
         this._timers.remove(name);
       }

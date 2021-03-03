@@ -22,13 +22,13 @@ namespace gdjs {
      * Useful to notify scene and layers that resolution is changed, as they
      * might be caching it.
      */
-    onGameResolutionResized() {
+    onGameResolutionResized(): void {
       for (let i = 0; i < this._stack.length; ++i) {
         this._stack[i].onGameResolutionResized();
       }
     }
 
-    step(elapsedTime) {
+    step(elapsedTime: float): boolean {
       if (this._stack.length === 0) {
         return false;
       }
@@ -56,7 +56,7 @@ namespace gdjs {
       return true;
     }
 
-    renderWithoutStep() {
+    renderWithoutStep(): boolean {
       if (this._stack.length === 0) {
         return false;
       }
@@ -65,7 +65,7 @@ namespace gdjs {
       return true;
     }
 
-    pop() {
+    pop(): gdjs.RuntimeScene | null {
       if (this._stack.length <= 1) {
         return null;
       }
@@ -89,7 +89,7 @@ namespace gdjs {
      * Pause the scene currently being played and start the new scene that is specified.
      * If `externalLayoutName` is set, also instantiate the objects from this external layout.
      */
-    push(newSceneName: string, externalLayoutName?: string) {
+    push(newSceneName: string, externalLayoutName?: string): gdjs.RuntimeScene {
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
       if (currentScene) {
@@ -124,7 +124,7 @@ namespace gdjs {
      * Start the specified scene, replacing the one currently being played.
      * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
      */
-    replace(newSceneName: string, clear?: boolean) {
+    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene {
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
@@ -148,7 +148,7 @@ namespace gdjs {
     /**
      * Return the current gdjs.RuntimeScene being played, or null if none is run.
      */
-    getCurrentScene() {
+    getCurrentScene(): gdjs.RuntimeScene | null {
       if (this._stack.length === 0) {
         return null;
       }
@@ -158,7 +158,7 @@ namespace gdjs {
     /**
      * Return true if a scene was loaded, false otherwise (i.e: game not yet started).
      */
-    wasFirstSceneLoaded() {
+    wasFirstSceneLoaded(): boolean {
       return this._wasFirstSceneLoaded;
     }
   }

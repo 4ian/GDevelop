@@ -57,7 +57,7 @@ namespace gdjs {
     _getLocationAwareKeyCode(
       keyCode: number,
       location: number | null | undefined
-    ) {
+    ): integer {
       if (location) {
         // If it is a numpad number, do not modify it.
         if (96 <= keyCode && keyCode <= 105) {
@@ -78,7 +78,7 @@ namespace gdjs {
      * @param keyCode The raw key code associated to the key press.
      * @param location The location of the event.
      */
-    onKeyPressed(keyCode: number, location?: number) {
+    onKeyPressed(keyCode: number, location?: number): void {
       const locationAwareKeyCode = this._getLocationAwareKeyCode(
         keyCode,
         location
@@ -94,7 +94,7 @@ namespace gdjs {
      * @param keyCode The raw key code associated to the key release.
      * @param location The location of the event.
      */
-    onKeyReleased(keyCode: number, location?: number) {
+    onKeyReleased(keyCode: number, location?: number): void {
       const locationAwareKeyCode = this._getLocationAwareKeyCode(
         keyCode,
         location
@@ -170,7 +170,7 @@ namespace gdjs {
      * @param x The mouse new X position
      * @param y The mouse new Y position
      */
-    onMouseMove(x: float, y: float) {
+    onMouseMove(x: float, y: float): void {
       this._mouseX = x;
       this._mouseY = y;
     }
@@ -198,7 +198,7 @@ namespace gdjs {
      * @param buttonCode The mouse button code associated to the event.
      * See InputManager.MOUSE_LEFT_BUTTON, InputManager.MOUSE_RIGHT_BUTTON, InputManager.MOUSE_MIDDLE_BUTTON
      */
-    onMouseButtonPressed(buttonCode: number) {
+    onMouseButtonPressed(buttonCode: number): void {
       this._pressedMouseButtons[buttonCode] = true;
       this._releasedMouseButtons[buttonCode] = false;
     }
@@ -207,7 +207,7 @@ namespace gdjs {
      * Should be called whenever a mouse button is released.
      * @param buttonCode The mouse button code associated to the event. (see onMouseButtonPressed)
      */
-    onMouseButtonReleased(buttonCode: number) {
+    onMouseButtonReleased(buttonCode: number): void {
       this._pressedMouseButtons[buttonCode] = false;
       this._releasedMouseButtons[buttonCode] = true;
     }
@@ -238,14 +238,14 @@ namespace gdjs {
      * Should be called whenever the mouse wheel is used
      * @param wheelDelta The mouse wheel delta
      */
-    onMouseWheel(wheelDelta: number) {
+    onMouseWheel(wheelDelta: number): void {
       this._mouseWheelDelta = wheelDelta;
     }
 
     /**
      * Return the mouse wheel delta
      */
-    getMouseWheelDelta() {
+    getMouseWheelDelta(): float {
       return this._mouseWheelDelta;
     }
 
@@ -286,7 +286,7 @@ namespace gdjs {
       return InputManager._allTouchIds;
     }
 
-    onTouchStart(identifier: integer, x, y) {
+    onTouchStart(identifier: integer, x: float, y: float): void {
       this._startedTouches.push(identifier);
       this._touches.put(identifier, { x: x, y: y, justEnded: false });
       if (this._touchSimulateMouse) {
@@ -295,7 +295,7 @@ namespace gdjs {
       }
     }
 
-    onTouchMove(identifier: integer, x, y) {
+    onTouchMove(identifier: integer, x: float, y: float): void {
       const touch = this._touches.get(identifier);
       if (!touch) {
         return;
@@ -307,7 +307,7 @@ namespace gdjs {
       }
     }
 
-    onTouchEnd(identifier) {
+    onTouchEnd(identifier: number): void {
       this._endedTouches.push(identifier);
       if (this._touches.containsKey(identifier)) {
         //Postpone deletion at the end of the frame
@@ -318,15 +318,15 @@ namespace gdjs {
       }
     }
 
-    getStartedTouchIdentifiers() {
+    getStartedTouchIdentifiers(): integer[] {
       return this._startedTouches;
     }
 
-    popStartedTouch() {
+    popStartedTouch(): integer | undefined {
       return this._startedTouches.shift();
     }
 
-    popEndedTouch() {
+    popEndedTouch(): integer | undefined {
       return this._endedTouches.shift();
     }
 
@@ -337,7 +337,7 @@ namespace gdjs {
      * as pressed/released.
      * @param enable true to simulate mouse events, false to disable it.
      */
-    touchSimulateMouse(enable: boolean) {
+    touchSimulateMouse(enable: boolean): void {
       if (enable === undefined) {
         enable = true;
       }
@@ -351,7 +351,7 @@ namespace gdjs {
      * This method should be called in the game loop (see `gdjs.RuntimeGame.startGameLoop`).
      * You don't need to call it otherwise.
      */
-    onFrameEnded() {
+    onFrameEnded(): void {
       //Only clear the ended touches at the end of the frame.
       for (const id in this._touches.items) {
         if (this._touches.items.hasOwnProperty(id)) {

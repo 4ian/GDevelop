@@ -72,7 +72,9 @@ namespace gdjs {
    * Convert a hex color value to an rgb object.
    * @param hex Hex color
    */
-  export const hexNumberToRGB = (hexNumber: number) => {
+  export const hexNumberToRGB = (
+    hexNumber: number
+  ): { r: integer; g: integer; b: integer; a: integer } => {
     return {
       r: (hexNumber >> 16) & 0xff,
       g: (hexNumber >> 8) & 0xff,
@@ -164,7 +166,7 @@ namespace gdjs {
   export const registerObject = function (
     objectTypeName: string,
     Ctor: typeof gdjs.RuntimeObject
-  ) {
+  ): void {
     gdjs.objectsTypes.put(objectTypeName, Ctor);
   };
 
@@ -182,7 +184,7 @@ namespace gdjs {
   export const registerBehavior = function (
     behaviorTypeName: string,
     Ctor: typeof gdjs.RuntimeBehavior
-  ) {
+  ): void {
     gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
   };
 
@@ -194,7 +196,7 @@ namespace gdjs {
    */
   export const registerFirstRuntimeSceneLoadedCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksFirstRuntimeSceneLoaded.push(callback);
   };
 
@@ -204,7 +206,7 @@ namespace gdjs {
    */
   export const registerRuntimeSceneLoadedCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeSceneLoaded.push(callback);
   };
 
@@ -215,7 +217,7 @@ namespace gdjs {
    */
   export const registerRuntimeScenePreEventsCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeScenePreEvents.push(callback);
   };
 
@@ -226,7 +228,7 @@ namespace gdjs {
    */
   export const registerRuntimeScenePostEventsCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeScenePostEvents.push(callback);
   };
 
@@ -236,7 +238,7 @@ namespace gdjs {
    */
   export const registerRuntimeScenePausedCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeScenePaused.push(callback);
   };
 
@@ -246,7 +248,7 @@ namespace gdjs {
    */
   export const registerRuntimeSceneResumedCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeSceneResumed.push(callback);
   };
 
@@ -260,7 +262,7 @@ namespace gdjs {
    */
   export const registerRuntimeSceneUnloadingCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeSceneUnloading.push(callback);
   };
 
@@ -273,7 +275,7 @@ namespace gdjs {
    */
   export const registerRuntimeSceneUnloadedCallback = function (
     callback: RuntimeSceneCallback
-  ) {
+  ): void {
     gdjs.callbacksRuntimeSceneUnloaded.push(callback);
   };
 
@@ -283,7 +285,7 @@ namespace gdjs {
    */
   export const registerObjectDeletedFromSceneCallback = function (
     callback: RuntimeSceneRuntimeObjectCallback
-  ) {
+  ): void {
     gdjs.callbacksObjectDeletedFromScene.push(callback);
   };
 
@@ -292,7 +294,7 @@ namespace gdjs {
    * @deprecated
    * @private
    */
-  export const registerGlobalCallbacks = function () {
+  export const registerGlobalCallbacks = function (): void {
     console.warn(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
@@ -303,7 +305,7 @@ namespace gdjs {
    *
    * Should only be used for testing - this should never be used at runtime.
    */
-  export const clearGlobalCallbacks = function () {
+  export const clearGlobalCallbacks = function (): void {
     gdjs.callbacksFirstRuntimeSceneLoaded.length = 0;
     gdjs.callbacksRuntimeSceneLoaded.length = 0;
     gdjs.callbacksRuntimeScenePreEvents.length = 0;
@@ -400,7 +402,7 @@ namespace gdjs {
    * @param src The source array
    * @param dst The destination array
    */
-  export const copyArray = function <T>(src: Array<T>, dst: Array<T>) {
+  export const copyArray = function <T>(src: Array<T>, dst: Array<T>): void {
     var len = src.length;
     for (var i = 0; i < len; ++i) {
       dst[i] = src[i];
@@ -408,14 +410,19 @@ namespace gdjs {
     dst.length = len;
   };
 
+  interface MakeUUID {
+    (): string;
+    hex?: string[];
+  }
+
   /**
    * Generate a UUID v4.
    * @returns The generated UUID.
    */
-  export const makeUuid = function (): string {
+  export const makeUuid = <MakeUUID>function (): string {
     // Fallback to non cryptographically secure UUIDs if not supported
     if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
-      const makeMathRandomUuid = (a?: any) => {
+      const makeMathRandomUuid = (a?: any): string => {
         return a
           ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
           : ('' + 1e7 + -1e3 + -4e3 + -8e3 + -1e11).replace(
@@ -427,17 +434,13 @@ namespace gdjs {
       return makeMathRandomUuid();
     }
 
-    // @ts-ignore - TS does not like properties added on functions
     if (!gdjs.makeUuid.hex) {
-      // @ts-ignore - TS does not like properties added on functions
       gdjs.makeUuid.hex = [];
 
       for (var i = 0; i < 256; i++) {
-        // @ts-ignore - TS does not like properties added on functions
         gdjs.makeUuid.hex[i] = (i < 16 ? '0' : '') + i.toString(16);
       }
     }
-    // @ts-ignore - TS does not like properties added on functions
     const hex = gdjs.makeUuid.hex;
 
     var r = crypto.getRandomValues(new Uint8Array(16));

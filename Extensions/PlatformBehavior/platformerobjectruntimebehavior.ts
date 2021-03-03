@@ -311,7 +311,6 @@ namespace gdjs {
 
     checkTransitionOnLadder() {
       if (this._ladderKey && this._isOverlappingLadder()) {
-        this._currentFallSpeed = 0;
         this._setOnLadder();
       }
     }
@@ -392,18 +391,11 @@ namespace gdjs {
         //Check if landing on a new floor: (Exclude already overlapped jump truh)
         let collidingPlatform = this._getCollidingPlatform();
         if (canLand && collidingPlatform !== null) {
-          this._currentFallSpeed = 0;
-          
-          //Ensure nothing is grabbed.
-          this._releaseGrabbedPlatform();
           //Register the colliding platform as the floor.
           this._setOnFloor(collidingPlatform);
-        } else if (this._state != this._grabbingPlatform) {
-          //In the air
-          this._canJump = false;
-          if (this._state == this._onFloor) {
-            this._setFalling();
-          }
+        } else if (this._state == this._onFloor) {
+          // don't fall if GrabbingPlatform or OnLadder
+          this._setFalling();
         }
       }
       object.setY(oldY);
@@ -502,7 +494,7 @@ namespace gdjs {
 
       //3) Update the current floor data for the next tick:
       this._updateOverlappedJumpThru();
-      //TODO what about a moving platform, do the same as for grabbing?
+      //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state != this._onLadder) {
         this.checkTransitionOnFloorOrFalling();
       }
@@ -1132,6 +1124,7 @@ namespace gdjs {
         this._floorPlatform = floorPlatform;
         this.updateFloorPosition();
         this._behavior._canJump = true;
+        this._behavior._currentFallSpeed = 0;
       }
 
       leave() {
@@ -1448,6 +1441,7 @@ namespace gdjs {
       enter(grabbedPlatform: PlatformRuntimeBehavior) {
         this._grabbedPlatform = grabbedPlatform;
         this._behavior._canJump = true;
+        this._behavior._currentFallSpeed = 0;
       }
 
       leave() {
@@ -1495,7 +1489,6 @@ namespace gdjs {
   
       beforeMovingY(timeDelta: float, oldX: float) {
         const behavior = this._behavior;
-        behavior._currentFallSpeed = 0;
         this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
         this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
       }
@@ -1514,6 +1507,7 @@ namespace gdjs {
 
       enter() {
         this._behavior._canJump = true;
+        this._behavior._currentFallSpeed = 0;
       }
 
       leave() {

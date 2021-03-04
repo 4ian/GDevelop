@@ -80,7 +80,7 @@ const getPathOfNode = (
 
   if (hasPath(mosaicNode)) return path;
 
-  return path;
+  return [];
 };
 
 // Remove a node in the mosaicTree.
@@ -88,11 +88,15 @@ const removeNode = (
   editorName: string,
   mosaicNodeRoot: ?EditorMosaicNode
 ): EditorMosaicNode => {
-  const path = getPathOfNode(editorName, mosaicNodeRoot);
-  const mosiacUpdates = [createRemoveUpdate(mosaicNodeRoot, path)];
-  const updatedTree = updateTree(mosaicNodeRoot, mosiacUpdates);
+  try {
+    const path = getPathOfNode(editorName, mosaicNodeRoot);
+    const mosiacUpdates = [createRemoveUpdate(mosaicNodeRoot, path)];
+    const updatedTree = updateTree(mosaicNodeRoot, mosiacUpdates);
 
-  return updatedTree;
+    return updatedTree;
+  } catch (error) {
+    return mosaicNodeRoot;
+  }
 };
 
 // Add a node (an editor) in the mosaic.

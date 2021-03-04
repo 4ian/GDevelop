@@ -56,8 +56,6 @@ export default class CollisionMasksEditor extends Component {
     }
 
     this.forceUpdate(); // Refresh the preview and the list
-    if (this.props.onCollisionMasksUpdated)
-      this.props.onCollisionMasksUpdated();
   };
 
   chooseAnimation = index => {

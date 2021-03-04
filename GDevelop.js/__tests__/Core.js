@@ -842,10 +842,6 @@ describe('libGD.js', function () {
       expect(parentVariable.hasChild('Child1')).toBe(true);
       expect(parentVariable.hasChild('Child2')).toBe(false);
 
-      grandChild1.delete();
-      grandChild2.delete();
-      child1.delete()
-      child2.delete()
       parentVariable.delete();
     });
 

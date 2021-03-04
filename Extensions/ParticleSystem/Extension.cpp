@@ -102,6 +102,9 @@ ParticleSystemCppExtension::ParticleSystemCppExtension() {
   conditions["ParticleSystem::EmitterAngle"]
       .SetFunctionName("GetAngle")
       .SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+  conditions["ParticleSystem::ParticleType"]
+      .SetFunctionName("GetRendererType")
+      .SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
   actions["ParticleSystem::EmitterAngleA"]
       .SetFunctionName("SetEmitterAngleA")
       .SetGetter("GetEmitterAngleA")

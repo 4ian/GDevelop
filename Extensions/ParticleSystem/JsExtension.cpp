@@ -51,6 +51,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setAngle")
         .SetGetter("getAngle");
     conditions["ParticleSystem::EmitterAngle"].SetFunctionName("getAngle");
+    conditions["ParticleSystem::ParticleType"].SetFunctionName("getRendererType");
     actions["ParticleSystem::EmitterAngleA"]
         .SetFunctionName("setEmitterAngleA")
         .SetGetter("getEmitterAngleA");

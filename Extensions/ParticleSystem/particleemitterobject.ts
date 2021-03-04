@@ -403,6 +403,10 @@ namespace gdjs {
       return (this.angleA + this.angleB) / 2.0;
     }
 
+    getRendererType(): float {
+      return parseInt(this.rendererType, 10) || 0;
+    }
+
     setEmitterAngle(angle): void {
       const oldAngle = this.getEmitterAngle();
       if (angle !== oldAngle) {

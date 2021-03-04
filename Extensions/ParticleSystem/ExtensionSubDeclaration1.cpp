@@ -122,6 +122,16 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
 
+  obj.AddCondition("ParticleType",
+                  _("Kind of Particle"),
+                  _("Test the Kind of Particle(Point: 0, Line: 1, or Quad: 2)"),
+                  _("the Particle Kind"),
+                  _("Common"),
+                  "CppPlatform/Extensions/particleSystemicon24.png",
+                  "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .UseStandardRelationalOperatorParameters("number");
+
   obj.AddAction("EmitterAngleA",
                 _("Emission angle 1"),
                 _("Change emission angle #1"),

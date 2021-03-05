@@ -61,6 +61,7 @@ type Props = {|
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
+  onOpenTutorials: () => void,
   onOpenGamesShowcase: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,

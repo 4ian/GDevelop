@@ -30,7 +30,7 @@ export type CreateProjectDialogWithComponentsProps = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => Promise<void>,
-  initialTab: 'starters' | 'games-showcase',
+  initialTab: 'starters' | 'tutorials' | 'games-showcase',
 |};
 
 type Props = {|

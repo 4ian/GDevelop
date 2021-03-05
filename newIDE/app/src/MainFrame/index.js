@@ -295,7 +295,7 @@ const MainFrame = (props: Props) => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
-    'starters' | 'games-showcase'
+    'starters' | 'tutorials' | 'games-showcase'
   >('starters');
 
   // This is just for testing, to check if we're getting the right state

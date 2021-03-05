@@ -10,6 +10,7 @@ import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import Window from '../../../Utils/Window';
 import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
+import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
@@ -35,6 +36,7 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
     maxWidth: 400,
+    margin: 10,
   },
   logoPaper: {
     marginBottom: 10,
@@ -91,6 +93,7 @@ export class StartPage extends React.Component<Props, {||}> {
       onCreate,
       onOpenProjectManager,
       onCloseProject,
+      onOpenTutorials,
       onOpenGamesShowcase,
       onOpenHelpFinder,
       onOpenLanguageDialog,
@@ -102,6 +105,50 @@ export class StartPage extends React.Component<Props, {||}> {
           <ScrollBackground>
             <div style={styles.innerContainer}>
               <Line expand justifyContent="center">
+                <div style={styles.centerContainer}>
+                  <Paper
+                    elevation={2}
+                    style={{
+                      ...styles.logoPaper,
+                    }}
+                  >
+                    <EducationTutorialImage />
+                    <Text>
+                      <Trans>
+                        Learn step-by-step how create your first game. You will
+                        learn basic concepts and will be able to play your game!
+                      </Trans>
+                    </Text>
+                  </Paper>
+                  <ColumnStackLayout noMargin>
+                    {
+                      <RaisedButton
+                        label={<Trans>Getting Started guide</Trans>}
+                        fullWidth
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'http://wiki.compilgames.net/doku.php/gdevelop5/start'
+                          )
+                        }
+                        primary
+                      />
+                    }
+                    {
+                      <RaisedButton
+                        label={<Trans>Watch Tutorials</Trans>}
+                        fullWidth
+                        onClick={onOpenTutorials}
+                      />
+                    }
+                    {
+                      <FlatButton
+                        label={<Trans>Search the documentation</Trans>}
+                        fullWidth
+                        onClick={onOpenHelpFinder}
+                      />
+                    }
+                  </ColumnStackLayout>
+                </div>
                 <div style={styles.centerContainer}>
                   <Paper
                     elevation={2}
@@ -153,9 +200,9 @@ export class StartPage extends React.Component<Props, {||}> {
                     )}
                     {
                       <FlatButton
-                        label={<Trans>Search the documentation</Trans>}
+                        label={<Trans>Games Showcase</Trans>}
                         fullWidth
-                        onClick={onOpenHelpFinder}
+                        onClick={onOpenGamesShowcase}
                       />
                     }
                   </ColumnStackLayout>
@@ -264,6 +311,7 @@ export const renderStartPageContainer = (
     onCreate={props.onCreate}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
+    onOpenTutorials={props.onOpenTutorials}
     onOpenGamesShowcase={props.onOpenGamesShowcase}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

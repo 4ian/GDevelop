@@ -135,7 +135,7 @@ namespace gdjs {
       return true;
     }
 
-    updateSpeed(timeDelta: float): float {
+    private _updateSpeed(timeDelta: float): float {
       //Change the speed according to the player's input.
       // @ts-ignore
       if (this._leftKey) {
@@ -168,7 +168,7 @@ namespace gdjs {
       return this._currentSpeed * timeDelta;
     }
 
-    moveX() {
+    private _moveX() {
       const object = this.owner;
       //Move the object on x axis.
       const oldX = object.getX();
@@ -236,14 +236,14 @@ namespace gdjs {
       this._falling.enter();
     }
 
-    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
       console.debug(`${this._state} --> ${this._onFloor}`);
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
     }
 
-    _setJumping() {
+    private _setJumping() {
       console.debug(`${this._state} --> ${this._jumping}`);
       this._state.leave();
       const from = this._state;
@@ -251,14 +251,14 @@ namespace gdjs {
       this._jumping.enter(from);
     }
 
-    _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
+    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
       console.debug(`${this._state} --> ${this._grabbingPlatform}`);
       this._state.leave();
       this._state = this._grabbingPlatform;
       this._grabbingPlatform.enter(grabbedPlatform);
     }
 
-    _setOnLadder() {
+    private _setOnLadder() {
       console.debug(`${this._state} --> ${this._onLadder}`);
       this._state.leave();
       this._state = this._onLadder;
@@ -458,7 +458,7 @@ namespace gdjs {
         !this._ignoreDefaultControls &&
         inputManager.isKeyPressed(DOWNKEY));
 
-      this._requestedDeltaX += this.updateSpeed(timeDelta);
+      this._requestedDeltaX += this._updateSpeed(timeDelta);
 
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles();
@@ -483,7 +483,7 @@ namespace gdjs {
       //After being unstuck, the object must be able to jump again.
 
       const oldX = object.getX();
-      this.moveX();
+      this._moveX();
 
       //2) Y axis:
       this._state.checkTransitionBeforeY(timeDelta);
@@ -530,7 +530,7 @@ namespace gdjs {
      * @param platform The platform the object is in collision with
      * @param y The value in pixels on Y axis the object wants to move to
      */
-    _canGrab(platform) {
+    private _canGrab(platform) {
       const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
       const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
@@ -599,7 +599,7 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
-    _separateFromPlatforms(candidates, excludeJumpThrus) {
+    private _separateFromPlatforms(candidates, excludeJumpThrus) {
       excludeJumpThrus = !!excludeJumpThrus;
       const objects = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms
@@ -629,7 +629,7 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param exceptTheseOnes The platforms to be excluded from the test
      */
-    _isCollidingWithExcluding(candidates, exceptTheseOnes) {
+    private _isCollidingWithExcluding(candidates, exceptTheseOnes) {
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
         if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) {
@@ -658,7 +658,7 @@ namespace gdjs {
      * Overlapped jump thru and ladders are excluded.
      * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before.
      */
-    _getCollidingPlatform() {
+    private _getCollidingPlatform() {
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
         if (

@@ -1096,15 +1096,44 @@ namespace gdjs {
   }
 
   export namespace PlatformerObjectRuntimeBehavior {
+    /**
+     * The object can take 5 states: OnFloor, Falling, Jumping, GrabbingPlatform and OnLadder.
+     * The implementations of this interface hold the specific behaviors and internal state of theses 5 states.
+     * @see PlatformerObjectRuntimeBehavior.doStepPreEvents to understand how the functions are called.
+     */
     export interface State {
+    /**
+     * Called when the object leaves this state.
+     * It's a good place to reset the internal state.
+     * @see OnFloor.enter that is not part of the interface because it take specific parameters.
+     */
       leave(): void;
+      /**
+      * Called before the obstacle search.
+      * The object position may need adjustments to handle external changes.
+      */
       beforeUpdatingObstacles(): void;
+      /**
+      * Check if transition to other states is needed and apply them before moving horizontally.
+      */
       checkTransitionBeforeX(): void;
+      /**
+      * Use _requestedDeltaX and _requestedDeltaY to choose the movement that suite the state before moving horizontally.
+      */
       beforeMovingX(): void;
+      /**
+      * Check if transition to other states is needed and apply them before moving vertically.
+      */
       checkTransitionBeforeY(timeDelta: float): void;
+      /**
+      * Use _requestedDeltaY to choose the movement that suite the state before moving vertically.
+      */
       beforeMovingY(timeDelta: float, oldX: float): void;
     }
 
+    /**
+     * The object is on the floor standing or walking.
+     */
     export class OnFloor implements State {
       private _behavior : PlatformerObjectRuntimeBehavior;
       private _floorPlatform:PlatformRuntimeBehavior | null = null;
@@ -1281,6 +1310,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * The object is falling.
+     */
     export class Falling implements State {
       private _behavior : PlatformerObjectRuntimeBehavior;
 
@@ -1329,6 +1361,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * The object is on the ascending part of the jump (otherwise it's falling).
+     */
     export class Jumping implements State {
       private _behavior : PlatformerObjectRuntimeBehavior;
       private _currentJumpSpeed: number = 0;
@@ -1428,6 +1463,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * The object grabbed the edge of a platform and is standing there.
+     */
     export class GrabbingPlatform implements State {
       private _behavior : PlatformerObjectRuntimeBehavior;
       private _grabbedPlatform: any = null;
@@ -1467,7 +1505,7 @@ namespace gdjs {
       beforeMovingX() {
         const behavior = this._behavior;
         //Shift the object according to the grabbed platform movement.
-          // this._behavior erases any other movement
+        // this._behavior erases any other movement
         behavior._requestedDeltaX =
           this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
         behavior._requestedDeltaY =
@@ -1498,6 +1536,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * The object grabbed a ladder. It can stand or move in 8 directions.
+     */
     export class OnLadder implements State {
       private _behavior : PlatformerObjectRuntimeBehavior;
 

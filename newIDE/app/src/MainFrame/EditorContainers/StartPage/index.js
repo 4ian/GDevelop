@@ -10,7 +10,6 @@ import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import Window from '../../../Utils/Window';
 import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
-import EducationTutorialImage from './EducationTutorialImage';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from '../../../UI/RaisedButton';
 import Text from '../../../UI/Text';
@@ -36,7 +35,6 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
     maxWidth: 400,
-    margin: 10,
   },
   logoPaper: {
     marginBottom: 10,
@@ -113,50 +111,6 @@ export class StartPage extends React.Component<Props, {||}> {
                       ...styles.logoPaper,
                     }}
                   >
-                    <EducationTutorialImage />
-                    <Text>
-                      <Trans>
-                        Learn step-by-step how create your first game. You will
-                        learn basic concepts and will be able to play your game!
-                      </Trans>
-                    </Text>
-                  </Paper>
-                  <ColumnStackLayout noMargin>
-                    {
-                      <RaisedButton
-                        label={<Trans>Getting Started guide</Trans>}
-                        fullWidth
-                        onClick={() =>
-                          Window.openExternalURL(
-                            'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                          )
-                        }
-                        primary
-                      />
-                    }
-                    {
-                      <RaisedButton
-                        label={<Trans>Watch Tutorials</Trans>}
-                        fullWidth
-                        onClick={onOpenTutorials}
-                      />
-                    }
-                    {
-                      <FlatButton
-                        label={<Trans>Search the documentation</Trans>}
-                        fullWidth
-                        onClick={onOpenHelpFinder}
-                      />
-                    }
-                  </ColumnStackLayout>
-                </div>
-                <div style={styles.centerContainer}>
-                  <Paper
-                    elevation={2}
-                    style={{
-                      ...styles.logoPaper,
-                    }}
-                  >
                     <GDevelopLogo />
                     <Text>
                       <Trans>
@@ -166,19 +120,26 @@ export class StartPage extends React.Component<Props, {||}> {
                     </Text>
                   </Paper>
                   <ColumnStackLayout noMargin>
-                    {!project && canOpen && (
+                    {
                       <RaisedButton
-                        label={<Trans>Open a project</Trans>}
+                        label={<Trans>Getting Started and Tutorials</Trans>}
                         fullWidth
-                        onClick={onOpen}
-                        primary
+                        onClick={onOpenTutorials}
                       />
-                    )}
+                    }
                     {!project && (
                       <RaisedButton
                         label={<Trans>Create a new project</Trans>}
                         fullWidth
                         onClick={onCreate}
+                        primary
+                      />
+                    )}
+                    {!project && canOpen && (
+                      <RaisedButton
+                        label={<Trans>Open a project</Trans>}
+                        fullWidth
+                        onClick={onOpen}
                         primary
                       />
                     )}
@@ -199,13 +160,6 @@ export class StartPage extends React.Component<Props, {||}> {
                         }}
                       />
                     )}
-                    {
-                      <FlatButton
-                        label={<Trans>Games Showcase</Trans>}
-                        fullWidth
-                        onClick={onOpenGamesShowcase}
-                      />
-                    }
                   </ColumnStackLayout>
                 </div>
               </Line>
@@ -230,12 +184,8 @@ export class StartPage extends React.Component<Props, {||}> {
                     />
                     <FlatButton
                       icon={<HelpIcon />}
-                      label={<Trans>Help and tutorials</Trans>}
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                        )
-                      }
+                      label={<Trans>Help and documentation</Trans>}
+                      onClick={onOpenHelpFinder}
                     />
                   </Line>
                   <Line noMargin alignItems="center" justifyContent="center">

@@ -142,6 +142,14 @@ namespace gdjs {
       this.updatePosition();
     }
 
+    getTextureWidth() {
+      return this._cachedTextureWidth;
+    }
+
+    getTextureHeight() {
+      return this._cachedTextureHeight;
+    }
+
     updateXOffset(): void {
       this._updateTextureRect();
     }

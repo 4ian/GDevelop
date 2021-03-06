@@ -2518,6 +2518,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
+      onOpenTutorials={() => action('onOpenTutorials')()}
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
@@ -2534,6 +2535,7 @@ storiesOf('StartPage', module)
       onCreate={() => action('onCreate')()}
       onOpenProjectManager={() => action('onOpenProjectManager')()}
       onCloseProject={() => action('onCloseProject')()}
+      onOpenTutorials={() => action('onOpenTutorials')()}
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}

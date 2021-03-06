@@ -212,6 +212,9 @@ export function createGdevelopTheme(
       logo: {
         src: 'res/GD-logo-big.png',
       },
+      educationTutorialImage: {
+        src: 'res/education_tutorial.png',
+      },
       gdevelopIconsCSSFilter,
     },
     muiThemeOptions: {

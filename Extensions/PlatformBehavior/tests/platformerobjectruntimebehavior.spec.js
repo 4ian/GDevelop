@@ -1,4 +1,4 @@
-describe.only('gdjs.PlatformerObjectRuntimeBehavior', function () {
+describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
   const makeTestRuntimeScene = () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],

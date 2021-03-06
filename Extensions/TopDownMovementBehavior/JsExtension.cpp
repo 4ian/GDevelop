@@ -111,6 +111,7 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autExpressions["Angle"].SetFunctionName("getAngle");
     autExpressions["XVelocity"].SetFunctionName("getXVelocity");
     autExpressions["YVelocity"].SetFunctionName("getYVelocity");
+    autExpressions["MovementAngleOffset"].SetFunctionName("getMovementAngleOffset");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

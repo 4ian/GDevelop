@@ -242,8 +242,11 @@ namespace gdjs {
      * @param width The new width in pixels.
      */
     setWrappingWidth(width: float): void {
+      if (this._wrappingWidth === width) return;
+
       this._wrappingWidth = width;
       this._renderer.updateWrappingWidth();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -253,12 +256,15 @@ namespace gdjs {
       return this._wrappingWidth;
     }
 
-    setWordWrap(wordWrap): void {
+    setWordWrap(wordWrap: boolean): void {
+      if (this._wordWrap === wordWrap) return;
+
       this._wordWrap = wordWrap;
       this._renderer.updateWordWrap();
+      this.hitBoxesDirty = true;
     }
 
-    getWordWrap(wordWrap) {
+    getWordWrap() {
       return this._wordWrap;
     }
 

@@ -6,6 +6,8 @@
 
 #include "GDCore/String.h"
 
+#include <string.h>
+
 #include <SFML/System/String.hpp>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
@@ -250,7 +252,7 @@ String& String::operator+=( const String &other )
 
 String& String::operator+=( const char *other )
 {
-    *this += gd::String(other);
+    m_string += other;
     return *this;
 }
 
@@ -674,12 +676,12 @@ bool GD_CORE_API operator==( const String &lhs, const String &rhs )
 
 bool GD_CORE_API operator==( const String &lhs, const char *rhs )
 {
-    return (lhs == String(rhs));
+    return (strcmp(lhs.c_str(), rhs) == 0);
 }
 
 bool GD_CORE_API operator==( const char *lhs, const gd::String &rhs )
 {
-    return (String(lhs) == rhs);
+    return (strcmp(lhs, rhs.c_str()) == 0);
 }
 
 bool GD_CORE_API operator!=( const String &lhs, const String &rhs )
@@ -704,12 +706,12 @@ bool GD_CORE_API operator<( const String &lhs, const String &rhs )
 
 bool GD_CORE_API operator<( const String &lhs, const char *rhs )
 {
-    return (lhs < String(rhs));
+    return strcmp(lhs.c_str(), rhs) < 0;
 }
 
 bool GD_CORE_API operator<( const char *lhs, const String &rhs )
 {
-    return (String(lhs) < rhs);
+    return strcmp(lhs, rhs.c_str()) < 0;
 }
 
 bool GD_CORE_API operator<=( const String &lhs, const String &rhs )
@@ -719,12 +721,12 @@ bool GD_CORE_API operator<=( const String &lhs, const String &rhs )
 
 bool GD_CORE_API operator<=( const String &lhs, const char *rhs )
 {
-    return (lhs <= String(rhs));
+    return strcmp(lhs.c_str(), rhs) <= 0;
 }
 
 bool GD_CORE_API operator<=( const char *lhs, const String &rhs )
 {
-    return (String(lhs) <= rhs);
+    return strcmp(lhs, rhs.c_str()) <= 0;
 }
 
 bool GD_CORE_API operator>( const String &lhs, const String &rhs )
@@ -734,12 +736,12 @@ bool GD_CORE_API operator>( const String &lhs, const String &rhs )
 
 bool GD_CORE_API operator>( const String &lhs, const char *rhs )
 {
-    return (lhs > String(rhs));
+    return strcmp(lhs.c_str(), rhs) > 0;
 }
 
 bool GD_CORE_API operator>( const char *lhs, const String &rhs )
 {
-    return (String(lhs) > rhs);
+    return strcmp(lhs, rhs.c_str()) > 0;
 }
 
 bool GD_CORE_API operator>=( const String &lhs, const String &rhs )
@@ -749,12 +751,12 @@ bool GD_CORE_API operator>=( const String &lhs, const String &rhs )
 
 bool GD_CORE_API operator>=( const String &lhs, const char *rhs )
 {
-    return (lhs >= String(rhs));
+    return strcmp(lhs.c_str(), rhs) >= 0;
 }
 
 bool GD_CORE_API operator>=( const char *lhs, const String &rhs )
 {
-    return (String(lhs) >= rhs);
+    return strcmp(lhs, rhs.c_str()) >= 0;
 }
 
 std::ostream& GD_CORE_API operator<<(std::ostream& os, const String& str)

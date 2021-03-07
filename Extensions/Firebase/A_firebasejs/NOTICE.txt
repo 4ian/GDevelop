@@ -1,0 +1,2 @@
+This is the firebase js sdk. The source can be found on https://github.com/firebase/firebase-js-sdk .
+The version used is 8.2.10.

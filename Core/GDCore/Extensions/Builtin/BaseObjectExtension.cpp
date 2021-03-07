@@ -547,7 +547,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to append"))
+      .AddParameter("scenevar", _("Scene variable with the content to append"))
+      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
       .MarkAsAdvanced();
 
   obj.AddAction(

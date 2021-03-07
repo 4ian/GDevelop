@@ -1,5 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
@@ -17,14 +18,15 @@ import BooleanField from '../UI/BooleanField';
 import { type VariableOrigin } from './VariablesList.flow';
 import Text from '../UI/Text';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import BackgroundText from '../UI/BackgroundText';
 const gd: libGDevelop = global.gd;
 
 //TODO: Refactor into TreeTable?
-const Indent = ({ width }) => (
+const Indent = React.memo(({ width }) => (
   <div style={{ ...styles.indent, width }}>
     <SubdirectoryArrowRight htmlColor={styles.indentIconColor} />
   </div>
-);
+));
 
 type Props = {|
   name: string,
@@ -86,9 +88,7 @@ const VariableRow = ({
         />
       )}
       {arrayElement ? (
-        <Text noMargin fullWidth>
-          {name}
-        </Text>
+        <Text noMargin>{name}</Text>
       ) : (
         <TextField
           margin="none"
@@ -112,9 +112,13 @@ const VariableRow = ({
         key="value"
         style={limitEditing ? styles.fadedButton : undefined}
       >
-        <Text noMargin>
-          ({type === gd.Variable.Structure ? 'Structure' : 'Array'})
-        </Text>
+        <BackgroundText>
+          {type === gd.Variable.Structure ? (
+            <Trans>Structure</Trans>
+          ) : (
+            <Trans>Array</Trans>
+          )}
+        </BackgroundText>
       </TreeTableCell>
     );
   } else {
@@ -145,6 +149,11 @@ const VariableRow = ({
             }}
             disabled={origin === 'parent' && depth !== 0}
             multiline={type === gd.Variable.String}
+            inputStyle={
+              type === gd.Variable.String
+                ? styles.noPaddingMultilineTextField
+                : undefined
+            }
           />
         </TreeTableCell>
       );
@@ -246,10 +255,10 @@ const VariableRow = ({
   );
 
   return (
-    <div>
-      <TreeTableRow>{columns}</TreeTableRow>
+    <>
+      <TreeTableRow alignItems="flex-start">{columns}</TreeTableRow>
       {children}
-    </div>
+    </>
   );
 };
 

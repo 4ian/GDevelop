@@ -13,7 +13,6 @@ type Props = {|
   noShrink?: boolean,
   /** Remove the margin around the text. */
   noMargin?: boolean,
-  fullWidth?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -44,13 +43,11 @@ export default ({
   noShrink,
   noMargin,
   displayInlineAsSpan,
-  fullWidth,
 }: Props) => (
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
     component={displayInlineAsSpan ? 'span' : undefined}
     style={{
-      width: fullWidth ? '100%' : undefined,
       ...style,
       display: displayInlineAsSpan ? 'inline-block' : undefined,
       flexShrink: noShrink ? 0 : undefined,

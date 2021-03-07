@@ -44,7 +44,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
   };
 
   const addLadderObject = (runtimeScene) => {
-    const platform = new gdjs.RuntimeObject(runtimeScene, {
+    const ladder = new gdjs.RuntimeObject(runtimeScene, {
       name: 'obj3',
       type: '',
       behaviors: [
@@ -55,15 +55,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         },
       ],
     });
-    platform.getWidth = function () {
+    ladder.getWidth = function () {
       return 20;
     };
-    platform.getHeight = function () {
+    ladder.getHeight = function () {
       return 60;
     };
-    runtimeScene.addObject(platform);
+    runtimeScene.addObject(ladder);
 
-    return platform;
+    return ladder;
   };
 
   describe('(falling)', function () {
@@ -305,6 +305,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.getBehavior('auto1').simulateJumpKey();
       for (let i = 0; i < 18; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
       }
 
       // Check that we reached the maximum height
@@ -315,9 +316,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.within(-180, -179);
 
       // Then let the object fall
-      for (let i = 0; i < 60; ++i) {
+      for (let i = 0; i < 17; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
       }
+      // The jump finishes one frame before going back to the floor
+      // because the gravity is not applied on the first step.
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getY()).to.be(-31);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getY()).to.be(-30);
     });
 
@@ -409,7 +420,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(-30);
     });
 
-    it('should not grab a platform while jumping', function () {
+    it('should not grab a platform while in the ascending phase of a jump', function () {
       const topPlatform = addPlatformObject(runtimeScene);
       topPlatform.setPosition(12, -80);
       runtimeScene.renderAndStep(1000 / 60);
@@ -446,6 +457,44 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         topPlatform.getX() - object.getWidth() + 20
       );
       expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
+    });
+
+    it('can grab a platform while in the descending phase of a jump', function () {
+      const topPlatform = addPlatformObject(runtimeScene);
+      topPlatform.setPosition(12, -120);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Jump, reach the top and go down
+      object.getBehavior('auto1').simulateJumpKey();
+      for (let i = 0; i < 30; ++i) {
+        console.log("i: " + i + " x: " + object.getX() + " y: " + object.getY());
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      }
+      // the object is against the platform side
+      expect(object.getY()).to.be.within(
+        topPlatform.getY() - object.getHeight(),
+        topPlatform.getY()
+      );
+
+      // try to grab the platform
+      for (let i = 0; i < 30; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Check that the object grabbed the platform
+      expect(object.getY()).to.be(topPlatform.getY());
+      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
     });
 
     it('should not grab a platform while walking', function () {
@@ -691,6 +740,39 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(platform.getY() - object.getHeight());
       expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
     });
+
+    // This may be a bug. Please, remove the skip if you fixed it.
+    // It fails on the last 2 expect()
+    it.skip('follows a moving platform when was grabbed to a ladder', function () {
+      // object is 10 pixel higher than the platform and overlap the ladder
+      object.setPosition(0, platform.getY() - object.getHeight() - 10);
+      const ladder = addLadderObject(runtimeScene);
+      ladder.setPosition(object.getX(), platform.getY() - ladder.getHeight());
+  
+      // Fall and Grab the platform
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      object.getBehavior('auto1').simulateLadderKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+  
+      // move the bottom platform to the object
+      for (let i = 0; i < 20; ++i) {
+        platform.setY(platform.getY() - 1);
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+      }
+      // the platform reach the object
+      expect(platform.getY()).to.be(object.getY() + object.getHeight());
+      for (let i = 0; i < 5; ++i) {
+        platform.setY(platform.getY() - 1);
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // the object follows it and no longer grab the other platform
+      expect(object.getY()).to.be(platform.getY() - object.getHeight());
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(false);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+    });
   });
 
   describe('and gdjs.PlatformRuntimeBehavior at same time', function () {
@@ -911,6 +993,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const lastY = object.getY();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
         expect(object.getY()).to.be.above(lastY);
       }
     };
@@ -921,6 +1004,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         object.getBehavior('auto1').simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+        //TODO Probably a bug, uncomment it after it's fixed
+        //expect(object.getBehavior('auto1').isMoving()).to.be(true);
         expect(object.getY()).to.be.below(lastY);
       }
     };
@@ -930,9 +1015,30 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const lastY = object.getY();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+        //TODO Probably a bug, uncomment it after it's fixed
+        //expect(object.getBehavior('auto1').isMoving()).to.be(false);
         expect(object.getY()).to.be(lastY);
       }
     };
+
+    const jumpAndAscend = (frameCount) => {
+      for (let i = 0; i < frameCount; ++i) {
+        const lastY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getY()).to.be.below(lastY);
+      }
+    }
+    const jumpAndDescend = (frameCount) => {
+      for (let i = 0; i < frameCount; ++i) {
+        const lastY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getY()).to.be.above(lastY);
+      }
+    }
 
     const fallOnPlatform = (maxFrameCount) => {
       // Ensure the object falls on the platform
@@ -973,7 +1079,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
     });
 
-    it('can jump and grab a ladder', function () {
+    it('can jump and grab a ladder even on the ascending phase of a jump the 1st time', function () {
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
       fallOnPlatform(10);
@@ -994,6 +1100,108 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
       stayOnLadder(10);
       climbLadder(2);
+    });
+
+    it('can grab a ladder while on the descending phase of a jump', function () {
+      // Need a bigger ladder
+      ladder.getHeight = function () {
+        return 300;
+      };
+      ladder.setPosition(30, -10 - ladder.getHeight());
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // Jump
+      object.getBehavior('auto1').simulateJumpKey();
+      for (let i = 0; i < 19; ++i) {
+        jumpAndAscend(1);
+      }
+
+      // starting to going down
+      object.getBehavior('auto1').simulateLadderKey();
+      stayOnLadder(1);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      stayOnLadder(10);
+      climbLadder(2);
+    });
+
+    //TODO Probably a bug, remove the skip when it's fixed
+    it.skip("can't grab a ladder while on the ascending phase of a jump", function () {
+      // Need a bigger ladder
+      ladder.getHeight = function () {
+        return 300;
+      };
+      ladder.setPosition(30, -10 - ladder.getHeight());
+      
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // Climb the ladder
+      object.getBehavior('auto1').simulateLadderKey();
+      climbLadder(10);
+      stayOnLadder(10);
+
+      // Jump from the ladder
+      object.getBehavior('auto1').simulateJumpKey();
+      for (let i = 0; i < 19; ++i) {
+        // Keep pressing to the ladder key should have no effect
+        object.getBehavior('auto1').simulateLadderKey();
+        jumpAndAscend(1);
+        console.log("i: " + i);
+      }
+      // starting to going down, can grab the ladder again
+      object.getBehavior('auto1').simulateLadderKey();
+      stayOnLadder(1);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      // Can jump again
+      object.getBehavior('auto1').simulateJumpKey();
+      jumpAndAscend(10);
+    });
+
+    it('can jump from ladder to ladder', function () {
+      // Need a bigger ladder
+      ladder.getHeight = function () {
+        return 300;
+      };
+      ladder.setPosition(30, -10 - ladder.getHeight());
+
+      const ladder2 = addLadderObject(runtimeScene);
+      ladder2.getHeight = function () {
+        return 300;
+      };
+      ladder2.setPosition(ladder.getX() + ladder.getWidth(), ladder.getY());
+
+      object.setPosition(35, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // Jump
+      object.getBehavior('auto1').simulateJumpKey();
+      for (let i = 0; i < 10; ++i) {
+        jumpAndAscend(1);
+      }
+
+      // 1st time grabbing this ladder
+      object.getBehavior('auto1').simulateLadderKey();
+      stayOnLadder(1);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      // Jump right
+      object.getBehavior('auto1').simulateJumpKey();
+      for (let i = 0; i < 15; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        jumpAndAscend(1);
+      }
+      // leave the 1st ladder
+      expect(object.getX()).to.be.above(ladder2.getX());
+      // and grab the 2nd one, even if still ascending
+      object.getBehavior('auto1').simulateLadderKey();
+      stayOnLadder(1);
     });
 
     it('can fall from a ladder right side', function () {
@@ -1133,6 +1341,234 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // panic mode! (probably a bug)
       expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
       expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+    });
+  });
+
+  describe('(walk)', function () {
+    let runtimeScene;
+    let object;
+    let platform;
+
+    beforeEach(function () {
+      runtimeScene = makeTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.RuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 1500,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 900,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+            roundCoordinates: true,
+          },
+        ],
+      });
+      object.getWidth = function () {
+        return 10;
+      };
+      object.getHeight = function () {
+        return 20;
+      };
+      runtimeScene.addObject(object);
+
+      // Put a platform.
+      platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+    });
+
+    const fall = (frameCount) => {
+      for (let i = 0; i < frameCount; ++i) {
+        const lastY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getY()).to.be.above(lastY);
+      }
+    };
+
+    const walkRight = (frameCount) => {
+      for (let i = 0; i < frameCount; ++i) {
+        const lastX = object.getX();
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+        expect(object.getX()).to.be.above(lastX);
+        //TODO probably a bug, uncomment when it's fixed.
+        //expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      }
+    };
+
+    const fallOnPlatform = (maxFrameCount) => {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < maxFrameCount; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      //Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    };
+
+    it('can walk from a platform to another one', function () {
+      const platform2 = addPlatformObject(runtimeScene);
+      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY());
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // walk from the 1st platform to the 2nd one
+      walkRight(30);
+      expect(object.getX()).to.be.above(platform2.getX());
+    });
+
+    it('can walk from a platform to another one that not aligned', function () {
+      // the 2nd platform is 1 pixel higher
+      const platform2 = addPlatformObject(runtimeScene);
+      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY() - 1);
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // walk from the 1st platform to the 2nd one
+      walkRight(30);
+      expect(object.getX()).to.be.above(platform2.getX());
+
+    });
+
+    it("can't walk from a platform to another one that is too high", function () {
+      // the 2nd platform is 2 pixels higher
+      const platform2 = addPlatformObject(runtimeScene);
+      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY() - 2);
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // walk right
+      for (let i = 0; i < 20; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      }
+      // is blocked by the 2nd platform
+      expect(object.getX()).to.be(platform2.getX() - object.getWidth());
+    });
+
+    it('can walk from a platform to another one that is rotated', function () {
+      const platform2 = addPlatformObject(runtimeScene);
+      
+      const angle = -30 * Math.PI / 180;
+      const centerDeltaX = platform2.getWidth() / 2;
+      const centerDeltaY = platform2.getHeight() / 2;
+      // to make the vertex of the 2 platform touch
+      const vertexDeltaX = centerDeltaX  * Math.cos(angle) + centerDeltaY * (-Math.sin(angle)) - centerDeltaX;
+      const vertexDeltaY = centerDeltaX  * Math.sin(angle) + centerDeltaY * Math.cos(angle) - centerDeltaY;
+      
+      platform2.setAngle(-30);
+      platform2.setPosition(platform.getX() + platform.getWidth() + vertexDeltaX, platform.getY() + vertexDeltaY);
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+
+      // walk from the 1st platform to the 2nd one
+      walkRight(30);
+      expect(object.getX()).to.be.above(platform2.getX());
+      // gone upward following the 2nd platform
+      expect(object.getY()).to.be.below(platform.getY());
+    });
+  });
+
+  describe.skip('(benchmark)', function () {
+    let runtimeScene;
+    let objects;
+    const duplicateCount = 60;
+    const stepCount = 6000;
+
+    beforeEach(function () {
+      runtimeScene = makeTestRuntimeScene();
+
+      objects = new Array(duplicateCount);
+      for (let i = 0; i < duplicateCount; ++i) {
+        // Put a platformer object on a platform
+        object = new gdjs.RuntimeObject(runtimeScene, {
+          name: 'obj1',
+          type: '',
+          behaviors: [
+            {
+              type: 'PlatformBehavior::PlatformerObjectBehavior',
+              name: 'auto1',
+              gravity: 1500,
+              maxFallingSpeed: 1500,
+              acceleration: 500,
+              deceleration: 1500,
+              maxSpeed: 500,
+              jumpSpeed: 900,
+              canGrabPlatforms: true,
+              ignoreDefaultControls: true,
+              slopeMaxAngle: 60,
+              jumpSustainTime: 0.2,
+              roundCoordinates: true,
+            },
+          ],
+        });
+        object.getWidth = function () {
+          return 10;
+        };
+        object.getHeight = function () {
+          return 20;
+        };
+        runtimeScene.addObject(object);
+        object.setPosition(100 * i + 60 * 5, 400 * i - 32);
+        objects[i] = object;
+
+        // Put a platform.
+        for (let p = 0; p < 10; ++p) {
+          const platform = addPlatformObject(runtimeScene);
+          platform.setPosition(100 * i + p * platform.getWidth(), 400 * i - 10);
+        }
+      }
+    });
+
+    it('benchmark', function () {
+      this.timeout(30000);
+
+      for (let b = 0; b < 10; ++b) {
+        const benchmarkSuite = makeBenchmarkSuite({
+          benchmarksCount: 1,
+          iterationsCount: stepCount,
+        });
+      benchmarkSuite
+        .add('jump in loop', (t) => {
+          for (let i = 0; i < duplicateCount; ++i) {
+            const object = objects[i];
+            if (t % 60 == i % 60) {
+              object.getBehavior('auto1').simulateJumpKey();
+            }
+            if (t + i % 61 < 31) {
+              object.getBehavior('auto1').simulateRightKey();
+            }
+            if (t + i % 61 >= 31) {
+              object.getBehavior('auto1').simulateLeftKey();
+            }
+          }
+          runtimeScene.renderAndStep(1000 / 60);
+        });
+      console.log(benchmarkSuite.run());
+      }
     });
   });
 });

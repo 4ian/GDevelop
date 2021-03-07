@@ -24,6 +24,7 @@ namespace gdjs {
     _rotateObject: any;
     _angleOffset: any;
     _ignoreDefaultControls: any;
+    _movementAngleOffset: float;
 
     /** The latest angle of movement, in degrees. */
     _angle: float = 0;
@@ -57,6 +58,7 @@ namespace gdjs {
         behaviorData.viewpoint,
         behaviorData.customIsometryAngle
       );
+      this._movementAngleOffset = behaviorData.movementAngleOffset || 0;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -96,6 +98,9 @@ namespace gdjs {
           newBehaviorData.platformType,
           newBehaviorData.customIsometryAngle
         );
+      }
+      if (oldBehaviorData.movementAngleOffset !== newBehaviorData.movementAngleOffset) {
+        this._movementAngleOffset = newBehaviorData.movementAngleOffset;
       }
       return true;
     }
@@ -192,6 +197,14 @@ namespace gdjs {
       return this._angle;
     }
 
+    setMovementAngleOffset(movementAngleOffset: float): void {
+      this._movementAngleOffset = movementAngleOffset;
+    }
+
+    getMovementAngleOffset() {
+      return this._movementAngleOffset;
+    }
+
     doStepPreEvents(runtimeScene) {
       const LEFTKEY = 37;
       const UPKEY = 38;
@@ -273,8 +286,8 @@ namespace gdjs {
 
       //Update the speed of the object
       if (direction != -1) {
-        directionInRad = (direction * Math.PI) / 4.0;
-        directionInDeg = direction * 45;
+        directionInRad = ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
+        directionInDeg = direction * 45 + this._movementAngleOffset;
         this._xVelocity +=
           this._acceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity +=

@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Check if the specified child of the global "
                       "variable exists."),
                     _("Child _PARAM1_ of global variable _PARAM0_ exists"),
-                    _("Variables/Global Variables/Collections/Structures"),
+                    _("Variables/Global variables/Collections/Structures"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
@@ -296,7 +296,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to append"))
+      .AddParameter("scenevar", _("Scene variable with the content to append"))
+      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
       .MarkAsAdvanced();
 
   extension
@@ -357,7 +358,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("scenevar", _("Variable to append"))
+      .AddParameter("scenevar", _("Scene variable with the content to append"))
+      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
       .MarkAsAdvanced();
 
   extension

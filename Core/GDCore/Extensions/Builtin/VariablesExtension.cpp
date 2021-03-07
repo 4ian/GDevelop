@@ -150,7 +150,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ModVarScene",
                  _("Value of a scene variable"),
-                 _("Modify the value of a scene variable."),
+                 _("Change the value of a scene variable."),
                  _("the scene variable _PARAM0_"),
                  _("Variables"),
                  "res/actions/var24.png",
@@ -196,7 +196,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ModVarGlobal",
                  _("Value of a global variable"),
-                 _("Modify the value of a global variable"),
+                 _("Change the value of a global variable"),
                  _("the global variable _PARAM0_"),
                  _("Variables/Global variables"),
                  "res/actions/var24.png",
@@ -414,7 +414,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddExpression("GlobalVariableChildCount",
                      _("Number of children of a global variable"),
-                     _("Get the number of children of a global variable"),
+                     _("Number of children of a global variable"),
                      _("Variables"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"));
@@ -422,7 +422,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddExpression("VariableChildCount",
                      _("Number of children of a scene variable"),
-                     _("Get the number of children of a scene variable"),
+                     _("Number of children of a scene variable"),
                      _("Variables"),
                      "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"));

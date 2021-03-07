@@ -36,6 +36,7 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("ignoreDefaultControls", false);
   behaviorContent.SetAttribute("viewpoint", "TopDown");
   behaviorContent.SetAttribute("customIsometryAngle", 30);
+  behaviorContent.SetAttribute("movementAngleOffset", 0);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -87,6 +88,8 @@ TopDownMovementBehavior::GetProperties(
       .AddExtraInfo(_("Custom Isometry"));
   properties[_("Custom isometry angle")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("customIsometryAngle")));
+  properties[_("Movement angle offset")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("movementAngleOffset")));
 
   return properties;
 }
@@ -108,6 +111,15 @@ bool TopDownMovementBehavior::UpdateProperty(
     return true;
   }
   if (name == _("Viewpoint")) {
+    // Fix the offset angle when switching between top-down and isometry
+    const gd::String& oldValue = behaviorContent.GetStringAttribute("viewpoint", "TopDown", "");
+    if (value == _("Top-Down") && oldValue != "TopDown") {
+      behaviorContent.SetAttribute("movementAngleOffset", behaviorContent.GetDoubleAttribute("movementAngleOffset", 0, "") + 45);
+    }
+    else if (value != _("Top-Down") && oldValue == "TopDown") {
+      behaviorContent.SetAttribute("movementAngleOffset", behaviorContent.GetDoubleAttribute("movementAngleOffset", 45, "") - 45);
+    }
+
     if (value == _("Isometry 2:1 (26.565°)"))
       behaviorContent.SetAttribute("viewpoint", "PixelIsometry");
     else if (value == _("True Isometry (30°)"))
@@ -117,6 +129,9 @@ bool TopDownMovementBehavior::UpdateProperty(
     else
       behaviorContent.SetAttribute("viewpoint", "TopDown");
     return true;
+  }
+  if (name == _("Movement angle offset")) {
+    behaviorContent.SetAttribute("movementAngleOffset", value.To<float>());
   }
 
   if (value.To<float>() < 0) return false;

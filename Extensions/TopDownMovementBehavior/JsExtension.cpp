@@ -74,6 +74,11 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         "getXVelocity");
     autConditions["TopDownMovementBehavior::YVelocity"].SetFunctionName(
         "getYVelocity");
+    autActions["TopDownMovementBehavior::MovementAngleOffset"]
+        .SetFunctionName("setMovementAngleOffset")
+        .SetGetter("getMovementAngleOffset");
+    autConditions["TopDownMovementBehavior::MovementAngleOffset"].SetFunctionName(
+        "getMovementAngleOffset");
 
     autActions["TopDownMovementBehavior::AllowDiagonals"].SetFunctionName(
         "allowDiagonals");
@@ -106,6 +111,7 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autExpressions["Angle"].SetFunctionName("getAngle");
     autExpressions["XVelocity"].SetFunctionName("getXVelocity");
     autExpressions["YVelocity"].SetFunctionName("getYVelocity");
+    autExpressions["MovementAngleOffset"].SetFunctionName("getMovementAngleOffset");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

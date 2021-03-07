@@ -3,8 +3,10 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+
 #include <iostream>
 #include <vector>
+
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
 #include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
@@ -244,10 +246,13 @@ bool GD_API RaycastObject(
     gd::Variable &varY,
     bool inverted) {
   return RaycastObjectToPosition(pickedObjectLists,
-                                 x, y,
-                                 x + dist*cos(angle*3.14159/180.0),
-                                 y + dist*sin(angle*3.14159/180.0),
-                                 varX, varY, inverted);
+                                 x,
+                                 y,
+                                 x + dist * cos(angle * 3.14159 / 180.0),
+                                 y + dist * sin(angle * 3.14159 / 180.0),
+                                 varX,
+                                 varY,
+                                 inverted);
 }
 
 bool GD_API RaycastObjectToPosition(
@@ -260,10 +265,12 @@ bool GD_API RaycastObjectToPosition(
     gd::Variable &varY,
     bool inverted) {
   RuntimeObject *matchObject = NULL;
-  float testSqDist = inverted ? 0 : (endX - x)*(endX - x) + (endY - y)*(endY - y);
+  float testSqDist =
+      inverted ? 0 : (endX - x) * (endX - x) + (endY - y) * (endY - y);
   float resultX = 0.0f;
   float resultY = 0.0f;
-  for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end(); ++it) {
+  for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end();
+       ++it) {
     if (it->second == NULL) continue;
     auto list = *it->second;
 
@@ -323,8 +330,7 @@ void GD_API VariableClearChildren(gd::Variable &variable) {
 }
 
 unsigned int GD_API GetVariableChildCount(gd::Variable &variable) {
-  if (variable.IsStructure() == false) return 0;
-
+  if (gd::Variable::IsPrimitive(variable.GetType())) return 0;
   return variable.GetChildrenCount();
 }
 

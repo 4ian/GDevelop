@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorVariable {
+    unsigned long size();
+    [Const] Variable WRAPPED_at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -166,24 +171,43 @@ interface PairStringVariable {
     [Ref] Variable WRAPPED_GetVariable();
 };
 
+enum Variable_Type {
+    "Variable::String",
+    "Variable::Number",
+    "Variable::Boolean",
+    "Variable::Structure",
+    "Variable::Array"
+};
+
 interface Variable {
     void Variable();
+
+    boolean STATIC_IsPrimitive([Const] Variable_Type type);
+
+    Variable_Type GetType();
+    void CastTo([Const] DOMString type);
 
     void SetString([Const] DOMString str);
     [Const, Ref] DOMString GetString();
     void SetValue([Const] double val);
     double GetValue();
+    void SetBool([Const] boolean val);
+    boolean GetBool();
+
+    unsigned long GetChildrenCount();
+    boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
 
     boolean HasChild([Const] DOMString str);
     [Ref] Variable GetChild([Const] DOMString str);
     void RemoveChild([Const] DOMString name);
     boolean RenameChild([Const] DOMString oldName, [Const] DOMString newName);
     [Value] VectorString GetAllChildrenNames();
-    unsigned long GetChildrenCount();
-    boolean IsNumber();
-    boolean IsStructure();
-    boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
     void RemoveRecursively([Const, Ref] Variable variableToRemove);
+
+    [Ref] Variable GetAtIndex([Const] unsigned long index);
+    [Ref] Variable PushNew();
+    void RemoveAtIndex([Const] unsigned long index);
+    [Const, Ref] VectorVariable GetAllChildrenArray();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

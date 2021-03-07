@@ -465,27 +465,40 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "const $VALUE_ITERATOR_REFERENCE = runtimeScene.getVariables().get($VALUE_ITERATOR_VARIABLE_NAME);\n";
         outputCode +=
             "const $ITERABLE_REFERENCE = runtimeScene.getVariables().get($ITERABLE_VARIABLE_NAME);\n";
+
+        // Do not execute the loop on non iterables
+        outputCode += "if(!$ITERABLE_REFERENCE.isPrimitive()) {\n";
         
         // Begin the for loop
         outputCode +=
             "for(\n"
             "    const $ITERATOR_KEY in \n"
-            "    $ITERABLE_REFERENCE.getAllChildren()\n"
+            "    $ITERABLE_REFERENCE.getType() === \"structure\"\n"
+            "      ? $ITERABLE_REFERENCE.getAllChildren()\n"
+            "      : $ITERABLE_REFERENCE.getType() === \"array\"\n"
+            "        ? $ITERABLE_REFERENCE.getAllChildrenArray()\n"
+            "        : []\n"
             ") {\n";
         
         // If variables are defined, store the value in them
         if(keyIteratorExists) outputCode += 
-            "    $KEY_ITERATOR_REFERENCE.setString($ITERATOR_KEY);\n";
+            "    if($ITERABLE_REFERENCE.getType() === \"structure\")\n"
+            "        $KEY_ITERATOR_REFERENCE.setString($ITERATOR_KEY);\n"
+            "    else if($ITERABLE_REFERENCE.getType() === \"array\")\n"
+            "        $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY);\n";
+
         if(valueIteratorExists) outputCode += 
-            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY);\n"
-            "    if($STRUCTURE_CHILD_VARIABLE.isNumber()) {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setNumber($STRUCTURE_CHILD_VARIABLE.getAsNumber());\n"
-            "    } else if ($STRUCTURE_CHILD_VARIABLE.isStructure()) {\n"
+            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
+            "    $VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE.getType())\n"
+            "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
+            "        $VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE.getValue());\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"structure\") {\n"
             "        // Structures are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
-            "    } else {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setString($STRUCTURE_CHILD_VARIABLE.getAsString());\n"
-            "    }\n";
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"array\") {\n"
+            "        // Arrays are passed by reference like JS objects\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
+            "    } else console.warn(\"Cannot identify type: \", type);\n";
         
         // Now do the rest of standard event generation
         outputCode += objectDeclaration;
@@ -499,8 +512,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           outputCode += "} //Subevents end.\n";
         }
         outputCode += "}\n";
+        // End of standard code generation
 
         // End the for loop
+        outputCode += "}\n";
+
+        // End the condition block
         outputCode += "}\n";
 
         if(valueIteratorExists) {

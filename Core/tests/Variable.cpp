@@ -6,14 +6,13 @@
 /**
  * @file Tests covering events of GDevelop Core.
  */
-#include "catch.hpp"
-
 #include <algorithm>
 #include <initializer_list>
 #include <map>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "catch.hpp"
 
 TEST_CASE("Variable", "[common][variables]") {
   SECTION("Basics") {
@@ -21,38 +20,43 @@ TEST_CASE("Variable", "[common][variables]") {
     variable.SetValue(50);
     REQUIRE(variable.GetValue() == 50);
     REQUIRE(variable == 50);
-    REQUIRE(variable.IsNumber() == true);
-    REQUIRE(variable.IsStructure() == false);
+    REQUIRE(variable.GetType() == gd::Variable::Type::Number);
 
     variable.SetString("MyString");
     REQUIRE(variable.GetString() == "MyString");
     REQUIRE(variable == "MyString");
-    REQUIRE(variable.IsNumber() == false);
-    REQUIRE(variable.IsStructure() == false);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
+
+    variable.SetBool(false);
+    REQUIRE(variable.GetBool() == false);
+    REQUIRE(variable == false);
+    REQUIRE(variable.GetType() == gd::Variable::Type::Boolean);
   }
   SECTION("Conversions") {
     gd::Variable variable;
     variable.SetValue(50);
-    REQUIRE(variable.GetString() == "50");  // Used as a string...
-    REQUIRE(variable.IsNumber() == false);  //...so consider as a string
+    variable.CastTo(gd::Variable::Type::String);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
+    REQUIRE(variable.GetString() == "50");
 
     variable.SetString("MyString");
-    REQUIRE(variable.GetValue() == 0);     // Used as a number...
-    REQUIRE(variable.IsNumber() == true);  //...so consider as a number
+    variable.CastTo(gd::Variable::Type::Number);
+    REQUIRE(variable.GetType() == gd::Variable::Type::Number);
+    REQUIRE(variable.GetValue() == 0);
   }
   SECTION("Use with int and string like semantics") {
     gd::Variable variable;
     variable = 50;
     REQUIRE(variable.GetValue() == 50);
-    REQUIRE(variable.IsNumber() == true);
+    REQUIRE(variable.GetType() == gd::Variable::Type::Number);
 
     variable = "MyString";
     REQUIRE(variable.GetString() == "MyString");
-    REQUIRE(variable.IsNumber() == false);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
 
     variable = "MyRealStdString";
     REQUIRE(variable.GetString() == "MyRealStdString");
-    REQUIRE(variable.IsNumber() == false);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
   }
   SECTION("Copy and assignment") {
     gd::Variable variable1;

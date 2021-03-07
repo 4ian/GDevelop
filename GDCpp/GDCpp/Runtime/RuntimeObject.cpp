@@ -4,10 +4,12 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCpp/Runtime/RuntimeObject.h"
+
 #include <SFML/System.hpp>
 #include <cmath>
 #include <cstring>
 #include <iostream>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
@@ -37,7 +39,7 @@ RuntimeObject::RuntimeObject(RuntimeScene &scene, const gd::Object &object)
   for (auto &it : object.GetAllBehaviorContents()) {
     std::unique_ptr<RuntimeBehavior> behavior =
         CppPlatform::Get().CreateRuntimeBehavior(it.second->GetTypeName(),
-                                                  it.second->GetContent());
+                                                 it.second->GetContent());
     if (behavior) {
       AddBehavior(it.first, std::move(behavior));
     }
@@ -766,6 +768,8 @@ void RuntimeObject::VariableClearChildren(gd::Variable &variable) {
 }
 
 unsigned int RuntimeObject::GetVariableChildCount(gd::Variable &variable) {
-  if (variable.IsStructure() == false) return 0;
+  if (variable.GetType() != gd::Variable::Type::Structure &&
+      variable.GetType() != gd::Variable::Type::Array)
+    return 0;
   return variable.GetChildrenCount();
 }

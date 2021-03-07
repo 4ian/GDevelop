@@ -46,11 +46,12 @@ describe('gdjs.HotReloader.deepEqual', () => {
     const variablesContainer = new gdjs.VariablesContainer([]);
 
     // Add a new variable
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariable = [
       {
         name: 'MyVariable',
         value: '123',
+        type: 'number',
       },
     ];
     hotReloader._hotReloadVariablesContainer(
@@ -70,11 +71,12 @@ describe('gdjs.HotReloader.deepEqual', () => {
     expect(variablesContainer.has('MyVariable')).to.be(false);
 
     // Change a variable
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsString = [
       {
         name: 'MyVariable',
         value: 'Hello World',
+        type: 'string',
       },
     ];
     hotReloader._hotReloadVariablesContainer(
@@ -87,19 +89,39 @@ describe('gdjs.HotReloader.deepEqual', () => {
       'Hello World'
     );
 
+    // Change a variable to a boolean
+    /** @type {RootVariableData[]} */
+    const dataWithMyVariableAsBool = [
+      {
+        name: 'MyVariable',
+        value: 'true',
+        type: 'boolean',
+      },
+    ];
+    hotReloader._hotReloadVariablesContainer(
+      dataWithMyVariableAsString,
+      dataWithMyVariableAsBool,
+      variablesContainer
+    );
+    expect(variablesContainer.has('MyVariable')).to.be(true);
+    expect(variablesContainer.get('MyVariable').getAsBoolean()).to.be(true);
+
     // Add a new structure
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructure = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
             value: '123',
+            type: 'number',
           },
           {
             name: 'MyChild2',
             value: 'Hello World',
+            type: 'string',
           },
         ],
       },
@@ -125,18 +147,21 @@ describe('gdjs.HotReloader.deepEqual', () => {
     ).to.be('Hello World');
 
     // Change a variable in a structure
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructure2 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
             value: '124',
+            type: 'number',
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -162,14 +187,16 @@ describe('gdjs.HotReloader.deepEqual', () => {
     ).to.be('Hello World 2');
 
     // Remove a child variable
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructureWithoutChild1 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -192,23 +219,27 @@ describe('gdjs.HotReloader.deepEqual', () => {
     ).to.be('Hello World 2');
 
     // Add a child variable as a structure
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructureWithChild1AsStructure = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild1',
                 value: '456',
+                type: 'number',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -247,23 +278,27 @@ describe('gdjs.HotReloader.deepEqual', () => {
     ).to.be(456);
 
     // Modify a grand child variable
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructureWithChild1AsStructure2 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild1',
                 value: '789',
+                type: 'number',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -302,23 +337,27 @@ describe('gdjs.HotReloader.deepEqual', () => {
     ).to.be(789);
 
     // Remove a grand child variable and add another
-    /** @type {VariableData[]} */
+    /** @type {RootVariableData[]} */
     const dataWithMyVariableAsStructureWithChild1AsStructure3 = [
       {
         name: 'MyVariable',
+        type: 'structure',
         children: [
           {
             name: 'MyChild1',
+            type: 'structure',
             children: [
               {
                 name: 'MyGrandChild2',
                 value: 'Hello World 3',
+                type: 'string',
               },
             ],
           },
           {
             name: 'MyChild2',
             value: 'Hello World 2',
+            type: 'string',
           },
         ],
       },
@@ -361,5 +400,45 @@ describe('gdjs.HotReloader.deepEqual', () => {
         .getChild('MyGrandChild2')
         .getAsString()
     ).to.be('Hello World 3');
+
+    // Make the variable an array
+    /** @type {RootVariableData[]} */
+    const dataWithMyVariableAsArray = [
+      {
+        name: 'MyVariable',
+        type: 'array',
+        children: [
+          {
+            type: 'structure',
+            children: [
+              {
+                name: 'MyGrandChild2',
+                value: 'Hello World 3',
+                type: 'string',
+              },
+            ],
+          },
+          {
+            value: 'Hello World 2',
+            type: 'string',
+          },
+        ],
+      },
+    ];
+    hotReloader._hotReloadVariablesContainer(
+      dataWithMyVariableAsStructureWithChild1AsStructure3,
+      dataWithMyVariableAsArray,
+      variablesContainer
+    );
+    expect(variablesContainer.has('MyVariable')).to.be(true);
+    expect(variablesContainer.get('MyVariable').getType()).to.be('array');
+    expect(variablesContainer.get('MyVariable').getChildrenCount()).to.be(2);
+    const array = variablesContainer.get('MyVariable');
+    expect(array.getChild('0').getType()).to.be('structure');
+    expect(array.getChild('0').getChild('MyGrandChild2').getAsString()).to.be(
+      'Hello World 3'
+    );
+    expect(array.getChild('1').getType()).to.be('string');
+    expect(array.getChild('1').getAsString()).to.be('Hello World 2');
   });
 });

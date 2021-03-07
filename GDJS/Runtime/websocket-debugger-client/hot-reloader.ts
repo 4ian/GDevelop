@@ -383,53 +383,67 @@ namespace gdjs {
     }
 
     _hotReloadVariablesContainer(
-      oldVariablesData: VariableData[],
-      newVariablesData: VariableData[],
+      oldVariablesData: RootVariableData[],
+      newVariablesData: RootVariableData[],
       variablesContainer: gdjs.VariablesContainer
     ): void {
       newVariablesData.forEach((newVariableData) => {
         const variableName = newVariableData.name;
-        const oldVariableData = oldVariablesData.filter(
-          (variable) => variable.name === newVariableData.name
-        )[0];
+        const oldVariableData = oldVariablesData.find(
+          (variable) => variable.name === variableName
+        );
         const variable = variablesContainer.get(newVariableData.name);
+
         if (!oldVariableData) {
           // New variable
           variablesContainer.add(
             variableName,
             new gdjs.Variable(newVariableData)
           );
-        } else {
-          if (
-            !newVariableData.children &&
-            (oldVariableData.value !== newVariableData.value ||
-              oldVariableData.children)
-          ) {
-            // Variable value was changed or was converted from
-            // a structure to a variable with value.
+        } else if (
+          gdjs.Variable.isPrimitive(newVariableData.type || 'number') &&
+          (oldVariableData.value !== newVariableData.value ||
+            !gdjs.Variable.isPrimitive(oldVariableData.type || 'number'))
+        ) {
+          // Variable value was changed or was converted from
+          // a structure to a variable with value.
+          variablesContainer.remove(variableName);
+          variablesContainer.add(
+            variableName,
+            new gdjs.Variable(newVariableData)
+          );
+        } else if (
+          !gdjs.Variable.isPrimitive(newVariableData.type || 'number')
+        ) {
+          // Variable is a structure or array (or was converted from a primitive
+          // to one of those).
+          if (newVariableData.type === 'structure')
+            this._hotReloadStructureVariable(
+              //@ts-ignore If the type is structure, it is assured that the children have a name
+              oldVariableData.children,
+              newVariableData.children,
+              variable
+            );
+          else {
+            // Arrays cannot be hot reloaded.
+            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // It will in that case mess up the whole array,
+            // and there is no way to know if that was the case.
+            //
+            // We therefore just replace the old array with the new one.
             variablesContainer.remove(variableName);
             variablesContainer.add(
               variableName,
               new gdjs.Variable(newVariableData)
             );
-          } else {
-            if (newVariableData.children) {
-              // Variable is a structure (or was converted from a non structure
-              // to a structure).
-              // Note: oldVariableData.children can be null!
-              this._hotReloadStructureVariable(
-                oldVariableData.children,
-                newVariableData.children,
-                variable
-              );
-            }
           }
         }
       });
       oldVariablesData.forEach((oldVariableData) => {
-        const newVariableData = newVariablesData.filter(
+        const newVariableData = newVariablesData.find(
           (variable) => variable.name === oldVariableData.name
-        )[0];
+        );
+
         if (!newVariableData) {
           // Variable was removed
           variablesContainer.remove(oldVariableData.name);
@@ -438,48 +452,63 @@ namespace gdjs {
     }
 
     _hotReloadStructureVariable(
-      oldChildren: VariableData[] | undefined,
-      newChildren: VariableData[],
+      oldChildren: RootVariableData[],
+      newChildren: RootVariableData[],
       variable: gdjs.Variable
     ): void {
       if (oldChildren) {
         oldChildren.forEach((oldChildVariableData) => {
-          const newChildVariableData = newChildren.filter(
+          const newChildVariableData = newChildren.find(
             (childVariableData) =>
               childVariableData.name === oldChildVariableData.name
-          )[0];
+          );
+
           if (!newChildVariableData) {
             // Child variable was removed.
             variable.removeChild(oldChildVariableData.name);
-          } else {
-            if (
-              !newChildVariableData.children &&
-              (oldChildVariableData.value !== newChildVariableData.value ||
-                !oldChildVariableData.children)
-            ) {
-              // The child variable value was changed or was converted from
-              // structure to a variable with value.
+          } else if (
+            gdjs.Variable.isPrimitive(newChildVariableData.type || 'number') &&
+            (oldChildVariableData.value !== newChildVariableData.value ||
+              !gdjs.Variable.isPrimitive(oldChildVariableData.type || 'number'))
+          ) {
+            // The child variable value was changed or was converted from
+            // structure to a variable with value.
+            variable.addChild(
+              newChildVariableData.name,
+              new gdjs.Variable(newChildVariableData)
+            );
+          } else if (
+            !gdjs.Variable.isPrimitive(newChildVariableData.type || 'number')
+          ) {
+            // Variable is a structure or array (or was converted from a primitive
+            // to one of those).
+            if (newChildVariableData.type === 'structure')
+              this._hotReloadStructureVariable(
+                //@ts-ignore If the type is structure, it is assured that the children have a name
+                oldChildVariableData.children,
+                newChildVariableData.children as Required<VariableData>[],
+                variable.getChild(newChildVariableData.name)
+              );
+            else {
+              // Arrays cannot be hot reloaded.
+              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // It will in that case mess up the whole array,
+              // and there is no way to know if that was the case.
+              //
+              // We therefore just replace the old array with the new one.
               variable.addChild(
                 newChildVariableData.name,
                 new gdjs.Variable(newChildVariableData)
               );
-            } else {
-              if (newChildVariableData.children) {
-                // The child variable is a structure.
-                this._hotReloadStructureVariable(
-                  oldChildVariableData.children,
-                  newChildVariableData.children,
-                  variable.getChild(newChildVariableData.name)
-                );
-              }
             }
           }
         });
         newChildren.forEach((newChildVariableData) => {
-          const oldChildVariableData = oldChildren.filter(
+          const oldChildVariableData = oldChildren.find(
             (childVariableData) =>
               childVariableData.name === newChildVariableData.name
-          )[0];
+          );
+
           if (!oldChildVariableData) {
             // Child variable was added
             variable.addChild(
@@ -517,8 +546,8 @@ namespace gdjs {
           .setWindowTitle(newLayoutData.title);
       }
       this._hotReloadVariablesContainer(
-        oldLayoutData.variables,
-        newLayoutData.variables,
+        oldLayoutData.variables as Required<VariableData>[],
+        newLayoutData.variables as Required<VariableData>[],
         runtimeScene.getVariables()
       );
       this._hotReloadRuntimeSceneBehaviorsSharedData(
@@ -768,8 +797,8 @@ namespace gdjs {
         // Update variables
         runtimeObjects.forEach((runtimeObject) => {
           this._hotReloadVariablesContainer(
-            oldObjectData.variables,
-            newObjectData.variables,
+            oldObjectData.variables as Required<VariableData>[],
+            newObjectData.variables as Required<VariableData>[],
             runtimeObject.getVariables()
           );
         });
@@ -1159,8 +1188,8 @@ namespace gdjs {
 
       // Update variables
       this._hotReloadVariablesContainer(
-        oldInstance.initialVariables,
-        newInstance.initialVariables,
+        oldInstance.initialVariables as Required<VariableData>[],
+        newInstance.initialVariables as Required<VariableData>[],
         runtimeObject.getVariables()
       );
 

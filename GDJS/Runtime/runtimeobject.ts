@@ -586,6 +586,49 @@ namespace gdjs {
     }
 
     /**
+     * Shortcut to set the value of a variable considered as a boolean.
+     * This shortcut function is needed for events code generation.
+     *
+     * @private
+     * @param {gdjs.Variable} variable
+     * @param {boolean} newValue
+     */
+    static setVariableBoolean = function (
+      variable: gdjs.Variable,
+      newValue: boolean
+    ) {
+      variable.setBoolean(newValue);
+    };
+
+    /**
+     * Shortcut to compare the value of a variable considered as a boolean.
+     * This shortcut function is needed for events code generation.
+     *
+     * @private
+     * @param {gdjs.Variable} variable
+     * @param {boolean} compareWith
+     * @returns {boolean}
+     */
+    static getVariableBoolean = function (
+      variable: gdjs.Variable,
+      compareWith: boolean
+    ): boolean {
+      return gdjs.evtTools.common.getVariableBoolean(variable, compareWith);
+    };
+
+    /**
+     * Toggles a variable.
+     * This shortcut function is needed for events code generation.
+     *
+     * @private
+     * @param {gdjs.Variable} variable
+     * @see {gdjs.evtTools.common.toggleVariableBoolean}
+     */
+    static toggleVariableBoolean = function (variable: gdjs.Variable) {
+      gdjs.evtTools.common.toggleVariableBoolean(variable);
+    };
+
+    /**
      * Get the number of children from a variable
      * @param variable The variable to be accessed
      * @return The number of children
@@ -647,6 +690,36 @@ namespace gdjs {
     private static variableClearChildren(variable: gdjs.Variable): void {
       variable.clearChildren();
     }
+
+    /**
+     * This shortcut function is needed for events code generation.
+     * @private
+     */
+    static variablePushCopy = function (
+      array: gdjs.Variable,
+      variable: gdjs.Variable
+    ) {
+      array.pushVariableCopy(variable);
+    };
+
+    /**
+     * This shortcut function is needed for events code generation.
+     * @private
+     */
+    static valuePush = function (
+      array: gdjs.Variable,
+      value: string | float | boolean
+    ) {
+      array.pushValue(value);
+    };
+
+    /**
+     * This shortcut function is needed for events code generation.
+     * @private
+     */
+    static variableRemoveAt = function (array: gdjs.Variable, index: number) {
+      array.removeAtIndex(index);
+    };
 
     /**
      * Shortcut to test if a variable exists for the object.
@@ -1829,9 +1902,15 @@ namespace gdjs {
     getVariableString = RuntimeObject.getVariableString;
     setVariableNumber = RuntimeObject.setVariableNumber;
     setVariableString = RuntimeObject.setVariableString;
+    getVariableBoolean = RuntimeObject.getVariableBoolean;
+    setVariableBoolean = RuntimeObject.setVariableBoolean;
+    toggleVariableBoolean = RuntimeObject.toggleVariableBoolean;
     variableChildExists = RuntimeObject.variableChildExists;
     variableRemoveChild = RuntimeObject.variableRemoveChild;
     variableClearChildren = RuntimeObject.variableClearChildren;
+    variablePushCopy = RuntimeObject.variablePushCopy;
+    valuePush = RuntimeObject.valuePush;
+    variableRemoveAt = RuntimeObject.variableRemoveAt;
 
     /**
      * Get the squared distance, in pixels, from the *object center* to a position.

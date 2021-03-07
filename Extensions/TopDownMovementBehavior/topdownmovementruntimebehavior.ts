@@ -58,7 +58,7 @@ namespace gdjs {
         behaviorData.viewpoint,
         behaviorData.customIsometryAngle
       );
-      this._movementAngleOffset = behaviorData.movementAngleOffset;
+      this._movementAngleOffset = behaviorData.movementAngleOffset || 0;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {

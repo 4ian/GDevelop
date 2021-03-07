@@ -74,7 +74,7 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         "getXVelocity");
     autConditions["TopDownMovementBehavior::YVelocity"].SetFunctionName(
         "getYVelocity");
-    autActions["TopDownMovementBehavior::MovementAngleOffset"]
+    autActions["TopDownMovementBehavior::SetMovementAngleOffset"]
         .SetFunctionName("setMovementAngleOffset")
         .SetGetter("getMovementAngleOffset");
     autConditions["TopDownMovementBehavior::MovementAngleOffset"].SetFunctionName(

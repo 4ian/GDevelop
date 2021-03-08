@@ -328,11 +328,15 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // the cost of creating/storing it for each events function might not
          // be worth it.
          "    if (objectsList) {\n" +
-         "      return parentEventsFunctionContext ?\n" +
+         "      const object = parentEventsFunctionContext ?\n" +
          "        "
          "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
          ":\n" +
          "        runtimeScene.createObject(objectsList.firstKey());\n" +
+         // Add the new instance to object lists
+         "      objectsList.get(objectsList.firstKey()).push(object);"
+         "      eventsFunctionContext._objectArraysMap[objectName].push(object);" +
+         "      return object;" +
          "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +

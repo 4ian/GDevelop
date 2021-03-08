@@ -1110,7 +1110,7 @@ namespace gdjs {
       /**
        * Called when the object leaves this state.
        * It's a good place to reset the internal state.
-       * @see OnFloor.enter that is not part of the interface because it take specific parameters.
+       * @see OnFloor.enter that is not part of the interface because it takes specific parameters.
        */
       leave(): void;
       /**
@@ -1119,19 +1119,19 @@ namespace gdjs {
        */
       beforeUpdatingObstacles(): void;
       /**
-       * Check if transition to other states is needed and apply them before moving horizontally.
+       * Check if transitions to other states are needed and apply them before moving horizontally.
        */
       checkTransitionBeforeX(): void;
       /**
-       * Use _requestedDeltaX and _requestedDeltaY to choose the movement that suite the state before moving horizontally.
+       * Use _requestedDeltaX and _requestedDeltaY to choose the movement that suits the state before moving horizontally.
        */
       beforeMovingX(): void;
       /**
-       * Check if transition to other states is needed and apply them before moving vertically.
+       * Check if transitions to other states are needed and apply them before moving vertically.
        */
       checkTransitionBeforeY(timeDelta: float): void;
       /**
-       * Use _requestedDeltaY to choose the movement that suite the state before moving vertically.
+       * Use _requestedDeltaY to choose the movement that suits the state before moving vertically.
        */
       beforeMovingY(timeDelta: float, oldX: float): void;
     }
@@ -1373,7 +1373,8 @@ namespace gdjs {
     }
 
     /**
-     * The object is on the ascending part of the jump (otherwise it's falling).
+     * The object is on the ascending and descending part of the jump.
+     * The object is considered falling when the jump continue to a lower position than the initial one.
      */
     export class Jumping implements State {
       private _behavior: PlatformerObjectRuntimeBehavior;

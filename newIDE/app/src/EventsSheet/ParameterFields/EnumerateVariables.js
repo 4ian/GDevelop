@@ -1,6 +1,7 @@
 // @flow
 import flatten from 'lodash/flatten';
 import { mapFor } from '../../Utils/MapFor';
+import flatMap from 'lodash/flatMap';
 const gd: libGDevelop = global.gd;
 
 export const enumerateVariables = (
@@ -17,27 +18,24 @@ export const enumerateVariables = (
     if (variable.getType() === gd.Variable.Structure) {
       return [
         fullName,
-        ...variable
-          .getAllChildrenNames()
-          .toJSArray()
-          .flatMap(childName =>
-            enumerateVariableAndChildrenNames(
-              `${fullName}.${childName}`,
-              variable.getChild(childName)
-            )
-          ),
+        ...flatMap(variable.getAllChildrenNames().toJSArray(), childName =>
+          enumerateVariableAndChildrenNames(
+            `${fullName}.${childName}`,
+            variable.getChild(childName)
+          )
+        ),
       ];
     } else if (variable.getType() === gd.Variable.Array) {
       return [
         fullName,
-        ...new Array(variable.getChildrenCount())
-          .fill('')
-          .flatMap((_, index) =>
+        ...flatMap(
+          new Array(variable.getChildrenCount()).fill(''),
+          (_, index) =>
             enumerateVariableAndChildrenNames(
               `${fullName}[${index}]`,
               variable.getAtIndex(index)
             )
-          ),
+        ),
       ];
     } else {
       // Variable of primitive type

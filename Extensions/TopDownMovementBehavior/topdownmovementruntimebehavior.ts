@@ -99,7 +99,10 @@ namespace gdjs {
           newBehaviorData.customIsometryAngle
         );
       }
-      if (oldBehaviorData.movementAngleOffset !== newBehaviorData.movementAngleOffset) {
+      if (
+        oldBehaviorData.movementAngleOffset !==
+        newBehaviorData.movementAngleOffset
+      ) {
         this._movementAngleOffset = newBehaviorData.movementAngleOffset;
       }
       return true;
@@ -286,7 +289,8 @@ namespace gdjs {
 
       //Update the speed of the object
       if (direction != -1) {
-        directionInRad = ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
+        directionInRad =
+          ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
         this._xVelocity +=
           this._acceleration * timeDelta * Math.cos(directionInRad);

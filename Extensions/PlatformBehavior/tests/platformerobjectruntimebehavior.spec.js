@@ -477,7 +477,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Jump, reach the top and go down
       object.getBehavior('auto1').simulateJumpKey();
       for (let i = 0; i < 30; ++i) {
-        console.log("i: " + i + " x: " + object.getX() + " y: " + object.getY());
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isJumping()).to.be(true);
       }
@@ -748,14 +747,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.setPosition(0, platform.getY() - object.getHeight() - 10);
       const ladder = addLadderObject(runtimeScene);
       ladder.setPosition(object.getX(), platform.getY() - ladder.getHeight());
-  
+
       // Fall and Grab the platform
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       object.getBehavior('auto1').simulateLadderKey();
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-  
+
       // move the bottom platform to the object
       for (let i = 0; i < 20; ++i) {
         platform.setY(platform.getY() - 1);
@@ -1028,7 +1027,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(true);
         expect(object.getY()).to.be.below(lastY);
       }
-    }
+    };
     const jumpAndDescend = (frameCount) => {
       for (let i = 0; i < frameCount; ++i) {
         const lastY = object.getY();
@@ -1037,7 +1036,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(true);
         expect(object.getY()).to.be.above(lastY);
       }
-    }
+    };
 
     const fallOnPlatform = (maxFrameCount) => {
       // Ensure the object falls on the platform
@@ -1392,7 +1391,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
     it('can walk from a platform to another one', function () {
       const platform2 = addPlatformObject(runtimeScene);
-      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY());
+      platform2.setPosition(
+        platform.getX() + platform.getWidth(),
+        platform.getY()
+      );
 
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
@@ -1407,7 +1409,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     it('can walk from a platform to another one that not aligned', function () {
       // the 2nd platform is 1 pixel higher
       const platform2 = addPlatformObject(runtimeScene);
-      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY() - 1);
+      platform2.setPosition(
+        platform.getX() + platform.getWidth(),
+        platform.getY() - 1
+      );
 
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
@@ -1422,7 +1427,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     it("can't walk from a platform to another one that is too high", function () {
       // the 2nd platform is 2 pixels higher
       const platform2 = addPlatformObject(runtimeScene);
-      platform2.setPosition(platform.getX() + platform.getWidth(), platform.getY() - 2);
+      platform2.setPosition(
+        platform.getX() + platform.getWidth(),
+        platform.getY() - 2
+      );
 
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
@@ -1441,16 +1449,25 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
     it('can walk from a platform to another one that is rotated', function () {
       const platform2 = addPlatformObject(runtimeScene);
-      
-      const angle = -30 * Math.PI / 180;
+
+      const angle = (-30 * Math.PI) / 180;
       const centerDeltaX = platform2.getWidth() / 2;
       const centerDeltaY = platform2.getHeight() / 2;
       // to make the vertex of the 2 platform touch
-      const vertexDeltaX = centerDeltaX  * Math.cos(angle) + centerDeltaY * (-Math.sin(angle)) - centerDeltaX;
-      const vertexDeltaY = centerDeltaX  * Math.sin(angle) + centerDeltaY * Math.cos(angle) - centerDeltaY;
-      
+      const vertexDeltaX =
+        centerDeltaX * Math.cos(angle) +
+        centerDeltaY * -Math.sin(angle) -
+        centerDeltaX;
+      const vertexDeltaY =
+        centerDeltaX * Math.sin(angle) +
+        centerDeltaY * Math.cos(angle) -
+        centerDeltaY;
+
       platform2.setAngle(-30);
-      platform2.setPosition(platform.getX() + platform.getWidth() + vertexDeltaX, platform.getY() + vertexDeltaY);
+      platform2.setPosition(
+        platform.getX() + platform.getWidth() + vertexDeltaX,
+        platform.getY() + vertexDeltaY
+      );
 
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
@@ -1523,23 +1540,22 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           benchmarksCount: 1,
           iterationsCount: stepCount,
         });
-      benchmarkSuite
-        .add('jump in loop', (t) => {
+        benchmarkSuite.add('jump in loop', (t) => {
           for (let i = 0; i < duplicateCount; ++i) {
             const object = objects[i];
             if (t % 60 == i % 60) {
               object.getBehavior('auto1').simulateJumpKey();
             }
-            if (t + i % 61 < 31) {
+            if (t + (i % 61) < 31) {
               object.getBehavior('auto1').simulateRightKey();
             }
-            if (t + i % 61 >= 31) {
+            if (t + (i % 61) >= 31) {
               object.getBehavior('auto1').simulateLeftKey();
             }
           }
           runtimeScene.renderAndStep(1000 / 60);
         });
-      console.log(benchmarkSuite.run());
+        console.log(benchmarkSuite.run());
       }
     });
   });

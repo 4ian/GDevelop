@@ -1015,8 +1015,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const lastY = object.getY();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-        //TODO Probably a bug, uncomment it after it's fixed
-        //expect(object.getBehavior('auto1').isMoving()).to.be(false);
+        expect(object.getBehavior('auto1').isMoving()).to.be(false);
         expect(object.getY()).to.be(lastY);
       }
     };
@@ -1128,41 +1127,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       climbLadder(2);
     });
 
-    //TODO Probably a bug, remove the skip when it's fixed
-    it.skip("can't grab a ladder while on the ascending phase of a jump", function () {
-      // Need a bigger ladder
-      ladder.getHeight = function () {
-        return 300;
-      };
-      ladder.setPosition(30, -10 - ladder.getHeight());
-      
-      object.setPosition(30, -32);
-      // Ensure the object falls on the platform
-      fallOnPlatform(10);
-
-      // Climb the ladder
-      object.getBehavior('auto1').simulateLadderKey();
-      climbLadder(10);
-      stayOnLadder(10);
-
-      // Jump from the ladder
-      object.getBehavior('auto1').simulateJumpKey();
-      for (let i = 0; i < 19; ++i) {
-        // Keep pressing to the ladder key should have no effect
-        object.getBehavior('auto1').simulateLadderKey();
-        jumpAndAscend(1);
-        console.log("i: " + i);
-      }
-      // starting to going down, can grab the ladder again
-      object.getBehavior('auto1').simulateLadderKey();
-      stayOnLadder(1);
-      expect(object.getBehavior('auto1').isJumping()).to.be(false);
-
-      // Can jump again
-      object.getBehavior('auto1').simulateJumpKey();
-      jumpAndAscend(10);
-    });
-
     it('can jump from ladder to ladder', function () {
       // Need a bigger ladder
       ladder.getHeight = function () {
@@ -1201,6 +1165,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be.above(ladder2.getX());
       // and grab the 2nd one, even if still ascending
       object.getBehavior('auto1').simulateLadderKey();
+      // still moves a little because of inertia maybe?
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
       stayOnLadder(1);
     });
 
@@ -1404,8 +1373,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
         expect(object.getX()).to.be.above(lastX);
-        //TODO probably a bug, uncomment when it's fixed.
-        //expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        if (Math.abs(object.getX() - lastX) > 1) {
+          expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        }
       }
     };
 
@@ -1431,6 +1401,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // walk from the 1st platform to the 2nd one
       walkRight(30);
       expect(object.getX()).to.be.above(platform2.getX());
+      expect(object.getY()).to.be(platform2.getY() - object.getHeight());
     });
 
     it('can walk from a platform to another one that not aligned', function () {
@@ -1445,7 +1416,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // walk from the 1st platform to the 2nd one
       walkRight(30);
       expect(object.getX()).to.be.above(platform2.getX());
-
+      expect(object.getY()).to.be(platform2.getY() - object.getHeight());
     });
 
     it("can't walk from a platform to another one that is too high", function () {
@@ -1465,6 +1436,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
       // is blocked by the 2nd platform
       expect(object.getX()).to.be(platform2.getX() - object.getWidth());
+      expect(object.getY()).to.be(platform.getY() - object.getHeight());
     });
 
     it('can walk from a platform to another one that is rotated', function () {

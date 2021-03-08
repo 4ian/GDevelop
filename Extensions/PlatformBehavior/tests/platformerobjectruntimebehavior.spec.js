@@ -1,4 +1,4 @@
-describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
+describe.only('gdjs.PlatformerObjectRuntimeBehavior', function () {
   const makeTestRuntimeScene = () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
@@ -450,9 +450,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
 
       // try to grab the platform
-      for (let i = 0; i < 30; ++i) {
+      for (let i = 0; i < 20; ++i) {
         object.getBehavior('auto1').simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
       }
       // Check that the object didn't grabbed the platform
       expect(object.getX()).to.be.above(
@@ -717,7 +718,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         topPlatform.getX() - object.getWidth(),
         topPlatform.getY() - 10
       );
-      for (let i = 0; i < 7; ++i) {
+      for (let i = 0; i < 8; ++i) {
         object.getBehavior('auto1').simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -1295,7 +1296,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         topPlatform.getX() - object.getWidth(),
         topPlatform.getY() - 10
       );
-      for (let i = 0; i < 5; ++i) {
+      for (let i = 0; i < 6; ++i) {
         object.getBehavior('auto1').simulateRightKey();
         fall(1);
       }

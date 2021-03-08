@@ -69,6 +69,7 @@ namespace gdjs {
 
     _requestedDeltaX: float = 0;
     _requestedDeltaY: float = 0;
+    _lastDeltaY: float = 0;
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
@@ -494,6 +495,21 @@ namespace gdjs {
       //Jumping
       this.checkTransitionJumping();
 
+      //Grabbing a platform
+      if (
+        this._canGrabPlatforms &&
+        this._requestedDeltaX !== 0 &&
+        this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
+        this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
+        (this._state != PlatformerObjectRuntimeBehavior.State.Jumping || this._lastDeltaY >= 0)
+      ) {
+        this.checkGrabPlatform();
+      }
+    }
+
+    beforeMovingY(timeDelta: float, oldX: float) {
+      const object = this.owner;
+      
       //Fall
       if (
         !this._jumpingFirstDelta &&
@@ -503,20 +519,6 @@ namespace gdjs {
       ) {
         this.fall(timeDelta);
       }
-
-      //Grabbing a platform
-      if (
-        this._canGrabPlatforms &&
-        this._requestedDeltaX !== 0 &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnFloor
-      ) {
-        this.checkGrabPlatform();
-      }
-    }
-
-    beforeMovingY(timeDelta: float, oldX: float) {
-      const object = this.owner;
       
       if (
         this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
@@ -738,6 +740,7 @@ namespace gdjs {
 
       this.beforeMovingY(timeDelta, oldX);
 
+      const oldY = object.getY();
       this.moveY();
 
       //3) Update the current floor data for the next tick:
@@ -757,6 +760,8 @@ namespace gdjs {
 
       //5) Track the movement
       this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
+
+      this._lastDeltaY = object.getY() - oldY;
     }
 
     doStepPostEvents(runtimeScene) {}
@@ -777,8 +782,10 @@ namespace gdjs {
      * @param y The value in pixels on Y axis the object wants to move to
      */
     _canGrab(platform) {
-      const y1 = this.owner.getY() + this._yGrabOffset;
-      const y2 = this.owner.getY() + this._yGrabOffset + this._requestedDeltaY;
+      console.debug("this._lastDeltaY: " + this._lastDeltaY);
+      console.debug("this._requestedDeltaY: " + this._requestedDeltaY);
+      const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
+      const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
       return (
         platform.canBeGrabbed() &&

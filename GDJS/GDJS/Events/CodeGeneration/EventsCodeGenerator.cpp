@@ -334,8 +334,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          ":\n" +
          "        runtimeScene.createObject(objectsList.firstKey());\n" +
          // Add the new instance to object lists
-         "      objectsList.get(objectsList.firstKey()).push(object);"
-         "      eventsFunctionContext._objectArraysMap[objectName].push(object);" +
+         "      if (object) {" +
+         "        objectsList.get(objectsList.firstKey()).push(object);" +
+         "        eventsFunctionContext._objectArraysMap[objectName].push(object);" +
+         "      }" +
          "      return object;" +
          "    }\n" +
          // Unknown object, don't create anything:

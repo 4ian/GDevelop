@@ -1165,7 +1165,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be.above(ladder2.getX());
       // and grab the 2nd one, even if still ascending
       object.getBehavior('auto1').simulateLadderKey();
-      // still moves a little because of inertia maybe?
+      // still moves a little because of inertia
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
       runtimeScene.renderAndStep(1000 / 60);

@@ -55,11 +55,12 @@ namespace gdjs {
     _shadowBlur: integer = 1;
     _shadowAngle: float = 0;
     _padding: integer = 5;
-    _scaleX: number = 1;
-    _scaleY: number = 1;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
-    hitBoxesDirty: any;
+
+    // We can store the scale as nothing else can change it.
+    _scaleX: number = 1;
+    _scaleY: number = 1;
 
     /**
      * @param runtimeScene The scene the object belongs to.
@@ -305,14 +306,14 @@ namespace gdjs {
      * Get x-scale of the text.
      */
     getScaleX(): float {
-      return this._renderer.getScaleX();
+      return this._scaleX;
     }
 
     /**
      * Get y-scale of the text.
      */
     getScaleY(): float {
-      return this._renderer.getScaleY();
+      return this._scaleY;
     }
 
     /**
@@ -320,9 +321,12 @@ namespace gdjs {
      * @param newScale The new scale for the text object.
      */
     setScale(newScale: float): void {
+      if (this._scaleX === newScale && this._scaleY === newScale) return;
+
       this._scaleX = newScale;
       this._scaleY = newScale;
       this._renderer.setScale(newScale);
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -330,8 +334,11 @@ namespace gdjs {
      * @param newScale The new x-scale for the text object.
      */
     setScaleX(newScale: float): void {
+      if (this._scaleX === newScale) return;
+
       this._scaleX = newScale;
       this._renderer.setScaleX(newScale);
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -339,15 +346,18 @@ namespace gdjs {
      * @param newScale The new y-scale for the text object.
      */
     setScaleY(newScale: float): void {
+      if (this._scaleY === newScale) return;
+
       this._scaleY = newScale;
       this._renderer.setScaleY(newScale);
+      this.hitBoxesDirty = true;
     }
 
     /**
      * Change the text color.
      * @param color color as a "R;G;B" string, for example: "255;0;0"
      */
-    setColor(str): void {
+    setColor(str: string): void {
       const color = str.split(';');
       if (color.length < 3) {
         return;
@@ -363,7 +373,7 @@ namespace gdjs {
      * Get the text color.
      * @return The color as a "R;G;B" string, for example: "255;0;0"
      */
-    getColor(str): string {
+    getColor(): string {
       return this._color[0] + ';' + this._color[1] + ';' + this._color[2];
     }
 
@@ -396,8 +406,11 @@ namespace gdjs {
      * @param enable true to enable word wrapping, false to disable it.
      */
     setWrapping(enable: boolean): void {
+      if (this._wrapping === enable) return;
+
       this._wrapping = enable;
       this._renderer.updateStyle();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -415,8 +428,11 @@ namespace gdjs {
       if (width <= 1) {
         width = 1;
       }
+      if (this._wrappingWidth === width) return;
+
       this._wrappingWidth = width;
       this._renderer.updateStyle();
+      this.hitBoxesDirty = true;
     }
 
     /**

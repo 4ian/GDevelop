@@ -8,11 +8,12 @@
 #define GDCORE_VARIABLE_H
 #include <map>
 #include <memory>
+#include <vector>
+
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
 }
-class TiXmlElement;
 
 namespace gd {
 
@@ -26,18 +27,49 @@ namespace gd {
  */
 class GD_CORE_API Variable {
  public:
+  static gd::Variable badVariable;
+  enum Type {
+    // Primitive types
+    String,
+    Number,
+    Boolean,
+
+    // Collection types
+    Structure,
+    Array
+  };
+
+  /**
+   * \brief Returns true if the passed type is primitive
+   */
+  static bool IsPrimitive(const Type type);
+
   /**
    * \brief Default constructor creating a variable with 0 as value.
    */
-  Variable() : value(0), isNumber(true), isStructure(false){};
+  Variable() : value(0), type(Type::Number){};
   Variable(const Variable&);
   virtual ~Variable(){};
 
   Variable& operator=(const Variable& rhs);
 
-  /** \name Number or string
-   * Methods and operators used when the variable is considered as a number or a
-   * string.
+  /**
+   * \brief Get the type of the variable.
+   */
+  Type GetType() const { return type; }
+
+  /**
+   * \brief Converts the variable to a new type.
+   */
+  void CastTo(const Type newType);
+
+  /**
+   * \brief Converts the variable to a new type.
+   */
+  void CastTo(const gd::String& type) { return CastTo(StringAsType(type)); };
+
+  /** \name Primitives
+   * Methods and operators used when the variable is considered as a primitive.
    */
   ///@{
 
@@ -51,8 +83,7 @@ class GD_CORE_API Variable {
    */
   void SetString(const gd::String& newStr) {
     str = newStr;
-    isNumber = false;
-    isStructure = false;
+    type = Type::String;
   }
 
   /**
@@ -65,8 +96,20 @@ class GD_CORE_API Variable {
    */
   void SetValue(double val) {
     value = val;
-    isNumber = true;
-    isStructure = false;
+    type = Type::Number;
+  }
+
+  /**
+   * \brief Return the content of the variable, considered as a boolean.
+   */
+  bool GetBool() const;
+
+  /**
+   * \brief Change the content of the variable, considered as a boolean.
+   */
+  void SetBool(bool val) {
+    boolVal = val;
+    type = Type::Boolean;
   }
 
   // Operators are overloaded to allow accessing to variable using a simple
@@ -84,6 +127,20 @@ class GD_CORE_API Variable {
   bool operator==(double val) const { return GetValue() == val; };
   bool operator!=(double val) const { return GetValue() != val; };
 
+  // Avoid ambiguous operators
+  void operator=(int val) { SetValue(val); };
+  void operator+=(int val) { SetValue(val + GetValue()); }
+  void operator-=(int val) { SetValue(GetValue() - val); }
+  void operator*=(int val) { SetValue(val * GetValue()); }
+  void operator/=(int val) { SetValue(GetValue() / val); }
+
+  bool operator<=(int val) const { return GetValue() <= val; };
+  bool operator>=(int val) const { return GetValue() >= val; };
+  bool operator<(int val) const { return GetValue() < val; };
+  bool operator>(int val) const { return GetValue() > val; };
+  bool operator==(int val) const { return GetValue() == val; };
+  bool operator!=(int val) const { return GetValue() != val; };
+
   // Operators are overloaded to allow accessing to variable using a simple
   // string-like semantic.
   void operator=(const gd::String& val) { SetString(val); };
@@ -92,22 +149,48 @@ class GD_CORE_API Variable {
   bool operator==(const gd::String& val) const { return GetString() == val; };
   bool operator!=(const gd::String& val) const { return GetString() != val; };
 
-  /**
-   * \brief Return true if the variable is a number
-   */
-  bool IsNumber() const { return !isStructure && isNumber; }
+  // Avoid ambiguous operators
+  void operator=(const char* val) { SetString(val); };
+  void operator+=(const char* val) { SetString(GetString() + val); }
+
+  bool operator==(const char* val) const { return GetString() == val; };
+  bool operator!=(const char* val) const { return GetString() != val; };
+
+  // Operators are overloaded to allow accessing to variable using a simple
+  // bool-like semantic.
+  void operator=(const bool val) { SetBool(val); };
+
+  bool operator==(const bool val) const { return GetBool() == val; };
+  bool operator!=(const bool val) const { return GetBool() != val; };
+
   ///@}
+
+  /** \name Collection types
+   * Methods used for collection types
+   */
+  ///@{
+
+  /**
+   * \brief Remove all the children.
+   */
+  void ClearChildren() {
+    children.clear();
+    childrenArray.clear();
+  };
+
+  /**
+   * \brief Get the count of children that the variable has.
+   */
+  size_t GetChildrenCount() const {
+    return type == Type::Structure
+               ? children.size()
+               : type == Type::Array ? childrenArray.size() : 0;
+  };
 
   /** \name Structure
    * Methods used when the variable is considered as a structure.
    */
   ///@{
-
-  /**
-   * \brief Return true if the variable is a structure which can have children.
-   */
-  bool IsStructure() const { return isStructure; }
-
   /**
    * \brief Return true if the variable is a structure and has the specified
    * child.
@@ -148,18 +231,6 @@ class GD_CORE_API Variable {
   bool RenameChild(const gd::String& oldName, const gd::String& newName);
 
   /**
-   * \brief Remove all the children.
-   *
-   * If the variable is not a structure, nothing is done.
-   */
-  void ClearChildren();
-
-  /**
-   * \brief Get the count of children that the variable has.
-   */
-  size_t GetChildrenCount() const { return children.size(); };
-
-  /**
    * \brief Get the names of all children
    */
   std::vector<gd::String> GetAllChildrenNames() const;
@@ -183,20 +254,52 @@ class GD_CORE_API Variable {
   void RemoveRecursively(const gd::Variable& variableToRemove);
   ///@}
 
+  /** \name Array
+   * Methods used when the variable is considered as an array.
+   */
+  ///@{
+
+  /**
+   * \brief Return the element with the specified index.
+   *
+   * If the variable does not have the specified index,
+   * the array will be filled up to that index with empty variables.
+   */
+  Variable& GetAtIndex(const size_t index);
+
+  /**
+   * \brief Return the element with the specified index.
+   *
+   * If the variable has not the specified child,
+   * an empty variable is returned.
+   */
+  const Variable& GetAtIndex(const size_t index) const;
+
+  /**
+   * \brief Appends a new variable at the end of the list and returns it.
+   */
+  Variable& PushNew();
+
+  /**
+   * \brief Remove the element with the specified index.
+   *
+   * And shifts all the next elements back by one.
+   */
+  void RemoveAtIndex(const size_t index);
+
+  /**
+   * \brief Get the vector containing all the children.
+   */
+  const std::vector<std::shared_ptr<Variable>>& GetAllChildrenArray() const {
+    return childrenArray;
+  }
+  ///@}
+  ///@}
+
   /** \name Serialization
    * Methods used when to load or save a variable to XML.
    */
   ///@{
-  /**
-   * Called to save the variable to a TiXmlElement.
-   */
-  void SaveToXml(TiXmlElement* element) const;
-
-  /**
-   * Called to load the variable from a TiXmlElement.
-   */
-  void LoadFromXml(const TiXmlElement* element);
-
   /**
    * \brief Serialize variable.
    */
@@ -209,14 +312,25 @@ class GD_CORE_API Variable {
   ///@}
 
  private:
-  mutable double value;
+  /**
+   * \brief Converts a Type to a string.
+   */
+  static gd::String TypeAsString(Type t);
+
+  /**
+   * \brief Converts a string to a Type.
+   */
+  static Type StringAsType(const gd::String& str);
+
+  mutable Type type;
   mutable gd::String str;
-  mutable bool isNumber;     ///< True if the type of the variable is a number.
-  mutable bool isStructure;  ///< False when the variable is a primitive ( i.e:
-                             ///< Number or String ), true when it is a
-                             ///< structure and has may have children.
+  mutable double value;
+  mutable bool boolVal;
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.
+  mutable std::vector<std::shared_ptr<Variable>>
+      childrenArray;  ///< Children, when the variable is considered as an
+                      ///< array.
 
   /**
    * Initialize children by copying them from another variable.  Used by

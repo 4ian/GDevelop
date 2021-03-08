@@ -115,13 +115,13 @@ export default class KeyboardShortcuts {
 
     if (onMove) {
       if (evt.which === UP_KEY) {
-        onMove(0, -1);
+        this._shiftPressed ? onMove(0, -5) : onMove(0, -1);
       } else if (evt.which === DOWN_KEY) {
-        onMove(0, 1);
+        this._shiftPressed ? onMove(0, 5) : onMove(0, 1);
       } else if (evt.which === LEFT_KEY) {
-        onMove(-1, 0);
+        this._shiftPressed ? onMove(-5, 0) : onMove(-1, 0);
       } else if (evt.which === RIGHT_KEY) {
-        onMove(1, 0);
+        this._shiftPressed ? onMove(5, 0) : onMove(1, 0);
       }
     }
     if (onDelete && (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY)) {

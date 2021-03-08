@@ -16,6 +16,8 @@ const styles = {
 
 type TreeTableRowProps = {|
   children: React.Node,
+  /* Allow to specify a different alignment than the default (centered). */
+  alignItems?: ?'flex-start',
 |};
 
 export const TreeTableRow = (props: TreeTableRowProps) => {
@@ -25,6 +27,7 @@ export const TreeTableRow = (props: TreeTableRowProps) => {
     <div
       style={{
         ...styles.row,
+        alignItems: props.alignItems,
         backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
       }}
     >

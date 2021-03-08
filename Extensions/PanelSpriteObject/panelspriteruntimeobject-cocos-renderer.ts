@@ -10,6 +10,8 @@ namespace gdjs {
     _leftSpriteShader: any;
     _bottomSpriteShader: any;
     _convertYPosition: any;
+    _textureWidth = 0;
+    _textureHeight = 0;
 
     constructor(runtimeObject, runtimeScene, textureName, tiled) {
       this._object = runtimeObject;
@@ -203,11 +205,12 @@ namespace gdjs {
 
     setTexture(textureName, runtimeScene): void {
       const obj = this._object;
-      const that = this;
       const texture = runtimeScene
         .getGame()
         .getImageManager()
         .getTexture(textureName);
+      this._textureWidth = texture.pixelsWidth;
+      this._textureHeight = texture.pixelsHeight;
 
       function makeInsideTexture(rect) {
         //TODO
@@ -386,6 +389,14 @@ namespace gdjs {
       this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
+    }
+
+    getTextureWidth() {
+      return this._textureWidth;
+    }
+
+    getTextureHeight() {
+      return this._textureHeight;
     }
   }
   // @ts-ignore - Register the class to let the engine use it.

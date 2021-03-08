@@ -136,8 +136,8 @@ class GD_API RuntimeObject {
    */
   virtual bool Draw(sf::RenderTarget& renderTarget) { return true; };
 
-  /** \name Object's variables
-   * Members functions providing access to the object's variables.
+  /** \name Object variables
+   * Members functions providing access to the object variables.
    */
   ///@{
 

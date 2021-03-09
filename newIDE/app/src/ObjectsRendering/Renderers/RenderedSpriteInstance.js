@@ -166,7 +166,7 @@ RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function() {
 RenderedSpriteInstance.prototype.update = function() {
   const animation = this._instance.getRawFloatProperty('animation');
   if (this._renderedAnimation !== animation) {
-    this.updatePIXITexture();
+    this.updatePIXITextureAndSprite();
   } else {
     this.updatePIXISprite();
   }

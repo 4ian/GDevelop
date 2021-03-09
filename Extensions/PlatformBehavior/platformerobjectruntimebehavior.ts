@@ -45,8 +45,13 @@ namespace gdjs {
     _downKey: boolean = false;
     _jumpKey: boolean = false;
     _jumpingFirstDelta:boolean = false;
-    _state: PlatformerObjectRuntimeBehavior.State =
-      PlatformerObjectRuntimeBehavior.State.Falling;
+
+    _state: PlatformerObjectRuntimeBehavior.State;
+    _falling: PlatformerObjectRuntimeBehavior.Falling;
+    _onFloor: PlatformerObjectRuntimeBehavior.OnFloor;
+    _jumping: PlatformerObjectRuntimeBehavior.Jumping;
+    _grabbingPlatform: PlatformerObjectRuntimeBehavior.GrabbingPlatform;
+    _onLadder: PlatformerObjectRuntimeBehavior.OnLadder;
 
     /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
     _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
@@ -92,6 +97,13 @@ namespace gdjs {
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
       this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
+
+      this._falling = new PlatformerObjectRuntimeBehavior.Falling(this);
+      this._onFloor = new PlatformerObjectRuntimeBehavior.OnFloor(this);
+      this._jumping = new PlatformerObjectRuntimeBehavior.Jumping(this);
+      this._grabbingPlatform = new PlatformerObjectRuntimeBehavior.GrabbingPlatform(this);
+      this._onLadder = new PlatformerObjectRuntimeBehavior.OnLadder(this);
+      this._state = this._falling;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -200,7 +212,7 @@ namespace gdjs {
           }
 
           //If on floor: try get up a bit to bypass not perfectly aligned floors.
-          if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
+          if (this._state == this._onFloor) {
             object.setY(object.getY() - 1);
             if (
               !this._isCollidingWith(
@@ -230,7 +242,7 @@ namespace gdjs {
     }
 
     setState(state: PlatformerObjectRuntimeBehavior.State) {
-      console.debug(`${PlatformerObjectRuntimeBehavior.getStateName(this._state)} --> ${PlatformerObjectRuntimeBehavior.getStateName(state)}`);
+      console.debug(`${this._state} --> ${state}`);
       this._state = state;
     }
 
@@ -258,8 +270,8 @@ namespace gdjs {
             ))
         ) {
           //Jumpthru = obstacle <=> Only if not already overlapped when going down
-          if (PlatformerObjectRuntimeBehavior.State.Jumping) {
-            this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
+          if (this._state == this._jumping) {
+            this.setState(this._falling);
           }
           this._currentJumpSpeed = 0;
           if (
@@ -285,16 +297,16 @@ namespace gdjs {
         this._floorPlatform = null;
         this._currentJumpSpeed = 0;
         this._currentFallSpeed = 0;
-        this.setState(PlatformerObjectRuntimeBehavior.State.OnLadder);
+        this.setState(this._onLadder);
       }
     }
 
     checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
-        if (this._state != PlatformerObjectRuntimeBehavior.State.Jumping) {
+        if (this._state != this._jumping) {
           this._jumpingFirstDelta = true;
         }
-        this.setState(PlatformerObjectRuntimeBehavior.State.Jumping);
+        this.setState(this._jumping);
         this._canJump = false;
         this._timeSinceCurrentJumpStart = 0;
         this._jumpKeyHeldSinceJumpStart = true;
@@ -343,7 +355,7 @@ namespace gdjs {
             true
           )
         ) {
-          this.setState(PlatformerObjectRuntimeBehavior.State.GrabbingPlatform);
+          this.setState(this._grabbingPlatform);
           this._grabbedPlatform = collidingPlatform;
           this._requestedDeltaY = 0;
         } else {
@@ -359,7 +371,7 @@ namespace gdjs {
       let oldY = object.getY();
       object.setY(object.getY() + 1);
       if (
-        this._state == PlatformerObjectRuntimeBehavior.State.OnFloor &&
+        this._state == this._onFloor &&
         gdjs.RuntimeObject.collisionTest(
           object,
           this._floorPlatform.owner,
@@ -392,12 +404,12 @@ namespace gdjs {
 
           //Ensure nothing is grabbed.
           this._releaseGrabbedPlatform();
-          this.setState(PlatformerObjectRuntimeBehavior.State.OnFloor);
-        } else if (this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform) {
+          this.setState(this._onFloor);
+        } else if (this._state != this._grabbingPlatform) {
           //In the air
           this._canJump = false;
-          if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
-            this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
+          if (this._state == this._onFloor) {
+            this.setState(this._falling);
             this._floorPlatform = null;
           }
         }
@@ -415,246 +427,6 @@ namespace gdjs {
         this._requestedDeltaY,
         this._maxFallingSpeed * timeDelta
       );
-    }
-
-    beforeUpdatingObstacles() {
-      const object = this.owner;
-      //Stick the object to the floor if its height has changed.
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.OnFloor &&
-        this._oldHeight !== object.getHeight()
-      ) {
-        object.setY(
-          this._floorLastY -
-            object.getHeight() +
-            (object.getY() - object.getDrawableY()) -
-            1
-        );
-      }
-      this._oldHeight = object.getHeight();
-    }
-
-    checkTransitionBeforeX() {
-      //Check that the floor object still exists and is near the object.
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.OnFloor &&
-        !this._isIn(
-          this._potentialCollidingObjects,
-          this._floorPlatform.owner.id
-        )
-      ) {
-        this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
-        this._floorPlatform = null;
-      }
-
-      //Check that the grabbed platform object still exists and is near the object.
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
-        !this._isIn(
-          this._potentialCollidingObjects,
-          this._grabbedPlatform.owner.id
-        )
-      ) {
-        this._releaseGrabbedPlatform();
-      }
-    }
-
-    beforeMovingX() {
-      //Shift the object according to the floor movement.
-      if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
-        this._requestedDeltaX += this._floorPlatform.owner.getX() - this._floorLastX;
-        this._requestedDeltaY += this._floorPlatform.owner.getY() - this._floorLastY;
-      }
-
-      //Shift the object according to the grabbed platform movement.
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
-      ) {
-        // This erases any other movement
-        this._requestedDeltaX =
-          this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
-        this._requestedDeltaY =
-          this._grabbedPlatform.owner.getY() - this._grabbedPlatformLastY;
-      }
-    }
-
-    checkTransitionBeforeY(timeDelta: float) {
-      //Go on a ladder
-      this.checkTransitionOnLadder();
-      if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
-        //Coming to an extremity of a ladder
-        if (!this._isOverlappingLadder()) {
-          this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
-        }
-      }
-
-      if (this._releaseKey) {
-        this._releaseGrabbedPlatform();
-      }
-
-      //Jumping
-      this.checkTransitionJumping();
-
-      //Grabbing a platform
-      if (
-        this._canGrabPlatforms &&
-        this._requestedDeltaX !== 0 &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
-        (this._state != PlatformerObjectRuntimeBehavior.State.Jumping || this._lastDeltaY >= 0)
-      ) {
-        this.checkGrabPlatform();
-      }
-    }
-
-    beforeMovingY(timeDelta: float, oldX: float) {
-      const object = this.owner;
-      
-      //Fall
-      if (
-        !this._jumpingFirstDelta &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnFloor &&
-        this._state != PlatformerObjectRuntimeBehavior.State.OnLadder &&
-        this._state != PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
-      ) {
-        this.fall(timeDelta);
-      }
-      
-      if (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform &&
-        !this._releaseKey
-      ) {
-        this._canJump = true;
-        this._currentJumpSpeed = 0;
-        this._currentFallSpeed = 0;
-        this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
-        this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
-      }
-
-      if (this._state == PlatformerObjectRuntimeBehavior.State.OnLadder) {
-        if (this._upKey) {
-          this._requestedDeltaY -= this._ladderClimbingSpeed * timeDelta;
-        }
-        if (this._downKey) {
-          this._requestedDeltaY += this._ladderClimbingSpeed * timeDelta;
-        }
-      }
-
-      // Check if the jump key is continuously held since
-      // the beginning of the jump.
-      if (!this._jumpKey) {
-        this._jumpKeyHeldSinceJumpStart = false;
-      }
-      if (this._state == PlatformerObjectRuntimeBehavior.State.Jumping) {
-        this._timeSinceCurrentJumpStart += timeDelta;
-        this._requestedDeltaY -= this._currentJumpSpeed * timeDelta;
-
-        // Decrease jump speed after the (optional) jump sustain time is over.
-        const sustainJumpSpeed =
-          this._jumpKeyHeldSinceJumpStart &&
-          this._timeSinceCurrentJumpStart < this._jumpSustainTime;
-        if (!sustainJumpSpeed) {
-          this._currentJumpSpeed -= this._gravity * timeDelta;
-        }
-        if (this._currentJumpSpeed < 0) {
-          this._currentJumpSpeed = 0;
-          this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
-        }
-      }
-
-      //Follow the floor
-      if (this._state == PlatformerObjectRuntimeBehavior.State.OnFloor) {
-        if (
-          gdjs.RuntimeObject.collisionTest(
-            object,
-            this._floorPlatform.owner,
-            this._ignoreTouchingEdges
-          )
-        ) {
-          //Floor is getting up, as the object is colliding with it.
-          let oldY = object.getY();
-          let step = 0;
-          let stillInFloor = false;
-          do {
-            if (
-              step >=
-              Math.floor(Math.abs(this._requestedDeltaX * this._slopeClimbingFactor))
-            ) {
-              //Slope is too step ( > 50% )
-              object.setY(
-                object.getY() -
-                  (Math.abs(this._requestedDeltaX * this._slopeClimbingFactor) - step)
-              );
-
-              //Try to add the decimal part.
-              if (
-                gdjs.RuntimeObject.collisionTest(
-                  object,
-                  this._floorPlatform.owner,
-                  this._ignoreTouchingEdges
-                )
-              ) {
-                stillInFloor = true;
-              }
-
-              //Too steep.
-              break;
-            }
-
-            //Try to get out of the floor.
-            object.setY(object.getY() - 1);
-            step++;
-          } while (
-            gdjs.RuntimeObject.collisionTest(
-              object,
-              this._floorPlatform.owner,
-              this._ignoreTouchingEdges
-            )
-          );
-          if (stillInFloor) {
-            object.setY(
-              //Unable to follow the floor ( too steep ): Go back to the original position.
-              oldY
-            );
-            object.setX(
-              //And also revert the shift on X axis.
-              oldX
-            );
-          }
-        } else {
-          //Floor is flat or get down.
-          let oldY = object.getY();
-          const tentativeStartY = object.getY() + 1;
-          object.setY(
-            this._roundCoordinates
-              ? Math.round(tentativeStartY)
-              : tentativeStartY
-          );
-          let step = 0;
-          let noMoreOnFloor = false;
-          while (!this._isCollidingWith(this._potentialCollidingObjects)) {
-            if (step > Math.abs(this._requestedDeltaX * this._slopeClimbingFactor)) {
-              //Slope is too step ( > 50% )
-              noMoreOnFloor = true;
-              break;
-            }
-
-            //Object was on floor, but no more: Maybe a slope, try to follow it.
-            object.setY(object.getY() + 1);
-            step++;
-          }
-
-          //Unable to follow the floor: Go back to the original position. Fall will be triggered next tick.
-          if (noMoreOnFloor) {
-            object.setY(oldY);
-          } else {
-            object.setY(
-              //Floor touched: Go back 1 pixel over.
-              object.getY() - 1
-            );
-          }
-        }
-      }
     }
 
     doStepPreEvents(runtimeScene) {
@@ -707,7 +479,8 @@ namespace gdjs {
       this._requestedDeltaX += this.updateSpeed(timeDelta);
 
       //0.2) Track changes in object size
-      this.beforeUpdatingObstacles();
+      this._state.beforeUpdatingObstacles();
+      this._oldHeight = object.getHeight();
 
       //0.3) Update list of platforms around/related to the object
 
@@ -717,10 +490,10 @@ namespace gdjs {
       );
       this._updateOverlappedJumpThru();
 
-      this.checkTransitionBeforeX();
+      this._state.checkTransitionBeforeX();
 
       //1) X axis:
-      this.beforeMovingX();
+      this._state.beforeMovingX();
 
       //Ensure the object is not stuck
       if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
@@ -734,18 +507,18 @@ namespace gdjs {
       //Collided with a wall
 
       //2) Y axis:
-      this.checkTransitionBeforeY(timeDelta);
+      this._state.checkTransitionBeforeY(timeDelta);
 
       //object.setY(object.getY()-1); //Useless and dangerous
 
-      this.beforeMovingY(timeDelta, oldX);
+      this._state.beforeMovingY(timeDelta, oldX);
 
       const oldY = object.getY();
       this.moveY();
 
       //3) Update the current floor data for the next tick:
       this._updateOverlappedJumpThru();
-      if (this._state != PlatformerObjectRuntimeBehavior.State.OnLadder) {
+      if (this._state != this._onLadder) {
         this.checkTransitionOnFloorOrFalling();
       }
 
@@ -799,9 +572,9 @@ namespace gdjs {
      */
     _releaseGrabbedPlatform() {
       if (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
+        this._state == this._grabbingPlatform
       ) {
-        this.setState(PlatformerObjectRuntimeBehavior.State.Falling);
+        this.setState(this._falling);
       }
 
       //Ensure nothing is grabbed.
@@ -961,7 +734,7 @@ namespace gdjs {
      * Return true if the object is overlapping a ladder.
      * Note: _updatePotentialCollidingObjects must have been called before.
      */
-    private _isOverlappingLadder() {
+    _isOverlappingLadder() { //FIXME put back private
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
         if (
@@ -1303,7 +1076,7 @@ namespace gdjs {
      * @returns Returns true if on the floor and false if not.
      */
     isOnFloor(): boolean {
-      return this._state == PlatformerObjectRuntimeBehavior.State.OnFloor;
+      return this._state == this._onFloor;
     }
 
     /**
@@ -1311,7 +1084,7 @@ namespace gdjs {
      * @returns Returns true if on a ladder and false if not.
      */
     isOnLadder(): boolean {
-      return this._state == PlatformerObjectRuntimeBehavior.State.OnLadder;
+      return this._state == this._onLadder;
     }
 
     /**
@@ -1319,7 +1092,7 @@ namespace gdjs {
      * @returns Returns true if jumping and false if not.
      */
     isJumping(): boolean {
-      return this._state == PlatformerObjectRuntimeBehavior.State.Jumping;
+      return this._state == this._jumping;
     }
 
     /**
@@ -1327,9 +1100,7 @@ namespace gdjs {
      * @returns Returns true if a platform is grabbed and false if not.
      */
     isGrabbingPlatform(): boolean {
-      return (
-        this._state == PlatformerObjectRuntimeBehavior.State.GrabbingPlatform
-      );
+      return this._state == this._grabbingPlatform;
     }
 
     /**
@@ -1337,7 +1108,7 @@ namespace gdjs {
      * @returns Returns true if it is falling and false if not.
      */
     isFalling(): boolean {
-      return this._state == PlatformerObjectRuntimeBehavior.State.Falling;
+      return this._state == this._falling;
     }
 
     /**
@@ -1354,17 +1125,385 @@ namespace gdjs {
   }
 
   export namespace PlatformerObjectRuntimeBehavior {
-    export const enum State {
-      Falling = 0,
-      OnFloor,
-      Jumping,
-      OnLadder,
-      GrabbingPlatform,
+    export interface State {
+      beforeUpdatingObstacles(): void;
+      checkTransitionBeforeX(): void;
+      beforeMovingX(): void;
+      checkTransitionBeforeY(timeDelta: float): void;
+      beforeMovingY(timeDelta: float, oldX: float): void;
     }
 
-    const stateNames = ["Falling", "OnFloor", "Jumping", "OnLadder", "GrabbingPlatform"];
-    export function getStateName(state: PlatformerObjectRuntimeBehavior.State): String {
-      return stateNames[state];
+    export class OnFloor implements State {
+      _behavior : PlatformerObjectRuntimeBehavior;
+
+      constructor(behavior: PlatformerObjectRuntimeBehavior) {
+        this._behavior = behavior;
+      }
+
+      beforeUpdatingObstacles() {
+        const object = this._behavior.owner;
+        //Stick the object to the floor if its height has changed.
+        if (
+          this._behavior._oldHeight !== object.getHeight()
+        ) {
+          object.setY(
+            this._behavior._floorLastY -
+              object.getHeight() +
+              (object.getY() - object.getDrawableY()) -
+              1
+          );
+        }
+      }
+  
+      checkTransitionBeforeX() {
+        //Check that the floor object still exists and is near the object.
+        if (
+          !this._behavior._isIn(
+            this._behavior._potentialCollidingObjects,
+            this._behavior._floorPlatform.owner.id
+          )
+        ) {
+          this._behavior.setState(this._behavior._falling);
+          this._behavior._floorPlatform = null;
+        }
+      }
+  
+      beforeMovingX() {
+        //Shift the object according to the floor movement.
+        this._behavior._requestedDeltaX += this._behavior._floorPlatform.owner.getX() - this._behavior._floorLastX;
+        this._behavior._requestedDeltaY += this._behavior._floorPlatform.owner.getY() - this._behavior._floorLastY;
+      }
+  
+      checkTransitionBeforeY(timeDelta: float) {
+        //Go on a ladder
+        this._behavior.checkTransitionOnLadder();
+        //Jumping
+        this._behavior.checkTransitionJumping();
+      }
+  
+      beforeMovingY(timeDelta: float, oldX: float) {
+        const object = this._behavior.owner;
+        
+        //Follow the floor
+        if (
+          gdjs.RuntimeObject.collisionTest(
+            object,
+            this._behavior._floorPlatform.owner,
+            this._behavior._ignoreTouchingEdges
+          )
+        ) {
+          //Floor is getting up, as the object is colliding with it.
+          let oldY = object.getY();
+          let step = 0;
+          let stillInFloor = false;
+          do {
+            if (
+              step >=
+              Math.floor(Math.abs(this._behavior._requestedDeltaX * this._behavior._slopeClimbingFactor))
+            ) {
+              //Slope is too step ( > 50% )
+              object.setY(
+                object.getY() -
+                  (Math.abs(this._behavior._requestedDeltaX * this._behavior._slopeClimbingFactor) - step)
+              );
+
+              //Try to add the decimal part.
+              if (
+                gdjs.RuntimeObject.collisionTest(
+                  object,
+                  this._behavior._floorPlatform.owner,
+                  this._behavior._ignoreTouchingEdges
+                )
+              ) {
+                stillInFloor = true;
+              }
+
+              //Too steep.
+              break;
+            }
+
+            //Try to get out of the floor.
+            object.setY(object.getY() - 1);
+            step++;
+          } while (
+            gdjs.RuntimeObject.collisionTest(
+              object,
+              this._behavior._floorPlatform.owner,
+              this._behavior._ignoreTouchingEdges
+            )
+          );
+          if (stillInFloor) {
+            object.setY(
+              //Unable to follow the floor ( too steep ): Go back to the original position.
+              oldY
+            );
+            object.setX(
+              //And also revert the shift on X axis.
+              oldX
+            );
+          }
+        } else {
+          //Floor is flat or get down.
+          let oldY = object.getY();
+          const tentativeStartY = object.getY() + 1;
+          object.setY(
+            this._behavior._roundCoordinates
+              ? Math.round(tentativeStartY)
+              : tentativeStartY
+          );
+          let step = 0;
+          let noMoreOnFloor = false;
+          while (!this._behavior._isCollidingWith(this._behavior._potentialCollidingObjects)) {
+            if (step > Math.abs(this._behavior._requestedDeltaX * this._behavior._slopeClimbingFactor)) {
+              //Slope is too step ( > 50% )
+              noMoreOnFloor = true;
+              break;
+            }
+
+            //Object was on floor, but no more: Maybe a slope, try to follow it.
+            object.setY(object.getY() + 1);
+            step++;
+          }
+
+          //Unable to follow the floor: Go back to the original position. Fall will be triggered next tick.
+          if (noMoreOnFloor) {
+            object.setY(oldY);
+          } else {
+            object.setY(
+              //Floor touched: Go back 1 pixel over.
+              object.getY() - 1
+            );
+          }
+        }
+      }
+
+      toString(): String {
+        return "OnFloor";
+      }
+    }
+
+    export class Falling implements State {
+      _behavior : PlatformerObjectRuntimeBehavior;
+
+      constructor(behavior: PlatformerObjectRuntimeBehavior) {
+        this._behavior = behavior;
+      }
+
+      beforeUpdatingObstacles() {
+      }
+  
+      checkTransitionBeforeX() {
+      }
+  
+      beforeMovingX() {
+      }
+  
+      checkTransitionBeforeY(timeDelta: float) {
+        //Go on a ladder
+        this._behavior.checkTransitionOnLadder();
+        //Jumping
+        this._behavior.checkTransitionJumping();
+  
+        //Grabbing a platform
+        if (
+          this._behavior._canGrabPlatforms &&
+          this._behavior._requestedDeltaX !== 0
+        ) {
+          this._behavior.checkGrabPlatform();
+        }
+      }
+  
+      beforeMovingY(timeDelta: float, oldX: float) {
+        const object = this._behavior.owner;
+        
+        //Fall
+        this._behavior.fall(timeDelta);
+      }
+
+      toString(): String {
+        return "Falling";
+      }
+    }
+
+    export class Jumping implements State {
+      _behavior : PlatformerObjectRuntimeBehavior;
+
+      constructor(behavior: PlatformerObjectRuntimeBehavior) {
+        this._behavior = behavior;
+      }
+
+      beforeUpdatingObstacles() {
+      }
+  
+      checkTransitionBeforeX() {
+      }
+  
+      beforeMovingX() {
+      }
+  
+      checkTransitionBeforeY(timeDelta: float) {
+        //Go on a ladder
+        this._behavior.checkTransitionOnLadder();
+        //Jumping
+        this._behavior.checkTransitionJumping();
+
+        //Grabbing a platform
+        if (
+          this._behavior._canGrabPlatforms &&
+          this._behavior._requestedDeltaX !== 0 &&
+          this._behavior._lastDeltaY >= 0
+        ) {
+          this._behavior.checkGrabPlatform();
+        }
+      }
+  
+      beforeMovingY(timeDelta: float, oldX: float) {
+        const object = this._behavior.owner;
+        
+        //Fall
+        if (
+          !this._behavior._jumpingFirstDelta
+        ) {
+          this._behavior.fall(timeDelta);
+        }
+        
+        // Check if the jump key is continuously held since
+        // the beginning of the jump.
+        if (!this._behavior._jumpKey) {
+          this._behavior._jumpKeyHeldSinceJumpStart = false;
+        }
+        this._behavior._timeSinceCurrentJumpStart += timeDelta;
+        this._behavior._requestedDeltaY -= this._behavior._currentJumpSpeed * timeDelta;
+
+        // Decrease jump speed after the (optional) jump sustain time is over.
+        const sustainJumpSpeed =
+          this._behavior._jumpKeyHeldSinceJumpStart &&
+          this._behavior._timeSinceCurrentJumpStart < this._behavior._jumpSustainTime;
+        if (!sustainJumpSpeed) {
+          this._behavior._currentJumpSpeed -= this._behavior._gravity * timeDelta;
+        }
+        if (this._behavior._currentJumpSpeed < 0) {
+          this._behavior._currentJumpSpeed = 0;
+          this._behavior.setState(this._behavior._falling);
+        }
+      }
+
+      toString(): String {
+        return "Jumping";
+      }
+    }
+
+    export class GrabbingPlatform implements State {
+      _behavior : PlatformerObjectRuntimeBehavior;
+
+      constructor(behavior: PlatformerObjectRuntimeBehavior) {
+        this._behavior = behavior;
+      }
+
+      beforeUpdatingObstacles() {
+      }
+  
+      checkTransitionBeforeX() {
+        //Check that the grabbed platform object still exists and is near the object.
+        if (
+          !this._behavior._isIn(
+            this._behavior._potentialCollidingObjects,
+            this._behavior._grabbedPlatform.owner.id
+          )
+        ) {
+          this._behavior._releaseGrabbedPlatform();
+        }
+      }
+  
+      beforeMovingX() {
+        //Shift the object according to the grabbed platform movement.
+          // this._behavior erases any other movement
+        this._behavior._requestedDeltaX =
+          this._behavior._grabbedPlatform.owner.getX() - this._behavior._grabbedPlatformLastX;
+        this._behavior._requestedDeltaY =
+          this._behavior._grabbedPlatform.owner.getY() - this._behavior._grabbedPlatformLastY;
+      }
+  
+      checkTransitionBeforeY(timeDelta: float) {
+        //Go on a ladder
+        this._behavior.checkTransitionOnLadder();
+
+        if (this._behavior._releaseKey) {
+          this._behavior._releaseGrabbedPlatform();
+        }
+  
+        //Jumping
+        this._behavior.checkTransitionJumping();
+  
+        //Grabbing a platform
+        if (
+          this._behavior._canGrabPlatforms &&
+          this._behavior._requestedDeltaX !== 0
+        ) {
+          //TODO useless?
+          this._behavior.checkGrabPlatform();
+        }
+      }
+  
+      beforeMovingY(timeDelta: float, oldX: float) {
+        const object = this._behavior.owner;
+        //TODO useless condition?
+        if (
+          !this._behavior._releaseKey
+        ) {
+          this._behavior._canJump = true;
+          this._behavior._currentJumpSpeed = 0;
+          this._behavior._currentFallSpeed = 0;
+          this._behavior._grabbedPlatformLastX = this._behavior._grabbedPlatform.owner.getX();
+          this._behavior._grabbedPlatformLastY = this._behavior._grabbedPlatform.owner.getY();
+        }
+      }
+
+      toString(): String {
+        return "GrabbingPlatform";
+      }
+    }
+
+    export class OnLadder implements State {
+      _behavior : PlatformerObjectRuntimeBehavior;
+
+      constructor(behavior: PlatformerObjectRuntimeBehavior) {
+        this._behavior = behavior;
+      }
+
+      beforeUpdatingObstacles() {
+      }
+  
+      checkTransitionBeforeX() {
+      }
+  
+      beforeMovingX() {
+      }
+  
+      checkTransitionBeforeY(timeDelta: float) {
+        //Coming to an extremity of a ladder
+        if (!this._behavior._isOverlappingLadder()) {
+          this._behavior.setState(this._behavior._falling);
+        }
+  
+        //Jumping
+        this._behavior.checkTransitionJumping();
+      }
+  
+      beforeMovingY(timeDelta: float, oldX: float) {
+        const object = this._behavior.owner;
+        
+        if (this._behavior._upKey) {
+          this._behavior._requestedDeltaY -= this._behavior._ladderClimbingSpeed * timeDelta;
+        }
+        if (this._behavior._downKey) {
+          this._behavior._requestedDeltaY += this._behavior._ladderClimbingSpeed * timeDelta;
+        }
+      }
+
+      toString(): String {
+        return "OnLadder";
+      }
     }
   }
 

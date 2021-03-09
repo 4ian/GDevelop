@@ -23,6 +23,7 @@ type Props = {|
     },
   }) => void,
   type?: 'text' | 'number',
+  calculValue?: boolean,
 
   // Some TextField props that can be reused:
   onClick?: () => void,
@@ -95,6 +96,7 @@ export default class SemiControlledTextField extends React.Component<
       onFocus,
       onBlur,
       type,
+      calculValue,
       ...otherProps
     } = this.props;
 
@@ -122,12 +124,13 @@ export default class SemiControlledTextField extends React.Component<
         }}
         onBlur={event => {
           let value = event.currentTarget.value;
+          if (this.props.calculValue) {
+            const rex = /(^\d).*[-+*()/.,].*(\d+$)|(^\d+$)|^((\d)|[-+*()/.,]).((\d)|[-+*()/.,])+$/gm;
+            const regexData = value.match(rex);
 
-          const rex = /(^\d).*[-+*()/.,].*(\d+$)|(^\d+$)|^((\d)|[-+*()/.,]).((\d)|[-+*()/.,])+$/gm;
-          const isCalculable = value.match(rex);
-
-          if (isCalculable) {
-            value = eval(isCalculable[0]);
+            if (regexData) {
+              value = eval(regexData[0]);
+            }
           }
 
           onChange(value);

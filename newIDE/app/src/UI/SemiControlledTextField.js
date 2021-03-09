@@ -121,7 +121,16 @@ export default class SemiControlledTextField extends React.Component<
           if (!commitOnBlur) onChange(newValue);
         }}
         onBlur={event => {
-          onChange(event.currentTarget.value);
+          let value = event.currentTarget.value;
+
+          const rex = /(^\d).*[-+*()/.,].*(\d+$)|(^\d+$)|^((\d)|[-+*()/.,]).((\d)|[-+*()/.,])+$/gm;
+          const isCalculable = value.match(rex);
+
+          if (isCalculable) {
+            value = eval(isCalculable[0]);
+          }
+
+          onChange(value);
           this.setState({
             focused: false,
             text: null,

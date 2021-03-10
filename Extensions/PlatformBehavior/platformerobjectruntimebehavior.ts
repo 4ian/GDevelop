@@ -204,7 +204,7 @@ namespace gdjs {
           }
 
           //If on floor: try get up a bit to bypass not perfectly aligned floors.
-          if (this._state == this._onFloor) {
+          if (this._state === this._onFloor) {
             object.setY(object.getY() - 1);
             if (
               !this._isCollidingWith(
@@ -293,7 +293,7 @@ namespace gdjs {
             ))
         ) {
           //Jumpthru = obstacle <=> Only if not already overlapped when going down
-          if (this._state == this._jumping) {
+          if (this._state === this._jumping) {
             this._setFalling();
           }
           if (
@@ -378,7 +378,7 @@ namespace gdjs {
       let oldY = object.getY();
       object.setY(object.getY() + 1);
       if (
-        this._state == this._onFloor &&
+        this._state === this._onFloor &&
         gdjs.RuntimeObject.collisionTest(
           object,
           this._onFloor.getFloorPlatform()!.owner,
@@ -398,7 +398,7 @@ namespace gdjs {
         if (canLand && collidingPlatform !== null) {
           //Register the colliding platform as the floor.
           this._setOnFloor(collidingPlatform);
-        } else if (this._state == this._onFloor) {
+        } else if (this._state === this._onFloor) {
           // don't fall if GrabbingPlatform or OnLadder
           this._setFalling();
         }
@@ -437,7 +437,6 @@ namespace gdjs {
       this._leftKey ||
         (this._leftKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
-      // @ts-ignore
       this._rightKey ||
         (this._rightKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(RIGHTKEY));
@@ -501,7 +500,7 @@ namespace gdjs {
       //3) Update the current floor data for the next tick:
       this._updateOverlappedJumpThru();
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
-      if (this._state != this._onLadder) {
+      if (this._state !== this._onLadder) {
         this.checkTransitionOnFloorOrFalling();
       }
 
@@ -551,7 +550,7 @@ namespace gdjs {
      * Mark the platformer object has not being grabbing any platform.
      */
     _releaseGrabbedPlatform() {
-      if (this._state == this._grabbingPlatform) {
+      if (this._state === this._grabbingPlatform) {
         this._setFalling();
       }
     }
@@ -1052,7 +1051,7 @@ namespace gdjs {
      * @returns Returns true if on the floor and false if not.
      */
     isOnFloor(): boolean {
-      return this._state == this._onFloor;
+      return this._state === this._onFloor;
     }
 
     /**
@@ -1060,7 +1059,7 @@ namespace gdjs {
      * @returns Returns true if on a ladder and false if not.
      */
     isOnLadder(): boolean {
-      return this._state == this._onLadder;
+      return this._state === this._onLadder;
     }
 
     /**
@@ -1068,7 +1067,7 @@ namespace gdjs {
      * @returns Returns true if jumping and false if not.
      */
     isJumping(): boolean {
-      return this._state == this._jumping;
+      return this._state === this._jumping;
     }
 
     /**
@@ -1076,7 +1075,7 @@ namespace gdjs {
      * @returns Returns true if a platform is grabbed and false if not.
      */
     isGrabbingPlatform(): boolean {
-      return this._state == this._grabbingPlatform;
+      return this._state === this._grabbingPlatform;
     }
 
     /**
@@ -1084,7 +1083,7 @@ namespace gdjs {
      * @returns Returns true if it is falling and false if not.
      */
     isFalling(): boolean {
-      return this._state == this._falling;
+      return this._state === this._falling;
     }
 
     /**
@@ -1396,14 +1395,11 @@ namespace gdjs {
         this._timeSinceCurrentJumpStart = 0;
         this._jumpKeyHeldSinceJumpStart = true;
 
-        if (from != behavior._jumping && from != behavior._falling) {
+        if (from !== behavior._jumping && from !== behavior._falling) {
           this._jumpingFirstDelta = true;
         }
 
         behavior._canJump = false;
-
-        //FIXME can't be Jumping and OnFloor at the same time, need a fix and a test
-        //this._isOnFloor = false; If floor is a very steep slope, the object could go into it.
         this._currentJumpSpeed = behavior._jumpSpeed;
         behavior._currentFallSpeed = 0;
       }
@@ -1510,7 +1506,7 @@ namespace gdjs {
       beforeMovingX() {
         const behavior = this._behavior;
         //Shift the object according to the grabbed platform movement.
-        // this._behavior erases any other movement
+        // this erases any other movement
         behavior._requestedDeltaX =
           this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
         behavior._requestedDeltaY =

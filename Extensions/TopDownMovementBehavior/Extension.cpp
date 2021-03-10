@@ -126,6 +126,22 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
+  aut.AddAction("SimulateStick",
+                _("Simulate stick control"),
+                _("Simulate a stick control."),
+                _("Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force"),
+                _("Controls"),
+                "res/conditions/keyboard24.png",
+                "res/conditions/keyboard.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .AddParameter("expression", _("Stick rotation"))
+      .AddParameter("expression", _("Stick force"))
+      .MarkAsAdvanced()
+      .SetFunctionName("SimulateStick")
+      .SetIncludeFile(
+          "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
   aut.AddCondition("IsMoving",
                    _("Is moving"),
                    _("Check if the object is moving."),

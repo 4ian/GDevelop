@@ -17,34 +17,28 @@ namespace gdjs {
     // platform hitbox left edge is also at X position 10).
     // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
     _ignoreTouchingEdges: boolean = true;
-    _roundCoordinates: any;
-    _gravity: any;
-    _maxFallingSpeed: any;
-    _ladderClimbingSpeed: any;
-    _acceleration: any;
-    _deceleration: any;
-    _maxSpeed: any;
-    _jumpSpeed: any;
-    _canGrabPlatforms: any;
+    _roundCoordinates: boolean;
+    _gravity: float;
+    _maxFallingSpeed: float;
+    _ladderClimbingSpeed: float;
+    _acceleration: float;
+    _deceleration: float;
+    _maxSpeed: float;
+    _jumpSpeed: float;
+    _canGrabPlatforms: boolean;
     _yGrabOffset: any;
     _xGrabTolerance: any;
     _jumpSustainTime: float;
-    _floorPlatform: any = null;
-    _currentFallSpeed: number = 0;
-    _currentSpeed: number = 0;
-    _currentJumpSpeed: number = 0;
-    _timeSinceCurrentJumpStart: number = 0;
-    _jumpKeyHeldSinceJumpStart: boolean = false;
+    _currentFallSpeed: float = 0;
+    _currentSpeed: float = 0;
     _canJump: boolean = false;
-    _grabbedPlatform: any = null;
-    _ignoreDefaultControls: any;
+    _ignoreDefaultControls: boolean;
     _leftKey: boolean = false;
     _rightKey: boolean = false;
     _ladderKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
-    _jumpingFirstDelta:boolean = false;
 
     _state: PlatformerObjectRuntimeBehavior.State;
     _falling: PlatformerObjectRuntimeBehavior.Falling;
@@ -59,18 +53,12 @@ namespace gdjs {
     /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
     _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
 
-    _oldHeight: float = 0;
-
     _hasReallyMoved: boolean = false;
-    _manager: any;
-    _grabbedPlatformLastX: any;
-    _grabbedPlatformLastY: any;
+    _manager: gdjs.PlatformObjectsManager;
 
-    _floorLastX: any;
-    _floorLastY: any;
-    _releaseKey: any;
+    _releaseKey: boolean = false;
     _slopeMaxAngle: float;
-    _slopeClimbingFactor: any;
+    _slopeClimbingFactor: float = 1;
 
     _requestedDeltaX: float = 0;
     _requestedDeltaY: float = 0;
@@ -186,7 +174,7 @@ namespace gdjs {
       const oldX = object.getX();
       if (this._requestedDeltaX !== 0) {
         const floorPlatformId =
-          this._floorPlatform !== null ? this._floorPlatform.owner.id : null;
+          this._onFloor._floorPlatform !== null ? this._onFloor._floorPlatform.owner.id : null;
         object.setX(object.getX() + this._requestedDeltaX);
         let tryRounding = true;
 
@@ -243,7 +231,10 @@ namespace gdjs {
 
     setState(state: PlatformerObjectRuntimeBehavior.State) {
       console.debug(`${this._state} --> ${state}`);
+      this._state.leave();
+      const from = this._state;
       this._state = state;
+      this._state.enter(from);
     }
 
     moveY() {
@@ -273,7 +264,6 @@ namespace gdjs {
           if (this._state == this._jumping) {
             this.setState(this._falling);
           }
-          this._currentJumpSpeed = 0;
           if (
             (this._requestedDeltaY > 0 && object.getY() <= oldY) ||
             (this._requestedDeltaY < 0 && object.getY() >= oldY)
@@ -294,8 +284,6 @@ namespace gdjs {
     checkTransitionOnLadder() {
       if (this._ladderKey && this._isOverlappingLadder()) {
         this._canJump = true;
-        this._floorPlatform = null;
-        this._currentJumpSpeed = 0;
         this._currentFallSpeed = 0;
         this.setState(this._onLadder);
       }
@@ -303,18 +291,7 @@ namespace gdjs {
 
     checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
-        if (this._state != this._jumping) {
-          this._jumpingFirstDelta = true;
-        }
         this.setState(this._jumping);
-        this._canJump = false;
-        this._timeSinceCurrentJumpStart = 0;
-        this._jumpKeyHeldSinceJumpStart = true;
-
-        //FIXME can't be Jumping and OnFloor at the same time, need a fix and a test
-        //this._isOnFloor = false; If floor is a very steep slope, the object could go into it.
-        this._currentJumpSpeed = this._jumpSpeed;
-        this._currentFallSpeed = 0;
       }
     }
 
@@ -356,7 +333,7 @@ namespace gdjs {
           )
         ) {
           this.setState(this._grabbingPlatform);
-          this._grabbedPlatform = collidingPlatform;
+          this._grabbingPlatform.setGrabbedPlatform(collidingPlatform);
           this._requestedDeltaY = 0;
         } else {
           object.setY(oldY);
@@ -374,13 +351,12 @@ namespace gdjs {
         this._state == this._onFloor &&
         gdjs.RuntimeObject.collisionTest(
           object,
-          this._floorPlatform.owner,
+          this._onFloor._floorPlatform!.owner,
           this._ignoreTouchingEdges
         )
       ) {
         //Still on the same floor
-        this._floorLastX = this._floorPlatform.owner.getX();
-        this._floorLastY = this._floorPlatform.owner.getY();
+        this._onFloor.updateFloorPosition();
 
         //Ensure nothing is grabbed.
         this._releaseGrabbedPlatform();
@@ -394,23 +370,20 @@ namespace gdjs {
         let collidingPlatform = this._getCollidingPlatform();
         if (canLand && collidingPlatform !== null) {
           this._canJump = true;
-          this._currentJumpSpeed = 0;
           this._currentFallSpeed = 0;
-
-          //Register the colliding platform as the floor.
-          this._floorPlatform = collidingPlatform;
-          this._floorLastX = this._floorPlatform.owner.getX();
-          this._floorLastY = this._floorPlatform.owner.getY();
 
           //Ensure nothing is grabbed.
           this._releaseGrabbedPlatform();
           this.setState(this._onFloor);
+          
+          //Register the colliding platform as the floor.
+          this._onFloor._floorPlatform = collidingPlatform;
+          this._onFloor.updateFloorPosition();
         } else if (this._state != this._grabbingPlatform) {
           //In the air
           this._canJump = false;
           if (this._state == this._onFloor) {
             this.setState(this._falling);
-            this._floorPlatform = null;
           }
         }
       }
@@ -439,8 +412,6 @@ namespace gdjs {
       const SPACEKEY = 32;
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
-
-      this._jumpingFirstDelta = false;
 
       //0.1) Get the player input:
       this._requestedDeltaX = 0;
@@ -494,6 +465,7 @@ namespace gdjs {
 
       //1) X axis:
       this._state.beforeMovingX();
+      this._onFloor._oldHeight = object.getHeight();
 
       //Ensure the object is not stuck
       if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
@@ -555,8 +527,6 @@ namespace gdjs {
      * @param y The value in pixels on Y axis the object wants to move to
      */
     _canGrab(platform) {
-      console.debug("this._lastDeltaY: " + this._lastDeltaY);
-      console.debug("this._requestedDeltaY: " + this._requestedDeltaY);
       const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
       const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
@@ -578,7 +548,7 @@ namespace gdjs {
       }
 
       //Ensure nothing is grabbed.
-      this._grabbedPlatform = null;
+      this._grabbingPlatform.setGrabbedPlatform(null);
     }
 
     /**
@@ -812,7 +782,7 @@ namespace gdjs {
      * Get the gravity of the Platformer Object.
      * @returns The current gravity.
      */
-    getGravity(): number {
+    getGravity(): float {
       return this._gravity;
     }
 
@@ -820,7 +790,7 @@ namespace gdjs {
      * Get the maximum falling speed of the Platformer Object.
      * @returns The maximum falling speed.
      */
-    getMaxFallingSpeed(): number {
+    getMaxFallingSpeed(): float {
       return this._maxFallingSpeed;
     }
 
@@ -828,7 +798,7 @@ namespace gdjs {
      * Get the speed used to move on Y axis when climbing a ladder.
      * @returns The speed of ladder climbing.
      */
-    getLadderClimbingSpeed(): number {
+    getLadderClimbingSpeed(): float {
       return this._ladderClimbingSpeed;
     }
 
@@ -836,7 +806,7 @@ namespace gdjs {
      * Get the acceleration value of the Platformer Object.
      * @returns The current acceleration.
      */
-    getAcceleration(): number {
+    getAcceleration(): float {
       return this._acceleration;
     }
 
@@ -844,7 +814,7 @@ namespace gdjs {
      * Get the deceleration of the Platformer Object.
      * @returns The current deceleration.
      */
-    getDeceleration(): number {
+    getDeceleration(): float {
       return this._deceleration;
     }
 
@@ -852,7 +822,7 @@ namespace gdjs {
      * Get the maximum speed of the Platformer Object.
      * @returns The maximum speed.
      */
-    getMaxSpeed(): number {
+    getMaxSpeed(): float {
       return this._maxSpeed;
     }
 
@@ -860,7 +830,7 @@ namespace gdjs {
      * Get the jump speed of the Platformer Object.
      * @returns The jump speed.
      */
-    getJumpSpeed(): number {
+    getJumpSpeed(): float {
       return this._jumpSpeed;
     }
 
@@ -876,7 +846,7 @@ namespace gdjs {
      * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
      * @returns The current fall speed.
      */
-    getCurrentFallSpeed(): number {
+    getCurrentFallSpeed(): float {
       return this._currentFallSpeed;
     }
 
@@ -884,7 +854,7 @@ namespace gdjs {
      * Get the current speed of the Platformer Object.
      * @returns The current speed.
      */
-    getCurrentSpeed(): number {
+    getCurrentSpeed(): float {
       return this._currentSpeed;
     }
 
@@ -892,8 +862,8 @@ namespace gdjs {
      * Get the current jump speed of the Platformer Object.
      * @returns The current jump speed.
      */
-    getCurrentJumpSpeed(): number {
-      return this._currentJumpSpeed;
+    getCurrentJumpSpeed(): float {
+      return this._jumping.getCurrentJumpSpeed();
     }
 
     /**
@@ -924,7 +894,7 @@ namespace gdjs {
      * Set the maximum falling speed of the Platformer Object.
      * @param maxFallingSpeed The maximum falling speed.
      */
-    setMaxFallingSpeed(maxFallingSpeed: number): void {
+    setMaxFallingSpeed(maxFallingSpeed: float): void {
       this._maxFallingSpeed = maxFallingSpeed;
     }
 
@@ -932,7 +902,7 @@ namespace gdjs {
      * Set the speed used to move on Y axis when climbing a ladder.
      * @param ladderClimbingSpeed The speed of ladder climbing.
      */
-    setLadderClimbingSpeed(ladderClimbingSpeed: number): void {
+    setLadderClimbingSpeed(ladderClimbingSpeed: float): void {
       this._ladderClimbingSpeed = ladderClimbingSpeed;
     }
 
@@ -940,7 +910,7 @@ namespace gdjs {
      * Set the acceleration of the Platformer Object.
      * @param acceleration The new acceleration.
      */
-    setAcceleration(acceleration: number): void {
+    setAcceleration(acceleration: float): void {
       this._acceleration = acceleration;
     }
 
@@ -948,7 +918,7 @@ namespace gdjs {
      * Set the deceleration of the Platformer Object.
      * @param deceleration The new deceleration.
      */
-    setDeceleration(deceleration: number): void {
+    setDeceleration(deceleration: float): void {
       this._deceleration = deceleration;
     }
 
@@ -956,7 +926,7 @@ namespace gdjs {
      * Set the maximum speed of the Platformer Object.
      * @param maxSpeed The new maximum speed.
      */
-    setMaxSpeed(maxSpeed: number): void {
+    setMaxSpeed(maxSpeed: float): void {
       this._maxSpeed = maxSpeed;
     }
 
@@ -964,7 +934,7 @@ namespace gdjs {
      * Set the jump speed of the Platformer Object.
      * @param jumpSpeed The new jump speed.
      */
-    setJumpSpeed(jumpSpeed: number): void {
+    setJumpSpeed(jumpSpeed: float): void {
       this._jumpSpeed = jumpSpeed;
     }
 
@@ -972,7 +942,7 @@ namespace gdjs {
      * Set the jump sustain time of the Platformer Object.
      * @param jumpSpeed The new jump sustain time.
      */
-    setJumpSustainTime(jumpSustainTime): void {
+    setJumpSustainTime(jumpSustainTime: float): void {
       this._jumpSustainTime = jumpSustainTime;
     }
 
@@ -1118,7 +1088,7 @@ namespace gdjs {
     isMoving(): boolean {
       return (
         (this._hasReallyMoved && this._currentSpeed !== 0) ||
-        this._currentJumpSpeed !== 0 ||
+        this._jumping.getCurrentJumpSpeed() !== 0 ||
         this._currentFallSpeed !== 0
       );
     }
@@ -1126,6 +1096,8 @@ namespace gdjs {
 
   export namespace PlatformerObjectRuntimeBehavior {
     export interface State {
+      enter(from: PlatformerObjectRuntimeBehavior.State): void;
+      leave(): void;
       beforeUpdatingObstacles(): void;
       checkTransitionBeforeX(): void;
       beforeMovingX(): void;
@@ -1134,20 +1106,36 @@ namespace gdjs {
     }
 
     export class OnFloor implements State {
-      _behavior : PlatformerObjectRuntimeBehavior;
+      private _behavior : PlatformerObjectRuntimeBehavior;
+      _floorPlatform:PlatformRuntimeBehavior | null = null;
+      private _floorLastX: float = 0;
+      private _floorLastY: float = 0;
+      _oldHeight: float = 0;
 
       constructor(behavior: PlatformerObjectRuntimeBehavior) {
         this._behavior = behavior;
+      }
+
+      enter(from: PlatformerObjectRuntimeBehavior.State) {
+      }
+
+      leave() {
+        this._floorPlatform = null;
+      }
+
+      updateFloorPosition() {
+        this._floorLastX = this._floorPlatform!.owner.getX();
+        this._floorLastY = this._floorPlatform!.owner.getY();
       }
 
       beforeUpdatingObstacles() {
         const object = this._behavior.owner;
         //Stick the object to the floor if its height has changed.
         if (
-          this._behavior._oldHeight !== object.getHeight()
+          this._oldHeight !== object.getHeight()
         ) {
           object.setY(
-            this._behavior._floorLastY -
+            this._floorLastY -
               object.getHeight() +
               (object.getY() - object.getDrawableY()) -
               1
@@ -1160,18 +1148,17 @@ namespace gdjs {
         if (
           !this._behavior._isIn(
             this._behavior._potentialCollidingObjects,
-            this._behavior._floorPlatform.owner.id
+            this._floorPlatform!.owner.id
           )
         ) {
           this._behavior.setState(this._behavior._falling);
-          this._behavior._floorPlatform = null;
         }
       }
   
       beforeMovingX() {
         //Shift the object according to the floor movement.
-        this._behavior._requestedDeltaX += this._behavior._floorPlatform.owner.getX() - this._behavior._floorLastX;
-        this._behavior._requestedDeltaY += this._behavior._floorPlatform.owner.getY() - this._behavior._floorLastY;
+        this._behavior._requestedDeltaX += this._floorPlatform!.owner.getX() - this._floorLastX;
+        this._behavior._requestedDeltaY += this._floorPlatform!.owner.getY() - this._floorLastY;
       }
   
       checkTransitionBeforeY(timeDelta: float) {
@@ -1188,7 +1175,7 @@ namespace gdjs {
         if (
           gdjs.RuntimeObject.collisionTest(
             object,
-            this._behavior._floorPlatform.owner,
+            this._floorPlatform!.owner,
             this._behavior._ignoreTouchingEdges
           )
         ) {
@@ -1211,7 +1198,7 @@ namespace gdjs {
               if (
                 gdjs.RuntimeObject.collisionTest(
                   object,
-                  this._behavior._floorPlatform.owner,
+                  this._floorPlatform!.owner,
                   this._behavior._ignoreTouchingEdges
                 )
               ) {
@@ -1228,7 +1215,7 @@ namespace gdjs {
           } while (
             gdjs.RuntimeObject.collisionTest(
               object,
-              this._behavior._floorPlatform.owner,
+              this._floorPlatform!.owner,
               this._behavior._ignoreTouchingEdges
             )
           );
@@ -1283,10 +1270,16 @@ namespace gdjs {
     }
 
     export class Falling implements State {
-      _behavior : PlatformerObjectRuntimeBehavior;
+      private _behavior : PlatformerObjectRuntimeBehavior;
 
       constructor(behavior: PlatformerObjectRuntimeBehavior) {
         this._behavior = behavior;
+      }
+
+      enter(from: PlatformerObjectRuntimeBehavior.State) {
+      }
+
+      leave() {
       }
 
       beforeUpdatingObstacles() {
@@ -1326,10 +1319,39 @@ namespace gdjs {
     }
 
     export class Jumping implements State {
-      _behavior : PlatformerObjectRuntimeBehavior;
+      private _behavior : PlatformerObjectRuntimeBehavior;
+      private _currentJumpSpeed: number = 0;
+      private _timeSinceCurrentJumpStart: number = 0;
+      private _jumpKeyHeldSinceJumpStart: boolean = false;
+      private _jumpingFirstDelta: boolean = false;
 
       constructor(behavior: PlatformerObjectRuntimeBehavior) {
         this._behavior = behavior;
+      }
+
+      getCurrentJumpSpeed() {
+        return this._currentJumpSpeed;
+      }
+
+      enter(from: PlatformerObjectRuntimeBehavior.State) {
+        this._timeSinceCurrentJumpStart = 0;
+        this._jumpKeyHeldSinceJumpStart = true;
+        
+        if (from != this._behavior._jumping &&
+            from != this._behavior._falling) {
+          this._jumpingFirstDelta = true;
+        }
+        
+        this._behavior._canJump = false;
+
+        //FIXME can't be Jumping and OnFloor at the same time, need a fix and a test
+        //this._isOnFloor = false; If floor is a very steep slope, the object could go into it.
+        this._currentJumpSpeed = this._behavior._jumpSpeed;
+        this._behavior._currentFallSpeed = 0;
+      }
+
+      leave() {
+        this._currentJumpSpeed = 0;
       }
 
       beforeUpdatingObstacles() {
@@ -1362,28 +1384,28 @@ namespace gdjs {
         
         //Fall
         if (
-          !this._behavior._jumpingFirstDelta
+          !this._jumpingFirstDelta
         ) {
           this._behavior.fall(timeDelta);
         }
+        this._jumpingFirstDelta = false;
         
         // Check if the jump key is continuously held since
         // the beginning of the jump.
         if (!this._behavior._jumpKey) {
-          this._behavior._jumpKeyHeldSinceJumpStart = false;
+          this._jumpKeyHeldSinceJumpStart = false;
         }
-        this._behavior._timeSinceCurrentJumpStart += timeDelta;
-        this._behavior._requestedDeltaY -= this._behavior._currentJumpSpeed * timeDelta;
+        this._timeSinceCurrentJumpStart += timeDelta;
+        this._behavior._requestedDeltaY -= this._currentJumpSpeed * timeDelta;
 
         // Decrease jump speed after the (optional) jump sustain time is over.
         const sustainJumpSpeed =
-          this._behavior._jumpKeyHeldSinceJumpStart &&
-          this._behavior._timeSinceCurrentJumpStart < this._behavior._jumpSustainTime;
+          this._jumpKeyHeldSinceJumpStart &&
+          this._timeSinceCurrentJumpStart < this._behavior._jumpSustainTime;
         if (!sustainJumpSpeed) {
-          this._behavior._currentJumpSpeed -= this._behavior._gravity * timeDelta;
+          this._currentJumpSpeed -= this._behavior._gravity * timeDelta;
         }
-        if (this._behavior._currentJumpSpeed < 0) {
-          this._behavior._currentJumpSpeed = 0;
+        if (this._currentJumpSpeed < 0) {
           this._behavior.setState(this._behavior._falling);
         }
       }
@@ -1394,10 +1416,24 @@ namespace gdjs {
     }
 
     export class GrabbingPlatform implements State {
-      _behavior : PlatformerObjectRuntimeBehavior;
+      private _behavior : PlatformerObjectRuntimeBehavior;
+      private _grabbedPlatform: any = null;
+      private _grabbedPlatformLastX: any;
+      private _grabbedPlatformLastY: any;
 
       constructor(behavior: PlatformerObjectRuntimeBehavior) {
         this._behavior = behavior;
+      }
+
+      enter(from: PlatformerObjectRuntimeBehavior.State) {
+      }
+
+      leave() {
+        this._grabbedPlatform = null;
+      }
+
+      setGrabbedPlatform(grabbedPlatform: PlatformRuntimeBehavior | null) {
+        this._grabbedPlatform = grabbedPlatform;
       }
 
       beforeUpdatingObstacles() {
@@ -1408,7 +1444,7 @@ namespace gdjs {
         if (
           !this._behavior._isIn(
             this._behavior._potentialCollidingObjects,
-            this._behavior._grabbedPlatform.owner.id
+            this._grabbedPlatform.owner.id
           )
         ) {
           this._behavior._releaseGrabbedPlatform();
@@ -1419,9 +1455,9 @@ namespace gdjs {
         //Shift the object according to the grabbed platform movement.
           // this._behavior erases any other movement
         this._behavior._requestedDeltaX =
-          this._behavior._grabbedPlatform.owner.getX() - this._behavior._grabbedPlatformLastX;
+          this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
         this._behavior._requestedDeltaY =
-          this._behavior._grabbedPlatform.owner.getY() - this._behavior._grabbedPlatformLastY;
+          this._grabbedPlatform.owner.getY() - this._grabbedPlatformLastY;
       }
   
       checkTransitionBeforeY(timeDelta: float) {
@@ -1452,10 +1488,9 @@ namespace gdjs {
           !this._behavior._releaseKey
         ) {
           this._behavior._canJump = true;
-          this._behavior._currentJumpSpeed = 0;
           this._behavior._currentFallSpeed = 0;
-          this._behavior._grabbedPlatformLastX = this._behavior._grabbedPlatform.owner.getX();
-          this._behavior._grabbedPlatformLastY = this._behavior._grabbedPlatform.owner.getY();
+          this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
+          this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
         }
       }
 
@@ -1465,10 +1500,16 @@ namespace gdjs {
     }
 
     export class OnLadder implements State {
-      _behavior : PlatformerObjectRuntimeBehavior;
+      private _behavior : PlatformerObjectRuntimeBehavior;
 
       constructor(behavior: PlatformerObjectRuntimeBehavior) {
         this._behavior = behavior;
+      }
+
+      enter(from: PlatformerObjectRuntimeBehavior.State) {
+      }
+
+      leave() {
       }
 
       beforeUpdatingObstacles() {

@@ -68,6 +68,11 @@ export default class SemiControlledTextField extends React.Component<
 
   _field: ?TextField = null;
 
+  componentDidMount() {
+    const input = this.getInputNode();
+    input.addEventListener('wheel', this._onWheel.bind(this));
+  }
+
   forceSetValue(text: string) {
     this.setState({ text });
   }
@@ -86,6 +91,22 @@ export default class SemiControlledTextField extends React.Component<
 
   getInputNode(): ?HTMLInputElement {
     if (this._field) return this._field.getInputNode();
+  }
+
+  _onWheel(evt) {
+    const { focused, text } = this.state;
+
+    if (!focused) return;
+    if (typeof text === 'number') {
+      let value = 0;
+      if (evt.deltaY < 0) {
+        value = evt.shiftKey ? 5 : 1;
+      } else {
+        value = evt.shiftKey ? -5 : -1;
+      }
+      this.setState({ text: text + value });
+      this.props.onChange(text + value);
+    }
   }
 
   render() {

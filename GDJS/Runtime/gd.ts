@@ -59,7 +59,9 @@ namespace gdjs {
    *
    * @param {string} hex Color hexadecimal
    */
-  export const hexToRGBColor = function (hexString: string): string {
+  export const hexToRGBColor = function (
+    hexString: string
+  ): [number, number, number] {
     var hexNumber = parseInt(hexString.replace('#', ''), 16);
     return [
       (hexNumber >> 16) & 0xff,

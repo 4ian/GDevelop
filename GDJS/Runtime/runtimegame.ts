@@ -40,6 +40,7 @@ namespace gdjs {
     _soundManager: any;
     _fontManager: any;
     _jsonManager: any;
+    _bitmapFontManager: any;
     _maxFPS: any;
     _minFPS: any;
     _gameResolutionWidth: integer;

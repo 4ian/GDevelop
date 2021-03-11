@@ -172,8 +172,7 @@ module.exports = {
         _('the text'),
         _('the text'),
         '',
-        'res/conditions/text24.png',
-        'res/conditions/text.png'
+        'res/conditions/text24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('string')
@@ -188,8 +187,7 @@ module.exports = {
         _('the opacity, between 0 (fully transparent) and 255 (opaque)'),
         _('the opacity'),
         '',
-        'res/conditions/opacity24.png',
-        'res/conditions/opacity.png'
+        'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('number')
@@ -204,8 +202,7 @@ module.exports = {
         _('the font size, defined in the Bitmap Font'),
         _('the font size'),
         '',
-        'res/conditions/characterSize24.png',
-        'res/conditions/characterSize.png'
+        'res/conditions/characterSize24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('number')
@@ -219,8 +216,7 @@ module.exports = {
         _('the scale (1 by default)'),
         _('the scale'),
         '',
-        'res/actions/scale24.png',
-        'res/actions/scale.png'
+        'res/actions/scale24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('number')
@@ -235,8 +231,7 @@ module.exports = {
         _('the font name (defined in the Bitmap font)'),
         _('the font name'),
         '',
-        'res/conditions/font24.png',
-        'res/conditions/font.png'
+        'res/conditions/font24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('string')
@@ -309,8 +304,7 @@ module.exports = {
         _('the text alignment'),
         _('the text alignment'),
         '',
-        'res/actions/textAlign24.png',
-        'res/actions/textAlign.png'
+        'res/actions/textAlign24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('string')
@@ -373,8 +367,7 @@ module.exports = {
         _('the width, in pixels, after which the text is wrapped on next line'),
         _('the wrapping width'),
         '',
-        'res/actions/scaleWidth24.png',
-        'res/actions/scaleWidth.png'
+        'res/actions/scaleWidth24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('number')

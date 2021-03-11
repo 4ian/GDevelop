@@ -209,7 +209,7 @@ export default class ImagePreview extends React.Component<Props, State> {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts
                   if (event.metaKey || event.ctrlKey) {
-                    this._zoomBy(deltaY / 500);
+                    this._zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();
                   } else {

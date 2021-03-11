@@ -9,13 +9,15 @@
 
 namespace gd {
 
-ExpressionMetadata::ExpressionMetadata(const gd::String& extensionNamespace_,
+ExpressionMetadata::ExpressionMetadata(const gd::String& returnType_,
+  const gd::String& extensionNamespace_,
                                        const gd::String& name_,
                                        const gd::String& fullname_,
                                        const gd::String& description_,
                                        const gd::String& group_,
                                        const gd::String& smallicon_)
-    : fullname(fullname_),
+    : returnType(returnType_),
+      fullname(fullname_),
       description(description_),
       group(group_),
       shown(true),

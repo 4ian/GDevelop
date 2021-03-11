@@ -22,18 +22,6 @@ declare class gdMetadataProvider {
   static getStrExpressionMetadata(p: gdPlatform, type: string): gdExpressionMetadata;
   static getObjectStrExpressionMetadata(p: gdPlatform, objectType: string, type: string): gdExpressionMetadata;
   static getBehaviorStrExpressionMetadata(p: gdPlatform, autoType: string, type: string): gdExpressionMetadata;
-  static hasCondition(p: gdPlatform, type: string): boolean;
-  static hasAction(p: gdPlatform, type: string): boolean;
-  static hasObjectAction(p: gdPlatform, objectType: string, type: string): boolean;
-  static hasObjectCondition(p: gdPlatform, objectType: string, type: string): boolean;
-  static hasBehaviorAction(p: gdPlatform, autoType: string, type: string): boolean;
-  static hasBehaviorCondition(p: gdPlatform, autoType: string, type: string): boolean;
-  static hasExpression(p: gdPlatform, type: string): boolean;
-  static hasObjectExpression(p: gdPlatform, objectType: string, type: string): boolean;
-  static hasBehaviorExpression(p: gdPlatform, autoType: string, type: string): boolean;
-  static hasStrExpression(p: gdPlatform, type: string): boolean;
-  static hasObjectStrExpression(p: gdPlatform, objectType: string, type: string): boolean;
-  static hasBehaviorStrExpression(p: gdPlatform, autoType: string, type: string): boolean;
   delete(): void;
   ptr: number;
 };

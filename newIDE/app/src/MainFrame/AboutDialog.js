@@ -91,6 +91,16 @@ const contributors = [
     description: 'Contributions to GDevelop and Moderation on the Forum',
     link: 'https://forum.gdevelop-app.com/u/arthuro555/summary',
   },
+  {
+    name: 'Tristan Rhodes (Victris Games)',
+    description: 'High quality extensions for GDevelop',
+    link: 'https://www.youtube.com/channel/UClbq1M-D83t_bYhfa1mfyEQ',
+  },
+  {
+    name: 'The Gem Dev',
+    description: 'Contributions to GDevelop and tutorials on Youtube',
+    link: 'https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q',
+  },
 
   // Community members:
   {

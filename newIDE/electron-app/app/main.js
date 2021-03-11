@@ -19,6 +19,7 @@ const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
+const { downloadLocalFile } = require('./LocalFileDownloader');
 
 log.info('GDevelop Electron app starting...');
 
@@ -243,6 +244,12 @@ app.on('ready', function() {
       }
     );
   });
+
+  // LocalFileDownloader events:
+  ipcMain.handle('local-file-download', async (event, url, outputPath) => {
+    const result = await downloadLocalFile(url, outputPath);
+    return result;
+  })
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {

@@ -14,8 +14,7 @@ import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEdito
 import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
-import LightingLayerDialog from '../LayersList/LightingLayerDialog';
-import EffectsListDialog from '../EffectsList/EffectsListDialog';
+import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
@@ -27,7 +26,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -129,8 +128,8 @@ type State = {|
   layerRemoveDialogOpen: boolean,
   onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
   layerRemoved: ?string,
-  effectsEditedLayer: ?gdLayer,
-  lightingEditedLayer: ?gdLayer,
+  editedLayer: ?gdLayer,
+  editedLayerInitialTab: 'properties' | 'effects',
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
@@ -161,7 +160,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     setToolbar: () => {},
   };
 
-  zOrderFinder: ?gd.HighestZOrderFinder;
   instancesSelection: InstancesSelection;
   editor: ?InstancesEditor;
   contextMenu: ?ContextMenu;
@@ -181,8 +179,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
-      effectsEditedLayer: null,
-      lightingEditedLayer: null,
+      editedLayer: null,
+      editedLayerInitialTab: 'properties',
       editedObjectWithContext: null,
       variablesEditedInstance: null,
       variablesEditedObject: null,
@@ -210,10 +208,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       selectedObjectTags: [],
     };
-  }
-
-  componentWillMount() {
-    this.zOrderFinder = new gd.HighestZOrderFinder();
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -346,11 +340,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editLayerEffects = (layer: ?gdLayer) => {
-    this.setState({ effectsEditedLayer: layer });
+    this.setState({ editedLayer: layer, editedLayerInitialTab: 'effects' });
   };
 
-  editLightingLayer = (layer: ?gdLayer) => {
-    this.setState({ lightingEditedLayer: layer });
+  editLayer = (layer: ?gdLayer) => {
+    this.setState({ editedLayer: layer, editedLayerInitialTab: 'properties' });
   };
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
@@ -673,11 +667,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout.getObjectGroups().has(newName) ||
       project.getObjectGroups().has(newName)
     ) {
-      showWarningBox('Another object or group with this name already exists.');
+      showWarningBox('Another object or group with this name already exists.', {
+        delayToNextTick: true,
+      });
       return false;
     } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.'
+        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
+        { delayToNextTick: true }
       );
       return false;
     }
@@ -854,14 +851,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
-    if (!clipboardContent || !this.editor) return;
+    if (!this.editor) return;
 
     const position = useLastCursorPosition
       ? this.editor.getLastCursorSceneCoordinates()
       : this.editor.getLastContextMenuSceneCoordinates();
-    const { x, y } = clipboardContent;
-    clipboardContent.instances
+
+    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+    const instancesContent = SafeExtractor.extractArrayProperty(
+      clipboardContent,
+      'instances'
+    );
+    const x = SafeExtractor.extractNumberProperty(clipboardContent, 'x');
+    const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
+    if (x === null || y === null || instancesContent === null) return;
+
+    instancesContent
       .map(serializedInstance => {
         const instance = new gd.InitialInstance();
         unserializeFromJSObject(instance, serializedInstance);
@@ -985,7 +990,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
             onEditLayerEffects={this.editLayerEffects}
-            onEditLightingLayer={this.editLightingLayer}
+            onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
@@ -1062,6 +1067,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             )}
             project={project}
             objectsContainer={layout}
+            layout={layout}
+            events={layout.getEvents()}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
             selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
@@ -1110,7 +1120,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
           onEditLayerEffects={this.editLayerEffects}
-          onEditLightingLayer={this.editLightingLayer}
+          onEditLayer={this.editLayer}
         />
         <ResponsiveWindowMeasurer>
           {windowWidth => (
@@ -1317,29 +1327,21 @@ export default class SceneEditor extends React.Component<Props, State> {
             onClose={this.state.onCloseLayerRemoveDialog}
           />
         )}
-        {!!this.state.effectsEditedLayer && (
-          <EffectsListDialog
+        {!!this.state.editedLayer && (
+          <LayerEditorDialog
             project={project}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
-            effectsContainer={this.state.effectsEditedLayer}
-            onApply={() =>
+            layer={this.state.editedLayer}
+            initialInstances={initialInstances}
+            initialTab={this.state.editedLayerInitialTab}
+            onClose={() =>
               this.setState({
-                effectsEditedLayer: null,
+                editedLayer: null,
               })
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-          />
-        )}
-        {!!this.state.lightingEditedLayer && (
-          <LightingLayerDialog
-            layer={this.state.lightingEditedLayer}
-            onClose={() =>
-              this.setState({
-                lightingEditedLayer: null,
-              })
-            }
           />
         )}
         {this.state.scenePropertiesDialogOpen && (

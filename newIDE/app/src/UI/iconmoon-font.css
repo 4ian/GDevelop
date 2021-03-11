@@ -24,20 +24,28 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-facebook:before {
+.icon-youtube:before {
   content: "\e900";
   margin-bottom: -2px;
+
+  /* The icon is a bit too big compared to the others. */
+  transform: scale(0.9);
+  margin-top: 1px;
 }
-.icon-twitter:before {
+.icon-facebook:before {
   content: "\e901";
   margin-bottom: -2px;
 }
+.icon-twitter:before {
+  content: "\e902";
+  margin-bottom: -2px;
+}
 .icon-discord:before {
-  content: "\e903";
+  content: "\e904";
   margin-top: 3px;
   margin-bottom: -3px;
 }
 .icon-reddit:before {
-  content: "\e902";
+  content: "\e903";
   margin-bottom: -2px;
 }

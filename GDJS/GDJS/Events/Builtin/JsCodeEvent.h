@@ -47,6 +47,9 @@ class JsCodeEvent : public gd::BaseEvent {
                                const gd::SerializerElement& element);
   virtual bool IsUseStrict() const { return useStrict; }
 
+  bool IsEventsSheetExpanded() const { return eventsSheetExpanded; }
+  void SetEventsSheetExpanded(bool enable) { eventsSheetExpanded = enable; };
+
  private:
   void Init(const JsCodeEvent& event);
 
@@ -56,6 +59,7 @@ class JsCodeEvent : public gd::BaseEvent {
   bool useStrict;  ///< Should the generated JS function have "use strict". true
                    ///< by default. Should be removed once all the game engine
                    ///< is using "use strict".
+  bool eventsSheetExpanded; ///< Is the code block expanded in the events sheet?
 };
 
 }  // namespace gdjs

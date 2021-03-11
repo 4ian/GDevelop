@@ -33,6 +33,18 @@ AudioExtension::AudioExtension() {
       "gdjs.evtTools.sound.pauseMusicOnChannel");
   GetAllActions()["RePlayMusicCanal"].SetFunctionName(
       "gdjs.evtTools.sound.continueMusicOnChannel");
+
+  GetAllActions()["PreloadMusic"].SetFunctionName(
+      "gdjs.evtTools.sound.preloadMusic");
+  GetAllActions()["PreloadSound"].SetFunctionName(
+      "gdjs.evtTools.sound.preloadSound"); 
+  GetAllActions()["UnloadMusic"].SetFunctionName(
+      "gdjs.evtTools.sound.unloadMusic");
+  GetAllActions()["UnloadSound"].SetFunctionName(
+      "gdjs.evtTools.sound.unloadSound");
+  GetAllActions()["UnloadAllAudio"].SetFunctionName(
+      "gdjs.evtTools.sound.unloadAllAudio"); 
+
   GetAllConditions()["MusicPlaying"].SetFunctionName(
       "gdjs.evtTools.sound.isMusicOnChannelPlaying");
   GetAllConditions()["MusicPaused"].SetFunctionName(

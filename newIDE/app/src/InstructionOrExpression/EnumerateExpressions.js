@@ -9,6 +9,15 @@ const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
+// Support enumerate expressions that can be string, number or both ("number|string").
+// "number|string" has limited support in the codebase, enough to be used in expressions but not
+// in parameters and this is not a generic feature (you can't do "string|variable" or this kind of things).
+// This may be improved in the future if really necessary.
+const isPotentiallyStringType = (type: string) =>
+  type === 'string' || type === 'number|string';
+const isPotentiallyNumberType = (type: string) =>
+  type === 'number' || type === 'number|string';
+
 const getExtensionPrefix = (extension: gdPlatformExtension): string => {
   const allObjectsTypes = extension.getExtensionObjectsTypes();
   const allBehaviorsTypes = extension.getBehaviorsTypes();
@@ -65,20 +74,34 @@ export const enumerateFreeExpressions = (
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
+  const returnNumber = isPotentiallyNumberType(type);
+  const returnString = isPotentiallyStringType(type);
 
   return flatten(
     mapVector(allExtensions, extension => {
       const prefix = getExtensionPrefix(extension);
-      return enumerateExpressionMetadataMap(
-        prefix,
-        type === 'string'
-          ? extension.getAllStrExpressions()
-          : extension.getAllExpressions(),
-        {
-          objectMetadata: undefined,
-          behaviorMetadata: undefined,
-        }
-      );
+      const scope = {
+        extension,
+        objectMetadata: undefined,
+        behaviorMetadata: undefined,
+      };
+
+      return [
+        ...(returnString
+          ? enumerateExpressionMetadataMap(
+              prefix,
+              extension.getAllStrExpressions(),
+              scope
+            )
+          : []),
+        ...(returnNumber
+          ? enumerateExpressionMetadataMap(
+              prefix,
+              extension.getAllExpressions(),
+              scope
+            )
+          : []),
+      ];
     })
   );
 };
@@ -94,15 +117,24 @@ export const enumerateObjectExpressions = (
   );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
-  const scope = { objectMetadata };
+  const scope = { extension, objectMetadata };
 
-  let objectsExpressions = enumerateExpressionMetadataMap(
-    '',
-    type === 'string'
-      ? extension.getAllStrExpressionsForObject(objectType)
-      : extension.getAllExpressionsForObject(objectType),
-    scope
-  );
+  let objectsExpressions = [
+    ...(isPotentiallyStringType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllStrExpressionsForObject(objectType),
+          scope
+        )
+      : []),
+    ...(isPotentiallyNumberType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllExpressionsForObject(objectType),
+          scope
+        )
+      : []),
+  ];
 
   const baseObjectType = ''; /* An empty string means the base object */
   if (objectType !== baseObjectType) {
@@ -114,13 +146,20 @@ export const enumerateObjectExpressions = (
 
     objectsExpressions = [
       ...objectsExpressions,
-      ...enumerateExpressionMetadataMap(
-        '',
-        type === 'string'
-          ? extension.getAllStrExpressionsForObject(baseObjectType)
-          : extension.getAllExpressionsForObject(baseObjectType),
-        scope
-      ),
+      ...(isPotentiallyStringType(type)
+        ? enumerateExpressionMetadataMap(
+            '',
+            extension.getAllStrExpressionsForObject(baseObjectType),
+            scope
+          )
+        : []),
+      ...(isPotentiallyNumberType(type)
+        ? enumerateExpressionMetadataMap(
+            '',
+            extension.getAllExpressionsForObject(baseObjectType),
+            scope
+          )
+        : []),
     ];
   }
 
@@ -138,24 +177,36 @@ export const enumerateBehaviorExpressions = (
   );
   const extension = extensionAndBehaviorMetadata.getExtension();
   const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
-  const scope = { behaviorMetadata };
+  const scope = { extension, behaviorMetadata };
 
-  return enumerateExpressionMetadataMap(
-    '',
-    type === 'string'
-      ? extension.getAllStrExpressionsForBehavior(behaviorType)
-      : extension.getAllExpressionsForBehavior(behaviorType),
-    scope
-  );
+  return [
+    ...(isPotentiallyStringType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllStrExpressionsForBehavior(behaviorType),
+          scope
+        )
+      : []),
+    ...(isPotentiallyNumberType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllExpressionsForBehavior(behaviorType),
+          scope
+        )
+      : []),
+  ];
 };
 
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
   type: string
 ): Array<EnumeratedExpressionMetadata> => {
-  const freeExpressions = enumerateFreeExpressions(type);
+  const returnNumber = isPotentiallyNumberType(type);
+  const returnString = isPotentiallyStringType(type);
+
   const objectsExpressions = [];
   const behaviorsExpressions = [];
+  const freeExpressions = enumerateFreeExpressions(type);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -166,31 +217,51 @@ export const enumerateAllExpressions = (
     //Objects expressions:
     mapVector(extension.getExtensionObjectsTypes(), objectType => {
       const objectMetadata = extension.getObjectMetadata(objectType);
-      objectsExpressions.push.apply(
-        objectsExpressions,
-        enumerateExpressionMetadataMap(
-          prefix,
-          type === 'string'
-            ? extension.getAllStrExpressionsForObject(objectType)
-            : extension.getAllExpressionsForObject(objectType),
-          { objectMetadata }
-        )
-      );
+      const scope = { extension, objectMetadata };
+
+      if (returnString)
+        objectsExpressions.push.apply(
+          objectsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllStrExpressionsForObject(objectType),
+            scope
+          )
+        );
+      if (returnNumber)
+        objectsExpressions.push.apply(
+          objectsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllExpressionsForObject(objectType),
+            scope
+          )
+        );
     });
 
     //Behaviors expressions:
     mapVector(extension.getBehaviorsTypes(), behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      behaviorsExpressions.push.apply(
-        behaviorsExpressions,
-        enumerateExpressionMetadataMap(
-          prefix,
-          type === 'string'
-            ? extension.getAllStrExpressionsForBehavior(behaviorType)
-            : extension.getAllExpressionsForBehavior(behaviorType),
-          { behaviorMetadata }
-        )
-      );
+      const scope = { extension, behaviorMetadata };
+
+      if (returnString)
+        behaviorsExpressions.push.apply(
+          behaviorsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllStrExpressionsForBehavior(behaviorType),
+            scope
+          )
+        );
+      if (returnNumber)
+        behaviorsExpressions.push.apply(
+          behaviorsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllExpressionsForBehavior(behaviorType),
+            scope
+          )
+        );
     });
   });
 

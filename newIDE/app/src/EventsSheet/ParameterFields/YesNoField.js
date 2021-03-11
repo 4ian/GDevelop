@@ -16,7 +16,6 @@ const styles = {
     margin: 5,
   },
   description: {
-    display: 'inline-block',
     marginRight: 5,
   },
 };
@@ -37,7 +36,9 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
 
     return (
       <Line>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.description} displayInlineAsSpan>
+          {description}
+        </Text>
         <Column noMargin>
           <RaisedButton
             style={styles.button}

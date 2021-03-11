@@ -98,6 +98,88 @@ export const makeTestExtensions = (gd: libGDevelop) => {
   {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
+      'FakeBehavior',
+      'Fake extension with a fake behavior',
+      'A fake extension with a fake behavior containing 2 properties.',
+      '',
+      'MIT'
+    );
+    const fakeBehavior = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.updateProperty = function(
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
+      if (propertyName === 'property1') {
+        behaviorContent.setStringAttribute('property1', newValue);
+        return true;
+      }
+      if (propertyName === 'property2') {
+        behaviorContent.setBoolAttribute('property2', newValue === '1');
+        return true;
+      }
+
+      return false;
+    };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.getProperties = function(behaviorContent) {
+      var behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      behaviorProperties
+        .getOrCreate('property1')
+        .setValue(behaviorContent.getStringAttribute('property1'));
+      behaviorProperties
+        .getOrCreate('property2')
+        .setValue(
+          behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
+        )
+        .setType('Boolean');
+
+      return behaviorProperties;
+    };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.initializeContent = function(behaviorContent) {
+      behaviorContent.setStringAttribute('property1', 'Initial value 1');
+      behaviorContent.setBoolAttribute('property2', true);
+    };
+
+    const behavior = extension.addBehavior(
+      'FakeBehavior',
+      'Fake behavior with two properties',
+      'FakeBehavior', // Default name is the name
+      'A fake behavior with two properties.',
+      '',
+      'res/function24.png',
+      'FakeBehavior', // Class name is the name, actually unused
+      fakeBehavior,
+      new gd.BehaviorsSharedData()
+    );
+    behavior
+      .addExpression(
+        'SomethingReturningNumberWith1NumberParam',
+        'Some expression returning a number',
+        'Some expression returning a number',
+        '',
+        'fake-icon.png'
+      )
+      .addParameter('expression', 'First parameter (number)', '', false);
+    behavior
+      .addStrExpression(
+        'SomethingReturningStringWith1NumberParam',
+        'Some expression returning a string',
+        'Some expression returning a string',
+        '',
+        'fake-icon.png'
+      )
+      .addParameter('expression', 'First parameter (number)', '', false);
+
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
       'FakeTextBehavior',
       'Fake extension with a fake behavior for text objects only',
       'A fake extension with a fake behavior for text objects only.',
@@ -105,6 +187,21 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.updateProperty = function(
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
+      return false;
+    };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.getProperties = function(behaviorContent) {
+      var behaviorProperties = new gd.MapStringPropertyDescriptor();
+      return behaviorProperties;
+    };
+    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    fakeBehavior.initializeContent = function(behaviorContent) {};
 
     extension
       .addBehavior(

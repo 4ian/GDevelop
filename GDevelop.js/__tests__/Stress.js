@@ -4,7 +4,7 @@ describe('libGD.js - stress tests', function() {
   it('should support being required a lot', function() {
     jest.setTimeout(10000);
     process.setMaxListeners(40); //Avoid Node.js warning.
-    return Promise.all(new Array(20).fill().map((_, i) => {
+    return Promise.all(new Array(15).fill().map((_, i) => {
       return new Promise((resolve, reject) => {
         initializeGDevelopJs().then(gd => {
           var layout = new gd.Layout();

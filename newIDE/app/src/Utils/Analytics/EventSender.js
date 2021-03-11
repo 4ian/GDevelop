@@ -214,6 +214,42 @@ export const sendSubscriptionDialogShown = () => {
   client.recordEvent('subscription-dialog-shown', {});
 };
 
+export const sendAssetOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-opened', { id, name });
+};
+
+export const sendAssetAddedToProject = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('asset-added-to-project', { id, name });
+};
+
+export const sendNewObjectCreated = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('new-object-created', { name });
+};
+
+export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('showcase-open-game-link', { title, linkType });
+};
+
 export const sendChoosePlanClicked = (planId: string | null) => {
   if (isDev || !client) return;
 

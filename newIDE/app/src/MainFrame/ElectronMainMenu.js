@@ -26,6 +26,7 @@ type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
+  | 'main-menu-open-games-dashboard'
   | 'update-status';
 
 type MenuItemTemplate =
@@ -143,6 +144,10 @@ const buildAndSendMenuTemplate = (
       {
         label: i18n._(t`My Profile`),
         onClickSendEvent: 'main-menu-open-profile',
+      },
+      {
+        label: i18n._(t`Games Dashboard`),
+        onClickSendEvent: 'main-menu-open-games-dashboard',
       },
       {
         label: i18n._(t`Preferences`),
@@ -279,6 +284,10 @@ const buildAndSendMenuTemplate = (
           onClickSendEvent: 'main-menu-open-profile',
         },
         {
+          label: i18n._(t`Games Dashboard`),
+          onClickSendEvent: 'main-menu-open-games-dashboard',
+        },
+        {
           label: i18n._(t`Preferences`),
           onClickSendEvent: 'main-menu-open-preferences',
         },
@@ -344,6 +353,10 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
   useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
   useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
+  useIPCEventListener(
+    'main-menu-open-games-dashboard',
+    props.onOpenGamesDashboard
+  );
   useIPCEventListener('update-status', props.setUpdateStatus);
 
   React.useEffect(

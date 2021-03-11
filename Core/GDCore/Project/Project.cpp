@@ -38,6 +38,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/PolymorphicClone.h"
+#include "GDCore/Tools/UUID/UUID.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Utf8/utf8.h"
 
@@ -64,6 +65,8 @@ Project::Project()
       scaleMode("linear"),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      projectUuid(""),
+      useDeprecatedZeroAsDefaultZOrder(false),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
       ,
@@ -105,6 +108,8 @@ Project::Project()
 }
 
 Project::~Project() {}
+
+void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
@@ -594,12 +599,12 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
+  SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
-  SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
                                             0,
@@ -609,16 +614,27 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
-  winExecutableFilename =
-      propElement.GetStringAttribute("winExecutableFilename");
-  winExecutableIconFile =
-      propElement.GetStringAttribute("winExecutableIconFile");
-  linuxExecutableFilename =
-      propElement.GetStringAttribute("linuxExecutableFilename");
-  macExecutableFilename =
-      propElement.GetStringAttribute("macExecutableFilename");
+
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (VersionWrapper::IsOlderOrEqual(
+          gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
+      !propElement.HasAttribute("useDeprecatedZeroAsDefaultZOrder")) {
+    useDeprecatedZeroAsDefaultZOrder = true;
+  } else {
+    useDeprecatedZeroAsDefaultZOrder =
+        propElement.GetBoolAttribute("useDeprecatedZeroAsDefaultZOrder", false);
+  }
+  // end of compatibility code
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (!propElement.HasAttribute("projectUuid") &&
+      !propElement.HasChild("projectUuid")) {
+    ResetProjectUuid();
+  }
+  // end of compatibility code
 
   extensionProperties.UnserializeFrom(
       propElement.GetChild("extensionProperties"));
@@ -884,18 +900,20 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
-  propElement.SetAttribute("projectFile", gameFile);
+  propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
-  propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
-  propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
-  propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
-  propElement.SetAttribute("macExecutableFilename", macExecutableFilename);
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (useDeprecatedZeroAsDefaultZOrder) {
+    propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
+  }
+  // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
 
@@ -1072,7 +1090,6 @@ Project& Project::operator=(const Project& other) {
 }
 
 void Project::Init(const gd::Project& game) {
-  // Some properties
   name = game.name;
   version = game.version;
   windowWidth = game.windowWidth;
@@ -1083,6 +1100,8 @@ void Project::Init(const gd::Project& game) {
   scaleMode = game.scaleMode;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  projectUuid = game.projectUuid;
+  useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
 #if defined(GD_IDE_ONLY)
   author = game.author;
@@ -1105,7 +1124,6 @@ void Project::Init(const gd::Project& game) {
   extensionsUsed = game.extensionsUsed;
   platforms = game.platforms;
 
-  // Resources
   resourcesManager = game.resourcesManager;
   imageManager = std::make_shared<ImageManager>(*game.imageManager);
   imageManager->SetResourcesManager(&resourcesManager);
@@ -1130,13 +1148,8 @@ void Project::Init(const gd::Project& game) {
   variables = game.GetVariables();
 
 #if defined(GD_IDE_ONLY)
-  gameFile = game.GetProjectFile();
+  projectFile = game.GetProjectFile();
   imagesChanged = game.imagesChanged;
-
-  winExecutableFilename = game.winExecutableFilename;
-  winExecutableIconFile = game.winExecutableIconFile;
-  linuxExecutableFilename = game.linuxExecutableFilename;
-  macExecutableFilename = game.macExecutableFilename;
 #endif
 }
 

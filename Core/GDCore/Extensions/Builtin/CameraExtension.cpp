@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Tools/Localization.h"
 
 using namespace std;
@@ -12,141 +13,115 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinCamera",
-                               _("Cameras and layers features"),
-                               _("Built-in camera extension"),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinCamera",
+          _("Cameras and layers features"),
+          "Each scene can be composed of multiple layers. These conditions "
+          "and actions allow to manipulate them during the game. In "
+          "particular, you can move the camera of a layer to center it on an "
+          "object or a position.",
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
 
 #if defined(GD_IDE_ONLY)
   extension
-      .AddCondition("CameraX",
-                    _("Camera center X position"),
-                    _("Compare the X position of the center of a camera."),
-                    _("the X position of camera _PARAM4_ (layer: _PARAM3_)"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0")
-      .MarkAsAdvanced();
-
-  extension
-      .AddCondition("CameraY",
-                    _("Camera center Y position"),
-                    _("Compare the Y position of the center of a camera."),
-                    _("the Y position of camera _PARAM4_ (layer: _PARAM3_)"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"))
-      .SetDefaultValue("0")
-      .MarkAsAdvanced();
-
-  extension
-      .AddAction(
+      .AddExpressionAndConditionAndAction(
+          "number",
           "CameraX",
           _("Camera center X position"),
-          _("Change the X position of the center of the specified camera."),
+          _("the X position of the center of a camera"),
           _("the X position of camera _PARAM4_ (layer: _PARAM3_)"),
           _("Layers and cameras"),
-          "res/conditions/camera24.png",
-          "res/conditions/camera.png")
+          "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
+  extension.AddDuplicatedAction("CameraX", "SetCameraX")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedExpression("VueX", "CameraX")
+      .SetHidden();  // Deprecated
+
   extension
-      .AddAction(
+      .AddExpressionAndConditionAndAction(
+          "number",
           "CameraY",
           _("Camera center Y position"),
-          _("Change the Y position of the center of the specified camera."),
+          _("the Y position of the center of a camera"),
           _("the Y position of camera _PARAM4_ (layer: _PARAM3_)"),
           _("Layers and cameras"),
-          "res/conditions/camera24.png",
-          "res/conditions/camera.png")
+          "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardOperatorParameters("number")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
-  extension
-      .AddCondition("CameraWidth",
-                    _("Width of a camera"),
-                    _("Test the width of a camera of a layer"),
-                    _("the width of camera _PARAM2_ of layer _PARAM1_"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"))
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number"))
-      .UseStandardRelationalOperatorParameters("number")
-      .MarkAsAdvanced();
+  extension.AddDuplicatedAction("CameraY", "SetCameraY")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedExpression("VueY", "CameraY")
+      .SetHidden();  // Deprecated
 
   extension
-      .AddCondition("CameraHeight",
-                    _("Height of a camera"),
-                    _("Test the height of a camera of a layer"),
-                    _("the height of camera _PARAM2_ of layer _PARAM1_"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
+      .AddExpressionAndCondition(
+          "number",
+          "CameraWidth",
+          _("Width of a camera"),
+          _("the width of a camera of a layer"),
+          _("the width of camera _PARAM2_ of layer _PARAM1_"),
+          _("Layers and cameras"),
+          "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardParameters("number")
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("CameraAngle",
-                    _("Angle of a camera of a layer"),
-                    _("Test a camera angle."),
-                    _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
-                    _("Layers and cameras"),
-                    "res/conditions/camera24.png",
-                    "res/conditions/camera.png")
+      .AddExpressionAndCondition(
+          "number",
+          "CameraHeight",
+          _("Height of a camera"),
+          _("the height of a camera of a layer"),
+          _("the height of camera _PARAM2_ of layer _PARAM1_"),
+          _("Layers and cameras"),
+          "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
+      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number"))
+      .UseStandardParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddExpressionAndConditionAndAction(
+          "number",
+          "CameraAngle",
+          _("Angle of a camera of a layer"),
+          _("the angle of rotation of a camera"),
+          _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
+          _("Layers and cameras"),
+          "res/conditions/camera24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .UseStandardParameters("number")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
-  extension
-      .AddAction("RotateCamera",
-                 _("Change camera angle"),
-                 _("This action modifies the angle of a camera in the "
-                   "specified layer."),
-                 _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
-                 _("Layers and cameras"),
-                 "res/actions/camera24.png",
-                 "res/actions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardOperatorParameters("number")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
+  extension.AddDuplicatedAction("RotateCamera", "SetCameraAngle").SetHidden();
+  extension.AddDuplicatedExpression("CameraRotation", "CameraAngle")
+      .SetHidden();
+  extension.AddDuplicatedExpression("VueRotation", "CameraAngle").SetHidden();
 
   extension
       .AddAction("AddCamera",
@@ -245,9 +220,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddAction("ZoomCamera",
+                 _("Change camera zoom"),
                  _("Change camera zoom."),
-                 _("Change camera zoom."),
-                 _("Change camera zoom to _PARAM1_ (layer : _PARAM2_, camera : "
+                 _("Change camera zoom to _PARAM1_ (layer: _PARAM2_, camera: "
                    "_PARAM3_)"),
                  _("Layers and cameras"),
                  "res/actions/camera24.png",
@@ -470,26 +445,50 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
-      .AddExpression("CameraWidth",
-                     _("Width of a camera of a layer"),
-                     _("Width of a camera of a layer"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
+      .AddCondition("LayerDefaultZOrder",
+                    _("Layer default Z order"),
+                    _("Compare the default Z order set to objects when they "
+                      "are created on a layer."),
+                    _("the default Z order of objects created on _PARAM1_"),
+                    _("Layers and cameras"),
+                    "res/conditions/layer24.png",
+                    "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"))
-      .AddParameter("expression", _("Camera number (default : 0)"))
-      .SetDefaultValue("0");
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
 
   extension
-      .AddExpression("CameraHeight",
-                     _("Height of a camera of a layer"),
-                     _("Height of a camera of a layer"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
+      .AddAction("SetLayerDefaultZOrder",
+                 _("Change layer default Z order"),
+                 _("Change the default Z order set to objects when they are "
+                   "created on a layer."),
+                 _("Set the default Z order of objects created on _PARAM1_ to "
+                   "_PARAM2_"),
+                 _("Layers and cameras"),
+                 "res/actions/layer24.png",
+                 "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"))
-      .AddParameter("expression", _("Camera number (default : 0)"))
-      .SetDefaultValue("0");
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("New default Z order"));
+
+  extension
+      .AddAction(
+          "SetLayerAmbientLightColor",
+          _("Set the ambient light color"),
+          _("Set the ambient light color of the lighting layer in format "
+            "\"R;G;B\" string."),
+          _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),
+          _("Layers and cameras/Lighting"),
+          "res/actions/color24.png",
+          "res/actions/color.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"Lighting\"")
+      .AddParameter("color", _("Color"))
+      .MarkAsAdvanced();
 
   extension
       .AddExpression(
@@ -540,74 +539,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0");
 
   extension
-      .AddExpression("CameraX",
-                     _("Camera X position"),
-                     _("Camera X position"),
+      .AddExpression("CameraZoom",
+                     _("Zoom of a camera of a layer"),
+                     _("Zoom of a camera of a layer"),
                      _("Layers and cameras"),
                      "res/actions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("VueX",
-                     _("Camera X position"),
-                     _("Camera X position"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
-      .SetHidden()
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("CameraY",
-                     _("Camera Y position"),
-                     _("Camera Y position"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("VueY",
-                     _("Camera Y position"),
-                     _("Camera Y position"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
-      .SetHidden()
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("CameraRotation",
-                     _("Angle of a camera of a layer"),
-                     _("Angle of a camera of a layer"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer"), "", true)
-      .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
-      .SetDefaultValue("0");
-
-  extension
-      .AddExpression("VueRotation",
-                     _("Angle of a camera of a layer"),
-                     _("Angle of a camera of a layer"),
-                     _("Layers and cameras"),
-                     "res/actions/camera.png")
-      .SetHidden()
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
@@ -620,6 +556,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                      _("Time scale"),
                      _("Layers and cameras"),
                      "res/actions/time.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer"));
+
+  extension
+      .AddExpression("LayerDefaultZOrder",
+                     _("Default Z Order for a layer"),
+                     _("Default Z Order for a layer"),
+                     _("Layers and cameras"),
+                     "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"));
 #endif

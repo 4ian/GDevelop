@@ -328,14 +328,24 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // the cost of creating/storing it for each events function might not
          // be worth it.
          "    if (objectsList) {\n" +
-         "      return parentEventsFunctionContext ?\n" +
+         "      const object = parentEventsFunctionContext ?\n" +
          "        "
          "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
          ":\n" +
          "        runtimeScene.createObject(objectsList.firstKey());\n" +
+         // Add the new instance to object lists
+         "      if (object) {\n" +
+         "        objectsList.get(objectsList.firstKey()).push(object);\n" +
+         "        eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
+         "      }\n" +
+         "      return object;" +
          "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
+         "  },\n"
+         // Allow to get a layer directly from the context for convenience:
+         "  getLayer: function(layerName) {\n"
+         "    return runtimeScene.getLayer(layerName);\n"
          "  },\n"
          // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
@@ -842,10 +852,6 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
           GenerateBooleanFullName(
               "condition" + gd::String::From(cId - 1) + "IsTrue", context) +
           ".val ) {\n";
-
-    gd::InstructionMetadata instrInfos =
-        gd::MetadataProvider::GetConditionMetadata(platform,
-                                                   conditions[cId].GetType());
 
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId],

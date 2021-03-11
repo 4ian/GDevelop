@@ -156,11 +156,11 @@ export default class InstancesEditor extends Component<Props> {
       return false;
     });
 
-    this.pixiRenderer.view.onmousewheel = event => {
+    this.pixiRenderer.view.onwheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomBy(event.wheelDelta / 5000);
+        this.zoomBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
-        this.viewPosition.scrollBy(-event.wheelDelta / 10, 0);
+        this.viewPosition.scrollBy(-event.deltaY / 10, 0);
       } else {
         this.viewPosition.scrollBy(event.deltaX / 10, event.deltaY / 10);
       }
@@ -636,14 +636,15 @@ export default class InstancesEditor extends Component<Props> {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX: number, deltaY: number) => {
-    const sceneDeltaX = deltaX / this.getZoomFactor();
-    const sceneDeltaY = deltaY / this.getZoomFactor();
+  _onResize = (deltaX: number | null, deltaY: number | null) => {
+    const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
+    const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const forceProportional =
+      this.props.screenType === 'touch' && deltaX !== null && deltaY !== null;
     const proportional =
-      this.keyboardShortcuts.shouldResizeProportionally() ||
-      this.props.screenType === 'touch';
+      forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(
       selectedInstances,
       sceneDeltaX,

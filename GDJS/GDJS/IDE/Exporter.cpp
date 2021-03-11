@@ -114,7 +114,7 @@ bool Exporter::ExportWholePixiProject(
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
-    helper.ExportIncludesAndLibs(includesFiles, exportDir);
+    helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
@@ -222,7 +222,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src");
+  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
 
   if (!helper.ExportCocos2dFiles(
           project, exportDir, debugMode, includesFiles)) {

@@ -1,5 +1,7 @@
-#Script launching the generation of the documentations of all modules
-#Install globally doxgen and jsdoc before starting it.
+# Script launching the generation of the documentations of all modules
+# Install globally doxgen before starting it.
+set -e
+
 echo Generating all docs...
 mkdir -p ../docs
 mkdir -p logs
@@ -21,4 +23,10 @@ npm install
 npm run generate-doc
 echo ℹ️ Generated GDJS Runtime docs
 cd ..
+cd newIDE/app/scripts
+npm install
+node extract-extensions-document.js
+node extract-reference-document.js
+cd ../../..
+echo ℹ️ Generated wiki docs
 cd scripts

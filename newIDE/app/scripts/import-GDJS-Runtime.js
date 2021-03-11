@@ -5,16 +5,19 @@ const args = require('minimist')(process.argv.slice(2));
 
 const gdevelopRootPath = path.join(__dirname, '..', '..', '..');
 const destinationPaths = [
-  path.join(__dirname, '..', 'resources', 'GDJS', 'Runtime'),
-  path.join(
-    __dirname,
-    '..',
-    'node_modules',
-    'GDJS-for-web-app-only',
-    'Runtime'
-  ),
+  path.join(__dirname, '..', 'resources', 'GDJS'),
+  path.join(__dirname, '..', 'node_modules', 'GDJS-for-web-app-only'),
 ];
 
+// Build GDJS
+const output = shell.exec(`node scripts/build.js`, {
+  cwd: path.join(gdevelopRootPath, 'GDJS'),
+});
+if (output.code !== 0) {
+  shell.exit(0);
+}
+
+// Then copy the Runtime to the IDE
 const copyOptions = {
   overwrite: true,
   expand: true,
@@ -22,49 +25,56 @@ const copyOptions = {
   junk: true,
 };
 
+shell.echo(
+  `ℹ️ Copying GDJS and extensions runtime built files and sources to ${destinationPaths.join(
+    ', '
+  )}...`
+);
 destinationPaths.forEach(destinationPath => {
-  shell.echo(
-    `ℹ️ Copying GDJS and extensions runtime files (*.js) to "${destinationPath}"...`
-  );
-
   if (args.clean) {
     shell.echo(`ℹ️ Cleaning destination first...`);
     shell.rm('-rf', destinationPath);
   }
   shell.mkdir('-p', destinationPath);
 
-  copy(
-    path.join(gdevelopRootPath, 'GDJS', 'Runtime'),
-    destinationPath,
-    copyOptions
-  )
-    .then(function(results) {
+  const startTime = Date.now();
+  // TODO: Investigate the use of a smart & faster sync
+  // that only copy files with changed content.
+  return Promise.all([
+    // Copy the built files
+    copy(
+      path.join(gdevelopRootPath, 'GDJS', 'Runtime-dist'),
+      path.join(destinationPath, 'Runtime'),
+      copyOptions
+    ),
+    // Copy the GDJS runtime and extension sources (useful for autocompletions
+    // in the IDE).
+    copy(
+      path.join(gdevelopRootPath, 'GDJS', 'Runtime'),
+      path.join(destinationPath, 'Runtime-sources'),
+      copyOptions
+    ),
+    copy(
+      path.join(gdevelopRootPath, 'Extensions'),
+      path.join(destinationPath, 'Runtime-sources', 'Extensions'),
+      { ...copyOptions, filter: ['**/*.js', '**/*.ts'] }
+    ),
+  ])
+    .then(function([
+      bundledResults,
+      unbundledResults,
+      unbundledExtensionsResults,
+    ]) {
+      const totalFilesCount =
+        bundledResults.length +
+        unbundledResults.length +
+        unbundledExtensionsResults.length;
+      const duration = Date.now() - startTime;
       console.info(
-        `✅ GDJS and extensions runtime copy succeeded (${
-          results.length
-        } file(s) copied`
+        `✅ Runtime files copy done (${totalFilesCount} file(s) copied in ${duration}ms).`
       );
     })
     .catch(function(error) {
-      console.error('❌ Copy failed: ' + error);
-    });
-
-  copy(
-    path.join(gdevelopRootPath, 'Extensions'),
-    path.join(destinationPath, 'Extensions'),
-    {
-      ...copyOptions,
-      filter: ['**/*.js'],
-    }
-  )
-    .then(function(results) {
-      console.info(
-        `✅ GDJS and extensions runtime copy succeeded (${
-          results.length
-        } file(s) copied`
-      );
-    })
-    .catch(function(error) {
-      console.error('❌ Copy failed: ' + error);
+      console.error('❌ Copy failed: ', error);
     });
 });

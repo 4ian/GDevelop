@@ -4,35 +4,70 @@
  * This project is released under the MIT License.
  */
 
-// ⚠️ While this file is a TypeScript type definitions file, it's used only
-// for describing a serialized exported project. The game engine itself is still typed
-// using JSDoc style annotations (see https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc).
-
-// ℹ️ See this doc about supported JavaScript features and type checking in the
-// game engine: https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md
-
 /**
  * Contains the data of a serialized exported project.
  */
-export interface ProjectData {
+declare interface ProjectData {
   firstLayout: string;
   gdVersion: GdVersionData;
   properties: ProjectPropertiesData;
   resources: ResourcesData;
   objects: ObjectData[];
-  variables: any[];
+  variables: RootVariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
 }
 
-export interface GdVersionData {
+/** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
+declare type ObjectData = {
+  /** The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example). */
+  name: string;
+  /** The object type. */
+  type: string;
+  /** The list of default variables. */
+  variables: Array<RootVariableData>;
+  /** The list of default behaviors. */
+  behaviors: Array<BehaviorData>;
+};
+
+declare type VariableType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'structure'
+  | 'array';
+
+/** Data representation of a GDevelop variable */
+declare type VariableData = Readonly<{
+  /** The name of the variable. Leave blank for array children. */
+  name?: string;
+  /** The value of the variable. Leave blank for structures. */
+  value?: string | float | boolean;
+  /** The children of the structure. Leave blank if value is defined. */
+  children?: VariableData[];
+  /** The type of the variable. Defaults to number. */
+  type?: VariableType;
+}>;
+
+/** A variable child of a container. Those always have a name. */
+declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
+
+/** Properties to set up a behavior. */
+declare type BehaviorData = {
+  /** The name of the behavior (for getting from an object (object.getBehavior) for example) */
+  name: string;
+  /** The behavior type. Used by GDJS to find the proper behavior to construct. */
+  type: string;
+};
+
+declare interface GdVersionData {
   build: number;
   major: number;
   minor: number;
   revision: number;
 }
 
-export interface LayoutData {
+declare interface LayoutData {
   r: number;
   v: number;
   b: number;
@@ -40,24 +75,24 @@ export interface LayoutData {
   name: string;
   stopSoundsOnStartup: boolean;
   title: string;
-  variables: VariableData[];
+  variables: RootVariableData[];
   instances: InstanceData[];
   objects: ObjectData[];
   layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
 }
 
-export interface BehaviorSharedData {
+declare interface BehaviorSharedData {
   name: string;
   type: string;
 }
 
-export interface ExternalLayoutData {
+declare interface ExternalLayoutData {
   name: string;
   instances: InstanceData[];
 }
 
-export interface InstanceData {
+declare interface InstanceData {
   persistentUuid: string;
   angle: number;
   customSize: boolean;
@@ -71,19 +106,19 @@ export interface InstanceData {
   zOrder: number;
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
-  initialVariables: VariableData[];
+  initialVariables: RootVariableData[];
 }
 
-export interface InstanceNumberProperty {
+declare interface InstanceNumberProperty {
   name: string;
   value: number;
 }
-export interface InstanceStringProperty {
+declare interface InstanceStringProperty {
   name: string;
   value: number;
 }
 
-export interface LayerData {
+declare interface LayerData {
   name: string;
   visibility: boolean;
   cameras: CameraData[];
@@ -95,7 +130,7 @@ export interface LayerData {
   followBaseLayerCamera: boolean;
 }
 
-export interface CameraData {
+declare interface CameraData {
   defaultSize: boolean;
   defaultViewport: boolean;
   height: number;
@@ -106,7 +141,7 @@ export interface CameraData {
   width: number;
 }
 
-export interface EffectData {
+declare interface EffectData {
   effectType: string;
   name: string;
   doubleParameters: {
@@ -120,21 +155,16 @@ export interface EffectData {
   };
 }
 
-export interface ProjectPropertiesData {
-  adMobAppId: string;
+declare interface ProjectPropertiesData {
   adaptGameResolutionAtRuntime: boolean;
   folderProject: boolean;
-  linuxExecutableFilename: string;
-  macExecutableFilename: string;
   orientation: string;
   packageName: string;
   projectFile: string;
-  scaleMode: string;
+  scaleMode: 'linear' | 'nearest';
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;
-  winExecutableFilename: string;
-  winExecutableIconFile: string;
   name: string;
   author: string;
   windowWidth: number;
@@ -146,23 +176,25 @@ export interface ProjectPropertiesData {
   loadingScreen: LoadingScreenData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
+  useDeprecatedZeroAsDefaultZOrder?: boolean;
+  projectUuid?: string;
 }
 
-export interface ExtensionProperty {
+declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
 }
 
-export interface LoadingScreenData {
+declare interface LoadingScreenData {
   showGDevelopSplash: boolean;
 }
 
-export interface ResourcesData {
+declare interface ResourcesData {
   resources: ResourceData[];
 }
 
-export interface ResourceData {
+declare interface ResourceData {
   alwaysLoaded?: boolean;
   file: string;
   kind: ResourceKind;
@@ -171,12 +203,8 @@ export interface ResourceData {
   smoothed?: boolean;
   userAdded: boolean;
   disablePreload?: boolean;
+  preloadAsSound?: boolean;
+  preloadAsMusic?: boolean;
 }
 
-export enum ResourceKind {
-  Audio = 'audio',
-  Image = 'image',
-  Font = 'font',
-  Video = 'video',
-  Json = 'json',
-}
+declare type ResourceKind = 'audio' | 'image' | 'font' | 'video' | 'json';

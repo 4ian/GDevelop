@@ -36,6 +36,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
+  onRequestClose?: () => void,
   margin?: 'none' | 'dense',
   style?: {| alignSelf?: 'center' |},
 |};
@@ -275,6 +276,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
             errorText={errorText}
             fullWidth={this.props.fullWidth}
             margin={this.props.margin}
+            onRequestClose={this.props.onRequestClose}
             ref={autoComplete => (this._autoComplete = autoComplete)}
           />
         )}

@@ -74,7 +74,7 @@ describe('gdjs.LightRuntimeObject', function () {
 
   it('check object properties', function () {
     expect(lightObj.getRadius()).to.be(100);
-    expect(lightObj.getColor()).to.eql("180;180;180");
+    expect(lightObj.getColor()).to.eql('180;180;180');
     expect(lightObj.getDebugMode()).to.be(false);
     expect(lightObj.getDrawableX()).to.be(100);
     expect(lightObj.getDrawableY()).to.be(100);
@@ -119,7 +119,7 @@ describe('Light with obstacles around it', function () {
     light.setPosition(200, 200);
     obstacle.setPosition(250, 250);
 
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
 
     const vertexBuffer = light._renderer._vertexBuffer;
@@ -149,7 +149,7 @@ describe('Light with obstacles around it', function () {
 
   it('Vertex and index buffers after obstacle is moved.', function () {
     obstacle.setPosition(150, 250);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
 
     const vertexBuffer = light._renderer._vertexBuffer;
@@ -179,7 +179,7 @@ describe('Light with obstacles around it', function () {
 
   it("Obstacle moved outside light's radius.", function () {
     obstacle.setPosition(400, 400);
-    runtimeScene.renderAndStep();
+    runtimeScene.renderAndStep(1000 / 60);
     light.update();
     // Ensure the fallback to simple quads. There shouldn't be anymore calculations
     // when the obstacle is not inside light's area.

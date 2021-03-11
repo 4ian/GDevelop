@@ -16,6 +16,7 @@ type Props = {|
   children: ?React.Node,
   maxWidth?: boolean,
   width?: number | string,
+  /** Sometimes required on Safari */
   noFullHeight?: boolean,
   noExpand?: boolean,
 |};

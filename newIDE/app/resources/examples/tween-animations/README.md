@@ -1,0 +1,1 @@
+Examples of how to use a variety of tween animations, including object position, color, opacity, angle, and scale.

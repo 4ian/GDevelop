@@ -19,6 +19,7 @@ import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from './EventRenderer';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -87,6 +88,12 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
   };
 
   endEditing = () => {
+    const { anchorEl } = this.state;
+
+    // Put back the focus after closing the inline popover.
+    // $FlowFixMe
+    if (anchorEl) anchorEl.focus();
+
     this.setState({
       editing: false,
       anchorEl: null,
@@ -120,9 +127,15 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                   [selectableArea]: true,
                 })}
                 onClick={this.edit}
+                onKeyPress={event => {
+                  if (shouldActivate(event)) {
+                    this.edit(event);
+                  }
+                }}
+                tabIndex={0}
               >
                 {target || (
-                  <Trans>&lt; Enter the name of external events &gt;</Trans>
+                  <Trans>{`<Enter the name of external events>`}</Trans>
                 )}
               </i>
             </span>
@@ -148,6 +161,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                   this.props.onUpdate();
                 }}
                 isInline
+                onRequestClose={this.endEditing}
                 ref={externalEventsField =>
                   (this._externalEventsField = externalEventsField)
                 }

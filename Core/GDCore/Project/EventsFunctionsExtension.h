@@ -8,6 +8,8 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
+
+#include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
@@ -83,15 +85,40 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
-  const gd::String& GetTags() const { return tags; };
-  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
-    tags = tags_;
-    return *this;
-  }
+  const std::vector<gd::String>& GetTags() const { return tags; };
+  std::vector<gd::String>& GetTags() { return tags; };
 
   const gd::String& GetAuthor() const { return author; };
   EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
     author = author_;
+    return *this;
+  }
+
+  const gd::String& GetPreviewIconUrl() const { return previewIconUrl; };
+  EventsFunctionsExtension& SetPreviewIconUrl(
+      const gd::String& previewIconUrl_) {
+    previewIconUrl = previewIconUrl_;
+    return *this;
+  }
+
+  const gd::String& GetIconUrl() const { return iconUrl; };
+  EventsFunctionsExtension& SetIconUrl(const gd::String& iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  const gd::String& GetHelpPath() const { return helpPath; };
+
+  /**
+   * \brief Set the help path of this extension, relative to the GDevelop
+   * documentation root.
+   */
+  EventsFunctionsExtension& SetHelpPath(const gd::String& helpPath_) {
+    helpPath = helpPath_;
     return *this;
   }
 
@@ -109,6 +136,35 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   GetEventsBasedBehaviors() const {
     return eventsBasedBehaviors;
   }
+
+  /** \name Dependencies
+   */
+  ///@{
+
+  /**
+   * \brief Adds a new dependency.
+   */
+  gd::DependencyMetadata& AddDependency() {
+    gd::DependencyMetadata dependency;
+    dependencies.push_back(dependency);
+    return dependencies.back();
+  };
+
+  /**
+   * \brief Adds a new dependency.
+   */
+  void RemoveDependencyAt(size_t index) {
+    dependencies.erase(dependencies.begin() + index);
+  };
+
+  /**
+   * \brief Returns the list of dependencies.
+   */
+  std::vector<gd::DependencyMetadata>& GetAllDependencies() {
+    return dependencies;
+  };
+
+  ///@}
 
   /** \name Serialization
    */
@@ -128,7 +184,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   /** \name Lifecycle event functions
    */
   ///@{
-  static bool IsExtensionLifecycleEventsFunction(const gd::String& eventsFunctionName);
+  static bool IsExtensionLifecycleEventsFunction(
+      const gd::String& eventsFunctionName);
   ///@}
 
  private:
@@ -138,15 +195,38 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
    */
   void Init(const gd::EventsFunctionsExtension& other);
 
+  void SerializeDependencyTo(const gd::DependencyMetadata& dependency,
+                             gd::SerializerElement& serializer) const {
+    serializer.SetStringAttribute("type", dependency.GetDependencyType());
+    serializer.SetStringAttribute("exportName", dependency.GetExportName());
+    serializer.SetStringAttribute("name", dependency.GetName());
+    serializer.SetStringAttribute("version", dependency.GetVersion());
+  }
+
+  gd::DependencyMetadata UnserializeDependencyFrom(
+      gd::SerializerElement& serializer) {
+    gd::DependencyMetadata dependency;
+    dependency.SetDependencyType(serializer.GetStringAttribute("type"));
+    dependency.SetExportName(serializer.GetStringAttribute("exportName"));
+    dependency.SetName(serializer.GetStringAttribute("name"));
+    dependency.SetVersion(serializer.GetStringAttribute("version"));
+    return dependency;
+  }
+
   gd::String version;
   gd::String extensionNamespace;
   gd::String shortDescription;
   gd::String description;
   gd::String name;
   gd::String fullName;
-  gd::String tags;
+  std::vector<gd::String> tags;
   gd::String author;
+  gd::String previewIconUrl;
+  gd::String iconUrl;
+  gd::String helpPath;  ///< The relative path to the help for this extension in
+                        ///< the documentation (or an absolute URL).
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  std::vector<gd::DependencyMetadata> dependencies;
 };
 
 }  // namespace gd

@@ -8,7 +8,7 @@ import InstancesSelection from './InstancesSelection';
 type Props = {|
   instancesSelection: InstancesSelection,
   instanceMeasurer: Object, // To be typed in InstancesRenderer
-  onResize: (number, number) => void,
+  onResize: (deltaX: number | null, deltaY: number | null) => void,
   onResizeEnd: () => void,
   onRotate: (number, number) => void,
   onRotateEnd: () => void,
@@ -19,10 +19,10 @@ type Props = {|
 const getButtonSizes = (screenType: ScreenType) => {
   if (screenType === 'touch') {
     return {
-      buttonSize: 16,
-      smallButtonSize: 14,
+      buttonSize: 14,
+      smallButtonSize: 12,
       buttonPadding: 5,
-      hitAreaPadding: 20,
+      hitAreaPadding: 12,
     };
   }
 
@@ -43,7 +43,7 @@ const CIRCLE_BUTTON_SHAPE = 1;
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
-  onResize: (number, number) => void;
+  onResize: (deltaX: number | null, deltaY: number | null) => void;
   onResizeEnd: () => void;
   onRotate: (number, number) => void;
   onRotateEnd: () => void;
@@ -54,7 +54,7 @@ export default class SelectedInstances {
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
   resizeButton = new PIXI.Graphics();
-  resizeIcon = new PIXI.Sprite.from('res/actions/direction.png');
+  resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
   rightResizeButton = new PIXI.Graphics();
   bottomResizeButton = new PIXI.Graphics();
   rotateButton = new PIXI.Graphics();
@@ -93,7 +93,7 @@ export default class SelectedInstances {
     this._makeButton(
       this.rightResizeButton,
       event => {
-        this.onResize(event.deltaX, 0);
+        this.onResize(event.deltaX, null);
       },
       () => {
         this.onResizeEnd();
@@ -103,7 +103,7 @@ export default class SelectedInstances {
     this._makeButton(
       this.bottomResizeButton,
       event => {
-        this.onResize(0, event.deltaY);
+        this.onResize(null, event.deltaY);
       },
       () => {
         this.onResizeEnd();

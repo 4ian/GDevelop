@@ -1,46 +1,36 @@
 {
   "tags": {
-    "allowUnknownTags": false
+    "allowUnknownTags": true
   },
   "source": {
-    "include": ["./Runtime/"],
+    "include": ["./Runtime/", "../Extensions"],
     "exclude": [
       "./Runtime/Cocos2d/",
+      "./Runtime/cocos-renderers/",
+      "./Runtime/cocos-sound-manager/",
       "./Runtime/Cordova/",
       "./Runtime/Electron/",
-      "./Runtime/FacebookInstantGames/",
-      "./Runtime/types/"
+      "./Runtime/FacebookInstantGames/"
     ],
-    "includePattern": ".+\\.js(doc)?$",
-    "excludePattern": "(^|\\/|\\\\)_"
+    "includePattern": "\\.ts$",
+    "excludePattern": "((^|\\/|\\\\)_|\\cocos-renderer\\.ts$)"
   },
   "plugins": [
     "plugins/markdown",
     "../node_modules/jsdoc-plugin-intersection",
-    "../node_modules/jsdoc-autoprivate"
+    "../node_modules/jsdoc-autoprivate",
+    "../node_modules/better-docs/typescript",
+    "../node_modules/better-docs/typedef-import",
+    "../node_modules/jsdoc-typeof-plugin"
   ],
   "templates": {
-    "default": {
-      "outputSourceFiles": true,
-      "includeDate": false
-    },
-    "applicationName": "GDevelop JS Runtime",
-    "footer": "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
-    "copyright": "GDevelop Copyright © 2008-present Florian Rival",
-    "googleAnalytics": "TODO",
-    "openGraph": {
-      "title": "GDevelop JS Runtime Documentation",
-      "type": "website",
-      "image": "",
-      "site_name": "",
-      "url": ""
-    },
-    "meta": {
-      "title": "GDevelop JS Runtime Documentation",
-      "description": "Documentation for the GDevelop JavaScript game engine",
-      "keyword": "docs, documentation, gdevelop, game, engine, html5, javascript"
-    },
-    "linenums": true
+    "referenceTitle": "GDevelop JavaScript reference",
+    "disableSort": false,
+    "collapse": false,
+    "resources": {
+        "Github -": "https://github.com/4ian/GDevelop",
+        "GDevelop Documentation": "http://wiki.compilgames.net/doku.php/gdevelop5/start"
+    }
   },
   "markdown": {
     "parser": "gfm",
@@ -51,7 +41,7 @@
     "recurse": true,
     "private": false,
     "lenient": true,
-    "template": "docs/jaguarjs-jsdoc",
+    "template": "../node_modules/jsdoc-fresh",
     "destination": "../docs/GDJS Runtime Documentation"
   }
 }

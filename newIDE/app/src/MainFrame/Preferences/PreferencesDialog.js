@@ -45,6 +45,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoOpenMostRecentProject,
     resetShortcutsToDefault,
     setShortcutForCommand,
+    setIsMenuBarHiddenInPreview,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -244,6 +245,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   Automatically re-open the project edited during last session
                 </Trans>
               }
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
+              toggled={values.isMenuBarHiddenInPreview}
+              labelPosition="right"
+              label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
           </Line>
           {Window.isDev() && (

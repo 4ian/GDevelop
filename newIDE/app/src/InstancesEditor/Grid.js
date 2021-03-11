@@ -1,4 +1,12 @@
 import * as PIXI from 'pixi.js-legacy';
+import { rgbColorToHexNumber, type RGBColor } from '../Utils/ColorTransformer';
+
+// Equal to #6868E8
+const DEFAULT_COLOR: RGBColor = {
+  r: 104,
+  g: 104,
+  b: 232,
+};
 
 export default class SelectionRectangle {
   constructor({ viewPosition, options }) {
@@ -25,10 +33,14 @@ export default class SelectionRectangle {
       return;
     }
 
+    const gridColor = options.gridColor || DEFAULT_COLOR;
+    const gridHex = rgbColorToHexNumber(gridColor);
+    const gridAlpha = gridColor.a || 1;
+
     this.pixiGrid.visible = true;
     this.pixiGrid.clear();
-    this.pixiGrid.beginFill(0x6868e8);
-    this.pixiGrid.lineStyle(1, 0x6868e8, 1);
+    this.pixiGrid.beginFill(gridHex);
+    this.pixiGrid.lineStyle(1, gridHex, gridAlpha);
     this.pixiGrid.fill.alpha = 0.1;
     this.pixiGrid.alpha = 0.8;
 

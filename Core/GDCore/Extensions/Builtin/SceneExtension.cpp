@@ -15,7 +15,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetExtensionInformation(
           "BuiltinScene",
           _("Scene management features"),
-          _("Built-in extension allowing to manipulate scenes and providing common features"),
+          _("Actions and conditions to manipulate the scenes during the game."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);

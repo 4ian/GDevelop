@@ -277,7 +277,8 @@ class AnimationsListContainer extends React.Component<
 
     if (newName !== '' && otherNames.filter(name => name === newName).length) {
       showWarningBox(
-        'Another animation with this name already exists. Please use another name.'
+        'Another animation with this name already exists. Please use another name.',
+        { delayToNextTick: true }
       );
       return;
     }
@@ -481,10 +482,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onPointsUpdated={
-                () =>
-                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-              }
             />
           </Dialog>
         )}
@@ -512,10 +509,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onCollisionMasksUpdated={
-                () =>
-                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-              }
             />
           </Dialog>
         )}

@@ -1,6 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import Popover from '@material-ui/core/Popover';
-
 import * as React from 'react';
 import {
   type ResourceSource,
@@ -19,6 +19,9 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
+import FlatButton from '../../UI/FlatButton';
+import Paste from '../../UI/CustomSvgIcons/Paste';
+import { Line } from '../../UI/Grid';
 
 const styles = {
   fullHeightSelector: {
@@ -52,6 +55,8 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  canPasteInstructions: boolean, // Unused
+  onPasteInstructions: () => void, // Unused
 |};
 
 /**
@@ -70,6 +75,8 @@ export default function NewInstructionEditorMenu({
   anchorEl,
   scope,
   onSubmit,
+  canPasteInstructions,
+  onPasteInstructions,
 }: Props) {
   const forceUpdate = useForceUpdate();
   const [
@@ -90,7 +97,7 @@ export default function NewInstructionEditorMenu({
     chosenObjectInstructionsInfoTree,
   } = newInstructionEditorState;
   const {
-    chooseFreeInstruction,
+    chooseInstruction,
     chooseObject,
     chooseObjectInstruction,
   } = newInstructionEditorSetters;
@@ -135,6 +142,7 @@ export default function NewInstructionEditorMenu({
       key="instruction-or-object-selector"
       style={styles.fullHeightSelector}
       project={project}
+      scope={scope}
       currentTab={currentInstructionOrObjectSelectorTab}
       onChangeTab={setCurrentInstructionOrObjectSelectorTab}
       globalObjectsContainer={globalObjectsContainer}
@@ -142,7 +150,7 @@ export default function NewInstructionEditorMenu({
       isCondition={isCondition}
       chosenInstructionType={!chosenObjectName ? instructionType : undefined}
       onChooseInstruction={(instructionType: string) => {
-        const { instruction, chosenObjectName } = chooseFreeInstruction(
+        const { instruction, chosenObjectName } = chooseInstruction(
           instructionType
         );
         submitInstruction({ instruction, chosenObjectName });
@@ -206,6 +214,20 @@ export default function NewInstructionEditorMenu({
           }
         }}
       />
+      <Line noMargin justifyContent="flex-end">
+        <FlatButton
+          label={
+            isCondition ? (
+              <Trans>Paste condition(s)</Trans>
+            ) : (
+              <Trans>Paste action(s)</Trans>
+            )
+          }
+          icon={<Paste />}
+          disabled={!canPasteInstructions}
+          onClick={() => onPasteInstructions()}
+        />
+      </Line>
     </Popover>
   );
 }

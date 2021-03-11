@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
+import { getHelpLink } from '../Utils/HelpLink';
 
 export type Hint = {|
   kind: 'warning' | 'info',
@@ -12,9 +13,10 @@ export type TutorialHint = {|
   kind: 'tutorial' | 'video-tutorial',
   name: string,
   message: MessageDescriptor,
-  iconSrc: string,
+  iconSrc: ?string,
   link: string,
   identifier: string,
+  featuredForGettingStarted?: boolean,
 |};
 
 export const getDeprecatedBehaviorsInformation = (): {
@@ -28,8 +30,8 @@ export const getDeprecatedBehaviorsInformation = (): {
 export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
-  'Video::VideoObject': true,
   'SkeletonObject::Skeleton': true,
+  'TileMap::TileMap': true,
 });
 
 export const getExtraObjectsInformation = (): {
@@ -57,6 +59,12 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
+    },
+  ],
+  'TileMap::TileMap': [
+    {
+      kind: 'info',
+      message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
     },
   ],
 });
@@ -102,11 +110,98 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Note that the distinction between what is a mobile device and what is not is becoming blurry (with devices like iPad pro and other "desktop-class" tablets). If you use this for mobile controls, prefer to check if the device has touchscreen support.`,
     };
   }
+  if (
+    type === 'AdvancedWindow::SetClosable' ||
+    type === 'AdvancedWindow::EnableWindow' ||
+    type === 'AdvancedWindow::Show' ||
+    type === 'AdvancedWindow::SetFocusable' ||
+    type === 'AdvancedWindow::Focus'
+  ) {
+    return {
+      kind: 'warning',
+      message: t`Be careful with this action, you may have problems exiting the preview if you don't add a way to toggle it back.`,
+    };
+  }
+  if (type === 'GetArgumentAsBoolean') {
+    return {
+      kind: 'info',
+      message: t`If the parameter is a string or a number, you probably want to use the expressions "GetArgumentAsString" or "GetArgumentAsNumber", along with the conditions "Compare two strings" or "Compare two numbers".`,
+    };
+  }
 
   return null;
 };
 
 const tutorialHints = {
+  'geometry-monster': {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/geometry-monster.png',
+    name: 'Geometry Monster Tutorial',
+    message: t`Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.`,
+    link: getHelpLink('/tutorials/geometry-monster'),
+    identifier: 'geometry-monster',
+    featuredForGettingStarted: true,
+  },
+  platformer: {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/platformer.png',
+    name: 'Platformer Tutorial',
+    message: t`Make a platform game from scratch.`,
+    link: getHelpLink('/tutorials/platformer/start'),
+    identifier: 'platformer',
+    featuredForGettingStarted: true,
+  },
+  'space-shooter': {
+    kind: 'tutorial',
+    iconSrc: 'res/tutorial_icons/space-shooter.png',
+    name: 'Space Shooter Tutorial',
+    message: t`Make a space shooter game from scratch.`,
+    link: getHelpLink('/tutorials/space-shooter'),
+    identifier: 'space-shooter',
+    featuredForGettingStarted: true,
+  },
+  'simple-game-physics-particles': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/simple-game-physics-particles.jpg',
+    name: 'How to Create a Simple Game with Physics and Particles',
+    message: t`Create a game from scratch using physics and particles.`,
+    link: 'https://www.youtube.com/watch?v=w8B84Dpgkjc',
+    identifier: 'simple-game-physics-particles',
+    featuredForGettingStarted: true,
+  },
+  'tank-shooter': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Tank Shooter Tutorial',
+    message: t`Make a simple tank shooter game from scratch.`,
+    link: getHelpLink('/tutorials/tank-shooter'),
+    identifier: 'tank-shooter',
+  },
+  'endless-runner': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Endless Runner Tutorial',
+    message: t`Make a simple game where the player must jump on platforms for as long as possible.`,
+    link: getHelpLink('/tutorials/endless-runner'),
+    identifier: 'endless-runner',
+  },
+  'endless-car-game': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Endless Car Game Tutorial',
+    message: t`Create a simple game where you must dodge the cars on the road.`,
+    link: getHelpLink('/tutorials/roadrider'),
+    identifier: 'endless-car-game',
+  },
+  'breakout-tutorial': {
+    kind: 'tutorial',
+    iconSrc: null,
+    name: 'Breakout Tutorial',
+    message: t`Create a simple breakout game where you must destroy all the bricks on the screen.`,
+    link: getHelpLink('/tutorials/breakout'),
+    identifier: 'breakout-tutorial',
+  },
+
   'screen-shake-timer-variables': {
     kind: 'video-tutorial',
     iconSrc: 'res/tutorial_icons/screen-shake-timer-variables.jpg',
@@ -219,6 +314,54 @@ const tutorialHints = {
     link: 'https://www.youtube.com/watch?v=P-scQW7PeVg',
     identifier: 'health-bar-and-health-potion',
   },
+  'touch-360-joystick-controller': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/touch-360-joystick-controller.jpg',
+    name: 'Create a Touch 360 Joystick Controller',
+    message: t`How to create a joystick displayed on screen, useful to control the player in mobile games.`,
+    link: 'https://www.youtube.com/watch?v=-k-bVU3QrfA',
+    identifier: 'touch-360-joystick-controller',
+  },
+  'flickering-dynamic-light-effect': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/flickering-dynamic-light-effect.jpg',
+    name: 'Create a Flickering Dynamic Light Effect',
+    message: t`Learn how to create a dynamic light following the player, with a flickering effect.`,
+    link: 'https://www.youtube.com/watch?v=HolCWx4E0TU',
+    identifier: 'flickering-dynamic-light-effect',
+  },
+  '2d-platformer-shooter': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/2d-platformer-shooter.jpg',
+    name: 'Create a 2D Platformer Shooter',
+    message: t`Create a 2D platform game where the player can shoot at enemies chasing him.`,
+    link: 'https://www.youtube.com/watch?v=OOw3Sh6rga8',
+    identifier: '2d-platformer-shooter',
+  },
+  'animated-buttons': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/animated-buttons.jpg',
+    name: 'Create Animated Buttons',
+    message: t`Create animated buttons that can be shown in your game menus (main menu, selection screen, etc...).`,
+    link: 'https://www.youtube.com/watch?v=7_oLY_x4vEk',
+    identifier: 'animated-buttons',
+  },
+  'simple-trampoline-platformer': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/simple-trampoline-platformer.jpg',
+    name: 'Make a Simple Trampoline/Jump Pad',
+    message: t`Create a trampoline in your platformer game, making the player jump very high when stepped on.`,
+    link: 'https://www.youtube.com/watch?v=p42i4omA7j8',
+    identifier: 'simple-trampoline-platformer',
+  },
+  '2d-car-physics-movement': {
+    kind: 'video-tutorial',
+    iconSrc: 'res/tutorial_icons/2d-car-physics-movement.jpg',
+    name: 'How to Make a 2D Car or Bike Movement With Physics Engine',
+    message: t`Learn how to create a physics based car movement.`,
+    link: 'https://www.youtube.com/watch?v=_-fX755cctU',
+    identifier: '2d-car-physics-movement',
+  },
 };
 
 const allTutorialHints = Object.keys(tutorialHints).map(
@@ -228,6 +371,9 @@ const allTutorialHints = Object.keys(tutorialHints).map(
 export const getObjectTutorialHints = (type: string): Array<TutorialHint> => {
   if (type === 'ParticleSystem::ParticleEmitter') {
     return [tutorialHints['particle-effects']];
+  }
+  if (type === 'Lighting::LightObject') {
+    return [tutorialHints['flickering-dynamic-light-effect']];
   }
 
   return [];
@@ -241,7 +387,10 @@ export const getBehaviorTutorialHints = (type: string): Array<TutorialHint> => {
     return [tutorialHints['responsive-ui']];
   }
   if (type === 'Physics2::Physics2Behavior') {
-    return [tutorialHints['physics-engine-platformer-game']];
+    return [
+      tutorialHints['physics-engine-platformer-game'],
+      tutorialHints['2d-car-physics-movement'],
+    ];
   }
 
   return [];
@@ -274,6 +423,9 @@ export const getInstructionTutorialHints = (
     ].includes(type)
   ) {
     return [tutorialHints['save-and-load']];
+  }
+  if (type === 'PlatformBehavior::SimulateJumpKey') {
+    return [tutorialHints['simple-trampoline-platformer']];
   }
 
   return [];

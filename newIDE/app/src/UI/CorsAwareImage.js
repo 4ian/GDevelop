@@ -17,6 +17,11 @@ const addSearchParameterToUrl = (
   urlEncodedParameterName: string,
   urlEncodedValue: string
 ) => {
+  if (url.startsWith('data:')) {
+    // data protocol does not support search parameters, which are useless anyway.
+    return url;
+  }
+
   const separator = url.indexOf('?') === -1 ? '?' : '&';
   return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
 };

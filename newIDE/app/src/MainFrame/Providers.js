@@ -12,9 +12,6 @@ import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
-import EventsFunctionsExtensionsContext, {
-  type EventsFunctionsExtensionsState,
-} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
@@ -28,6 +25,14 @@ import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
 import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 import { create } from 'jss';
 import rtl from 'jss-rtl';
+import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
+import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
+import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import {
+  type ResourceFetcher,
+  ResourceFetcherContext,
+} from '../ProjectsStorage/ResourceFetcher';
+import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -40,10 +45,10 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  children: ({
+  resourceFetcher: ResourceFetcher,
+  children: ({|
     i18n: I18nType,
-    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  }) => React.Node,
+  |}) => React.Node,
 |};
 
 /**
@@ -59,6 +64,7 @@ export default class Providers extends React.Component<Props, {||}> {
       makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
+      resourceFetcher,
     } = this.props;
     return (
       <DragAndDropContextProvider>
@@ -93,14 +99,19 @@ export default class Providers extends React.Component<Props, {||}> {
                                   }
                                 >
                                   <CommandsContextProvider>
-                                    <EventsFunctionsExtensionsContext.Consumer>
-                                      {eventsFunctionsExtensionsState =>
-                                        children({
-                                          i18n,
-                                          eventsFunctionsExtensionsState,
-                                        })
-                                      }
-                                    </EventsFunctionsExtensionsContext.Consumer>
+                                    <AssetStoreStateProvider>
+                                      <ResourceStoreStateProvider>
+                                        <ExtensionStoreStateProvider>
+                                          <GamesShowcaseStateProvider>
+                                            <ResourceFetcherContext.Provider
+                                              value={resourceFetcher}
+                                            >
+                                              {children({ i18n })}
+                                            </ResourceFetcherContext.Provider>
+                                          </GamesShowcaseStateProvider>
+                                        </ExtensionStoreStateProvider>
+                                      </ResourceStoreStateProvider>
+                                    </AssetStoreStateProvider>
                                   </CommandsContextProvider>
                                 </EventsFunctionsExtensionsProvider>
                               )}

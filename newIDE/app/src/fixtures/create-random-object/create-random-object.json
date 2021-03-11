@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\create-random-object\\game.json",
+    "projectUuid": "019a5b5d-4e69-49f5-8c33-12839ffe4e8b",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "@ddabrahim gametemplates.itch.io",
     "windowWidth": 800,
@@ -270,7 +267,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "b96049d6-1c16-4297-b824-d3f200f6d5ef",
+          "persistentUuid": "39d45fbc-b72b-4d3e-963f-071a582000f4",
           "width": 0,
           "x": 173,
           "y": 42,

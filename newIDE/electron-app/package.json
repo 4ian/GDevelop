@@ -53,7 +53,7 @@
     "electron-notarize": "^0.2.1",
     "minimist": "^1.2.3",
     "prettier": "1.15.3",
-    "shelljs": "^0.7.7",
+    "shelljs": "0.8.4",
     "unzipper": "^0.9.11"
   },
   "dependencies": {

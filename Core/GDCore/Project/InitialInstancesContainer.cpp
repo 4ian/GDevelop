@@ -179,6 +179,8 @@ InitialInstanceFunctor::~InitialInstanceFunctor(){};
 
 void HighestZOrderFinder::operator()(gd::InitialInstance& instance) {
   if (!layerRestricted || instance.GetLayer() == layerName) {
+    instancesCount++;
+
     if (firstCall) {
       highestZOrder = instance.GetZOrder();
       lowestZOrder = instance.GetZOrder();

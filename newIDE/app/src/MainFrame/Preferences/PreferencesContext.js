@@ -6,6 +6,8 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import optionalRequire from '../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -31,7 +33,10 @@ export type AlertMessageIdentifier =
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-broker-recommendation'
-  | 'command-palette-shortcut';
+  | 'command-palette-shortcut'
+  | 'asset-installed-explanation'
+  | 'extension-installed-explanation'
+  | 'project-should-have-unique-package-name';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -136,6 +141,18 @@ export const allAlertMessages: Array<{
     key: 'command-palette-shortcut',
     label: <Trans>Command palette keyboard shortcut</Trans>,
   },
+  {
+    key: 'asset-installed-explanation',
+    label: (
+      <Trans>Explanation after an object is installed from the store</Trans>
+    ),
+  },
+  {
+    key: 'project-should-have-unique-package-name',
+    label: (
+      <Trans>Project package names should not begin with com.example</Trans>
+    ),
+  },
 ];
 
 /**
@@ -164,6 +181,8 @@ export type PreferencesValues = {|
   autoOpenMostRecentProject: boolean,
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
+  newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  isMenuBarHiddenInPreview: boolean,
 |};
 
 /**
@@ -210,13 +229,21 @@ export type Preferences = {|
   setHasProjectOpened: (enabled: boolean) => void,
   resetShortcutsToDefault: () => void,
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
+  getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
+  setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getIsMenuBarHiddenInPreview: () => boolean,
+  setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: 'GDevelop default',
+    themeName:
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'Nord'
+        : 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -234,6 +261,8 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    isMenuBarHiddenInPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -270,6 +299,10 @@ export const initialPreferences = {
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
+  getNewObjectDialogDefaultTab: () => 'asset-store',
+  setNewObjectDialogDefaultTab: () => {},
+  getIsMenuBarHiddenInPreview: () => true,
+  setIsMenuBarHiddenInPreview: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

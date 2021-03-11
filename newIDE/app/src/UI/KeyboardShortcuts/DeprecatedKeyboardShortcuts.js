@@ -123,13 +123,13 @@ export default class DeprecatedKeyboardShortcuts {
 
     if (this.onMove) {
       if (evt.which === UP_KEY) {
-        this.onMove(0, -1);
+        this.shiftPressed ? this.onMove(0, -5) : this.onMove(0, -1);
       } else if (evt.which === DOWN_KEY) {
-        this.onMove(0, 1);
+        this.shiftPressed ? this.onMove(0, 5) : this.onMove(0, 1);
       } else if (evt.which === LEFT_KEY) {
-        this.onMove(-1, 0);
+        this.shiftPressed ? this.onMove(-5, 0) : this.onMove(-1, 0);
       } else if (evt.which === RIGHT_KEY) {
-        this.onMove(1, 0);
+        this.shiftPressed ? this.onMove(5, 0) : this.onMove(1, 0);
       }
     }
     if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
@@ -230,6 +230,11 @@ export default class DeprecatedKeyboardShortcuts {
 
   blur() {
     this.isFocused = false;
+
+    // Clear these keys on blur to handle the case where app switching via
+    // Cmd+Tab, Win+Tab, or Alt+Tab prevents us from capturing the "keyup" event.
+    this.metaPressed = false;
+    this.altPressed = false;
   }
 
   mount() {

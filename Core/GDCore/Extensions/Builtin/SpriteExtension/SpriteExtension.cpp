@@ -367,15 +367,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction(
          "ChangeColor",
-         _("Global color"),
-         _("Change the global color of an object. The default color is white."),
-         _("Change color of _PARAM0_ to _PARAM1_"),
+         _("Tint color"),
+         _("Change the tint of an object. The default color is white."),
+         _("Change tint of _PARAM0_ to _PARAM1_"),
          _("Effects"),
          "res/actions/color24.png",
          "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("color", _("Color"));
+      .AddParameter("color", _("Tint"));
 
   obj.AddAction("ChangeBlendMode",
                 _("Blend mode"),
@@ -417,7 +417,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedX",
                    _("Horizontally flipped"),
-                   _("Return true if the object is horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
                    _("_PARAM0_ is horizontally flipped"),
                    _("Effects"),
                    "res/actions/flipX24.png",
@@ -427,7 +427,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
-                   _("Return true if the object is vertically flipped"),
+                   _("Check if the object is vertically flipped"),
                    _("_PARAM0_ is vertically flipped"),
                    _("Effects"),
                    "res/actions/flipY24.png",

@@ -39,8 +39,7 @@ function RenderedSpriteInstance(
     this._pixiResourcesLoader.getInvalidPIXITexture()
   );
   this._pixiContainer.addChild(this._pixiObject);
-  this.updatePIXITexture();
-  this.updatePIXISprite();
+  this.updatePIXITextureAndSprite();
 }
 RenderedSpriteInstance.prototype = Object.create(RenderedInstance.prototype);
 
@@ -132,44 +131,45 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   return true;
 };
 
-RenderedSpriteInstance.prototype.updatePIXITexture = function() {
+RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function() {
   this.updateSprite();
   if (!this._sprite) return;
 
-  this._pixiObject.texture = this._pixiResourcesLoader.getPIXITexture(
+  const texture = this._pixiResourcesLoader.getPIXITexture(
     this._project,
     this._sprite.getImageName()
   );
+  this._pixiObject.texture = texture;
+
+  if (!texture.baseTexture.valid) {
+    // Post pone texture update if texture is not loaded.
+    texture.once('update', () => this.updatePIXITextureAndSprite());
+    return;
+  }
 
   const origin = this._sprite.getOrigin();
   this._originX = origin.getX();
   this._originY = origin.getY();
 
   if (this._sprite.isDefaultCenterPoint()) {
-    if (!this._pixiObject.texture.baseTexture.valid) {
-      var that = this;
-      // We might have to wait for the texture to load
-      this._pixiObject.texture.on('update', function() {
-        that._centerX = that._pixiObject.texture.width / 2;
-        that._centerY = that._pixiObject.texture.height / 2;
-        that._pixiObject.texture.off('update', this);
-      });
-    } else {
-      this._centerX = this._pixiObject.texture.width / 2;
-      this._centerY = this._pixiObject.texture.height / 2;
-    }
+    this._centerX = texture.width / 2;
+    this._centerY = texture.height / 2;
   } else {
     const center = this._sprite.getCenter();
     this._centerX = center.getX();
     this._centerY = center.getY();
   }
+
+  this.updatePIXISprite();
 };
 
 RenderedSpriteInstance.prototype.update = function() {
   const animation = this._instance.getRawFloatProperty('animation');
-  if (this._renderedAnimation !== animation) this.updatePIXITexture();
-
-  this.updatePIXISprite();
+  if (this._renderedAnimation !== animation) {
+    this.updatePIXITextureAndSprite();
+  } else {
+    this.updatePIXISprite();
+  }
 };
 
 RenderedSpriteInstance.prototype.getOriginX = function() {

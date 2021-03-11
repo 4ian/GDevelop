@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\open-url-in-browser\\open-url-in-browser.json",
+    "projectUuid": "7168116e-9731-4c26-a6cd-81d34cf42542",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -146,7 +143,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
-          "persistentUuid": "40db4101-cb09-4c70-8ec2-e31d9fef6fdc",
+          "persistentUuid": "cffc83b4-ef83-47cb-8c3e-ce594d83e56b",
           "width": 0,
           "x": 123,
           "y": 268.5,

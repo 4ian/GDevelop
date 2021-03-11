@@ -118,13 +118,13 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * Called when project file has changed.
    */
-  void SetProjectFile(const gd::String& file) { gameFile = file; }
+  void SetProjectFile(const gd::String& file) { projectFile = file; }
 
   /**
    * Return project file
    * \see gd::Project::SetProjectFile
    */
-  const gd::String& GetProjectFile() const { return gameFile; }
+  const gd::String& GetProjectFile() const { return projectFile; }
 
   /**
    * Set that the project should be saved as a folder project.
@@ -278,6 +278,42 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetScaleMode(const gd::String& scaleMode_) { scaleMode = scaleMode_; }
 
   /**
+   * \brief Return if the project should set 0 as Z-order for objects created
+   * from events (which is deprecated) - instead of the highest Z order that was
+   * found on each layer when the scene started.
+   */
+  bool GetUseDeprecatedZeroAsDefaultZOrder() const {
+    return useDeprecatedZeroAsDefaultZOrder;
+  }
+
+  /**
+   * \brief Set if the project should set 0 as Z-order for objects created from
+   * events (which is deprecated) - instead of the highest Z order that was
+   * found on each layer when the scene started.
+   */
+  void SetUseDeprecatedZeroAsDefaultZOrder(bool enable) {
+    useDeprecatedZeroAsDefaultZOrder = enable;
+  }
+
+  /**
+   * \brief Change the project UUID.
+   */
+  void SetProjectUuid(const gd::String& projectUuid_) {
+    projectUuid = projectUuid_;
+  };
+
+  /**
+   * \brief Get the project UUID, useful when using the game on online services
+   * that would require a unique identifier.
+   */
+  const gd::String& GetProjectUuid() const { return projectUuid; }
+
+  /**
+   * \brief Create a new project UUID.
+   */
+  void ResetProjectUuid();
+
+  /**
    * Return a reference to the vector containing the names of extensions used by
    * the project.
    */
@@ -293,20 +329,20 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Get the properties set by extensions. 
-   * 
-   * Each extension can store arbitrary values indexed by a property name, which are
-   * useful to store project wide settings (AdMob id, etc...).
+   * \brief Get the properties set by extensions.
+   *
+   * Each extension can store arbitrary values indexed by a property name, which
+   * are useful to store project wide settings (AdMob id, etc...).
    */
   gd::ExtensionProperties& GetExtensionProperties() {
     return extensionProperties;
   };
 
   /**
-   * \brief Get the properties set by extensions. 
-   * 
-   * Each extension can store arbitrary values indexed by a property name, which are
-   * useful to store project wide settings (AdMob id, etc...).
+   * \brief Get the properties set by extensions.
+   *
+   * Each extension can store arbitrary values indexed by a property name, which
+   * are useful to store project wide settings (AdMob id, etc...).
    */
   const gd::ExtensionProperties& GetExtensionProperties() const {
     return extensionProperties;
@@ -923,10 +959,6 @@ class GD_CORE_API Project : public ObjectsContainer {
 #if defined(GD_IDE_ONLY)
   std::vector<gd::String> imagesChanged;  ///< Images that have been changed and
                                           ///< which have to be reloaded
-  gd::String winExecutableFilename;       ///< Windows executable name
-  gd::String winExecutableIconFile;       ///< Icon for Windows executable
-  gd::String linuxExecutableFilename;     ///< Linux executable name
-  gd::String macExecutableFilename;       ///< Mac executable name
 #endif
 
  private:
@@ -948,8 +980,15 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
                                       ///< to the window size at runtime
   gd::String
-      sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
-                          ///< "adaptWidth", "adaptHeight" or empty
+      sizeOnStartupMode;   ///< How to adapt the game size to the screen. Can be
+                           ///< "adaptWidth", "adaptHeight" or empty
+  gd::String projectUuid;  ///< UUID useful to identify the game in online
+                           ///< services or database that would require it.
+  bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from
+                                          ///< events will have 0 as Z order,
+                                          ///< instead of the highest Z order
+                                          ///< found on the layer at the scene
+                                          ///< startup.
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
@@ -977,8 +1016,9 @@ class GD_CORE_API Project : public ObjectsContainer {
                             ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
-  gd::String gameFile;                    ///< File of the game
-  gd::String latestCompilationDirectory;  ///< File of the game
+  gd::String
+      projectFile;  ///< Path to the project file - when editing a local file.
+  gd::String latestCompilationDirectory;
   gd::Platform*
       currentPlatform;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;

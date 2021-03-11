@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\text-to-speech\\text-to-speech.json",
+    "projectUuid": "1a8033f4-1034-4e3f-8210-435ec49c236e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -143,7 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
-          "persistentUuid": "8a4d713a-bf7b-4e24-b1d1-cb2b5163626c",
+          "persistentUuid": "f5ad09f5-aeea-4ab2-b720-de5d0525033b",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -159,7 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
-          "persistentUuid": "309c189f-5db4-41ac-9693-74a54cb3f585",
+          "persistentUuid": "0b86fb6a-ff19-4144-8dc0-84d5bb135636",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -401,7 +398,8 @@
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "//Get scene variables\nvar variables = runtimeScene.getVariables();\nvar speech = variables.get(\"speech\").getAsString();\n\nspeak(speech);\n \n// say a message\nfunction speak(text, callback) {\n var u = new SpeechSynthesisUtterance();\n u.text = text;\n u.lang = 'en-US';\n \n u.onend = function () {\n if (callback) {\n callback();\n }\n };\n \n u.onerror = function (e) {\n if (callback) {\n callback(e);\n }\n };\n \n speechSynthesis.speak(u);\n}\n\n//Thanks to https://stephenwalther.com/archive/2015/01/05/using-html5-speech-recognition-and-text-to-speech\n//for the original code",
           "parameterObjects": "",
-          "useStrict": false
+          "useStrict": false,
+          "eventsSheetExpanded": false
         }
       ]
     }

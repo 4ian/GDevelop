@@ -42,6 +42,7 @@ export default class AudioResourceField extends Component<
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
         floatingLabelText={<Trans>Choose the audio file to use</Trans>}
+        onRequestClose={this.props.onRequestClose}
         ref={field => (this._field = field)}
       />
     );

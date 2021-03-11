@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <streambuf>
 #include <string>
@@ -18,6 +19,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
@@ -34,43 +36,6 @@
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
-
-namespace {
-
-std::map<gd::String, gd::String> GetExtensionDependencyExtraSettingValues(
-    const gd::Project &project,
-    const gd::String &extensionName,
-    const gd::DependencyMetadata &dependency) {
-  std::map<gd::String, gd::String> values;
-
-  for (const auto &extraSetting : dependency.GetAllExtraSettings()) {
-    const gd::String &type = extraSetting.second.GetType();
-    const gd::String extraSettingValue =
-        type == "ExtensionProperty"
-            ? project.GetExtensionProperties().GetValue(
-                  extensionName, extraSetting.second.GetValue())
-            : extraSetting.second.GetValue();
-
-    if (!extraSettingValue.empty())
-      values[extraSetting.first] = extraSettingValue;
-  }
-
-  return values;
-};
-
-bool AreMapKeysMissingElementOfSet(const std::map<gd::String, gd::String> &map,
-                                   const std::set<gd::String> &set) {
-  bool missingKey = false;
-  for (auto &key : set) {
-    if (map.find(key) == map.end()) {
-      missingKey = true;
-    }
-  }
-
-  return missingKey;
-}
-
-}  // namespace
 
 namespace gdjs {
 
@@ -174,8 +139,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-  // Copy all the dependencies
-  ExportIncludesAndLibs(includesFiles, options.exportPath);
+  // Copy all the dependencies and their source maps
+  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -268,22 +233,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsIos = [&getIconFilename]() {
-    std::vector<gd::String> sizes = {"180",
-                                     "60",
-                                     "120",
-                                     "76",
-                                     "152",
-                                     "40",
-                                     "80",
-                                     "57",
-                                     "114",
-                                     "72",
-                                     "144",
-                                     "167",
-                                     "29",
-                                     "58",
-                                     "50",
-                                     "100"};
+    std::vector<gd::String> sizes = {
+        "180", "60",  "120", "76", "152", "40", "80", "57",  "114", "72",
+        "144", "167", "29",  "58", "87",  "50", "20", "100", "167", "1024"};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -303,43 +255,39 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace(
               "GDJS_PACKAGENAME",
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))
-          .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
   gd::String plugins = "";
+  auto dependenciesAndExtensions =
+      gd::ExportedDependencyResolver::GetDependenciesFor(project, "cordova");
+  for (auto &dependencyAndExtension : dependenciesAndExtensions) {
+    const auto &dependency = dependencyAndExtension.GetDependency();
 
-  for (std::shared_ptr<gd::PlatformExtension> extension :
-       project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-    for (gd::DependencyMetadata dependency : extension->GetAllDependencies()) {
-      if (dependency.GetDependencyType() == "cordova") {
-        gd::String plugin;
-        plugin += "<plugin name=\"" + dependency.GetExportName();
-        if (dependency.GetVersion() != "") {
-          plugin += "\" spec=\"" + dependency.GetVersion();
-        }
-        plugin += "\">\n";
-
-        auto extraSettingValues = GetExtensionDependencyExtraSettingValues(
-            project, extension->GetName(), dependency);
-
-        // For Cordova, all settings are considered a plugin variable.
-        for (auto &extraSetting : extraSettingValues) {
-          plugin += "\t\t<variable name=\"" + extraSetting.first +
-                    "\" value=\"" + extraSetting.second + "\" />\n";
-        }
-
-        plugin += "\t</plugin>";
-
-        // Don't include the plugin if an extra setting was not fulfilled.
-        bool missingSetting = AreMapKeysMissingElementOfSet(
-            extraSettingValues, dependency.GetRequiredExtraSettingsForExport());
-        if (!missingSetting) plugins += plugin;
-      }
+    gd::String plugin;
+    plugin += "<plugin name=\"" + dependency.GetExportName();
+    if (dependency.GetVersion() != "") {
+      plugin += "\" spec=\"" + dependency.GetVersion();
     }
+    plugin += "\">\n";
+
+    auto extraSettingValues = gd::ExportedDependencyResolver::
+        GetExtensionDependencyExtraSettingValues(project,
+                                                 dependencyAndExtension);
+
+    // For Cordova, all settings are considered a plugin variable.
+    for (auto &extraSetting : extraSettingValues) {
+      plugin += "\t\t<variable name=\"" + extraSetting.first + "\" value=\"" +
+                extraSetting.second + "\" />\n";
+    }
+
+    plugin += "\t</plugin>";
+
+    plugins += plugin;
   }
 
+  // TODO: migrate the plugins to the package.json
   str =
       str.FindAndReplace("<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->", plugins);
 
@@ -479,6 +427,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir) {
   gd::String jsonName =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
   gd::String jsonAuthor =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
   gd::String jsonVersion =
@@ -493,33 +443,30 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
             .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
 
     gd::String packages = "";
 
-    for (std::shared_ptr<gd::PlatformExtension> extension :
-         project.GetCurrentPlatform()
-             .GetAllPlatformExtensions()) {  // TODO Add a way to select only
-                                             // used Extensions
-      for (gd::DependencyMetadata dependency :
-           extension->GetAllDependencies()) {
-        if (dependency.GetDependencyType() == "npm") {
-          if (dependency.GetVersion() == "") {
-            gd::LogError(
-                "Latest Version not available for NPM dependencies, "
-                "dependency " +
-                dependency.GetName() +
-                " is not exported. Please specify a version when calling "
-                "addDependency.");
-            continue;
-          }
-          packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
-                      dependency.GetVersion() + "\",";
-          // For node extra settings are ignored
-        }
+    auto dependenciesAndExtensions =
+        gd::ExportedDependencyResolver::GetDependenciesFor(project, "npm");
+    for (auto &dependencyAndExtension : dependenciesAndExtensions) {
+      const auto &dependency = dependencyAndExtension.GetDependency();
+      if (dependency.GetVersion() == "") {
+        gd::LogError(
+            "Latest Version not available for NPM dependencies, "
+            "dependency " +
+            dependency.GetName() +
+            " is not exported. Please specify a version when calling "
+            "addDependency.");
+        continue;
       }
+
+      // For Electron, extra settings of dependencies are ignored.
+      packages += "\n\t\"" + dependency.GetExportName() + "\": \"" +
+                  dependency.GetVersion() + "\",";
     }
 
     if (!packages.empty()) {
@@ -615,7 +562,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "libs/jshashtable.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "gd-splash-image.js");
-  InsertUnique(includesFiles, "libs/hshg.js");
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
@@ -824,7 +770,9 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    const std::vector<gd::String> &includesFiles, gd::String exportDir) {
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
+    bool exportSourceMaps) {
   for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
       // By convention, an include file that is relative is relative to
@@ -836,6 +784,12 @@ bool ExporterHelper::ExportIncludesAndLibs(
         if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
+
+        gd::String sourceMap = source + ".map";
+        // Copy source map if present
+        if (exportSourceMaps && fs.FileExists(sourceMap)) {
+          fs.CopyFile(sourceMap, exportDir + "/" + include + ".map");
+        }
       } else {
         std::cout << "Could not find GDJS include file " << include
                   << std::endl;

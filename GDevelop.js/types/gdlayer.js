@@ -22,6 +22,8 @@ declare class gdLayer {
   insertEffect(theEffect: gdEffect, position: number): void;
   removeEffect(name: string): void;
   swapEffects(firstEffectIndex: number, secondEffectIndex: number): void;
+  serializeTo(element: gdSerializerElement): void;
+  unserializeFrom(element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

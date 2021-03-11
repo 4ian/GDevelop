@@ -48,7 +48,7 @@ module.exports = {
       .addCodeOnlyParameter("currentScene", "")
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
-      .setFunctionName('gdjs.evtTools.debugger.pause');
+      .setFunctionName('gdjs.evtTools.debuggerTools.pause');
 
       return extension;
     },

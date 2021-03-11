@@ -42,7 +42,7 @@ const defaultShortcuts: ShortcutMap = {
   TOGGLE_GRID: 'Alt+KeyG',
   OPEN_SETUP_GRID: 'CmdOrCtrl+Shift+KeyG',
   EDIT_LAYER_EFFECTS: 'KeyE',
-  EDIT_LIGHTING_LAYER: 'KeyT',
+  EDIT_LAYER: 'KeyT',
   EDIT_OBJECT: 'Shift+KeyE',
   EDIT_OBJECT_VARIABLES: 'Shift+KeyV',
   EDIT_OBJECT_GROUP: 'Shift+KeyG',

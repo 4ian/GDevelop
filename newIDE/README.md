@@ -57,7 +57,7 @@ npm run electron-linux
 
 There is a script file that automates cloning this repository, building the IDE and running it:
 
--   For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned, then simply run it.
+- For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned, then simply run it.
 
 ### Development of UI components
 
@@ -87,9 +87,9 @@ It's pretty easy to create new themes. Check the [README about themes](./README-
 
 Make sure to have the standalone app running with Electron.
 
--   If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.
+- If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.
 
--   The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime).
+- The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime).
 
 If you modify any file while the IDE is running with Electron, a watcher will _automatically import_ your changes (look at the console to be sure).
 
@@ -107,8 +107,8 @@ Any text editor is fine, but it's a good idea to have one with _Prettier_ (code 
 
 Cloud storage providers are set up with development keys when you're running GDevelop in development mode. For these, to work, you must execute the web-app not from the traditional `http://localhost:3000` origin, but from `http://gdevelop-app-local:3000`:
 
--   Set up a [redirection in your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), that should look like: `127.0.0.1 gdevelop-app-local.com`.
--   Launch then the web app from `http://gdevelop-app-local:3000`.
+- Set up a [redirection in your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), that should look like: `127.0.0.1 gdevelop-app-local.com`.
+- Launch then the web app from `http://gdevelop-app-local:3000`.
 
 > This is only necessary if you want to have cloud storage providers working in development. If not done, GDevelop will simply display an error while trying to use them.
 
@@ -134,6 +134,11 @@ GH_TOKEN=xxx yarn build --mac --win --linux AppImage --publish always
 ```
 
 > To build beta versions, you can create archives: `yarn build --mac zip --win zip --linux AppImage`.
+
+#### Publish to discord
+
+Once you have built the Electron app, you can publish the executables to discord by runnning `yarn publish-discord`.
+After publishing the new version, you can test it out by running `./scripts/dispatch/(dispatch.exe|dispatch_mac|dispatch_linux) build update 718194112775454720 718194112775454720 <install_path> --platform <value> --locale en-US`, and running the GDevelop executable present in the specified installation path.
 
 ### Webapp version
 
@@ -165,12 +170,12 @@ yarn compile-translations # or npm run compile-translations
 
 The editor, the game engine and extensions are always in development. Your contribution is welcome!
 
--   Check [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+- Check [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
 
-    You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
+  You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
--   Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
+- Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
 
--   To submit your changes, you have to first create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+- To submit your changes, you have to first create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
--   Finally, make sure that the tests pass (refer to this README and the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS) for learning how to run tests).
+- Finally, make sure that the tests pass (refer to this README and the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS) for learning how to run tests).

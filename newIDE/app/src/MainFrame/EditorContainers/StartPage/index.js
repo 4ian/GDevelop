@@ -59,6 +59,7 @@ type Props = {|
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
+  onOpenTutorials: () => void,
   onOpenGamesShowcase: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
@@ -91,6 +92,7 @@ export class StartPage extends React.Component<Props, {||}> {
       onCreate,
       onOpenProjectManager,
       onCloseProject,
+      onOpenTutorials,
       onOpenGamesShowcase,
       onOpenHelpFinder,
       onOpenLanguageDialog,
@@ -118,19 +120,26 @@ export class StartPage extends React.Component<Props, {||}> {
                     </Text>
                   </Paper>
                   <ColumnStackLayout noMargin>
-                    {!project && canOpen && (
+                    {
                       <RaisedButton
-                        label={<Trans>Open a project</Trans>}
+                        label={<Trans>Getting Started and Tutorials</Trans>}
                         fullWidth
-                        onClick={onOpen}
-                        primary
+                        onClick={onOpenTutorials}
                       />
-                    )}
+                    }
                     {!project && (
                       <RaisedButton
                         label={<Trans>Create a new project</Trans>}
                         fullWidth
                         onClick={onCreate}
+                        primary
+                      />
+                    )}
+                    {!project && canOpen && (
+                      <RaisedButton
+                        label={<Trans>Open a project</Trans>}
+                        fullWidth
+                        onClick={onOpen}
                         primary
                       />
                     )}
@@ -151,13 +160,6 @@ export class StartPage extends React.Component<Props, {||}> {
                         }}
                       />
                     )}
-                    {
-                      <FlatButton
-                        label={<Trans>Search the documentation</Trans>}
-                        fullWidth
-                        onClick={onOpenHelpFinder}
-                      />
-                    }
                   </ColumnStackLayout>
                 </div>
               </Line>
@@ -182,12 +184,8 @@ export class StartPage extends React.Component<Props, {||}> {
                     />
                     <FlatButton
                       icon={<HelpIcon />}
-                      label={<Trans>Help and tutorials</Trans>}
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                        )
-                      }
+                      label={<Trans>Help and documentation</Trans>}
+                      onClick={onOpenHelpFinder}
                     />
                   </Line>
                   <Line noMargin alignItems="center" justifyContent="center">
@@ -264,6 +262,7 @@ export const renderStartPageContainer = (
     onCreate={props.onCreate}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
+    onOpenTutorials={props.onOpenTutorials}
     onOpenGamesShowcase={props.onOpenGamesShowcase}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

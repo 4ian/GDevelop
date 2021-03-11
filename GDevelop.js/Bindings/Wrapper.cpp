@@ -377,6 +377,7 @@ typedef std::map<gd::String, gd::InstructionMetadata>
     MapStringInstructionMetadata;
 typedef std::map<gd::String, gd::EventMetadata> MapStringEventMetadata;
 typedef std::map<gd::String, gd::Variable> MapStringVariable;
+typedef std::vector<std::shared_ptr<gd::Variable>> VectorVariable;
 typedef std::map<gd::String, gd::PropertyDescriptor>
     MapStringPropertyDescriptor;
 typedef std::set<gd::String> SetString;
@@ -404,6 +405,7 @@ typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
+typedef gd::Variable::Type Variable_Type;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -514,6 +516,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetStrExpressionMetadata GetStrExpressionMetadata
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
+#define STATIC_IsPrimitive IsPrimitive
 
 #define STATIC_Major Major
 #define STATIC_Minor Minor

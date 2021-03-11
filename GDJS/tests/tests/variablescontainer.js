@@ -39,15 +39,19 @@ describe('gdjs.VariablesContainer', function() {
     it('can be constructed from data, so that variables are indexed', function() {
         const container = new gdjs.VariablesContainer([{
             name: 'Var1',
-            value: 123
+            value: 123,
+            type: "number",
         },{
             name: 'Var2',
-            value: 'Hello World'
+            value: 'Hello World',
+            type: "string",
         }, {
             name: 'Var3',
+            type: "structure",
             children: [{
                 name: 'Var3.1',
                 value: 1,
+                type: "number",
             }]
         }]);
 
@@ -68,10 +72,12 @@ describe('gdjs.VariablesContainer', function() {
         // Call initFrom to add more variables (not overriding the existing ones)
         container.initFrom([{
             name: 'Var4',
-            value: 456
+            value: 456,
+            type: "number",
         },{
             name: 'Var2',
-            value: 'Modified Hello World'
+            value: 'Modified Hello World',
+            type: "string",
         }], true);
 
         expect(container.has('Var1')).to.be(true);
@@ -93,10 +99,12 @@ describe('gdjs.VariablesContainer', function() {
         // Call initFrom to replace all variables (erasing the existing ones)
         container.initFrom([{
             name: 'Var5',
-            value: 789
+            value: 789,
+            type: "number",
         },{
             name: 'Var6',
-            value: 'The Only Hello World'
+            value: 'The Only Hello World',
+            type: "string",
         }]);
 
         expect(container.has('Var1')).to.be(false);
@@ -112,14 +120,18 @@ describe('gdjs.VariablesContainer', function() {
     it('persists index of variables constructed from data', function() {
         const container = new gdjs.VariablesContainer([{
             name: 'Var1',
-            value: 123
+            value: 123,
+            type: "number",
         },{
             name: 'Var2',
-            value: 'Hello World'
+            value: 'Hello World',
+            type: "string",
         }, {
             name: 'Var3',
+            type: "structure",
             children: [{
                 name: 'Var3.1',
+                type: "number",
                 value: 1,
             }]
         }]);

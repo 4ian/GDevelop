@@ -150,7 +150,10 @@ namespace gdjs {
      * @param width The new width in pixels.
      */
     setWidth(width: float): void {
+      if (this._renderer.getWidth() === width) return;
+
       this._renderer.setWidth(width);
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -158,7 +161,10 @@ namespace gdjs {
      * @param height The new height in pixels.
      */
     setHeight(height: float): void {
+      if (this._renderer.getHeight() === height) return;
+
       this._renderer.setHeight(height);
+      this.hitBoxesDirty = true;
     }
 
     /**

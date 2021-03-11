@@ -75,7 +75,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
                 'http://wiki.compilgames.net/doku.php/gdevelop5/start'
               );
             }}
-            label={<Trans>Wiki</Trans>}
+            label={<Trans>Browse the documentation</Trans>}
           />,
         ]}
         cannotBeDismissed={false}

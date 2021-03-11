@@ -482,10 +482,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onPointsUpdated={
-                () =>
-                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-              }
             />
           </Dialog>
         )}
@@ -513,10 +509,6 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onCollisionMasksUpdated={
-                () =>
-                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-              }
             />
           </Dialog>
         )}

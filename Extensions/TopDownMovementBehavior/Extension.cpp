@@ -512,6 +512,17 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetYVelocity")
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
+  aut.AddExpressionAndConditionAndAction("number",
+                    "MovementAngleOffset",
+                    _("Movement angle offset"),
+                    _("the movement angle offset"),
+                    _("the movement angle offset"),
+                    _("Movement"),
+                    "CppPlatform/Extensions/topdownmovementicon24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardParameters("number");
 #endif
 }
 

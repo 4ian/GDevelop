@@ -722,17 +722,22 @@ describe('libGD.js', function () {
 
     it('should have initial value', function () {
       expect(variable.getValue()).toBe(0);
-      expect(variable.isNumber()).toBe(true);
+      expect(variable.getType()).toBe(gd.Variable.Number);
     });
     it('can have a value', function () {
       variable.setValue(5);
       expect(variable.getValue()).toBe(5);
-      expect(variable.isNumber()).toBe(true);
+      expect(variable.getType()).toBe(gd.Variable.Number);
     });
-    it('can have a string', function () {
+    it('can have a string value', function () {
       variable.setString('Hello');
       expect(variable.getString()).toBe('Hello');
-      expect(variable.isNumber()).toBe(false);
+      expect(variable.getType()).toBe(gd.Variable.String);
+    });
+    it('can have a boolean value', function () {
+      variable.setBool(true);
+      expect(variable.getBool()).toBe(true);
+      expect(variable.getType()).toBe(gd.Variable.Boolean);
     });
     it('can be a structure', function () {
       variable.getChild('FirstChild').setValue(1);
@@ -741,11 +746,16 @@ describe('libGD.js', function () {
       expect(variable.hasChild('SecondChild')).toBe(true);
       expect(variable.hasChild('NotExisting')).toBe(false);
       expect(variable.getChild('SecondChild').getString()).toBe('two');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
       variable.removeChild('FirstChild');
       expect(variable.hasChild('FirstChild')).toBe(false);
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      variable.removeChild('SecondChild');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
     });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
+      variable.getChild('SecondChild').setValue(1);
 
       var childrenNames = variable.getAllChildrenNames();
       expect(childrenNames.size()).toBe(2);
@@ -758,34 +768,73 @@ describe('libGD.js', function () {
 
       expect(childrenNames.size()).toBe(2);
     });
+    it('can be an array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(2).setString('three');
+      expect(variable.getAllChildrenArray().size()).toBe(3);
+      expect(variable.getAtIndex(0).getValue()).toBe(1);
+      expect(variable.getAtIndex(1).getValue()).toBe(0);
+      expect(variable.getAtIndex(2).getType()).toBe(gd.Variable.String);
+      variable.removeAtIndex(2);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.removeAtIndex(1);
+      variable.removeAtIndex(0);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+    });
     it('can search inside children and remove them recursively', function () {
       var parentVariable = new gd.Variable();
 
       var child1 = parentVariable.getChild('Child1');
       var child2 = parentVariable.getChild('Child2');
-      var grandChild = parentVariable.getChild('Child1').getChild('GrandChild');
-      expect(parentVariable.contains(grandChild, true)).toBe(true);
-      expect(parentVariable.contains(grandChild, false)).toBe(false);
+      var grandChild1 = parentVariable.getChild('Child1').getChild('GrandChild');
+      var grandChild2 = parentVariable.getChild('Child2').getAtIndex(0);
+
+      expect(parentVariable.contains(grandChild1, true)).toBe(true);
+      expect(parentVariable.contains(grandChild1, false)).toBe(false);
+      expect(parentVariable.contains(grandChild2, true)).toBe(true);
+      expect(parentVariable.contains(grandChild2, false)).toBe(false);
       expect(parentVariable.contains(child1, true)).toBe(true);
       expect(parentVariable.contains(child2, true)).toBe(true);
       expect(parentVariable.contains(child1, false)).toBe(true);
       expect(parentVariable.contains(child2, false)).toBe(true);
-      expect(child1.contains(grandChild, true)).toBe(true);
-      expect(child1.contains(grandChild, false)).toBe(true);
-      expect(child2.contains(grandChild, true)).toBe(false);
-      expect(child2.contains(grandChild, false)).toBe(false);
-      expect(grandChild.contains(grandChild, true)).toBe(false);
-      expect(grandChild.contains(grandChild, false)).toBe(false);
-      expect(grandChild.contains(child1, true)).toBe(false);
-      expect(grandChild.contains(child2, true)).toBe(false);
-      expect(grandChild.contains(parentVariable, true)).toBe(false);
-      expect(grandChild.contains(child1, false)).toBe(false);
-      expect(grandChild.contains(child2, false)).toBe(false);
-      expect(grandChild.contains(parentVariable, false)).toBe(false);
 
-      parentVariable.removeRecursively(grandChild);
+      expect(child1.contains(grandChild1, true)).toBe(true);
+      expect(child1.contains(grandChild1, false)).toBe(true);
+      expect(child2.contains(grandChild1, true)).toBe(false);
+      expect(child2.contains(grandChild1, false)).toBe(false);
+
+      expect(child1.contains(grandChild2, true)).toBe(false);
+      expect(child1.contains(grandChild2, false)).toBe(false);
+      expect(child2.contains(grandChild2, true)).toBe(true);
+      expect(child2.contains(grandChild2, false)).toBe(true);
+
+      expect(grandChild1.contains(grandChild1, true)).toBe(false);
+      expect(grandChild1.contains(grandChild1, false)).toBe(false);
+      expect(grandChild1.contains(child1, true)).toBe(false);
+      expect(grandChild1.contains(child2, true)).toBe(false);
+      expect(grandChild1.contains(parentVariable, true)).toBe(false);
+      expect(grandChild1.contains(child1, false)).toBe(false);
+      expect(grandChild1.contains(child2, false)).toBe(false);
+      expect(grandChild1.contains(parentVariable, false)).toBe(false);
+
+      expect(grandChild2.contains(grandChild1, true)).toBe(false);
+      expect(grandChild2.contains(grandChild1, false)).toBe(false);
+      expect(grandChild2.contains(child1, true)).toBe(false);
+      expect(grandChild2.contains(child2, true)).toBe(false);
+      expect(grandChild2.contains(parentVariable, true)).toBe(false);
+      expect(grandChild2.contains(child1, false)).toBe(false);
+      expect(grandChild2.contains(child2, false)).toBe(false);
+      expect(grandChild2.contains(parentVariable, false)).toBe(false);
+
+      parentVariable.removeRecursively(grandChild1);
       expect(child1.hasChild('GrandChild')).toBe(false);
       expect(child1.getChildrenCount()).toBe(0);
+      expect(parentVariable.getChildrenCount()).toBe(2);
+
+      parentVariable.removeRecursively(grandChild2);
+      expect(child2.getAllChildrenArray().size()).toBe(0);
+      expect(child2.getChildrenCount()).toBe(0);
       expect(parentVariable.getChildrenCount()).toBe(2);
 
       parentVariable.removeRecursively(child2);

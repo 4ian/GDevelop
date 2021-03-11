@@ -46,6 +46,7 @@ namespace gdjs {
       let i = 0;
       for (let j = 0; j < data.length; ++j) {
         const varData = data[j];
+        if (!varData.name) continue;
 
         //Get the variable:
         const variable = that.get(varData.name);
@@ -213,8 +214,14 @@ namespace gdjs {
      * @static
      */
     static badVariable = {
+      getType: function () {
+        return 'number';
+      },
+      isPrimitive: function () {
+        return true;
+      },
       getChild: function () {
-        return VariablesContainer.badVariable;
+        return gdjs.VariablesContainer.badVariable;
       },
       hasChild: function () {
         return false;
@@ -234,14 +241,32 @@ namespace gdjs {
       setString: function () {
         return;
       },
+      setBoolean: function () {
+        return;
+      },
       getAsString: function () {
-        return '';
+        return '0';
       },
       getAsNumber: function () {
         return 0;
       },
+      getAsBoolean: function () {
+        return 'false';
+      },
       getAllChildren: function () {
         return {};
+      },
+      getAllChildrenArray: function () {
+        return [];
+      },
+      getAtIndex: function () {
+        return gdjs.VariablesContainer.badVariable;
+      },
+      push: function () {
+        return;
+      },
+      removeAtIndex: function () {
+        return;
       },
       add: function () {
         return;
@@ -256,6 +281,9 @@ namespace gdjs {
         return;
       },
       concatenate: function () {
+        return;
+      },
+      concatenateString: function () {
         return;
       },
       setUndefinedInContainer: function () {

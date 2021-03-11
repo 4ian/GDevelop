@@ -67,7 +67,7 @@ namespace gdjs {
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
      * @param runtimeScene The runtimeScene owning the object
      */
-    stepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    stepPreEvents(runtimeScene: gdjs.RuntimeScene): void {
       if (this._activated) {
         const profiler = runtimeScene.getProfiler();
         if (profiler) {
@@ -85,7 +85,7 @@ namespace gdjs {
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
      * @param runtimeScene The runtimeScene owning the object
      */
-    stepPostEvents(runtimeScene: gdjs.RuntimeScene) {
+    stepPostEvents(runtimeScene: gdjs.RuntimeScene): void {
       if (this._activated) {
         const profiler = runtimeScene.getProfiler();
         if (profiler) {
@@ -102,7 +102,7 @@ namespace gdjs {
      * De/Activate the behavior
      * @param enable true to enable the behavior, false to disable it
      */
-    activate(enable: boolean) {
+    activate(enable: boolean): void {
       if (enable === undefined) {
         enable = true;
       }
@@ -122,12 +122,12 @@ namespace gdjs {
      * object using it was created), after the object is fully initialized (so
      * you can use `this.owner` without risk).
      */
-    onCreated() {}
+    onCreated(): void {}
 
     /**
      * Return true if the behavior is activated
      */
-    activated() {
+    activated(): boolean {
       return this._activated;
     }
 
@@ -135,24 +135,24 @@ namespace gdjs {
      * Reimplement this method to do extra work when the behavior is activated (after
      * it has been deactivated, see `onDeActivate`).
      */
-    onActivate() {}
+    onActivate(): void {}
 
     /**
      * Reimplement this method to do extra work when the behavior is deactivated.
      */
-    onDeActivate() {}
+    onDeActivate(): void {}
 
     /**
      * This method is called each tick before events are done.
      * @param runtimeScene The runtimeScene owning the object
      */
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene): void {}
 
     /**
      * This method is called each tick after events are done.
      * @param runtimeScene The runtimeScene owning the object
      */
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene): void {}
 
     /**
      * This method is called when the owner of the behavior
@@ -161,14 +161,14 @@ namespace gdjs {
      * hot-reloading only. Otherwise, behaviors are just de-activated,
      * not removed. See `onDeActivate`).
      */
-    onDestroy() {}
+    onDestroy(): void {}
 
     /**
      * This method is called when the owner of the behavior
      * was hot reloaded, so its position, angle, size can have been changed outside
      * of events.
      */
-    onObjectHotReloaded() {}
+    onObjectHotReloaded(): void {}
   }
   gdjs.registerBehavior('', gdjs.RuntimeBehavior);
 }

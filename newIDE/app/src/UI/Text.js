@@ -43,21 +43,19 @@ export default ({
   noShrink,
   noMargin,
   displayInlineAsSpan,
-}: Props) => {
-  return (
-    <Typography
-      variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
-      component={displayInlineAsSpan ? 'span' : undefined}
-      style={{
-        ...style,
-        display: displayInlineAsSpan ? 'inline-block' : undefined,
-        flexShrink: noShrink ? 0 : undefined,
-        marginTop: noMargin ? 0 : 6,
-        marginBottom: noMargin ? 0 : 6,
-      }}
-      align={align || 'inherit'}
-    >
-      {children}
-    </Typography>
-  );
-};
+}: Props) => (
+  <Typography
+    variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
+    component={displayInlineAsSpan ? 'span' : undefined}
+    style={{
+      ...style,
+      display: displayInlineAsSpan ? 'inline-block' : undefined,
+      flexShrink: noShrink ? 0 : undefined,
+      marginTop: noMargin ? 0 : 6,
+      marginBottom: noMargin ? 0 : 6,
+    }}
+    align={align || 'inherit'}
+  >
+    {children}
+  </Typography>
+);

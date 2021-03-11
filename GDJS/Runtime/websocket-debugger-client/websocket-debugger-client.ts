@@ -5,38 +5,50 @@ namespace gdjs {
   export interface IDebuggerClient {
     /**
      * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
+     * @param path - The path to the variable, starting from {@link RuntimeGame}.
      * @param newValue - The new value.
+     * @return Was the operation successful?
      */
-    set(path, newValue: any);
+    set(path: string[], newValue: any): boolean;
 
     /**
      * Call a method, specified by a path starting from the {@link RuntimeGame} instance.
-     * @param path - The path to the method, starting from the RuntimeGame.
+     * @param path - The path to the method, starting from {@link RuntimeGame}.
      * @param args - The arguments to pass the method.
+     * @return Was the operation successful?
      */
-    call(path: string[], args: any[]);
+    call(path: string[], args: any[]): boolean;
 
     /**
      * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
      */
-    sendRuntimeGameDump();
+    sendRuntimeGameDump(): void;
 
     /**
-     * Start profiling.
+     * Send logs from the hot reloader to the server.
+     * @param logs The hot reloader logs.
      */
-    sendProfilerStarted();
+    sendHotReloaderLogs(logs: HotReloaderLog[]): void;
 
     /**
-     * Stop profiling.
+     * Callback called when profiling is starting.
      */
-    sendProfilerStopped();
+    sendProfilerStarted(): void;
+
+    /**
+     * Callback called when profiling is ending.
+     */
+    sendProfilerStopped(): void;
 
     /**
      * Send profiling results.
      * @param framesAverageMeasures The measures made for each frames.
      * @param stats Other measures done during the profiler run.
      */
-    sendProfilerOutput(framesAverageMeasures: any, stats: any);
+    sendProfilerOutput(
+      framesAverageMeasures: FrameMeasure,
+      stats: ProfilerStats
+    ): void;
   }
 
   /**
@@ -62,7 +74,7 @@ namespace gdjs {
     /**
      * @param path - The path of the property to modify, starting from the RuntimeGame.
      */
-    constructor(runtimeGame) {
+    constructor(runtimeGame: RuntimeGame) {
       this._runtimegame = runtimeGame;
       this._hotReloader = new gdjs.HotReloader(runtimeGame);
       this._ws = null;
@@ -147,7 +159,7 @@ namespace gdjs {
       return;
     }
 
-    set(path, newValue): boolean {
+    set(path: string[], newValue: any): boolean {
       if (!path || !path.length) {
         console.warn('No path specified, set operation from debugger aborted');
         return false;
@@ -179,7 +191,7 @@ namespace gdjs {
       return true;
     }
 
-    call(path, args) {
+    call(path: string[], args: any[]): boolean {
       if (!path || !path.length) {
         console.warn('No path specified, call operation from debugger aborted');
         return false;
@@ -204,7 +216,7 @@ namespace gdjs {
       return true;
     }
 
-    sendRuntimeGameDump() {
+    sendRuntimeGameDump(): void {
       if (!this._ws) {
         console.warn(
           'No connection to debugger opened to send RuntimeGame dump'
@@ -277,7 +289,7 @@ namespace gdjs {
       this._ws.send(stringifiedMessage);
     }
 
-    sendHotReloaderLogs(logs) {
+    sendHotReloaderLogs(logs: HotReloaderLog[]): void {
       if (!this._ws) {
         console.warn('No connection to debugger opened');
         return;
@@ -290,7 +302,7 @@ namespace gdjs {
       );
     }
 
-    sendProfilerStarted() {
+    sendProfilerStarted(): void {
       if (!this._ws) {
         console.warn('No connection to debugger opened');
         return;
@@ -303,7 +315,7 @@ namespace gdjs {
       );
     }
 
-    sendProfilerStopped() {
+    sendProfilerStopped(): void {
       if (!this._ws) {
         console.warn('No connection to debugger opened');
         return;
@@ -316,7 +328,10 @@ namespace gdjs {
       );
     }
 
-    sendProfilerOutput(framesAverageMeasures, stats) {
+    sendProfilerOutput(
+      framesAverageMeasures: FrameMeasure,
+      stats: ProfilerStats
+    ): void {
       if (!this._ws) {
         console.warn(
           'No connection to debugger opened to send profiler measures'
@@ -345,14 +360,13 @@ namespace gdjs {
      */
     _circularSafeStringify(
       obj: any,
-      replacer?: Function,
+      replacer?: DebuggerClientCycleReplacer,
       maxDepth?: number,
       spaces?: number,
       cycleReplacer?: DebuggerClientCycleReplacer
     ) {
       return JSON.stringify(
         obj,
-        // @ts-ignore
         this._depthLimitedSerializer(replacer, cycleReplacer, maxDepth),
         spaces
       );
@@ -365,10 +379,10 @@ namespace gdjs {
      * @param [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
      */
     _depthLimitedSerializer(
-      replacer?: Function,
+      replacer?: DebuggerClientCycleReplacer,
       cycleReplacer?: DebuggerClientCycleReplacer,
       maxDepth?: number
-    ): Function {
+    ): DebuggerClientCycleReplacer {
       const stack: Array<string> = [],
         keys: Array<string> = [];
       if (cycleReplacer === undefined || cycleReplacer === null) {
@@ -382,7 +396,7 @@ namespace gdjs {
         };
       }
 
-      return function (key, value) {
+      return function (key: string, value: any): any {
         if (stack.length > 0) {
           const thisPos = stack.indexOf(this);
           ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
@@ -391,8 +405,11 @@ namespace gdjs {
             return '[Max depth reached]';
           } else {
             if (~stack.indexOf(value)) {
-              // @ts-ignore
-              value = cycleReplacer.call(this, key, value);
+              value = (cycleReplacer as DebuggerClientCycleReplacer).call(
+                this,
+                key,
+                value
+              );
             }
           }
         } else {

@@ -16,9 +16,9 @@ namespace gdjs {
    */
   export class HotReloader {
     _runtimeGame: gdjs.RuntimeGame;
-    _reloadedScriptElement: { [key: string]: HTMLScriptElement } = {};
+    _reloadedScriptElement: Record<string, HTMLScriptElement> = {};
     _logs: HotReloaderLog[] = [];
-    _alreadyLoadedScriptFiles: { [key: string]: boolean } = {};
+    _alreadyLoadedScriptFiles: Record<string, boolean> = {};
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -31,7 +31,7 @@ namespace gdjs {
       ObjectWithPersistentId extends { persistentUuid: string | null }
     >(
       objectsWithPersistentId: ObjectWithPersistentId[]
-    ): { [key: string]: ObjectWithPersistentId } {
+    ): Record<string, ObjectWithPersistentId> {
       return objectsWithPersistentId.reduce(function (objectsMap, object) {
         if (object.persistentUuid) {
           objectsMap[object.persistentUuid] = object;
@@ -41,7 +41,7 @@ namespace gdjs {
     }
 
     _canReloadScriptFile(srcFilename: string): boolean {
-      function endsWith(str, suffix) {
+      function endsWith(str: string, suffix: string): boolean {
         const suffixPosition = str.indexOf(suffix);
         return (
           suffixPosition !== -1 && suffixPosition === str.length - suffix.length
@@ -83,7 +83,7 @@ namespace gdjs {
     }
 
     _reloadScript(srcFilename: string): Promise<void> {
-      function endsWith(str, suffix) {
+      function endsWith(str: string, suffix: string): boolean {
         const suffixPosition = str.indexOf(suffix);
         return (
           suffixPosition !== -1 && suffixPosition === str.length - suffix.length
@@ -132,7 +132,7 @@ namespace gdjs {
       });
     }
 
-    hotReload() {
+    hotReload(): Promise<HotReloaderLog[]> {
       console.info('Hot reload started');
       this._runtimeGame.pause(true);
       this._logs = [];
@@ -140,36 +140,29 @@ namespace gdjs {
       // Save old data of the project, to be used to compute
       // the difference between the old and new project data:
 
-      // @ts-ignore
       const oldProjectData: ProjectData = gdjs.projectData;
 
-      // @ts-ignore
-      const oldScriptFiles: RuntimeGameOptionsScriptFile[] =
-        gdjs.runtimeGameOptions.scriptFiles;
+      const oldScriptFiles = gdjs.runtimeGameOptions
+        .scriptFiles as RuntimeGameOptionsScriptFile[];
+
       oldScriptFiles.forEach((scriptFile) => {
         this._alreadyLoadedScriptFiles[scriptFile.path] = true;
       });
       const oldBehaviorConstructors: { [key: string]: Function } = {};
 
-      // @ts-ignore - TODO: type gdjs.behaviorsType
       for (let behaviorTypeName in gdjs.behaviorsTypes.items) {
         oldBehaviorConstructors[behaviorTypeName] =
-          // @ts-ignore - TODO: type gdjs.behaviorsType
           gdjs.behaviorsTypes.items[behaviorTypeName];
       }
 
       // Reload projectData and runtimeGameOptions stored by convention in data.js:
       return this._reloadScript('data.js').then(() => {
-        // @ts-ignore
         const newProjectData: ProjectData = gdjs.projectData;
 
-        // @ts-ignore
         const newRuntimeGameOptions: RuntimeGameOptions =
           gdjs.runtimeGameOptions;
 
-        // @ts-ignore
-        const newScriptFiles: RuntimeGameOptionsScriptFile[] =
-          newRuntimeGameOptions.scriptFiles;
+        const newScriptFiles = newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
         const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
 
         // Reload the changed scripts, which will have the side effects of re-running
@@ -185,7 +178,6 @@ namespace gdjs {
           .then(() => {
             const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
               oldBehaviorConstructors,
-              // @ts-ignore - TODO: type gdjs.behaviorsType
               gdjs.behaviorsTypes.items
             );
             return this._hotReloadRuntimeGame(
@@ -220,8 +212,8 @@ namespace gdjs {
     }
 
     _computeChangedRuntimeBehaviors(
-      oldBehaviorConstructors: { [key: string]: Function },
-      newBehaviorConstructors: { [key: string]: Function }
+      oldBehaviorConstructors: Record<string, Function>,
+      newBehaviorConstructors: Record<string, Function>
     ): ChangedRuntimeBehavior[] {
       const changedRuntimeBehaviors: ChangedRuntimeBehavior[] = [];
       for (let behaviorTypeName in oldBehaviorConstructors) {
@@ -262,7 +254,7 @@ namespace gdjs {
       oldScriptFiles: RuntimeGameOptionsScriptFile[],
       newScriptFiles: RuntimeGameOptionsScriptFile[],
       projectDataOnlyExport: boolean
-    ) {
+    ): Promise<void[]> {
       const reloadPromises: Array<Promise<void>> = [];
 
       // Reload events, only if they were exported.
@@ -391,53 +383,67 @@ namespace gdjs {
     }
 
     _hotReloadVariablesContainer(
-      oldVariablesData: VariableData[],
-      newVariablesData: VariableData[],
+      oldVariablesData: RootVariableData[],
+      newVariablesData: RootVariableData[],
       variablesContainer: gdjs.VariablesContainer
-    ) {
+    ): void {
       newVariablesData.forEach((newVariableData) => {
         const variableName = newVariableData.name;
-        const oldVariableData = oldVariablesData.filter(
-          (variable) => variable.name === newVariableData.name
-        )[0];
+        const oldVariableData = oldVariablesData.find(
+          (variable) => variable.name === variableName
+        );
         const variable = variablesContainer.get(newVariableData.name);
+
         if (!oldVariableData) {
           // New variable
           variablesContainer.add(
             variableName,
             new gdjs.Variable(newVariableData)
           );
-        } else {
-          if (
-            !newVariableData.children &&
-            (oldVariableData.value !== newVariableData.value ||
-              oldVariableData.children)
-          ) {
-            // Variable value was changed or was converted from
-            // a structure to a variable with value.
+        } else if (
+          gdjs.Variable.isPrimitive(newVariableData.type || 'number') &&
+          (oldVariableData.value !== newVariableData.value ||
+            !gdjs.Variable.isPrimitive(oldVariableData.type || 'number'))
+        ) {
+          // Variable value was changed or was converted from
+          // a structure to a variable with value.
+          variablesContainer.remove(variableName);
+          variablesContainer.add(
+            variableName,
+            new gdjs.Variable(newVariableData)
+          );
+        } else if (
+          !gdjs.Variable.isPrimitive(newVariableData.type || 'number')
+        ) {
+          // Variable is a structure or array (or was converted from a primitive
+          // to one of those).
+          if (newVariableData.type === 'structure')
+            this._hotReloadStructureVariable(
+              //@ts-ignore If the type is structure, it is assured that the children have a name
+              oldVariableData.children,
+              newVariableData.children,
+              variable
+            );
+          else {
+            // Arrays cannot be hot reloaded.
+            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // It will in that case mess up the whole array,
+            // and there is no way to know if that was the case.
+            //
+            // We therefore just replace the old array with the new one.
             variablesContainer.remove(variableName);
             variablesContainer.add(
               variableName,
               new gdjs.Variable(newVariableData)
             );
-          } else {
-            if (newVariableData.children) {
-              // Variable is a structure (or was converted from a non structure
-              // to a structure).
-              // Note: oldVariableData.children can be null!
-              this._hotReloadStructureVariable(
-                oldVariableData.children,
-                newVariableData.children,
-                variable
-              );
-            }
           }
         }
       });
       oldVariablesData.forEach((oldVariableData) => {
-        const newVariableData = newVariablesData.filter(
+        const newVariableData = newVariablesData.find(
           (variable) => variable.name === oldVariableData.name
-        )[0];
+        );
+
         if (!newVariableData) {
           // Variable was removed
           variablesContainer.remove(oldVariableData.name);
@@ -446,48 +452,63 @@ namespace gdjs {
     }
 
     _hotReloadStructureVariable(
-      oldChildren,
-      newChildren: VariableData[],
+      oldChildren: RootVariableData[],
+      newChildren: RootVariableData[],
       variable: gdjs.Variable
-    ) {
+    ): void {
       if (oldChildren) {
         oldChildren.forEach((oldChildVariableData) => {
-          const newChildVariableData = newChildren.filter(
+          const newChildVariableData = newChildren.find(
             (childVariableData) =>
               childVariableData.name === oldChildVariableData.name
-          )[0];
+          );
+
           if (!newChildVariableData) {
             // Child variable was removed.
             variable.removeChild(oldChildVariableData.name);
-          } else {
-            if (
-              !newChildVariableData.children &&
-              (oldChildVariableData.value !== newChildVariableData.value ||
-                !oldChildVariableData.children)
-            ) {
-              // The child variable value was changed or was converted from
-              // structure to a variable with value.
+          } else if (
+            gdjs.Variable.isPrimitive(newChildVariableData.type || 'number') &&
+            (oldChildVariableData.value !== newChildVariableData.value ||
+              !gdjs.Variable.isPrimitive(oldChildVariableData.type || 'number'))
+          ) {
+            // The child variable value was changed or was converted from
+            // structure to a variable with value.
+            variable.addChild(
+              newChildVariableData.name,
+              new gdjs.Variable(newChildVariableData)
+            );
+          } else if (
+            !gdjs.Variable.isPrimitive(newChildVariableData.type || 'number')
+          ) {
+            // Variable is a structure or array (or was converted from a primitive
+            // to one of those).
+            if (newChildVariableData.type === 'structure')
+              this._hotReloadStructureVariable(
+                //@ts-ignore If the type is structure, it is assured that the children have a name
+                oldChildVariableData.children,
+                newChildVariableData.children as Required<VariableData>[],
+                variable.getChild(newChildVariableData.name)
+              );
+            else {
+              // Arrays cannot be hot reloaded.
+              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // It will in that case mess up the whole array,
+              // and there is no way to know if that was the case.
+              //
+              // We therefore just replace the old array with the new one.
               variable.addChild(
                 newChildVariableData.name,
                 new gdjs.Variable(newChildVariableData)
               );
-            } else {
-              if (newChildVariableData.children) {
-                // The child variable is a structure.
-                this._hotReloadStructureVariable(
-                  oldChildVariableData.children,
-                  newChildVariableData.children,
-                  variable.getChild(newChildVariableData.name)
-                );
-              }
             }
           }
         });
         newChildren.forEach((newChildVariableData) => {
-          const oldChildVariableData = oldChildren.filter(
+          const oldChildVariableData = oldChildren.find(
             (childVariableData) =>
               childVariableData.name === newChildVariableData.name
-          )[0];
+          );
+
           if (!oldChildVariableData) {
             // Child variable was added
             variable.addChild(
@@ -512,7 +533,7 @@ namespace gdjs {
       newLayoutData: LayoutData,
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       runtimeScene.setBackgroundColor(
         newLayoutData.r,
         newLayoutData.v,
@@ -525,8 +546,8 @@ namespace gdjs {
           .setWindowTitle(newLayoutData.title);
       }
       this._hotReloadVariablesContainer(
-        oldLayoutData.variables,
-        newLayoutData.variables,
+        oldLayoutData.variables as Required<VariableData>[],
+        newLayoutData.variables as Required<VariableData>[],
         runtimeScene.getVariables()
       );
       this._hotReloadRuntimeSceneBehaviorsSharedData(
@@ -568,7 +589,7 @@ namespace gdjs {
       oldBehaviorsSharedData: BehaviorSharedData[],
       newBehaviorsSharedData: BehaviorSharedData[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       oldBehaviorsSharedData.forEach((oldBehaviorSharedData) => {
         const name = oldBehaviorSharedData.name;
         const newBehaviorSharedData = newBehaviorsSharedData.filter(
@@ -611,7 +632,7 @@ namespace gdjs {
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       newObjects: ObjectData[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       newObjects.forEach((newObjectData) => {
         const objectName = newObjectData.name;
         const newBehaviors = newObjectData.behaviors;
@@ -648,7 +669,7 @@ namespace gdjs {
     _reinstantiateRuntimeObjectRuntimeBehavior(
       behaviorData: BehaviorData,
       runtimeObject: gdjs.RuntimeObject
-    ) {
+    ): void {
       const behaviorName = behaviorData.name;
       const oldRuntimeBehavior = runtimeObject.getBehavior(behaviorName);
       if (!oldRuntimeBehavior) {
@@ -701,7 +722,7 @@ namespace gdjs {
       oldObjects: ObjectData[],
       newObjects: ObjectData[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       oldObjects.forEach((oldObjectData) => {
         const name = oldObjectData.name;
         const newObjectData = newObjects.filter(
@@ -745,7 +766,7 @@ namespace gdjs {
       oldObjectData: ObjectData,
       newObjectData: ObjectData,
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       let hotReloadSucceeded = true;
       if (!HotReloader.deepEqual(oldObjectData, newObjectData)) {
         this._logs.push({
@@ -776,8 +797,8 @@ namespace gdjs {
         // Update variables
         runtimeObjects.forEach((runtimeObject) => {
           this._hotReloadVariablesContainer(
-            oldObjectData.variables,
-            newObjectData.variables,
+            oldObjectData.variables as Required<VariableData>[],
+            newObjectData.variables as Required<VariableData>[],
             runtimeObject.getVariables()
           );
         });
@@ -804,7 +825,7 @@ namespace gdjs {
       oldBehaviors: BehaviorData[],
       newBehaviors: BehaviorData[],
       runtimeObjects: gdjs.RuntimeObject[]
-    ) {
+    ): void {
       oldBehaviors.forEach((oldBehaviorData) => {
         const name = oldBehaviorData.name;
         const newBehaviorData = newBehaviors.filter(
@@ -898,7 +919,7 @@ namespace gdjs {
       oldLayers: LayerData[],
       newLayers: LayerData[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       oldLayers.forEach((oldLayerData) => {
         const name = oldLayerData.name;
         const newLayerData = newLayers.filter(
@@ -933,7 +954,7 @@ namespace gdjs {
       oldLayer: LayerData,
       newLayer: LayerData,
       runtimeLayer: gdjs.Layer
-    ) {
+    ): void {
       // Properties
       if (oldLayer.visibility !== newLayer.visibility) {
         runtimeLayer.show(newLayer.visibility);
@@ -967,7 +988,7 @@ namespace gdjs {
       oldEffectsData: EffectData[],
       newEffectsData: EffectData[],
       runtimeLayer: gdjs.Layer
-    ) {
+    ): void {
       oldEffectsData.forEach((oldEffectData) => {
         const name = oldEffectData.name;
         const newEffectData = newEffectsData.filter(
@@ -1010,7 +1031,7 @@ namespace gdjs {
       newEffectData: EffectData,
       runtimeLayer: gdjs.Layer,
       effectName: string
-    ) {
+    ): void {
       // We consider oldEffectData.effectType and newEffectData.effectType
       // are the same - it's responsibility of the caller to verify this.
       for (let parameterName in newEffectData.booleanParameters) {
@@ -1049,7 +1070,7 @@ namespace gdjs {
       oldInstances: InstanceData[],
       newInstances: InstanceData[],
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): void {
       const runtimeObjects = runtimeScene.getAdhocListOfAllInstances();
       const groupedOldInstances: {
         [key: number]: InstanceData;
@@ -1109,7 +1130,7 @@ namespace gdjs {
       oldInstance: InstanceData,
       newInstance: InstanceData,
       runtimeObject: gdjs.RuntimeObject
-    ) {
+    ): void {
       let somethingChanged = false;
 
       // Check if default properties changed
@@ -1167,8 +1188,8 @@ namespace gdjs {
 
       // Update variables
       this._hotReloadVariablesContainer(
-        oldInstance.initialVariables,
-        newInstance.initialVariables,
+        oldInstance.initialVariables as Required<VariableData>[],
+        newInstance.initialVariables as Required<VariableData>[],
         runtimeObject.getVariables()
       );
 
@@ -1215,7 +1236,7 @@ namespace gdjs {
      * @param a The first object/array/primitive to compare
      * @param b The second object/array/primitive to compare
      */
-    static deepEqual(a: any, b: any) {
+    static deepEqual(a: any, b: any): boolean {
       if (a === b) {
         return true;
       }

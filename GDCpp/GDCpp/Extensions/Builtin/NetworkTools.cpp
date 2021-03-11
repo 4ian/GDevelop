@@ -4,11 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCpp/Extensions/Builtin/NetworkTools.h"
+
 #include <SFML/Network.hpp>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <string>
+
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Variable.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
@@ -173,28 +175,45 @@ std::string StringToQuotedJSONString(const char* value) {
 }  // namespace
 
 gd::String GD_API VariableStructureToJSON(const gd::Variable& variable) {
-  if (!variable.IsStructure()) {
-    if (variable.IsNumber())
-      return gd::String::From(variable.GetValue());
-    else
-      return gd::String::FromUTF8(
-          StringToQuotedJSONString(variable.GetString().c_str()));
+  if (variable.GetType() == gd::Variable::Type::Number)
+    return gd::String::From(variable.GetValue());
+  else if (variable.GetType() == gd::Variable::Type::String)
+    return gd::String::FromUTF8(
+        StringToQuotedJSONString(variable.GetString().c_str()));
+  else if (variable.GetType() == gd::Variable::Type::Boolean) {
+    gd::String str = variable.GetBool() ? "true" : "false";
+    return str;
   }
+  else if (variable.GetType() == gd::Variable::Type::Structure) {
+    gd::String str = "{";
+    bool firstChild = true;
+    for (auto i = variable.GetAllChildren().begin();
+         i != variable.GetAllChildren().end();
+         ++i) {
+      if (!firstChild) str += ",";
+      str += gd::String::FromUTF8(StringToQuotedJSONString(i->first.c_str())) +
+             ": " + VariableStructureToJSON(*i->second);
 
-  gd::String str = "{";
-  bool firstChild = true;
-  for (auto i = variable.GetAllChildren().begin();
-       i != variable.GetAllChildren().end();
-       ++i) {
-    if (!firstChild) str += ",";
-    str += gd::String::FromUTF8(StringToQuotedJSONString(i->first.c_str())) +
-           ": " + VariableStructureToJSON(*i->second);
+      firstChild = false;
+    }
 
-    firstChild = false;
-  }
+    str += "}";
+    return str;
+  } else {
+    gd::String str = "[";
+    bool firstChild = true;
+    for (auto i = variable.GetAllChildrenArray().begin();
+         i != variable.GetAllChildrenArray().end();
+         ++i) {
+      if (!firstChild) str += ",";
+      str += VariableStructureToJSON(**i);
 
-  str += "}";
-  return str;
+      firstChild = false;
+    }
+
+    str += "]";
+    return str;
+  };
 }
 
 gd::String GD_API ObjectVariableStructureToJSON(RuntimeObject* object,
@@ -277,11 +296,12 @@ std::string DecodeString(const std::string& original) {
 }
 
 /**
- * Return the position of the end of the string. Blank are skipped if necessary
+ * Return the position of the end of the string. Blank are skipped if
+ * necessary
  * @param str The string to be used
  * @param startPos The start position
- * @param strContent A reference to a string that will be filled with the string
- * content.
+ * @param strContent A reference to a string that will be filled with the
+ * string content.
  */
 size_t SkipString(const std::string& str,
                   size_t startPos,
@@ -314,8 +334,8 @@ size_t SkipString(const std::string& str,
 /**
  * Parse a JSON string, starting from pos, and storing the result into the
  * specified variable. Note that the parsing is stopped as soon as a valid
- * object is parsed. \return The position at the end of the valid object stored
- * into the variable.
+ * object is parsed. \return The position at the end of the valid object
+ * stored into the variable.
  */
 size_t ParseJSONObject(const std::string& jsonStr,
                        size_t startPos,

@@ -9,15 +9,20 @@ namespace gdjs {
    * that are used in events to have conditions that are only valid for one frame in a row.
    */
   export class OnceTriggers {
-    _onceTriggers: any = {};
-    _lastFrameOnceTrigger: any = {};
+    _onceTriggers: Record<integer, boolean> = {};
+    _lastFrameOnceTrigger: Record<integer, boolean> = {};
 
     /**
      * To be called when events begin so that "Trigger once" conditions
      * are properly handled.
      */
-    startNewFrame() {
-      this._clearObject(this._lastFrameOnceTrigger);
+    startNewFrame(): void {
+      // Clear triggers from 2 frames ago
+      for (const k in this._lastFrameOnceTrigger)
+        if (this._lastFrameOnceTrigger.hasOwnProperty(k))
+          delete this._lastFrameOnceTrigger[k];
+
+      // Move triggers from this frame to last frame
       for (const k in this._onceTriggers) {
         if (this._onceTriggers.hasOwnProperty(k)) {
           this._lastFrameOnceTrigger[k] = this._onceTriggers[k];
@@ -31,17 +36,9 @@ namespace gdjs {
      * this method was not called with the same identifier during the last frame.
      * @param triggerId The identifier of the "Trigger once" condition.
      */
-    triggerOnce(triggerId) {
+    triggerOnce(triggerId: integer): boolean {
       this._onceTriggers[triggerId] = true;
       return !this._lastFrameOnceTrigger.hasOwnProperty(triggerId);
-    }
-
-    _clearObject(obj) {
-      for (const k in obj) {
-        if (obj.hasOwnProperty(k)) {
-          delete obj[k];
-        }
-      }
     }
   }
 }

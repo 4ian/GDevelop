@@ -13,6 +13,7 @@ declare class gdDependencyMetadata {
   getAllExtraSettings(): gdMapStringPropertyDescriptor;
   onlyIfSomeExtraSettingsNonEmpty(): gdDependencyMetadata;
   onlyIfOtherDependencyIsExported(otherDependency: string): gdDependencyMetadata;
+  copyFrom(dependencyMetadata: gdDependencyMetadata): void;
   delete(): void;
   ptr: number;
 };

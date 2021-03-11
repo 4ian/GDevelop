@@ -1,6 +1,6 @@
 namespace gdjs {
   export class InventoryManager {
-    static get(runtimeScene, name) {
+    static get(runtimeScene, name): gdjs.Inventory {
       const game = runtimeScene.getGame();
       if (!game.inventories) {
         game.inventories = {};
@@ -65,10 +65,10 @@ namespace gdjs {
       };
       export const serializeToVariable = function (
         runtimeScene,
-        inventoryName,
-        variable
+        inventoryName: string,
+        variable: gdjs.Variable
       ) {
-        const allItems = InventoryManager.get(
+        const allItems = gdjs.InventoryManager.get(
           runtimeScene,
           inventoryName
         ).getAllItems();
@@ -77,39 +77,39 @@ namespace gdjs {
           const serializedItem = variable.getChild(name);
           serializedItem.getChild('count').setNumber(item.count);
           serializedItem.getChild('maxCount').setNumber(item.maxCount);
-          serializedItem
-            .getChild('unlimited')
-            .setNumber(item.unlimited ? 'true' : 'false');
-          serializedItem
-            .getChild('equipped')
-            .setNumber(item.equipped ? 'true' : 'false');
+          serializedItem.getChild('unlimited').setBoolean(item.unlimited);
+          serializedItem.getChild('equipped').setBoolean(item.equipped);
         }
       };
       export const unserializeFromVariable = function (
         runtimeScene,
-        inventoryName,
-        variable
+        inventoryName: string,
+        variable: gdjs.Variable
       ) {
-        const inventory = InventoryManager.get(runtimeScene, inventoryName);
+        const inventory = gdjs.InventoryManager.get(
+          runtimeScene,
+          inventoryName
+        );
         inventory.clear();
+
         const children = variable.getAllChildren();
         for (const name in children) {
           const serializedItem = children[name];
+          inventory.setCount(
+            name,
+            serializedItem.getChild('count').getAsNumber()
+          );
           inventory.setMaximum(
             name,
             serializedItem.getChild('maxCount').getAsNumber()
           );
           inventory.setUnlimited(
             name,
-            serializedItem.getChild('unlimited').getAsString() == 'true'
-          );
-          inventory.setCount(
-            name,
-            serializedItem.getChild('count').getAsNumber()
+            serializedItem.getChild('unlimited').getAsBoolean()
           );
           inventory.equip(
             name,
-            serializedItem.getChild('equipped').getAsString() == 'true'
+            serializedItem.getChild('equipped').getAsBoolean()
           );
         }
       };

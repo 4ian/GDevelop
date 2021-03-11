@@ -1,5 +1,5 @@
 // Make sure that the naming convention for methods of GDevelop
-// classes is camelCase (instead of CamelCase) and rename methods
+// classes is camelCase (instead of PascalCase) and rename methods
 // with special names (like `WRAPPED_`, `STATIC_`...).
 var adaptNamingConventions = function(gd) {
     function uncapitalizeFirstLetter(method) {

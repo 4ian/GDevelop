@@ -2,8 +2,6 @@
 GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
-type FloatPoint = [number, number];
-
 namespace gdjs {
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to

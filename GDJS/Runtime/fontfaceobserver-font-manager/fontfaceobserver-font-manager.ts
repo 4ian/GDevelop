@@ -214,5 +214,6 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  export type FontManager = FontFaceObserverFontManager;
   export const FontManager = FontFaceObserverFontManager;
 }

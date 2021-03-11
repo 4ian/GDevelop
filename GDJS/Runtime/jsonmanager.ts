@@ -25,7 +25,7 @@ namespace gdjs {
    * that loading failed.
    */
   export class JsonManager {
-    _resources: any;
+    _resources: ResourceData[];
 
     _loadedJsons: { [key: string]: Object } = {};
 
@@ -57,7 +57,7 @@ namespace gdjs {
     preloadJsons(
       onProgress: JsonManagerOnProgressCallback,
       onComplete: JsonManagerOnCompleteCallback
-    ) {
+    ): void {
       const resources = this._resources;
       const jsonResources = resources.filter(function (resource) {
         return resource.kind === 'json' && !resource.disablePreload;
@@ -91,7 +91,7 @@ namespace gdjs {
      * @param resourceName The resource pointing to the json file to load.
      * @param callback The callback function called when json is loaded (or an error occured).
      */
-    loadJson(resourceName: string, callback: JsonManagerRequestCallback) {
+    loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.find(function (resource) {
         return resource.kind === 'json' && resource.name === resourceName;
       });

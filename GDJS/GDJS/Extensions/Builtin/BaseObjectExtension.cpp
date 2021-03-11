@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BaseObjectExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -86,6 +87,9 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
   objectConditions["VarObjetTxt"]
       .SetFunctionName("getVariableString")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectVariableAsBoolean"]
+      .SetFunctionName("getVariableBoolean")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["VarObjetDef"]
       .SetFunctionName("hasVariable")
@@ -189,8 +193,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
   objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
-  objectExpressions["DistanceToPosition"].SetFunctionName("getDistanceToPosition");
-  objectExpressions["SqDistanceToPosition"].SetFunctionName("getSqDistanceToPosition");
+  objectExpressions["DistanceToPosition"].SetFunctionName(
+      "getDistanceToPosition");
+  objectExpressions["SqDistanceToPosition"].SetFunctionName(
+      "getSqDistanceToPosition");
   objectExpressions["AngleToObject"].SetFunctionName("getAngleToObject");
   objectExpressions["AngleToPosition"].SetFunctionName("getAngleToPosition");
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
@@ -206,8 +212,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickedObjectsCount");
   GetAllConditions()["NbObjet"].SetFunctionName(
       "gdjs.evtTools.object.pickedObjectsCount");
-  GetAllConditions()["CollisionNP"]
-      .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
+  GetAllConditions()["CollisionNP"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(
@@ -250,6 +256,29 @@ BaseObjectExtension::BaseObjectExtension() {
           {"=", "setString"},
           {"+", "concatenate"},
       })
+      .SetIncludeFile("runtimeobject.js");
+
+  objectActions["SetObjectVariableAsBoolean"]
+      .SetFunctionName("setVariableBoolean")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ToggleObjectVariableAsBoolean"]
+      .SetFunctionName("toggleVariableBoolean")
+      .SetIncludeFile("runtimeobject.js");
+
+  objectActions["ObjectVariablePush"]
+      .SetFunctionName("variablePushCopy")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushString"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushNumber"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariablePushBool"]
+      .SetFunctionName("valuePush")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ObjectVariableRemoveAt"]
+      .SetFunctionName("variableRemoveAt")
       .SetIncludeFile("runtimeobject.js");
 
   GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(

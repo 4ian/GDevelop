@@ -8,7 +8,6 @@ module.exports = function(config) {
       //GDJS game engine files: (Order is important)
       '../Runtime-dist/libs/jshashtable.js',
       '../Runtime-dist/gd.js',
-      '../Runtime-dist/libs/hshg.js',
       '../Runtime-dist/libs/rbush.js',
       '../Runtime-dist/cocos-renderers/cocos-director-manager.js',
       '../Runtime-dist/pixi-renderers/pixi.js',

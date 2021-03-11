@@ -12,7 +12,6 @@
     "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install",
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
-	"package": "node scripts/build.js --skip-app-build -mwl dir",
     "format": "prettier --write --ignore-path .gitignore \"**/*.js\"",
     "check-format": "prettier --list-different --ignore-path .gitignore \"**/*.js\"",
     "electron-win": "node node_modules/electron/cli.js app",
@@ -20,7 +19,7 @@
     "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
     "reload-extensions": "cd ../app/scripts && node import-GDJS-Runtime.js",
     "import-zipped-electron-extensions": "node scripts/import-zipped-electron-extension.js ReactDeveloperTools app/extensions/",
-	"publish-discord": "npm run package && dispatch build push 718194112775454720 ./discord_build_config.json ."
+    "publish-discord": "node scripts/publish-discord.js"
   },
   "build": {
     "appId": "com.gdevelop-app.ide",

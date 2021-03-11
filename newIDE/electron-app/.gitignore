@@ -2,3 +2,4 @@ dist/
 app/www/
 .env
 app/extensions/ReactDeveloperTools
+!scripts/dispatch/dispatch.exe

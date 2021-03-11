@@ -65,6 +65,10 @@ jobs:
           command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
 
       - run:
+          name: Publish nightly builds to discord
+          command: mkdir ~/.dispatch && echo "$DISPATCH_CREDENTIALS" > ~/.dispatch/credentials.json && npm run publish-discord -- --branch nightly
+
+      - run:
           name: Clean dist folder to keep only installers/binaries.
           command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/win-unpacked && rm -rf newIDE/electron-app/dist/mac
 

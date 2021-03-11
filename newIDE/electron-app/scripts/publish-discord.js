@@ -48,9 +48,9 @@ const dispatchBin = path.join(
     console.error('Cannot find build ID! Did the build finish sucessfully?');
     shell.exit(0);
   }
-  const buildID = buildMatch[1];
-  console.log(buildID);
 
   // Publish the build on selected branch
-  shell.exec(`${dispatchBin} build publish ${appID} ${branch} ${buildID}`);
+  shell.exec(
+    `${dispatchBin} build publish ${appID} ${branch} ${buildMatch[1]}`
+  );
 })();

@@ -19,15 +19,16 @@ namespace gdjs {
        */
       export const drawCollisionsAndPoints = function (
         runtimeScene: gdjs.RuntimeScene,
-        viewInsivibleInstance: boolean,
-        viewCustomPoints: boolean,
-        viewPointsNames: boolean
+        showHiddenInstances: boolean,
+        showCustomPoints: boolean,
+        showPointsNames: boolean,
+        enableDebugDrawRenderedObjects: boolean
       ) {
         runtimeScene.renderCollisionsAndPoints(
-          true,
-          viewInsivibleInstance,
-          viewCustomPoints,
-          viewPointsNames
+          enableDebugDrawRenderedObjects,
+          showHiddenInstances,
+          showCustomPoints,
+          showPointsNames
         );
       };
     }

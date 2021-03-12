@@ -56,19 +56,28 @@ module.exports = {
         'drawCollisions',
         _('Draw collisions hitboxes and points'),
         _(
-          'This draw all hitboxes collsions and points of objects.' // TODO expliqué les couleurs des hitboxes
+          'This activates the display of rectangles and information on screen showing the objects bounding boxes (blue), the hitboxes (red) and some points of objects.'
         ),
-        _('Draw collisions hitboxes and points'),
+        _(
+          'Activate debugging view of bounding boxes/collision masks (include invisible objects: _PARAM1_, point names: _PARAM2_, custom points: _PARAM3_)'
+        ),
         _('Debugger Tools'),
         'res/actions/planicon24.png',
         'res/actions/planicon.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('yesorno', _('Show collisions for hidden objects'), '', true)
+      .addParameter(
+        'yesorno',
+        _('Show collisions for hidden objects'),
+        '',
+        true
+      )
       .setDefaultValue('no')
       .addParameter('yesorno', _('Show points names'), '', true)
       .setDefaultValue('yes')
       .addParameter('yesorno', _('Show custom points'), '', true)
+      .setDefaultValue('yes')
+      .addParameter('yesorno', _('Enable debug draw'), '', true)
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')

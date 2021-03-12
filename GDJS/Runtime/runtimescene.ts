@@ -83,18 +83,18 @@ namespace gdjs {
      * @memberof gdjs.RuntimeScene
      */
     renderCollisionsAndPoints(
-      enabled: boolean,
-      viewInsivibleInstance: boolean,
-      viewPointsNames: boolean,
-      viewCustomPoints: boolean
+      enableDebugDrawRenderedObjects: boolean,
+      showHiddenInstances: boolean,
+      showCustomPoints: boolean,
+      showPointsNames: boolean
     ): void {
-      if (enabled && this._layersCameraCoordinates) {
+      if (enableDebugDrawRenderedObjects && this._layersCameraCoordinates) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
           this._layersCameraCoordinates,
-          viewInsivibleInstance,
-          viewCustomPoints,
-          viewPointsNames
+          showHiddenInstances,
+          showCustomPoints,
+          showPointsNames
         );
       }
     }

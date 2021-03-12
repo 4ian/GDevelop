@@ -8,10 +8,13 @@ namespace gdjs {
     _pixiContainer: any;
     _debugDraw: PIXI.Graphics | null = null;
     _profilerText: PIXI.Text | null = null;
-    _renderedObjectsPoints: Array<{
-      wasRendered: boolean;
-      points: { x: float; y: float };
-    }>;
+    _debugDrawRenderedObjectsPoints: Record<
+      number,
+      {
+        wasRendered: boolean;
+        points: { x: float; y: float };
+      }
+    >;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -23,7 +26,7 @@ namespace gdjs {
         : null;
       this._runtimeScene = runtimeScene;
       this._pixiContainer = new PIXI.Container();
-      this._renderedObjectsPoints = [];
+      this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
@@ -83,9 +86,9 @@ namespace gdjs {
     renderDebugDraw(
       instances: gdjs.RuntimeObject[],
       layersCameraCoordinates: Record<string, [float, float, float, float]>,
-      viewInsivibleInstance: boolean,
-      viewCustomPoints: boolean,
-      viewPointsNames: boolean
+      showHiddenInstances: boolean,
+      showCustomPoints: boolean,
+      showPointsNames: boolean
     ) {
       if (!this._debugDraw) {
         this._debugDraw = new PIXI.Graphics();
@@ -100,8 +103,8 @@ namespace gdjs {
       const debugDraw: PIXI.Graphics = this._debugDraw;
 
       // Reset the boolean "wasRendered" of all points of objects to false:
-      for (var id in this._renderedObjectsPoints) {
-        this._renderedObjectsPoints[id].wasRendered = false;
+      for (let id in this._debugDrawRenderedObjectsPoints) {
+        this._debugDrawRenderedObjectsPoints[id].wasRendered = false;
       }
 
       debugDraw.clear();
@@ -113,14 +116,14 @@ namespace gdjs {
         for (let i = 0; i < instances.length; i++) {
           const object = instances[i];
           const layer = this._runtimeScene.getLayer(object.getLayer());
-          const compensationCameraMovementX =
+          const cameraTopLeftX =
             layer.getCameraX() - layer.getCameraWidth() / 2;
-          const compensationCameraMovementY =
+          const cameraTopLeftY =
             layer.getCameraY() - layer.getCameraHeight() / 2;
 
           if (
             (!object.isVisible() || !layer.isVisible()) &&
-            !viewInsivibleInstance
+            !showHiddenInstances
           ) {
             continue;
           }
@@ -134,8 +137,8 @@ namespace gdjs {
           debugDraw.line.color = 0x778ee8;
           debugDraw.fill.color = 0x778ee8;
           debugDraw.drawRect(
-            aabb.min[0] - compensationCameraMovementX,
-            aabb.min[1] - compensationCameraMovementY,
+            aabb.min[0] - cameraTopLeftX,
+            aabb.min[1] - cameraTopLeftY,
             aabb.max[0] - aabb.min[0],
             aabb.max[1] - aabb.min[1]
           );
@@ -147,14 +150,14 @@ namespace gdjs {
           const object = instances[i];
           const id = object.id;
           const layer = this._runtimeScene.getLayer(object.getLayer());
-          const compensationCameraMovementX =
+          const cameraTopLeftX =
             layer.getCameraX() - layer.getCameraWidth() / 2;
-          const compensationCameraMovementY =
+          const cameraTopLeftY =
             layer.getCameraY() - layer.getCameraHeight() / 2;
 
           if (
             (!object.isVisible() || !layer.isVisible()) &&
-            !viewInsivibleInstance
+            !showHiddenInstances
           ) {
             continue;
           }
@@ -165,14 +168,16 @@ namespace gdjs {
           }
 
           // Create the structure to store the points in memory
-          if (!this._renderedObjectsPoints[id]) {
-            this._renderedObjectsPoints[id] = {
+          if (!this._debugDrawRenderedObjectsPoints[id]) {
+            this._debugDrawRenderedObjectsPoints[id] = {
               wasRendered: true,
               points: { x: 0, y: 0 },
             };
           }
 
-          const renderedObjectTextPoints = this._renderedObjectsPoints[id];
+          const renderedObjectTextPoints = this._debugDrawRenderedObjectsPoints[
+            id
+          ];
 
           // Draw hitboxes (sub-optimal performance)
           const hitboxes = object.getHitBoxes();
@@ -184,10 +189,8 @@ namespace gdjs {
             let polyPointY: float = 0;
             hitboxes[j].vertices.forEach((point) => {
               if (layer) {
-                polyPointX = point[0] - compensationCameraMovementX;
-                polyPointY = point[1] - compensationCameraMovementY;
-                polygon.push(polyPointX);
-                polygon.push(polyPointY);
+                polygon.push(point[0] - cameraTopLeftX);
+                polygon.push(point[1] - cameraTopLeftY);
               }
             });
             debugDraw.fill.alpha = 0;
@@ -199,14 +202,8 @@ namespace gdjs {
           // Draw points
           // Center point of the object, with camera movement
           const centerPoint = {
-            x:
-              object.getDrawableX() +
-              object.getCenterX() -
-              compensationCameraMovementX,
-            y:
-              object.getDrawableY() +
-              object.getCenterY() -
-              compensationCameraMovementY,
+            x: object.getDrawableX() + object.getCenterX() - cameraTopLeftX,
+            y: object.getDrawableY() + object.getCenterY() - cameraTopLeftY,
           };
 
           // Draw Center point
@@ -215,7 +212,7 @@ namespace gdjs {
           debugDraw.fill.color = 0xffff00;
           debugDraw.drawCircle(centerPoint.x, centerPoint.y, 3);
 
-          if (viewPointsNames) {
+          if (showPointsNames) {
             if (!renderedObjectTextPoints.points['center']) {
               renderedObjectTextPoints.points['center'] = new PIXI.Text(
                 'Center',
@@ -240,21 +237,25 @@ namespace gdjs {
           // Origin point of the object, with camera movement
           // For Sprite objects get the position of the origin point.
           // For others objects that doesn't have origin point the position of the rendered object is used.
+          /*
           let originPoint = [
-            object.getDrawableX() - compensationCameraMovementX,
-            object.getDrawableY() - compensationCameraMovementY,
+            object.getDrawableX() - cameraTopLeftX,
+            object.getDrawableY() - cameraTopLeftY,
           ];
           if (object instanceof gdjs.SpriteRuntimeObject) {
             originPoint = object.getPointPosition('origin');
-            originPoint[0] = originPoint[0] - compensationCameraMovementX;
-            originPoint[1] = originPoint[1] - compensationCameraMovementY;
+            originPoint[0] = originPoint[0] - cameraTopLeftX;
+            originPoint[1] = originPoint[1] - cameraTopLeftY;
           }
+          */
+
+          let originPoint = [object.getX(), object.getY()];
 
           debugDraw.line.color = 0xff0000;
           debugDraw.fill.color = 0xff0000;
           debugDraw.drawCircle(originPoint[0], originPoint[1], 3);
 
-          if (viewPointsNames) {
+          if (showPointsNames) {
             if (!renderedObjectTextPoints.points['origin']) {
               renderedObjectTextPoints.points['origin'] = new PIXI.Text(
                 'Origin',
@@ -277,11 +278,11 @@ namespace gdjs {
           }
 
           // Draw custom point
-          if (viewCustomPoints) {
+          if (showCustomPoints) {
             // @ts-ignore '_animationFrame' does not exist on type 'RuntimeObject | SpriteRuntimeObject'.
             if (!object?._animationFrame?.points) continue;
             // @ts-ignore '_animationFrame' does not exist on type 'RuntimeObject | SpriteRuntimeObject'.
-            for (const customPointName in object._animationFrame.points[
+            for (let customPointName in object._animationFrame.points[
               'items'
             ]) {
               let customPoint: [float, float];
@@ -293,7 +294,8 @@ namespace gdjs {
                 continue;
               }
 
-              if (viewPointsNames) {
+              if (showPointsNames) {
+                console.log('ok');
                 if (!renderedObjectTextPoints.points[customPointName]) {
                   renderedObjectTextPoints.points[
                     customPointName
@@ -304,8 +306,8 @@ namespace gdjs {
                 }
 
                 renderedObjectTextPoints.points[customPointName].position.set(
-                  customPoint[0] - compensationCameraMovementX,
-                  customPoint[1] - compensationCameraMovementY
+                  customPoint[0] - cameraTopLeftX,
+                  customPoint[1] - cameraTopLeftY
                 );
 
                 // Mark the text points as rendered
@@ -320,21 +322,20 @@ namespace gdjs {
               debugDraw.line.color = 0x0000ff;
               debugDraw.fill.color = 0x0000ff;
               debugDraw.drawCircle(
-                customPoint[0] - compensationCameraMovementX,
-                customPoint[1] - compensationCameraMovementY,
+                customPoint[0] - cameraTopLeftX,
+                customPoint[1] - cameraTopLeftY,
                 3
               );
             }
           }
 
           // After we've iterated on all objects, maybe some were destroyed. So clean their text points:
-          for (var objectID in this._renderedObjectsPoints) {
-            const renderedObjectTextPoints = this._renderedObjectsPoints[
-              objectID
-            ];
+          for (let objectID in this._debugDrawRenderedObjectsPoints) {
+            const renderedObjectTextPoints = this
+              ._debugDrawRenderedObjectsPoints[objectID];
             if (!renderedObjectTextPoints.wasRendered) {
               // Clean our point objects
-              for (var name in renderedObjectTextPoints.points) {
+              for (let name in renderedObjectTextPoints.points) {
                 // Remove from the PIXI container the text point.
                 this._pixiContainer.removeChild(
                   renderedObjectTextPoints.points[name]

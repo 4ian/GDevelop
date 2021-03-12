@@ -135,8 +135,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("expression", _("Stick rotation"))
-      .AddParameter("expression", _("Stick force"))
+      .AddParameter("expression", _("Stick angle (in degrees)"))
+      .AddParameter("expression", _("Stick force (between 0 and 1)"))
       .MarkAsAdvanced()
       .SetFunctionName("SimulateStick")
       .SetIncludeFile(

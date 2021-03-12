@@ -39,7 +39,7 @@ namespace gdjs {
     _rightKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
-    private _strickRotation: float = 0;
+    private _stickAngle: float = 0;
     private _stickForce: float = 0;
 
     // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
@@ -111,11 +111,11 @@ namespace gdjs {
     }
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
-      if (viewpoint == 'PixelIsometry') {
+      if (viewpoint === 'PixelIsometry') {
         this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
-      } else if (viewpoint == 'TrueIsometry') {
+      } else if (viewpoint === 'TrueIsometry') {
         this._basisTransformation = new IsometryTransformation(Math.PI / 6);
-      } else if (viewpoint == 'CustomIsometry') {
+      } else if (viewpoint === 'CustomIsometry') {
         this._basisTransformation = new IsometryTransformation(
           (customIsometryAngle * Math.PI) / 180
         );
@@ -290,7 +290,7 @@ namespace gdjs {
       let directionInRad = 0;
       let directionInDeg = 0;
       //Update the speed of the object
-      if (direction != -1) {
+      if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
@@ -298,8 +298,8 @@ namespace gdjs {
           this._acceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity +=
           this._acceleration * timeDelta * Math.sin(directionInRad);
-      } else if (this._stickForce != 0) {
-        directionInDeg = this._strickRotation + this._movementAngleOffset;
+      } else if (this._stickForce !== 0) {
+        directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;
         this._xVelocity += norm * Math.cos(directionInRad);
@@ -337,7 +337,7 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      if (this._basisTransformation == null) {
+      if (this._basisTransformation === null) {
         // Top-down viewpoint
         object.setX(object.getX() + this._xVelocity * timeDelta);
         object.setY(object.getY() + this._yVelocity * timeDelta);
@@ -401,8 +401,8 @@ namespace gdjs {
       this._downKey = true;
     }
 
-    simulateStick(strickRotation: float, stickForce: float) {
-      this._strickRotation = strickRotation % 360;
+    simulateStick(stickAngle: float, stickForce: float) {
+      this._stickAngle = stickAngle % 360;
       this._stickForce = Math.max(0, Math.min(1, stickForce));
     }
   }

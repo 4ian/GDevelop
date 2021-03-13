@@ -54,32 +54,32 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Get the X position of the instance
    */
-  float GetX() const { return x; }
+  double GetX() const { return x; }
 
   /**
    * \brief Set the X position of the instance
    */
-  void SetX(float x_) { x = x_; }
+  void SetX(double x_) { x = x_; }
 
   /**
    * \brief Get the Y position of the instance
    */
-  float GetY() const { return y; }
+  double GetY() const { return y; }
 
   /**
    * \brief Set the Y position of the instance
    */
-  void SetY(float y_) { y = y_; }
+  void SetY(double y_) { y = y_; }
 
   /**
    * \brief Get the rotation of the instance, in radians.
    */
-  float GetAngle() const { return angle; }
+  double GetAngle() const { return angle; }
 
   /**
    * \brief Set the rotation of the instance, in radians.
    */
-  void SetAngle(float angle_) { angle = angle_; }
+  void SetAngle(double angle_) { angle = angle_; }
 
   /**
    * \brief Get the Z order of the instance.
@@ -120,11 +120,11 @@ class GD_CORE_API InitialInstance {
     personalizedSize = hasCustomSize_;
   }
 
-  float GetCustomWidth() const { return width; }
-  void SetCustomWidth(float width_) { width = width_; }
+  double GetCustomWidth() const { return width; }
+  void SetCustomWidth(double width_) { width = width_; }
 
-  float GetCustomHeight() const { return height; }
-  void SetCustomHeight(float height_) { height = height_; }
+  double GetCustomHeight() const { return height; }
+  void SetCustomHeight(double height_) { height = height_; }
 
   /**
    * \brief Return true if the instance is locked and cannot be selected by
@@ -168,20 +168,23 @@ class GD_CORE_API InitialInstance {
    *
    * \note Extensions writers: even if we can define new types of object by
    * inheriting from gd::Object class, we cannot define new gd::InitialInstance
-   * classes. However, objects can store custom properties for their associated
-   * initial instances: these properties can be stored into floatInfos and
-   * stringInfos members. When the IDE want to get the custom properties, it
-   * will call GetProperties and UpdateProperty methods. These
-   * methods are here defined to forward the call to the gd::Object associated
-   * to the gd::InitialInstance. (by looking at the value returned by
-   * GetObjectName()).
+   * classes.
+   *
+   * However, objects can store custom properties for their associated
+   * initial instances. When the IDE want to get the custom properties, it
+   * will call `GetCustomProperties` and `UpdateCustomProperty` methods.
+   * These methods are here defined to forward the call to the gd::Object
+   * associated to the gd::InitialInstance (by looking at the value returned
+   * by GetObjectName()).
    *
    * \see gd::Object
    */
   ///@{
   /**
    * \brief Return a map containing the properties names (as keys) and their
-   * values. \note Common properties ( name, position... ) do not need to be
+   * values.
+   *
+   * \note Common properties ( name, position... ) do not need to be
    * inserted in this map
    */
   std::map<gd::String, gd::PropertyDescriptor> GetCustomProperties(
@@ -198,13 +201,13 @@ class GD_CORE_API InitialInstance {
                             gd::Layout& layout);
 
   /**
-   * \brief Get the value of a float property stored in the instance.
+   * \brief Get the value of a double property stored in the instance.
    * \note Only use this when \a GetCustomProperties is too slow (when rendering
    * instances for example).
    * \return the value of the property, or 0 if it does
    * not exists.
    */
-  float GetRawFloatProperty(const gd::String& name) const;
+  double GetRawDoubleProperty(const gd::String& name) const;
 
   /**
    * \brief Get the value of a string property stored in the instance.
@@ -216,9 +219,9 @@ class GD_CORE_API InitialInstance {
   const gd::String& GetRawStringProperty(const gd::String& name) const;
 
   /**
-   * \brief Set the value of a float property stored in the instance.
+   * \brief Set the value of a double property stored in the instance.
    */
-  void SetRawFloatProperty(const gd::String& name, float value);
+  void SetRawDoubleProperty(const gd::String& name, double value);
 
   /**
    * \brief Set the value of a string property stored in the instance.
@@ -248,22 +251,23 @@ class GD_CORE_API InitialInstance {
   InitialInstance& ResetPersistentUuid();
   ///@}
 
-  // More properties can be stored in floatInfos and stringInfos.
-  // These properties are then managed by the Object class.
-  std::map<gd::String, float>
-      floatInfos;  ///< More data which can be used by the object
-  std::map<gd::String, gd::String>
-      stringInfos;  ///< More data which can be used by the object
  private:
+  // More properties can be stored in numberProperties and stringProperties.
+  // These properties are then managed by the Object class.
+  std::map<gd::String, double>
+      numberProperties;  ///< More data which can be used by the object
+  std::map<gd::String, gd::String>
+      stringProperties;  ///< More data which can be used by the object
+
   gd::String objectName;  ///< Object name
-  float x;                ///< Object initial X position
-  float y;                ///< Object initial Y position
-  float angle;            ///< Object initial angle
+  double x;                ///< Object initial X position
+  double y;                ///< Object initial Y position
+  double angle;            ///< Object initial angle
   int zOrder;             ///< Object initial Z order
   gd::String layer;       ///< Object initial layer
   bool personalizedSize;  ///< True if object has a custom size
-  float width;            ///< Object custom width
-  float height;           ///< Object custom height
+  double width;            ///< Object custom width
+  double height;           ///< Object custom height
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
   mutable gd::String persistentUuid; ///< A persistent random version 4 UUID, useful for hot reloading.

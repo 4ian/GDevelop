@@ -24,9 +24,9 @@ declare class gdInitialInstance {
   resetPersistentUuid(): gdInitialInstance;
   updateCustomProperty(name: string, value: string, project: gdProject, layout: gdLayout): void;
   getCustomProperties(project: gdProject, layout: gdLayout): gdMapStringPropertyDescriptor;
-  getRawFloatProperty(name: string): number;
+  getRawDoubleProperty(name: string): number;
   getRawStringProperty(name: string): string;
-  setRawFloatProperty(name: string, value: number): void;
+  setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): gdVariablesContainer;
   serializeTo(element: gdSerializerElement): void;

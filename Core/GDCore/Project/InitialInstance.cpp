@@ -48,17 +48,17 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
 
-  floatInfos.clear();
-  const SerializerElement& floatPropElement =
+  numberProperties.clear();
+  const SerializerElement& numberPropertiesElement =
       element.GetChild("numberProperties", 0, "floatInfos");
-  floatPropElement.ConsiderAsArrayOf("property", "Info");
-  for (std::size_t j = 0; j < floatPropElement.GetChildrenCount(); ++j) {
-    gd::String name = floatPropElement.GetChild(j).GetStringAttribute("name");
-    float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
-    floatInfos[name] = value;
+  numberPropertiesElement.ConsiderAsArrayOf("property", "Info");
+  for (std::size_t j = 0; j < numberPropertiesElement.GetChildrenCount(); ++j) {
+    gd::String name = numberPropertiesElement.GetChild(j).GetStringAttribute("name");
+    double value = numberPropertiesElement.GetChild(j).GetDoubleAttribute("value");
+    numberProperties[name] = value;
   }
 
-  stringInfos.clear();
+  stringProperties.clear();
   const SerializerElement& stringPropElement =
       element.GetChild("stringProperties", 0, "stringInfos");
   stringPropElement.ConsiderAsArrayOf("property", "Info");
@@ -66,7 +66,7 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
     gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
     gd::String value =
         stringPropElement.GetChild(j).GetStringAttribute("value");
-    stringInfos[name] = value;
+    stringProperties[name] = value;
   }
 
   GetVariables().UnserializeFrom(
@@ -88,26 +88,20 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);
 
-  SerializerElement& floatPropElement = element.AddChild("numberProperties");
-  floatPropElement.ConsiderAsArrayOf("property");
-  for (std::map<gd::String, float>::const_iterator floatInfo =
-           floatInfos.begin();
-       floatInfo != floatInfos.end();
-       ++floatInfo) {
-    floatPropElement.AddChild("property")
-        .SetAttribute("name", floatInfo->first)
-        .SetAttribute("value", floatInfo->second);
+  SerializerElement& numberPropertiesElement = element.AddChild("numberProperties");
+  numberPropertiesElement.ConsiderAsArrayOf("property");
+  for (const auto& property: numberProperties) {
+    numberPropertiesElement.AddChild("property")
+        .SetAttribute("name", property.first)
+        .SetAttribute("value", property.second);
   }
 
   SerializerElement& stringPropElement = element.AddChild("stringProperties");
   stringPropElement.ConsiderAsArrayOf("property");
-  for (std::map<gd::String, gd::String>::const_iterator stringInfo =
-           stringInfos.begin();
-       stringInfo != stringInfos.end();
-       ++stringInfo) {
+  for (const auto& property: stringProperties) {
     stringPropElement.AddChild("property")
-        .SetAttribute("name", stringInfo->first)
-        .SetAttribute("value", stringInfo->second);
+        .SetAttribute("name", property.first)
+        .SetAttribute("value", property.second);
   }
 
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
@@ -147,26 +141,26 @@ bool InitialInstance::UpdateCustomProperty(const gd::String& name,
   return false;
 }
 
-float InitialInstance::GetRawFloatProperty(const gd::String& name) const {
-  const auto& it = floatInfos.find(name);
-  return it != floatInfos.end() ? it->second : 0;
+double InitialInstance::GetRawDoubleProperty(const gd::String& name) const {
+  const auto& it = numberProperties.find(name);
+  return it != numberProperties.end() ? it->second : 0;
 }
 
 const gd::String& InitialInstance::GetRawStringProperty(
     const gd::String& name) const {
   if (!badStringProperyValue) badStringProperyValue = new gd::String("");
 
-  const auto& it = stringInfos.find(name);
-  return it != stringInfos.end() ? it->second : *badStringProperyValue;
+  const auto& it = stringProperties.find(name);
+  return it != stringProperties.end() ? it->second : *badStringProperyValue;
 }
 
-void InitialInstance::SetRawFloatProperty(const gd::String& name, float value) {
-  floatInfos[name] = value;
+void InitialInstance::SetRawDoubleProperty(const gd::String& name, double value) {
+  numberProperties[name] = value;
 }
 
 void InitialInstance::SetRawStringProperty(const gd::String& name,
                                            const gd::String& value) {
-  stringInfos[name] = value;
+  stringProperties[name] = value;
 }
 #endif
 

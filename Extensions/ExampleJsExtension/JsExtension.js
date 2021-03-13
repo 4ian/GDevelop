@@ -372,7 +372,7 @@ module.exports = {
         return true;
       }
       if (propertyName === 'My other instance property') {
-        instance.setRawFloatProperty('instanceprop2', parseFloat(newValue));
+        instance.setRawDoubleProperty('instanceprop2', parseFloat(newValue));
         return true;
       }
 
@@ -392,7 +392,7 @@ module.exports = {
         .setValue(instance.getRawStringProperty('instanceprop1'));
       instanceProperties
         .getOrCreate('My other instance property')
-        .setValue(instance.getRawFloatProperty('instanceprop2').toString())
+        .setValue(instance.getRawDoubleProperty('instanceprop2').toString())
         .setType('number');
 
       return instanceProperties;

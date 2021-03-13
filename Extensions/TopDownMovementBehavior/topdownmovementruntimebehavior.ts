@@ -39,6 +39,8 @@ namespace gdjs {
     _rightKey: boolean = false;
     _upKey: boolean = false;
     _downKey: boolean = false;
+    private _stickAngle: float = 0;
+    private _stickForce: float = 0;
 
     // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
     _basisTransformation: BasisTransformation | null;
@@ -109,11 +111,11 @@ namespace gdjs {
     }
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
-      if (viewpoint == 'PixelIsometry') {
+      if (viewpoint === 'PixelIsometry') {
         this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
-      } else if (viewpoint == 'TrueIsometry') {
+      } else if (viewpoint === 'TrueIsometry') {
         this._basisTransformation = new IsometryTransformation(Math.PI / 6);
-      } else if (viewpoint == 'CustomIsometry') {
+      } else if (viewpoint === 'CustomIsometry') {
         this._basisTransformation = new IsometryTransformation(
           (customIsometryAngle * Math.PI) / 180
         );
@@ -213,8 +215,6 @@ namespace gdjs {
       const UPKEY = 38;
       const RIGHTKEY = 39;
       const DOWNKEY = 40;
-      const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
       //Get the player input:
       // @ts-ignore
@@ -234,8 +234,6 @@ namespace gdjs {
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
       let direction = -1;
-      let directionInRad = 0;
-      let directionInDeg = 0;
       if (!this._allowDiagonals) {
         if (this._upKey && !this._downKey) {
           direction = 6;
@@ -287,8 +285,12 @@ namespace gdjs {
         }
       }
 
+      const object = this.owner;
+      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      let directionInRad = 0;
+      let directionInDeg = 0;
       //Update the speed of the object
-      if (direction != -1) {
+      if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
@@ -296,6 +298,14 @@ namespace gdjs {
           this._acceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity +=
           this._acceleration * timeDelta * Math.sin(directionInRad);
+      } else if (this._stickForce !== 0) {
+        directionInDeg = this._stickAngle + this._movementAngleOffset;
+        directionInRad = (directionInDeg * Math.PI) / 180;
+        const norm = this._acceleration * timeDelta * this._stickForce;
+        this._xVelocity += norm * Math.cos(directionInRad);
+        this._yVelocity += norm * Math.sin(directionInRad);
+
+        this._stickForce = 0;
       } else {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
         directionInDeg =
@@ -327,12 +337,12 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      if (this._basisTransformation == null) {
-        // Top-down pointview
+      if (this._basisTransformation === null) {
+        // Top-down viewpoint
         object.setX(object.getX() + this._xVelocity * timeDelta);
         object.setY(object.getY() + this._yVelocity * timeDelta);
       } else {
-        // Isometry pointview
+        // Isometry viewpoint
         const point = this._temporaryPointForTransformations;
         point[0] = this._xVelocity * timeDelta;
         point[1] = this._yVelocity * timeDelta;
@@ -389,6 +399,11 @@ namespace gdjs {
 
     simulateDownKey() {
       this._downKey = true;
+    }
+
+    simulateStick(stickAngle: float, stickForce: float) {
+      this._stickAngle = stickAngle % 360;
+      this._stickForce = Math.max(0, Math.min(1, stickForce));
     }
   }
 

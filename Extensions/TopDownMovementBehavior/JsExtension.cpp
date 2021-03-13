@@ -101,6 +101,8 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         "simulateControl");
     autActions["TopDownMovementBehavior::IgnoreDefaultControls"]
         .SetFunctionName("ignoreDefaultControls");
+    autActions["TopDownMovementBehavior::SimulateStick"].SetFunctionName(
+        "simulateStick");
 
     autExpressions["Acceleration"].SetFunctionName("getAcceleration");
     autExpressions["Deceleration"].SetFunctionName("getDeceleration");

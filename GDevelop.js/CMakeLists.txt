@@ -82,10 +82,6 @@ target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size 
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
 target_link_libraries(GD "-s \"EXTRA_EXPORTED_RUNTIME_METHODS=['addOnPreMain', 'calledRun', 'UTF8ToString']\"")
-IF(NOT USE_WASM)
-	MESSAGE(STATUS "Not building a wasm output - link time will long.")
-	target_link_libraries(GD "-s WASM=0") #Disable Wasm for now. Enable when confident running well on iOS
-ENDIF()
 
 # Even if we're building an "executable", prefix it by lib as it's used as a library.
 set_target_properties(GD PROPERTIES PREFIX "lib")

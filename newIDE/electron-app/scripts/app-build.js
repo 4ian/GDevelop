@@ -22,7 +22,7 @@ const checkLibGDjsSize = () => {
       }
 
       const sizeInMiB = stats.size / 1024 / 1024;
-      if (sizeInMiB > 5) {
+      if (sizeInMiB > 2) {
         shell.echo(
           `❌ libGD.js size is too big (${sizeInMiB.toFixed(
             2
@@ -33,12 +33,9 @@ const checkLibGDjsSize = () => {
 
       shell.echo(`✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`);
 
-      if (
-        !fs.existsSync(path.join(appPublicPath, 'libGD.js.mem')) ||
-        fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))
-      ) {
+      if (!fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))) {
         shell.echo(
-          `❌ Found libGD.wasm or missing libGD.js.mem - are you sure you're not trying to deploy the development version?`
+          `❌ Did not find libGD.wasm - are you sure it was built properly?`
         );
         shell.exit(1);
       }

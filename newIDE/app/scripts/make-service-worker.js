@@ -39,7 +39,7 @@ const buildSW = () => {
       globDirectory: buildPath,
       globPatterns: [
         // Application:
-        '*.{js,css,html,png}', // Root files
+        '*.{js,wasm,css,html,png}', // Root files
         'static/css/*.css',
         'static/media/*',
         'static/js/!(locales-|local-app)*.js',

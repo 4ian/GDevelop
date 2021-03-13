@@ -140,6 +140,7 @@ bool InitialInstance::UpdateCustomProperty(const gd::String& name,
 
   return false;
 }
+#endif
 
 double InitialInstance::GetRawDoubleProperty(const gd::String& name) const {
   const auto& it = numberProperties.find(name);
@@ -162,6 +163,5 @@ void InitialInstance::SetRawStringProperty(const gd::String& name,
                                            const gd::String& value) {
   stringProperties[name] = value;
 }
-#endif
 
 }  // namespace gd

@@ -162,7 +162,6 @@ class GD_CORE_API InitialInstance {
   gd::VariablesContainer& GetVariables() { return initialVariables; }
   ///@}
 
-#if defined(GD_IDE_ONLY)
   /** \name Others properties management
    * Members functions related to exposing others properties of the instance.
    *
@@ -180,6 +179,7 @@ class GD_CORE_API InitialInstance {
    * \see gd::Object
    */
   ///@{
+#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a map containing the properties names (as keys) and their
    * values.
@@ -199,6 +199,7 @@ class GD_CORE_API InitialInstance {
                             const gd::String& value,
                             gd::Project& project,
                             gd::Layout& layout);
+#endif
 
   /**
    * \brief Get the value of a double property stored in the instance.
@@ -228,7 +229,6 @@ class GD_CORE_API InitialInstance {
    */
   void SetRawStringProperty(const gd::String& name, const gd::String& value);
 ///@}
-#endif
 
   /** \name Saving and loading
    * Members functions related to serialization.

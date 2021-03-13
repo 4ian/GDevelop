@@ -143,10 +143,7 @@ SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance& position,
                                            gd::Project& project,
                                            gd::Layout& scene) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
-  properties[_("Animation")] =
-      position.floatInfos.find("animation") != position.floatInfos.end()
-          ? gd::String::From(position.floatInfos.find("animation")->second)
-          : gd::String("0");
+  properties[_("Animation")] = gd::String::From(position.GetRawDoubleProperty("animation"));
 
   return properties;
 }
@@ -157,7 +154,7 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance& position,
                                                  gd::Project& project,
                                                  gd::Layout& scene) {
   if (name == _("Animation"))
-    position.floatInfos["animation"] = value.To<int>();
+    position.SetRawDoubleProperty("animation", value.To<int>());
 
   return true;
 }

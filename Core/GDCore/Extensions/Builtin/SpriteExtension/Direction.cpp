@@ -21,7 +21,7 @@ Direction::~Direction(){};
 
 void Direction::SetLoop(bool loop_) { loop = loop_; }
 
-void Direction::SetTimeBetweenFrames(float time) { timeBetweenFrame = time; }
+void Direction::SetTimeBetweenFrames(double time) { timeBetweenFrame = time; }
 
 void Direction::AddSprite(const Sprite& sprite) { sprites.push_back(sprite); }
 

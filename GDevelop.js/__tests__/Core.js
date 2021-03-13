@@ -567,7 +567,7 @@ describe('libGD.js', function () {
           .get('Animation')
           .getValue()
       ).toBe('2');
-      expect(initialInstance.getRawFloatProperty('animation')).toBe(2);
+      expect(initialInstance.getRawDoubleProperty('animation')).toBe(2);
     });
     it('can be serialized', function () {
       expect(initialInstance.serializeTo).not.toBe(undefined);
@@ -1567,7 +1567,7 @@ describe('libGD.js', function () {
           return true;
         }
         if (propertyName === 'My other instance property') {
-          instance.setRawFloatProperty('instanceprop2', parseFloat(newValue));
+          instance.setRawDoubleProperty('instanceprop2', parseFloat(newValue));
           return true;
         }
 
@@ -1586,7 +1586,7 @@ describe('libGD.js', function () {
           .setValue(instance.getRawStringProperty('instanceprop1'));
         properties
           .getOrCreate('My other instance property')
-          .setValue(instance.getRawFloatProperty('instanceprop2').toString())
+          .setValue(instance.getRawDoubleProperty('instanceprop2').toString())
           .setType('number');
 
         return properties;

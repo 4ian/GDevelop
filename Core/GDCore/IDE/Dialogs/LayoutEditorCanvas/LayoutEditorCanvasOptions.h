@@ -47,7 +47,7 @@ class GD_CORE_API LayoutEditorCanvasOptions {
   int gridR;         ///< Grid red color in editor
   int gridG;         ///< Grid green color in editor
   int gridB;         ///< Grid blue color in editor
-  float zoomFactor;  ///< Stores the zoom factor
+  double zoomFactor;  ///< Stores the zoom factor
   bool windowMask;   ///< True if window mask displayed in editor
 };
 

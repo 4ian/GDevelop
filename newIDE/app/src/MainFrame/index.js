@@ -1138,27 +1138,29 @@ const MainFrame = (props: Props) => {
   };
 
   const autosaveProjectIfNeeded = React.useCallback(
-    () => {
+    async () => {
       if (!currentProject) return;
 
-      getStorageProviderOperations().then(storageProviderOperations => {
-        if (
-          preferences.values.autosaveOnPreview &&
-          storageProviderOperations.onAutoSaveProject &&
-          currentFileMetadata
-        ) {
-          storageProviderOperations
-            .onAutoSaveProject(currentProject, currentFileMetadata)
-            .catch(err => {
-              console.error('Error while auto-saving the project: ', err);
-              _showSnackMessage(
-                i18n._(
-                  t`There was an error while making an auto-save of the project. Verify that you have permissions to write in the project folder.`
-                )
-              );
-            });
+      const storageProviderOperations = await getStorageProviderOperations();
+      if (
+        preferences.values.autosaveOnPreview &&
+        storageProviderOperations.onAutoSaveProject &&
+        currentFileMetadata
+      ) {
+        try {
+          await storageProviderOperations.onAutoSaveProject(
+            currentProject,
+            currentFileMetadata
+          );
+        } catch (err) {
+          console.error('Error while auto-saving the project: ', err);
+          _showSnackMessage(
+            i18n._(
+              t`There was an error while making an auto-save of the project. Verify that you have permissions to write in the project folder.`
+            )
+          );
         }
-      });
+      }
     },
     [
       i18n,
@@ -1758,50 +1760,54 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProject = React.useCallback(
-    () => {
+    async () => {
       if (!currentProject) return;
       if (!currentFileMetadata) {
         return saveProjectAs();
       }
 
-      getStorageProviderOperations().then(storageProviderOperations => {
-        const { onSaveProject } = storageProviderOperations;
-        if (!onSaveProject) {
-          return saveProjectAs();
+      const storageProviderOperations = await getStorageProviderOperations();
+      const { onSaveProject } = storageProviderOperations;
+      if (!onSaveProject) {
+        return saveProjectAs();
+      }
+
+      saveUiSettings(state.editorTabs);
+      _showSnackMessage(i18n._(t`Saving...`));
+
+      // Protect against concurrent saves, which can trigger issues with the
+      // file system.
+      if (isSavingProject) {
+        console.info('Project is already being saved, not triggering save.');
+        return;
+      }
+      setIsSavingProject(true);
+
+      try {
+        const saveStartTime = performance.now();
+        const { wasSaved } = await onSaveProject(
+          currentProject,
+          currentFileMetadata
+        );
+
+        if (wasSaved) {
+          console.info(
+            `Project saved in ${performance.now() - saveStartTime}ms.`
+          );
+          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+          _showSnackMessage(i18n._(t`Project properly saved`));
         }
+      } catch (rawError) {
+        showErrorBox({
+          message: i18n._(
+            t`Unable to save as the project! Please try again by choosing another location.`
+          ),
+          rawError,
+          errorId: 'project-save-error',
+        });
+      }
 
-        saveUiSettings(state.editorTabs);
-        _showSnackMessage(i18n._(t`Saving...`));
-
-        // Protect against concurrent saves, which can trigger issues with the
-        // file system.
-        if (isSavingProject) {
-          console.info('Project is already being saved, not triggering save.');
-          return;
-        }
-        setIsSavingProject(true);
-
-        onSaveProject(currentProject, currentFileMetadata)
-          .then(
-            ({ wasSaved }) => {
-              if (wasSaved) {
-                if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-                _showSnackMessage(i18n._(t`Project properly saved`));
-              }
-            },
-            rawError => {
-              showErrorBox({
-                message: i18n._(
-                  t`Unable to save as the project! Please try again by choosing another location.`
-                ),
-                rawError,
-                errorId: 'project-save-error',
-              });
-            }
-          )
-          .catch(() => {})
-          .then(() => setIsSavingProject(false));
-      });
+      setIsSavingProject(false);
     },
     [
       isSavingProject,

@@ -5,6 +5,9 @@
  */
 #include "GDJS/IDE/ExporterHelper.h"
 
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -37,6 +40,25 @@
 #include "GDJS/Extensions/JsPlatform.h"
 #undef CopyFile  // Disable an annoying macro
 
+namespace {
+  double GetTimeNow() {
+    #if defined(EMSCRIPTEN)
+    double currentTime = emscripten_get_now();
+    return currentTime;
+    #else
+    return 0;
+    #endif
+  }
+  double GetTimeSpent(double previousTime) {
+    return GetTimeNow() - previousTime;
+  }
+  double LogTimeSpent(const gd::String & name, double previousTime) {
+    gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) + "ms");
+    std::cout << std::endl;
+    return GetTimeNow();
+  }
+}
+
 namespace gdjs {
 
 static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
@@ -51,6 +73,7 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
 
 bool ExporterHelper::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
+  double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
@@ -63,6 +86,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
   ExportResources(fs, exportedProject, options.exportPath);
+
+  previousTime = LogTimeSpent("Resource export", previousTime);
 
   // Compatibility with GD <= 5.0-beta56
   // Stay compatible with text objects declaring their font as just a filename
@@ -81,6 +106,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // the engine)
   ExportEffectIncludes(exportedProject, includesFiles);
 
+  previousTime = LogTimeSpent("Include files export", previousTime);
+
   if (!options.projectDataOnlyExport) {
     // Generate events code
     if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
@@ -94,6 +121,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
           lastError);
       return false;
     }
+
+    previousTime = LogTimeSpent("Events code export", previousTime);
   }
 
   // Strip the project (*after* generating events as the events may use stripped
@@ -105,6 +134,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // runtimeGameOptions, since otherwise Cocos files will be passed to the
   // hot-reloader).
   RemoveIncludes(false, true, includesFiles);
+
+  previousTime = LogTimeSpent("Data stripping", previousTime);
 
   // Create the setup options passed to the gdjs.RuntimeGame
   gd::SerializerElement runtimeGameOptions;
@@ -139,6 +170,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
+  previousTime = LogTimeSpent("Project data export", previousTime);
+
   // Copy all the dependencies and their source maps
   ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
@@ -151,6 +184,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                            "gdjs.runtimeGameOptions"))
     return false;
 
+  previousTime = LogTimeSpent("Include and libs export", previousTime);
   return true;
 }
 

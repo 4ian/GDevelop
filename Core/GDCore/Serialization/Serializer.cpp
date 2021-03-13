@@ -5,16 +5,23 @@
  */
 
 #include "GDCore/Serialization/Serializer.h"
+
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/rapidjson.h"
 #if !defined(EMSCRIPTEN)
 #include "GDCore/TinyXml/tinyxml.h"
 #endif
+
+using namespace rapidjson;
 
 namespace gd {
 
@@ -104,401 +111,120 @@ gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
 }
 
 namespace {
-
-/**
- * Adapted from public domain library "jsoncpp"
- * (http://sourceforge.net/projects/jsoncpp/).
- */
-static inline bool isControlCharacter(char ch) { return ch > 0 && ch <= 0x1F; }
-
-/**
- * Adapted from public domain library "jsoncpp"
- * (http://sourceforge.net/projects/jsoncpp/).
- */
-static bool containsControlCharacter(const char* str) {
-  while (*str) {
-    if (isControlCharacter(*(str++))) return true;
-  }
-  return false;
-}
-
-/**
- * Tool function converting a string to a quoted string that can be inserted
- * into a JSON file. Adapted from public domain library "jsoncpp"
- * (http://sourceforge.net/projects/jsoncpp/).
- */
-gd::String StringToQuotedJSONString(const char* value) {
-  if (value == NULL) return "";
-  // Not sure how to handle unicode...
-  if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL &&
-      !containsControlCharacter(value))
-    return gd::String("\"") + value + "\"";
-  // We have to walk value and escape any special characters.
-  // Appending to std::string is not efficient, but this should be rare.
-  // (Note: forward slashes are *not* rare, but I am not escaping them.)
-  std::string::size_type maxsize =
-      strlen(value) * 2 + 3;  // allescaped+quotes+NULL
-  std::string result;
-  result.reserve(maxsize);  // to avoid lots of mallocs
-  result += "\"";
-  for (const char* c = value; *c != 0; ++c) {
-    switch (*c) {
-      case '\"':
-        result += "\\\"";
-        break;
-      case '\\':
-        result += "\\\\";
-        break;
-      case '\b':
-        result += "\\b";
-        break;
-      case '\f':
-        result += "\\f";
-        break;
-      case '\n':
-        result += "\\n";
-        break;
-      case '\r':
-        result += "\\r";
-        break;
-      case '\t':
-        result += "\\t";
-        break;
-      // case '/':
-      // Even though \/ is considered a legal escape in JSON, a bare
-      // slash is also legal, so I see no reason to escape it.
-      // (I hope I am not misunderstanding something.
-      // blep notes: actually escaping \/ may be useful in javascript to avoid
-      // </ sequence. Should add a flag to allow this compatibility mode and
-      // prevent this sequence from occurring.
-      default:
-        if (isControlCharacter(*c)) {
-          std::ostringstream oss;
-          oss << "\\u" << std::hex << std::uppercase << std::setfill('0')
-              << std::setw(4) << static_cast<int>(*c);
-          result += oss.str();
-        } else {
-          result += *c;
-        }
-        break;
+void RapidJsonValueToElement(const Value& value,
+                             gd::SerializerElement& element) {
+  if (value.IsBool()) {
+    element.SetBoolValue(value.GetBool());
+  } else if (value.IsNumber()) {
+    if (value.IsInt64())
+      element.SetIntValue(value.GetInt64());
+    else if (value.IsUint64())
+      element.SetIntValue(value.GetUint64());
+    else if (value.IsInt())
+      element.SetValue(value.GetInt());
+    else if (value.IsUint())
+      element.SetValue(value.GetUint());
+    else if (value.IsDouble())
+      element.SetValue(value.GetDouble());
+    else if (value.IsFloat())
+      element.SetValue(value.GetFloat());
+  } else if (value.IsString()) {
+    element.SetStringValue(value.GetString());
+  } else if (value.IsObject()) {
+    for (auto& m : value.GetObject()) {
+      RapidJsonValueToElement(m.value, element.AddChild(m.name.GetString()));
+    }
+  } else if (value.IsArray()) {
+    element.ConsiderAsArray();
+    for (auto& m : value.GetArray()) {
+      RapidJsonValueToElement(m, element.AddChild(""));
     }
   }
-  result += "\"";
-  return gd::String::FromUTF8(result);
 }
 
-gd::String ValueToJSON(const SerializerValue& val) {
-  if (val.IsBoolean())
-    return val.GetBool() ? "true" : "false";
-  else if (val.IsInt())
-    return gd::String::From(val.GetInt());
-  else if (val.IsDouble())
-    return gd::String::From(val.GetDouble());
-  else
-    return StringToQuotedJSONString(val.GetString().c_str());
+void ElementToRapidJson(const gd::SerializerElement& element,
+                        Value& value,
+                        Document::AllocatorType& allocator) {
+  if (!element.IsValueUndefined()) {
+    const SerializerValue& serializerValue = element.GetValue();
+    // TODO: use GetRaw to avoid conversions
+    if (serializerValue.IsBoolean())
+      value.SetBool(serializerValue.GetBool());
+    else if (serializerValue.IsDouble())
+      value.SetDouble(serializerValue.GetDouble());
+    else if (serializerValue.IsInt())
+      value.SetInt(serializerValue.GetInt());
+    else if (serializerValue.IsString()) {
+      // This does a copy of the string, and measure the string length.
+      value.SetString(serializerValue.GetRawString().c_str(), allocator);
+    }
+  } else if (element.ConsideredAsArray()) {
+    value.SetArray();
+
+    const auto& children = element.GetAllChildren();
+    value.Reserve(children.size(), allocator);
+
+    for (const auto& child : children) {
+      Value childValue;
+      ElementToRapidJson(*child.second, childValue, allocator);
+      value.PushBack(childValue, allocator);
+    }
+  } else {
+    value.SetObject();
+
+    const auto& attributes = element.GetAllAttributes();
+    const auto& children = element.GetAllChildren();
+
+    for (const auto& attribute : attributes) {
+      Value name(attribute.first.c_str(),
+                 allocator);  // Copying the name is required.
+      Value childValue;
+      ElementToRapidJson(attribute.second, childValue, allocator);
+      value.AddMember(name, childValue, allocator);
+    }
+    for (const auto& child : children) {
+      Value name(child.first.c_str(),
+                 allocator);  // Copying the name is required.
+      Value childValue;
+      ElementToRapidJson(*child.second, childValue, allocator);
+      value.AddMember(name, childValue, allocator);
+    }
+  }
 }
 }  // namespace
+
+SerializerElement Serializer::FromJSON(const char* json) {
+  SerializerElement element;
+  size_t len = strlen(json);
+  if (len != 0) {
+    Document document;
+
+    // In-situ parsing, decode strings directly in the source string. Source
+    // must be string.
+    char buffer[len + 1];
+    memcpy(buffer, json, len + 1);
+    if (document.ParseInsitu(buffer).HasParseError()) {
+      std::cout << "TODO: error while parsing" << std::endl;
+      return element;
+    }
+
+    RapidJsonValueToElement(document, element);
+  }
+
+  return element;
+}
 
 gd::String Serializer::ToJSON(const SerializerElement& element) {
-  if (element.IsValueUndefined()) {
-    if (element.ConsideredAsArray()) {
-      // Store the element as an array in JSON:
-      gd::String str = "[";
-      bool firstChild = true;
+  Document document;
+  Document::AllocatorType& allocator = document.GetAllocator();
 
-      if (element.GetAllAttributes().size() > 0) {
-        std::cout << "ERROR: A SerializerElement is considered as an array of "
-                  << (element.ConsideredAsArrayOf().empty()
-                          ? "[unnamed elements]"
-                          : element.ConsideredAsArrayOf())
-                  << " but has attributes. These attributes won't be saved!"
-                  << std::endl;
-      }
+  ElementToRapidJson(element, document, allocator);
 
-      const std::vector<
-          std::pair<gd::String, std::shared_ptr<SerializerElement> > >&
-          children = element.GetAllChildren();
-      for (size_t i = 0; i < children.size(); ++i) {
-        if (children[i].second == std::shared_ptr<SerializerElement>())
-          continue;
-        if (children[i].first != element.ConsideredAsArrayOf()) {
-          std::cout
-              << "ERROR: A SerializerElement is considered as an array of "
-              << (element.ConsideredAsArrayOf().empty()
-                      ? "[unnamed elements]"
-                      : element.ConsideredAsArrayOf())
-              << " but has a child called \"" << children[i].first
-              << "\". This child won't be saved!" << std::endl;
-          continue;
-        }
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  document.Accept(writer);
 
-        if (!firstChild) str += ",";
-        str += ToJSON(*children[i].second);
-
-        firstChild = false;
-      }
-
-      str += "]";
-      return str;
-    } else {
-      gd::String str = "{";
-      bool firstChild = true;
-
-      const std::map<gd::String, SerializerValue>& attributes =
-          element.GetAllAttributes();
-      for (std::map<gd::String, SerializerValue>::const_iterator it =
-               attributes.begin();
-           it != attributes.end();
-           ++it) {
-        if (!firstChild) str += ",";
-        str += StringToQuotedJSONString(it->first.c_str()) + ": " +
-               ValueToJSON(it->second);
-
-        firstChild = false;
-      }
-
-      const std::vector<
-          std::pair<gd::String, std::shared_ptr<SerializerElement> > >&
-          children = element.GetAllChildren();
-      for (size_t i = 0; i < children.size(); ++i) {
-        if (children[i].second == std::shared_ptr<SerializerElement>())
-          continue;
-
-        if (attributes.find(children[i].first) != attributes.end()) {
-          std::cout << "ERROR: An attribute and a children called \""
-                    << children[i].first
-                    << "\" both exist. The children will erase the attribute - "
-                       "fix the usage of the attribute or (better) use "
-                       "children methods only."
-                    << std::endl;
-        }
-
-        if (!firstChild) str += ",";
-        str += StringToQuotedJSONString(children[i].first.c_str()) + ": " +
-               ToJSON(*children[i].second);
-
-        firstChild = false;
-      }
-
-      str += "}";
-      return str;
-    }
-  } else {
-    return ValueToJSON(element.GetValue());
-  }
-}
-
-// Private functions for JSON parsing
-namespace {
-size_t SkipBlankChar(const std::string& str, size_t pos) {
-  const std::string blankChar = " \n";
-  return str.find_first_not_of(blankChar, pos);
-}
-
-/**
- * Adapted from https://github.com/hjiang/jsonxx
- */
-std::string DecodeString(const std::string& original) {
-  std::string value;
-  value.reserve(original.size());
-  std::istringstream input("\"" + original + "\"");
-
-  char ch = '\0', delimiter = '"';
-  input.get(ch);
-  if (ch != delimiter) return "";
-
-  while (!input.eof() && input.good()) {
-    input.get(ch);
-    if (ch == delimiter) {
-      break;
-    }
-    if (ch == '\\') {
-      input.get(ch);
-      switch (ch) {
-        case '\\':
-        case '/':
-          value.push_back(ch);
-          break;
-        case 'b':
-          value.push_back('\b');
-          break;
-        case 'f':
-          value.push_back('\f');
-          break;
-        case 'n':
-          value.push_back('\n');
-          break;
-        case 'r':
-          value.push_back('\r');
-          break;
-        case 't':
-          value.push_back('\t');
-          break;
-        case 'u': {
-          int i;
-          std::stringstream ss;
-          for (i = 0; (!input.eof() && input.good()) && i < 4; ++i) {
-            input.get(ch);
-            ss << ch;
-          }
-          if (input.good() && (ss >> i)) value.push_back(i);
-        } break;
-        default:
-          if (ch != delimiter) {
-            value.push_back('\\');
-            value.push_back(ch);
-          } else
-            value.push_back(ch);
-          break;
-      }
-    } else {
-      value.push_back(ch);
-    }
-  }
-  if (input && ch == delimiter) {
-    return value;
-  } else {
-    return "";
-  }
-}
-
-/**
- * Return the position of the end of the string. Blank are skipped if necessary
- * @param str The string to be used
- * @param startPos The start position
- * @param strContent A reference to a string that will be filled with the string
- * content.
- */
-size_t SkipString(const std::string& str,
-                  size_t startPos,
-                  std::string& strContent) {
-  startPos = SkipBlankChar(str, startPos);
-  if (startPos >= str.length()) return std::string::npos;
-
-  size_t endPos = startPos;
-
-  if (str[startPos] == '"') {
-    if (startPos + 1 >= str.length()) return std::string::npos;
-
-    while (endPos == startPos || (str[endPos - 1] == '\\')) {
-      endPos = str.find_first_of('\"', endPos + 1);
-      if (endPos == std::string::npos)
-        return std::string::npos;  // Invalid string
-    }
-
-    strContent = DecodeString(str.substr(startPos + 1, endPos - 1 - startPos));
-    return endPos;
-  }
-
-  endPos = str.find_first_of(" \n,:");
-  if (endPos >= str.length()) return std::string::npos;  // Invalid string
-
-  strContent = DecodeString(str.substr(startPos, endPos - 1 - startPos));
-  return endPos - 1;
-}
-
-/**
- * Parse a JSON string, starting from pos, and storing the result into the
- * specified element. Note that the parsing is stopped as soon as a valid object
- * is parsed. \return The position at the end of the valid object stored into
- * the element.
- */
-size_t ParseJSONObject(const std::string& jsonStr,
-                       size_t startPos,
-                       gd::SerializerElement& element) {
-  size_t pos = SkipBlankChar(jsonStr, startPos);
-  if (pos >= jsonStr.length()) return std::string::npos;
-
-  if (jsonStr[pos] == '{')  // Object
-  {
-    bool firstChild = true;
-    while (firstChild || jsonStr[pos] == ',') {
-      pos++;
-      if (pos < jsonStr.length() && jsonStr[pos] == '}') break;
-
-      std::string childName;
-      pos = SkipString(jsonStr, pos, childName);
-
-      pos++;
-      pos = SkipBlankChar(jsonStr, pos);
-      if (pos >= jsonStr.length() || jsonStr[pos] != ':')
-        return std::string::npos;
-
-      pos++;
-      pos = ParseJSONObject(
-          jsonStr,
-          pos,
-          element.AddChild(gd::String::FromUTF8(childName).ReplaceInvalid()));
-
-      pos = SkipBlankChar(jsonStr, pos);
-      if (pos >= jsonStr.length()) return std::string::npos;
-      firstChild = false;
-    }
-
-    if (jsonStr[pos] != '}') {
-      std::cout << "Parsing error: Object not properly formed.";
-      return std::string::npos;
-    }
-    return pos + 1;
-  } else if (jsonStr[pos] == '[')  // Array
-  {
-    element.ConsiderAsArray();
-    unsigned int index = 0;
-    while (index == 0 || jsonStr[pos] == ',') {
-      pos++;
-      if (pos < jsonStr.length() && jsonStr[pos] == ']') break;
-      pos = ParseJSONObject(jsonStr, pos, element.AddChild(""));
-
-      pos = SkipBlankChar(jsonStr, pos);
-      if (pos >= jsonStr.length()) {
-        std::cout << "Parsing error: element of array not properly formed.";
-        return std::string::npos;
-      }
-      index++;
-    }
-
-    if (jsonStr[pos] != ']') {
-      std::cout << "Parsing error: array not properly ended";
-      return std::string::npos;
-    }
-    return pos + 1;
-  } else if (jsonStr[pos] == '"')  // String
-  {
-    std::string str;
-    pos = SkipString(jsonStr, pos, str);
-    if (pos >= jsonStr.length()) {
-      std::cout << "Parsing error: Invalid string";
-      return std::string::npos;
-    }
-
-    element.SetValue(gd::String::FromUTF8(str).ReplaceInvalid());
-    return pos + 1;
-  } else  // Number or boolean
-  {
-    std::string str;
-    size_t endPos = pos;
-    const std::string separators = " \n,}]";
-    while (endPos < jsonStr.length() &&
-           separators.find_first_of(jsonStr[endPos]) == std::string::npos) {
-      endPos++;
-    }
-
-    str = jsonStr.substr(pos, endPos - pos);
-    if (str == "true")
-      element.SetValue(true);
-    else if (str == "false")
-      element.SetValue(false);
-    else
-      element.SetValue(gd::String::FromUTF8(str).To<double>());
-    return endPos;
-  }
-}
-}  // namespace
-
-SerializerElement Serializer::FromJSON(const std::string& jsonStr) {
-  SerializerElement element;
-  if (!jsonStr.empty()) gd::ParseJSONObject(jsonStr, 0, element);
-  return element;
+  return buffer.GetString();  // Temporary copy
 }
 
 }  // namespace gd

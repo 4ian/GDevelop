@@ -24,26 +24,8 @@ export default {
     return fs.existsSync(path);
   },
   clearDir: function(path) {
-    var files = [];
-    var that = this;
     try {
-      if (fs.existsSync(path)) {
-        files = fs.readdirSync(path);
-        files.forEach(function(file) {
-          var curPath = path + '/' + file;
-          if (fs.lstatSync(curPath).isDirectory()) {
-            // recurse
-            that.clearDir(curPath);
-          } else {
-            // delete file
-            try {
-              fs.unlinkSync(curPath);
-            } catch (e) {
-              console.error('fs.unlinkSync(' + curPath + ') failed: ' + e);
-            }
-          }
-        });
-      }
+      fs.emptyDirSync(path);
     } catch (e) {
       console.error('clearDir(' + path + ') failed: ' + e);
     }

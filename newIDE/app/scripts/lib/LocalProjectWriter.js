@@ -1,24 +1,24 @@
 const fs = require('fs');
 
-const serializeToJSObject = (gd, serializable, methodName = 'serializeTo') => {
+const serializeToJSON = (gd, serializable, methodName = 'serializeTo') => {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
-  const object = JSON.parse(gd.Serializer.toJSON(serializedElement));
+  const json = gd.Serializer.toJSON(serializedElement);
   serializedElement.delete();
 
-  return object;
+  return json;
 };
 
 module.exports = {
   writeProjectJSONFile: (gd, project, filepath) => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
-  
+
       try {
-        const content = JSON.stringify(serializeToJSObject(gd, project), null, 2);
+        const content = serializeToJSON(gd, project);
         fs.writeFile(filepath, content, err => {
           if (err) return reject(err);
-  
+
           resolve();
         });
       } catch (e) {

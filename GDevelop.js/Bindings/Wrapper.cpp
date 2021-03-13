@@ -406,6 +406,12 @@ typedef std::vector<gd::ExpressionCompletionDescription>
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
+typedef std::map<gd::String, gd::SerializerValue>
+    MapStringSerializerValue;
+typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
+    VectorPairStringSharedPtrSerializerElement;
+typedef std::shared_ptr<SerializerElement>
+    SharedPtrSerializerElement;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -428,6 +434,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define WRAPPED_GetComment() com1
 #define WRAPPED_SetComment(str) com1 = str
 #define WRAPPED_GetTextFormatting(i) at(i).second
+#define WRAPPED_GetSharedPtrSerializerElement(i) at(i).second
 #define WRAPPED_GetName() first
 #define WRAPPED_GetVariable() second
 #define WRAPPED_SetBool(v) SetValue(v)
@@ -474,7 +481,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_InitializePlatforms InitializePlatforms
 #define STATIC_ValidateName ValidateName
 #define STATIC_ToJSON ToJSON
-#define STATIC_FromJSON(x) FromJSON(gd::String(x))
+#define STATIC_FromJSON(x) FromJSON(x)
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_Get Get

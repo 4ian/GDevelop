@@ -181,6 +181,8 @@ public:
      */
     void clear() { m_string.clear(); }
 
+    void reserve(gd::String::size_type size) { m_string.reserve(size); }
+
 /**
  * \}
  */

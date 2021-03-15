@@ -261,7 +261,7 @@ module.exports = {
           _(
             'The resource name can be found in: `Project Manager > Game settings > Resources`.'
           ),
-        _('Set the bitmap font of _PARAM0_ to _PARAM2_'),
+        _('Set the bitmap font of _PARAM0_ to _PARAM1_'),
         '',
         'res/actions/font24.png',
         'res/actions/font.png'

@@ -9,7 +9,7 @@ namespace gdjs {
    * to avoid conflicts between different font files using the same font name.
    */
   const patchInstalledBitmapFont = (bitmapFont: PIXI.BitmapFont) => {
-    const generateSlugName = (bitmapFont) => {
+    const generateSlugName = (bitmapFont: PIXI.BitmapFont) => {
       return (
         bitmapFont.font + '-' + bitmapFont.size + '-' + bitmapFont.lineHeight
       );

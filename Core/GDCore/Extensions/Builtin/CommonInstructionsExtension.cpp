@@ -122,8 +122,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   extension.AddEvent(
       "ForEachChildVariable",
-      _("For each child variable (of a structure)"),
-      _("Repeat the event for each child variable of a structure."),
+      _("For each child variable (of a collection)"),
+      _("Repeat the event for each child variable of a collection."),
       "",
       "res/foreach.png",
       std::make_shared<gd::ForEachChildVariableEvent>());

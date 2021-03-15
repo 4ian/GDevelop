@@ -371,7 +371,7 @@ namespace gdjs {
       this._downKey = false;
     }
 
-    simulateControl(input: String) {
+    simulateControl(input: string) {
       if (input === 'Left') {
         this._leftKey = true;
       } else if (input === 'Right') {

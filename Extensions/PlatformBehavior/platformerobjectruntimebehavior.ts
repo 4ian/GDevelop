@@ -1079,11 +1079,33 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is falling.
+     * Check if the Platformer Object is in the falling state. This is false
+     * if the object is jumping, even if the object is going down after reaching
+     * the jump peak.
      * @returns Returns true if it is falling and false if not.
      */
-    isFalling(): boolean {
+    isFallingWithoutJumping(): boolean {
       return this._state === this._falling;
+    }
+
+    /**
+     * Check if the Platformer Object is "going down", either because it's in the
+     * falling state *or* because it's jumping but reached the jump peak and
+     * is now going down (because the jump speed can't compensate anymore the
+     * falling speed).
+     *
+     * If you want to check if the object is falling outside of a jump (or because
+     * the jump is entirely finished and there is no jump speed applied to the object
+     * anymore), consider using `isFallingWithoutJumping`.
+     *
+     * @returns Returns true if it is "going down" and false if not.
+     */
+    isFalling(): boolean {
+      return (
+        this._state === this._falling ||
+        (this._state === this._jumping &&
+          this._currentFallSpeed > this._jumping.getCurrentJumpSpeed())
+      );
     }
 
     /**

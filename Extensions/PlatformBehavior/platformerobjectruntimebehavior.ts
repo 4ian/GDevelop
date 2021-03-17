@@ -151,7 +151,7 @@ namespace gdjs {
       }
 
       //Take deceleration into account only if no key is pressed.
-      if (this._leftKey == this._rightKey) {
+      if (this._leftKey === this._rightKey) {
         const wasPositive = this._currentSpeed > 0;
         this._currentSpeed -=
           this._deceleration * timeDelta * (wasPositive ? 1.0 : -1.0);
@@ -968,7 +968,7 @@ namespace gdjs {
       this._slopeMaxAngle = slopeMaxAngle;
 
       //Avoid rounding errors
-      if (slopeMaxAngle == 45) {
+      if (slopeMaxAngle === 45) {
         this._slopeClimbingFactor = 1;
       } else {
         this._slopeClimbingFactor = Math.tan(

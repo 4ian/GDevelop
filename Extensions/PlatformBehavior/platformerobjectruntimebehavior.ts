@@ -140,6 +140,108 @@ namespace gdjs {
       return true;
     }
 
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+      const LEFTKEY = 37;
+      const UPKEY = 38;
+      const RIGHTKEY = 39;
+      const DOWNKEY = 40;
+      const LSHIFTKEY = 1016;
+      const RSHIFTKEY = 2016;
+      const SPACEKEY = 32;
+      const object = this.owner;
+      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+
+      //0.1) Get the player input:
+      this._requestedDeltaX = 0;
+      this._requestedDeltaY = 0;
+
+      const inputManager = runtimeScene.getGame().getInputManager();
+      this._leftKey ||
+        (this._leftKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
+      this._rightKey ||
+        (this._rightKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(RIGHTKEY));
+
+      this._jumpKey ||
+        (this._jumpKey =
+          !this._ignoreDefaultControls &&
+          (inputManager.isKeyPressed(LSHIFTKEY) ||
+            inputManager.isKeyPressed(RSHIFTKEY) ||
+            inputManager.isKeyPressed(SPACEKEY)));
+
+      this._ladderKey ||
+        (this._ladderKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
+
+      this._upKey ||
+        (this._upKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
+      this._downKey ||
+        (this._downKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
+
+      this._releaseKey ||
+        (this._releaseKey =
+          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
+
+      this._requestedDeltaX += this._updateSpeed(timeDelta);
+
+      //0.2) Track changes in object size
+      this._state.beforeUpdatingObstacles();
+      this._onFloor._oldHeight = object.getHeight();
+
+      //0.3) Update list of platforms around/related to the object
+
+      //Compute the list of the objects that will be used
+      this._updatePotentialCollidingObjects(
+        Math.max(this._requestedDeltaX, this._maxFallingSpeed * timeDelta)
+      );
+      this._updateOverlappedJumpThru();
+
+      //1) X axis:
+      this._state.checkTransitionBeforeX();
+      this._state.beforeMovingX();
+
+      //Ensure the object is not stuck
+      if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
+        this._canJump = true;
+      }
+      //After being unstuck, the object must be able to jump again.
+
+      const oldX = object.getX();
+      this._moveX();
+
+      //2) Y axis:
+      this._state.checkTransitionBeforeY(timeDelta);
+      this._state.beforeMovingY(timeDelta, oldX);
+
+      const oldY = object.getY();
+      this._moveY();
+
+      //3) Update the current floor data for the next tick:
+      this._updateOverlappedJumpThru();
+      //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
+      if (this._state !== this._onLadder) {
+        this._checkTransitionOnFloorOrFalling();
+      }
+
+      //4) Do not forget to reset pressed keys
+      this._leftKey = false;
+      this._rightKey = false;
+      this._ladderKey = false;
+      this._upKey = false;
+      this._downKey = false;
+      this._releaseKey = false;
+      this._jumpKey = false;
+
+      //5) Track the movement
+      this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
+      this._lastDeltaY = object.getY() - oldY;
+    }
+
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+
     private _updateSpeed(timeDelta: float): float {
       //Change the speed according to the player's input.
       // @ts-ignore
@@ -236,42 +338,6 @@ namespace gdjs {
       }
     }
 
-    _setFalling() {
-      console.debug(`${this._state} --> ${this._falling}`);
-      this._state.leave();
-      this._state = this._falling;
-      this._falling.enter();
-    }
-
-    private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
-      console.debug(`${this._state} --> ${this._onFloor}`);
-      this._state.leave();
-      this._state = this._onFloor;
-      this._onFloor.enter(collidingPlatform);
-    }
-
-    private _setJumping() {
-      console.debug(`${this._state} --> ${this._jumping}`);
-      this._state.leave();
-      const from = this._state;
-      this._state = this._jumping;
-      this._jumping.enter(from);
-    }
-
-    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
-      console.debug(`${this._state} --> ${this._grabbingPlatform}`);
-      this._state.leave();
-      this._state = this._grabbingPlatform;
-      this._grabbingPlatform.enter(grabbedPlatform);
-    }
-
-    private _setOnLadder() {
-      console.debug(`${this._state} --> ${this._onLadder}`);
-      this._state.leave();
-      this._state = this._onLadder;
-      this._onLadder.enter();
-    }
-
     private _moveY() {
       const object = this.owner;
       //Move the object on Y axis
@@ -314,6 +380,42 @@ namespace gdjs {
           );
         }
       }
+    }
+
+    _setFalling() {
+      console.debug(`${this._state} --> ${this._falling}`);
+      this._state.leave();
+      this._state = this._falling;
+      this._falling.enter();
+    }
+
+    private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+      console.debug(`${this._state} --> ${this._onFloor}`);
+      this._state.leave();
+      this._state = this._onFloor;
+      this._onFloor.enter(collidingPlatform);
+    }
+
+    private _setJumping() {
+      console.debug(`${this._state} --> ${this._jumping}`);
+      this._state.leave();
+      const from = this._state;
+      this._state = this._jumping;
+      this._jumping.enter(from);
+    }
+
+    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
+      console.debug(`${this._state} --> ${this._grabbingPlatform}`);
+      this._state.leave();
+      this._state = this._grabbingPlatform;
+      this._grabbingPlatform.enter(grabbedPlatform);
+    }
+
+    private _setOnLadder() {
+      console.debug(`${this._state} --> ${this._onLadder}`);
+      this._state.leave();
+      this._state = this._onLadder;
+      this._onLadder.enter();
     }
 
     _checkTransitionOnLadder() {
@@ -420,108 +522,6 @@ namespace gdjs {
         this._maxFallingSpeed * timeDelta
       );
     }
-
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
-      const LEFTKEY = 37;
-      const UPKEY = 38;
-      const RIGHTKEY = 39;
-      const DOWNKEY = 40;
-      const LSHIFTKEY = 1016;
-      const RSHIFTKEY = 2016;
-      const SPACEKEY = 32;
-      const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
-
-      //0.1) Get the player input:
-      this._requestedDeltaX = 0;
-      this._requestedDeltaY = 0;
-
-      const inputManager = runtimeScene.getGame().getInputManager();
-      this._leftKey ||
-        (this._leftKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
-      this._rightKey ||
-        (this._rightKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(RIGHTKEY));
-
-      this._jumpKey ||
-        (this._jumpKey =
-          !this._ignoreDefaultControls &&
-          (inputManager.isKeyPressed(LSHIFTKEY) ||
-            inputManager.isKeyPressed(RSHIFTKEY) ||
-            inputManager.isKeyPressed(SPACEKEY)));
-
-      this._ladderKey ||
-        (this._ladderKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
-
-      this._upKey ||
-        (this._upKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(UPKEY));
-      this._downKey ||
-        (this._downKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
-
-      this._releaseKey ||
-        (this._releaseKey =
-          !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
-
-      this._requestedDeltaX += this._updateSpeed(timeDelta);
-
-      //0.2) Track changes in object size
-      this._state.beforeUpdatingObstacles();
-      this._onFloor._oldHeight = object.getHeight();
-
-      //0.3) Update list of platforms around/related to the object
-
-      //Compute the list of the objects that will be used
-      this._updatePotentialCollidingObjects(
-        Math.max(this._requestedDeltaX, this._maxFallingSpeed * timeDelta)
-      );
-      this._updateOverlappedJumpThru();
-
-      //1) X axis:
-      this._state.checkTransitionBeforeX();
-      this._state.beforeMovingX();
-
-      //Ensure the object is not stuck
-      if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
-        this._canJump = true;
-      }
-      //After being unstuck, the object must be able to jump again.
-
-      const oldX = object.getX();
-      this._moveX();
-
-      //2) Y axis:
-      this._state.checkTransitionBeforeY(timeDelta);
-      this._state.beforeMovingY(timeDelta, oldX);
-
-      const oldY = object.getY();
-      this._moveY();
-
-      //3) Update the current floor data for the next tick:
-      this._updateOverlappedJumpThru();
-      //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
-      if (this._state !== this._onLadder) {
-        this._checkTransitionOnFloorOrFalling();
-      }
-
-      //4) Do not forget to reset pressed keys
-      this._leftKey = false;
-      this._rightKey = false;
-      this._ladderKey = false;
-      this._upKey = false;
-      this._downKey = false;
-      this._releaseKey = false;
-      this._jumpKey = false;
-
-      //5) Track the movement
-      this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
-      this._lastDeltaY = object.getY() - oldY;
-    }
-
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     //Scene change is not supported
     /*

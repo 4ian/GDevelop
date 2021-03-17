@@ -272,7 +272,7 @@ namespace gdjs {
       this._onLadder.enter();
     }
 
-    moveY() {
+    private _moveY() {
       const object = this.owner;
       //Move the object on Y axis
       if (this._requestedDeltaY !== 0) {
@@ -316,19 +316,19 @@ namespace gdjs {
       }
     }
 
-    checkTransitionOnLadder() {
+    _checkTransitionOnLadder() {
       if (this._ladderKey && this._isOverlappingLadder()) {
         this._setOnLadder();
       }
     }
 
-    checkTransitionJumping() {
+    _checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
         this._setJumping();
       }
     }
 
-    checkGrabPlatform() {
+    _checkGrabPlatform() {
       const object = this.owner;
       let tryGrabbingPlatform = false;
       object.setX(
@@ -374,7 +374,7 @@ namespace gdjs {
       }
     }
 
-    checkTransitionOnFloorOrFalling() {
+    private _checkTransitionOnFloorOrFalling() {
       const object = this.owner;
       //Check if the object is on a floor:
       //In priority, check if the last floor platform is still the floor.
@@ -409,7 +409,7 @@ namespace gdjs {
       object.setY(oldY);
     }
 
-    fall(timeDelta: float) {
+    _fall(timeDelta: float) {
       this._currentFallSpeed += this._gravity * timeDelta;
       if (this._currentFallSpeed > this._maxFallingSpeed) {
         this._currentFallSpeed = this._maxFallingSpeed;
@@ -498,13 +498,13 @@ namespace gdjs {
       this._state.beforeMovingY(timeDelta, oldX);
 
       const oldY = object.getY();
-      this.moveY();
+      this._moveY();
 
       //3) Update the current floor data for the next tick:
       this._updateOverlappedJumpThru();
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
-        this.checkTransitionOnFloorOrFalling();
+        this._checkTransitionOnFloorOrFalling();
       }
 
       //4) Do not forget to reset pressed keys
@@ -715,7 +715,6 @@ namespace gdjs {
      * Note: _updatePotentialCollidingObjects must have been called before.
      */
     _isOverlappingLadder() {
-      //FIXME put back private
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
         if (
@@ -1212,9 +1211,9 @@ namespace gdjs {
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
       //Go on a ladder
-      behavior.checkTransitionOnLadder();
+      behavior._checkTransitionOnLadder();
       //Jumping
-      behavior.checkTransitionJumping();
+      behavior._checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
@@ -1354,19 +1353,19 @@ namespace gdjs {
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
       //Go on a ladder
-      behavior.checkTransitionOnLadder();
+      behavior._checkTransitionOnLadder();
       //Jumping
-      behavior.checkTransitionJumping();
+      behavior._checkTransitionJumping();
 
       //Grabbing a platform
       if (behavior._canGrabPlatforms && behavior._requestedDeltaX !== 0) {
-        behavior.checkGrabPlatform();
+        behavior._checkGrabPlatform();
       }
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
       //Fall
-      this._behavior.fall(timeDelta);
+      this._behavior._fall(timeDelta);
     }
 
     toString(): String {
@@ -1420,9 +1419,9 @@ namespace gdjs {
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
       //Go on a ladder
-      behavior.checkTransitionOnLadder();
+      behavior._checkTransitionOnLadder();
       //Jumping
-      behavior.checkTransitionJumping();
+      behavior._checkTransitionJumping();
 
       //Grabbing a platform
       if (
@@ -1430,7 +1429,7 @@ namespace gdjs {
         behavior._requestedDeltaX !== 0 &&
         behavior._lastDeltaY >= 0
       ) {
-        behavior.checkGrabPlatform();
+        behavior._checkGrabPlatform();
       }
     }
 
@@ -1439,7 +1438,7 @@ namespace gdjs {
 
       //Fall
       if (!this._jumpingFirstDelta) {
-        behavior.fall(timeDelta);
+        behavior._fall(timeDelta);
       }
       this._jumpingFirstDelta = false;
 
@@ -1519,14 +1518,14 @@ namespace gdjs {
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
       //Go on a ladder
-      behavior.checkTransitionOnLadder();
+      behavior._checkTransitionOnLadder();
 
       if (behavior._releaseKey) {
         behavior._releaseGrabbedPlatform();
       }
 
       //Jumping
-      behavior.checkTransitionJumping();
+      behavior._checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
@@ -1571,7 +1570,7 @@ namespace gdjs {
       }
 
       //Jumping
-      behavior.checkTransitionJumping();
+      behavior._checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {

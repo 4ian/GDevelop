@@ -383,21 +383,18 @@ namespace gdjs {
     }
 
     _setFalling() {
-      console.debug(`${this._state} --> ${this._falling}`);
       this._state.leave();
       this._state = this._falling;
       this._falling.enter();
     }
 
     private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
-      console.debug(`${this._state} --> ${this._onFloor}`);
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
     }
 
     private _setJumping() {
-      console.debug(`${this._state} --> ${this._jumping}`);
       this._state.leave();
       const from = this._state;
       this._state = this._jumping;
@@ -405,14 +402,12 @@ namespace gdjs {
     }
 
     private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
-      console.debug(`${this._state} --> ${this._grabbingPlatform}`);
       this._state.leave();
       this._state = this._grabbingPlatform;
       this._grabbingPlatform.enter(grabbedPlatform);
     }
 
     private _setOnLadder() {
-      console.debug(`${this._state} --> ${this._onLadder}`);
       this._state.leave();
       this._state = this._onLadder;
       this._onLadder.enter();

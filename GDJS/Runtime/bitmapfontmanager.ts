@@ -5,23 +5,22 @@
  */
 namespace gdjs {
   /**
-   * We patch the installed font to use a more complex name that includes the size of the font and line height,
-   * to avoid conflicts between different font files using the same font name.
+   * We patch the installed font to use a name that is unique for each font data and texture,
+   * to avoid conflicts between different font files using the same font name (by default, the
+   * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
+   * For example, 2 resources can use the same font, or we can have multiple objects with the same
+   * font data and different textures).
    */
-  const patchInstalledBitmapFont = (bitmapFont: PIXI.BitmapFont) => {
-    const generateSlugName = (bitmapFont: PIXI.BitmapFont) => {
-      return (
-        bitmapFont.font + '-' + bitmapFont.size + '-' + bitmapFont.lineHeight
-      );
-    };
-
+  const patchInstalledBitmapFont = (
+    bitmapFont: PIXI.BitmapFont,
+    bitmapFontInstallKey: string
+  ) => {
     const defaultName = bitmapFont.font;
-    const fullSlugName = generateSlugName(bitmapFont);
     // @ts-ignore - we "hack" into Pixi to change the font name
-    bitmapFont.font = fullSlugName;
-    PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+    bitmapFont.font = bitmapFontInstallKey;
+    PIXI.BitmapFont.available[bitmapFontInstallKey] = bitmapFont;
     delete PIXI.BitmapFont.available[defaultName];
-    return PIXI.BitmapFont.available[fullSlugName];
+    return PIXI.BitmapFont.available[bitmapFontInstallKey];
   };
 
   /**
@@ -31,6 +30,7 @@ namespace gdjs {
    */
   export class BitmapFontManager {
     private _resources: ResourceData[];
+    private _imageManager: gdjs.PixiImageManager;
 
     /** Pixi.BitmapFont used, indexed by their BitmapFont name. */
     private _pixiBitmapFontsInUse: Record<
@@ -51,9 +51,14 @@ namespace gdjs {
 
     /**
      * @param resources The resources data of the game.
+     * @param imageManager The image manager to be used to get textures used by fonts.
      */
-    constructor(resources: ResourceData[]) {
+    constructor(
+      resources: ResourceData[],
+      imageManager: gdjs.PixiImageManager
+    ) {
       this._resources = resources;
+      this._imageManager = imageManager;
     }
 
     /**
@@ -65,8 +70,9 @@ namespace gdjs {
       }
 
       // Default bitmap font style
+      const fontFamily = 'Arial';
       const bitmapFontStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: fontFamily,
         fontSize: 20,
         padding: 5,
         align: 'left',
@@ -77,11 +83,11 @@ namespace gdjs {
 
       // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
       const defaultBitmapFont = patchInstalledBitmapFont(
-        // @ts-ignore
-        PIXI.BitmapFont.from(bitmapFontStyle.fontFamily, bitmapFontStyle, {
+        PIXI.BitmapFont.from(fontFamily, bitmapFontStyle, {
           // All the printable ASCII characters
           chars: [[' ', '~']],
-        })
+        }),
+        'GDJS-DEFAULT-BITMAP-FONT'
       );
 
       // Define the default name used for the default bitmap font.
@@ -162,14 +168,18 @@ namespace gdjs {
 
     getBitmapFontFromData(
       bitmapFontResourceName: string,
-      texture: PIXI.Texture
+      textureAtlasResourceName: string
     ): PIXI.BitmapFont {
+      const bitmapFontInstallKey =
+        bitmapFontResourceName + '@' + textureAtlasResourceName;
+
       // Return the existing Bitmap Font that is already in memory and already installed.
-      if (this._installedPixiBitmapFont[bitmapFontResourceName]) {
-        return this._installedPixiBitmapFont[bitmapFontResourceName];
+      if (this._installedPixiBitmapFont[bitmapFontInstallKey]) {
+        return this._installedPixiBitmapFont[bitmapFontInstallKey];
       }
 
       // The Bitmap Font is not loaded, load it in memory.
+
       // First get the font data:
       const fontData = this._loadedFontsData[bitmapFontResourceName];
       if (!fontData) {
@@ -181,14 +191,20 @@ namespace gdjs {
         return this.getDefaultBitmapFont();
       }
 
+      // Get the texture to be used in the font:
+      const texture = this._imageManager.getPIXITexture(
+        textureAtlasResourceName
+      );
+
       try {
         // Create and install the Pixi.BitmapFont in memory:
         const bitmapFont = patchInstalledBitmapFont(
-          PIXI.BitmapFont.install(fontData, texture)
+          PIXI.BitmapFont.install(fontData, texture),
+          bitmapFontInstallKey
         );
 
         return (this._installedPixiBitmapFont[
-          bitmapFontResourceName
+          bitmapFontInstallKey
         ] = bitmapFont);
       } catch (error) {
         console.warn(
@@ -201,49 +217,38 @@ namespace gdjs {
       }
     }
 
-    async preloadBitmapFontData(onProgress, onComplete) {
-      let resources = this._resources;
-      const bitmapFontResources = resources.filter(function (resource) {
-        return resource.kind === 'bitmapFont' && !resource.disablePreload;
-      });
+    loadBitmapFontData(
+      onProgress: (count: integer, total: integer) => void
+    ): Promise<void[]> {
+      const bitmapFontResources = this._resources.filter(
+        (resource) => resource.kind === 'bitmapFont' && !resource.disablePreload
+      );
       if (bitmapFontResources.length === 0) {
-        return onComplete(bitmapFontResources.length);
+        return Promise.resolve([]);
       }
-      let loaded = 0;
 
-      function onLoad(error) {
-        if (error) {
-          console.error(
-            'Error while preloading a bitmapFont resource:' + error
-          );
-        }
-        loaded++;
-        if (loaded === bitmapFontResources.length) {
-          onComplete(bitmapFontResources.length);
-        } else {
-          onProgress(loaded, bitmapFontResources.length);
-        }
-      }
-      for (let i = 0; i < bitmapFontResources.length; ++i) {
-        const response = await fetch(bitmapFontResources[i].file)
-          .then(function (response) {
-            return response;
-          })
-          .catch(function (error) {
-            console.error(
-              "Can't fetch the bitmap font file " +
-                bitmapFontResources[i].file +
-                ', error: ' +
-                error
-            );
-          });
-        if (!response) {
-          return;
-        }
-        const fontData = await response.text();
-        this._loadedFontsData[bitmapFontResources[i].name] = fontData;
-        onLoad(null);
-      }
+      let loadedCount = 0;
+      return Promise.all(
+        bitmapFontResources.map((bitmapFontResource) => {
+          return fetch(bitmapFontResource.file)
+            .then((response) => response.text())
+            .then((fontData) => {
+              this._loadedFontsData[bitmapFontResource.name] = fontData;
+            })
+            .catch((error) => {
+              console.error(
+                "Can't fetch the bitmap font file " +
+                  bitmapFontResource.file +
+                  ', error: ' +
+                  error
+              );
+            })
+            .then(() => {
+              loadedCount++;
+              onProgress(loadedCount, bitmapFontResources.length);
+            });
+        })
+      );
     }
   }
 }

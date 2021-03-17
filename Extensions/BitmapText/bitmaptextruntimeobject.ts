@@ -47,9 +47,7 @@ namespace gdjs {
     _wrappingWidth: float;
     _align: string;
 
-    _renderer:
-      | gdjs.BitmapTextRuntimeObjectPixiRenderer
-      | gdjs.BitmapTextRuntimeObjectCocosRenderer;
+    _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
     /**
      * @param runtimeScene The scene the object belongs to.

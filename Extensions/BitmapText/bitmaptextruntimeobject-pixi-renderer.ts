@@ -16,29 +16,19 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
 
-      // Create the object with a default font.
-      const defaultBitmapFont = runtimeScene
-        .getGame()
-        .getBitmapFontManager()
-        .getDefaultBitmapFont();
-      this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
-        fontName: defaultBitmapFont.font,
-      });
-
-      // Load the font set up in the object
-      const texture = runtimeScene
-        .getGame()
-        .getImageManager()
-        .getPIXITexture(runtimeObject._textureAtlasResourceName);
-
       const bitmapFont = runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .getBitmapFontFromData(runtimeObject._bitmapFontResourceName, texture);
+        .getBitmapFontFromData(
+          runtimeObject._bitmapFontResourceName,
+          runtimeObject._textureAtlasResourceName
+        );
+      this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
+        fontName: bitmapFont.font,
+        fontSize: bitmapFont.size,
+      });
 
-      // Use this font
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
+      // Mark the font as used
       runtimeScene
         .getGame()
         .getBitmapFontManager()
@@ -83,17 +73,14 @@ namespace gdjs {
     }
 
     updateFont(): void {
-      // Get the texture used in the bitmap font
-      const texture = this._object._runtimeScene
-        .getGame()
-        .getImageManager()
-        .getPIXITexture(this._object._textureAtlasResourceName);
-
-      // Get the bitmap font file and use the texture for generate the bitmapFont (PIXI.BitmapFont) and return the fontName ready to use.
+      // Get the new bitmap font to use
       const bitmapFont = this._object._runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .getBitmapFontFromData(this._object._bitmapFontResourceName, texture);
+        .getBitmapFontFromData(
+          this._object._bitmapFontResourceName,
+          this._object._textureAtlasResourceName
+        );
 
       // Mark the old font unused for the manager
       this._object._runtimeScene

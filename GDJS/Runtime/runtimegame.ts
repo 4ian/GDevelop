@@ -91,7 +91,8 @@ namespace gdjs {
       this._fontManager = new gdjs.FontManager(this._data.resources.resources);
       this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
       this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources
+        this._data.resources.resources,
+        this._imageManager
       );
       this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
       this._minFPS = this._data ? this._data.properties.minFPS : 15;
@@ -434,6 +435,10 @@ namespace gdjs {
       );
       const allAssetsTotal = this._data.resources.resources.length;
       const that = this;
+
+      // TODO: All the `loadXXX` (or `preloadXXX`) methods would be
+      // better converted to return promises, for better readability of the code.
+      // See how `loadBitmapFontData` is done.
       this._imageManager.loadTextures(
         function (count, total) {
           const percent = Math.floor((count / allAssetsTotal) * 100);
@@ -482,11 +487,9 @@ namespace gdjs {
                         progressCallback(percent);
                       }
                     },
-                    //
-
                     function (jsonTotalCount) {
-                      that._bitmapFontManager.preloadBitmapFontData(
-                        function (count, total) {
+                      that._bitmapFontManager
+                        .loadBitmapFontData((count) => {
                           var percent = Math.floor(
                             ((texturesTotalCount +
                               audioTotalCount +
@@ -498,14 +501,11 @@ namespace gdjs {
                           );
                           loadingScreen.render(percent);
                           if (progressCallback) progressCallback(percent);
-                        },
-                        function () {
+                        })
+                        .then(() => {
                           loadingScreen.unload();
                           callback();
-                        }
-                      );
-
-                      //
+                        });
                     }
                   );
                 }

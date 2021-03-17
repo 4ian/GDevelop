@@ -65,7 +65,11 @@ namespace gdjs {
     _requestedDeltaY: float = 0;
     _lastDeltaY: float = 0;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._roundCoordinates = behaviorData.roundCoordinates;
       this._gravity = behaviorData.gravity;
@@ -417,7 +421,7 @@ namespace gdjs {
       );
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -517,7 +521,7 @@ namespace gdjs {
       this._lastDeltaY = object.getY() - oldY;
     }
 
-    doStepPostEvents(runtimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     //Scene change is not supported
     /*
@@ -534,7 +538,7 @@ namespace gdjs {
      * @param platform The platform the object is in collision with
      * @param y The value in pixels on Y axis the object wants to move to
      */
-    private _canGrab(platform) {
+    private _canGrab(platform: gdjs.PlatformRuntimeBehavior) {
       const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
       const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
@@ -562,7 +566,7 @@ namespace gdjs {
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
     _isCollidingWith(
-      candidates,
+      candidates: gdjs.PlatformRuntimeBehavior[],
       exceptThisOne?: number | null,
       excludeJumpThrus?: boolean
     ) {
@@ -601,7 +605,10 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
-    private _separateFromPlatforms(candidates, excludeJumpThrus) {
+    private _separateFromPlatforms(
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      excludeJumpThrus: boolean
+    ) {
       excludeJumpThrus = !!excludeJumpThrus;
       const objects = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms
@@ -729,7 +736,7 @@ namespace gdjs {
       return false;
     }
 
-    _isIn(platformArray, id) {
+    _isIn(platformArray: gdjs.PlatformRuntimeBehavior[], id: integer) {
       for (let i = 0; i < platformArray.length; ++i) {
         if (platformArray[i].owner.id === id) {
           return true;
@@ -741,7 +748,7 @@ namespace gdjs {
     /**
      * Update _potentialCollidingObjects member with platforms near the object.
      */
-    private _updatePotentialCollidingObjects(maxMovementLength) {
+    private _updatePotentialCollidingObjects(maxMovementLength: float) {
       this._manager.getAllPlatformsAround(
         this.owner,
         maxMovementLength,

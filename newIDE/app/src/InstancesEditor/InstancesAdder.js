@@ -14,15 +14,13 @@ const roundPositionsToGrid = (
   const newPos = pos;
 
   if (options.grid && options.snap) {
-    newPos[0] = roundPosition(
-      newPos[0],
+    roundPosition(
+      newPos,
       options.gridWidth,
-      options.gridOffsetX
-    );
-    newPos[1] = roundPosition(
-      newPos[1],
       options.gridHeight,
-      options.gridOffsetY
+      options.gridOffsetX,
+      options.gridOffsetY,
+      options.gridType
     );
   } else {
     newPos[0] = Math.round(newPos[0]);

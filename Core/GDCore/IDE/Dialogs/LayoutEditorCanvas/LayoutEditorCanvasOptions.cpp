@@ -17,7 +17,7 @@ LayoutEditorCanvasOptions::LayoutEditorCanvasOptions()
       gridHeight(32),
       gridOffsetX(0),
       gridOffsetY(0),
-      gridType("retangular"),
+      gridType("rectangular"),
       gridR(158),
       gridG(180),
       gridB(255),

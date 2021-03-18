@@ -419,31 +419,23 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    /** The bitmap font used in case another font can't be loaded */
+    /** The bitmap font used in case another font can't be loaded. */
     let defaultBitmapFont = null;
 
     /**
-     * Patch the specified installed font to use a slug name that includes the size of the font and line height,
-     * to avoid conflicts between different font files using the same font name.
+     * We patch the installed font to use a name that is unique for each font data and texture,
+     * to avoid conflicts between different font files using the same font name (by default, the
+     * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
+     * For example, 2 resources can use the same font, or we can have multiple objects with the same
+     * font data and different textures).
      */
-    const patchBitmapFont = (bitmapFont) => {
-      const generateSlugName = (bitmapFontStyle) => {
-        return (
-          bitmapFontStyle.font +
-          '-' +
-          bitmapFontStyle.size +
-          '-' +
-          bitmapFontStyle.lineHeight
-        );
-      };
-
+    const patchBitmapFont = (bitmapFont, bitmapFontInstallKey) => {
       const defaultName = bitmapFont.font;
-      const fullSlugName = generateSlugName(bitmapFont);
-      bitmapFont.font = fullSlugName;
-      PIXI.BitmapFont.available[fullSlugName] = bitmapFont;
+      bitmapFont.font = bitmapFontInstallKey;
+      PIXI.BitmapFont.available[bitmapFontInstallKey] = bitmapFont;
 
       delete PIXI.BitmapFont.available[defaultName];
-      return PIXI.BitmapFont.available[fullSlugName];
+      return PIXI.BitmapFont.available[bitmapFontInstallKey];
     };
 
     /**
@@ -471,7 +463,8 @@ module.exports = {
               [' ', '~'], // All the printable ASCII characters
             ],
           }
-        )
+        ),
+        'GD-DEFAULT-BITMAP-FONT'
       );
       return defaultBitmapFont;
     };
@@ -565,6 +558,7 @@ module.exports = {
       ) {
         this._currentBitmapFontResourceName = bitmapFontResourceName;
         this._currentTextureAtlasResourceName = textureAtlasResourceName;
+        const bitmapFontInstallKey = bitmapFontResourceName + '@' + textureAtlasResourceName;
 
         const texture = this._pixiResourcesLoader.getPIXITexture(
           this._project,
@@ -578,7 +572,8 @@ module.exports = {
           )
           .then((fontData) => {
             const bitmapFont = patchBitmapFont(
-              PIXI.BitmapFont.install(fontData, texture)
+              PIXI.BitmapFont.install(fontData, texture),
+              bitmapFontInstallKey
             );
             this._pixiObject.fontName = bitmapFont.font;
             this._pixiObject.fontSize = bitmapFont.size;

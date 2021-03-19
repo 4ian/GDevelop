@@ -76,14 +76,80 @@ export default class SelectionRectangle {
       offsetY;
 
     if (options.gridType === 'isometric') {
-      this._drawLines(
-        this._topLeftDiamondPoints(startX, endX, startY, endY),
-        this._rightBottomDiamondPoints(startX, endX, startY, endY)
-      );
-      this._drawLines(
-        this._rightTopDiamondPoints(startX, endX, startY, endY),
-        this._bottomLeftDiamondPoints(startX, endX, startY, endY)
-      );
+      const countX = Math.round((endX - startX) / options.gridWidth);
+      const countY = Math.round((endY - startY) / options.gridHeight);
+      const lineCount = countX + countY;
+      for (let i = 0; i < lineCount; ++i) {
+        let lineStartX;
+        let lineStartY;
+        if (i < countX) {
+          // top
+          lineStartX = startX + options.gridWidth / 2 + i * options.gridWidth;
+          lineStartY = startY;
+        } else {
+          // right
+          lineStartX = endX;
+          lineStartY =
+            startY + options.gridHeight / 2 + (i - countX) * options.gridHeight;
+        }
+        let lineEndX;
+        let lineEndY;
+        if (i < countY) {
+          // left
+          lineEndX = startX;
+          lineEndY = startY + options.gridHeight / 2 + i * options.gridHeight;
+        } else {
+          // bottom
+          lineEndX =
+            startX + options.gridWidth / 2 + (i - countY) * options.gridWidth;
+          lineEndY = endY;
+        }
+        const start = this.viewPosition.toCanvasCoordinates(
+          lineStartX,
+          lineStartY
+        );
+        const end = this.viewPosition.toCanvasCoordinates(lineEndX, lineEndY);
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
+      for (let i = 0; i < lineCount; ++i) {
+        let lineStartX;
+        let lineStartY;
+        if (i < countY) {
+          // reverse left
+          lineStartX = startX;
+          lineStartY =
+            startY +
+            options.gridHeight / 2 +
+            (countY - 1 - i) * options.gridHeight;
+        } else {
+          // top
+          lineStartX =
+            startX + options.gridWidth / 2 + (i - countY) * options.gridWidth;
+          lineStartY = startY;
+        }
+        let lineEndX;
+        let lineEndY;
+        if (i < countX) {
+          // bottom
+          lineEndX = startX + options.gridWidth / 2 + i * options.gridWidth;
+          lineEndY = endY;
+        } else {
+          // reverse right
+          lineEndX = endX;
+          lineEndY =
+            startY +
+            options.gridHeight / 2 +
+            (lineCount - 1 - i) * options.gridHeight;
+        }
+        const start = this.viewPosition.toCanvasCoordinates(
+          lineStartX,
+          lineStartY
+        );
+        const end = this.viewPosition.toCanvasCoordinates(lineEndX, lineEndY);
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
     } else {
       for (let x = startX; x < endX; x += options.gridWidth) {
         const start = this.viewPosition.toCanvasCoordinates(x, startY);
@@ -103,119 +169,5 @@ export default class SelectionRectangle {
     }
 
     this.pixiGrid.endFill();
-  }
-
-  _drawLines(sceneStartPoints, sceneEndPoints) {
-    let sceneStartPoint = sceneStartPoints.next();
-    let sceneEndPoint = sceneEndPoints.next();
-    while (!sceneStartPoint.done && !sceneEndPoint.done) {
-      const start = this.viewPosition.toCanvasCoordinates(
-        sceneStartPoint.value[0],
-        sceneStartPoint.value[1]
-      );
-      const end = this.viewPosition.toCanvasCoordinates(
-        sceneEndPoint.value[0],
-        sceneEndPoint.value[1]
-      );
-
-      this.pixiGrid.moveTo(start[0], start[1]);
-      this.pixiGrid.lineTo(end[0], end[1]);
-
-      sceneStartPoint = sceneStartPoints.next();
-      sceneEndPoint = sceneEndPoints.next();
-    }
-  }
-
-  *_diamondsX(startX, endX) {
-    const options = this.options;
-    for (
-      let x = startX + options.gridWidth / 2;
-      x < endX;
-      x += options.gridWidth
-    ) {
-      yield x;
-    }
-  }
-
-  *_diamondsY(startY, endY) {
-    const options = this.options;
-    for (
-      let y = startY + options.gridHeight / 2;
-      y < endY;
-      y += options.gridHeight
-    ) {
-      yield y;
-    }
-  }
-
-  *_reverseDiamondsY(startY, endY) {
-    const options = this.options;
-    for (
-      let y = endY - options.gridHeight / 2;
-      y > startY;
-      y -= options.gridHeight
-    ) {
-      yield y;
-    }
-  }
-
-  _temporaryTopLeftDiamondPoint = [0, 0];
-  *_topLeftDiamondPoints(startX, endX, startY, endY) {
-    const point = this._temporaryTopLeftDiamondPoint;
-    for (const x of this._diamondsX(startX, endX)) {
-      point[0] = x;
-      point[1] = startY;
-      yield point;
-    }
-    for (const y of this._diamondsY(startY, endY)) {
-      point[0] = endX;
-      point[1] = y;
-      yield point;
-    }
-  }
-
-  _temporaryRightBottomDiamondPoint = [0, 0];
-  *_rightBottomDiamondPoints(startX, endX, startY, endY) {
-    const point = this._temporaryRightBottomDiamondPoint;
-    for (const y of this._diamondsY(startY, endY)) {
-      point[0] = startX;
-      point[1] = y;
-      yield point;
-    }
-    for (const x of this._diamondsX(startX, endX)) {
-      point[0] = x;
-      point[1] = endY;
-      yield point;
-    }
-  }
-
-  _temporaryRightTopDiamondPoint = [0, 0];
-  *_rightTopDiamondPoints(startX, endX, startY, endY) {
-    const point = this._temporaryRightTopDiamondPoint;
-    for (const y of this._reverseDiamondsY(startY, endY)) {
-      point[0] = startX;
-      point[1] = y;
-      yield point;
-    }
-    for (const x of this._diamondsX(startX, endX)) {
-      point[0] = x;
-      point[1] = startY;
-      yield point;
-    }
-  }
-
-  _temporaryBottomLeftDiamondPoint = [0, 0];
-  *_bottomLeftDiamondPoints(startX, endX, startY, endY) {
-    const point = this._temporaryBottomLeftDiamondPoint;
-    for (const x of this._diamondsX(startX, endX)) {
-      point[0] = x;
-      point[1] = endY;
-      yield point;
-    }
-    for (const y of this._reverseDiamondsY(startY, endY)) {
-      point[0] = endX;
-      point[1] = y;
-      yield point;
-    }
   }
 }

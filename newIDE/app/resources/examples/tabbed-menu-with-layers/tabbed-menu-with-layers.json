@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/tabbed-menu-with-layers/tabbed-menu-with-layers.json",
+    "projectUuid": "fa727924-68ca-4206-b8bd-de25d240946e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Wendash UI",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -347,6 +344,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Random 1\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0.4835746950193103,\\\"sustainPunch\\\":60,\\\"decay\\\":1.017774788642853,\\\"tremoloDepth\\\":12,\\\"tremoloFrequency\\\":0.32785956097053104,\\\"frequency\\\":806.4376780489404,\\\"frequencySweep\\\":-8136.485284538763,\\\"frequencyDeltaSweep\\\":-6.3397461570833595,\\\"repeatFrequency\\\":0.387066908541736,\\\"frequencyJump1Onset\\\":5,\\\"frequencyJump1Amount\\\":-10,\\\"frequencyJump2Onset\\\":20,\\\"frequencyJump2Amount\\\":-5,\\\"harmonics\\\":5,\\\"harmonicsFalloff\\\":0.27,\\\"waveform\\\":\\\"sine\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0.0804059036402498,\\\"vibratoFrequency\\\":0,\\\"squareDuty\\\":50,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":-15,\\\"bitCrush\\\":2,\\\"bitCrushSweep\\\":4,\\\"lowPassCutoff\\\":5700,\\\"lowPassCutoffSweep\\\":-1.7787788568783283,\\\"highPassCutoff\\\":6500,\\\"highPassCutoffSweep\\\":67.99595897809623,\\\"compression\\\":1.2,\\\"normalization\\\":true,\\\"amplification\\\":20}\",\"name\":\"change\"}}",
         "name": "assets\\change.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -354,6 +353,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Blip/select 2\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0,\\\"sustainPunch\\\":0,\\\"decay\\\":0.04791207830158295,\\\"tremoloDepth\\\":0,\\\"tremoloFrequency\\\":4.624818578328799,\\\"frequency\\\":76.88481388443182,\\\"frequencySweep\\\":-0.6179216722407899,\\\"frequencyDeltaSweep\\\":-150.05257592011773,\\\"repeatFrequency\\\":0,\\\"frequencyJump1Onset\\\":33,\\\"frequencyJump1Amount\\\":0,\\\"frequencyJump2Onset\\\":66,\\\"frequencyJump2Amount\\\":0,\\\"harmonics\\\":0,\\\"harmonicsFalloff\\\":0.62,\\\"waveform\\\":\\\"sawtooth\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0,\\\"vibratoFrequency\\\":1.8775417352126227,\\\"squareDuty\\\":25,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":0,\\\"bitCrush\\\":8,\\\"bitCrushSweep\\\":0,\\\"lowPassCutoff\\\":18.231190640999213,\\\"lowPassCutoffSweep\\\":4.766237777026747,\\\"highPassCutoff\\\":0,\\\"highPassCutoffSweep\\\":-0.15719810091153863,\\\"compression\\\":1,\\\"normalization\\\":true,\\\"amplification\\\":130}\",\"name\":\"hover\"}}",
         "name": "assets\\hover.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -370,6 +371,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Blip/select 10\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0.020259502326391177,\\\"sustainPunch\\\":10,\\\"decay\\\":0.10548598633317297,\\\"tremoloDepth\\\":0,\\\"tremoloFrequency\\\":10,\\\"frequency\\\":892.8568602317197,\\\"frequencySweep\\\":0,\\\"frequencyDeltaSweep\\\":0.22900375856919775,\\\"repeatFrequency\\\":0,\\\"frequencyJump1Onset\\\":10,\\\"frequencyJump1Amount\\\":0,\\\"frequencyJump2Onset\\\":66,\\\"frequencyJump2Amount\\\":0,\\\"harmonics\\\":0,\\\"harmonicsFalloff\\\":0.58,\\\"waveform\\\":\\\"sine\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0.47209129016044415,\\\"vibratoFrequency\\\":7.4964775075528784,\\\"squareDuty\\\":65,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":0,\\\"bitCrush\\\":16,\\\"bitCrushSweep\\\":0,\\\"lowPassCutoff\\\":22050,\\\"lowPassCutoffSweep\\\":0,\\\"highPassCutoff\\\":0,\\\"highPassCutoffSweep\\\":-0.3391074447532707,\\\"compression\\\":1,\\\"normalization\\\":true,\\\"amplification\\\":50}\",\"name\":\"click\"}}",
         "name": "assets\\click.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -377,6 +380,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\zipclick.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -416,6 +421,7 @@
       "variables": [
         {
           "name": "tab",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -427,6 +433,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
+          "persistentUuid": "6be7551c-1338-47e5-9fd5-c2f57f613132",
           "width": 0,
           "x": 25,
           "y": 25,
@@ -442,6 +449,7 @@
           "layer": "",
           "locked": false,
           "name": "underline",
+          "persistentUuid": "c2be7a7b-168a-47f8-a1fa-48bcb01fe4c2",
           "width": 177,
           "x": 63,
           "y": 216,
@@ -457,6 +465,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
+          "persistentUuid": "053f8fb5-a464-4740-9962-c8618efc5fe4",
           "width": 0,
           "x": 525,
           "y": 75,
@@ -471,10 +480,12 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "ABOUT"
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -486,6 +497,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
+          "persistentUuid": "e9c70a45-2d5d-4861-90f8-fcf7ee07be4e",
           "width": 0,
           "x": 300,
           "y": 75,
@@ -495,10 +507,12 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "OPTIONS"
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -510,6 +524,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
+          "persistentUuid": "ea4bf20a-d7c3-4010-a08f-4653ff60bb70",
           "width": 0,
           "x": 75,
           "y": 75,
@@ -519,6 +534,7 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "PLAY"
             }
           ]
@@ -530,6 +546,7 @@
           "layer": "",
           "locked": false,
           "name": "nav_line",
+          "persistentUuid": "9264840a-c871-470e-837c-8bc871da12ea",
           "width": 800,
           "x": 0,
           "y": 119,
@@ -545,6 +562,7 @@
           "layer": "",
           "locked": false,
           "name": "indicator",
+          "persistentUuid": "7dd71821-4f80-4e6a-9836-b8ff83b4412f",
           "width": 204,
           "x": 75,
           "y": 150,
@@ -560,6 +578,7 @@
           "layer": "",
           "locked": false,
           "name": "body",
+          "persistentUuid": "12e76e95-9692-46ea-8dc7-755b8cc38321",
           "width": 725,
           "x": 36,
           "y": 149,
@@ -575,6 +594,7 @@
           "layer": "",
           "locked": false,
           "name": "indicator",
+          "persistentUuid": "972e180d-a5ad-49a4-b4c5-acf7e801fba2",
           "width": 204,
           "x": 75,
           "y": 119,
@@ -590,6 +610,7 @@
           "layer": "",
           "locked": false,
           "name": "Big_name",
+          "persistentUuid": "a1ac455f-2b99-454d-bb31-1cd14ffed309",
           "width": 0,
           "x": 64,
           "y": 175,
@@ -605,6 +626,7 @@
           "layer": "",
           "locked": false,
           "name": "underline",
+          "persistentUuid": "8910b40b-a49d-4baf-bb3b-d4112fb95fc8",
           "width": 177,
           "x": 25,
           "y": 53,
@@ -620,6 +642,7 @@
           "layer": "play",
           "locked": false,
           "name": "color",
+          "persistentUuid": "6c7f2b85-2cbe-4ccd-8745-494e9d7ae871",
           "width": 708,
           "x": 44,
           "y": 247,
@@ -635,6 +658,7 @@
           "layer": "play",
           "locked": false,
           "name": "play_text",
+          "persistentUuid": "af250cb0-649b-48b7-9b1d-07685893958d",
           "width": 0,
           "x": 64,
           "y": 258,
@@ -650,6 +674,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "9e5773a9-dbc0-476a-8b25-83b5e205b363",
           "width": 0,
           "x": 75,
           "y": 492,
@@ -665,6 +690,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "a0786bca-3454-4676-a482-3459c7ca2914",
           "width": 0,
           "x": 425,
           "y": 492,
@@ -680,6 +706,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "28e44ce1-8eeb-4068-a20b-733d180b141b",
           "width": 0,
           "x": 425,
           "y": 267,
@@ -695,6 +722,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "283e9dc5-4451-4347-bea1-9c2b9511d4d2",
           "width": 0,
           "x": 75,
           "y": 267,
@@ -710,6 +738,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "6fdfcc29-dfe0-476f-afa5-4a2513c4914b",
           "width": 0,
           "x": 425,
           "y": 342,
@@ -725,6 +754,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "7c5e9673-07fc-4098-9a9b-00e92d369cef",
           "width": 0,
           "x": 75,
           "y": 342,
@@ -740,6 +770,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "e3cfdffc-9c3f-431f-97e5-9a37eae576e7",
           "width": 0,
           "x": 425,
           "y": 417,
@@ -755,6 +786,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
+          "persistentUuid": "c7ec93b9-3f98-46a9-b25e-676b230c2150",
           "width": 0,
           "x": 75,
           "y": 417,
@@ -770,6 +802,7 @@
           "layer": "about",
           "locked": false,
           "name": "about_text",
+          "persistentUuid": "0daf5a32-183e-45a1-a190-b9103471bed2",
           "width": 657,
           "x": 65,
           "y": 243,
@@ -785,6 +818,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "7b6659e1-99bc-4d75-9a40-f34bca461d61",
           "width": 0,
           "x": 354,
           "y": 472,
@@ -794,6 +828,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "13"
             }
           ]
@@ -805,6 +840,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "9c8f9de6-8470-4bce-97e8-d5f164ccd97d",
           "width": 0,
           "x": 74,
           "y": 472,
@@ -814,6 +850,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "11"
             }
           ]
@@ -825,6 +862,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "dcad8fe9-0f18-429a-bccc-66682d386b44",
           "width": 0,
           "x": 624,
           "y": 472,
@@ -834,6 +872,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "15"
             }
           ]
@@ -845,6 +884,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "ca16fc00-2773-459e-ab10-1bf988fc41c0",
           "width": 0,
           "x": 217,
           "y": 472,
@@ -854,6 +894,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "12"
             }
           ]
@@ -865,6 +906,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "255a71a7-23c5-4f98-8b1e-c3c3110120f2",
           "width": 0,
           "x": 488,
           "y": 472,
@@ -874,6 +916,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "14"
             }
           ]
@@ -885,6 +928,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "7a4bc6af-dfb8-443a-b3d4-4b44dac4059c",
           "width": 0,
           "x": 74,
           "y": 320,
@@ -900,6 +944,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "2993324a-a1a4-4ff6-aa69-01af6e27871e",
           "width": 0,
           "x": 217,
           "y": 320,
@@ -909,6 +954,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -920,6 +966,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "63a0cefc-5e55-44c8-b93c-c25b3f749ccb",
           "width": 0,
           "x": 354,
           "y": 320,
@@ -929,6 +976,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -940,6 +988,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "28ce9d41-f76e-42a7-a9f6-7d0b4c008f13",
           "width": 0,
           "x": 488,
           "y": 320,
@@ -949,6 +998,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -960,6 +1010,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "14408728-6136-47fd-92be-12568c2178a0",
           "width": 0,
           "x": 624,
           "y": 320,
@@ -969,6 +1020,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -980,6 +1032,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "836edf06-5b06-4b6d-a26c-c15d3a8ffe35",
           "width": 0,
           "x": 74,
           "y": 393,
@@ -989,6 +1042,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "6"
             }
           ]
@@ -1000,6 +1054,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "7d1a62d2-60ea-42c5-8791-bb564db719c7",
           "width": 0,
           "x": 217,
           "y": 393,
@@ -1009,6 +1064,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "7"
             }
           ]
@@ -1020,6 +1076,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "bcbde5c4-0220-4d48-9bcc-bdc9979c7195",
           "width": 0,
           "x": 354,
           "y": 393,
@@ -1029,6 +1086,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "8"
             }
           ]
@@ -1040,6 +1098,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "52d70ad6-323a-4887-ac70-7f1c15b25b2f",
           "width": 0,
           "x": 488,
           "y": 393,
@@ -1049,6 +1108,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "9"
             }
           ]
@@ -1060,6 +1120,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
+          "persistentUuid": "5aeef5c3-5695-473d-9bd7-a52e61d0f71d",
           "width": 0,
           "x": 624,
           "y": 393,
@@ -1069,6 +1130,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "10"
             }
           ]
@@ -1136,14 +1198,17 @@
           "variables": [
             {
               "name": "text",
+              "type": "string",
               "value": "\"\""
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "active",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1847,6 +1912,7 @@
           "variables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "1"
             }
           ],
@@ -2827,6 +2893,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2844,18 +2915,33 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "play",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "options",
           "visibility": false,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "about",
           "visibility": false,
           "cameras": [],
@@ -2877,16 +2963,23 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "RIR_FadingEffect",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Simply fade a sprite in",
           "fullName": "Fade in a sprite",
           "functionType": "Action",
           "name": "fadeInSprite",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -2994,6 +3087,7 @@
           "fullName": "Fade out and delete a sprite",
           "functionType": "Action",
           "name": "fadeOutDelSprite",
+          "private": false,
           "sentence": "Fade out and delete _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3134,6 +3228,7 @@
           "fullName": "Fade out a sprite",
           "functionType": "Action",
           "name": "fadeOutSprite",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3273,6 +3368,7 @@
           "fullName": "Fade in a text object",
           "functionType": "Action",
           "name": "fadeInText",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3380,6 +3476,7 @@
           "fullName": "Fade out a text object",
           "functionType": "Action",
           "name": "fadeOutText",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3519,6 +3616,7 @@
           "fullName": "Fade in a tiled object",
           "functionType": "Action",
           "name": "fadeInTile",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3626,6 +3724,7 @@
           "fullName": "Fade out a tiled object",
           "functionType": "Action",
           "name": "fadeOutTile",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {

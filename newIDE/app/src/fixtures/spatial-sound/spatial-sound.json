@@ -99,7 +99,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_all_128.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_all_128.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_all_128.png",
@@ -112,7 +112,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_center.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_center.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_center.png",
@@ -125,7 +125,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_east.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_east.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_east.png",
@@ -138,7 +138,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_north.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_north.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_north.png",
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_northeast.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_northeast.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_northeast.png",
@@ -164,7 +164,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_northwest.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_northwest.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_northwest.png",
@@ -177,7 +177,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_south.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_south.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_south.png",
@@ -190,7 +190,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_southeast.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_southeast.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_southeast.png",
@@ -203,7 +203,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_southwest.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_southwest.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_southwest.png",
@@ -216,7 +216,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/9patch_Grass and Sand_west.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/9patch_Grass and Sand_west.png",
         "kind": "image",
         "metadata": "",
         "name": "9patch_Grass and Sand_west.png",
@@ -229,7 +229,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Rock with grass (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/Rock with grass (2).png",
         "kind": "image",
         "metadata": "",
         "name": "Rock with grass (2).png",
@@ -242,7 +242,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Bush (2).png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/Bush (2).png",
         "kind": "image",
         "metadata": "",
         "name": "Bush (2).png",
@@ -255,7 +255,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Green Character (8).png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/Green Character (8).png",
         "kind": "image",
         "metadata": "",
         "name": "Green Character (8).png",
@@ -267,7 +267,7 @@
         }
       },
       {
-        "file": "music.wav",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/music.wav",
         "kind": "audio",
         "metadata": "",
         "name": "music.wav",
@@ -277,7 +277,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Blank button.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/Blank button.png",
         "kind": "image",
         "metadata": "",
         "name": "Blank button.png",
@@ -290,7 +290,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/tiled_Castles Background2.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/tiled_Castles Background2.png",
         "kind": "image",
         "metadata": "",
         "name": "tiled_Castles Background.png",
@@ -303,7 +303,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/houseSmallAlt (1).png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/houseSmallAlt (1).png",
         "kind": "image",
         "metadata": "",
         "name": "houseSmallAlt (1).png",
@@ -316,7 +316,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/bush (4).png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/bush (4).png",
         "kind": "image",
         "metadata": "",
         "name": "bush (4).png",
@@ -329,7 +329,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/tiled_Green Floor2.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/tiled_Green Floor2.png",
         "kind": "image",
         "metadata": "",
         "name": "tiled_Green Floor.png",
@@ -342,7 +342,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/ExitCollision.png",
+        "file": "https://resources.gdevelop-app.com/examples/spatial-sound/assets/ExitCollision.png",
         "kind": "image",
         "metadata": "",
         "name": "assets\\ExitCollision.png",

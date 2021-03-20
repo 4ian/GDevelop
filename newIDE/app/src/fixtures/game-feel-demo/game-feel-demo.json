@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.gamefeel.demo",
-    "projectUuid": "ab8c8f6d-35fb-4c86-90b9-26ba0b13573a",
+    "projectUuid": "78a9bf17-ca66-48cf-818b-40cc0f1f964c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -578,70 +578,87 @@
       "variables": [
         {
           "name": "pl_move_state",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pl_weap_cooldown",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_rand",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_pitch",
+          "type": "string",
           "value": "0.9"
         },
         {
           "name": "sfx_weap_sound_reset_timer",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_vol",
+          "type": "string",
           "value": "100"
         },
         {
           "name": "ambience_vol",
+          "type": "string",
           "value": "100"
         },
         {
           "name": "sfx_weap_sound_aux_vol",
+          "type": "string",
           "value": "10"
         },
         {
           "name": "cam_shake_count",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_growth",
+          "type": "string",
           "value": "-1"
         },
         {
           "name": "cam_shake_magnitude",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_state",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_timer",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_x_current",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_y_current",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "hitlag_amount",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pl_in_sfx_zone",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -1393,26 +1410,32 @@
           "variables": [
             {
               "name": "obj_is_squishy_scale",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "obj_scale_lerp",
+              "type": "string",
               "value": "0.2"
             },
             {
               "name": "obj_scdx",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "target_scale",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "hit_flashed",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "hostile_color",
+              "type": "string",
               "value": "255;255;255"
             }
           ],
@@ -1445,18 +1468,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1493,18 +1516,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1541,18 +1564,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1589,18 +1612,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1637,18 +1660,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1685,18 +1708,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1733,18 +1756,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1764,10 +1787,12 @@
           "variables": [
             {
               "name": "shot_crit_roll",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "shot_collided",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -3805,10 +3830,12 @@
           "variables": [
             {
               "name": "casing_is_falling",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "relative_floor_y",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -3920,10 +3947,12 @@
           "variables": [
             {
               "name": "casing_is_falling",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "relative_floor_y",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -4062,30 +4091,37 @@
           "variables": [
             {
               "name": "float_text_is_new",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_lifetime",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_oppacity",
+              "type": "string",
               "value": "800"
             },
             {
               "name": "float_text_target_size",
+              "type": "string",
               "value": "16"
             },
             {
               "name": "text_is_flashy_green",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_progress",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_timer",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -4110,30 +4146,37 @@
           "variables": [
             {
               "name": "float_text_is_new",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_lifetime",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_oppacity",
+              "type": "string",
               "value": "800"
             },
             {
               "name": "float_text_target_size",
+              "type": "string",
               "value": "16"
             },
             {
               "name": "text_is_flashy_red",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_progress",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_timer",
+              "type": "string",
               "value": "0"
             }
           ],

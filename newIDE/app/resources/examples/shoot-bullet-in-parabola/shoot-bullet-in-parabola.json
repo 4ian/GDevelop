@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shoot-bullet-in-parabola\\shoot-bullet-in-parabola.json",
+    "projectUuid": "efd52eeb-b066-48df-b2c6-fd3ba342c573",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": true,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 700,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -101,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "Source.png",
         "kind": "image",
+        "metadata": "",
         "name": "Source.png",
         "smoothed": true,
         "userAdded": true
@@ -109,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "Target.png",
         "kind": "image",
+        "metadata": "",
         "name": "Target.png",
         "smoothed": true,
         "userAdded": true
@@ -117,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "Bullet.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bullet.png",
         "smoothed": true,
         "userAdded": true
@@ -164,6 +168,7 @@
           "layer": "",
           "locked": false,
           "name": "Source",
+          "persistentUuid": "43b465bd-64a6-4d2c-a838-e3d033b0fc09",
           "width": 0,
           "x": 658.399,
           "y": 247.805,
@@ -179,6 +184,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "c4de0d97-fedd-488e-91f6-6ff4a54c115a",
           "width": 0,
           "x": 56.3788,
           "y": 532.427,
@@ -194,6 +200,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "218df9df-b4e3-4b20-982f-ca36b7ee47c8",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -206,6 +213,7 @@
       "objects": [
         {
           "name": "Source",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -263,6 +271,7 @@
         },
         {
           "name": "Target",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -325,6 +334,7 @@
         },
         {
           "name": "Bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -385,6 +395,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -641,6 +652,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1047,6 +1063,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": [
     {

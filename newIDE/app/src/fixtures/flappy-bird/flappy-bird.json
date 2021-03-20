@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.gdevelop.example.flappybird",
-    "projectUuid": "b892c39e-1249-4f06-a31c-e4065c10f304",
+    "projectUuid": "153be8b6-bee6-48be-b294-9a34a6c7bc9b",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -215,6 +215,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sfx_point.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -222,6 +224,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sfx_hit.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -229,6 +233,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sfx_wing.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -236,6 +242,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sfx_swooshing.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -707,6 +715,7 @@
       "variables": [
         {
           "name": "Rect_black_opacity",
+          "type": "string",
           "value": ""
         }
       ],
@@ -718,7 +727,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
-          "persistentUuid": "ea1d50a2-fddc-4a62-9254-2809ac8ca9a8",
+          "persistentUuid": "04f692b6-ee84-4dbf-9baf-dfd763d98443",
           "width": 50,
           "x": 261,
           "y": 165,
@@ -734,7 +743,7 @@
           "layer": "",
           "locked": false,
           "name": "Start",
-          "persistentUuid": "97e11fe7-12a1-46c4-9389-1323ffa247dd",
+          "persistentUuid": "e00bef2d-068a-4834-a698-5df360565937",
           "width": 100,
           "x": 100,
           "y": 410,
@@ -750,7 +759,7 @@
           "layer": "",
           "locked": false,
           "name": "Label_flappy_bird",
-          "persistentUuid": "a340561b-091b-496b-b2b6-c925d5e38b11",
+          "persistentUuid": "86881759-a690-4e5b-86c3-12eb08cc7798",
           "width": 100,
           "x": 100,
           "y": 159,
@@ -766,7 +775,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
-          "persistentUuid": "182827ce-4d88-48dc-aca2-7e630fc991da",
+          "persistentUuid": "7c32c9ed-9ace-4597-a5b9-f1bf01e67876",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -782,7 +791,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
-          "persistentUuid": "5f16f3db-4b3a-4eed-86c7-a16ce18c3e84",
+          "persistentUuid": "c5b7782a-25f4-4105-a3a6-6a58f72796b8",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -798,7 +807,7 @@
           "layer": "",
           "locked": false,
           "name": "Rate",
-          "persistentUuid": "aa9145e9-77a9-41d1-8d8d-d62a49282359",
+          "persistentUuid": "42fbe1be-4dfb-46d8-b5cb-fadc3def289e",
           "width": 0,
           "x": 300,
           "y": 410,
@@ -814,7 +823,7 @@
           "layer": "",
           "locked": false,
           "name": "ytchannel",
-          "persistentUuid": "fa6dcf22-9f67-4db7-ab9d-ec268b800638",
+          "persistentUuid": "ddcc4633-ee50-464b-98ba-8beb150b7f07",
           "width": 0,
           "x": 259,
           "y": 483,
@@ -1536,18 +1545,22 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "Obstacle_collision",
+          "type": "string",
           "value": ""
         },
         {
           "name": "Gameplay_started",
+          "type": "string",
           "value": ""
         },
         {
           "name": "New_hscore_sprite",
+          "type": "string",
           "value": ""
         }
       ],
@@ -1559,7 +1572,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird",
-          "persistentUuid": "3a6eb4c2-4f5e-440b-9582-887327efd8c2",
+          "persistentUuid": "eaf4cd03-30db-450a-a693-0b12a9ed3238",
           "width": 0,
           "x": 184,
           "y": 237,
@@ -1575,7 +1588,7 @@
           "layer": "",
           "locked": false,
           "name": "Background_day",
-          "persistentUuid": "cff74408-7049-423e-8579-533a4624374d",
+          "persistentUuid": "881e8426-39a7-4986-83cd-33af6e42780a",
           "width": 400,
           "x": 0,
           "y": 0,
@@ -1591,7 +1604,7 @@
           "layer": "",
           "locked": false,
           "name": "Bottom_pipe",
-          "persistentUuid": "41b29694-79ce-4d7d-ac5b-73ca31e19d41",
+          "persistentUuid": "a53cb80c-8096-418e-9718-0f1f0e9182a3",
           "width": 0,
           "x": 442,
           "y": 290,
@@ -1607,7 +1620,7 @@
           "layer": "",
           "locked": false,
           "name": "Top_pipe",
-          "persistentUuid": "26c46590-f730-48b7-b338-4f565c26aca5",
+          "persistentUuid": "7b2301b1-0dc2-431c-8a72-b705a20b9f2b",
           "width": 0,
           "x": 442,
           "y": 170,
@@ -1623,7 +1636,7 @@
           "layer": "",
           "locked": false,
           "name": "Flappy_bird_score",
-          "persistentUuid": "be93f680-8cbc-4b89-bb68-d5eb5cf83800",
+          "persistentUuid": "ab194f64-0ff6-4057-ac00-84ef2140b6ea",
           "width": 0,
           "x": 189,
           "y": 84,
@@ -1639,7 +1652,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
-          "persistentUuid": "a40e335f-465e-4462-84d4-851e66a65cc9",
+          "persistentUuid": "8ba0362b-88fd-43df-98f7-f346622fd35e",
           "width": 400,
           "x": 0,
           "y": 465,
@@ -1655,7 +1668,7 @@
           "layer": "",
           "locked": false,
           "name": "Instructions",
-          "persistentUuid": "e36c8f9b-8661-4cae-9523-979a98e6d7c8",
+          "persistentUuid": "b47f0776-ae87-43b9-833b-3d543538bb86",
           "width": 100,
           "x": 152,
           "y": 272,
@@ -1671,7 +1684,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
-          "persistentUuid": "6d74ef0a-763f-4c7b-8053-dc055d6fc0da",
+          "persistentUuid": "98cea29f-a59e-4c59-ab25-0b7f8c7bcf67",
           "width": 405,
           "x": -3,
           "y": -11,
@@ -1731,8 +1744,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 0.386029,
-                        "y": 11.4706
+                        "x": 0.3860290050506592,
+                        "y": 11.470600128173828
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1748,8 +1761,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 0.386029,
-                        "y": 11.4706
+                        "x": 0.3860290050506592,
+                        "y": 11.470600128173828
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1765,8 +1778,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 0.386029,
-                        "y": 11.4706
+                        "x": 0.3860290050506592,
+                        "y": 11.470600128173828
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -4927,6 +4940,7 @@
         "ellipsis",
         "movement"
       ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -4940,6 +4954,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5200,6 +5215,7 @@
         "hit",
         "damage"
       ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -5213,6 +5229,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5407,6 +5424,7 @@
               "fullName": "Flash (blink)",
               "functionType": "Action",
               "name": "Flash",
+              "private": false,
               "sentence": "Make _PARAM0_ blink for _PARAM2_ seconds",
               "events": [
                 {
@@ -5507,6 +5525,7 @@
               "fullName": "Is object flashing",
               "functionType": "Condition",
               "name": "IsFlashing",
+              "private": false,
               "sentence": "_PARAM0_ is flashing",
               "events": [
                 {
@@ -5589,6 +5608,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onOwnerRemovedFromScene",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5642,6 +5662,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onDeActivate",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5695,6 +5716,7 @@
               "fullName": "Stop flashing",
               "functionType": "Action",
               "name": "Stop",
+              "private": false,
               "sentence": "Stop flashing _PARAM0_",
               "events": [
                 {

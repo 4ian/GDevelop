@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\advanced-shape-based-painter\\advanced-shape-based-painter.json",
+    "projectUuid": "49af45a6-8dc7-4f4e-bce8-5fe696257fd1",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "ShapeCircle.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeCircle.png",
         "smoothed": true,
         "userAdded": true
@@ -112,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "ShapeCircleBorder.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeCircleBorder.png",
         "smoothed": true,
         "userAdded": true
@@ -120,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "ShapeRect.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeRect.png",
         "smoothed": true,
         "userAdded": true
@@ -128,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "ShapeRectBorder.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeRectBorder.png",
         "smoothed": true,
         "userAdded": true
@@ -136,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "ShapeLine.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeLine.png",
         "smoothed": true,
         "userAdded": true
@@ -144,6 +150,7 @@
         "alwaysLoaded": false,
         "file": "BarSelector.png",
         "kind": "image",
+        "metadata": "",
         "name": "BarSelector.png",
         "smoothed": true,
         "userAdded": true
@@ -185,122 +192,151 @@
       "variables": [
         {
           "name": "Shapes",
+          "type": "structure",
           "children": [
             {
               "name": "0",
+              "type": "structure",
               "children": [
                 {
                   "name": "Border",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "BorderColor",
+                  "type": "structure",
                   "children": [
                     {
                       "name": "B",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "G",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "R",
+                      "type": "string",
                       "value": "0"
                     }
                   ]
                 },
                 {
                   "name": "BorderOpacity",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "EndX",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "EndY",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "FillColor",
+                  "type": "structure",
                   "children": [
                     {
                       "name": "B",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "G",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "R",
+                      "type": "string",
                       "value": "0"
                     }
                   ]
                 },
                 {
                   "name": "FillOpacity",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Radius",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "StartX",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "StartY",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Thickness",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Type",
+                  "type": "string",
                   "value": "0"
                 }
               ]
             },
             {
               "name": "Size",
+              "type": "string",
               "value": "-1"
             }
           ]
         },
         {
           "name": "i",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "else",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "shape",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "drawing",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "R",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "G",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "B",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "A",
+          "type": "string",
           "value": "100"
         }
       ],
@@ -312,6 +348,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "1fb23849-d60e-4e8f-96e1-7e2e20d988c0",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -321,6 +358,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "-1"
             }
           ]
@@ -332,6 +370,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "c3144d13-d5d7-41dd-908a-3b1eecd1bd14",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -341,6 +380,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -352,6 +392,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "0bf1ca5d-2b6d-4d00-8128-29338d3a89fa",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -361,6 +402,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "0"
             }
           ]
@@ -372,6 +414,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "6389becb-a502-4967-baa5-68b9d0c353ba",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -381,6 +424,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -392,6 +436,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
+          "persistentUuid": "82ad3623-fdf2-4962-9e2d-604484a3ea35",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -401,6 +446,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -412,6 +458,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a0ad8fec-cdc3-4398-af1a-02a5282931e0",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -424,26 +471,32 @@
       "objects": [
         {
           "name": "Drawer",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [
             {
               "name": "StartX",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "StartY",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "EndX",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "EndY",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "ID",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -461,10 +514,12 @@
             "g": 232,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Shapes",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -666,15 +721,18 @@
         },
         {
           "name": "BarSelect",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
             {
               "name": "Drag",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "Value",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -735,6 +793,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2606,6 +2665,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2627,6 +2691,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -1,1 +1,645 @@
-{"firstLayout":"","gdVersion":{"build":96,"major":4,"minor":0,"revision":0},"properties":{"folderProject":false,"linuxExecutableFilename":"","macExecutableFilename":"","packageName":"com.example.gamename","projectFile":"C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\move-camera-to-position\\game.json","useExternalSourceFiles":false,"winExecutableFilename":"","winExecutableIconFile":"","name":"Project","author":"","windowWidth":800,"windowHeight":600,"latestCompilationDirectory":"","maxFPS":60,"minFPS":10,"verticalSync":false,"extensions":[{"name":"BuiltinObject"},{"name":"BuiltinAudio"},{"name":"BuiltinVariables"},{"name":"BuiltinTime"},{"name":"BuiltinMouse"},{"name":"BuiltinKeyboard"},{"name":"BuiltinJoystick"},{"name":"BuiltinCamera"},{"name":"BuiltinWindow"},{"name":"BuiltinFile"},{"name":"BuiltinNetwork"},{"name":"BuiltinScene"},{"name":"BuiltinAdvanced"},{"name":"Sprite"},{"name":"BuiltinCommonInstructions"},{"name":"BuiltinCommonConversions"},{"name":"BuiltinStringInstructions"},{"name":"BuiltinMathematicalTools"},{"name":"BuiltinExternalLayouts"}],"platforms":[{"name":"GDevelop JS platform"}],"currentPlatform":"GDevelop JS platform"},"resources":{"resources":[{"alwaysLoaded":false,"file":"orange_sprite.png","kind":"image","name":"orange_sprite.png","smoothed":true,"userAdded":true},{"alwaysLoaded":false,"file":"bg_wood.png","kind":"image","name":"bg_wood.png","smoothed":true,"userAdded":true}],"resourceFolders":[]},"objects":[],"objectsGroups":[],"variables":[],"layouts":[{"b":209,"disableInputWhenNotFocused":true,"mangledName":"New_32scene","name":"New scene","oglFOV":90,"oglZFar":500,"oglZNear":1,"r":209,"standardSortMethod":true,"stopSoundsOnStartup":true,"title":"","v":209,"uiSettings":{"grid":false,"gridB":255,"gridG":180,"gridHeight":32,"gridOffsetX":0,"gridOffsetY":0,"gridR":158,"gridWidth":32,"snap":true,"windowMask":false,"zoomFactor":1},"objectsGroups":[],"variables":[],"instances":[{"angle":0,"customSize":true,"height":45,"layer":"","locked":false,"name":"object","width":44.9999,"x":595.5,"y":506,"zOrder":3,"numberProperties":[],"stringProperties":[],"initialVariables":[]},{"angle":0,"customSize":false,"height":0,"layer":"message","locked":false,"name":"message","width":0,"x":63.1257,"y":26.697,"zOrder":2,"numberProperties":[],"stringProperties":[],"initialVariables":[]},{"angle":0,"customSize":true,"height":2673.93,"layer":"","locked":true,"name":"background","width":3240.43,"x":-1275.2,"y":-1136.78,"zOrder":0,"numberProperties":[],"stringProperties":[],"initialVariables":[]}],"objects":[{"name":"object","type":"Sprite","updateIfNotVisible":true,"variables":[],"behaviors":[{"name":"Draggable","type":"DraggableBehavior::Draggable"}],"animations":[{"name":"","useMultipleDirections":false,"directions":[{"looping":false,"timeBetweenFrames":1,"sprites":[{"hasCustomCollisionMask":false,"image":"orange_sprite.png","points":[],"originPoint":{"name":"origine","x":0,"y":0},"centerPoint":{"automatic":true,"name":"centre","x":50,"y":50},"customCollisionMask":[[{"x":0,"y":0},{"x":100,"y":0},{"x":100,"y":100},{"x":0,"y":100}]]}]}]}]},{"bold":false,"italic":false,"name":"message","smoothed":true,"type":"TextObject::Text","underlined":false,"variables":[],"behaviors":[],"string":"Drag the green box and when you drop it, the camera will move to it position","font":"","characterSize":20,"color":{"b":0,"g":0,"r":0}},{"height":32,"name":"background","texture":"bg_wood.png","type":"TiledSpriteObject::TiledSprite","width":32,"variables":[],"behaviors":[]}],"events":[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"Set camera speed at the beginning","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"DepartScene"},"parameters":[""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"ModVarScene"},"parameters":["cameraSpeed","=","2"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"if the box is not being dragged, get it X and Y position and store it in the variables","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"DraggableBehavior::Dragged"},"parameters":["object","Draggable"],"subInstructions":[]},{"type":{"inverted":false,"value":"BuiltinCommonInstructions::Once"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"ModVarScene"},"parameters":["targetX","=","object.X()"],"subInstructions":[]},{"type":{"inverted":false,"value":"ModVarScene"},"parameters":["targetY","=","object.Y()"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"if the box is not being dragged, move the camera to the target X and Y position","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"DraggableBehavior::Dragged"},"parameters":["object","Draggable"],"subInstructions":[]}],"actions":[],"events":[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CameraX"},"parameters":["","<","floor(Variable(targetX))","",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"CameraX"},"parameters":["","+","Variable(cameraSpeed)","",""],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CameraY"},"parameters":["","<","floor(Variable(targetY))","\"\"","0"],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"CameraY"},"parameters":["","+","Variable(cameraSpeed)","",""],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CameraX"},"parameters":["",">","floor(Variable(targetX))","",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"CameraX"},"parameters":["","-","Variable(cameraSpeed)","",""],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CameraY"},"parameters":["",">","floor(Variable(targetY))","\"\"","0"],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"CameraY"},"parameters":["","-","Variable(cameraSpeed)","",""],"subInstructions":[]}],"events":[]}]}],"layers":[{"name":"","visibility":true,"cameras":[{"defaultSize":true,"defaultViewport":true,"height":0,"viewportBottom":1,"viewportLeft":0,"viewportRight":1,"viewportTop":0,"width":0}],"effects":[]},{"name":"message","visibility":true,"cameras":[],"effects":[]}],"behaviorsSharedData":[]}],"externalEvents":[],"externalLayouts":[],"externalSourceFiles":[]}
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": false,
+    "folderProject": false,
+    "orientation": "default",
+    "packageName": "com.example.gamename",
+    "projectUuid": "6a57b1e6-5801-4d40-a8e5-6a5649d8be7b",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "orange_sprite.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "orange_sprite.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "bg_wood.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bg_wood.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "New_32scene",
+      "name": "New scene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 45,
+          "layer": "",
+          "locked": false,
+          "name": "object",
+          "persistentUuid": "967a7d63-c8f1-4bc9-9c68-3205c03f8a19",
+          "width": 44.9999,
+          "x": 595.5,
+          "y": 506,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "message",
+          "locked": false,
+          "name": "message",
+          "persistentUuid": "1d086d75-df06-40dc-a577-e26931a46033",
+          "width": 0,
+          "x": 63.1257,
+          "y": 26.697,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 2673.93,
+          "layer": "",
+          "locked": true,
+          "name": "background",
+          "persistentUuid": "e08521bf-0fe7-44f0-83b3-66d10469307e",
+          "width": 3240.43,
+          "x": -1275.2,
+          "y": -1136.78,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "object",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "orange_sprite.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 50,
+                        "y": 50
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 100
+                          },
+                          {
+                            "x": 0,
+                            "y": 100
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "message",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Drag the green box and when you drop it, the camera will move to it position",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "height": 32,
+          "name": "background",
+          "tags": "",
+          "texture": "bg_wood.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 32,
+          "variables": [],
+          "behaviors": []
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Set camera speed at the beginning",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "cameraSpeed",
+                "=",
+                "2"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "if the box is not being dragged, get it X and Y position and store it in the variables",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "DraggableBehavior::Dragged"
+              },
+              "parameters": [
+                "object",
+                "Draggable"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "targetX",
+                "=",
+                "object.X()"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "targetY",
+                "=",
+                "object.Y()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "if the box is not being dragged, move the camera to the target X and Y position",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "DraggableBehavior::Dragged"
+              },
+              "parameters": [
+                "object",
+                "Draggable"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraX"
+                  },
+                  "parameters": [
+                    "",
+                    "<",
+                    "floor(Variable(targetX))",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraX"
+                  },
+                  "parameters": [
+                    "",
+                    "+",
+                    "Variable(cameraSpeed)",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraY"
+                  },
+                  "parameters": [
+                    "",
+                    "<",
+                    "floor(Variable(targetY))",
+                    "\"\"",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraY"
+                  },
+                  "parameters": [
+                    "",
+                    "+",
+                    "Variable(cameraSpeed)",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraX"
+                  },
+                  "parameters": [
+                    "",
+                    ">",
+                    "floor(Variable(targetX))",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraX"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "Variable(cameraSpeed)",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraY"
+                  },
+                  "parameters": [
+                    "",
+                    ">",
+                    "floor(Variable(targetY))",
+                    "\"\"",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CameraY"
+                  },
+                  "parameters": [
+                    "",
+                    "-",
+                    "Variable(cameraSpeed)",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "message",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

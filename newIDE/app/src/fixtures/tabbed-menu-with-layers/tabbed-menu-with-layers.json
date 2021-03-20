@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "0cc5f7e5-4d61-476b-a3c6-b3578fb9ad85",
+    "projectUuid": "fa727924-68ca-4206-b8bd-de25d240946e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -344,6 +344,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Random 1\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0.4835746950193103,\\\"sustainPunch\\\":60,\\\"decay\\\":1.017774788642853,\\\"tremoloDepth\\\":12,\\\"tremoloFrequency\\\":0.32785956097053104,\\\"frequency\\\":806.4376780489404,\\\"frequencySweep\\\":-8136.485284538763,\\\"frequencyDeltaSweep\\\":-6.3397461570833595,\\\"repeatFrequency\\\":0.387066908541736,\\\"frequencyJump1Onset\\\":5,\\\"frequencyJump1Amount\\\":-10,\\\"frequencyJump2Onset\\\":20,\\\"frequencyJump2Amount\\\":-5,\\\"harmonics\\\":5,\\\"harmonicsFalloff\\\":0.27,\\\"waveform\\\":\\\"sine\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0.0804059036402498,\\\"vibratoFrequency\\\":0,\\\"squareDuty\\\":50,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":-15,\\\"bitCrush\\\":2,\\\"bitCrushSweep\\\":4,\\\"lowPassCutoff\\\":5700,\\\"lowPassCutoffSweep\\\":-1.7787788568783283,\\\"highPassCutoff\\\":6500,\\\"highPassCutoffSweep\\\":67.99595897809623,\\\"compression\\\":1.2,\\\"normalization\\\":true,\\\"amplification\\\":20}\",\"name\":\"change\"}}",
         "name": "assets\\change.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -351,6 +353,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Blip/select 2\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0,\\\"sustainPunch\\\":0,\\\"decay\\\":0.04791207830158295,\\\"tremoloDepth\\\":0,\\\"tremoloFrequency\\\":4.624818578328799,\\\"frequency\\\":76.88481388443182,\\\"frequencySweep\\\":-0.6179216722407899,\\\"frequencyDeltaSweep\\\":-150.05257592011773,\\\"repeatFrequency\\\":0,\\\"frequencyJump1Onset\\\":33,\\\"frequencyJump1Amount\\\":0,\\\"frequencyJump2Onset\\\":66,\\\"frequencyJump2Amount\\\":0,\\\"harmonics\\\":0,\\\"harmonicsFalloff\\\":0.62,\\\"waveform\\\":\\\"sawtooth\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0,\\\"vibratoFrequency\\\":1.8775417352126227,\\\"squareDuty\\\":25,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":0,\\\"bitCrush\\\":8,\\\"bitCrushSweep\\\":0,\\\"lowPassCutoff\\\":18.231190640999213,\\\"lowPassCutoffSweep\\\":4.766237777026747,\\\"highPassCutoff\\\":0,\\\"highPassCutoffSweep\\\":-0.15719810091153863,\\\"compression\\\":1,\\\"normalization\\\":true,\\\"amplification\\\":130}\",\"name\":\"hover\"}}",
         "name": "assets\\hover.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -367,6 +371,8 @@
         "kind": "audio",
         "metadata": "{\"jfxr\":{\"data\":\"{\\\"_version\\\":1,\\\"_name\\\":\\\"Blip/select 10\\\",\\\"_locked\\\":[],\\\"sampleRate\\\":44100,\\\"attack\\\":0,\\\"sustain\\\":0.020259502326391177,\\\"sustainPunch\\\":10,\\\"decay\\\":0.10548598633317297,\\\"tremoloDepth\\\":0,\\\"tremoloFrequency\\\":10,\\\"frequency\\\":892.8568602317197,\\\"frequencySweep\\\":0,\\\"frequencyDeltaSweep\\\":0.22900375856919775,\\\"repeatFrequency\\\":0,\\\"frequencyJump1Onset\\\":10,\\\"frequencyJump1Amount\\\":0,\\\"frequencyJump2Onset\\\":66,\\\"frequencyJump2Amount\\\":0,\\\"harmonics\\\":0,\\\"harmonicsFalloff\\\":0.58,\\\"waveform\\\":\\\"sine\\\",\\\"interpolateNoise\\\":true,\\\"vibratoDepth\\\":0.47209129016044415,\\\"vibratoFrequency\\\":7.4964775075528784,\\\"squareDuty\\\":65,\\\"squareDutySweep\\\":0,\\\"flangerOffset\\\":0,\\\"flangerOffsetSweep\\\":0,\\\"bitCrush\\\":16,\\\"bitCrushSweep\\\":0,\\\"lowPassCutoff\\\":22050,\\\"lowPassCutoffSweep\\\":0,\\\"highPassCutoff\\\":0,\\\"highPassCutoffSweep\\\":-0.3391074447532707,\\\"compression\\\":1,\\\"normalization\\\":true,\\\"amplification\\\":50}\",\"name\":\"click\"}}",
         "name": "assets\\click.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -374,6 +380,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\zipclick.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -413,6 +421,7 @@
       "variables": [
         {
           "name": "tab",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -424,7 +433,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "07684001-3dfd-46e4-823b-ef605ba294d3",
+          "persistentUuid": "6be7551c-1338-47e5-9fd5-c2f57f613132",
           "width": 0,
           "x": 25,
           "y": 25,
@@ -440,7 +449,7 @@
           "layer": "",
           "locked": false,
           "name": "underline",
-          "persistentUuid": "151fcff1-194a-460f-9e3e-8a5f5da24483",
+          "persistentUuid": "c2be7a7b-168a-47f8-a1fa-48bcb01fe4c2",
           "width": 177,
           "x": 63,
           "y": 216,
@@ -456,7 +465,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
-          "persistentUuid": "6053333e-951b-4eeb-ae88-d59d4582278d",
+          "persistentUuid": "053f8fb5-a464-4740-9962-c8618efc5fe4",
           "width": 0,
           "x": 525,
           "y": 75,
@@ -471,10 +480,12 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "ABOUT"
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -486,7 +497,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
-          "persistentUuid": "c7d703a1-6278-4ea5-8a21-01bb30cc6273",
+          "persistentUuid": "e9c70a45-2d5d-4861-90f8-fcf7ee07be4e",
           "width": 0,
           "x": 300,
           "y": 75,
@@ -496,10 +507,12 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "OPTIONS"
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -511,7 +524,7 @@
           "layer": "",
           "locked": false,
           "name": "tab_btn",
-          "persistentUuid": "8ec492a5-47e6-4866-ab30-c36eeab0dc5c",
+          "persistentUuid": "ea4bf20a-d7c3-4010-a08f-4653ff60bb70",
           "width": 0,
           "x": 75,
           "y": 75,
@@ -521,6 +534,7 @@
           "initialVariables": [
             {
               "name": "text",
+              "type": "string",
               "value": "PLAY"
             }
           ]
@@ -532,7 +546,7 @@
           "layer": "",
           "locked": false,
           "name": "nav_line",
-          "persistentUuid": "ea877303-a45b-4f4a-8170-6cda3ea99337",
+          "persistentUuid": "9264840a-c871-470e-837c-8bc871da12ea",
           "width": 800,
           "x": 0,
           "y": 119,
@@ -548,7 +562,7 @@
           "layer": "",
           "locked": false,
           "name": "indicator",
-          "persistentUuid": "b349c321-9f39-402b-bd59-e7aa2ca01ad0",
+          "persistentUuid": "7dd71821-4f80-4e6a-9836-b8ff83b4412f",
           "width": 204,
           "x": 75,
           "y": 150,
@@ -564,7 +578,7 @@
           "layer": "",
           "locked": false,
           "name": "body",
-          "persistentUuid": "1605bf95-5621-41bf-a131-af128dc2042b",
+          "persistentUuid": "12e76e95-9692-46ea-8dc7-755b8cc38321",
           "width": 725,
           "x": 36,
           "y": 149,
@@ -580,7 +594,7 @@
           "layer": "",
           "locked": false,
           "name": "indicator",
-          "persistentUuid": "cd15f100-b8c3-48e2-a686-a05c5509fb29",
+          "persistentUuid": "972e180d-a5ad-49a4-b4c5-acf7e801fba2",
           "width": 204,
           "x": 75,
           "y": 119,
@@ -596,7 +610,7 @@
           "layer": "",
           "locked": false,
           "name": "Big_name",
-          "persistentUuid": "3b3f0bbf-6c6c-4ebe-9ebb-23d5b57afb3a",
+          "persistentUuid": "a1ac455f-2b99-454d-bb31-1cd14ffed309",
           "width": 0,
           "x": 64,
           "y": 175,
@@ -612,7 +626,7 @@
           "layer": "",
           "locked": false,
           "name": "underline",
-          "persistentUuid": "9bb97978-bbdc-476b-9b55-25ecc160e540",
+          "persistentUuid": "8910b40b-a49d-4baf-bb3b-d4112fb95fc8",
           "width": 177,
           "x": 25,
           "y": 53,
@@ -628,7 +642,7 @@
           "layer": "play",
           "locked": false,
           "name": "color",
-          "persistentUuid": "6ff8ac92-8825-454d-9362-c1198d5e356c",
+          "persistentUuid": "6c7f2b85-2cbe-4ccd-8745-494e9d7ae871",
           "width": 708,
           "x": 44,
           "y": 247,
@@ -644,7 +658,7 @@
           "layer": "play",
           "locked": false,
           "name": "play_text",
-          "persistentUuid": "369aff5b-9042-4597-bd64-c899ae649905",
+          "persistentUuid": "af250cb0-649b-48b7-9b1d-07685893958d",
           "width": 0,
           "x": 64,
           "y": 258,
@@ -660,7 +674,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "8ec0d849-b021-4a68-a428-0ba9236172c6",
+          "persistentUuid": "9e5773a9-dbc0-476a-8b25-83b5e205b363",
           "width": 0,
           "x": 75,
           "y": 492,
@@ -676,7 +690,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "8fa7ebc7-816a-4081-bb8f-2852f631549f",
+          "persistentUuid": "a0786bca-3454-4676-a482-3459c7ca2914",
           "width": 0,
           "x": 425,
           "y": 492,
@@ -692,7 +706,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "57ebb0c0-b770-4565-b45a-491e382647ab",
+          "persistentUuid": "28e44ce1-8eeb-4068-a20b-733d180b141b",
           "width": 0,
           "x": 425,
           "y": 267,
@@ -708,7 +722,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "291d1d95-6119-4ed2-9255-c4db6f29aa80",
+          "persistentUuid": "283e9dc5-4451-4347-bea1-9c2b9511d4d2",
           "width": 0,
           "x": 75,
           "y": 267,
@@ -724,7 +738,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "5f4504da-d1f0-4edf-becb-e04b7fabbc3d",
+          "persistentUuid": "6fdfcc29-dfe0-476f-afa5-4a2513c4914b",
           "width": 0,
           "x": 425,
           "y": 342,
@@ -740,7 +754,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "2868f890-1088-4b91-885b-9c8a5db49ede",
+          "persistentUuid": "7c5e9673-07fc-4098-9a9b-00e92d369cef",
           "width": 0,
           "x": 75,
           "y": 342,
@@ -756,7 +770,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "0519a6ed-b639-42bd-8d27-9e472b5247b4",
+          "persistentUuid": "e3cfdffc-9c3f-431f-97e5-9a37eae576e7",
           "width": 0,
           "x": 425,
           "y": 417,
@@ -772,7 +786,7 @@
           "layer": "options",
           "locked": false,
           "name": "options_text",
-          "persistentUuid": "6f3afcd5-21dc-496d-b91c-6fac9c90c7fa",
+          "persistentUuid": "c7ec93b9-3f98-46a9-b25e-676b230c2150",
           "width": 0,
           "x": 75,
           "y": 417,
@@ -788,7 +802,7 @@
           "layer": "about",
           "locked": false,
           "name": "about_text",
-          "persistentUuid": "0ebacac6-69c8-4c6e-b58d-20054e7cc7a4",
+          "persistentUuid": "0daf5a32-183e-45a1-a190-b9103471bed2",
           "width": 657,
           "x": 65,
           "y": 243,
@@ -804,7 +818,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "6ee1ebb9-45c5-4719-b3fc-2dff58b8cf1d",
+          "persistentUuid": "7b6659e1-99bc-4d75-9a40-f34bca461d61",
           "width": 0,
           "x": 354,
           "y": 472,
@@ -814,6 +828,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "13"
             }
           ]
@@ -825,7 +840,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "6c685498-35b6-4b11-8927-cccdfcb10b2a",
+          "persistentUuid": "9c8f9de6-8470-4bce-97e8-d5f164ccd97d",
           "width": 0,
           "x": 74,
           "y": 472,
@@ -835,6 +850,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "11"
             }
           ]
@@ -846,7 +862,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "b9f1963a-521c-4f9e-9e12-3cad6f2b59d2",
+          "persistentUuid": "dcad8fe9-0f18-429a-bccc-66682d386b44",
           "width": 0,
           "x": 624,
           "y": 472,
@@ -856,6 +872,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "15"
             }
           ]
@@ -867,7 +884,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "c779cac5-a0c6-4d6b-9836-fceba72f4174",
+          "persistentUuid": "ca16fc00-2773-459e-ab10-1bf988fc41c0",
           "width": 0,
           "x": 217,
           "y": 472,
@@ -877,6 +894,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "12"
             }
           ]
@@ -888,7 +906,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "aad2ba82-1f55-4b25-b1e4-79a0f0561ece",
+          "persistentUuid": "255a71a7-23c5-4f98-8b1e-c3c3110120f2",
           "width": 0,
           "x": 488,
           "y": 472,
@@ -898,6 +916,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "14"
             }
           ]
@@ -909,7 +928,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "4b231598-e4ae-4516-8ebb-5689b4e55626",
+          "persistentUuid": "7a4bc6af-dfb8-443a-b3d4-4b44dac4059c",
           "width": 0,
           "x": 74,
           "y": 320,
@@ -925,7 +944,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "ecb07c74-a1e6-493b-8407-a5e29c8bfc17",
+          "persistentUuid": "2993324a-a1a4-4ff6-aa69-01af6e27871e",
           "width": 0,
           "x": 217,
           "y": 320,
@@ -935,6 +954,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -946,7 +966,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "89ad6f3f-28cb-41b8-97f2-ea37d4657e5b",
+          "persistentUuid": "63a0cefc-5e55-44c8-b93c-c25b3f749ccb",
           "width": 0,
           "x": 354,
           "y": 320,
@@ -956,6 +976,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -967,7 +988,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "c72ac25a-462b-4be9-9eac-409c5473d3cc",
+          "persistentUuid": "28ce9d41-f76e-42a7-a9f6-7d0b4c008f13",
           "width": 0,
           "x": 488,
           "y": 320,
@@ -977,6 +998,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -988,7 +1010,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "312da511-946a-4cb2-af73-832c18eba1c7",
+          "persistentUuid": "14408728-6136-47fd-92be-12568c2178a0",
           "width": 0,
           "x": 624,
           "y": 320,
@@ -998,6 +1020,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -1009,7 +1032,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "8337d779-bd63-4c4e-a792-31fedeaa3f3c",
+          "persistentUuid": "836edf06-5b06-4b6d-a26c-c15d3a8ffe35",
           "width": 0,
           "x": 74,
           "y": 393,
@@ -1019,6 +1042,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "6"
             }
           ]
@@ -1030,7 +1054,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "d260d2ca-04fd-40db-a7dd-757649410993",
+          "persistentUuid": "7d1a62d2-60ea-42c5-8791-bb564db719c7",
           "width": 0,
           "x": 217,
           "y": 393,
@@ -1040,6 +1064,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "7"
             }
           ]
@@ -1051,7 +1076,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "71c9d509-d1ea-49b1-af98-a7461d5eb016",
+          "persistentUuid": "bcbde5c4-0220-4d48-9bcc-bdc9979c7195",
           "width": 0,
           "x": 354,
           "y": 393,
@@ -1061,6 +1086,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "8"
             }
           ]
@@ -1072,7 +1098,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "aaa10472-ffad-4f25-a913-ebcd3dc279ef",
+          "persistentUuid": "52d70ad6-323a-4887-ac70-7f1c15b25b2f",
           "width": 0,
           "x": 488,
           "y": 393,
@@ -1082,6 +1108,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "9"
             }
           ]
@@ -1093,7 +1120,7 @@
           "layer": "play",
           "locked": false,
           "name": "lvl_btn",
-          "persistentUuid": "4bf5d79f-8cea-4d46-8d11-d5fb93d1e658",
+          "persistentUuid": "5aeef5c3-5695-473d-9bd7-a52e61d0f71d",
           "width": 0,
           "x": 624,
           "y": 393,
@@ -1103,6 +1130,7 @@
           "initialVariables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "10"
             }
           ]
@@ -1170,14 +1198,17 @@
           "variables": [
             {
               "name": "text",
+              "type": "string",
               "value": "\"\""
             },
             {
               "name": "tab_redirect",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "active",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1881,6 +1912,7 @@
           "variables": [
             {
               "name": "lvl_redirect",
+              "type": "string",
               "value": "1"
             }
           ],
@@ -2940,12 +2972,14 @@
       "tags": [
         ""
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Simply fade a sprite in",
           "fullName": "Fade in a sprite",
           "functionType": "Action",
           "name": "fadeInSprite",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3053,6 +3087,7 @@
           "fullName": "Fade out and delete a sprite",
           "functionType": "Action",
           "name": "fadeOutDelSprite",
+          "private": false,
           "sentence": "Fade out and delete _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3193,6 +3228,7 @@
           "fullName": "Fade out a sprite",
           "functionType": "Action",
           "name": "fadeOutSprite",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3332,6 +3368,7 @@
           "fullName": "Fade in a text object",
           "functionType": "Action",
           "name": "fadeInText",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3439,6 +3476,7 @@
           "fullName": "Fade out a text object",
           "functionType": "Action",
           "name": "fadeOutText",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3578,6 +3616,7 @@
           "fullName": "Fade in a tiled object",
           "functionType": "Action",
           "name": "fadeInTile",
+          "private": false,
           "sentence": "Fade in _PARAM1_ at _PARAM2_ speed",
           "events": [
             {
@@ -3685,6 +3724,7 @@
           "fullName": "Fade out a tiled object",
           "functionType": "Action",
           "name": "fadeOutTile",
+          "private": false,
           "sentence": "Fade out _PARAM1_ at _PARAM2_ speed",
           "events": [
             {

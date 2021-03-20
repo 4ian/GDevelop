@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\text-to-speech\\text-to-speech.json",
+    "projectUuid": "2b99a36a-4cca-4233-a71a-b9d19d3c4c1e",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -139,6 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "TextEntry",
+          "persistentUuid": "6755a3a5-0c50-4727-b766-7234d9595086",
           "width": 0,
           "x": 335,
           "y": 156,
@@ -154,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "EntryText",
+          "persistentUuid": "ac9db23f-aea5-4736-b376-223acc52306b",
           "width": 0,
           "x": 237,
           "y": 247,
@@ -166,6 +169,7 @@
       "objects": [
         {
           "name": "TextEntry",
+          "tags": "",
           "type": "TextEntryObject::TextEntry",
           "variables": [],
           "behaviors": []
@@ -175,6 +179,7 @@
           "italic": false,
           "name": "EntryText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -356,6 +361,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -387,11 +397,14 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::JsCode",
           "inlineCode": "//Get scene variables\nvar variables = runtimeScene.getVariables();\nvar speech = variables.get(\"speech\").getAsString();\n\nspeak(speech);\n \n// say a message\nfunction speak(text, callback) {\n var u = new SpeechSynthesisUtterance();\n u.text = text;\n u.lang = 'en-US';\n \n u.onend = function () {\n if (callback) {\n callback();\n }\n };\n \n u.onerror = function (e) {\n if (callback) {\n callback(e);\n }\n };\n \n speechSynthesis.speak(u);\n}\n\n//Thanks to https://stephenwalther.com/archive/2015/01/05/using-html5-speech-recognition-and-text-to-speech\n//for the original code",
-          "parameterObjects": ""
+          "parameterObjects": "",
+          "useStrict": false,
+          "eventsSheetExpanded": false
         }
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

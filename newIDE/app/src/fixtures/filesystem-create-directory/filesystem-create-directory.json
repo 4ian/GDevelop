@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "dbddb668-ce41-43db-a8ff-4b06875bc2eb",
+    "projectUuid": "411dcc7a-5687-4899-a62f-b696cc36334a",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -207,10 +207,12 @@
       "variables": [
         {
           "name": "ClickDesktop",
+          "type": "string",
           "value": ""
         },
         {
           "name": "ClickDocuments",
+          "type": "string",
           "value": ""
         }
       ],
@@ -222,7 +224,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
-          "persistentUuid": "4d68309e-8851-47c0-9c23-d0a82dbbbf4f",
+          "persistentUuid": "079fbf89-e08e-4d4b-8e14-aa7f82df637e",
           "width": 0,
           "x": 10,
           "y": 25,
@@ -238,7 +240,7 @@
           "layer": "",
           "locked": false,
           "name": "Dir",
-          "persistentUuid": "d270999d-cb00-42f0-80d0-9ee1621e1d92",
+          "persistentUuid": "6aea9adf-3e61-48f7-a274-5ecc94f7dcd7",
           "width": 0,
           "x": 10,
           "y": 135,
@@ -254,7 +256,7 @@
           "layer": "",
           "locked": false,
           "name": "Desktop",
-          "persistentUuid": "885eebc9-6d58-495b-aa8e-ed7ced5ad41a",
+          "persistentUuid": "5fafde38-7ce9-4d99-bec5-067d42a1bc59",
           "width": 0,
           "x": 100,
           "y": 50,
@@ -270,7 +272,7 @@
           "layer": "",
           "locked": false,
           "name": "Documents",
-          "persistentUuid": "30859662-c8ce-4580-b39a-d74dde62fc95",
+          "persistentUuid": "999c7aa4-ea50-4dae-9a85-73f2e491ca09",
           "width": 0,
           "x": 100,
           "y": 160,
@@ -286,7 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDocuments",
-          "persistentUuid": "3756d7d4-9382-4804-9790-91b86b5ae72d",
+          "persistentUuid": "7130dd70-86aa-45b2-b455-de1ad0adcaf7",
           "width": 400,
           "x": 10,
           "y": 120,
@@ -302,7 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
-          "persistentUuid": "3d5da741-a589-4d52-a3a2-6cf8ef7dfa39",
+          "persistentUuid": "77f2fbcb-8df0-4697-8663-86cff411f719",
           "width": 0,
           "x": 415,
           "y": 126,
@@ -318,7 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Select",
-          "persistentUuid": "4b6f370e-f8de-4a72-bd53-846be6ea5e8c",
+          "persistentUuid": "920474c1-7765-48e0-8fd1-03fb1442edd2",
           "width": 0,
           "x": 512.867,
           "y": 338.5,
@@ -334,7 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "CreateMessage",
-          "persistentUuid": "6df5ac12-b5b3-48b7-abcc-96851991c02a",
+          "persistentUuid": "f54204b1-ae72-47c4-b8e5-847c47dd6dfb",
           "width": 0,
           "x": 300,
           "y": 300,
@@ -350,7 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "HowerDesktop",
-          "persistentUuid": "8abd151f-ffb9-45a2-a376-6d436f3f0943",
+          "persistentUuid": "0b182373-5548-4975-8d42-b9f731be412a",
           "width": 400,
           "x": 10,
           "y": 10,
@@ -820,10 +822,12 @@
       "variables": [
         {
           "name": "Name",
+          "type": "string",
           "value": ""
         },
         {
           "name": "Error",
+          "type": "string",
           "value": ""
         }
       ],
@@ -835,7 +839,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDesktop",
-          "persistentUuid": "b193e451-7f6b-480e-809c-0a1794f6beb6",
+          "persistentUuid": "e9a18252-24bf-4f12-b53b-ac31b486b04a",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -851,7 +855,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
-          "persistentUuid": "bd17fedd-3072-44e0-82d3-fa2f00e7832a",
+          "persistentUuid": "7a2b785b-d969-462d-a34b-b827c84d941d",
           "width": 0,
           "x": 228,
           "y": 240,
@@ -1419,10 +1423,12 @@
       "variables": [
         {
           "name": "Name",
+          "type": "string",
           "value": ""
         },
         {
           "name": "Error",
+          "type": "string",
           "value": ""
         }
       ],
@@ -1434,7 +1440,7 @@
           "layer": "",
           "locked": false,
           "name": "NewFileDocuments",
-          "persistentUuid": "31fd7e7f-57de-4a5a-9e1c-dd9bfa48fefa",
+          "persistentUuid": "8ab5852a-67dd-4d4f-b0e8-34e48726b9f5",
           "width": 0,
           "x": 150,
           "y": 300,
@@ -1450,7 +1456,7 @@
           "layer": "",
           "locked": false,
           "name": "ErrorMessage",
-          "persistentUuid": "30d272b3-a9b4-43b9-9a7c-47215cfbbd7f",
+          "persistentUuid": "574d4fe3-4850-4806-88cf-bedee8a38e69",
           "width": 0,
           "x": 228,
           "y": 240,

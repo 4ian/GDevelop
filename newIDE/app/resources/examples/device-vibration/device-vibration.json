@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/mobile-vibration/mobile-vibration.json",
+    "projectUuid": "8b624785-6654-491a-ab1c-82cf01e8e56c",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "img/blue.png",
         "kind": "image",
+        "metadata": "",
         "name": "blue.png",
         "smoothed": true,
         "userAdded": false
@@ -149,6 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateOnce",
+          "persistentUuid": "f914a475-be10-4539-986b-980bc0e5bc65",
           "width": 0,
           "x": 224,
           "y": 256,
@@ -164,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "VibrateMulti",
+          "persistentUuid": "d672aeb3-2182-4c18-96d6-6b1bc6807437",
           "width": 0,
           "x": 224,
           "y": 416,
@@ -179,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "StopVibration",
+          "persistentUuid": "48d9996c-ff54-40a9-bb28-859d7afa8b34",
           "width": 0,
           "x": 224,
           "y": 576,
@@ -194,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "e7ddad62-6e14-47a8-a74d-04405f912af8",
           "width": 416,
           "x": 192,
           "y": 544,
@@ -209,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "20382406-cdae-4d69-a556-77f18dc9aff3",
           "width": 416,
           "x": 192,
           "y": 224,
@@ -224,6 +230,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "ca2e54d8-9b72-43d1-940c-da56a67f0292",
           "width": 416,
           "x": 192,
           "y": 384,
@@ -239,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
+          "persistentUuid": "f1ef5a44-3c3b-4835-b76a-b85526fa574c",
           "width": 0,
           "x": 32,
           "y": 64,
@@ -254,6 +262,7 @@
           "italic": false,
           "name": "title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -272,6 +281,7 @@
           "italic": false,
           "name": "VibrateOnce",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -290,6 +300,7 @@
           "italic": false,
           "name": "VibrateMulti",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -308,6 +319,7 @@
           "italic": false,
           "name": "StopVibration",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -323,6 +335,7 @@
         },
         {
           "name": "background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -494,6 +507,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -515,6 +533,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Documents/Projects/GDevelop/count-down-timer/game.json",
+    "projectUuid": "84197251-29a5-4907-84fd-19452377aca1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -142,6 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "TimerText",
+          "persistentUuid": "47005ab2-c6e5-4845-bb41-ffa7b025bdf4",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -157,6 +156,7 @@
           "italic": false,
           "name": "TimerText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -421,6 +421,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -476,6 +481,7 @@
           "layer": "",
           "locked": false,
           "name": "GOText",
+          "persistentUuid": "7c8c79e3-4e87-4744-83f5-a1d62717f6d0",
           "width": 0,
           "x": 136,
           "y": 245,
@@ -491,6 +497,7 @@
           "italic": false,
           "name": "GOText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -508,6 +515,11 @@
       "events": [],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

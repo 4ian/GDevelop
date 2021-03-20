@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectUuid": "e9fa3604-be68-4ae2-9d30-050e5a7514a3",
+    "projectUuid": "14b0169e-6e42-411f-9a6d-ca99bc805081",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -189,10 +189,12 @@
       "variables": [
         {
           "name": "pause_animation",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "switch_animation",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -204,7 +206,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "eb0a0a76-1726-4586-b273-1266f632fd04",
+          "persistentUuid": "70cc28f4-11aa-47e1-9d3b-a51467b8c264",
           "width": 0,
           "x": 331,
           "y": 298,
@@ -220,7 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "9b9e854b-461c-49db-9afe-74d991941ce0",
+          "persistentUuid": "9f529613-6baa-4570-af4b-6ff4d7f76e54",
           "width": 0,
           "x": 113,
           "y": 33,
@@ -236,7 +238,7 @@
           "layer": "",
           "locked": false,
           "name": "pause_message",
-          "persistentUuid": "ee25edf9-efbe-42e5-b865-d309b12e8de9",
+          "persistentUuid": "d6acfed5-4dd7-4aaa-9e37-8edca8695813",
           "width": 0,
           "x": 192,
           "y": 432,
@@ -252,7 +254,7 @@
           "layer": "",
           "locked": false,
           "name": "animation_message",
-          "persistentUuid": "f6739592-6f28-4b7d-b062-268b85464979",
+          "persistentUuid": "d5b2ce14-622d-4f2e-8530-f05e2a6e99ca",
           "width": 0,
           "x": 341,
           "y": 250,

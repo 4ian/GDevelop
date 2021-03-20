@@ -3,7 +3,13 @@ const fs = require('fs');
 const serializeToJSON = (gd, serializable, methodName = 'serializeTo') => {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
-  const json = gd.Serializer.toJSON(serializedElement);
+  // TODO: this could be speed up with a gd.Serializer.toPrettyJSON
+  // (and used in the IDE LocalProjectWriter.js too).
+  const json = JSON.stringify(
+    JSON.parse(gd.Serializer.toJSON(serializedElement)),
+    null,
+    2
+  );
   serializedElement.delete();
 
   return json;
@@ -25,5 +31,5 @@ module.exports = {
         return reject(e);
       }
     });
-  }
+  },
 };

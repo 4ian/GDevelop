@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectUuid": "828eb2ce-4bb5-4f93-9d35-5beb46daeb34",
+    "projectUuid": "12b22292-5247-4ca1-93f2-e4164e95c6a3",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -134,6 +134,7 @@
       "variables": [
         {
           "name": "wrapDir",
+          "type": "string",
           "value": "1"
         }
       ],
@@ -145,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
-          "persistentUuid": "dcae0ed1-50ed-4549-b626-f5a31de6368e",
+          "persistentUuid": "0472baa9-44f6-4f9b-aab2-008cd29c0673",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -161,7 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
-          "persistentUuid": "ab7f14e3-9f2d-466e-a57f-6e65d913733d",
+          "persistentUuid": "e10df137-3821-4fd9-be7c-ac2b706f8afb",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -177,7 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
-          "persistentUuid": "0c7afb11-481a-49ea-8a52-8027dc958b2f",
+          "persistentUuid": "7465a9e4-79cd-45c8-9c1a-5c5fb1dc0690",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -193,7 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
-          "persistentUuid": "7ec63af7-e6da-4663-b355-461c21d8fa72",
+          "persistentUuid": "2e23af8a-560a-4b93-97b3-971331246425",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -209,7 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
-          "persistentUuid": "99228d62-1f17-4bf2-883d-ab07c5eedf25",
+          "persistentUuid": "8512ec31-3f47-411e-bce4-7350ebbb3dcc",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -225,7 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
-          "persistentUuid": "b2e5f9a4-e199-4a60-9466-31c254b75865",
+          "persistentUuid": "fcbb5d36-c2b9-459e-bf7e-c5e6ceefae86",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -241,7 +242,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
-          "persistentUuid": "f725292e-f5dc-40f4-be48-10e36fbb6334",
+          "persistentUuid": "939d9d82-bb25-4489-8814-f69477838878",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -257,7 +258,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
-          "persistentUuid": "da8b4816-83a1-4f3e-ac87-15718e7f4e50",
+          "persistentUuid": "37cdb660-340d-4053-a92e-9b1c78a8d450",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -369,6 +370,7 @@
           "variables": [
             {
               "name": "incremetDir",
+              "type": "string",
               "value": ""
             }
           ],

@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/level-editor/level-editor.json",
+    "projectUuid": "421e7de4-34b1-4df4-a2b8-fe43557d920e",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -282,6 +282,7 @@
           "layer": "",
           "locked": false,
           "name": "NewLevel",
+          "persistentUuid": "f69b980c-d61d-4314-8c57-57aaa96be5cb",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -297,6 +298,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "f188198a-18e7-4160-a324-f7a3ae28654e",
           "width": 0,
           "x": 209,
           "y": 34,
@@ -312,6 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "LoadLevel",
+          "persistentUuid": "7b63061f-96d7-45ae-9ca7-1b7bb918f5b4",
           "width": 0,
           "x": 256,
           "y": 256,
@@ -327,6 +330,7 @@
           "italic": false,
           "name": "NewLevel",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -345,6 +349,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -363,6 +368,7 @@
           "italic": false,
           "name": "LoadLevel",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -704,6 +710,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -753,14 +764,17 @@
       "variables": [
         {
           "name": "loadX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "loadY",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "loadAnimation",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -772,6 +786,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "2353d196-2390-474e-802a-4fda2437dd30",
           "width": 0,
           "x": 14,
           "y": 16,
@@ -787,6 +802,7 @@
           "layer": "",
           "locked": true,
           "name": "BGTile",
+          "persistentUuid": "ad56166c-6244-44ee-8c26-4030595697b1",
           "width": 1106,
           "x": 0,
           "y": 0,
@@ -802,6 +818,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "897435c5-a463-49b8-a12b-77e7acc2cf37",
           "width": 0,
           "x": 4,
           "y": 550,
@@ -817,6 +834,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "d378e1b1-8ce0-4766-ac4c-70b312594dcb",
           "width": 0,
           "x": 140,
           "y": 140,
@@ -837,6 +855,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "c7a972b5-8909-47af-a27c-1b90458b00a8",
           "width": 0,
           "x": 0,
           "y": 70,
@@ -852,6 +871,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "51d3a1cf-ad59-4ee4-be77-af7284f3d66a",
           "width": 0,
           "x": 70,
           "y": 70,
@@ -872,6 +892,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "a6eee9c2-8888-442d-a121-998172f491d9",
           "width": 0,
           "x": 140,
           "y": 70,
@@ -892,6 +913,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "47a697d0-6286-4c41-8b05-8d6d4b7bd9fc",
           "width": 0,
           "x": 210,
           "y": 70,
@@ -912,6 +934,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "33d05957-2d6e-4ee8-9e60-a65f62409d6d",
           "width": 0,
           "x": 280,
           "y": 70,
@@ -932,6 +955,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "878384ed-f7f2-4c72-84d8-416a3a6b09c8",
           "width": 0,
           "x": 350,
           "y": 70,
@@ -952,6 +976,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "73a77fe0-4149-4373-8702-dcc440cf02da",
           "width": 0,
           "x": 420,
           "y": 70,
@@ -972,6 +997,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "c761d13d-009f-4f6c-bc05-6df752eea824",
           "width": 0,
           "x": 490,
           "y": 70,
@@ -992,6 +1018,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "a9e4bab3-a840-431c-ae7b-fe2af69dea69",
           "width": 0,
           "x": 560,
           "y": 70,
@@ -1012,6 +1039,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "0fab9771-f6c1-4d87-a760-df3278f78819",
           "width": 0,
           "x": 630,
           "y": 70,
@@ -1032,6 +1060,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "d2fdfbb6-1047-4b9a-8e48-101ba06b72b5",
           "width": 0,
           "x": 700,
           "y": 70,
@@ -1052,6 +1081,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "a29595ce-937a-4504-a099-14cc782cb069",
           "width": 0,
           "x": 0,
           "y": 140,
@@ -1072,6 +1102,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "SelectionTile",
+          "persistentUuid": "eec81fc5-6bca-458e-acaa-66a3b4b4e05a",
           "width": 0,
           "x": 70,
           "y": 140,
@@ -1092,6 +1123,7 @@
           "layer": "TileSelection",
           "locked": false,
           "name": "TxtSelectAtile",
+          "persistentUuid": "f149e0bd-73aa-4832-9e7b-15e0bed4db25",
           "width": 0,
           "x": 327,
           "y": 23,
@@ -1104,6 +1136,7 @@
       "objects": [
         {
           "name": "Drawer",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1120,13 +1153,15 @@
             "g": 0,
             "r": 0
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "bold": false,
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1142,6 +1177,7 @@
         },
         {
           "name": "CursorTile",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1557,6 +1593,7 @@
         },
         {
           "name": "SelectionTile",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1977,6 +2014,7 @@
         },
         {
           "name": "Tile",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2393,6 +2431,7 @@
         {
           "height": 70,
           "name": "BGTile",
+          "tags": "",
           "texture": "bg_tile.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
@@ -2404,6 +2443,7 @@
           "italic": false,
           "name": "TxtSelectAtile",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3766,6 +3806,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3783,12 +3828,22 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "TileSelection",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [],
@@ -3801,17 +3856,25 @@
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
+      "author": "",
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Grid",
+      "previewIconUrl": "",
+      "shortDescription": "",
       "version": "",
+      "tags": [],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Snap the objects to the grid, which has the size defined in scene variables called cell_width and cell_height",
           "fullName": "Snap to grid",
           "functionType": "Action",
           "name": "Snap",
+          "private": false,
           "sentence": "Snap _PARAM1_ to grid",
           "events": [
             {
@@ -3843,14 +3906,17 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Tile object",
+              "longDescription": "",
               "name": "Tile",
               "optional": false,
               "supplementaryInformation": "",
               "type": "objectList"
             }
-          ]
+          ],
+          "objectGroups": []
         }
-      ]
+      ],
+      "eventsBasedBehaviors": []
     }
   ],
   "externalLayouts": [],

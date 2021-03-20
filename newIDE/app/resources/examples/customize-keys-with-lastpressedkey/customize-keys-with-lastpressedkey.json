@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\customize-keys-with-lastpressedkey\\customize-keys-with-lastpressedkey.json",
+    "projectUuid": "9ad205b0-91df-4d7b-8205-24362150fa77",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "green_racer.png",
         "kind": "image",
+        "metadata": "",
         "name": "green_racer.png",
         "smoothed": true,
         "userAdded": false
@@ -116,6 +118,7 @@
   "variables": [
     {
       "name": "RotateKey",
+      "type": "string",
       "value": "Up"
     }
   ],
@@ -156,6 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyPressed",
+          "persistentUuid": "0e7614e3-8f72-49c4-b04d-8c6f12ab5330",
           "width": 0,
           "x": 64,
           "y": 192,
@@ -171,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "LastKeyText",
+          "persistentUuid": "5562e205-0449-4b10-8337-8c4327649bfc",
           "width": 0,
           "x": 256,
           "y": 192,
@@ -186,6 +191,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "cf8019bb-6170-4e28-9a54-1813e7cd03ce",
           "width": 0,
           "x": 356.5,
           "y": 439.5,
@@ -201,6 +207,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "d5977aef-a6d6-4e5d-ae19-10b6df2be120",
           "width": 0,
           "x": 113,
           "y": 323,
@@ -216,6 +223,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyUsed",
+          "persistentUuid": "31e51617-ebe2-4975-8725-396b7d8a65f5",
           "width": 0,
           "x": 64,
           "y": 224,
@@ -231,6 +239,7 @@
           "layer": "",
           "locked": false,
           "name": "CurrentKeyText",
+          "persistentUuid": "66498349-04eb-48ea-9546-d990731029ba",
           "width": 0,
           "x": 256,
           "y": 224,
@@ -246,6 +255,7 @@
           "italic": false,
           "name": "LastKeyPressed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -264,6 +274,7 @@
           "italic": false,
           "name": "LastKeyText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -279,6 +290,7 @@
         },
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -339,6 +351,7 @@
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -357,6 +370,7 @@
           "italic": false,
           "name": "CurrentKeyUsed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -375,6 +389,7 @@
           "italic": false,
           "name": "CurrentKeyText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -596,6 +611,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -617,6 +637,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

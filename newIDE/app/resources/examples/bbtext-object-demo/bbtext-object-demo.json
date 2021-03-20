@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/bbtext-object-demo/manipulate-bbtext-object.json",
+    "projectUuid": "12b22292-5247-4ca1-93f2-e4164e95c6a3",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -136,6 +134,7 @@
       "variables": [
         {
           "name": "wrapDir",
+          "type": "string",
           "value": "1"
         }
       ],
@@ -147,6 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
+          "persistentUuid": "0472baa9-44f6-4f9b-aab2-008cd29c0673",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -162,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
+          "persistentUuid": "e10df137-3821-4fd9-be7c-ac2b706f8afb",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -177,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "7465a9e4-79cd-45c8-9c1a-5c5fb1dc0690",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -192,6 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
+          "persistentUuid": "2e23af8a-560a-4b93-97b3-971331246425",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -207,6 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
+          "persistentUuid": "8512ec31-3f47-411e-bce4-7350ebbb3dcc",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -222,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
+          "persistentUuid": "fcbb5d36-c2b9-459e-bf7e-c5e6ceefae86",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -237,6 +242,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
+          "persistentUuid": "939d9d82-bb25-4489-8814-f69477838878",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -252,6 +258,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
+          "persistentUuid": "37cdb660-340d-4053-a92e-9b1c78a8d450",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -363,6 +370,7 @@
           "variables": [
             {
               "name": "incremetDir",
+              "type": "string",
               "value": ""
             }
           ],
@@ -1122,6 +1130,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

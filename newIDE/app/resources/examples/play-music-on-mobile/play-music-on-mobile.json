@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/play-music-on-mobile/play-music-on-mobile.json",
+    "projectUuid": "5ebaa29d-c76f-4a1b-ab14-494645a44721",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -101,7 +101,10 @@
       {
         "file": "Castle-of-Despair.ogg",
         "kind": "audio",
+        "metadata": "",
         "name": "Castle-of-Despair.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -152,6 +155,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "1e55114b-2108-4f11-bc58-5098c18dc085",
           "width": 0,
           "x": 167,
           "y": 251,
@@ -167,6 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "music",
+          "persistentUuid": "58c1b32a-79d8-412b-b50b-48e6afa1568f",
           "width": 0,
           "x": 401,
           "y": 273,
@@ -182,6 +187,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -250,6 +256,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -271,6 +282,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

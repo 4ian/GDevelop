@@ -422,6 +422,14 @@ module.exports = {
     /** The bitmap font used in case another font can't be loaded. */
     let defaultBitmapFont = null;
 
+    const defaultBitmapFontInstallKey = 'GD-DEFAULT-BITMAP-FONT';
+
+    /**
+     * Map counting the number of "reference" to a bitmap font. This is useful
+     * to uninstall a bitmap font when not used anymore.
+     */
+    const bitmapFontUsageCount = {};
+
     /**
      * We patch the installed font to use a name that is unique for each font data and texture,
      * to avoid conflicts between different font files using the same font name (by default, the
@@ -464,9 +472,119 @@ module.exports = {
             ],
           }
         ),
-        'GD-DEFAULT-BITMAP-FONT'
+        defaultBitmapFontInstallKey
       );
       return defaultBitmapFont;
+    };
+
+    /**
+     * Given a bitmap font resource name and a texture atlas resource name, returns the PIXI.BitmapFont
+     * for it.
+     * The font must be released with `releaseBitmapFont` when not used anymore - so that it can be removed
+     * from memory when not used by any instance.
+     *
+     * @param pixiResourcesLoader
+     * @param project
+     * @param bitmapFontResourceName
+     * @param textureAtlasResourceName
+     */
+    const obtainBitmapFont = (
+      pixiResourcesLoader,
+      project,
+      bitmapFontResourceName,
+      textureAtlasResourceName
+    ) => {
+      const bitmapFontInstallKey =
+        bitmapFontResourceName + '@' + textureAtlasResourceName;
+
+      if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
+        // Return the existing BitmapFont that is already in memory and already installed.
+        bitmapFontUsageCount[bitmapFontInstallKey] =
+          (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
+        return Promise.resolve(PIXI.BitmapFont.available[bitmapFontInstallKey]);
+      }
+
+      // Get the atlas texture, the bitmap font data and install the font:
+      const texture = pixiResourcesLoader.getPIXITexture(
+        project,
+        textureAtlasResourceName
+      );
+
+      const loadBitmapFont = () =>
+        pixiResourcesLoader
+          .getBitmapFontData(project, bitmapFontResourceName)
+          .then((fontData) => {
+            if (!texture.valid)
+              throw new Error(
+                'Tried to install a BitmapFont with an invalid texture.'
+              );
+
+            const bitmapFont = patchBitmapFont(
+              PIXI.BitmapFont.install(fontData, texture),
+              bitmapFontInstallKey
+            );
+            bitmapFontUsageCount[bitmapFontInstallKey] =
+              (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
+
+            return bitmapFont;
+          })
+          .catch((err) => {
+            console.warn('Unable to load font data:', err);
+            console.info(
+              'Is the texture atlas properly set for the Bitmap Text object? The default font will be used instead.'
+            );
+
+            const bitmapFont = getDefaultBitmapFont();
+            return bitmapFont;
+          });
+
+      if (!texture.valid) {
+        // Post pone texture update if texture is not loaded.
+        // (otherwise, the bitmap font would not get updated when the
+        // texture is loaded and udpated).
+        return new Promise((resolve) => {
+          texture.once('update', () => {
+            resolve(loadBitmapFont());
+          });
+        });
+      } else {
+        // We're ready to load the bitmap font now, as the texture
+        // is already loaded.
+        return loadBitmapFont();
+      }
+    };
+
+    /**
+     * When a font is not used by an object anymore (object destroyed or font changed),
+     * call this function to decrease the internal count of objects using the font.
+     *
+     * Fonts are unloaded when not used anymore.
+     */
+    const releaseBitmapFont = (bitmapFontInstallKey) => {
+      if (bitmapFontInstallKey === defaultBitmapFontInstallKey) {
+        // Never uninstall the default bitmap font.
+        return;
+      }
+
+      if (!bitmapFontUsageCount[bitmapFontInstallKey]) {
+        console.error(
+          'BitmapFont with name ' +
+            bitmapFontInstallKey +
+            ' was tried to be released but was never marked as used.'
+        );
+        return;
+      }
+      bitmapFontUsageCount[bitmapFontInstallKey]--;
+
+      if (bitmapFontUsageCount[bitmapFontInstallKey] === 0) {
+        // TODO: We don't uninstall fonts (which is a memory leak!) because uninstall calls
+        // `destroy` on the BitmapFont, which destroys the atlas texture *including* its base texture.
+        //
+        // This will crash if there is any other object using this base texture (like a Sprite).
+
+        // PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        console.info("Should uninstall BitmapFont " + bitmapFontInstallKey + " - but not doing it.");
+      }
     };
 
     /**
@@ -556,40 +674,21 @@ module.exports = {
         this._currentBitmapFontResourceName !== bitmapFontResourceName ||
         this._currentTextureAtlasResourceName !== textureAtlasResourceName
       ) {
+        // Release the old font (if it was installed).
+        releaseBitmapFont(this._pixiObject.fontName);
+
         this._currentBitmapFontResourceName = bitmapFontResourceName;
         this._currentTextureAtlasResourceName = textureAtlasResourceName;
-        const bitmapFontInstallKey = bitmapFontResourceName + '@' + textureAtlasResourceName;
-
-        const texture = this._pixiResourcesLoader.getPIXITexture(
+        obtainBitmapFont(
+          this._pixiResourcesLoader,
           this._project,
+          this._currentBitmapFontResourceName,
           this._currentTextureAtlasResourceName
-        );
-
-        this._pixiResourcesLoader
-          .getResourceBitmapFont(
-            this._project,
-            this._currentBitmapFontResourceName
-          )
-          .then((fontData) => {
-            const bitmapFont = patchBitmapFont(
-              PIXI.BitmapFont.install(fontData, texture),
-              bitmapFontInstallKey
-            );
-            this._pixiObject.fontName = bitmapFont.font;
-            this._pixiObject.fontSize = bitmapFont.size;
-            this._pixiObject.dirty = true;
-          })
-          .catch((err) => {
-            console.warn('Unable to load font data:', err);
-            console.info(
-              'Is the texture atlas properly set for the Bitmap Text object? The default font will be used instead.'
-            );
-
-            const bitmapFont = getDefaultBitmapFont();
-            this._pixiObject.fontName = bitmapFont.font;
-            this._pixiObject.fontSize = bitmapFont.size;
-            this._pixiObject.dirty = true;
-          });
+        ).then((bitmapFont) => {
+          this._pixiObject.fontName = bitmapFont.font;
+          this._pixiObject.fontSize = bitmapFont.size;
+          this._pixiObject.dirty = true;
+        });
       }
 
       // Set up the wrapping width if enabled.
@@ -610,6 +709,13 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
+    };
+
+    RenderedBitmapTextInstance.prototype.onRemovedFromScene = function () {
+      RenderedInstance.prototype.onRemovedFromScene.call(this);
+
+      releaseBitmapFont(this._pixiObject.fontName);
+      this._pixiObject.destroy();
     };
 
     /**

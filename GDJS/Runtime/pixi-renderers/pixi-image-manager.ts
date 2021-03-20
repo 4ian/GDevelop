@@ -43,7 +43,12 @@ namespace gdjs {
      */
     getPIXITexture(resourceName: string): PIXI.Texture {
       if (this._loadedTextures.containsKey(resourceName)) {
-        return this._loadedTextures.get(resourceName);
+        const texture = this._loadedTextures.get(resourceName);
+        if (texture.valid) {
+          return texture;
+        } else {
+          console.error("Texture for " + resourceName + " is not valid anymore.");
+        }
       }
       if (resourceName === '') {
         return this._invalidTexture;

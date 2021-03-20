@@ -16,10 +16,11 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
 
+      // Obtain the bitmap font to use in the object.
       const bitmapFont = runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .getBitmapFontFromData(
+        .obtainBitmapFont(
           runtimeObject._bitmapFontResourceName,
           runtimeObject._textureAtlasResourceName
         );
@@ -27,12 +28,6 @@ namespace gdjs {
         fontName: bitmapFont.font,
         fontSize: bitmapFont.size,
       });
-
-      // Mark the font as used
-      runtimeScene
-        .getGame()
-        .getBitmapFontManager()
-        .setFontUsed(bitmapFont.font);
 
       // Set the object on the scene
       runtimeScene
@@ -61,11 +56,13 @@ namespace gdjs {
     }
 
     onDestroy() {
-      // Mark the font from the object not used anymore.
+      // Mark the font from the object as not used anymore.
       this._object._runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .removeFontUsed(this._pixiObject.fontName);
+        .releaseBitmapFont(this._pixiObject.fontName);
+
+      this._pixiObject.destroy();
     }
 
     getFontSize() {
@@ -77,26 +74,20 @@ namespace gdjs {
       const bitmapFont = this._object._runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .getBitmapFontFromData(
+        .obtainBitmapFont(
           this._object._bitmapFontResourceName,
           this._object._textureAtlasResourceName
         );
 
-      // Mark the old font unused for the manager
+      // Mark the old font as not used anymore
       this._object._runtimeScene
         .getGame()
         .getBitmapFontManager()
-        .removeFontUsed(this._pixiObject.fontName);
+        .releaseBitmapFont(this._pixiObject.fontName);
 
-      // Update the font used for Pixi
+      // Update the font used by the object:
       this._pixiObject.fontName = bitmapFont.font;
       this._pixiObject.fontSize = bitmapFont.size;
-
-      // Mark the new font used for the manager
-      this._object._runtimeScene
-        .getGame()
-        .getBitmapFontManager()
-        .setFontUsed(this._pixiObject.fontName);
       this.updatePosition();
     }
 

@@ -190,7 +190,7 @@ namespace gdjs {
     }
 
     getBitmapFontResourceName(): string {
-      return this._renderer.getRendererObject().fontName;
+      return this._bitmapFontResourceName;
     }
 
     setTextureAtlasResourceName(textureAtlasResourceName: string): void {

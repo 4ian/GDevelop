@@ -915,7 +915,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       objectResourceNames,
       () => {},
       () => {
-        if (this.editor) this.editor.resetRenderersFor(object.getName());
+        if (this.editor) this.editor.resetInstanceRenderersFor(object.getName());
       }
     );
   };

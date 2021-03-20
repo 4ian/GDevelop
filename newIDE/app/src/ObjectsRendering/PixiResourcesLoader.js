@@ -98,6 +98,10 @@ export default class PixiResourcesLoader {
    */
   static getPIXITexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
+      // TODO: we never consider textures as not valid anymore. When we
+      // update the IDE to unload textures, we should handle loading them again
+      // here (and also be careful to return the same texture if it's not valid
+      // but still loading, when multiple objects are rapidly asking for the same texture).
       return loadedTextures[resourceName];
     }
 
@@ -129,6 +133,10 @@ export default class PixiResourcesLoader {
    */
   static getPIXIVideoTexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
+      // TODO: we never consider textures as not valid anymore. When we
+      // update the IDE to unload textures, we should handle loading them again
+      // here (and also be careful to return the same texture if it's not valid
+      // but still loading, when multiple objects are rapidly asking for the same texture).
       return loadedTextures[resourceName];
     }
 
@@ -222,7 +230,7 @@ export default class PixiResourcesLoader {
   /**
    * Get the the data from a bitmap font file (fnt/xml) resource in the IDE.
    */
-  static getResourceBitmapFont(
+  static getBitmapFontData(
     project: gdProject,
     resourceName: string
   ): Promise<any> {

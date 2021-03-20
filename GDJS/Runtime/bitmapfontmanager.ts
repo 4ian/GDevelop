@@ -4,6 +4,13 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const defaultBitmapFontKey = 'GDJS-DEFAULT-BITMAP-FONT';
+
+  // TODO: We implemented a cache to lazily unload unused `BitmapFont`s, but this
+  // is set to 0 because we don't even unload (`uninstall`) `BitmapFont`s, as this
+  // would destroy the texture that can be used by other objects or other fonts.
+  const uninstallCacheSize = 0;
+
   /**
    * We patch the installed font to use a name that is unique for each font data and texture,
    * to avoid conflicts between different font files using the same font name (by default, the
@@ -43,9 +50,6 @@ namespace gdjs {
 
     /** Loaded fonts data, indexed by resource name. */
     private _loadedFontsData: Record<string, any> = {};
-
-    /** Installed Pixi.BitmapFont, indexed by resource name. */
-    private _installedPixiBitmapFont: Record<string, PIXI.BitmapFont> = {};
 
     private _defaultSlugFontName: string | null = null;
 
@@ -87,7 +91,7 @@ namespace gdjs {
           // All the printable ASCII characters
           chars: [[' ', '~']],
         }),
-        'GDJS-DEFAULT-BITMAP-FONT'
+        defaultBitmapFontKey
       );
 
       // Define the default name used for the default bitmap font.
@@ -104,18 +108,22 @@ namespace gdjs {
     }
 
     /**
-     * When an object use a BitmapFont, call this function to register the slug of the font and how many objects use it.
-     * @param pixiBitmapFontName Name of the font of the BitmapFont (`bitmapFont.font`)
+     * Called to specify that the bitmap font with the specified key is used by an object
+     * (i.e: this is reference counting).
+     * `releaseBitmapFont` *must* be called to mark the font as not used anymore when the
+     * object is destroyed or its font changed.
+     *
+     * @param bitmapFontInstallKey Name of the font of the BitmapFont (`bitmapFont.font`)
      */
-    setFontUsed(pixiBitmapFontName: string): void {
-      this._pixiBitmapFontsInUse[pixiBitmapFontName] = this
-        ._pixiBitmapFontsInUse[pixiBitmapFontName] || {
+    private _markBitmapFontAsUsed(bitmapFontInstallKey: string): void {
+      this._pixiBitmapFontsInUse[bitmapFontInstallKey] = this
+        ._pixiBitmapFontsInUse[bitmapFontInstallKey] || {
         objectsUsingTheFont: 0,
       };
-      this._pixiBitmapFontsInUse[pixiBitmapFontName].objectsUsingTheFont++;
+      this._pixiBitmapFontsInUse[bitmapFontInstallKey].objectsUsingTheFont++;
 
       for (let i = 0; i < this._pixiBitmapFontsToUninstall.length; ) {
-        if (this._pixiBitmapFontsToUninstall[i] === pixiBitmapFontName) {
+        if (this._pixiBitmapFontsToUninstall[i] === bitmapFontInstallKey) {
           // The font is in the cache of fonts to uninstall, because it was previously used and then marked as not used anymore.
           // Remove it from the cache to avoid the font getting uninstalled.
           this._pixiBitmapFontsToUninstall.splice(i, 1);
@@ -132,50 +140,76 @@ namespace gdjs {
      * When a font is not unused anymore, it goes in a temporary cache. The cache holds up to 10 fonts.
      * If the cache reaches its maximum capacity, the oldest font is uninstalled from memory.
      *
-     * @param pixiBitmapFontName Name of the font of the BitmapFont (`bitmapFont.font`)
+     * @param bitmapFontInstallKey Name of the font of the BitmapFont (`bitmapFont.font`)
      */
-    removeFontUsed(pixiBitmapFontName: string) {
-      if (!this._pixiBitmapFontsInUse[pixiBitmapFontName]) {
-        // We tried to remove font that was never marked as used.
+    releaseBitmapFont(bitmapFontInstallKey: string) {
+      if (bitmapFontInstallKey === defaultBitmapFontKey) {
+        // Never uninstall the default font.
+        return;
+      }
+
+      if (!this._pixiBitmapFontsInUse[bitmapFontInstallKey]) {
         console.error(
           'BitmapFont with name ' +
-            pixiBitmapFontName +
-            ' was tried to be removed but was never marked as used.'
+            bitmapFontInstallKey +
+            ' was tried to be released but was never marked as used.'
         );
         return;
       }
-      this._pixiBitmapFontsInUse[pixiBitmapFontName].objectsUsingTheFont--;
+      this._pixiBitmapFontsInUse[bitmapFontInstallKey].objectsUsingTheFont--;
+
       if (
-        this._pixiBitmapFontsInUse[pixiBitmapFontName].objectsUsingTheFont === 0
+        this._pixiBitmapFontsInUse[bitmapFontInstallKey].objectsUsingTheFont ===
+        0
       ) {
-        delete this._pixiBitmapFontsInUse[pixiBitmapFontName];
+        delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
 
         // Add the font name at the last position of the cache.
-        if (!this._pixiBitmapFontsToUninstall.includes(pixiBitmapFontName)) {
-          this._pixiBitmapFontsToUninstall.push(pixiBitmapFontName);
+        if (!this._pixiBitmapFontsToUninstall.includes(bitmapFontInstallKey)) {
+          this._pixiBitmapFontsToUninstall.push(bitmapFontInstallKey);
         }
-        if (this._pixiBitmapFontsToUninstall.length > 10) {
+        if (this._pixiBitmapFontsToUninstall.length > uninstallCacheSize) {
           // Remove the first font (i.e: the oldest one)
           const oldestUnloadedPixiBitmapFontName = this._pixiBitmapFontsToUninstall.shift() as string;
-          PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+
+          // TODO: We don't uninstall fonts (which is a memory leak!) because uninstall calls
+          // `destroy` on the BitmapFont, which destroys the atlas texture *including* its base texture.
+          //
+          // This will crash if there is any other object using this base texture (like a Sprite).
+          //
+          // This will also put the texture in a non valid state (which is a problem as PixiImageManager expects
+          // textures to be all already loaded). You can see the problem by deleting all the BitmapText object using
+          // a texture and creating a new one.
+          //
+          // PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
           console.log(
-            'Uninstalled Bitmap Font from memory: ' +
-              oldestUnloadedPixiBitmapFontName
+            'Should uninstall BitmapFont ' +
+              oldestUnloadedPixiBitmapFontName + 'from memory - but not doing it.'
           );
         }
       }
     }
 
-    getBitmapFontFromData(
+    /**
+     * Given a bitmap font resource name and a texture atlas resource name, returns the PIXI.BitmapFont
+     * for it.
+     * The font is register and should be released with `releaseBitmapFont` - so that it can be removed
+     * from memory when unused.
+     *
+     * @param bitmapFontResourceName
+     * @param textureAtlasResourceName
+     */
+    obtainBitmapFont(
       bitmapFontResourceName: string,
       textureAtlasResourceName: string
     ): PIXI.BitmapFont {
       const bitmapFontInstallKey =
         bitmapFontResourceName + '@' + textureAtlasResourceName;
 
-      // Return the existing Bitmap Font that is already in memory and already installed.
-      if (this._installedPixiBitmapFont[bitmapFontInstallKey]) {
-        return this._installedPixiBitmapFont[bitmapFontInstallKey];
+      if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
+        // Return the existing BitmapFont that is already in memory and already installed.
+        this._markBitmapFontAsUsed(bitmapFontInstallKey);
+        return PIXI.BitmapFont.available[bitmapFontInstallKey];
       }
 
       // The Bitmap Font is not loaded, load it in memory.
@@ -202,10 +236,8 @@ namespace gdjs {
           PIXI.BitmapFont.install(fontData, texture),
           bitmapFontInstallKey
         );
-
-        return (this._installedPixiBitmapFont[
-          bitmapFontInstallKey
-        ] = bitmapFont);
+        this._markBitmapFontAsUsed(bitmapFontInstallKey);
+        return bitmapFont;
       } catch (error) {
         console.warn(
           'Could not load the Bitmap Font for resource named "' +

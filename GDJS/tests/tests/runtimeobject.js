@@ -194,6 +194,30 @@ describe('gdjs.RuntimeObject', () => {
       farSqDist: 800,
     });
 
+    // Vertical raycast, far from the origin:
+    object1.setPosition(20, 300);
+    expect(object1.raycastTest(25, 500, 25, 250, true).collision).to.be(true);
+
+    // Vertical raycast, far from the origin, to the edge of the object:
+    object1.setPosition(20, 300);
+    expect(object1.raycastTest(25, 500, 25, 300+19, true).collision).to.be(true);
+    expect(object1.raycastTest(25, 500, 25, 300+20, true).collision).to.be(true);
+    expect(object1.raycastTest(25, 500, 25, 300+20.1, true).collision).to.be(false);
+    expect(object1.raycastTest(25, 500, 25, 300+20.5, true).collision).to.be(false);
+    expect(object1.raycastTest(25, 500, 25, 300+21, true).collision).to.be(false);
+
+    // Horizontal raycast, far from the origin:
+    object1.setPosition(200, 30);
+    expect(object1.raycastTest(500, 35, 190, 35, true).collision).to.be(true);
+
+    // Horizontal raycast, far from the origin, to the edge of the object:
+    object1.setPosition(200, 30);
+    expect(object1.raycastTest(500, 35, 200+9, 35, true).collision).to.be(true);
+    expect(object1.raycastTest(500, 35, 200+10, 35, true).collision).to.be(true);
+    expect(object1.raycastTest(500, 35, 200+10.1, 35, true).collision).to.be(false);
+    expect(object1.raycastTest(500, 35, 200+10.5, 35, true).collision).to.be(false);
+    expect(object1.raycastTest(500, 35, 200+11, 35, true).collision).to.be(false);
+
     // Raycast not intersecting with the object
     object1.setPosition(20, 30);
     expect(object1.raycastTest(10, 10, 105, 55, true).collision).to.be(false);

@@ -561,175 +561,6 @@ namespace gdjs {
   );
 
   export namespace PathfindingRuntimeBehavior {
-    /**
-     * Internal tool class representing a node when looking for a path
-     */
-    export class Node {
-      graph: GridGraph;
-      pos: FloatPoint;
-      center: FloatPoint = [0, 0];
-      cost: integer = 0;
-      smallestCost: integer = -1;
-      estimateCost: integer = -1;
-      parent: Node | null = null;
-      open: boolean = true;
-      factor: float = 1;
-
-      constructor(graph: GridGraph, xPos: integer, yPos: integer) {
-        this.graph = graph;
-        this.pos = [xPos, yPos];
-      }
-
-      reinitialize(xPos: integer, yPos: integer) {
-        this.pos[0] = xPos;
-        this.pos[1] = yPos;
-        this.cost = 0;
-        this.smallestCost = -1;
-        this.estimateCost = -1;
-        this.parent = null;
-        this.open = true;
-      }
-    }
-
-    export class GridGraph {
-      _allNodes: Node[][] = [];
-      //Used by getNodes to temporarily store obstacles near a position.
-      _nodeCache: Node[] = [];
-      
-      _grid: Grid;
-      
-      constructor(grid: Grid) {
-        this._grid = grid;
-        this._grid._graph = this;
-      }
-
-      /**
-       * Get (or dynamically construct) a node.
-       *
-       * *All* nodes should be created using this method: The cost of the node is computed thanks
-       * to the objects flagged as obstacles.
-       */
-      _getNode(xPos: integer, yPos: integer): Node {
-        //First check if their is a node a the specified position.
-        if (this._allNodes.hasOwnProperty(xPos)) {
-          if (this._allNodes[xPos].hasOwnProperty(yPos)) {
-            return this._allNodes[xPos][yPos];
-          }
-        } else {
-          this._allNodes[xPos] = [];
-        }
-
-        //No so construct a new node (or get it from the cache)...
-        let newNode: Node;
-        if (this._nodeCache.length !== 0) {
-          newNode = this._nodeCache.shift()!;
-          newNode.reinitialize(xPos, yPos);
-        } else {
-          newNode = new Node(this, xPos, yPos);
-        }
-
-        //Default cost when no objects put on the cell.
-        this._allNodes[xPos][yPos] = newNode;
-        return newNode;
-      }
-      
-      getNeighbors(currentNode: Node, result: Node[]) {
-        this._grid.getNeighbors(currentNode, result);
-      }
-      
-      getCellIndex(position: FloatPoint, index?: FloatPoint) {
-        this._grid.getCellIndex(position, index);
-      }
-      
-      getCellCenter(index: FloatPoint, position?: FloatPoint) {
-        this._grid.getCellCenter(index, position);
-      }
-      
-      _freeAllNodes() {
-        if (this._nodeCache.length <= 32000) {
-          for (const i in this._allNodes) {
-            if (this._allNodes.hasOwnProperty(i)) {
-              const nodeArray = this._allNodes[i];
-              for (const j in nodeArray) {
-                if (nodeArray.hasOwnProperty(j)) {
-                  this._nodeCache.push(nodeArray[j]);
-                }
-              }
-            }
-          }
-        }
-        this._allNodes = [];
-      }
-    }
-    
-    export class Grid {
-      static _withoutDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-      static _withDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, -1], [-1, 1]];
-      
-      _graph: GridGraph | null = null;
-      _allowDiagonals: boolean = true;
-      _offsetX: float = 0;
-      _offsetY: float = 0;
-      _cellWidth: float = 20;
-      _cellHeight: float = 20;
-      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
-      
-      setBasisTransformation(basisTransformation: PathfindingRuntimeBehavior.BasisTransformation) {
-        this._basisTransformation = basisTransformation;
-      }
-      
-      setCellSize(
-        cellWidth: float,
-        cellHeight: float
-      ) {
-        this._cellWidth = cellWidth;
-        this._cellHeight = cellHeight;
-      }
-
-      setOffset(
-        offsetX: float,
-        offsetY: float
-      ) {
-        this._offsetX = offsetX;
-        this._offsetY = offsetY;
-      }
-
-      getCellIndex(position: FloatPoint, index?: FloatPoint) {
-        if (!index) {
-          index = position;
-        }
-        position[0] -= this._offsetX;
-        position[1] -= this._offsetY;
-        this._basisTransformation.toWorld(position, index);
-        index[0] = Math.round(index[0] / this._cellWidth);
-        index[1] = Math.round(index[1] / this._cellHeight);
-      }
-      
-      getCellCenter(index: FloatPoint, position?: FloatPoint) {
-        if (!position) {
-          position = index;
-        }
-        position[0] = index[0] * this._cellWidth;
-        position[1] = index[1] * this._cellHeight;
-        this._basisTransformation.toScreen(position);
-        position[0] += this._offsetX;
-        position[1] += this._offsetY;
-      }
-
-      getNeighbors(currentNode: Node, result: Node[]) {
-        const deltas: FloatPoint[] = this._allowDiagonals ? Grid._withDiagonalsDeltas
-                                                          : Grid._withoutDiagonalsDeltas;
-        for (const delta of deltas) {
-          let node = this._graph!._getNode(
-            currentNode.pos[0] + delta[0],
-            currentNode.pos[1] + delta[1]
-          );
-          node.factor = 1;
-          this.getCellCenter(node.pos, node.center);
-          result.push(node);
-        }
-      }
-    }
 
     /**
      * Internal tool class containing the structures used by A* and members functions related
@@ -1079,6 +910,174 @@ namespace gdjs {
           }
         }
         return false;
+      }
+    }
+
+    /**
+     * Internal tool class representing a node when looking for a path
+     */
+    export class Node {
+      pos: FloatPoint;
+      center: FloatPoint = [0, 0];
+      cost: integer = 0;
+      smallestCost: integer = -1;
+      estimateCost: integer = -1;
+      parent: Node | null = null;
+      open: boolean = true;
+      factor: float = 1;
+
+      constructor(xPos: integer, yPos: integer) {
+        this.pos = [xPos, yPos];
+      }
+
+      reinitialize(xPos: integer, yPos: integer) {
+        this.pos[0] = xPos;
+        this.pos[1] = yPos;
+        this.cost = 0;
+        this.smallestCost = -1;
+        this.estimateCost = -1;
+        this.parent = null;
+        this.open = true;
+      }
+    }
+
+    export class GridGraph {
+      _allNodes: Node[][] = [];
+      //Used by getNodes to temporarily store obstacles near a position.
+      _nodeCache: Node[] = [];
+      
+      _grid: Grid;
+      
+      constructor(grid: Grid) {
+        this._grid = grid;
+        this._grid._graph = this;
+      }
+
+      /**
+       * Get (or dynamically construct) a node.
+       *
+       * *All* nodes should be created using this method: The cost of the node is computed thanks
+       * to the objects flagged as obstacles.
+       */
+      _getNode(xPos: integer, yPos: integer): Node {
+        //First check if their is a node a the specified position.
+        if (this._allNodes.hasOwnProperty(xPos)) {
+          if (this._allNodes[xPos].hasOwnProperty(yPos)) {
+            return this._allNodes[xPos][yPos];
+          }
+        } else {
+          this._allNodes[xPos] = [];
+        }
+
+        //No so construct a new node (or get it from the cache)...
+        let newNode: Node;
+        if (this._nodeCache.length !== 0) {
+          newNode = this._nodeCache.shift()!;
+          newNode.reinitialize(xPos, yPos);
+        } else {
+          newNode = new Node(xPos, yPos);
+        }
+
+        //Default cost when no objects put on the cell.
+        this._allNodes[xPos][yPos] = newNode;
+        return newNode;
+      }
+      
+      getNeighbors(currentNode: Node, result: Node[]) {
+        this._grid.getNeighbors(currentNode, result);
+      }
+      
+      getCellIndex(position: FloatPoint, index?: FloatPoint) {
+        this._grid.getCellIndex(position, index);
+      }
+      
+      getCellCenter(index: FloatPoint, position?: FloatPoint) {
+        this._grid.getCellCenter(index, position);
+      }
+      
+      _freeAllNodes() {
+        if (this._nodeCache.length <= 32000) {
+          for (const i in this._allNodes) {
+            if (this._allNodes.hasOwnProperty(i)) {
+              const nodeArray = this._allNodes[i];
+              for (const j in nodeArray) {
+                if (nodeArray.hasOwnProperty(j)) {
+                  this._nodeCache.push(nodeArray[j]);
+                }
+              }
+            }
+          }
+        }
+        this._allNodes = [];
+      }
+    }
+    
+    export class Grid {
+      static _withoutDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      static _withDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, -1], [-1, 1]];
+      
+      _graph: GridGraph | null = null;
+      _allowDiagonals: boolean = true;
+      _offsetX: float = 0;
+      _offsetY: float = 0;
+      _cellWidth: float = 20;
+      _cellHeight: float = 20;
+      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
+      
+      setBasisTransformation(basisTransformation: PathfindingRuntimeBehavior.BasisTransformation) {
+        this._basisTransformation = basisTransformation;
+      }
+      
+      setCellSize(
+        cellWidth: float,
+        cellHeight: float
+      ) {
+        this._cellWidth = cellWidth;
+        this._cellHeight = cellHeight;
+      }
+
+      setOffset(
+        offsetX: float,
+        offsetY: float
+      ) {
+        this._offsetX = offsetX;
+        this._offsetY = offsetY;
+      }
+
+      getCellIndex(position: FloatPoint, index?: FloatPoint) {
+        if (!index) {
+          index = position;
+        }
+        position[0] -= this._offsetX;
+        position[1] -= this._offsetY;
+        this._basisTransformation.toWorld(position, index);
+        index[0] = Math.round(index[0] / this._cellWidth);
+        index[1] = Math.round(index[1] / this._cellHeight);
+      }
+      
+      getCellCenter(index: FloatPoint, position?: FloatPoint) {
+        if (!position) {
+          position = index;
+        }
+        position[0] = index[0] * this._cellWidth;
+        position[1] = index[1] * this._cellHeight;
+        this._basisTransformation.toScreen(position);
+        position[0] += this._offsetX;
+        position[1] += this._offsetY;
+      }
+
+      getNeighbors(currentNode: Node, result: Node[]) {
+        const deltas: FloatPoint[] = this._allowDiagonals ? Grid._withDiagonalsDeltas
+                                                          : Grid._withoutDiagonalsDeltas;
+        for (const delta of deltas) {
+          let node = this._graph!._getNode(
+            currentNode.pos[0] + delta[0],
+            currentNode.pos[1] + delta[1]
+          );
+          node.factor = 1;
+          this.getCellCenter(node.pos, node.center);
+          result.push(node);
+        }
       }
     }
 

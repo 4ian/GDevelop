@@ -46,6 +46,7 @@ namespace gdjs {
     _temporaryPointForTransformations: FloatPoint = [0, 0];
     
     _graph: PathfindingRuntimeBehavior.GridGraph;
+    _graphGrid: PathfindingRuntimeBehavior.Grid;
     _nodeEvaluator: PathfindingRuntimeBehavior.NodeEvaluator;
 
 
@@ -74,9 +75,10 @@ namespace gdjs {
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
       
-      this._nodeEvaluator = new PathfindingRuntimeBehavior.NodeEvaluator(this._manager);
-      this._graph = new PathfindingRuntimeBehavior.GridGraph(this._nodeEvaluator);
-      this._pathFinder = new gdjs.PathfindingRuntimeBehavior.AStarPathFinder(this._graph);
+      this._graphGrid = new PathfindingRuntimeBehavior.Grid();
+      this._graph = new PathfindingRuntimeBehavior.GridGraph(this._graphGrid);
+      this._nodeEvaluator = new PathfindingRuntimeBehavior.NodeEvaluator(this._graph, this._manager);
+      this._pathFinder = new gdjs.PathfindingRuntimeBehavior.AStarPathFinder(this._graph, this._nodeEvaluator);
       this._setViewpoint(
         behaviorData.viewpoint,
         behaviorData.cellWidth,
@@ -362,18 +364,19 @@ namespace gdjs {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
-      const target = this._temporaryPointForTransformations;
-      target[0] = x - this._gridOffsetX;
-      target[1] = y - this._gridOffsetY;
-      this._basisTransformation.toWorld(target);
-      const targetCellX = Math.round(target[0] / this._cellWidth);
-      const targetCellY = Math.round(target[1] / this._cellHeight);
-      const start = this._temporaryPointForTransformations;
-      start[0] = owner.getX() - this._gridOffsetX;
-      start[1] = owner.getY() - this._gridOffsetY;
-      this._basisTransformation.toWorld(start);
-      const startCellX = Math.round(start[0] / this._cellWidth);
-      const startCellY = Math.round(start[1] / this._cellHeight);
+      const tempPoint = this._temporaryPointForTransformations;
+      tempPoint[0] = x;
+      tempPoint[1] = y;
+      this._graph.getCellIndex(tempPoint);
+      const targetCellX = tempPoint[0];
+      const targetCellY = tempPoint[1];
+      
+      tempPoint[0] = owner.getX();
+      tempPoint[1] = owner.getY();
+      this._graph.getCellIndex(tempPoint);
+      const startCellX = tempPoint[0];
+      const startCellY = tempPoint[1];
+      
       if (startCellX == targetCellX && startCellY == targetCellY) {
         this._path.length = 0;
         this._path.push([owner.getX(), owner.getY()]);
@@ -385,10 +388,10 @@ namespace gdjs {
 
       //Start searching for a path
       this._pathFinder.allowDiagonals(this._allowDiagonals);
-      this._pathFinder.setBasisTransformation(this._basisTransformation);
       this._pathFinder.setStartPosition(owner.getX(), owner.getY());
-      this._graph.setGridOffset(this._gridOffsetX, this._gridOffsetY);
-      this._graph.setCellSize(this._cellWidth, this._cellHeight);
+      this._graphGrid.setOffset(this._gridOffsetX, this._gridOffsetY);
+      this._graphGrid.setCellSize(this._cellWidth, this._cellHeight);
+      this._graphGrid.setBasisTransformation(this._basisTransformation);
       this._nodeEvaluator.setCollisionMethod(this._collisionMethod);
       if (this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION) {
         this._nodeEvaluator.setObjectSize(
@@ -408,10 +411,10 @@ namespace gdjs {
         for (let pi = 0; pi < copyHitboxes.length; ++pi) {
           copyHitboxes[pi].move(-owner.getX(), -owner.getY());
         }
-        this._pathFinder._graph._nodeEvaluator.setObjectHitBoxes(copyHitboxes);
+        this._pathFinder._nodeEvaluator.setObjectHitBoxes(copyHitboxes);
         
         const aabb = owner.getAABB();
-        this._pathFinder._graph._nodeEvaluator.setObjectSize(
+        this._pathFinder._nodeEvaluator.setObjectSize(
           owner.getX() - aabb.min[0] + this._extraBorder,
           owner.getY() - aabb.min[1] + this._extraBorder,
           aabb.max[0] - owner.getX() + this._extraBorder,
@@ -564,7 +567,7 @@ namespace gdjs {
     export class Node {
       graph: GridGraph;
       pos: FloatPoint;
-      center: FloatPoint;
+      center: FloatPoint = [0, 0];
       cost: integer = 0;
       smallestCost: integer = -1;
       estimateCost: integer = -1;
@@ -575,8 +578,6 @@ namespace gdjs {
       constructor(graph: GridGraph, xPos: integer, yPos: integer) {
         this.graph = graph;
         this.pos = [xPos, yPos];
-        // TODO
-        this.center = [0, 0];
       }
 
       reinitialize(xPos: integer, yPos: integer) {
@@ -595,94 +596,11 @@ namespace gdjs {
       //Used by getNodes to temporarily store obstacles near a position.
       _nodeCache: Node[] = [];
       
-      _gridOffsetX: float = 0;
-      _gridOffsetY: float = 0;
-      _cellWidth: float = 20;
-      _cellHeight: float = 20;
-      _allowDiagonals: boolean = true;
+      _grid: Grid;
       
-      _nodeEvaluator: NodeEvaluator;
-      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
-      
-      constructor(nodeEvaluator: NodeEvaluator) {
-        this._nodeEvaluator = nodeEvaluator;
-        this._nodeEvaluator._graph = this;
-      }
-
-      setCellSize(
-        cellWidth: float,
-        cellHeight: float
-      ) {
-        this._cellWidth = cellWidth;
-        this._cellHeight = cellHeight;
-      }
-
-      setGridOffset(
-        gridOffsetX: float,
-        gridOffsetY: float
-      ) {
-        this._gridOffsetX = gridOffsetX;
-        this._gridOffsetY = gridOffsetY;
-      }
-      
-      getNeighbors(currentNode: Node, result: Node[]) {
-        let node = this._getNode(
-          currentNode.pos[0] + 1,
-          currentNode.pos[1]
-        );
-        node.factor = 1;
-        result.push(node);
-        
-        node = this._getNode(
-          currentNode.pos[0] - 1,
-          currentNode.pos[1]
-        );
-        node.factor = 1;
-        result.push(node);
-        
-        node = this._getNode(
-          currentNode.pos[0],
-          currentNode.pos[1] + 1
-        );
-        node.factor = 1;
-        result.push(node);
-        
-        node = this._getNode(
-          currentNode.pos[0],
-          currentNode.pos[1] - 1
-        );
-        node.factor = 1;
-        result.push(node);
-
-        if (this._allowDiagonals) {
-          node = this._getNode(
-            currentNode.pos[0] + 1,
-            currentNode.pos[1] + 1
-          );
-          node.factor = 1.414213562;
-          result.push(node);
-          
-          node = this._getNode(
-            currentNode.pos[0] + 1,
-            currentNode.pos[1] - 1
-          );
-          node.factor = 1.414213562;
-          result.push(node);
-          
-          node = this._getNode(
-            currentNode.pos[0] - 1,
-            currentNode.pos[1] - 1
-          );
-          node.factor = 1.414213562;
-          result.push(node);
-          
-          node = this._getNode(
-            currentNode.pos[0] - 1,
-            currentNode.pos[1] + 1
-          );
-          node.factor = 1.414213562;
-          result.push(node);
-        }
+      constructor(grid: Grid) {
+        this._grid = grid;
+        this._grid._graph = this;
       }
 
       /**
@@ -709,19 +627,24 @@ namespace gdjs {
         } else {
           newNode = new Node(this, xPos, yPos);
         }
-        const nodeCenter = newNode.center;
-        nodeCenter[0] = xPos * this._cellWidth;
-        nodeCenter[1] = yPos * this._cellHeight;
-        this._basisTransformation.toScreen(nodeCenter);
-        newNode.center = nodeCenter;
-        
-        newNode.cost = this._nodeEvaluator.evaluateNode(newNode);
 
         //Default cost when no objects put on the cell.
         this._allNodes[xPos][yPos] = newNode;
         return newNode;
       }
-
+      
+      getNeighbors(currentNode: Node, result: Node[]) {
+        this._grid.getNeighbors(currentNode, result);
+      }
+      
+      getCellIndex(position: FloatPoint, index?: FloatPoint) {
+        this._grid.getCellIndex(position, index);
+      }
+      
+      getCellCenter(index: FloatPoint, position?: FloatPoint) {
+        this._grid.getCellCenter(index, position);
+      }
+      
       _freeAllNodes() {
         if (this._nodeCache.length <= 32000) {
           for (const i in this._allNodes) {
@@ -738,6 +661,75 @@ namespace gdjs {
         this._allNodes = [];
       }
     }
+    
+    export class Grid {
+      static _withoutDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      static _withDiagonalsDeltas: FloatPoint[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, -1], [-1, 1]];
+      
+      _graph: GridGraph | null = null;
+      _allowDiagonals: boolean = true;
+      _offsetX: float = 0;
+      _offsetY: float = 0;
+      _cellWidth: float = 20;
+      _cellHeight: float = 20;
+      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
+      
+      setBasisTransformation(basisTransformation: PathfindingRuntimeBehavior.BasisTransformation) {
+        this._basisTransformation = basisTransformation;
+      }
+      
+      setCellSize(
+        cellWidth: float,
+        cellHeight: float
+      ) {
+        this._cellWidth = cellWidth;
+        this._cellHeight = cellHeight;
+      }
+
+      setOffset(
+        offsetX: float,
+        offsetY: float
+      ) {
+        this._offsetX = offsetX;
+        this._offsetY = offsetY;
+      }
+
+      getCellIndex(position: FloatPoint, index?: FloatPoint) {
+        if (!index) {
+          index = position;
+        }
+        position[0] -= this._offsetX;
+        position[1] -= this._offsetY;
+        this._basisTransformation.toWorld(position, index);
+        index[0] = Math.round(index[0] / this._cellWidth);
+        index[1] = Math.round(index[1] / this._cellHeight);
+      }
+      
+      getCellCenter(index: FloatPoint, position?: FloatPoint) {
+        if (!position) {
+          position = index;
+        }
+        position[0] = index[0] * this._cellWidth;
+        position[1] = index[1] * this._cellHeight;
+        this._basisTransformation.toScreen(position);
+        position[0] += this._offsetX;
+        position[1] += this._offsetY;
+      }
+
+      getNeighbors(currentNode: Node, result: Node[]) {
+        const deltas: FloatPoint[] = this._allowDiagonals ? Grid._withDiagonalsDeltas
+                                                          : Grid._withoutDiagonalsDeltas;
+        for (const delta of deltas) {
+          let node = this._graph!._getNode(
+            currentNode.pos[0] + delta[0],
+            currentNode.pos[1] + delta[1]
+          );
+          node.factor = 1;
+          this.getCellCenter(node.pos, node.center);
+          result.push(node);
+        }
+      }
+    }
 
     /**
      * Internal tool class containing the structures used by A* and members functions related
@@ -746,7 +738,7 @@ namespace gdjs {
      */
     export class AStarPathFinder {
       _graph: GridGraph;
-      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
+      _nodeEvaluator: NodeEvaluator;
       _finalNode: Node | null = null;
       _destination: FloatPoint = [0, 0];
       _start: FloatPoint = [0, 0];
@@ -762,8 +754,10 @@ namespace gdjs {
       _openNodes: Node[] = [];
       _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
 
-      constructor(graph: GridGraph) {
+      constructor(graph: GridGraph, nodeEvaluator: NodeEvaluator) {
         this._graph = graph;
+        this._nodeEvaluator = nodeEvaluator;
+        this._nodeEvaluator._graph = graph;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
 
         //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
@@ -777,7 +771,7 @@ namespace gdjs {
       }
 
       allowDiagonals(allowDiagonals: boolean) {
-        this._graph._allowDiagonals = allowDiagonals;
+        this._graph._grid._allowDiagonals = allowDiagonals;
         this._distanceFunction = allowDiagonals
           ? PathfindingRuntimeBehavior.euclideanDistance
           : PathfindingRuntimeBehavior.manhattanDistance;
@@ -792,30 +786,20 @@ namespace gdjs {
         this._startY = y;
         return this;
       }
-      
-      setBasisTransformation(basisTransformation: PathfindingRuntimeBehavior.BasisTransformation): PathfindingRuntimeBehavior.AStarPathFinder {
-        this._basisTransformation = basisTransformation;
-        this._graph._basisTransformation = basisTransformation;
-        return this;
-      }
 
       computePathTo(targetX: float, targetY: float) {
-        if (this._graph._nodeEvaluator._obstacles === null) {
+        if (this._nodeEvaluator._obstacles === null) {
           console.log(
             'You tried to compute a path without specifying the obstacles'
           );
           return;
         }
-        this._destination[0] = targetX - this._graph._gridOffsetX;
-        this._destination[1] = targetY - this._graph._gridOffsetY;
-        this._basisTransformation.toWorld(this._destination);
-        this._destination[0] = Math.round(this._destination[0] / this._graph._cellWidth);
-        this._destination[1] = Math.round(this._destination[1] / this._graph._cellHeight);
-        this._start[0] = this._startX - this._graph._gridOffsetX;
-        this._start[1] = this._startY - this._graph._gridOffsetY;
-        this._basisTransformation.toWorld(this._start);
-        this._start[0] = Math.round(this._start[0] / this._graph._cellWidth);
-        this._start[1] = Math.round(this._start[1] / this._graph._cellHeight);
+        this._destination[0] = targetX;
+        this._destination[1] = targetY;
+        this._graph.getCellIndex(this._destination);
+        this._start[0] = this._startX;
+        this._start[1] = this._startY;
+        this._graph.getCellIndex(this._start);
 
         //Initialize the algorithm
         this._graph._freeAllNodes();
@@ -869,6 +853,7 @@ namespace gdjs {
         currentNode: Node
       ) {
         for (const neighbor of neighbors) {
+          neighbor.cost = this._nodeEvaluator.evaluateNode(neighbor);
           //console.debug(`Add (${neighbor.pos[0]}, ${neighbor.pos[1]}) to open nodes?`);
 
           //cost < 0 means impassable obstacle
@@ -925,7 +910,7 @@ namespace gdjs {
     }
     
     export class NodeEvaluator {
-      _graph: GridGraph | null = null;
+      _graph: GridGraph;
       _obstacles: PathfindingObstaclesManager;
       _collisionMethod: integer = PathfindingRuntimeBehavior.AABB_COLLISION;
       _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
@@ -940,7 +925,8 @@ namespace gdjs {
       _objectHitboxes: Polygon[] = [];
       _stampHitboxes: Polygon[] = [];
       
-      constructor(obstacles: PathfindingObstaclesManager) {
+      constructor(graph: GridGraph, obstacles: PathfindingObstaclesManager) {
+        this._graph = graph;
         this._obstacles = obstacles;
 
         //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
@@ -974,13 +960,16 @@ namespace gdjs {
         const yPos = node.pos[1];
         const nodeCenter = node.center;
         
-        const cellWidth = this._graph!._cellWidth;
-        const cellHeight = this._graph!._cellHeight;
 
         //...and update its cost according to obstacles
         let objectsOnCell = false;
         
         if (this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION) {
+          // An evaluator should not depend on grid precision
+          // this smell bad but well it's deprecated, no need to make it right
+          const cellWidth = this._graph!._grid!._cellWidth;
+          const cellHeight = this._graph!._grid!._cellHeight;
+        
           const radius =
             cellHeight > cellWidth
               ? cellHeight * 2
@@ -999,13 +988,16 @@ namespace gdjs {
             this._aabb.max[1] = nodeCenter[1] + this._bottomBorder;
             this._obstacles.getAllObstaclesAroundAABB(this._aabb, this._closeObstacles);
         }
-        //console.debug(`Evaluate (${xPos}, ${yPos}) ${this._closeObstacles.length} obstacles`);
+        //console.debug(`Evaluate (${xPos}, ${yPos}) center:${node.center} ${this._closeObstacles.length} obstacles`);
         
         let cost: float = 0;
         for (let k = 0; k < this._closeObstacles.length; ++k) {
           const obj = this._closeObstacles[k].owner;
           
           if (this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION) {
+          const cellWidth = this._graph!._grid!._cellWidth;
+          const cellHeight = this._graph!._grid!._cellHeight;
+          
           const topLeftCellX = Math.floor(
             (obj.getDrawableX() - this._rightBorder) / cellWidth
           );

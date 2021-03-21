@@ -19,7 +19,6 @@ module.exports = function(config) {
       '../Runtime-dist/jsonmanager.js',
       '../Runtime-dist/timemanager.js',
       '../Runtime-dist/timemanager.js',
-      '../Runtime-dist/bitmapfontmanager.js',
       '../Runtime-dist/runtimeobject.js',
       '../Runtime-dist/runtimescene.js',
       '../Runtime-dist/scenestack.js',

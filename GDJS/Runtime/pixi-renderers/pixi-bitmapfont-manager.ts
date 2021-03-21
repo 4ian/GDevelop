@@ -31,11 +31,11 @@ namespace gdjs {
   };
 
   /**
-   * BitmapFontManager loads fnt/xml files (using `fetch`), from the "bitmapFont" resources of the game.
+   * PixiBitmapFontManager loads fnt/xml files (using `fetch`), from the "bitmapFont" resources of the game.
    *
-   * It installs the "Bitmap Font" with PixiJS to be used with PIXI.BitmapText.
+   * It installs the "BitmapFont" with PixiJS to be used with PIXI.BitmapText.
    */
-  export class BitmapFontManager {
+  export class PixiBitmapFontManager {
     private _resources: ResourceData[];
     private _imageManager: gdjs.PixiImageManager;
 
@@ -195,9 +195,6 @@ namespace gdjs {
      * for it.
      * The font is register and should be released with `releaseBitmapFont` - so that it can be removed
      * from memory when unused.
-     *
-     * @param bitmapFontResourceName
-     * @param textureAtlasResourceName
      */
     obtainBitmapFont(
       bitmapFontResourceName: string,
@@ -249,6 +246,10 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Load the "bitmapFont" resources of the game, so that they are ready
+     * to be used when `obtainBitmapFont` is called.
+     */
     loadBitmapFontData(
       onProgress: (count: integer, total: integer) => void
     ): Promise<void[]> {
@@ -283,4 +284,8 @@ namespace gdjs {
       );
     }
   }
+
+  // Register the class to let the engine use it.
+  export const BitmapFontManager = gdjs.PixiBitmapFontManager;
+  export type BitmapFontManager = gdjs.PixiBitmapFontManager;
 }

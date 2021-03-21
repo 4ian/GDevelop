@@ -47,7 +47,9 @@ namespace gdjs {
         if (texture.valid) {
           return texture;
         } else {
-          console.error("Texture for " + resourceName + " is not valid anymore.");
+          console.error(
+            'Texture for ' + resourceName + ' is not valid anymore.'
+          );
         }
       }
       if (resourceName === '') {

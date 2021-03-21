@@ -184,7 +184,8 @@ namespace gdjs {
           // PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
           console.log(
             'Should uninstall BitmapFont ' +
-              oldestUnloadedPixiBitmapFontName + 'from memory - but not doing it.'
+              oldestUnloadedPixiBitmapFontName +
+              'from memory - but not doing it.'
           );
         }
       }

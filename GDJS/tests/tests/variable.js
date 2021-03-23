@@ -188,4 +188,37 @@ describe('gdjs.Variable', function () {
       'String with quotes "", and a backslash \\ and new line \\n \\n\\r and brackets {[{}]}!'
     );
   });
+  it('exposes a badVariable that is neutral for all operations', function () {
+    expect(gdjs.VariablesContainer.badVariable.getValue()).to.be(0);
+
+    expect(gdjs.VariablesContainer.badVariable.getAsNumber()).to.be(0);
+    gdjs.VariablesContainer.badVariable.setBoolean(true);
+    expect(gdjs.VariablesContainer.badVariable.getAsBoolean()).to.be(false);
+    gdjs.VariablesContainer.badVariable.setString('123');
+    expect(gdjs.VariablesContainer.badVariable.getAsString()).to.be('0');
+    expect(gdjs.VariablesContainer.badVariable.getType()).to.be('number');
+    expect(gdjs.VariablesContainer.badVariable.getChild('')).to.be(
+      gdjs.VariablesContainer.badVariable
+    );
+    expect(gdjs.VariablesContainer.badVariable.getChildAt(0)).to.be(
+      gdjs.VariablesContainer.badVariable
+    );
+    expect(gdjs.VariablesContainer.badVariable.getChildrenCount()).to.be(0);
+    expect(gdjs.VariablesContainer.badVariable.isUndefinedInContainer()).to.be(
+      true
+    );
+    gdjs.VariablesContainer.badVariable.add(1);
+    gdjs.VariablesContainer.badVariable.mul(2);
+    gdjs.VariablesContainer.badVariable.div(1);
+    gdjs.VariablesContainer.badVariable.sub(-1);
+    expect(gdjs.VariablesContainer.badVariable.getValue()).to.be(0);
+    gdjs.VariablesContainer.badVariable.clearChildren();
+    gdjs.VariablesContainer.badVariable.reinitialize();
+    gdjs.VariablesContainer.badVariable.replaceChildren({});
+    gdjs.VariablesContainer.badVariable.replaceChildrenArray([]);
+    gdjs.VariablesContainer.badVariable.castTo('string');
+    gdjs.VariablesContainer.badVariable.castTo('boolean');
+    expect(gdjs.VariablesContainer.badVariable.getType()).to.be('number');
+    expect(gdjs.VariablesContainer.badVariable.getValue()).to.be(0);
+  });
 });

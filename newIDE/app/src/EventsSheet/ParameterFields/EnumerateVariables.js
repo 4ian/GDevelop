@@ -4,6 +4,10 @@ import { mapFor } from '../../Utils/MapFor';
 import flatMap from 'lodash/flatMap';
 const gd: libGDevelop = global.gd;
 
+// Note that in theory we could have this function inside gd.ExpressionParser2,
+// to be sure it's following perfectly the grammar of the expression parser. In
+// practice, the disallowed characters are not changing often, so it's fine to have
+// them here.
 const isValidIdentifier = (variableName: string) => {
   const identifierDisallowedCharacters = ',."()[]{}()[],+-<>?^=:!+-/* \'';
 

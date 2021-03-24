@@ -183,12 +183,17 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["VariableChildCount"]
       .SetFunctionName("gdjs.RuntimeObject.getVariableChildCount")
       .SetStatic();
-  objectExpressions["ForceX"].SetFunctionName("getAverageForce().getX");
-  objectExpressions["ForceY"].SetFunctionName("getAverageForce().getY");
-  objectExpressions["ForceAngle"].SetFunctionName("getAverageForce().getAngle");
+  objectExpressions["VelocityX"].SetFunctionName("getAverageForce().getX");
+  objectExpressions["ForceX"].SetFunctionName("getAverageForce().getX"); // Deprecated
+  objectExpressions["VelocityY"].SetFunctionName("getAverageForce().getY");
+  objectExpressions["ForceY"].SetFunctionName("getAverageForce().getY"); // Deprecated
+  objectExpressions["VelocityAngle"].SetFunctionName("getAverageForce().getAngle");
+  objectExpressions["ForceAngle"].SetFunctionName("getAverageForce().getAngle"); // Deprecated
   objectExpressions["Angle"].SetFunctionName("getAngle");
-  objectExpressions["ForceLength"].SetFunctionName(
+  objectExpressions["VelocityLength"].SetFunctionName(
       "getAverageForce().getLength");
+  objectExpressions["ForceLength"].SetFunctionName(
+      "getAverageForce().getLength"); // Deprecated
   objectExpressions["Longueur"].SetFunctionName(
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");

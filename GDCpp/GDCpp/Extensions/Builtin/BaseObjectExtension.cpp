@@ -116,10 +116,14 @@ BaseObjectExtension::BaseObjectExtension() {
 
   objectExpressions["X"].SetFunctionName("GetX");
   objectExpressions["Y"].SetFunctionName("GetY");
+  objectExpressions["VelocityX"].SetFunctionName("TotalForceX");
   objectExpressions["ForceX"].SetFunctionName("TotalForceX");
+  objectExpressions["VelocityY"].SetFunctionName("TotalForceY");
   objectExpressions["ForceY"].SetFunctionName("TotalForceY");
+  objectExpressions["VelocityAngle"].SetFunctionName("TotalForceAngle");
   objectExpressions["ForceAngle"].SetFunctionName("TotalForceAngle");
   objectExpressions["Angle"].SetFunctionName("GetAngle");
+  objectExpressions["VelocityLength"].SetFunctionName("TotalForceLength");
   objectExpressions["ForceLength"].SetFunctionName("TotalForceLength");
   objectExpressions["Longueur"].SetFunctionName("TotalForceLength");
   objectExpressions["Width"].SetFunctionName("GetWidth");

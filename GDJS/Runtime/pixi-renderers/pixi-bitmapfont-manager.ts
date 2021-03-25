@@ -181,7 +181,7 @@ namespace gdjs {
           // textures to be all already loaded). You can see the problem by deleting all the BitmapText object using
           // a texture and creating a new one.
           //
-          // PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
+          PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
           console.log(
             'Should uninstall BitmapFont ' +
               oldestUnloadedPixiBitmapFontName +

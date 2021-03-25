@@ -71,7 +71,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridWidth}
               onChange={(e, value) =>
-                this.setState({ gridWidth: parseFloat(value, 10) })
+                this.setState({ gridWidth: parseFloat(value) })
               }
             />
             <TextField
@@ -80,7 +80,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridHeight}
               onChange={(e, value) =>
-                this.setState({ gridHeight: parseFloat(value, 10) })
+                this.setState({ gridHeight: parseFloat(value) })
               }
             />
           </ResponsiveLineStackLayout>
@@ -91,7 +91,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridOffsetX}
               onChange={(e, value) =>
-                this.setState({ gridOffsetX: parseFloat(value, 10) })
+                this.setState({ gridOffsetX: parseFloat(value) })
               }
             />
             <TextField
@@ -100,7 +100,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridOffsetY}
               onChange={(e, value) =>
-                this.setState({ gridOffsetY: parseFloat(value, 10) })
+                this.setState({ gridOffsetY: parseFloat(value) })
               }
             />
           </ResponsiveLineStackLayout>

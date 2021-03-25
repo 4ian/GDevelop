@@ -11,15 +11,22 @@ export const roundPosition = (
   if (gridType === 'isometric') {
     if (gridWidth <= 0 || gridHeight <= 0) {
       pos[0] = Math.round(pos[0]);
-      pos[1] = Math.round([1]);
+      pos[1] = Math.round(pos[1]);
       return;
     }
     // Why do we need this?
-    // Take a 2x2 squares, put a diamond inside each square, there is a 5th diamond in the center
+    // Take a 2x2 squares, put a diamond inside each square,
+    // there is a 5th diamond in the center
+    // So, half cells are needed, but some are not to be used.
+    // It makes a pattern in diagonal like this:
+    // o-o-o-
+    // -o-o-o
+    // o-o-o-
     let cellX = Math.round(((pos[0] - gridOffsetX) * 2) / gridWidth);
     let cellY = Math.round(((pos[1] - gridOffsetY) * 2) / gridHeight);
 
     if ((((cellX + cellY) % 2) + 2) % 2 == 1) {
+      // This cell should not be used, find the nearest one
       const deltaX =
         (pos[0] - ((cellX / 2) * gridWidth + gridOffsetX)) / gridWidth;
       const deltaY =
@@ -39,6 +46,7 @@ export const roundPosition = (
         }
       }
     }
+    // magnet to the half cell
     pos[0] = (cellX / 2) * gridWidth + gridOffsetX;
     pos[1] = (cellY / 2) * gridHeight + gridOffsetY;
   } else {
@@ -51,7 +59,7 @@ export const roundPosition = (
     }
 
     if (gridHeight <= 0) {
-      pos[1] = Math.round([1]);
+      pos[1] = Math.round(pos[1]);
     } else {
       pos[1] =
         Math.floor((pos[1] - gridOffsetY) / gridHeight) * gridHeight +

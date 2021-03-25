@@ -167,7 +167,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceXY",
-         _("Add a velocity"),
+         _("Add a velocity ("force")"),
          _("Add a velocity to an object. The object will move according to "
            "all of the velocities added to it."),
          _("Add to _PARAM0_ _PARAM3_ velocity of _PARAM1_ p/s on X axis and "
@@ -182,7 +182,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("forceMultiplier", _("Force multiplier"));
 
   obj.AddAction("AddForceAL",
-                _("Add a velocity (angle)"),
+                _("Add a velocity ("force") with an angle"),
                 _("Add a velocity to an object. The object will move according to "
                   "all of the velocities added to it. This action creates the velocity "
                   "using the specified angle and length."),
@@ -200,7 +200,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceVersPos",
-         _("Add a velocity to move toward a position"),
+         _("Add a velocity ("force") to move toward a position"),
          _("Add a velocity to an object to make it move toward a position."),
          _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ velocity of _PARAM3_ "
            "pixels"),
@@ -634,8 +634,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceVers",
-         _("Add a force to move toward an object"),
-         _("Add a force to an object to make it move toward another."),
+         _("Add a velocity ("force") to move toward an object"),
+         _("Add a velocity to an object to make it move toward another."),
          _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
          _("Movement"),
          "res/actions/forceVers24.png",
@@ -649,7 +649,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceTourne",
-         _("Add a velocity to move around an object"),
+         _("Add a velocity ("force") to move around an object"),
          _("Add a velocity to an object to make it rotate around another.\nNote "
            "that the movement is not precise, especially if the speed is "
            "high.\nTo position an object around a position more precisely, use "

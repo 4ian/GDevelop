@@ -184,9 +184,22 @@ namespace gdjs {
       return this._renderer.getFontSize();
     }
 
+    setBitmapFontAndTextureAtlasResourceName(
+      bitmapFontResourceName: string,
+      textureAtlasResourceName: string
+    ): void {
+      if (bitmapFontResourceName) {
+        this.setBitmapFontResourceName(bitmapFontResourceName);
+        this._renderer.updateFont();
+      }
+      if (textureAtlasResourceName) {
+        this.setTextureAtlasResourceName(textureAtlasResourceName);
+        this._renderer.updateFont();
+      }
+    }
+
     setBitmapFontResourceName(bitmapFontResourceName: string): void {
       this._bitmapFontResourceName = bitmapFontResourceName;
-      this._renderer.updateFont();
     }
 
     getBitmapFontResourceName(): string {
@@ -195,7 +208,6 @@ namespace gdjs {
 
     setTextureAtlasResourceName(textureAtlasResourceName: string): void {
       this._textureAtlasResourceName = textureAtlasResourceName;
-      this._renderer.updateFont();
     }
 
     getTextureAtlasResourceName(): string {
@@ -283,14 +295,14 @@ namespace gdjs {
      * Get the width of the object.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._renderer.getWidth() * this.getScale();
     }
 
     /**
      * Get the height of the object.
      */
     getHeight(): float {
-      return this._renderer.getHeight();
+      return this._renderer.getHeight() * this.getScale();
     }
   }
   gdjs.registerObject(

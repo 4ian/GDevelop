@@ -254,14 +254,16 @@ module.exports = {
 
     object
       .addAction(
-        'SetBitmapFontResourceName',
-        _('Bitmap Font'),
-        _('Change the Bitmap Font of the object.') +
+        'SetBitmapFontAndTextureAtlasResourceName',
+        _('Bitmap files resources'),
+        _('Change the Bitmap Font and/or the atlas image used by the object.') +
           ' ' +
           _(
             'The resource name can be found in: `Project Manager > Game settings > Resources`.'
           ),
-        _('Set the bitmap font of _PARAM0_ to _PARAM1_'),
+        _(
+          'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
+        ),
         '',
         'res/actions/font24.png',
         'res/actions/font.png'
@@ -271,30 +273,12 @@ module.exports = {
       .setParameterLongDescription(
         'The resource name of the font file, without quotes.'
       )
-      .getCodeExtraInformation()
-      .setFunctionName('setBitmapFontResourceName');
-
-    object
-      .addAction(
-        'SetTextureAtlasResourceName',
-        _('Bitmap Font Atlas'),
-        _('Change the atlas image used by the object.') +
-          ' ' +
-          _(
-            'The resource name can be found in: `Project Manager > Game settings > Resources`.'
-          ),
-        _('Set the atlas of _PARAM0_ to _PARAM1_'),
-        '',
-        'res/actions/font24.png',
-        'res/actions/font.png'
-      )
-      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('string', _('Texture atlas resource name'), '', false)
       .setParameterLongDescription(
         'The resource name of the image exported with the font, with quotes.'
       )
       .getCodeExtraInformation()
-      .setFunctionName('setTextureAtlasResourceName');
+      .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
     object
       .addExpressionAndCondition(
@@ -583,7 +567,11 @@ module.exports = {
         // This will crash if there is any other object using this base texture (like a Sprite).
 
         // PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        console.info("Should uninstall BitmapFont " + bitmapFontInstallKey + " - but not doing it.");
+        console.info(
+          'Should uninstall BitmapFont ' +
+            bitmapFontInstallKey +
+            ' - but not doing it.'
+        );
       }
     };
 

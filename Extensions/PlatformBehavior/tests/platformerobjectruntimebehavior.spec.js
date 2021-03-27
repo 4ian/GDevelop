@@ -471,6 +471,35 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(-30);
     });
 
+    it.only('should not jump after falling from a platform', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      // So at this point, the object could jump
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Fell from the platform
+      for (let i = 0; i < 35; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Try to jump
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
     it('should not grab a platform while in the ascending phase of a jump', function () {
       const topPlatform = addPlatformObject(runtimeScene);
       topPlatform.setPosition(12, -80);

@@ -1,4 +1,15 @@
 module.exports = function(config) {
+  const testFiles = [
+    '../../Extensions/**/tests/**.spec.js',
+    './tests/**/*.js',
+  ];
+
+  const benchmarkFiles = [
+    './benchmarks/init.js',
+    '../../Extensions/**/benchmark/**.benchmark.js',
+    './benchmarks/**/*.js',
+  ];
+
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
@@ -63,15 +74,12 @@ module.exports = function(config) {
 
       //All tests files:
       './tests-utils/init.pixiruntimegamewithassets.js',
-      '../../Extensions/**/tests/**.spec.js',
-      './tests/**/*.js',
-
-      //All benchmark files:
-      './benchmarks/init.js',
-      './benchmarks/**/*.js',
 
       // Assets
-      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false}
+      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false},
+
+      ...testFiles,
+      ...(config.enableBenchmarks ? benchmarkFiles : [])
     ]
   });
 };

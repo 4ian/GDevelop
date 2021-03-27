@@ -239,7 +239,7 @@ namespace gdjs {
       },
       setValue: () => {},
       getValue: () => 0,
-      getChild:  ()  => gdjs.VariablesContainer.badVariable,
+      getChild: () => gdjs.VariablesContainer.badVariable,
       getChildAt: () => gdjs.VariablesContainer.badVariable,
       hasChild: function () {
         return false;

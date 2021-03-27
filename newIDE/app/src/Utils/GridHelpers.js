@@ -25,7 +25,7 @@ export const roundPosition = (
     let cellX = Math.round(((pos[0] - gridOffsetX) * 2) / gridWidth);
     let cellY = Math.round(((pos[1] - gridOffsetY) * 2) / gridHeight);
 
-    if ((((cellX + cellY) % 2) + 2) % 2 == 1) {
+    if ((((cellX + cellY) % 2) + 2) % 2 === 1) {
       // This cell should not be used, find the nearest one
       const deltaX =
         (pos[0] - ((cellX / 2) * gridWidth + gridOffsetX)) / gridWidth;

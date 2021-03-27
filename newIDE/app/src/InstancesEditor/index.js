@@ -158,7 +158,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.pixiRenderer.view.onwheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomBy(-event.deltaY / 5000);
+        this.zoomOnMouseBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         this.viewPosition.scrollBy(-event.deltaY / 10, 0);
       } else {
@@ -455,6 +455,16 @@ export default class InstancesEditor extends Component<Props> {
 
   zoomBy(value: number) {
     this.setZoomFactor(this.getZoomFactor() + value);
+  }
+
+  zoomOnMouseBy(value: number) {
+    const beforeZoomCursor = this.getLastCursorSceneCoordinates();
+    this.setZoomFactor(this.getZoomFactor() + value);
+    const afterZoomCursor = this.getLastCursorSceneCoordinates();
+    this.viewPosition.scrollBy(beforeZoomCursor[0] - afterZoomCursor[0], beforeZoomCursor[1] - afterZoomCursor[1]);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   getZoomFactor = () => {

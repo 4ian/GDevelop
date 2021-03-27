@@ -6,7 +6,7 @@ export const roundPosition = (
   gridHeight: number,
   gridOffsetX: number,
   gridOffsetY: number,
-  gridType: number
+  gridType: string
 ) => {
   if (gridType === 'isometric') {
     if (gridWidth <= 0 || gridHeight <= 0) {

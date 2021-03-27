@@ -12,9 +12,12 @@ npm install
 Then launch tests:
 
 ```bash
-npm test #This will use Chrome Headless
-npm test:firefox #To run tests using Firefox
+npm run test:watch # This will use Chrome Headless
+npm run test-benchmark:watch # This will also run benchmarks
+npm run test:firefox:watch # To run tests using Firefox
 ```
+
+> ⚠️ If you're working on GDJS or extensions, make sure to have the development version of GDevelop running so that changes in GDJS or extension files are rebuilt (or run `npm run build` in `GDJS/`, but better run GDevelop so that any changes are watched).
 
 ## About the tests
 

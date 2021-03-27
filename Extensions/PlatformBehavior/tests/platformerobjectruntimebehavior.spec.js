@@ -471,7 +471,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(-30);
     });
 
-    it.only('should not jump after falling from a platform', function () {
+    it('should not jump after falling from a platform', function () {
       // Ensure the object falls on the platform
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);

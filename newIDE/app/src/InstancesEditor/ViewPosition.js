@@ -48,8 +48,8 @@ export default class ViewPosition {
   toSceneCoordinates = (x: number, y: number): [number, number] => {
     x -= this._width / 2;
     y -= this._height / 2;
-    x /= Math.abs(this._pixiContainer.scale.x);
-    y /= Math.abs(this._pixiContainer.scale.y);
+    x /= Math.abs(this.options.zoomFactor);
+    y /= Math.abs(this.options.zoomFactor);
 
     var viewRotation = 0;
     var tmp = x;
@@ -80,8 +80,8 @@ export default class ViewPosition {
       Math.sin((viewRotation / 180) * Math.PI) * tmp +
       Math.cos((viewRotation / 180) * Math.PI) * y;
 
-    x *= Math.abs(this._pixiContainer.scale.x);
-    y *= Math.abs(this._pixiContainer.scale.y);
+    x *= Math.abs(this.options.zoomFactor);
+    y *= Math.abs(this.options.zoomFactor);
 
     return [x + this._width / 2, y + this._height / 2];
   };

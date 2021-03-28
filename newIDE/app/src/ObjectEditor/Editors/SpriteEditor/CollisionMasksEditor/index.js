@@ -17,6 +17,8 @@ import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
 const gd: libGDevelop = global.gd;
 
+// Blank comment: will remove later
+
 export default class CollisionMasksEditor extends Component {
   state = {
     animationIndex: 0,

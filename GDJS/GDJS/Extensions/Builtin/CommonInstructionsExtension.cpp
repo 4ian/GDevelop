@@ -347,11 +347,22 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       [](gd::BaseEvent& event_,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& parentContext) {
-        gd::String outputCode;
         gd::WhileEvent& event = dynamic_cast<gd::WhileEvent&>(event_);
 
-        // Context is "reset" each time the event is repeated (i.e. objects are
-        // picked again)
+        // Prevent code generation if the event is empty, as this would
+        // get the game stuck in a never ending loop.
+        if (
+          event.GetWhileConditions().empty() && 
+          event.GetConditions().empty() && 
+          event.GetActions().empty()
+        )
+          return gd::String(
+              "\n// While event not generated to prevent an infinite loop.\n");
+       
+        gd::String outputCode;
+
+        // Context is "reset" each time the event is repeated (i.e. objects
+        // are picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
@@ -459,10 +470,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Define references to variables (if they exist)
         if (keyIteratorExists)
           outputCode +=
-              "const $KEY_ITERATOR_REFERENCE = $KEY_ITERATOR_VARIABLE_ACCESSOR;\n";
+              "const $KEY_ITERATOR_REFERENCE = "
+              "$KEY_ITERATOR_VARIABLE_ACCESSOR;\n";
         if (valueIteratorExists)
           outputCode +=
-              "const $VALUE_ITERATOR_REFERENCE = $VALUE_ITERATOR_VARIABLE_ACCESSOR;\n";
+              "const $VALUE_ITERATOR_REFERENCE = "
+              "$VALUE_ITERATOR_VARIABLE_ACCESSOR;\n";
         outputCode +=
             "const $ITERABLE_REFERENCE = $ITERABLE_VARIABLE_ACCESSOR;\n";
 

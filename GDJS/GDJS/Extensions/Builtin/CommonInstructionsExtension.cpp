@@ -349,11 +349,15 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerationContext& parentContext) {
         gd::WhileEvent& event = dynamic_cast<gd::WhileEvent&>(event_);
 
-        // Prevent code generation if there are no conditions, as this would
+        // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (event.GetWhileConditions().empty())
+        if (
+          event.GetWhileConditions().empty() && 
+          event.GetConditions().empty() && 
+          event.GetActions().empty()
+        )
           return gd::String(
-              "\n// While event not generated to prevent a crash\n");
+              "\n// While event not generated to prevent an infinite loop.\n");
        
         gd::String outputCode;
 

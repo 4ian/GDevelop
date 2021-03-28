@@ -1357,7 +1357,9 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter() {}
+    enter() {
+      this._behavior._canJump = false;
+    }
 
     leave() {}
 

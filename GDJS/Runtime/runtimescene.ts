@@ -82,20 +82,22 @@ namespace gdjs {
      * Activate or deactivate the debug visualization for collisions and points.
      * @memberof gdjs.RuntimeScene
      */
-    renderCollisionsAndPoints(
+    renderDebugDraw(
       enableDebugDrawRenderedObjects: boolean,
       showHiddenInstances: boolean,
-      showCustomPoints: boolean,
-      showPointsNames: boolean
+      showPointsNames: boolean,
+      showCustomPoints: boolean
     ): void {
       if (enableDebugDrawRenderedObjects && this._layersCameraCoordinates) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
           this._layersCameraCoordinates,
           showHiddenInstances,
-          showCustomPoints,
-          showPointsNames
+          showPointsNames,
+          showCustomPoints
         );
+      } else {
+        this.getRenderer().clearDebugDraw();
       }
     }
 

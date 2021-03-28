@@ -17,18 +17,18 @@ namespace gdjs {
        * Draw collisions hitboxes and points
        * @param runtimeScene - The current scene.
        */
-      export const drawCollisionsAndPoints = function (
+      export const enableDebugDraw = function (
         runtimeScene: gdjs.RuntimeScene,
+        enableDebugDrawRenderedObjects: boolean,
         showHiddenInstances: boolean,
-        showCustomPoints: boolean,
         showPointsNames: boolean,
-        enableDebugDrawRenderedObjects: boolean
+        showCustomPoints: boolean
       ) {
-        runtimeScene.renderCollisionsAndPoints(
+        runtimeScene.renderDebugDraw(
           enableDebugDrawRenderedObjects,
           showHiddenInstances,
-          showCustomPoints,
-          showPointsNames
+          showPointsNames,
+          showCustomPoints
         );
       };
     }

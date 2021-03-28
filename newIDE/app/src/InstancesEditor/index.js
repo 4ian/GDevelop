@@ -158,7 +158,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.pixiRenderer.view.onwheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomOnMouseBy(-event.deltaY / 5000);
+        this.zoomOnCursorBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         this.viewPosition.scrollBy(-event.deltaY / 10, 0);
       } else {
@@ -457,11 +457,18 @@ export default class InstancesEditor extends Component<Props> {
     this.setZoomFactor(this.getZoomFactor() + value);
   }
 
-  zoomOnMouseBy(value: number) {
-    const beforeZoomCursor = this.getLastCursorSceneCoordinates();
+  /**
+   * Zoom and scroll so that the cursor stays on the same position scene-wise.
+   */
+  zoomOnCursorBy(value: number) {
+    const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
     this.setZoomFactor(this.getZoomFactor() + value);
-    const afterZoomCursor = this.getLastCursorSceneCoordinates();
-    this.viewPosition.scrollBy(beforeZoomCursor[0] - afterZoomCursor[0], beforeZoomCursor[1] - afterZoomCursor[1]);
+    const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
+    // Compensate for the cursor change in position
+    this.viewPosition.scrollBy(
+      beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
+      beforeZoomCursorPosition[1] - afterZoomCursorPosition[1]
+    );
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
     }

@@ -30,7 +30,7 @@ namespace gdjs {
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
-      this._debugDraw = new PIXI.Graphics();
+      this._debugDraw = null;
     }
 
     onGameResolutionResized() {
@@ -91,10 +91,12 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
-      if (!this._debugDraw) this._debugDraw = new PIXI.Graphics();
+      if (!this._debugDraw) {
+        this._debugDraw = new PIXI.Graphics();
 
-      // Add on top of all layers:
-      this._pixiContainer.addChild(this._debugDraw);
+        // Add on top of all layers:
+        this._pixiContainer.addChild(this._debugDraw);
+      }
 
       // Activate here what you want to be displayed:
       const displayAABB = true;

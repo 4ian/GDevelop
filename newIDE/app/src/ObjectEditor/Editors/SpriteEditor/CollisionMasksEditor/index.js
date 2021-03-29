@@ -178,6 +178,12 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
+  const containerStyle = {
+    // Fixed height is required for large screens, otherwise
+    // EditorMosaic collapses to zero height
+    height: screenSize === 'small' ? '100%' : 750,
+  };
+
   if (!props.object.getAnimationsCount()) return null;
 
   const editors: { [string]: Editor } = {
@@ -185,26 +191,24 @@ const CollisionMasksEditor = (props: Props) => {
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <div style={{ display: 'flex' }}>
-          <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
-            project={props.project}
-            onSize={setCurrentSpriteSize}
-            renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
-              hasValidSprite && (
-                <CollisionMasksPreview
-                  imageWidth={imageWidth}
-                  imageHeight={imageHeight}
-                  imageZoomFactor={imageZoomFactor}
-                  isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
-                  polygons={sprite.getCustomCollisionMask()}
-                  onPolygonsUpdated={updateCollisionMasks}
-                />
-              )
-            }
-          />
-        </div>
+        <ImagePreview
+          resourceName={hasValidSprite ? sprite.getImageName() : ''}
+          resourcesLoader={props.resourcesLoader}
+          project={props.project}
+          onSize={setCurrentSpriteSize}
+          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+            hasValidSprite && (
+              <CollisionMasksPreview
+                imageWidth={imageWidth}
+                imageHeight={imageHeight}
+                imageZoomFactor={imageZoomFactor}
+                isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                polygons={sprite.getCustomCollisionMask()}
+                onPolygonsUpdated={updateCollisionMasks}
+              />
+            )
+          }
+        />
       ),
     },
     properties: {
@@ -284,7 +288,7 @@ const CollisionMasksEditor = (props: Props) => {
   };
 
   return (
-    <div style={{ height: 750 }}>
+    <div style={containerStyle}>
       <EditorMosaic editors={editors} initialNodes={editorNodes} />
     </div>
   );

@@ -73,6 +73,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
+    setDissmissablePanelBackdropClick: this._setDissmissablePanelBackdropClick.bind(this),
   };
 
   componentDidMount() {
@@ -500,6 +501,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           isMenuBarHiddenInPreview: enabled,
         },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDissmissablePanelBackdropClick(
+    useDissmissablePanelBackdropClick: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, useDissmissablePanelBackdropClick },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

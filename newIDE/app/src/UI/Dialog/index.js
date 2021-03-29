@@ -6,6 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const styles = {
   defaultBody: {
@@ -34,6 +35,7 @@ const styles = {
 // We support a subset of the props supported by Material-UI v0.x Dialog
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
+  onApply?: () => void,
   open?: boolean,
   title?: React.Node,
   actions?: React.Node,
@@ -71,6 +73,7 @@ type DialogContentStyle = {
  */
 export default (props: Props) => {
   const {
+    onApply,
     secondaryActions,
     actions,
     open,
@@ -84,6 +87,11 @@ export default (props: Props) => {
     fullHeight,
     noTitleMargin,
   } = props;
+
+  const preferences = React.useContext(PreferencesContext);
+  const tempVarName = preferences.values.useDissmissablePanelBackdropClick;
+
+
   const dialogActions = secondaryActions ? (
     <React.Fragment>
       <div key="secondary-actions">{secondaryActions}</div>
@@ -102,8 +110,25 @@ export default (props: Props) => {
     <ResponsiveWindowMeasurer>
       {size => (
         <Dialog
+          onApply={onApply}
           open={open}
-          onClose={onRequestClose}
+          onClose={(event: object, reason: string)=>{
+           
+            if(reason === "escapeKeyDown"){
+              console.log("escapeKeyDown");
+              onRequestClose();
+            }
+
+            if(reason === "backdropClick"){
+              console.log("backdropClick");
+                if(tempVarName){
+                  onRequestClose();
+                }else{
+                  onApply();
+                }
+            }
+
+          }}
           fullWidth
           fullScreen={size === 'small'}
           className={classNames({
@@ -112,7 +137,6 @@ export default (props: Props) => {
           })}
           maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
           disableBackdropClick={false}
-          disableEscapeKeyDown={false}
         >
           {title && (
             <DialogTitle

@@ -46,6 +46,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     resetShortcutsToDefault,
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
+    setDissmissablePanelBackdropClick,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -222,6 +223,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               toggled={values.useNewInstructionEditorDialog}
               labelPosition="right"
               label={<Trans>Use the new action/condition editor</Trans>}
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) => setDissmissablePanelBackdropClick(check)}
+              toggled={values.useDissmissablePanelBackdropClick}
+              labelPosition="right"
+              label={<Trans>Use the backdrop click for cancel</Trans>}
             />
           </Line>
           <Text size="title">

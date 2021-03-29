@@ -113,12 +113,10 @@ export default (props: Props) => {
           open={open}
           onClose={(event: object, reason: string) => {
             if (reason === 'escapeKeyDown') {
-              console.log('escapeKeyDown');
               onRequestClose();
             }
 
             if (reason === 'backdropClick') {
-              console.log('backdropClick');
               if (onBackdropClickDissmissChanges || !onApply) {
                 onRequestClose();
               } else {

@@ -264,7 +264,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    useDissmissablePanelBackdropClick: true,
+    useBackdropClickDissmissChanges: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},

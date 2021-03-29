@@ -228,7 +228,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           <Line>
             <Toggle
               onToggle={(e, check) => setDissmissablePanelBackdropClick(check)}
-              toggled={values.useDissmissablePanelBackdropClick}
+              toggled={values.useBackdropClickDissmissChanges}
               labelPosition="right"
               label={<Trans>Use the backdrop click for cancel</Trans>}
             />

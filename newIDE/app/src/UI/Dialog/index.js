@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Dialog from '@material-ui/core/Dialog';
+import { Dialog as DialogMaterialUI } from '@material-ui/core';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -42,7 +42,7 @@ type Props = {|
   secondaryActions?: React.Node,
   onRequestClose?: () => void,
 
-  cannotBeDismissed?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
+  cannotBeDismissed?: boolean, //Force the user to use one of the actions in the DialogMaterialUI. If true, the dialog can't be closed by clicking outside or pressing Escape.
 
   children: React.Node, // The content of the dialog
 
@@ -89,8 +89,8 @@ export default (props: Props) => {
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
-  const tempVarName = preferences.values.useDissmissablePanelBackdropClick;
-
+  const onBackdropClickDissmissChanges =
+    preferences.values.useBackdropClickDissmissChanges;
 
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -109,25 +109,22 @@ export default (props: Props) => {
   return (
     <ResponsiveWindowMeasurer>
       {size => (
-        <Dialog
-          onApply={onApply}
+        <DialogMaterialUI
           open={open}
-          onClose={(event: object, reason: string)=>{
-           
-            if(reason === "escapeKeyDown"){
-              console.log("escapeKeyDown");
+          onClose={(event: object, reason: string) => {
+            if (reason === 'escapeKeyDown') {
+              console.log('escapeKeyDown');
               onRequestClose();
             }
 
-            if(reason === "backdropClick"){
-              console.log("backdropClick");
-                if(tempVarName){
-                  onRequestClose();
-                }else{
-                  onApply();
-                }
+            if (reason === 'backdropClick') {
+              console.log('backdropClick');
+              if (onBackdropClickDissmissChanges || !onApply) {
+                onRequestClose();
+              } else {
+                onApply();
+              }
             }
-
           }}
           fullWidth
           fullScreen={size === 'small'}
@@ -155,7 +152,7 @@ export default (props: Props) => {
           >
             {dialogActions}
           </DialogActions>
-        </Dialog>
+        </DialogMaterialUI>
       )}
     </ResponsiveWindowMeasurer>
   );

@@ -507,11 +507,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setDissmissablePanelBackdropClick(
-    useDissmissablePanelBackdropClick: boolean
+    useBackdropClickDissmissChanges: boolean
   ) {
     this.setState(
       state => ({
-        values: { ...state.values, useDissmissablePanelBackdropClick },
+        values: { ...state.values, useBackdropClickDissmissChanges },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

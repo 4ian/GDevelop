@@ -152,6 +152,10 @@ export default class EventTextDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
+        onApply={() => {
+          this._applyChangesOnEvent();
+          onApply();
+        }}
         title={<Trans>Edit the event text</Trans>}
         onRequestClose={onClose}
         cannotBeDismissed={true}

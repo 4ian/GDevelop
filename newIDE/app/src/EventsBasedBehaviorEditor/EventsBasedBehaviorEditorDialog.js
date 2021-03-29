@@ -28,6 +28,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
 
     return (
       <Dialog
+        onApply={onApply}
         noMargin
         secondaryActions={[
           <HelpButton

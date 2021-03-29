@@ -68,6 +68,13 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <Dialog
+      onApply={() => {
+        props.onApply();
+        // Do the renaming *after* applying changes, as "withSerializableObject"
+        // HOC will unserialize the object to apply modifications, which will
+        // override the name.
+        props.onRename(newObjectName);
+      }}
       key={props.object && props.object.ptr}
       secondaryActions={[
         <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,

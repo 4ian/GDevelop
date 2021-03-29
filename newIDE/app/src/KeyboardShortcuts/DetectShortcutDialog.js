@@ -42,6 +42,10 @@ const DetectShortcutDialog = (props: Props) => {
 
   return (
     <Dialog
+      onApply={() => {
+        shortcutString && props.onSet(shortcutString);
+        props.onClose();
+      }}
       open
       title={<Trans>Set shortcut</Trans>}
       onRequestClose={props.onClose}

@@ -169,6 +169,28 @@ function ProjectPropertiesDialog(props: Props) {
   return (
     <React.Fragment>
       <Dialog
+        onApply={() => {
+          if (
+            applyPropertiesToProject(project, {
+              gameResolutionWidth,
+              gameResolutionHeight,
+              adaptGameResolutionAtRuntime,
+              name,
+              author,
+              version,
+              packageName,
+              orientation,
+              scaleMode,
+              sizeOnStartupMode,
+              showGDevelopSplash,
+              minFPS,
+              maxFPS,
+              isFolderProject,
+              useDeprecatedZeroAsDefaultZOrder,
+            })
+          )
+            props.onApply();
+        }}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}

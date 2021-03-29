@@ -250,6 +250,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
+        onClick={this._onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}

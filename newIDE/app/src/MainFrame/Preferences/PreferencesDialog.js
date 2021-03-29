@@ -225,17 +225,17 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               label={<Trans>Use the new action/condition editor</Trans>}
             />
           </Line>
+          <Text size="title">
+            <Trans>Advanced</Trans>
+          </Text>
           <Line>
             <Toggle
               onToggle={(e, check) => setDissmissablePanelBackdropClick(check)}
               toggled={values.useBackdropClickDissmissChanges}
               labelPosition="right"
-              label={<Trans>Use the backdrop click for cancel</Trans>}
+              label={<Trans>Backdrop click dismiss changes</Trans>}
             />
           </Line>
-          <Text size="title">
-            <Trans>Advanced</Trans>
-          </Text>
           <Line>
             <Toggle
               onToggle={(e, check) => setAutosaveOnPreview(check)}

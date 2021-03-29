@@ -45,6 +45,7 @@ export default class SetupGridDialog extends Component {
 
     return (
       <Dialog
+        onApply={this._onApply}
         title={<Trans>Edit Grid Options</Trans>}
         actions={actions}
         cannotBeDismissed={true}

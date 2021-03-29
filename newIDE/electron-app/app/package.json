@@ -2,10 +2,10 @@
   "name": "gdevelop",
   "productName": "GDevelop 5",
   "description": "GDevelop 5 IDE - the open-source, cross-platform game engine designed for everyone",
-  "version": "5.0.0-beta107",
+  "version": "5.0.0-beta108",
   "author": "Florian Rival",
   "license": "MIT",
-  "homepage": "http://gdevelop-app.com",
+  "homepage": "https://gdevelop-app.com",
   "main": "main.js",
   "dependencies": {
     "archiver": "^2.1.1",

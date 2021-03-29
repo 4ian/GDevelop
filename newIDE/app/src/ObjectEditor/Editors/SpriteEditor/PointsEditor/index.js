@@ -1,5 +1,6 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import React from 'react';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
@@ -14,96 +15,90 @@ import {
 import SpriteSelector from '../Utils/SpriteSelector';
 import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
-const gd /*TODO: add flow in this file */ = global.gd;
+import ResourcesLoader from '../../../../ResourcesLoader';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
+const gd: libGDevelop = global.gd;
 
-export default class PointsEditor extends Component {
-  state = {
-    animationIndex: 0,
-    directionIndex: 0,
-    spriteIndex: 0,
-    samePointsForAnimations: true,
-    samePointsForSprites: true,
-  };
+type Props = {|
+  object: any, // @todo passed as gdSpriteObject but used as gdObject?
+  resourcesLoader: typeof ResourcesLoader,
+  project: gdProject,
+|};
 
-  componentDidMount() {
-    this._updateSamePointsToggles();
-  }
+const PointsEditor = (props: Props) => {
+  const [animationIndex, setAnimationIndex] = React.useState(0);
+  const [directionIndex, setDirectionIndex] = React.useState(0);
+  const [spriteIndex, setSpriteIndex] = React.useState(0);
+  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
+    true
+  );
+  const [samePointsForSprites, setSamePointsForSprites] = React.useState(true);
+  const forceUpdate = useForceUpdate();
 
-  _updatePoints = () => {
-    const { object } = this.props;
-    const { animationIndex, directionIndex, spriteIndex } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
+  const spriteObject = gd.asSpriteObject(props.object);
+  const { animation, sprite, hasValidSprite } = getCurrentElements(
+    spriteObject,
+    animationIndex,
+    directionIndex,
+    spriteIndex
+  );
 
-    const { animation, sprite } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
-
-    if (animation && sprite) {
-      if (this.state.samePointsForAnimations) {
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
-          copyAnimationsSpritePoints(sprite, otherAnimation);
-        });
-      } else if (this.state.samePointsForSprites) {
-        copyAnimationsSpritePoints(sprite, animation);
+  const updatePoints = React.useCallback(
+    () => {
+      if (animation && sprite) {
+        if (samePointsForAnimations) {
+          mapFor(0, spriteObject.getAnimationsCount(), i => {
+            const otherAnimation = spriteObject.getAnimation(i);
+            copyAnimationsSpritePoints(sprite, otherAnimation);
+          });
+        } else if (samePointsForSprites) {
+          copyAnimationsSpritePoints(sprite, animation);
+        }
       }
-    }
 
-    this.forceUpdate(); // Refresh the preview
-  };
-
-  chooseAnimation = index => {
-    this.setState(
-      {
-        animationIndex: index,
-        directionIndex: 0,
-        spriteIndex: 0,
-      },
-      () => this._updateSamePointsToggles()
-    );
-  };
-
-  chooseDirection = index => {
-    this.setState({
-      directionIndex: index,
-      spriteIndex: 0,
-    });
-  };
-
-  chooseSprite = index => {
-    this.setState({
-      spriteIndex: index,
-    });
-  };
-
-  _updateSamePointsToggles = () => {
-    const { object } = this.props;
-    const { animationIndex, directionIndex, spriteIndex } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
-
-    const { animation, sprite } = getCurrentElements(
+      forceUpdate(); // Refresh the preview
+    },
+    [
+      animation,
+      sprite,
       spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+      samePointsForAnimations,
+      samePointsForSprites,
+      forceUpdate,
+    ]
+  );
+
+  const chooseAnimation = index => {
+    setAnimationIndex(index);
+    setDirectionIndex(0);
+    setSpriteIndex(0);
+  };
+
+  const chooseDirection = index => {
+    setDirectionIndex(index);
+    setSpriteIndex(0);
+  };
+
+  const chooseSprite = index => {
+    setSpriteIndex(index);
+  };
+
+  const updateSamePointsToggles = () => {
     if (!animation || !sprite) return;
 
-    this.setState({
-      samePointsForAnimations: every(
+    setSamePointsForAnimations(
+      every(
         mapFor(0, spriteObject.getAnimationsCount(), i => {
           const otherAnimation = spriteObject.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
-      ),
-      samePointsForSprites: allSpritesHaveSamePointsAs(sprite, animation),
-    });
+      )
+    );
+
+    setSamePointsForSprites(allSpritesHaveSamePointsAs(sprite, animation));
   };
 
-  _setSamePointsForAllAnimations = enable => {
+  const setSamePointsForAllAnimations = (enable: boolean) => {
     if (enable) {
       const answer = Window.showConfirmDialog(
         "Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?"
@@ -111,18 +106,11 @@ export default class PointsEditor extends Component {
       if (!answer) return;
     }
 
-    this.setState(
-      {
-        samePointsForAnimations: enable,
-        samePointsForSprites: enable ? true : this.state.samePointsForSprites,
-      },
-      () => {
-        this._updatePoints();
-      }
-    );
+    setSamePointsForAnimations(enable);
+    setSamePointsForSprites(enable || samePointsForSprites);
   };
 
-  _setSamePointsForAllSprites = enable => {
+  const setSamePointsForAllSprites = (enable: boolean) => {
     if (enable) {
       const answer = Window.showConfirmDialog(
         "Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?"
@@ -130,93 +118,69 @@ export default class PointsEditor extends Component {
       if (!answer) return;
     }
 
-    this.setState(
-      {
-        samePointsForAnimations: enable
-          ? this.state.samePointsForAnimations
-          : false,
-        samePointsForSprites: enable,
-      },
-      () => {
-        this._updatePoints();
-      }
-    );
+    setSamePointsForAnimations(enable && samePointsForAnimations);
+    setSamePointsForSprites(enable);
   };
 
-  render() {
-    const { object, resourcesLoader, project } = this.props;
-    const {
-      samePointsForAnimations,
-      samePointsForSprites,
-      animationIndex,
-      directionIndex,
-      spriteIndex,
-    } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
+  React.useEffect(updateSamePointsToggles, [animationIndex]);
 
-    if (!object.getAnimationsCount()) return null;
-    const { hasValidSprite, sprite } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+  React.useEffect(updatePoints, [
+    samePointsForAnimations,
+    samePointsForSprites,
+  ]);
 
-    return (
-      <div>
-        <ImagePreview
-          resourceName={hasValidSprite ? sprite.getImageName() : ''}
-          resourcesLoader={resourcesLoader}
-          project={project}
-          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
-            hasValidSprite && (
-              <PointsPreview
-                imageWidth={imageWidth}
-                imageHeight={imageHeight}
-                imageZoomFactor={imageZoomFactor}
-                pointsContainer={sprite}
-                onPointsUpdated={this._updatePoints}
-              />
-            )
-          }
-        />
-        <Line>
-          <Column expand>
-            <SpriteSelector
-              spriteObject={spriteObject}
-              animationIndex={animationIndex}
-              directionIndex={directionIndex}
-              spriteIndex={spriteIndex}
-              chooseAnimation={this.chooseAnimation}
-              chooseDirection={this.chooseDirection}
-              chooseSprite={this.chooseSprite}
-              sameForAllAnimations={samePointsForAnimations}
-              sameForAllSprites={samePointsForSprites}
-              setSameForAllAnimations={this._setSamePointsForAllAnimations}
-              setSameForAllSprites={this._setSamePointsForAllSprites}
-              setSameForAllAnimationsLabel={
-                <Trans>Share same points for all animations</Trans>
-              }
-              setSameForAllSpritesLabel={
-                <Trans>
-                  Share same points for all sprites of this animation
-                </Trans>
-              }
+  if (!props.object.getAnimationsCount()) return null;
+  return (
+    <div>
+      <ImagePreview
+        resourceName={hasValidSprite ? sprite.getImageName() : ''}
+        resourcesLoader={props.resourcesLoader}
+        project={props.project}
+        renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+          hasValidSprite && (
+            <PointsPreview
+              imageWidth={imageWidth}
+              imageHeight={imageHeight}
+              imageZoomFactor={imageZoomFactor}
+              pointsContainer={sprite}
+              onPointsUpdated={updatePoints}
             />
-          </Column>
-        </Line>
-        {!!sprite && (
-          <PointsList
-            pointsContainer={sprite}
-            onPointsUpdated={this._updatePoints}
+          )
+        }
+      />
+      <Line>
+        <Column expand>
+          <SpriteSelector
+            spriteObject={spriteObject}
+            animationIndex={animationIndex}
+            directionIndex={directionIndex}
+            spriteIndex={spriteIndex}
+            chooseAnimation={chooseAnimation}
+            chooseDirection={chooseDirection}
+            chooseSprite={chooseSprite}
+            sameForAllAnimations={samePointsForAnimations}
+            sameForAllSprites={samePointsForSprites}
+            setSameForAllAnimations={setSamePointsForAllAnimations}
+            setSameForAllSprites={setSamePointsForAllSprites}
+            setSameForAllAnimationsLabel={
+              <Trans>Share same points for all animations</Trans>
+            }
+            setSameForAllSpritesLabel={
+              <Trans>Share same points for all sprites of this animation</Trans>
+            }
           />
-        )}
-        {!sprite && (
-          <EmptyMessage>
-            <Trans>Choose an animation and frame to edit the points</Trans>
-          </EmptyMessage>
-        )}
-      </div>
-    );
-  }
-}
+        </Column>
+      </Line>
+      {!!sprite && (
+        <PointsList pointsContainer={sprite} onPointsUpdated={updatePoints} />
+      )}
+      {!sprite && (
+        <EmptyMessage>
+          <Trans>Choose an animation and frame to edit the points</Trans>
+        </EmptyMessage>
+      )}
+    </div>
+  );
+};
+
+export default PointsEditor;

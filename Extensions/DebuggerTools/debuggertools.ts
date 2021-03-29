@@ -24,7 +24,7 @@ namespace gdjs {
         showPointsNames: boolean,
         showCustomPoints: boolean
       ) {
-        runtimeScene.renderDebugDraw(
+        runtimeScene.enableDebugDraw(
           enableDebugDrawRenderedObjects,
           showHiddenInstances,
           showPointsNames,

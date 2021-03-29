@@ -274,7 +274,7 @@ namespace gdjs {
 
           // Draw custom point
           if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
-            if (!object?._animationFrame?.points) continue;
+            if (!object._animationFrame) continue;
             for (let customPointName in object._animationFrame.points[
               'items'
             ]) {

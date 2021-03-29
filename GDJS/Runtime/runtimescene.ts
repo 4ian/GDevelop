@@ -43,6 +43,12 @@ namespace gdjs {
     _instancesRemoved: gdjs.RuntimeObject[] = [];
     _profiler: gdjs.Profiler | null = null;
 
+    // Debug collision shapes and points, is driven by actions.
+    _enableDebugDraw: boolean = false;
+    _showHiddenInstances: boolean = false;
+    _showPointsNames: boolean = false;
+    _showCustomPoints: boolean = false;
+
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
 
@@ -82,23 +88,16 @@ namespace gdjs {
      * Activate or deactivate the debug visualization for collisions and points.
      * @memberof gdjs.RuntimeScene
      */
-    renderDebugDraw(
+    enableDebugDraw(
       enableDebugDrawRenderedObjects: boolean,
       showHiddenInstances: boolean,
       showPointsNames: boolean,
       showCustomPoints: boolean
     ): void {
-      if (enableDebugDrawRenderedObjects && this._layersCameraCoordinates) {
-        this.getRenderer().renderDebugDraw(
-          this._allInstancesList,
-          this._layersCameraCoordinates,
-          showHiddenInstances,
-          showPointsNames,
-          showCustomPoints
-        );
-      } else {
-        this.getRenderer().clearDebugDraw();
-      }
+      this._enableDebugDraw = enableDebugDrawRenderedObjects;
+      this._showHiddenInstances = showHiddenInstances;
+      this._showPointsNames = showPointsNames;
+      this._showCustomPoints = showCustomPoints;
     }
 
     /**
@@ -526,16 +525,19 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      const renderDebugDraw = false;
-      if (renderDebugDraw && this._layersCameraCoordinates) {
+      if (this._enableDebugDraw && this._layersCameraCoordinates) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
           this._layersCameraCoordinates,
-          true,
-          true,
-          true
+          this._showHiddenInstances,
+          this._showPointsNames,
+          this._showCustomPoints
         );
+        this._enableDebugDraw = false;
+      } else {
+        this.getRenderer().clearDebugDraw();
       }
+
       this._isJustResumed = false;
       this.render();
       if (this._profiler) {

@@ -46,7 +46,7 @@ export default class ForceMultiplierField extends Component<
           <Column>
             <Text>
               <Trans>
-                The force will only push the object during the time of one
+                The velocity will only move the object during the time of one
                 frame. Typically used in an event with no conditions or with
                 conditions that stay valid for a certain amount of time.
               </Trans>
@@ -64,7 +64,7 @@ export default class ForceMultiplierField extends Component<
           <Column>
             <Text>
               <Trans>
-                The force will push the object forever, unless you use the
+                The velocity will move the object forever, unless you use the
                 action "Stop the object". Typically used in an event with
                 conditions that are only true once, or with a "Trigger Once"
                 condition.

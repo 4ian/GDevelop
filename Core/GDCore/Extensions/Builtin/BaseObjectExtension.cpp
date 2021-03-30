@@ -167,10 +167,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceXY",
-         _("Add a force"),
-         _("Add a force to an object. The object will move according to "
-           "all of the forces it has."),
-         _("Add to _PARAM0_ _PARAM3_ force of _PARAM1_ p/s on X axis and "
+         _("Add a velocity ("force")"),
+         _("Add a velocity to an object. The object will move according to "
+           "all of the velocities added to it."),
+         _("Add to _PARAM0_ _PARAM3_ velocity of _PARAM1_ p/s on X axis and "
            "_PARAM2_ p/s on Y axis"),
          _("Movement"),
          "res/actions/force24.png",
@@ -182,11 +182,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("forceMultiplier", _("Force multiplier"));
 
   obj.AddAction("AddForceAL",
-                _("Add a force (angle)"),
-                _("Add a force to an object. The object will move according to "
-                  "all of the forces it has. This action creates the force "
+                _("Add a velocity ("force") with an angle"),
+                _("Add a velocity to an object. The object will move according to "
+                  "all of the velocities added to it. This action creates the velocity "
                   "using the specified angle and length."),
-                _("Add to _PARAM0_ _PARAM3_ force, angle: _PARAM1_ degrees and "
+                _("Add to _PARAM0_ _PARAM3_ velocity, angle: _PARAM1_ degrees and "
                   "length: _PARAM2_ pixels"),
                 _("Movement"),
                 "res/actions/force24.png",
@@ -200,9 +200,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceVersPos",
-         _("Add a force to move toward a position"),
-         _("Add a force to an object to make it move toward a position."),
-         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
+         _("Add a velocity ("force") to move toward a position"),
+         _("Add a velocity to an object to make it move toward a position."),
+         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ velocity of _PARAM3_ "
            "pixels"),
          _("Movement"),
          "res/actions/force24.png",
@@ -238,8 +238,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Arreter",
                 _("Stop the object"),
-                _("Stop the object by deleting all of its forces."),
-                _("Stop _PARAM0_ (remove all forces)"),
+                _("Stop the object by deleting all of its velocities."),
+                _("Stop _PARAM0_ (remove all velocities)"),
                 _("Movement"),
                 "res/actions/arreter24.png",
                 "res/actions/arreter.png")
@@ -634,8 +634,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceVers",
-         _("Add a force to move toward an object"),
-         _("Add a force to an object to make it move toward another."),
+         _("Add a velocity ("force") to move toward an object"),
+         _("Add a velocity to an object to make it move toward another."),
          _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
          _("Movement"),
          "res/actions/forceVers24.png",
@@ -649,8 +649,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceTourne",
-         _("Add a force to move around an object"),
-         _("Add a force to an object to make it rotate around another.\nNote "
+         _("Add a velocity ("force") to move around an object"),
+         _("Add a velocity to an object to make it rotate around another.\nNote "
            "that the movement is not precise, especially if the speed is "
            "high.\nTo position an object around a position more precisely, use "
            "the actions in category \"Position\"."),
@@ -847,33 +847,65 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/direction.png")
       .AddParameter("object", _("Object"));
 
-  obj.AddExpression("ForceX",
-                    _("Average X coordinates of forces"),
-                    _("Average X coordinates of forces"),
+  obj.AddExpression("VelocityX",
+                    _("X coordinate of the velocities sum"),
+                    _("X coordinate of the velocities sum"),
                     _("Movement"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
+
+  obj.AddExpression("VelocityY",
+                    _("Y coordinate of the velocities sum"),
+                    _("Y coordinate of the velocities sum"),
+                    _("Movement"),
+                    "res/actions/force.png")
+      .AddParameter("object", _("Object"));
+
+  obj.AddExpression("VelocityAngle",
+                    _("Angle of the velocities sum"),
+                    _("Angle of the velocities sum"),
+                    _("Movement"),
+                    "res/actions/force.png")
+      .AddParameter("object", _("Object"));
+
+  obj.AddExpression("VelocityLength",
+                    _("Length of the velocities sum"),
+                    _("Length of the velocities sum"),
+                    _("Movement"),
+                    "res/actions/force.png")
+      .AddParameter("object", _("Object"));
+
+  obj.AddExpression("ForceX",
+                    _("X coordinate of the velocities sum"),
+                    _("X coordinate of the velocities sum"),
+                    _("Movement"),
+                    "res/actions/force.png")
+      .AddParameter("object", _("Object"))
+      .SetHidden();
 
   obj.AddExpression("ForceY",
-                    _("Average Y coordinates of forces"),
-                    _("Average Y coordinates of forces"),
+                    _("Y coordinate of the velocities sum"),
+                    _("Y coordinate of the velocities sum"),
                     _("Movement"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHidden();
 
   obj.AddExpression("ForceAngle",
-                    _("Average angle of the forces"),
-                    _("Average angle of the forces"),
+                    _("Angle of the velocities sum"),
+                    _("Angle of the velocities sum"),
                     _("Movement"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHidden();
 
   obj.AddExpression("ForceLength",
-                    _("Average length of the forces"),
-                    _("Average length of the forces"),
+                    _("Length of the velocities sum"),
+                    _("Length of the velocities sum"),
                     _("Movement"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHidden();
 
   obj.AddExpression("Longueur",
                     _("Average length of the forces"),

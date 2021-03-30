@@ -25,12 +25,6 @@ type Props = {|
   onApply: () => void,
 |};
 
-type State = {|
-  textValue: string,
-  textColor: RGBColor,
-  backgroundColor: RGBColor,
-|};
-
 const white: RGBColor = {
   r: 255,
   g: 255,
@@ -54,184 +48,174 @@ export const filterEditableWithEventTextDialog = (
   );
 };
 
-export default class EventTextDialog extends React.Component<Props, State> {
-  _applyChangesOnEvent = () => {
-    const { event } = this.props;
-    const { textValue, textColor, backgroundColor } = this.state;
-    const eventType = event.getType();
+const EventTextDialog = (props: Props) => {
+  const { event, onApply, onClose } = props;
 
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      //Text value
-      gd.asCommentEvent(event).setComment(textValue);
+  const [textValue, setTextValue] = React.useState<string>('');
+  const [textColor, setTextColor] = React.useState<RGBColor>(black);
+  const [backgroundColor, setBackgroundColor] = React.useState<RGBColor>(black);
 
-      //Text color
-      gd.asCommentEvent(event).setTextColor(
-        textColor.r,
-        textColor.g,
-        textColor.b
-      );
-      //Background color
-      gd.asCommentEvent(event).setBackgroundColor(
-        backgroundColor.r,
-        backgroundColor.g,
-        backgroundColor.b
-      );
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      //Text value
-      gd.asGroupEvent(event).setName(textValue);
+  const eventType = event.getType(); // OK
 
-      //Text color for group not supported in Core, instead GroupEvent.js handle this
-      //Background color
-      gd.asGroupEvent(event).setBackgroundColor(
-        backgroundColor.r,
-        backgroundColor.g,
-        backgroundColor.b
-      );
+  React.useEffect(
+    () => {
+      if (eventType === 'BuiltinCommonInstructions::Comment') {
+        const commentEvent = gd.asCommentEvent(event);
+
+        // Les couleurs provenant normalement de l'event ne sont pas bonne.
+        setTextColor({
+          r: commentEvent.getTextColorRed(),
+          g: commentEvent.getTextColorGreen(),
+          b: commentEvent.getTextColorBlue(),
+        });
+
+        // Les couleurs provenant normalement de l'event ne sont pas bonne.
+        setBackgroundColor({
+          r: commentEvent.getBackgroundColorRed(),
+          g: commentEvent.getBackgroundColorGreen(),
+          b: commentEvent.getBackgroundColorBlue(),
+        });
+
+        // Le texte provenant normalement de l'event n'est pas bon.
+        setTextValue(gd.asCommentEvent(event).getComment());
+      } else if (eventType === 'BuiltinCommonInstructions::Group') {
+        var groupEvent = gd.asGroupEvent(event);
+        const r = groupEvent.getBackgroundColorR(),
+          g = groupEvent.getBackgroundColorG(),
+          b = groupEvent.getBackgroundColorB();
+
+        // Text color is automatically chosen for groups.
+        setTextColor(() => {
+          return (r + g + b) / 3 > 200 ? black : white;
+        });
+
+        setBackgroundColor({
+          r: groupEvent.getBackgroundColorR(),
+          g: groupEvent.getBackgroundColorG(),
+          b: groupEvent.getBackgroundColorB(),
+        });
+
+        setTextValue(gd.asGroupEvent(event).getName());
+      } else {
+        console.error(
+          'Dialog was opened for an unsupported event type: ' + eventType
+        );
+      }
+    },
+    [event, eventType]
+  );
+
+  const _onApply = React.useCallback(
+    () => {
+      if (eventType === 'BuiltinCommonInstructions::Comment') {
+        //Text value
+        gd.asCommentEvent(event).setComment(textValue);
+
+        //Text color
+        gd.asCommentEvent(event).setTextColor(
+          textColor.r,
+          textColor.g,
+          textColor.b
+        );
+        //Background color
+        gd.asCommentEvent(event).setBackgroundColor(
+          backgroundColor.r,
+          backgroundColor.g,
+          backgroundColor.b
+        );
+      } else if (eventType === 'BuiltinCommonInstructions::Group') {
+        //Text value
+        gd.asGroupEvent(event).setName(textValue);
+
+        //Text color for group not supported in Core, instead GroupEvent.js handle this
+        //Background color
+        gd.asGroupEvent(event).setBackgroundColor(
+          backgroundColor.r,
+          backgroundColor.g,
+          backgroundColor.b
+        );
+      }
+      onApply();
       return;
-    }
-  };
+    },
+    [event, eventType, onApply, textValue, textColor, backgroundColor]
+  );
 
-  _getInitialStateFromEvent = (): State => {
-    const { event } = this.props;
-    const eventType = event.getType();
-
-    let textValue: string = '';
-    let textColor = black;
-    let backgroundColor = black;
-
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      const commentEvent = gd.asCommentEvent(event);
-      textColor = {
-        r: commentEvent.getTextColorRed(),
-        g: commentEvent.getTextColorGreen(),
-        b: commentEvent.getTextColorBlue(),
-      };
-
-      backgroundColor = {
-        r: commentEvent.getBackgroundColorRed(),
-        g: commentEvent.getBackgroundColorGreen(),
-        b: commentEvent.getBackgroundColorBlue(),
-      };
-
-      textValue = gd.asCommentEvent(event).getComment();
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      var groupEvent = gd.asGroupEvent(event);
-      const r = groupEvent.getBackgroundColorR(),
-        g = groupEvent.getBackgroundColorG(),
-        b = groupEvent.getBackgroundColorB();
-
-      // Text color is automatically chosen for groups.
-      textColor = (r + g + b) / 3 > 200 ? black : white;
-
-      backgroundColor = {
-        r: groupEvent.getBackgroundColorR(),
-        g: groupEvent.getBackgroundColorG(),
-        b: groupEvent.getBackgroundColorB(),
-      };
-
-      textValue = gd.asGroupEvent(event).getName();
-    } else {
-      console.error(
-        'Dialog was opened for an unsupported event type: ' + eventType
-      );
-    }
-
-    return {
-      textValue,
-      textColor,
-      backgroundColor,
-    };
-  };
-
-  state = this._getInitialStateFromEvent();
-
-  render() {
-    const { event, onApply, onClose } = this.props;
-    const { textValue, textColor, backgroundColor } = this.state;
-    const eventType = event.getType();
-
-    return (
-      <Dialog
-        onApply={() => {
-          this._applyChangesOnEvent();
-          onApply();
-        }}
-        title={<Trans>Edit the event text</Trans>}
-        onRequestClose={onClose}
-        cannotBeDismissed={true}
-        open
-        noMargin
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Cancel</Trans>}
-            primary={false}
-            onClick={onClose}
-          />,
-          <FlatButton
-            key={'Apply'}
-            label={<Trans>Apply</Trans>}
-            primary
-            keyboardFocused
-            onClick={() => {
-              this._applyChangesOnEvent();
-              onApply();
+  return (
+    <Dialog
+      onApply={_onApply}
+      title={<Trans>Edit the event text</Trans>}
+      onRequestClose={onClose}
+      cannotBeDismissed={true}
+      open
+      noMargin
+      actions={[
+        <FlatButton
+          key="close"
+          label={<Trans>Cancel</Trans>}
+          primary={false}
+          onClick={onClose}
+        />,
+        <FlatButton
+          key={'Apply'}
+          label={<Trans>Apply</Trans>}
+          primary
+          keyboardFocused
+          onClick={_onApply}
+        />,
+      ]}
+    >
+      <Column noMargin>
+        <MiniToolbar>
+          <MiniToolbarText>
+            <Trans>Background color:</Trans>
+          </MiniToolbarText>
+          <ColorPicker
+            style={styles.sizeTextField}
+            disableAlpha
+            color={backgroundColor}
+            onChangeComplete={color => {
+              setBackgroundColor(color.rgb);
             }}
-          />,
-        ]}
-      >
-        <Column noMargin>
-          <MiniToolbar>
-            <MiniToolbarText>
-              <Trans>Background color:</Trans>
-            </MiniToolbarText>
-            <ColorPicker
-              style={styles.sizeTextField}
-              disableAlpha
-              color={backgroundColor}
-              onChangeComplete={color => {
-                this.setState({ backgroundColor: color.rgb });
-              }}
-            />
+          />
 
-            {eventType === 'BuiltinCommonInstructions::Comment' && (
-              <React.Fragment>
-                <MiniToolbarText>
-                  <Trans>Text color:</Trans>
-                </MiniToolbarText>
-                <ColorPicker
-                  style={styles.sizeTextField}
-                  disableAlpha
-                  color={textColor}
-                  onChangeComplete={color => {
-                    this.setState({ textColor: color.rgb });
-                  }}
-                />
-              </React.Fragment>
-            )}
-          </MiniToolbar>
-          <Line noMargin>
-            <Column expand>
-              <Line>
-                <SemiControlledTextField
-                  commitOnBlur
-                  hintText={t`Enter the text to be displayed`}
-                  fullWidth
-                  multiline
-                  rows={8}
-                  rowsMax={30}
-                  value={textValue}
-                  onChange={value => {
-                    this.setState({
-                      textValue: value,
-                    });
-                  }}
-                />
-              </Line>
-            </Column>
-          </Line>
-        </Column>
-      </Dialog>
-    );
-  }
-}
+          {eventType === 'BuiltinCommonInstructions::Comment' && (
+            <React.Fragment>
+              <MiniToolbarText>
+                <Trans>Text color:</Trans>
+              </MiniToolbarText>
+              <ColorPicker
+                style={styles.sizeTextField}
+                disableAlpha
+                color={textColor}
+                onChangeComplete={color => {
+                  setTextColor(color.rgb);
+                }}
+              />
+            </React.Fragment>
+          )}
+        </MiniToolbar>
+        <Line noMargin>
+          <Column expand>
+            <Line>
+              <SemiControlledTextField
+                commitOnBlur
+                hintText={t`Enter the text to be displayed`}
+                fullWidth
+                multiline
+                rows={8}
+                rowsMax={30}
+                value={textValue}
+                onChange={value => {
+                  setTextValue(value);
+                }}
+              />
+            </Line>
+          </Column>
+        </Line>
+      </Column>
+    </Dialog>
+  );
+};
+
+export default EventTextDialog;

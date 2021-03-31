@@ -24,6 +24,11 @@ const DetectShortcutDialog = (props: Props) => {
   const [shortcutString, setShortcutString] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
 
+  const _onApply = () => {
+    shortcutString && props.onSet(shortcutString);
+    props.onClose();
+  };
+
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -42,10 +47,7 @@ const DetectShortcutDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={() => {
-        shortcutString && props.onSet(shortcutString);
-        props.onClose();
-      }}
+      onApply={_onApply}
       open
       title={<Trans>Set shortcut</Trans>}
       onRequestClose={props.onClose}
@@ -61,10 +63,7 @@ const DetectShortcutDialog = (props: Props) => {
           label={<Trans>Set shortcut</Trans>}
           primary
           key="Set"
-          onClick={() => {
-            shortcutString && props.onSet(shortcutString);
-            props.onClose();
-          }}
+          onClick={_onApply}
           disabled={!isValid}
         />,
       ]}

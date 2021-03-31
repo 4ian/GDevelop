@@ -86,7 +86,7 @@ export default class CollisionMasksPreview extends React.Component<
         fill="rgba(255,0,0,0.2)"
         stroke="rgba(255,0,0,0.5)"
         strokeWidth={1}
-        fileRule="evenodd"
+        fillRule="evenodd"
         points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
           imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
           imageZoomFactor}`}
@@ -107,7 +107,7 @@ export default class CollisionMasksPreview extends React.Component<
               fill="rgba(255,0,0,0.2)"
               stroke="rgba(255,0,0,0.5)"
               strokeWidth={1}
-              fileRule="evenodd"
+              fillRule="evenodd"
               points={mapVector(
                 vertices,
                 (vertex, j) =>

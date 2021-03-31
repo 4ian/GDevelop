@@ -66,15 +66,17 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   const EditorComponent = props.editorComponent;
 
+  const _onApply = () => {
+    props.onApply();
+    // Do the renaming *after* applying changes, as "withSerializableObject"
+    // HOC will unserialize the object to apply modifications, which will
+    // override the name.
+    props.onRename(newObjectName);
+  };
+
   return (
     <Dialog
-      onApply={() => {
-        props.onApply();
-        // Do the renaming *after* applying changes, as "withSerializableObject"
-        // HOC will unserialize the object to apply modifications, which will
-        // override the name.
-        props.onRename(newObjectName);
-      }}
+      onApply={_onApply}
       key={props.object && props.object.ptr}
       secondaryActions={[
         <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
@@ -94,13 +96,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           label={<Trans>Apply</Trans>}
           primary
           keyboardFocused
-          onClick={() => {
-            props.onApply();
-            // Do the renaming *after* applying changes, as "withSerializableObject"
-            // HOC will unserialize the object to apply modifications, which will
-            // override the name.
-            props.onRename(newObjectName);
-          }}
+          onClick={_onApply}
         />,
       ]}
       noMargin
